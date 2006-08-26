@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>ejava-javaee</artifactId>
+    <groupId>ejava.javaee</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ejava.javaee.dao</groupId>
+  <artifactId>daoJDBC</artifactId>
+  <name>JDBC DAO Example</name>
+  <description>
+    This project provides an basic example of using JDBC and SQL to map a 
+    flat POJO to a database.
+  </description>
+  <version>1.0-SNAPSHOT</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>        
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.13</version>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.4</version>
+      <scope>test</scope>            
+    </dependency>       
+    
+  </dependencies>
+
+  <build>
+    <plugins>
+          <!-- make sure we are building java5 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>      
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sql-maven-plugin</artifactId>        
+        
+        <dependencies>
+          <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>1.8.0.4</version>            
+          </dependency>
+        </dependencies>
+          
+        <configuration>
+          <username>sa</username>
+          <password></password>
+          <driver>org.hsqldb.jdbcDriver</driver>
+          <url>jdbc:hsqldb:hsql://localhost:9001</url>          
+        </configuration>
+        
+        <executions>
+          <execution>
+            <id>drop-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>    
+            <configuration>              
+              <autocommit>true</autocommit>
+              <fileset>
+                <basedir>${basedir}/src/main/resources/ddl</basedir>
+                <includes>
+                  <include>**/*drop*.ddl</include>                  
+                </includes>
+              </fileset>
+              <!-- the tables may not exist when tests are run -->
+              <onError>continue</onError>
+            </configuration>        
+          </execution>
+          
+          <execution>
+            <id>create-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>    
+            <configuration>              
+              <autocommit>true</autocommit>
+              <fileset>
+                <basedir>${basedir}/src/main/resources/ddl</basedir>
+                <includes>
+                  <include>**/*create*.ddl</include>                  
+                </includes>
+              </fileset>
+              <print>true</print>
+            </configuration>        
+          </execution>
+
+          <execution>
+            <id>populate-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>    
+            <configuration>              
+              <autocommit>true</autocommit>
+              <fileset>
+                <basedir>${basedir}/src/main/resources/ddl</basedir>
+                <includes>
+                  <include>**/*populate*.ddl</include>                  
+                </includes>
+              </fileset>
+            </configuration>        
+          </execution>
+          
+          <!--
+          <execution>
+            <id>drop-db-after-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>    
+            <configuration>              
+              <autocommit>true</autocommit>
+              <fileset>
+              <basedir>${basedir}/src/main/resources/ddl</basedir>
+              <includes>
+                  <include>**/*drop*.ddl</include>                  
+                </includes>
+              </fileset>
+            </configuration>        
+          </execution>
+          -->
+          
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>jdbc.driver</name>
+              <value>${jdbc.driver}</value>
+            </property>
+            <property>
+              <name>jdbc.url</name>
+              <value>${jdbc.url}</value>          
+            </property>
+            <property>
+              <name>jdbc.user</name>
+              <value>${jdbc.user}</value>          
+            </property>
+            <property>
+              <name>jdbc.password</name>
+              <value>${jdbc.password}</value>          
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>      
+      
+    </plugins>
+  </build>
+  
+  <!--
+  <pluginRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+  -->
+</project>
