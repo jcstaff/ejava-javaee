@@ -1,0 +1,84 @@
+Projects
+
+* Project 1: Data Access Tier 
+
+    The data access tier used in follow-on projects is built
+during project 1.  All database schema, mapping, and direct access
+methods will be provided by this tier. Follow-on tiers will augment this
+tier with business logic, presentation, transaction, and security logic.
+There is no separate application server used in project 1. All code is
+executes within a single JVM and database.
+
+    * Specific Goals
+
+        * Develop and test a Java application
+
+        * Develop and test a set of POJOs
+
+        * Design a relational database schema
+
+        * Develop and test a DAO using JDBC and SQL
+
+        * Develop and test a DAO using EJB3 Entities
+
+        * Ingest test data into database using JDBC DAO
+
+        * Manipulate data in database using EJB3 Entity DAO
+
+* Project 2: N-Tier Application
+
+    Project 2 wraps the data access tier from project 1 within a set of
+business logic and deploys this within separate applications; Web-centric
+and N-Tier applications.  A Web-centric application provides an example
+of how JavaEE can be used without within the Servlet container and not
+introducing an EJB container. The N-Tier application provides an example
+of how to provide remote access, security, and integrated transaction
+management to the business logic using the EJB container. An application
+server is used to host the Web and EJB tiers. A stand-alone client is
+developed to be an RMI client of the EJB tier.
+
+    * Goals
+        * Develop and test business logic that uses the data access tier
+
+        * Deploy business logic within a Web application
+
+        * Deploy business logic within an EJB application using Session Beans
+
+        * Integrate application with JTA
+
+        * Protect business logic using EJB security
+
+        * Access EJB business logic using RMI
+
+* Project 3: Asynchronous Application
+
+    Project 3 adds publish/subscribe topics, request/reply queues, and
+timers to the application to better handle long running use cases. An
+application server is used to host the application logic and JMS
+components. A stand-alone client is also developed to interface with the
+appication through JMS messages.
+
+    * Goals
+
+        * Design asynchronous interfaces to long-running activities
+
+        * Design JMS messages 
+
+        * Develop and test EJB and stand-alone JMS clients
+
+        * Develop and test EJB Timers
+
+* General Requirements
+
+    * Projects must build using {{{http://maven.apache.org/}Maven 2}}. 
+    {{{http://ant.apache.org/}Ant}} may also be used as an alternative.
+
+    * All projects must be portable to build and deploy within grader and
+    intructor environments.
+
+    * Test Cases must be written using JUnit
+
+    * Projects must be supplied with a README that points out how project
+    meets requirements.
+
+* Submission Guidelines

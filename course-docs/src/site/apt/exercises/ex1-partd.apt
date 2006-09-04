@@ -1,0 +1,631 @@
+Exercise 1: First Simple Application
+
+* {Part D}: Automate project development with Maven
+
+** Objectives
+
+    * Demonstrate the basics of automating the manual steps in part A using
+    the Maven 2 build system. 
+
+
+    [Note:] Using Maven requires only an initial download and installation.
+    Plugins and dependencies will be downloaded from remote repositories
+    as needed.  Connectivity to the internet is required until all
+    dependencies have been satisfied.
+    
+    [Note:] If you do not have Maven installed on your system, it can be 
+    from {{http://maven.apache.org//}}
+
+    [Note:] The people involved with Maven 2 have done a tremendous job at 
+    documenting the system and how to get started. If you have not done so,
+    you should become familiar with the fact that the following exists:
+
+        * {{{http://maven.apache.org/guides/getting-started/index.html}
+        Maven Getting Started}} - This exercise actually mirrors most of
+        the concepts expressed in that paper. I will refer to the Maven
+        site to provide a complete description of each topic. However, this
+        exercise tweeks their example some to put it into context with the 
+        preceding and follow-on steps (e.g., how to get Ant and Maven 
+        environments to be consistent). Feel free to do their exercise 
+        and only scan over this one if you want.
+
+        * {{{http://maven.apache.org/guides/index.html}Getting Started
+        Guides}} - this is a collection of short papers on getting started
+        using a particular feature.
+
+        * {{{http://maven.apache.org/plugins/index.html}Plugins}} -
+        this provides a starting point to locating core plugin
+        documentation.
+
+        * {{{http://maven.apache.org/general.html}Maven FAQ}} contains
+        Maven's official FAQ. 
+        {{{http://docs.codehaus.org/display/MAVENUSER/FAQs-1}
+        Contributed FAQ}} contains a user-maintained FAQ.
+
+        * {{{http://maven.apache.org/where-is-it.html}
+        Links to Assorted Resources}} - this includes a seach engine for
+        the 
+        {{{http://www.nabble.com/Maven---Users-f178.html}
+        Maven User}} and Developer Groups as well as configuration
+        file references.
+
+        * {{{http://maven.apache.org/articles.html}Books and Articles}}
+        This has a huge collection of information; which is why you won't 
+        find me re-documenting Maven 2 here.
+
+    [Note:] Maven will automatically go out and download any
+    missing dependencies and recursively download what they depend
+    upon. If you are running Maven for the first time, this could
+    result in a significant amount of downloading and commonly
+    subject to connection failures when repositories are remote or
+    busy. Don't worry. As annoying as it is, just execute the build
+    again (and again) until all dependences have been successfully
+    resolved. If you consistently get connection timeouts with
+    no success, register some mirror repositories as described in
+    {{{http://maven.apache.org/guides/mini/guide-mirror-settings.html}
+    Using Mirrors for Repositories}}
+
+
+** Steps
+
+    [[1]] Create a pom.xml file in PROJECT_BASEDIR. This will be used to 
+    define your entire project. Refer to the
+    {{http://maven.apache.org/ref/current/maven-model/maven.html}}
+    Maven POM Reference} for details about each element. 
+
+        * modelVersion - yes; its required
+
+        * groupId - earlier in the exercise, we found junit.jar in a junit
+        directory on ibiblio. That is one area where the groupId comes in.
+
+        * version - Maven has a whole versioning system and versions 
+        appended with the word SNAPSHOT are handled differently. This is 
+        applied to a project in progress prior to release.
+
+        * dependency.scope - not that we only need junit and log4j during
+        testing; not compilation or deployment.
+
+        * maven-compiler-plugin - this declaration is not necessary
+        for this exercise, but like our Ant script, specify the Java
+        version to make sure we get what we need.
+
+        []
+
+---
+<?xml version="1.0"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.myproject</groupId>
+    <artifactId>ex1</artifactId>
+
+    <name>My First Simple Project</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+---
+---
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./src/test/resources/log4j.xml
+./build.properties
+./build.xml
+./pom.xml
+---
+
+    [[1]] Note that the pom.xml file is not required to have an assigned schema.
+    However, adding one does allow for XML editing tools to better assist 
+    in creating a more detailed POM. Replace the project element from 
+    above with the following declarations to assign an XML schema.
+
+---
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+---
+
+
+    [[1]] Run the package target and watch the project compile, assemble,
+    and test. 
+
+---
+> mvn package
+[INFO] Scanning for projects...
+[INFO]
+ ----------------------------------------------------------------------------
+[INFO] Building My First Maven Project
+[INFO]    task-segment: [package]
+[INFO]
+ ----------------------------------------------------------------------------
+[INFO] [resources:resources]
+[INFO] Using default encoding to copy filtered resources.
+[INFO] [compiler:compile]
+Compiling 1 source file to
+/home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
+[INFO] [resources:testResources]
+[INFO] Using default encoding to copy filtered resources.
+[INFO] [compiler:testCompile]
+Compiling 1 source file to
+/home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+[INFO] [surefire:test]
+[INFO] Surefire report directory:
+/home/jcstaff/proj/ejava-javaee/solutions/ex1/target/surefire-reports
+
+ -------------------------------------------------------
+ T E S T S
+ -------------------------------------------------------
+ Running myorg.mypackage.ex1.AppTest
+ INFO  01-09 16:42:09,648 (AppTest.java:testApp:26)  -testApp
+ DEBUG 01-09 16:42:09,660 (App.java:returnOne:11)  -Here's One!
+ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 sec
+
+ Results :
+ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+ [INFO] [jar:jar]
+ [INFO] Building jar:
+ /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1-1.0-SNAPSHOT.jar
+ [INFO]
+ ------------------------------------------------------------------------
+ [INFO] BUILD SUCCESSFUL
+ [INFO]
+ ------------------------------------------------------------------------
+ [INFO] Total time: 3 seconds
+ [INFO] Finished at: Fri Sep 01 16:42:09 EDT 2006
+ [INFO] Final Memory: 4M/11M
+ [INFO]
+ ------------------------------------------------------------------------
+---
+
+---
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./src/test/resources/log4j.xml
+./build.properties
+./build.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/test-classes/log4j.xml
+./target/test-classes/myorg/mypackage/ex1/AppTest.class
+./target/log4j-out.txt
+./target/surefire-reports/myorg.mypackage.ex1.AppTest.txt
+./target/surefire-reports/TEST-myorg.mypackage.ex1.AppTest.xml
+./target/exported-pom.xml
+./target/ex1-1.0-SNAPSHOT.jar
+./pom.xml
+---
+
+        [Note:] src/main/java classes were built in the target/classes
+            directory, src/test/java classes where built in the
+            target/test-classes directory, and src/test/resources
+            where copied to the target/test-classes directory by the
+            maven-compiler-plugin with no configuration help.  All Maven
+            defaults were take (except for specifying J2SE 5).
+
+        [Note:] Test cases were run and their reports were placed in
+            target/surefire-reports. Surefire is a Maven plugin that
+            supports multiple test frameworks, but defaults to JUnit. We
+            didn't have to configure it because we structured our project
+            using Maven directory structure.
+
+        [Note:] The build.xml and build.properties file from our work with
+            Ant is still allowed to exist. We could even delegate from
+            Maven to Ant using the maven-antrun-plugin if we had legacy
+            build.xml scripts that we wanted to leverage.
+
+    [[1]]  For fun, lets add a README that could be used to describe
+    your project when it is turned in. Maven supports a couple of 
+    documentation generation languages, but lets just use HTML
+    to keep this simple. Place the following content to
+    src/site/resources/README.html
+
+---
+<?xml version="1.0"?>
+<html>
+    <head>
+        <title>My First Project</title>
+    </head>
+<body>
+    <section><h1>My First Project</h1></section>
+
+    <p/>
+    This is my first project. Take a look at 
+
+    <p/>
+    <ul>
+        <li>this ....</li>
+        <li>that ....</li>
+        <li>or <a href="./index.html">go home</a></li>
+    </ul>
+
+    </section>
+</body>
+</html>
+---
+
+    [[1]] The above is enough to provide the page. Now add a link to it
+    from the project menu. Add the following content to src/site/site.xml
+
+---
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="${project.name}">
+  <body>
+    <menu name="Content">
+        <item name="README" href="README.html"/>
+    </menu>
+  </body>
+</project>
+---
+---
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./src/test/resources/log4j.xml
+./src/site/resources/README.html
+./src/site/site.xml
+./build.properties
+./build.xml
+./pom.xml
+---
+
+    [[1]] Build the site and open target/site/index.html in your browser.
+    You should see a link to the README on the left side.
+
+---
+> mvn site
+[INFO] Scanning for projects...
+[INFO]
+...
+---
+---
+> find ./target -type f
+./target/site/integration.html
+./target/site/dependencies.html
+./target/site/issue-tracking.html
+./target/site/license.html
+./target/site/mail-lists.html
+./target/site/index.html
+./target/site/project-summary.html
+./target/site/source-repository.html
+./target/site/team-list.html
+./target/site/project-info.html
+./target/site/css/maven-theme.css
+./target/site/css/maven-base.css
+./target/site/css/print.css
+./target/site/images/external.png
+./target/site/README.html
+---
+
+    [[1]] Okay, that was a lot of work to just copy an html file. Now lets
+    add javadoc to our project and create a link to it. Add the following 
+    contents to the bottom of the pom.xml file.
+
+---
+    <reporting>
+        <plugins>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <configuration>
+                    <links>
+                        <link>http://java.sun.com/javaee/5/docs/api</link>
+                        <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                    </links>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+---
+
+    [[1]] We could create a link the the apidocs/index.html like we did with
+    README.html, but that would be something we'd keep having to update each
+    time we added a new report. Lets add a property to the site.xml menu 
+    so a link to Javadoc and other reports can drop in automatically.
+
+---
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="${project.name}">
+  <body>
+    <menu name="Content">
+        <item name="README" href="README.html"/>
+    </menu>
+    <menu ref="reports"/>
+  </body>
+</project>
+---
+
+    [[1]] Re-generate the site documentation with the site target. Open 
+    the target/site/index.html page and you should now see a menu item for
+    "Project Reports" -> "JavaDocs". Our App class should be included in 
+    the Javadoc.
+
+        [Note:] The pom.xml file is the main configuration source
+        form 99% of what you develop with Maven. There is an
+        additional $HOME/.m2/settings.xml file where you can
+        specify build site-specific properties.  These will be
+        available to all pom.xml files. You want to be careful
+        not to over-populate this file (taking advantage of its
+        re-usable specification) since it will make you pom.xml
+        files too dependent on a particulate build site. Refer to
+        the {{{http://maven.apache.org/maven-settings/settings.html}
+        Settings Descriptor}} for detailed information on settings.xml.
+
+    [[1]] Let's start a settings.xml file to store properties that 
+    are specific to out build site. We'll start out with some core mirror 
+    properties described in
+    {{{http://maven.apache.org/guides/mini/guide-mirror-settings.html}
+    Mirror Settings}}.  Add the following contents to your
+    $HOME/.m2/settings.xml. This will keep you from hitting the same
+    ibiblio.org server each time you go to retrieve a dependency.
+
+---
+<settings>
+
+  <mirrors>
+    <mirror>
+      <id>ibiblio.net</id>
+      <url>http://www.ibiblio.net/pub/packages/maven2</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- United States, North Carolina -->
+    </mirror>
+    <mirror>
+      <id>lsu.edu</id>
+      <url>http://ibiblio.lsu.edu/main/pub/packages/maven2</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- United States, Louisiana -->
+     </mirror>
+  </mirrors>
+
+</settings>
+---
+
+        [Note:] At times you will need access to a dependency that is not 
+        available in a Maven repository. COTS libraries are generally not
+        available at ibiblio.org and even Sun's Java EE 5 API is not 
+        available from a Maven repository. You must download it 
+        and manually install it locally.
+
+    [[1]] This step will go though 
+    importing a stand-alone archive into the repository to resolve
+    any dependencies. Start by declaring a dependency before we do the 
+    import. Note that a new scope property was added. See the
+    {{{http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html}
+    Dependency Mechanism Intro Page}} for a discussion of scope, but in this
+    case it is indicating that it should only be present on the command
+    line and not the runtime classpath.
+
+---
+        <dependency>
+            <groupId>javax.javaee</groupId>
+            <artifactId>javaee</artifactId>
+            <version>5</version>
+            <scope>provided</scope>
+        </dependency>
+---
+---
+> mvn package
+...
+Downloading: http://www.ibiblio.org/maven2/javax/javaee/javaee/5/javaee-5.pom
+[WARNING] Unable to get resource from repository central (http://repo1.maven.org/maven2)
+Downloading: http://www.ibiblio.org/maven2/javax/javaee/javaee/5/javaee-5.jar
+[WARNING] Unable to get resource from repository central (http://repo1.maven.org/maven2)
+[INFO] ------------------------------------------------------------------------
+[ERROR] BUILD ERROR
+[INFO] ------------------------------------------------------------------------
+[INFO] Failed to resolve artifact.
+
+Missing:
+ ----------
+1) javax.javaee:javaee:jar:5
+
+  Try downloading the file manually from the project website.
+
+  Then, install it using the command:
+      mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
+          -Dversion=5 -Dpackaging=jar -Dfile=/path/to/file
+
+  Path to dependency:
+        1) myorg.myproject:ex1:jar:1.0-SNAPSHOT
+        2) javax.javaee:javaee:jar:5
+
+ ----------
+1 required artifact is missing.
+
+for artifact:
+  myorg.myproject:ex1:jar:1.0-SNAPSHOT
+
+from the specified remote repositories:
+  central (http://repo1.maven.org/maven2)
+---
+
+    [[1]] Okay; that was a pretty good error message.  If you haven't
+    already done so, manually download the Java EE 5 API from 
+    {{{http://java.sun.com/javaee/downloads/index.jsp}
+    Sun's Java EE SDK Page}}
+
+    [[1]] Manually install the downloaded lib/javaee.jar. Assign it a 
+    groupId of javax.javaee and an artifactId of javaee. Don't forget to 
+    add the -DgeneratePom=true or you will get a download warning 
+    everytime you try to build.
+
+---
+> mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
+-Dversion=5 -Dpackaging=jar -Dfile=/apps/linux/SUNWappserver/lib/javaee.jar \
+-DgeneratePom=true
+...
+
+[INFO] [install:install-file]
+[INFO] Installing /apps/linux/SUNWappserver/lib/javaee.jar to /home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+---
+---
+> find /home/jcstaff/.m2/repository/javax/javaee/javaee/5/ -type f
+/home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.jar
+/home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.pom
+
+
+//generated .m2/repository/javax/javaee/javaee/5/javaee-5.pom
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>javax.javaee</groupId>
+  <artifactId>javaee</artifactId>
+  <version>5</version>
+  <description>POM was created from install:install-file</description>
+  <distributionManagement>
+    <status>deployed</status>
+  </distributionManagement>
+</project>
+---
+
+    [[1]] Now try running "mvn package" and it should successfully 
+    resolve the fake dependency on the Java EE 5 API.
+
+    []
+
+** Useful Commands
+
+    * Getting the "Effective POM"
+
+    This is useful to determine what all the delegation summed up to.
+
+---
+mvn mvn help:effective-pom 
+
+...
+
+
+Effective POM for project 'myorg.myproject:ex1:jar:1.0-SNAPSHOT'
+********************************************************************************
+<?xml version="1.0"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>myorg.myproject</groupId>
+  <artifactId>ex1</artifactId>
+  <name>My First Simple Project</name>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <sourceDirectory>/home/jcstaff/proj/ejava-javaee/solutions/ex1/src/m
+ain/java</sourceDirectory>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>/home/jcstaff/proj/ejava-javaee/solutions/ex1/s
+rc/test/java</testSourceDirectory>
+    <outputDirectory>/home/jcstaff/proj/ejava-javaee/solutions/ex1/targe
+t/classes</outputDirectory>
+    <testOutputDirectory>/home/jcstaff/proj/ejava-javaee/solutions/ex1/t
+arget/test-classes</testOutputDirectory>
+    <resources>
+...
+---
+
+    * Getting the "Effective Settings"
+
+    There are various ways to implement local properties that do the work 
+of the global settings.xml. To get the net result, use the following
+
+---
+mvn help:effective-settings
+
+...
+
+Effective settings:
+
+<?xml version="1.0"?><settings>
+  <localRepository>/home/jcstaff/.m2/repository</localRepository>
+  <servers>
+...
+  </servers>
+  <mirrors>
+    <mirror>
+      <mirrorOf>central</mirrorOf>
+      <url>http://ibiblio.lsu.edu/main/pub/packages/maven2</url>
+      <id>isu.edu</id>
+    </mirror>
+    <mirror>
+      <mirrorOf>central</mirrorOf>
+      <url>http://www.ibiblio.org/maven2</url>
+      <id>ibiblio.org</id>
+    </mirror>
+  </mirrors>
+  <profiles>
+    <profile>
+      <repositories>
+
+...
+---
+
+    * Getting help for a plugin
+
+---
+> mvn help:describe -Dplugin=surefire -Dfull=true 
+
+...
+
+Mojos:
+
+===============================================
+Goal: 'test'
+===============================================
+Description:
+
+Run tests using Surefire.
+
+Implementation: org.apache.maven.plugin.surefire.SurefirePlugin
+Language: java
+Bound to Phase: test
+
+Parameters:
+ -----------------------------------------------
+
+[0] Name: argLine
+Type: java.lang.String
+Required: false
+Directly editable: true
+Description:
+
+Arbitrary options to set on the command line.
+
+...
+---
+
+** Summary
+
+    During this exercise, you were able to establish a project which 
+    was understood by Maven. Once Maven-compliant, each plugin can be added
+    to perform different tasks for development. By the time we start 
+    adding databases, building EARs, and deploying to application servers,
+    we can use all the plugin help we can get.

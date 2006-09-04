@@ -1,0 +1,309 @@
+Exercise 1: First Simple Application
+
+* Part C: Adding Logging
+
+    [Note:] This part requires commons-loggin and log4j.jar. If you do not 
+    already have these, they can be downloaded from the ibiblio 
+    repository; 
+    {{{http://www.ibiblio.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar}commons-logging}}, 
+    {{{http://www.ibiblio.org/maven2/log4j/log4j/1.2.13/log4j-1.2.13.jar}
+    log4j}}.
+
+
+** Objectives
+
+    * Replace System.out calls with calls to the Apache Co
+    control output; specifically the Apache commons-logging interace 
+
+    * Configure the Apache log4j provider to conditionally write output
+    to a log file and console.
+
+** Steps
+
+   [[1]] Change the System.out() calls in App and AppTest from Part A
+   to use commons logging API. The commons-loggin
+   {{{http://jakarta.apache.org/commons/logging/apidocs/index.html}
+   Javadoc}} and 
+   {{{http://jakarta.apache.org/commons/logging/guide.html}
+   guide}} will be helpful in understanding this interface. The guide 
+   goes into some details about log4j configuration as well.
+
+---
+package myorg.mypackage.ex1;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class App {
+    private static Log log = LogFactory.getLog(App.class);
+
+    public int returnOne() { 
+        //System.out.println( "Here's One!" );
+        log.debug( "Here's One!" );
+        return 1; 
+    }
+
+    public static void main( String[] args ) {
+        //System.out.println( "Hello World!" );
+        log.info( "Hello World!" );
+    }
+}
+---
+
+---
+package myorg.mypackage.ex1;
+
+...
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class AppTest extends TestCase {
+    private static Log log = LogFactory.getLog(AppTest.class);
+
+...
+
+    public void testApp() {
+        //System.out.println("testApp");
+        log.info("testApp");
+        App app = new App();
+        assertTrue("app didn't return 1", app.returnOne() == 1);
+    }
+}
+
+---
+
+   [[1]] Add a log4j.xml configuration file to the directory structure 
+   put in place in part A. Place this file in src/test/resources/log4j.xml. 
+   This file is used to control logging output. Refer to the 
+   {{{http://logging.apache.org/log4j/docs/documentation.html}
+   log4j documentation page}} for possible information on how to configure 
+   and use log4j. However, they sell a commercial text; so its hard to 
+   find a good, detailed online reference that goes through all options.
+   It doesn't matter whether you use a log4j.xml format or
+   log4j.properties format. However, their 
+   {{{http://logging.apache.org/log4j/docs/manual.html}quick intro}}
+   uses the property file format.
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration 
+    xmlns:log4j="http://jakarta.apache.org/log4j/" 
+    debug="false">
+   
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" 
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} (%F:%M:%L)  -%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="target/log4j-out.txt"/>
+        <param name="Append" value="false"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" 
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+        </layout>
+   </appender>
+
+   <logger name="myorg.mypackage">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>  
+   </logger>
+
+   <root>
+      <priority value="info"/>    
+      <appender-ref ref="CONSOLE"/>  
+   </root>   
+   
+</log4j:configuration>
+---
+---
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./src/test/resources/log4j.xml
+./build.properties
+./build.xml
+---
+
+    [Note:] The log4j.xml is placed in the JVM classpath; where log4j will 
+    locate it by default. However, it should not be placed in with the 
+    main classes (ex1.jar). Placing it in a our JAR file would pollute 
+    the application assembler and deployer's job of specifying the 
+    correct configuration file at runtime. Our test classes and resources
+    are not a part of follow-on deployment.
+
+   [[1]] Add the commons-logging.jar to the compile classpaths and the
+   commons-logging.jar and log4j.jar to the runtime classpath. Also 
+   add an additional task to copy the log4j.xml file into
+   target/test-classes so that it is seen by the classloader as a 
+   resource. Realize that your classes have no compilation dependencies
+   on log4j. Log4j is only used if it is located at runtime.
+
+---
+# ex1 build.properties
+commons.logging.classpath=/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
+---
+
+---
+        <javac srcdir="${src.dir}/main/java"
+               destdir="${build.dir}/classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement path="${commons.logging.classpath}"/>
+               </classpath>
+        </javac>
+---
+---
+        <javac srcdir="${src.dir}/test/java"
+               destdir="${build.dir}/test-classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement path="${commons.logging.classpath}"/>
+               </classpath>
+        </javac>
+
+        <copy todir="${build.dir}/test-classes">
+            <fileset dir="${src.dir}/test/resources"/>
+        </copy>
+---
+---
+        <junit printsummary="true" fork="true">
+               <classpath>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement location="${build.dir}/test-classes"/>
+                   <pathelement path="${commons.logging.classpath}"/>
+                   <pathelement path="${log4j.classpath}"/>
+               </classpath>
+...
+---
+
+   [[1]] Test application and inspect reports. All loggers inherit from
+   the root logger and may only extend its definition; not limit it.
+   Notice that the root logger's priority filter "info" value allows
+   log.info() (warning and fatal) messages to printed to the console. The
+   myorg.mypackage logger's level filter allows log.debug() messages
+   from the myorg.mypackage.* classes to appear in both the console and
+   logfile. This means that any Java classes not in our package hierarchy
+   will only have INFO or higher priority messages logged.
+
+---
+> ant test
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1.jar
+
+test:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+     [copy] Copying 1 file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-reports
+    [junit] Running myorg.mypackage.ex1.AppTest
+    [junit] INFO  01-09 12:58:52,224 (AppTest.java:testApp:26)  -testApp
+    [junit] DEBUG 01-09 12:58:52,232 (App.java:returnOne:11)  -Here's One!
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.018 sec
+
+BUILD SUCCESSFUL
+Total time: 3 seconds
+---
+---
+> more target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
+Testsuite: myorg.mypackage.ex1.AppTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.018 sec
+
+Testcase: testApp took 0.012 sec
+---
+---
+> more target/log4j-out.txt
+INFO  01-09 13:07:20,146 [myorg.mypackage.ex1.AppTest] (AppTest.java:testApp:26) -testApp
+DEBUG 01-09 13:07:20,154 [myorg.mypackage.ex1.App] (App.java:returnOne:11)  -Here's One!
+---
+---
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./src/test/resources/log4j.xml
+./build.properties
+./build.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/ex1.jar
+./target/test-classes/myorg/mypackage/ex1/AppTest.class
+./target/test-classes/log4j.xml
+./target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
+./target/test-reports/TEST-myorg.mypackage.ex1.AppTest.xml
+./target/log4j-out.txt
+---
+
+   [[1]] Change the logging level so that only the App class 
+   performs logs to the logfile. By extending the logger name specification
+   all the way to the class, we further limit which classes apply to this
+   logger.
+
+---
+   <logger name="myorg.mypackage.ex1.App">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>
+   </logger>
+---
+---
+    [junit] Running myorg.mypackage.ex1.AppTest
+    [junit] INFO  01-09 13:13:19,343 (AppTest.java:testApp:26)  -testApp
+    [junit] DEBUG 01-09 13:13:19,351 (App.java:returnOne:11)  -Here's One!
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.02 sec
+BUILD SUCCESSFUL
+Total time: 2 seconds
+---
+---
+> more target/log4j-out.txt
+DEBUG 01-09 13:13:19,351 [myorg.mypackage.ex1.App] (App.java:returnOne:11)  -Here's One!
+---
+
+   [[1]] Repeat after me.  <"I will never use System.out.println()
+   in this class."> Doing so will make it impossible for your deployed 
+   components to have their logs controlled and accessible as it 
+   is instantiated in unit testing, integration testing, and deployment
+   environments.
+
+** Summary
+
+    In this part of the exercise, you were given a taste of how to get
+    started adding the commons-logging framework to your components
+    and deferring the implementation and configuration of the logger
+    until runtime. This is a general topic that will come up in any
+    Java development project, but is more critical when integrating
+    independent components into a runtime environment.
+
+    The details of commons-logging and log4j are beyond the scope of
+    what can be covered in an intro exercise. Read through some of the
+    references and modify your implementation to test
+
+    * different layouts (in the event you want to customize the printed lines)
+    
+    * different logging levels/filters (to get the feel of how you
+    want to prioritize your log messages; this allows you to make logs
+    as loud and quiet as you wish while keeping them useful)
+
+    * different appender types and parameters (customize the behavior of
+    existing appenders or use different ones; possibly use a DB appender)
+
+

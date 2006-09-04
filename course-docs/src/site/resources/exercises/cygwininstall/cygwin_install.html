@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Cygwin Setup Example</title>
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 204, 102);"
+ alink="#000099" link="#000099" vlink="#990099">
+<h3 style="text-align: center;">Cygwin Setup Example<br>
+</h3>
+<div style="text-align: center;">1/25/2006<br>
+</div>
+
+<ol>
+  <li>Create user user accounts that <span style="font-weight: bold;">DO
+NOT HAVE SPACES IN THEIR NAMES</span> (e.g., jcstaff)<br>
+  </li>
+  <li>Login to the Windows machine with an account that has
+Administrator privileges. The Cygwin users will also need to have
+Administrator privileges to be consistent with this example.</li>
+  <li>Check the availability of disk space. For this case, the machine
+has a 40GB hard drive (39.9GB capacity) and 28.6GB available when
+starting the installation.<br>
+    <br>
+    <img alt="disk_properties_start.jpg" src="disk_properties_start.jpg"
+ style="width: 366px; height: 447px;"><br>
+    <br>
+  </li>
+  <li>Get Cygwin installer from cygwin.com<br>
+    <table style="text-align: left; width: 616px; height: 321px;"
+ border="1" cellpadding="2" cellspacing="2">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top;"><img
+ alt="get_cygwin_installer.jpg" src="get_cygwin_installer.jpg"
+ style="width: 608px; height: 309px;"><br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+  </li>
+  <li>Save the Cygwin installer to disk<br>
+    <img alt="save_cygwin_installer.jpg" src="save_cygwin_installer.jpg"
+ style="width: 382px; height: 298px;"><br>
+    <br>
+  </li>
+  <li>Open Cygwin installer<br>
+    <img alt="open_cygwin_installer.jpg" src="open_cygwin_installer.jpg"
+ style="width: 580px; height: 303px;"><br>
+    <br>
+    <br>
+  </li>
+  <li>Start the installed and select "Install from Internet". Note that
+this option will download and go through the installation steps in one
+pass. One can also download and install in separate steps using the
+other options. This is useful when you want to setup more than one
+machine and save download time on the subsequent machines.<br>
+    <img alt="install_from_internet.jpg" src="install_from_internet.jpg"
+ style="width: 1015px; height: 390px;"><br>
+    <br>
+  </li>
+  <li>Select the directory you want to install the software after the
+download. I generally place it on the system drive and make sure I have
+at least 1GB of free space if I am doing a full download.</li>
+  <ul>
+    <li>Select "All Users" so that all logins have access to the
+software. <br>
+    </li>
+    <li>If you select Unix/binary text file type, all text file end of
+lines will terminate with \lf (this is what I always use). If you
+select DOS/text, they will end with \cr\lf.<br>
+i<img alt="choose_installation_directory.jpg"
+ src="choose_installation_directory.jpg"
+ style="width: 507px; height: 389px;"><br>
+      <br>
+    </li>
+  </ul>
+  <li>Select a directory for the downloaded internet files.<br>
+    <br>
+    <img alt="select_package_directory.jpg"
+ src="select_package_directory.jpg" style="width: 502px; height: 387px;"><br>
+    <br>
+  </li>
+  <li>You will commonly select a Direct Connection for a normal
+internet configuration.<br>
+    <br>
+    <img alt="select_connection_type.jpg"
+ src="select_connection_type.jpg" style="width: 507px; height: 390px;"><br>
+    <br>
+  </li>
+  <li>Choose one of the download sites to obtain the files.<br>
+    <br>
+    <img alt="choose_download_site.jpg" src="choose_download_site.jpg"
+ style="width: 507px; height: 389px;"><br>
+    <br>
+  </li>
+  <li>Select the packages you want to install. The installer comes up
+ready to install only the default set of packages. This is probably
+good enough to to the minimum commands, but lacks various shell
+utilities like "find", "less", "more", "vi", etc. If you have enough
+disk space and a few hours for the download process, you can change to
+a full installation by clicking on the "All-Default" and changing it to
+"All-Install". The snapshots below goes after only a few packages. <br>
+o Shells - bash completion; adds a few bash utility commands<br>
+o System - ping; useful when debugging firewall issues<br>
+o Editors - vim; my favorite editor<br>
+    <br>
+    <img alt="select_packages.jpg" src="select_packages.jpg"
+ style="width: 1157px; height: 811px;"><br>
+    <br>
+    <br>
+  </li>
+  <li>The installation will then run, unattended for a lengthy period
+of time. If you chose the full installation, this is a great time to
+either leave it overnight to churn or go onto follow-on steps than do
+not involve Cygwin. If you only installed the basic set of packages,
+this could take as little as 15-30min. If the download fails, it
+remembers your selections and can be easily restarted.<br>
+    <br>
+    <img alt="cygwin_progress.jpg" src="cygwin_progress.jpg"
+ style="width: 622px; height: 524px;"><br>
+    <br>
+  </li>
+  <li>Optionally create a start icon on the desktop and/or start menu.<br>
+    <br>
+    <img alt="create_icons.jpg" src="create_icons.jpg"
+ style="width: 504px; height: 385px;"><br>
+    <br>
+  </li>
+  <li>Selecting only a few of the packages above resulted in only 100MB
+being taken for Cygwin (and its cached download files that can be
+deleted).<br>
+    <br>
+    <img alt="disk_properties_aftercygwin.jpg"
+ src="disk_properties_aftercygwin.jpg"
+ style="width: 364px; height: 447px;"><br>
+    <br>
+    <br>
+  </li>
+  <li>Start Cygwin's bash shell by clicking on the icon. You can adjust
+the size of the window and various properties by going through the
+window options on the upper left icon (this is the same for all
+terminal windows under MS Windows). The first time you execute this, it
+gathers login information from the system and adds it to its
+/etc/passwd and /etc/groups file. It also builds the user a set of
+.bash, .bash_profile, and .inputrc files.<br>
+    <br>
+    <img alt="start_cygwin.jpg" src="start_cygwin.jpg"
+ style="width: 741px; height: 333px;"><br>
+    <br>
+  </li>
+</body>
+</html>

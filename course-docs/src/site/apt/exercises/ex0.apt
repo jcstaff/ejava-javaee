@@ -1,0 +1,387 @@
+Exercise 0: Development Environment Setup
+
+* Goals
+
+    * Establish an initial development environment suitable for use 
+    in class for examples, exercises, and projects.
+
+* Objectives
+
+    * (Optional!) {{{#Part A}Download and install}}
+    {{{http://cygwin.com/}Cygwin}} if you are a Unix/bash developer
+    and feel helpless when looking at a DOS prompt.
+
+    * {{{#Part B}Download and install}}
+    {{{http://java.sun.com/javase/index.jsp}J2SE 1.5}} JDK
+    to compile and run our applications.
+
+    * {{{#Part C}Download and install}}
+    {{{http://java.sun.com/javaee/}Java EE 5}} and its application server
+    just to get a measily javaee.jar. We may use their server for some
+    portability testing (TBD).
+
+    * {{{#Part D} Download and install}} 
+    a Subversion Client (ex.
+    {{{http://tortoisesvn.tigris.org/}TortoiseSVN}})
+    to obtain source code from course and other repositories.
+
+    * {{{#Part E}Download and install}} 
+    {{{http://maven.apache.org/}Maven}} Build System
+    to manage our portable build environment.
+
+    * {{{#Part F}Download and install}}
+    {{{http://labs.jboss.com/portal/jbossas/download}
+    JBoss Application Server with EJB3 Support}} to supply a database
+    and application server for our projects.
+
+    * {{{#Part G}Download and install}
+    {{{http://sourceforge.net/project/showfiles.php?group_id=22866&package_id=132063&release_id=421939} 
+    JBoss Embeddable EJB3.0}} to supply a Java Persistence Provider
+    that will operate outside of the applicaiton server. One could 
+    have also gotten a similar capability from the Hibernate site.
+
+    * {{{#Part H}Download and install}
+    {{{http://www.eclipse.org/}Eclipse}} IDE to provide a mechanism
+    for enhanced code development and debugging support.
+
+    * (Optional!) {{{#Part I}Download and install}}
+    {{{http://ant.apache.org/}Ant}} Build Tool to act as a fallback 
+    for those who really cannot handle the power and mystery of
+    Maven.
+
+* {Part A}: (Optional!) Download and install Cygwin
+
+        [Note:] This really is optional; especially if you are not using
+        a Windows Operating System. I know of no mandatory
+        tools in class that require this Unix emulator interface. 
+        However, all posted shell command lines will be expressed in bash.
+        If you are comfortable with the DOS shell and can easily translate 
+        my bash commands into window clicks and DOS commands (e.g., how
+        do you translate "find src -type f" into DOS?) feel free to skip it.
+
+    [[1]] Download the Cygwin installer from the 
+    {{{http://cygwin.com/}Cygwin Site}}.
+
+    [[1]] The following
+    {{{./cygwininstall/cygwin_install.html}
+    cygwin installation example snapshot trail}}
+    may be of some assistance in installation. It has a few hints as to how
+    to download enough without getting the entire application. Be sure
+    to also select the subvsersion client.
+
+    [[1]] Windows users; welcome to the sane world of the bash shell and vi.
+
+* {Part B}: Download and Install J2SE 1.5 JDK
+
+    [[1]] Go to the 
+    {{{http://java.sun.com/javase/downloads/index.jsp}
+    Sun J2SE Download Page}} and download JDK 5.0. If you download it 
+    without Java EE, you can get the latest version. If you download it
+    with Java EE, I found it hiding in Sun/AppServer/jdk/bin after 
+    installing it.
+
+    [[1]] Go through Control Panel -> System -> Advanced -> Environment
+    Variables and add jdk/bin to your classpath.
+
+    [[1]] Open up a new command shell and execute "javac -version" to
+    determine you can find the JDK and verify the version.
+
+* {Part C}: Download and Install J2SE 1.5 JDK
+
+    [[1]] Download and install 
+    {{{http://java.sun.com/javaee/}Java EE 5}} and its application server
+    if you did not already do this as a part of the JDK installation.
+
+    [[1]] Verify you have javaee.jar. We'll use this during exercise 1.
+
+---
+$ find c:/Sun -name javaee.jar
+c:/Sun/AppServer/lib/javaee.jar
+---
+
+* {Part D}: Download and install a Subversion Client
+
+        [Linux Users:] Either go to your pacckage installer and
+        select subvserion or use google to find a suitable rpm for
+        your system.
+
+        [Cygwin Users:] You may have already installed a subversion
+        command line client (try "svn -version"). If not, you can use
+        the windows-based tool or go back to the cygwin setup to download
+        and install the subversion client.
+
+        [Windows Users:] I tried out the TortoiseSVN client
+        and was really impressed. Feel free to use another
+        client, but I'll go through some of the steps for
+        {{{http://tortoisesvn.tigris.org/}TortoiseSVN}} here.
+
+            [[1]] I didn't like the warnings on the 1.4.0RC1 release, so 
+            I went with the the 1.3.5 release.
+
+            [[2]] The install, of course, wants you to reboot your system.
+
+            [[3]] TortoiseSVN launchers have been added to your right click
+            menus and available from the explorer window as well.
+
+        [All:] Test out your subversion installation by performing a checkout
+        of the ejava-javaee course files. 
+
+            [[1]] Create a directory for class work; e.g., c:/jhu/784
+
+            [[1]] Browse the repository to determine the URL for the 
+            project you wish to checkout. You can start at the root 
+            using the following
+            {{https://ejava.info:8443/repos/class/trunk/ejava-javaee}}
+            URL .
+
+            [[1]] Check out a level of the SVN repository to your class
+            work directory. If you mess up, you can delete it and retry.
+
+---
+$ svn checkout https://ejava.info:8443/repos/class/trunk/ejava-javaee ejava-javaee
+A  ejava-javaee/.project
+A  ejava-javaee/jdbcDAO
+A  ejava-javaee/jdbcDAO/.classpath
+A  ejava-javaee/jdbcDAO/.project
+A  ejava-javaee/jdbcDAO/src
+A  ejava-javaee/jdbcDAO/src/test
+A  ejava-javaee/jdbcDAO/src/test/java
+A  ejava-javaee/jdbcDAO/src/test/java/ejava
+A  ejava-javaee/jdbcDAO/src/test/java/ejava/examples
+A  ejava-javaee/jdbcDAO/src/test/java/ejava/examples/dao
+A  ejava-javaee/jdbcDAO/src/test/java/ejava/examples/dao/jdbc
+A ejava-javaee/jdbcDAO/src/test/java/ejava/examples/dao/jdbc/JDBCBookDAOTest.java
+---
+
+                [Note:] It was not required that you check all files out from
+                the root, but it didn't hurt either.
+
+            [[1]] Repeat after me, "Cool!". This beats managing a bunch of 
+            zip files any day. As the content is updated during the
+            semester, just do an update to see changes
+
+---
+$ svn update
+At revision 24.
+---
+
+* {Part E}: Download and install Maven Build System
+
+    [[1]] Go to the 
+    {{{http://maven.apache.org/}Maven Site}}  and download the latest
+    version for your platform. You don't need the Tasks for Ant. Those
+    are for when you want to call Maven from within Ant.
+
+    [[1]] Unzip the archive. I put mine in c:\, which resulted in a
+    c:/maven-2.0.4 directory. 
+
+    [[1]] Add MAVEN_HOME/bin to your PATH
+
+    [[1]] Add JAVA_HOME to your path (maven will try to execute
+    $JAVA_HOME/bin/java. On Windows, I set mine to c:\Sun\AppServer\jdk\jre
+
+    [[1]] Execute "mvn -version" as a test.
+---
+$ mvn --version
+Maven version: 2.0.4
+---
+
+    [[1]] cd to the root directory you checked out from subvserion and
+    attempt to build the project.
+
+---
+$ cd c:/
+$ cd c:/jhu/784/ejava-javaee
+
+$ mvn package -Dmaven.test.skip=true
+---
+
+    [[1]] Maven will begin downloading dependencies, but will unfortunately 
+    run into several "Error transferring file" problems before we get all
+    dependencies. Just grit your teeth and re-issue the command until it
+    completes or you hit a real error.
+
+---
+[ERROR] BUILD ERROR
+[INFO] ------------------------------------------------------------------------
+[INFO] Error building POM (may not be this project's POM).
+
+
+Project ID: org.apache.maven:maven-model
+
+Reason: Error getting POM for 'org.apache.maven:maven-model' from the repository
+: Error transferring file
+  org.apache.maven:maven-model:pom:2.0
+
+from the specified remote repositories:
+  central (http://repo1.maven.org/maven2),
+  apache.snapshots (http://svn.apache.org/maven-snapshot-repository),
+  snapshots (http://snapshots.maven.codehaus.org/maven2)
+---
+---
+[ERROR] BUILD ERROR
+[INFO] ------------------------------------------------------------------------
+[INFO] Error building POM (may not be this project's POM).
+
+
+Project ID: null:plexus-compiler-api:jar:1.5.2
+
+Reason: Cannot find parent: org.codehaus.plexus:plexus-compiler for project: nul
+l:plexus-compiler-api:jar:1.5.2
+---
+
+    [[1]] TADA!!! right? We'll look at and configure Maven a bit more in 
+    Exercise 1, but we don't want to dwell on it. There's too much to cover
+    and address the topics of the course. You'll just be responsible for 
+    some of the basic tasks of building and testing an applicaiton. There 
+    will be plenty of examples supplied in class.
+    
+
+* {Part F}: Download and install JBoss Application Server with EJB3
+
+    [[1]] Go to the 
+    {{{http://labs.jboss.com/portal/jbossas/download}
+    Download site for the JBoss Application Server}}. I normally would
+    select the archive format of the download to keep the installation 
+    a bit less mysterious. However, Burke's EJB3 with JBoss workbook
+    shows an example of using the "Run Installer" that seems to 
+    walk you through the right options to get JBoss <<AND>> EJB3. 
+    Run the installer and walk-thru the installation with Burke's text
+    nearby for reference.
+
+    [[1]] One Windows, I installed mine into c:/jboss rather than the
+    default path since I normally have to cd into that directory.
+
+    [[1]] Be sure to pick the "ejb3" option. I don't know what the 
+    "ejb3-clustered" really has, but we won't need clustering in class.
+
+    [[1]] I typically just use the "default" server name.
+
+    [[1]] Leave the isolation/call by value de-selected. We'll 
+    be able to change it later if we have to.
+
+    [[1]] Leave the adminstrative interfaces unsecured; especially if
+    you will be working behind a firewall.
+
+    [[1]] Add a configuration file that will define a database
+    we'll be using for class. Although we can start/stop the database
+    without using JBoss and won't need the server for a while, it is 
+    very easy to have the all servers managed under a single set of
+    run/shutdown scripts. Paste the following
+    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/course-docs/target/site/files/jboss/deploy/ejava-jdbc-ds.xml}
+    file}} into the JBOSS_HOME/servers/default/deploy directory
+
+    [[1]] Start the server and look for the following lines towards the end
+    of its output. This means that our Hypersonic "ejava" database has 
+    started.
+
+---
+$ c:/jboss/bin/run.sh
+---
+---
+01:12:52,296 INFO  [STDOUT] [Server@1479ef9]: Initiating startup sequence...
+01:12:55,015 INFO  [STDOUT] [Server@1479ef9]: Server socket opened successfully in 2640 ms.
+01:12:55,296 INFO  [STDOUT] [Server@1479ef9]: Database [index=0, id=1, db=file:C:\jboss\server\default\data\hypersonic\ejava, alias=] opened sucessfully in 250
+ms.
+01:12:55,359 INFO  [STDOUT] [Server@1479ef9]: Startup sequence completed in 2984 ms.
+ 01:12:55,390 INFO  [STDOUT] [Server@1479ef9]: 2006-09-02 01:12:55.390 HSQLDB ser ver 1.8.0 is online
+ 01:12:55,609 INFO  [STDOUT] [Server@1479ef9]: To close normally, connect and exe cute SHUTDOWN SQL
+ 01:12:55,625 INFO  [STDOUT] [Server@1479ef9]: From command line, use [Ctrl]+[C] to abort abruptly
+---
+
+    [[1]] Start the database UI to verify that the database is up. 
+
+---
+$ java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+---
+    [[1]] Select HSQL Database Engine Server from the "Type" pulldown. 
+    Everything else can stay defaulted. After you hit OK, the GUI should
+    connect to the database using port 9001.
+
+    [[1]] Shutdown your server using the shutdown.sh script.
+
+    [[1]] You might want to map the run and shutdown scripts to some
+    desktop launch icons since your be starting and stopping this server
+    quite a bit over the semester.
+
+* {Part G}: Download and install JBoss Embeddable EJB3.0
+
+        [Note:] This set of files will be used to create applications
+        that use Java Persistence outside of the container. One could get 
+        a similar capability from the Hibernate.org site.
+
+        [Note:] One annoying issue with this download is that the main 
+        links take you to an older version. Their links point to 
+        alpha5. You must use the search engine or the link I have provided 
+        to locate the alpha8_patch2 release. The following 
+        {{{http://docs.jboss.org/ejb3/embedded/embedded.html}
+        URL}} contains some good information. Just don't follow the
+        download link off those pages.
+
+    [[1]] Download and install 
+    {{{http://sourceforge.net/project/showfiles.php?group_id=22866&package_id=132063&release_id=421939} 
+    JBoss Embeddable EJB3.0 alpha 8, patch2 release}}. It doesn't really
+    matter where you install these files since you'll just use them as 
+    the source of a copy to start certain projects.
+
+* {Part H}: Download and install Eclipse IDE
+
+            [Note:] Okay; an IDE and specifically Eclipse is <<NOT>> a
+            requirement for class. The memory requirements for an IDE and 
+            the applicaition server may have your machine swapping quite a bit.
+            I have included only as a productivity tool. You may use vi and
+            command line tools (I do!) or something like NetBeans from 
+            Sun. I do find the ability to step through an execution
+            with a graphical debugger priceless.
+
+    [[1]] Download and install
+    {{{http://www.eclipse.org/}Eclipse}}.
+
+    [[1]] Install the Maven.2x Plug-in for Eclipse as demonstrated
+    with the flash demo on the following 
+    {{{http://m2eclipse.codehaus.org/}page at Mergere}}. You don't need 
+    to physically download the binaries. You install the plugin by 
+    registering their site with the Eclipse plugin manager. Go ahead, 
+    {{{http://m2eclipse.codehaus.org/Installing_Maven_2.0_plugin_for_Eclipse.html}
+    watch the demo}}. In case you forgot to pause it, the URL for the 
+    plugin was {{http://m2eclipse.codehaus.org/}}. 
+    
+        [Note:] I usually install my plugins in a personal
+        directory so they live beyond Eclipse upgrades. You may want 
+        to do that as well.
+
+    [[1]] Go ahead and watch the 
+    {{{http://m2eclipse.codehaus.org/Maven_2.0_Plugin_for_Eclipse.html}
+    Using the plugin demo}}. It normally starts for me on the second load.
+    We will be performing most of these actions as a part of Exercise 1's
+    Eclipse setup.
+
+        
+* {Part I}: (Optional!) Download and install Ant Build Tool
+
+        [Note:] Its optional, but what geek doesn't have a copy of Ant
+        laying around. You'll be able to use it in Exercise 1, but
+        hopefully never need it after that. Students may use it as
+        a saftey net for a build tool if they find Maven 2 impossible
+        to work with (not likely, but possible).
+
+    [[1]] Download and install {{{http://ant.apache.org/}Ant}}. I
+    downloaded the 1.6.5 version to avoid potential headaches with 
+    the 1.7 beta.
+
+
+    [[1]] Add ANT_HOME/bin to your classpath so you can run it whenever 
+    you have the urge.
+
+---
+$ ant -version
+Apache Ant version 1.6.5 compiled on June 2 2005
+---
+
+* Summary
+
+    During this exercise, you put many of the tools in place to begin 
+    obtaining and building examples. The next exercise will employ some
+    of the tools that you have installed to walk you through the
+    development of a simple Java application.
+

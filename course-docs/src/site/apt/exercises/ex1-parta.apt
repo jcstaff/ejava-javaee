@@ -1,0 +1,180 @@
+Exercise 1: First Simple Application
+
+* {Part A: Develop and test application using command line tools} (OPTIONAL!)
+
+    [Note:] This part requires junit.jar. If you do not already have 
+    this, it can be downloaded from the 
+    {{{http://www.ibiblio.org/maven2/junit/junit/4.0/junit-4.0.jar} 
+    ibiblio.org/maven2 repository}}.
+
+
+** Objectives
+
+    * Build and populate a directory structure for developing simple 
+    project consisting of a single Java archive.
+
+    * Test our implementation and look at report.
+
+    * Add/remove failures to tests.
+
+** Steps
+
+   [[1]] Set a few logical variables to represent root directories. For the 
+   purposes of the follow-on steps, PROJECT_BASEDIR is the root directory
+   for this exercise. In the example below, the user has chosen a directory of
+   $HOME/proj/784/exercises to be the root directory for all class
+   exercises and named the root directory for this project "ex1". An
+   alternative for CLASS_HOME might be c:/jhu/784.
+
+---
+export CLASS_HOME=$HOME/proj/784
+export PROJECT_BASEDIR=$CLASS_HOME/exercises/ex1
+---
+
+   [[1]] Create project directory structure. In this example, the 
+   developer uses $HOME/proj/784 for all work in this class.
+
+---
+$PROJECT_BASEDIR
+    +---/src/main/java/myorg/mypackage/ex1
+    +---/src/test/java/myorg/mypackage/ex1
+    +---/target/classes
+    +---/target/test-classes
+    +---/target/test-reports
+---
+
+   [[1]] Add the following Java implementation class to
+   PROJECT_BASEDIR/src/main/java/myorg/mypackage/ex1/App.java
+
+---
+package myorg.mypackage.ex1;
+
+public class App {
+    public int returnOne() { 
+        System.out.println( "Here's One!" );
+        return 1; 
+    }
+
+    public static void main( String[] args ) {
+        System.out.println( "Hello World!" );
+    }
+}
+---
+
+   [[1]] Add the following Java test class to 
+   PROJECT_BASEDIR/src/main/java/myorg/mypackage/ex1/AppTest.java
+
+---
+package myorg.mypackage.ex1;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+/**
+ * Unit test for simple App.
+ */
+public class AppTest extends TestCase {
+
+    public AppTest( String testName ) {
+        super( testName );
+    }
+
+    public static Test suite() {
+        return new TestSuite( AppTest.class );
+    }
+
+    public void testApp() {
+        System.out.println("testApp");
+        App app = new App();
+        assertTrue("app didn't return 1", app.returnOne() == 1);
+    }
+}
+---
+
+   [[1]] Compile the application and place it in target/ex1.jar. The compiled
+   classes will go in target/classes.
+
+---
+> javac src/main/java/myorg/mypackage/ex1/App.java -d target/classes
+> jar cvf target/ex1.jar -C target/classes .
+added manifest
+adding: myorg/(in = 0) (out= 0)(stored 0%)
+adding: myorg/mypackage/(in = 0) (out= 0)(stored 0%)
+adding: myorg/mypackage/ex1/(in = 0) (out= 0)(stored 0%)
+adding: myorg/mypackage/ex1/App.class(in = 519) (out= 350)(deflated 32%)
+
+> jar tf target/ex1.jar
+META-INF/
+META-INF/MANIFEST.MF
+myorg/
+myorg/mypackage/
+myorg/mypackage/ex1/
+myorg/mypackage/ex1/App.class
+---
+
+   [[1]] Compile the JUnit test and place the compiled tests in 
+   target/test-classes. 
+   
+---
+> javac -classpath target/ex1.jar:$JUNIT_REPO/junit-4.0.jar \
+src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
+
+target/
+    +---classes/myorg/mypackage/ex1/App.class
+    +---test-classes/myorg/mypackage/ex1/AppTest.class
+    +---test-reports
+    +---ex1.jar
+---
+
+   [[1]] Run the JUnit test framework.
+
+---
+> java -classpath target/ex1.jar:$JUNIT_REPO/junit-4.0.jar:target/test-classes \
+junit.textui.TestRunner myorg.mypackage.ex1.AppTest
+.testApp
+Here's One!
+
+Time: 0.013
+
+OK (1 test)
+---
+
+   [[1]] Change add/remove a test that will fail, re-compile the test class
+   and re-run.
+
+---
+    //AppTest.java
+    public void testFail() {
+        System.out.println("testFail");
+        App app = new App();
+        assertTrue("app didn't return 0", app.returnOne() == 0);
+    }
+
+.testApp
+Here's One!
+.testFail
+Here's One!
+F
+Time: 0.015
+There was 1 failure:
+1) testFail(myorg.mypackage.ex1.AppTest)junit.framework.AssertionFailedError: app didn't return 0
+        at myorg.mypackage.ex1.AppTest.testFail(AppTest.java:29)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+
+FAILURES!!!
+Tests run: 2,  Failures: 1,  Errors: 0
+---
+
+** Summary
+
+   In this part of the exercise you setup, built, and tested a sample 
+   project with only command-line commands. You did this to help show what
+   higher level tools will need to do as well. Even though the command
+   line provides clarity, it doesn't scale and shell scripts aren't 
+   generally portable and optimized (wrong tool for the job). Hopefully,
+   after going through this, you have an understanding of the low level 
+   structure and usecases and are now interested adding a build environment.
+   
