@@ -1,0 +1,355 @@
+Exercise 1: First Simple Application
+
+* {Part B}: Automate build and testing with Ant (OPTIONAL!)
+
+    [Note:] All course examples will be written using Maven 2. You are 
+    encouraged to also use Maven 2 to build and test the projects you submit.
+    If you are unable to tackle the complexity of Maven 2, you may seek
+    permission to use Ant instead. If you use Ant, there must be a single 
+    build.xml and build.properties file at the project root that performs
+    all tasks. Your build.xml must be portable and import non-portable
+    property values from the single build.properties file.
+    
+    [Note:] If you do not have Ant installed on your system, it can be 
+    from {{http://ant.apache.org/}}
+
+** Objectives
+
+    * Demonstrate the basics of automating the manual steps in part A using
+    the Apache Ant build tool. 
+
+
+** Steps
+
+    [[1]] Create a build.properties file in PROJECT_BASEDIR. This will be
+    used to define any non-portable property values.
+
+---
+#ex1 build.properties
+unit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
+---
+
+    [[1]] Create a build.xml file in PROJECT_BASEDIR. Note the following 
+    key elements. 
+
+        * project - a required root for build.xml files
+
+            * name - not significant, but helpful
+
+            * default - the target to run if none is supplied on command line
+
+            * basedir - specifies current directory for all tasks
+
+        * property - defines an immutable name/value
+
+            * file - imports declarations from a file; in this case 
+            build.properties created earlier
+
+            * name/value - specifies a property within the script
+
+        * target - defines an entry point into the build.xml script. It hosts
+        one or more tasks.
+
+            * name - defines name of target, which can be supplied on 
+            command line.
+
+        * echo - a useful Ant task to printout status and debug information.
+        See 
+        {{{http://ant.apache.org/manual/CoreTasks/echo.html}Ant docs}}
+        for more information.
+
+        []
+
+---
+<?xml version="1.0" encoding="utf-8" ?> 
+<!-- ex1 build.xml 
+-->
+<project name="ex1" default="" basedir=".">
+    <property file="build.properties"/>
+
+    <property name="artifactId" value="ex1"/>
+    <property name="src.dir"    value="${basedir}/src"/>
+    <property name="build.dir"  value="${basedir}/target"/>
+
+    <target name="echo">
+        <echo>basedir=${basedir}</echo>
+        <echo>artifactId=${artifactId}</echo>
+        <echo>src.dir=${src.dir}</echo>
+        <echo>build.dir=${build.dir}</echo>
+        <echo>junit.classpath=${junit.classpath}</echo>
+    </target>
+</project>
+---
+
+    [[1]] Sanity check your build.xml and build.properties file with the 
+    echo target.
+
+---
+> ant echo
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+
+echo:
+     [echo] basedir=/home/jcstaff/proj/ejava-javaee/solutions/ex1
+     [echo] artifactId=ex1
+     [echo] src.dir=/home/jcstaff/proj/ejava-javaee/solutions/ex1/src
+     [echo] build.dir=/home/jcstaff/proj/ejava-javaee/solutions/ex1/target
+     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
+
+BUILD SUCCESSFUL
+Total time: 0 seconds
+
+---
+
+    [[1]] Add the "package" target to compile and archive your /src/main
+    classes. Note the following tasks in this target.
+
+        * mkdir - creates a directory. See 
+        {{{http://ant.apache.org/manual/CoreTasks/mkdir.html}Ant docs}}
+        for more infomation.
+
+        * javac - compiles java sources files. See
+        {{{http://ant.apache.org/manual/CoreTasks/javac.html}Ant docs}}
+        for more information. Note that we are making sure we get J2SE
+        1.5 classes compiled.
+
+        * jar - builds a java archive. See 
+        {{{http://ant.apache.org/manual/CoreTasks/jar.html}Ant Docs}}
+        for more information.
+
+        []
+
+---
+    <target name="package">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac srcdir="${src.dir}/main/java"
+               destdir="${build.dir}/classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+               </classpath>
+        </javac>
+
+        <jar destfile="${build.dir}/${artifactId}.jar">
+            <fileset dir="${build.dir}/classes"/>
+        </jar>
+    </target>
+---
+
+---
+
+> ant package
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1.jar
+
+BUILD SUCCESSFUL
+Total time: 1 second
+
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./build.properties
+./build.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/ex1.jar
+
+---
+
+    [[1]] Add the "test" target to compile your /src/test classes. Make this
+    the default target for your build.xml file. Note too that it should depend
+    on the successful completion of the "package" target and include 
+    the produced archive in its classpath.
+
+---
+<project name="ex1" default="test" basedir=".">
+...
+    <target name="test" depends="package">
+        <mkdir dir="${build.dir}/test-classes"/>
+        <javac srcdir="${src.dir}/test/java"
+               destdir="${build.dir}/test-classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement path="${junit.classpath}"/>
+               </classpath>
+        </javac>
+    </target>
+
+---
+
+---
+
+> ant test
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+
+package:
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1.jar
+
+test:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+
+BUILD SUCCESSFUL
+Total time: 1 second
+
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./build.properties
+./build.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/ex1.jar
+./target/test-classes/myorg/mypackage/ex1/AppTest.class
+
+---
+
+    [[1]] Add the junit task to the test target.  The junit task is 
+    being configured to run in batch mode and write a TXT and XML reports
+    to the target/test-reports directory.  See
+    {{{http://ant.apache.org/manual/OptionalTasks/junit.html}Ant docs}}
+    for more details on the junit task. Make special note of the following:
+
+        * printsummary - produce a short summary to standard out showing
+        the number of tests run and a count of errors, etc.
+
+        * fork - since Ant runs in a JVM, any time you run a task that 
+        requires a custom classpath, it is usually required that it be
+        forked into a separate process (with its own classpath).
+
+        * batchtest - run all tests found and write results of each test
+        into the test-reports directory.
+
+        * formatter - write a text and XML report of results
+
+        []
+
+---
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="true" fork="true">
+               <classpath>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement location="${build.dir}/test-classes"/>
+               </classpath>
+
+            <batchtest fork="true" todir="${build.dir}/test-reports">
+                <fileset dir="${build.dir}/test-classes">
+                    <include name="**/*Test*.class"/>
+                </fileset>
+            </batchtest>
+
+            <formatter type="plain"/>
+            <formatter type="xml"/>
+
+        </junit>
+---
+
+---
+
+> ant test
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+
+package:
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
+      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1.jar
+
+test:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-reports
+    [junit] Running myorg.mypackage.ex1.AppTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.04 sec
+
+BUILD SUCCESSFUL
+Total time: 1 second
+
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./build.properties
+./build.xml
+./target/classes/myorg/mypackage/ex1/App.class
+./target/ex1.jar
+./target/test-classes/myorg/mypackage/ex1/AppTest.class
+./target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
+./target/test-reports/TEST-myorg.mypackage.ex1.AppTest.xml
+
+---
+
+    [[1]] Test output of each test is in the TXT and XML reports.
+
+---
+> cat target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
+Testsuite: myorg.mypackage.ex1.AppTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.04 sec
+ ------------- Standard Output ---------------
+testApp
+Here's One!
+ ------------- ---------------- ---------------
+
+Testcase: testApp took 0.002 sec
+
+---
+
+    [[1]] Add a clean target to the build.xml file to delete built artifacts.
+    See {{{http://ant.apache.org/manual/CoreTasks/delete.html}Ant docs}} 
+    for details on the delete task.
+
+---
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+---
+
+---
+> ant clean
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+
+clean:
+   [delete] Deleting directory /home/jcstaff/proj/ejava-javaee/solutions/ex1/target
+
+BUILD SUCCESSFUL
+Total time: 0 seconds
+
+> find . -type f
+./src/main/java/myorg/mypackage/ex1/App.java
+./src/test/java/myorg/mypackage/ex1/AppTest.java
+./build.properties
+./build.xml
+---
+
+** Summary
+
+    In this part, we introduced Ant as a build tool to automate the 
+    tasks of building and testing our project. As you can see by looking
+    at the list of 
+    {{{http://ant.apache.org/manual/coretasklist.html}core}} and
+    {{{http://ant.apache.org/manual/optionaltasklist.html}optional}} tasks,
+    and performing other web searches for Ant tasks, there is quite a bit
+    of support for this approach. 
+    
+    Ant is an excellent work-horse for doing specific tasks. Tasks are 
+    written in Java and configured with XML. The main issue against Ant is
+    that the tasks are mostly written at the leaf level, with no formal 
+    way to supply higher level functionality. Ant neither requires or
+    promotes any structure or rules for a project. Lacking such a framework
+    requires that the end user develop their own structure and rules and
+    configure each task individually. This configuration can get quite 
+    large as the project matures. The developer knowledge of how to work 
+    within that configuration is not generally portable to other projects.
+
+    You won't have too worry about Ant in this class unless you get 
+    totally lost with Maven (covered later). It is covered here to
+    contrast Maven in its support for Enterprise Java applications. 

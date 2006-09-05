@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>ejava-javaee</artifactId>
+        <groupId>ejava.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.intro</groupId>
+    <artifactId>javase5Enhancements</artifactId>
+    <name>Java SE 5 Enhancements</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This project contains examples that demonstrate language
+        enhancements added in Java SE 5 (a.k.a J2SE 5, J2SE 1.5).
+        Many of these constructs will show up in Java EE Topics.
+    </description>
+    
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- make sure we get Java SE 5 classes -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+             <!-- surefire.argLine is set in debugger profile -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
