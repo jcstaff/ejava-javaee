@@ -8,44 +8,39 @@ Exercise 0: Development Environment Setup
 * Objectives
 
     * (Optional!) {{{#Part A}Download and install}}
-    {{{http://cygwin.com/}Cygwin}} if you are a Unix/bash developer
+    if you are a Unix/bash developer
     and feel helpless when looking at a DOS prompt.
 
     * {{{#Part B}Download and install}}
-    {{{http://java.sun.com/javase/index.jsp}J2SE 1.5}} JDK
-    to compile and run our applications.
+    J2SE 1.5 JDK to compile and run our applications.
 
     * {{{#Part C}Download and install}}
-    {{{http://java.sun.com/javaee/}Java EE 5}} and its application server
+    Java EE 5 and its application server
     just to get a measily javaee.jar. We may use their server for some
     portability testing (TBD).
 
     * {{{#Part D} Download and install}} 
-    a Subversion Client (ex.
-    {{{http://tortoisesvn.tigris.org/}TortoiseSVN}})
+    a Subversion Client (ex. TortoiseSVN)
     to obtain source code from course and other repositories.
 
     * {{{#Part E}Download and install}} 
-    {{{http://maven.apache.org/}Maven}} Build System
-    to manage our portable build environment.
+    Maven Build System to manage our portable build environment.
 
     * {{{#Part F}Download and install}}
-    {{{http://labs.jboss.com/portal/jbossas/download}
-    JBoss Application Server with EJB3 Support}} to supply a database
+    JBoss Application Server with EJB3 Support to supply a database
     and application server for our projects.
 
-    * {{{#Part G}Download and install}
-    {{{http://sourceforge.net/project/showfiles.php?group_id=22866&package_id=132063&release_id=421939} 
-    JBoss Embeddable EJB3.0}} to supply a Java Persistence Provider
+    * {{{#Part G}Download and install}}
+    JBoss Embeddable EJB3.0 to supply a Java Persistence Provider
     that will operate outside of the applicaiton server. One could 
     have also gotten a similar capability from the Hibernate site.
 
-    * {{{#Part H}Download and install}
-    {{{http://www.eclipse.org/}Eclipse}} IDE to provide a mechanism
+    * {{{#Part H}Download and install}}
+    Eclipse IDE to provide a mechanism
     for enhanced code development and debugging support.
 
     * (Optional!) {{{#Part I}Download and install}}
-    {{{http://ant.apache.org/}Ant}} Build Tool to act as a fallback 
+    Ant Build Tool to act as a fallback 
     for those who really cannot handle the power and mystery of
     Maven.
 
@@ -86,13 +81,14 @@ Exercise 0: Development Environment Setup
     [[1]] Open up a new command shell and execute "javac -version" to
     determine you can find the JDK and verify the version.
 
-* {Part C}: Download and Install J2SE 1.5 JDK
+* {Part C}: Download and Install Java EE 5 API
 
     [[1]] Download and install 
     {{{http://java.sun.com/javaee/}Java EE 5}} and its application server
     if you did not already do this as a part of the JDK installation.
 
-    [[1]] Verify you have javaee.jar. We'll use this during exercise 1.
+    [[1]] Verify you have javaee.jar. We'll use this during 
+    {{{./Part E}Part E}}.
 
 ---
 $ find c:/Sun -name javaee.jar
@@ -101,8 +97,8 @@ c:/Sun/AppServer/lib/javaee.jar
 
 * {Part D}: Download and install a Subversion Client
 
-        [Linux Users:] Either go to your pacckage installer and
-        select subvserion or use google to find a suitable rpm for
+        [Linux Users:] Either go to your package installer and
+        select subversion or use google to find a suitable rpm for
         your system.
 
         [Cygwin Users:] You may have already installed a subversion
@@ -136,6 +132,8 @@ c:/Sun/AppServer/lib/javaee.jar
 
             [[1]] Check out a level of the SVN repository to your class
             work directory. If you mess up, you can delete it and retry.
+
+        []
 
 ---
 $ svn checkout https://ejava.info:8443/repos/class/trunk/ejava-javaee ejava-javaee
@@ -186,7 +184,7 @@ $ mvn --version
 Maven version: 2.0.4
 ---
 
-    [[1]] cd to the root directory you checked out from subvserion and
+    [[1]] cd to the root directory you checked out from subversion and
     attempt to build the project.
 
 ---
@@ -229,11 +227,44 @@ Project ID: null:plexus-compiler-api:jar:1.5.2
 Reason: Cannot find parent: org.codehaus.plexus:plexus-compiler for project: nul
 l:plexus-compiler-api:jar:1.5.2
 ---
+    [[1]] When you get to the following error, you'll need to install
+    the javaee.jar file downloaded as a part of Java EE 5 from Sun to
+    go any further.
+
+---
+...
+[INFO] Failed to resolve artifact.
+
+Missing:
+ ----------
+1) javax.javaee:javaee:jar:5
+
+  Try downloading the file manually from the project website.
+
+  Then, install it using the command:
+      mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
+          -Dversion=5 -Dpackaging=jar -Dfile=/path/to/file
+
+  Path to dependency:
+...
+---
+---
+> mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
+-Dversion=5 -Dpackaging=jar -Dfile=/apps/linux/SUNWappserver/lib/javaee.jar \
+-DgeneratePom=true
+...
+
+[INFO] [install:install-file]
+[INFO] Installing /apps/linux/SUNWappserver/lib/javaee.jar to /home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+---
 
     [[1]] TADA!!! right? We'll look at and configure Maven a bit more in 
     Exercise 1, but we don't want to dwell on it. There's too much to cover
     and address the topics of the course. You'll just be responsible for 
-    some of the basic tasks of building and testing an applicaiton. There 
+    some of the basic tasks of building and testing an application. There 
     will be plenty of examples supplied in class.
     
 
@@ -249,7 +280,7 @@ l:plexus-compiler-api:jar:1.5.2
     Run the installer and walk-thru the installation with Burke's text
     nearby for reference.
 
-    [[1]] One Windows, I installed mine into c:/jboss rather than the
+    [[1]] On Windows, I installed mine into c:/jboss rather than the
     default path since I normally have to cd into that directory.
 
     [[1]] Be sure to pick the "ejb3" option. I don't know what the 
@@ -260,7 +291,7 @@ l:plexus-compiler-api:jar:1.5.2
     [[1]] Leave the isolation/call by value de-selected. We'll 
     be able to change it later if we have to.
 
-    [[1]] Leave the adminstrative interfaces unsecured; especially if
+    [[1]] Leave the administrative interfaces unsecured; especially if
     you will be working behind a firewall.
 
     [[1]] Add a configuration file that will define a database
@@ -268,7 +299,7 @@ l:plexus-compiler-api:jar:1.5.2
     without using JBoss and won't need the server for a while, it is 
     very easy to have the all servers managed under a single set of
     run/shutdown scripts. Paste the following
-    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/course-docs/target/site/files/jboss/deploy/ejava-jdbc-ds.xml}
+    {{{../files/jboss/deploy/ejava-jdbc-ds.xml}
     file}} into the JBOSS_HOME/servers/default/deploy directory
 
     [[1]] Start the server and look for the following lines towards the end
@@ -301,7 +332,7 @@ $ java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.Databas
     [[1]] Shutdown your server using the shutdown.sh script.
 
     [[1]] You might want to map the run and shutdown scripts to some
-    desktop launch icons since your be starting and stopping this server
+    desktop launch icons since you be starting and stopping this server
     quite a bit over the semester.
 
 * {Part G}: Download and install JBoss Embeddable EJB3.0
@@ -328,7 +359,7 @@ $ java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.Databas
 
             [Note:] Okay; an IDE and specifically Eclipse is <<NOT>> a
             requirement for class. The memory requirements for an IDE and 
-            the applicaition server may have your machine swapping quite a bit.
+            the application server may have your machine swapping quite a bit.
             I have included only as a productivity tool. You may use vi and
             command line tools (I do!) or something like NetBeans from 
             Sun. I do find the ability to step through an execution
@@ -359,10 +390,10 @@ $ java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.Databas
         
 * {Part I}: (Optional!) Download and install Ant Build Tool
 
-        [Note:] Its optional, but what geek doesn't have a copy of Ant
+        [Note:] It's optional, but what geek doesn't have a copy of Ant
         laying around. You'll be able to use it in Exercise 1, but
         hopefully never need it after that. Students may use it as
-        a saftey net for a build tool if they find Maven 2 impossible
+        a safety net for a build tool if they find Maven 2 impossible
         to work with (not likely, but possible).
 
     [[1]] Download and install {{{http://ant.apache.org/}Ant}}. I
