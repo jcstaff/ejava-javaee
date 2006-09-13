@@ -1,0 +1,799 @@
+Exercise: JDBC Tutorial
+
+* Goals
+
+    * Become comfortable building and testing a component that uses 
+    SQL and JDBC.
+
+* Objectives
+
+    * {{{#Section A} Setup and Start Database}}
+
+    * {{{#Section B}Setup Project Structure}}
+
+    * {{{#Section C}(Optional!) Setup Ant Build Scripts}}
+
+    * {{{#Section D}Setup Maven Project Definition}}
+
+    * {{{#Section E}Complete the Sun JDBC Tutorial}}
+
+* Steps
+
+** {Section A}: Setup and Start Database
+
+    * If you haven't done so already, perform the setup instructions
+    for JBoss and the database as defined in 
+    {{{ex0.html#Part F}Exercise 0}}. Refer back to those instructions for 
+    basic commands.
+
+    * Start the database (using the JBoss run.sh command). Note that the 
+    application server is not necessary for this exercise. We are just 
+    taking advantage of the fact it will start and stop the database 
+    process.
+
+    * Start the DB GUI and login using the "HSQL Database Engine Server"
+    option.
+
+---
+java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+---
+
+** {Section B}: Setup project structure
+
+    [Note:] You'll probably want to perform Section B concurrently with
+    either Section C or D so that you can incrementally test each 
+    item as it is added.
+
+    []
+
+    * Create a set of ddl scripts in src/main/resources/ddl to
+    handle creating the schema, deleting rows in the schema, and
+    dropping tables in the schema. Make sure each script has the 
+    word "create", "delete", or "drop" in its file name to match 
+    some search strings we'll use later.
+
+---
+# coffee_create.ddl
+CREATE TABLE COFFEES (
+    COF_NAME VARCHAR(32),
+    SUP_ID INTEGER,
+    PRICE FLOAT,
+    SALES INTEGER,
+    TOTAL INTEGER
+)
+
+# coffee_delete.ddl
+DELETE * FROM COFFEES;
+
+# coffee_drop.ddl
+DROP TABLE COFFEES;
+---
+
+    * Create a Coffee.java class in src/main/java/(package) to contain 
+    sections of the JDBC code from the tutorial.
+
+        * Create a logger.
+
+---
+public class Coffee {
+    private static final Log log = LogFactory.getLog(Coffee.class);
+---
+
+        * Add a demoSelect method to provide a template for all follow-on
+        methods.
+
+---
+    public void demoSelect(Connection connection) throws SQLException {
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.createStatement();
+            rs = st.executeQuery("SELECT * FROM COFFEES");
+            while (rs.next()) {
+                log.info("COF_NAME=" + rs.getString("COF_NAME") +
+                        ", SUP_ID=" + rs.getInt("SUP_ID") +
+                        ", PRICE=" + rs.getString("PRICE") +
+                        ", SALES" + rs.getFloat("PRICE") +
+                        ", TOTAL=" + rs.getInt("TOTAL")
+                        );            
+            }                                
+        }
+        finally {
+            try { rs.close(); } catch (Throwable ignored) {}
+            try { st.close(); } catch (Throwable ignored) {}
+        }
+    }
+---
+    
+    * Add a log4j.xml configuration file to src/test/resources
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration 
+    xmlns:log4j="http://jakarta.apache.org/log4j/" 
+    debug="false">
+   
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" 
+                   value="(%F:%M:%L)  -%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="target/log4j-out.txt"/>
+        <param name="Append" value="false"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" 
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+        </layout>
+   </appender>
+
+   <logger name="myorg">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>  
+   </logger>
+
+   <root>
+      <priority value="info"/>    
+      <appender-ref ref="CONSOLE"/>  
+   </root>   
+   
+</log4j:configuration>
+---
+
+    * Create a JUnit test class in src/test/java/(package).
+
+        * declare a logger for the test methods
+
+---
+public class CoffeeTest extends TestCase {
+    private static final Log log = LogFactory.getLog(CoffeeTest.class);
+---
+
+        * Obtain DB properties from the launch configuration: driver, url,
+        username, and password.
+
+---
+private static final String dbDriver = System.getProperty("jdbc.driver"); 
+private static final String dbUrl = System.getProperty("jdbc.url"); 
+private static final String dbUser = System.getProperty("jdbc.user"); 
+private static final String dbPassword = System.getProperty("jdbc.password"); 
+---
+
+        * Create a setUp() method to load the driver and get a connection
+        to the database.
+
+---
+private Connection connection;
+
+public void setUp() throws ClassNotFoundException, SQLException {
+    log.debug("loading driver:" + dbDriver);
+    Class.forName(dbDriver);
+    log.debug("getting connection: url=" + dbUrl + 
+            ", user=" + dbUser + ", password=" + dbPassword);
+    connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+}
+---
+
+        * Create a tearDown() method to close the connection.
+
+---
+public void tearDown() throws SQLException {
+    log.debug("closing connection"); 
+    connection.close();
+}
+
+---
+
+        * Create a test method to call the Coffee.demoSelect(). This 
+        test method should pass in the connection.
+
+---
+public void testDemoSelect() throws Exception {
+    log.debug("testDemoSelect");
+    Coffee dao = new Coffee();
+    dao.demoSelect(connection);
+}
+---
+
+    * Your structure should look something like the following
+
+---
+./src/main/java/myorg/jdbctutorial/Coffee.java
+./src/main/resources/ddl/coffee_create.ddl
+./src/main/resources/ddl/coffee_drop.ddl
+./src/main/resources/ddl/coffee_delete.ddl
+./src/test/java/myorg/jdbctutorial/CoffeeTest.java
+./src/test/resources/log4j.xml
+---
+
+** {Section C}: (Optional!) Setup Ant Build Scripts
+
+    * Create a build.properties with the following property declarations.
+    You'll need to provide the correct paths for your environment.
+
+---
+# jdbctutorial build.properties
+junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
+commons.logging.classpath=/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
+
+jdbc.classpath=/home/jcstaff/.m2/repository/hsqldb/hsqldb/1.8.0.4/hsqldb-1.8.0.4.jar
+jdbc.driver=org.hsqldb.jdbcDriver
+jdbc.url=jdbc:hsqldb:hsql://localhost:9001
+jdbc.user=sa
+jdbc.password=
+---
+
+    * Create a build.xml file that includes the build.properties and
+    echos the defined properties.
+
+---
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="coffee" default="test" basedir=".">
+    <property file="build.properties"/>
+
+    <property name="artifactId" value="coffee"/>
+    <property name="src.dir"    value="${basedir}/src"/>
+    <property name="build.dir"  value="${basedir}/target"/>
+
+    <target name="echo">
+        <echo>basedir=${basedir}</echo>
+        <echo>artifactId=${artifactId}</echo>
+        <echo>src.dir=${src.dir}</echo>
+        <echo>build.dir=${build.dir}</echo>
+        <echo>junit.classpath=${junit.classpath}</echo>
+        <echo>commons.logging.classpath=${commons.logging.classpath}</echo>
+        <echo>log4j.classpath=${log4j.classpath}</echo>
+        <echo>jdbc.classpath=${jdbc.classpath}</echo>
+        <echo>jdbc.driver=${jdbc.driver}</echo>
+        <echo>jdbc.url=${jdbc.url}</echo>
+        <echo>jdbc.user=${jdbc.user}</echo>
+        <echo>jdbc.password=${jdbc.password}</echo>
+    </target>
+---
+---
+> ant echo
+
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/build.xml
+
+echo:
+     [echo] basedir=/home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial
+     [echo] artifactId=coffee
+     [echo] src.dir=/home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src
+     [echo] build.dir=/home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target
+     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
+     [echo] commons.logging.classpath=/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+     [echo] log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
+     [echo] jdbc.classpath=/home/jcstaff/.m2/repository/hsqldb/hsqldb/1.8.0.4/hsqldb-1.8.0.4.jar
+     [echo] jdbc.driver=org.hsqldb.jdbcDriver
+     [echo] jdbc.url=jdbc:hsqldb:hsql://localhost:9001
+     [echo] jdbc.user=sa
+     [echo] jdbc.password=
+---
+
+    * Add a target to build a java archive of the src/main items. You'll
+    need to compile the class(es), copy the the resources, and archive
+    the full set.
+
+---
+    <target name="package">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac srcdir="${src.dir}/main/java"
+               destdir="${build.dir}/classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement path="${commons.logging.classpath}"/>
+               </classpath>
+        </javac>
+
+        <copy todir="${build.dir}">
+            <fileset dir="${src.dir}/main/resources"/>
+        </copy>
+
+        <jar destfile="${build.dir}/${artifactId}.jar">
+            <fileset dir="${build.dir}/classes"/>
+        </jar>
+    </target>
+---
+---
+> ant package
+
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/build.xml
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
+     [copy] Copying 3 files to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
+      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/coffee.jar
+
+BUILD SUCCESSFUL
+Total time: 1 second
+---
+---
+> jar tf target/coffee.jar
+
+META-INF/
+META-INF/MANIFEST.MF
+ddl/
+ddl/coffee_create.ddl
+ddl/coffee_delete.ddl
+ddl/coffee_drop.ddl
+myorg/
+myorg/jdbctutorial/
+myorg/jdbctutorial/Coffee.class
+---
+
+    * Add a test target to compile the JUnit class(es) and copy over the 
+    log4j configuration.
+
+---
+    <target name="test" depends="package">
+        <mkdir dir="${build.dir}/test-classes"/>
+        <javac srcdir="${src.dir}/test/java"
+               destdir="${build.dir}/test-classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement path="${commons.logging.classpath}"/>
+               </classpath>
+        </javac>
+
+        <copy todir="${build.dir}/test-classes">
+            <fileset dir="${src.dir}/test/resources"/>
+        </copy>
+
+        <!-- add more here -->
+    </target>
+---    
+
+    * Add the Ant sql task to run the create, delete, populate, and drop 
+    scripts as appropriate. Drop the schema, re-create, and populate
+    before each test. Drop the tables after each test.
+
+---
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}"
+            onerror="continue">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*drop.ddl"/>
+            </fileset>
+        </sql>
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*create.ddl"/>
+            </fileset>
+        </sql>
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*populate.ddl"/>
+            </fileset>
+        </sql>
+ 
+        <!-- run junit tests here -->
+
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*drop.ddl"/>
+            </fileset>
+        </sql>
+---
+
+    * Add the junit task to run the test in between the sql tasks. Remember
+    to add the jdbc.classpath to the junit classpath.
+
+---
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="true" fork="true">
+               <classpath>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement location="${build.dir}/test-classes"/>
+                   <pathelement path="${commons.logging.classpath}"/>
+                   <pathelement path="${log4j.classpath}"/>
+                   <pathelement path="${jdbc.classpath}"/>
+               </classpath>
+               <sysproperty key="jdbc.driver" value="${jdbc.driver}"/>
+               <sysproperty key="jdbc.url" value="${jdbc.url}"/>
+               <sysproperty key="jdbc.user" value="${jdbc.user}"/>
+               <sysproperty key="jdbc.password" value="${jdbc.password}"/>
+
+            <batchtest fork="true" todir="${build.dir}/test-reports">
+                <fileset dir="${build.dir}/test-classes">
+                    <include name="**/*Test*.class"/>
+                </fileset>
+            </batchtest>
+
+            <formatter type="plain"/>
+            <formatter type="xml"/>
+        </junit>
+---
+
+    * Run tests
+
+---
+> ant test
+
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/build.xml
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
+     [copy] Copying 3 files to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
+      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/coffee.jar
+
+test:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-classes
+     [copy] Copying 1 file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-classes
+      [sql] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
+      [sql] Failed to execute:  DROP TABLE COFFEES
+      [sql] java.sql.SQLException: Table not found: COFFEES in statement [ DROP TABLE COFFEES]
+      [sql] 0 of 1 SQL statements executed successfully
+      [sql] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_create.ddl
+      [sql] 1 of 1 SQL statements executed successfully
+      [sql] 0 of 0 SQL statements executed successfully
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-reports
+    [junit] Running myorg.jdbctutorial.CoffeeTest
+    [junit] (CoffeeTest.java:setUp:26)  -loading driver:org.hsqldb.jdbcDriver
+    [junit] (CoffeeTest.java:setUp:28)  -getting connection: url=jdbc:hsqldb:hsql://localhost:9001, user=sa, password=
+    [junit] (CoffeeTest.java:testDemoSelect:39)  -testDemoSelect
+    [junit] (CoffeeTest.java:tearDown:34)  -closing connection
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.12 sec
+      [sql] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
+      [sql] 1 of 1 SQL statements executed successfully
+
+---
+
+    * Add a clean target to delete built items.
+
+---
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+---
+
+** {Section D}: Setup Maven Project Definition
+
+    * Create an initial pom.xml with basic project information.
+
+---
+<?xml version="1.0"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.jdbctutorial</groupId>
+    <artifactId>jdbcTutorial</artifactId>
+    <name>JDBC Tutorial</name>
+    <version>1.0-SNAPSHOT</version>
+
+</project>
+---
+
+    * Optionally add a schema definition to the root element.
+
+---
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+---
+
+    * Add compilation and test dependencies. Be sure to add dependency
+    on the HSQL driver for the test scope.
+
+---
+    <dependencies>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.13</version>
+        </dependency>
+        <dependency>
+          <groupId>hsqldb</groupId>
+          <artifactId>hsqldb</artifactId>
+          <version>1.8.0.4</version>
+        </dependency>
+    </dependencies>
+---
+
+    * Add plugin definitions for the maven-compiler-plugin to give us
+    Java 1.5 classes and for maven-surefire-plugin to be passed
+    system properties with the database driver values.
+
+---
+    <build>
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+
+              <!-- pass in driver information to JUnit -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>jdbc.driver</name>
+                            <value>${jdbc.driver}</value>
+                        </property>
+                        <property>
+                            <name>jdbc.url</name>
+                            <value>${jdbc.url}</value>
+                        </property>
+                        <property>
+                            <name>jdbc.user</name>
+                            <value>${jdbc.user}</value>
+                        </property>
+                        <property>
+                            <name>jdbc.password</name>
+                            <value>${jdbc.password}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+---
+
+    * Add a definition of the database properties in the profile 
+    section. This will allow you to define other databases to use
+    (not yet).
+
+---
+    <profiles>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+            </properties>
+        </profile>
+    </profiles>
+----
+
+    * Add the maven-sql-plugin to handle database setup/tear down.
+    Place it within a profile, guarded by !maven.test.skip, so that
+    it does not run when we supplied the -Dmaven.test.skip=true
+    property to compile lines.
+
+---
+        <profile>
+            <id>testing</id>
+            <activation>
+                <property>
+                    <name>!maven.test.skip</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>sql-maven-plugin</artifactId>
+
+                        <dependencies>
+                            <dependency>
+                                <groupId>hsqldb</groupId>
+                                <artifactId>hsqldb</artifactId>
+                                <version>1.8.0.4</version>
+                            </dependency>
+                        </dependencies>
+
+                        <configuration>
+                            <username>${jdbc.user}</username>
+                            <password>${jdbc.password}</password>
+                            <driver>${jdbc.driver}</driver>
+                            <url>${jdbc.url}</url>
+                        </configuration>
+
+                        <executions>
+
+                        <!-- more goes here -->
+
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+---
+
+    * Add the test setup executions.
+
+---
+        <execution>
+            <id>drop-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>
+            <configuration>
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*drop*.ddl</include>
+                    </includes>
+                </fileset>
+                <onError>continue</onError>
+            </configuration>
+        </execution>
+
+        <execution>
+            <id>create-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>
+            <configuration>
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*create*.ddl</include>   
+                    </includes>
+                </fileset>
+                <print>true</print>
+            </configuration>
+        </execution>
+
+        <execution>
+            <id>populate-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>
+            <configuration>
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*populate*.ddl</include> 
+                        </includes>
+                </fileset>
+            </configuration>
+        </execution>
+---
+
+    * Add the test tearDown execution.
+
+---
+        <execution>
+            <id>drop-db-after-test</id>
+            <phase>test</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>
+            <configuration>
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*drop*.ddl</include>     
+                        </includes>
+                </fileset>
+            </configuration>
+        </execution>
+---
+
+    * Build and test the project.
+
+---
+[INFO] Scanning for projects...
+[INFO] -------------------------------------------------------------------------
+[INFO] Building JDBC Tutorial
+[INFO]    task-segment: [test]
+[INFO] -------------------------------------------------------------------------
+[INFO] [resources:resources]
+[INFO] Using default encoding to copy filtered resources.
+[INFO] [compiler:compile]
+Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
+[INFO] [resources:testResources]
+[INFO] Using default encoding to copy filtered resources.
+[INFO] [sql:execute {execution: drop-db-before-test}]
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
+[ERROR] Failed to execute:  DROP TABLE COFFEES
+[ERROR] java.sql.SQLException: Table not found: COFFEES in statement [ DROP TABLE COFFEES]
+[INFO] 0 of 1 SQL statements executed successfully
+[INFO] [sql:execute {execution: create-db-before-test}]
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_create.ddl
+[INFO] 1 of 1 SQL statements executed successfully
+[INFO] [sql:execute {execution: populate-db-before-test}]
+[INFO] 0 of 0 SQL statements executed successfully
+[INFO] [compiler:testCompile]
+Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-classes
+[INFO] [surefire:test]
+[INFO] Surefire report directory: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/surefire-reports
+
+ -------------------------------------------------------
+ T E S T S
+ -------------------------------------------------------
+Running myorg.jdbctutorial.CoffeeTest
+(CoffeeTest.java:setUp:26)  -loading driver:org.hsqldb.jdbcDriver
+(CoffeeTest.java:setUp:28)  -getting connection: url=jdbc:hsqldb:hsql://localhost:9001, user=sa, password=
+(CoffeeTest.java:testDemoSelect:39)  -testDemoSelect
+(CoffeeTest.java:tearDown:34)  -closing connection
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.149 sec
+
+Results :
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] [sql:execute {execution: drop-db-after-test}]
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
+[INFO] 1 of 1 SQL statements executed successfully
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3 seconds
+[INFO] Finished at: Wed Sep 13 00:55:21 EDT 2006
+[INFO] Final Memory: 5M/10M
+[INFO] ------------------------------------------------------------------------
+---
+
+* {Section E}: Complete the Sun JDBC Tutorial
+
+    * Go to the 
+    {{{http://java.sun.com/j2se/1.5.0/docs/guide/jdbc/}
+    Sun JDBC Online Tutorial}}
+    and go through some of the tutorial steps that have to do with 
+    creating, selecting, updating, and deleting database tables.
+    Add a new method to Coffee.java to hold the core implementation
+    that might go in a Data Access Object (DAO). Add a test method 
+    to CoffeeTest that obtains a connection and invokes the specific
+    methods of Coffee.
