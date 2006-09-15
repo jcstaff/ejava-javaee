@@ -35,6 +35,15 @@
         </dependency>       
     </dependencies>
 
+    <pluginRepositories>
+        <!-- will contain any patched plugins for class -->
+        <pluginRepository>
+            <id>webdev.repository</id>
+            <name>ejava webdev repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
         <plugins>
               <!-- make sure we are building java5 -->
@@ -105,6 +114,8 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>sql-maven-plugin</artifactId>        
+                        <!-- ss1 fixes onError issue -->
+                        <version>1.0-beta-2-ss1</version>        
                     
                         <dependencies>
                             <dependency>
