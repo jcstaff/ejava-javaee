@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<project 
+    xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.jpa</groupId>
+    <artifactId>entityMgrEx</artifactId>
+    <name>Entity Manager Exercise</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+          <groupId>javax.javaee</groupId>
+          <artifactId>javaee</artifactId>
+          <version>5</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+        </dependency>
+    
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.13</version>
+        </dependency>    
+
+        <!-- dependencies for JBoss Embedded Container -->
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>1.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ejb3.embedded</groupId>
+            <artifactId>hibernate-all</artifactId>
+            <version>alpha8_patch2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ejb3.embedded</groupId>
+            <artifactId>jboss-ejb3-all</artifactId>
+            <version>alpha8_patch2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ejb3.embedded</groupId>
+            <artifactId>thirdparty-all</artifactId>
+            <version>alpha8_patch2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>webdev.repository</id>
+            <name>ejava webdev repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <!-- will contain any patched plugins for class -->
+        <pluginRepository>
+            <id>webdev.repository</id>
+            <name>ejava webdev repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>      
+      
+              <!-- pass in driver information to JUnit -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>java.class.path</name>
+                            <value>target/classes</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>            
+        </plugins>    
+    </build>
+
+    <profiles>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>testing</id>
+            <activation>
+                <property>
+                    <name>!maven.test.skip</name>
+                </property>
+            </activation>
+      
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>sql-maven-plugin</artifactId>        
+                        <!-- ss1 fixes onError issue -->
+                        <version>1.0-beta-2-ss1</version>        
+                    
+                        <dependencies>
+                            <dependency>
+                                <groupId>hsqldb</groupId>
+                                <artifactId>hsqldb</artifactId>
+                                <version>1.8.0.4</version>            
+                            </dependency>
+                        </dependencies>
+                    
+                        <configuration>
+                            <username>${jdbc.user}</username>
+                            <password>${jdbc.password}</password>
+                            <driver>${jdbc.driver}</driver>
+                            <url>${jdbc.url}</url>          
+                        </configuration>
+                    
+                        <executions>
+        <execution>
+            <id>drop-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>    
+            <configuration>              
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*drop*.ddl</include>
+                    </includes>
+                </fileset>
+                <onError>continue</onError>
+            </configuration>        
+        </execution>
+                      
+        <execution>
+            <id>create-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>    
+            <configuration>              
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*create*.ddl</include>                  
+                    </includes>
+                </fileset>
+                <print>true</print>
+            </configuration>        
+        </execution>
+                      
+        <execution>
+            <id>populate-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>    
+            <configuration>              
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*populate*.ddl</include>                  
+                        </includes>
+                </fileset>
+            </configuration>        
+        </execution>
+<!--
+        <execution>
+            <id>drop-db-after-test</id>
+            <phase>test</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>    
+            <configuration>              
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*drop*.ddl</include>                  
+                        </includes>
+                </fileset>
+            </configuration>        
+        </execution>
+-->
+                        </executions>
+                    </plugin>          
+                </plugins>          
+            </build>          
+        </profile>
+    </profiles>
+</project>

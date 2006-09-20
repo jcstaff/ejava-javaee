@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<project name="entityMgrEx" default="test" basedir=".">
+    <property file="build.properties"/>
+
+    <property name="artifactId" value="${ant.project.name}"/>
+    <property name="src.dir"    value="${basedir}/src"/>
+    <property name="build.dir"  value="${basedir}/target"/>
+
+    <target name="echo">
+        <echo>basedir=${basedir}</echo>
+        <echo>artifactId=${artifactId}</echo>
+        <echo>src.dir=${src.dir}</echo>
+        <echo>build.dir=${build.dir}</echo>
+        <echo>junit.classpath=${junit.classpath}</echo>
+        <echo>commons.logging.classpath=${commons.logging.classpath}</echo>
+        <echo>log4j.classpath=${log4j.classpath}</echo>
+        <echo>jdbc.classpath=${jdbc.classpath}</echo>
+        <echo>jdbc.driver=${jdbc.driver}</echo>
+        <echo>jdbc.url=${jdbc.url}</echo>
+        <echo>jdbc.user=${jdbc.user}</echo>
+        <echo>jdbc.password=${jdbc.password}</echo>
+        <echo>javaee.classpath=${javaee.classpath}</echo>
+        <echo>jboss.embedded.classpath=${jboss.embedded.classpath}</echo>
+    </target>
+
+    <target name="package">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac srcdir="${src.dir}/main/java"
+               destdir="${build.dir}/classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement path="${commons.logging.classpath}"/>
+                   <pathelement path="${javaee.classpath}"/>
+               </classpath>
+        </javac>
+
+        <copy todir="${build.dir}/classes">
+            <fileset dir="${src.dir}/main/resources"/>
+        </copy>
+
+        <jar destfile="${build.dir}/${artifactId}.jar">
+            <fileset dir="${build.dir}/classes"/>
+        </jar>
+    </target>
+
+    <target name="test" depends="package">
+        <mkdir dir="${build.dir}/test-classes"/>
+        <javac srcdir="${src.dir}/test/java"
+               destdir="${build.dir}/test-classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement path="${commons.logging.classpath}"/>
+                   <pathelement path="${javaee.classpath}"/>
+                   <pathelement path="${jboss.embedded.classpath}"/>
+               </classpath>
+        </javac>
+
+        <copy todir="${build.dir}/test-classes">
+            <fileset dir="${src.dir}/test/resources"/>
+        </copy>
+
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}"
+            onerror="continue">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*drop.ddl"/>
+            </fileset>
+        </sql>
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*create.ddl"/>
+            </fileset>
+        </sql>
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*populate.ddl"/>
+            </fileset>
+        </sql>
+
+
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="true" fork="true">
+               <classpath>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement location="${build.dir}/test-classes"/>
+                   <pathelement path="${commons.logging.classpath}"/>
+                   <pathelement path="${log4j.classpath}"/>
+                   <pathelement path="${javaee.classpath}"/>
+                   <pathelement path="${jboss.embedded.classpath}"/>
+               </classpath>
+
+            <batchtest fork="true" todir="${build.dir}/test-reports">
+                <fileset dir="${build.dir}/test-classes">
+                    <include name="**/*Test*.class"/>
+                </fileset>
+            </batchtest>
+
+            <formatter type="plain"/>
+            <formatter type="xml"/>
+        </junit>
+
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*drop.ddl"/>
+            </fileset>
+        </sql>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+</project>

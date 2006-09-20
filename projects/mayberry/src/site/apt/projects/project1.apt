@@ -1,0 +1,402 @@
+Project1: Data Access Tier and Initial Business Logic
+
+    9/19/2006 Draft
+
+* Goals
+
+    * Build the data access tier and initial business logic for an
+    application.
+
+* Objectives
+
+    * Design a relational schema for your project.
+
+    * Design a set of business objects to represent the data in the system.
+
+    * Incorporate JDBC technology for bulk database operations.
+
+    * Incorporate the Java Persistence API for mapping objects to 
+    the database schema.
+
+    * Provide a layer of business logic that coordinates interaction with
+    the data access objects.
+
+    * Test our implementations.
+
+* Business Description
+
+    The  Mayberry Sheriff's Department has a very small budget and will want
+    to team up with the Department of Motor Vehicles (DMV) in Raleigh to
+    obtain most of their information. Often, deputies are sent to stakeout
+    a suspected criminal where all they may know is their name.  They will
+    interface with the DMV to get a residence, physical description,
+    and drivers license photo.  Once at the residence, they may see
+    vehicles on the premises. The tag information is checked against
+    the DMV database to help determine people associated with the
+    premises. The owners of the vehicle are searched against their own
+    database of "persons of interest" to help officers be aware of
+    any immediate danger or actions to take.
+
+    You are tasked with implementing a low-cost prototype, based on 
+    current standards, to automate much of this activity. At this point in
+    the project we are primarily looking to build the data access tiers
+    for both the DMV and Sherriff's department (two separate systems). We 
+    will also add a minor amount of business logic to coordinate the data 
+    access between the individual data access objects.
+
+* Technical Overview
+
+    The project will be broken into two separate systems; MayberrySD and
+    RaleighDMV. RaleighDMV will be the most complex, MayberrySD will have
+    a minor amount of internal complexity, but will act as a client of 
+    RalieghDMV. The fact that we have two systems and they both came to
+    us to design and implement their systems means we need to keep separate
+    projects; even though we may (behind the scenes) deploy them to the
+    same database and application server during development and testing.
+    The first two sub-projects we'll be working on are RalieghDAT (data
+    access tier) and MayberryDAT.
+
+    There should be no use of System.out.println() in the code and all
+    implementations must use the jakarta commons loggin API with the 
+    log4j logging provider.  You may leave debug in your code, but this 
+    should be able to be turned on/off with the proper logging priority
+    changes in the log4j.xml configuration.
+
+
+* Technical Details
+
+    [[1]] Design a database schema that accounts for the following information
+
+[project1/DatabaseSchema.gif] Database Schema
+
+        [[a]] RaleighDMV
+
+            [[1]] PERSON
+
+                * ID (N:N relationship with VEHICLE_REGISTRATION)
+
+                * FIRST_NAME
+
+                * MIDDLE_NAME
+
+                * LAST_NAME
+
+                * NAME_SUFFIX
+
+            [[1]] PHYSICAL_DETAILS 
+
+                * PERSON_ID (0..1:1 relationship with PERSON)
+
+                * SEX
+
+                * DOB
+
+                * HEIGHT (inches)
+
+                * WEIGHT (lbs)
+
+                * EYE_COLOR
+
+                * HAIR_COLOR
+
+            [[1]] PHOTO 
+
+                * PERSON_ID (0..1:1 relationship with PHYSICAL_DETAILS)
+
+                * IMAGE
+
+            [[1]] LOCATION
+
+                * ID
+
+                * STREET_NO
+
+                * STREET_NAME
+
+                * CITY
+
+                * STATE_CODE
+
+                * ZIP
+
+            [[1]] RESIDENCE
+
+                * PERSON_ID (N:1 relationship with PERSON)
+
+                * LOCATION_ID (N:1 relationship with LOCATION)
+
+                * START_DATE
+
+                * END_DATE
+
+            [[1]] VEHICLE_REGISTRATION
+
+                * ID (N:N relationship with PERSON)
+
+                * TAG_NO
+
+                * VIN
+
+                * MAKE
+
+                * MODEL
+
+                * YEAR
+
+                * EXPIRATION
+
+        [[a]] MayberrySD
+
+            [[1]] POI
+
+                * ID
+
+                * FIRST_NAME
+
+                * MIDDLE_NAME
+
+                * LAST_NAME
+                
+                * NAME_SUFFIX
+
+            [[1]] ACTIVITY
+
+                * ID
+
+                * POI_ID
+
+                * DATE
+
+                * CODE
+
+                * DESCRIPTION
+
+    [[1]] Design a set of business objects to represent the data in the 
+    system.
+
+[project1/BusinessObjects.gif] Database Schema
+
+        [[a]] RaleighDMV
+
+            [[1]] Person
+
+                * id:long
+
+                * firstName:String
+
+                * middleName:String
+
+                * lastName:String
+
+                * nameSuffix:String
+
+                * currentResidence:Residence
+
+                * residences:Collection\<Residence\>
+
+                * physicalDetails:PhysicalDetails
+
+            [[1]] PhysicalDetails
+
+                * id:long
+
+                * sex: SEX (enum)
+
+                * dob: Date
+
+                * height:int
+
+                * weight:int
+
+                * eyeColor: COLOR (enum)
+
+                * hairColor: COLOR (enum)
+
+                * photo:byte[]
+
+            [[1]] Residence
+
+                * locationId:long
+
+                * streetNo:int
+
+                * streetName:String
+
+                * city:String
+
+                * state:STATE (enum)
+
+                * zip:int
+
+                * person:Person
+
+
+            [[1]] VehicleRegistration
+
+                * id:long
+
+                * tagNo:String
+
+                * vin:String
+
+                * make:String
+
+                * model:String
+
+                * color:COLOR (enum)
+
+                * year:Date
+
+                * expiration:Date
+
+                * owners:Collection\<Person\>
+
+        [[a]] MayberrySD
+
+            [[1]] PersonOfInterest
+
+                * id:long
+
+                * firstName:String
+
+                * middleName:String
+
+                * lastName:String
+
+                * nameSuffix:String
+
+                * activities:Collection\<Activity\>
+
+            [[1]] Activity
+
+                * id:long
+
+                * date:Date
+
+                * description:String 
+
+
+    [[1]] Design a set of DAOs, based on JDBC/SQL that will be used for data
+    ingestion. These DAOs will be able to create a PreparedStatement
+    and loop through a set of inserts for a set of input records
+    for the DMV database. The records will be provided in a set of one
+    or more XML files and will be provided to you with a parser that 
+    can turn the file into a set of Java constructs. You are to map the 
+    output of the parser into your business objects and then hand them
+    off to the DAOs for insertion. The DAO need not support any other 
+    function that to insert these records.
+
+    [[1]] Map the DMV and Sheriff business objects to the database using
+    the Java Persistence API. You must encapsulate the fact that you are
+    using EntityManagers within a DAO layer. These DAOs should share an
+    EntityManager with other DAOs in the same Thread.
+
+    [[1]] Design an initial business logic wrapper around your data 
+    access tier.  This wrapper will be used to implement the required 
+    coordination between data access objects to perform business functions.
+    This level of business logic will operate within the current
+    transaction.
+    This layer must support:
+
+        [[a]] RalieghDMV
+
+            * getPersonDetails(firstName, lastName,...):
+                Collection\<Person\> - returns a Person with
+                PhysicalDetails and Resisence information.
+
+            * getOwnerDetails(tagNo): Collection\<Person\> - returns a
+            collection of information with PhysicalDetails.
+
+        [[a]] MayberrySD
+
+            * createPOI(POI): POI - adds a new person of interest.
+
+            * addActivity(POI, Activity): POI - adds a new activity to the
+            person of interest.
+
+            * getPOI(firstName, lastName, ...)
+                Collection\<POI\> - returns a list of persons of interest
+                with their activities.
+
+            * isDangerous(poiID): boolean - returns true if the word 
+            dangerous occurs in any of the activity descriptions.
+
+    [[1]] Provide at least one or more query methods that demonstrate the
+    use of EJB-QL within either system.
+
+* Testing
+
+    [[1]] Provide a JUnit test program for your ingest DAOs. This test 
+    should verify the ability of the DAOs to insert a Person,
+    PhysicalDetails, Residence, and VehicleRegistration information.
+    You will need to perform SQL selects within the test program to
+    fully test the inserts.
+
+    [[1]] Provide a JUnit test program for your Java Persistence O/R
+    Mappings. These tests should at least verify that you can persist(), 
+    update, and remove(), objects and their relationships.
+
+    [[1]] Provide a JUnit test program for your initial business logic.
+    The JUnit test case should take care of transaction boundaries and
+    providing the business logic thread an EntityManager to operate.
+    Be sure to include a test of the EJB-QL method.
+
+* Grading
+
+    Your project will be graded on completeness and quality of product. In
+    order for you to recieve full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The breakdown of grading 
+    will be as follows:
+
+        * README provided that describes where each requirement satisfield: 10pts
+
+        * projects cleanly builds with Maven or Ant: 15pts
+
+        * data ingest: 25pts
+
+        * O/R Mapping: 35pts
+
+        * Business Logic: 15pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implamantation supplied: 30%
+
+        * testing: 10%
+
+* Submission Guidelines
+
+    You should test your application prior to submission by 
+
+        * running the clean targets before zipping up the source code
+
+        * removing (or moving) your M2_REPO
+        
+        * unzipping your source code into a new directory.
+        
+        * building and running the tests for your application(s) from scratch.
+
+    You will e-mail the projects to both graders with the following subject
+    line
+
+        * (your name) project 1; revision 0; part # of #
+
+    Your submission will include source zip, README (could be in source
+    zip), and built project artifact(s) (e.g., jar, war, ear, etc.).
+
+    
+    If you need to make a correction, the correction should have the
+    following e-mail subject. The body should describe what you wish to 
+    revise.
+
+        * (your name) project 1; revision N; part # of #
+
+    Grader e-mails (mail to both):
+
+        * BenButler@comcast.net
+
+        * j_faniyi@yahoo.com

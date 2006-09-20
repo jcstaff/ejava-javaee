@@ -31,6 +31,17 @@ Exercise: JDBC Tutorial
     taking advantage of the fact it will start and stop the database 
     process.
 
+    [Note:] You can also start the databaase manually to save some room 
+    on your system for now. You should try both commands at first and
+    verify both approaches result in the same database using the DB GUI.
+
+---
+cd ${JBOSS_HOME}/server/default/data/hypersonic
+java -classpath ${JBOSS_HOME}/server/default/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+---
+
+    []
+
     * Start the DB GUI and login using the "HSQL Database Engine Server"
     option.
 

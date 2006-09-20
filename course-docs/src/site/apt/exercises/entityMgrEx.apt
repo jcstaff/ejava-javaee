@@ -1,0 +1,1623 @@
+Exercise: Entity Manager
+
+* Goals
+
+    * Become comfortable building and testing a component that uses 
+    the Java Persistence API's EntityManager
+
+* Objectives
+
+    * {{{#Section A} Setup and Start Database}}
+
+    * {{{#Section B} Setup Project Structure}}
+
+    * {{{#Section C} Setup Core JBoss Test Harness}}
+
+    * {{{#Section D} (Optional!) Setup Ant Build Scripts}}
+
+    * {{{#Section E} Setup Maven Project Definition}}
+
+    * {{{#Section F} Test Entity Manager Functions}}
+
+* Steps
+
+    [Note:] Although this exercise will show you how to create each file,
+    many of them are boilerplate from other exercises. If you already have
+    the JDBC Tutorial Exercise completed, you can consider starting 
+    with a copy of that project and modifying it.
+
+** {Section A}: Setup and Start Database
+
+    * If you haven't done so already, perform the setup instructions
+    for JBoss and the database as defined in 
+    {{{ex0.html#Part F}Exercise 0}}. Refer back to those instructions for 
+    basic commands.
+
+    * Start the database (using the JBoss run.sh command). Note that the 
+    application server is not necessary for this exercise. We are just 
+    taking advantage of the fact it will start and stop the database 
+    process.
+
+    [Note:] You can also start the databaase manually to save some room 
+    on your system for now. You should try both commands at first and
+    verify both approaches result in the same database using the DB GUI.
+
+---
+cd ${JBOSS_HOME}/server/default/data/hypersonic
+java -classpath ${JBOSS_HOME}/server/default/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+---
+
+    []
+
+    * Start the DB GUI and login using the "HSQL Database Engine Server"
+    option.
+
+---
+java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+---
+
+** {Section B}: Setup Project Structure
+
+    * Create a set of ddl scripts in src/main/resources/ddl to
+    handle creating the schema, deleting rows in the schema, and
+    dropping tables in the schema. Make sure each script has the 
+    word "create", "delete", or "drop" in its file name to match 
+    some search strings we'll use later. Have the database generate
+    a value for the primary key.
+
+    [Note:] We could actually skip this step and have the persistence 
+    provider create the table for us. That approach is great for quick
+    Java-first prototypes. However, creating the schema outside of the
+    persistence provider is a more realistic scenario for larger 
+    developments.
+
+    []
+
+---
+# emauto_create.ddl
+CREATE TABLE EM_AUTO (
+    ID BIGINT NOT NULL IDENTITY,
+    MAKE VARCHAR(32),
+    MODEL VARCHAR(32),
+    COLOR VARCHAR(32),
+    MILEAGE INT,
+
+    CONSTRAINT em_autoPK PRIMARY KEY(ID)
+)
+
+# emauto_delete.ddl
+DELETE * FROM EM_AUTO;
+
+# emauto_drop.ddl
+DROP TABLE EM_AUTO;
+---
+
+    * Create a META-INF/persistence.xml file to define the 
+    persistence unit for our jar file.
+
+        * persistence-unit name: must match what we place in our JUnit test
+
+        * jta-data-source: must match what we place in the jndiName field
+        within the embedded-jboss-beans.xml file we'll setup later.
+
+        []
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" version="1.0">
+
+    <persistence-unit name="entityMgrEx">
+        <jta-data-source>java:/ejavaDS</jta-data-source>
+        <properties>
+        </properties>
+    </persistence-unit>
+
+</persistence>
+---
+
+    * Create a utility class to hold the open EntityManagerFactory objects.
+    JBoss only allows a single EntityManagerFactory to be created per
+    peristsnce unit, so this must be managed at the application level and
+    not the per-test level (since tests should be allowed to run in 
+    parallel threads).
+
+---
+package myorg.entitymgrex;
+
+import java.util.HashMap;
+import java.util.Map;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class JPAUtil {
+    private static final Log log = LogFactory.getLog(JPAUtil.class);
+    private static final Map<String, EntityManagerFactory> factories = 
+        new HashMap<String, EntityManagerFactory>();
+}
+---
+
+    * Add a public static method to get or create an EntityManagerFactory
+    for a specific persistence unit. You may want to make this thread safe
+    by guarding against concurrent modifications to the singleton map. Note
+    the use of javax.persistence.Persistence.createEntityManagerFactory
+    to bootstrap our application with the persistence provider.
+
+---
+    public static EntityManagerFactory getEntityManagerFactory(String puName) {
+        EntityManagerFactory emf = factories.get(puName);
+        if (emf == null) {
+            synchronized(factories) {
+                emf = factories.get(puName);
+                if (emf == null) {
+                    log.debug("creating EntityManagerFactory(" + puName + ")");
+
+                    emf = Persistence.createEntityManagerFactory(puName);
+
+                    factories.put(puName, emf);
+                }
+            }
+        }
+        return emf;
+    }
+---
+
+    * Add a public static method to close all open EntityManagerFactory
+    objects and clear the map. You may want to make this thread safe by
+    guarding against concurrent access to the map during modification.
+
+---
+    public static void close() {
+        log.debug("closing " + factories.size() + " EntityManagerFactories");
+        synchronized(factories) {
+            for(String puName : factories.keySet()) {
+                factories.get(puName).close();
+                log.debug(puName + " closed");
+            }
+            factories.clear();
+        }
+    }
+---
+
+    * Create a JUnit Test case to hold your test code. This test 
+    test case will need to be run within an overall test suite that will 
+    take care of one-time startup and shutdown tasks for the JVM. Therefore,
+    you'll need to leave the word "Test" out of its name so that it is not
+    automatically located by JUnit search expressions looking for 
+    "*Test*.class". 
+
+---
+package myorg.entitymgrex;
+
+import javax.persistence.EntityManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import junit.framework.TestCase;
+
+public class EntityMgrExercise extends TestCase {
+    private static Log log = LogFactory.getLog(EntityMgrExercise.class);
+
+
+    public void testtemplate() {
+        log.info("testTemplate");
+    }
+}
+---
+
+    * Override the JUnit setUp() method to create an entity manager
+    for the tests to use. We are using the global JPAUtil class you wrote
+    earlier to share this global object with multiple test cases and
+    our root test case will take care of closing it out before shutting
+    down.
+
+---
+    private static final String PERSISTENCE_UNIT = "entityMgrEx";
+    private EntityManager em;    
+
+    protected void setUp() throws Exception {
+        log.debug("creating entity manager");
+        EntityManagerFactory emf = 
+            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);
+        em = emf.createEntityManager();
+        assertNotNull(em);
+    }
+---
+
+    * Override the JUnit tearDown() method to flush all remaining items
+    in the persistence context to the database and close the entity manager.
+
+---
+    protected void tearDown() throws Exception {
+        try {
+            log.debug("tearDown() started, em=" + em);
+            em.getTransaction().begin();
+            em.flush();
+            //logAutos();
+            //deleteAutos();
+            em.close();
+            em.getTransaction().commit();
+            log.debug("tearDown() complete, em=" + em);
+        }
+        catch (Exception ex) {
+            log.fatal("tearDown failed", ex);
+            throw ex;
+        }
+     }
+---
+
+    * Add in a logAutos() method to query and print all autos in the 
+    database. Do this after flushing the entity manager in the tearDown()
+    method so you can see the changes from the previos test. The following
+    example uses the entity manager to create an ad-hoc EJB-QL statement.
+
+---
+    public void logAutos() {
+        Query query = em.createQuery("select a from Auto as a");
+        for (Object o: query.getResultList()) {
+            log.info("EM_AUTO:" + o);
+        }        
+    }
+---
+
+    * You might also want to add a deleteAutos() to clear out the Auto
+    table between tests. The example below uses the entity manager to
+    create a native SQL statement.
+    
+---
+    public void deleteAutos() {
+        Query query = em.createNativeQuery("delete from EM_AUTO");
+        int rows = query.executeUpdate();
+        log.info("removed " + rows + " rows");
+    }
+---
+
+    * Add a log4j.xml file to src/test/resources that has your 
+    desired settings. The one below produces less timestamp information
+    at the console and more details in the logfile.
+
+    [Note:] JBoss provides a log4j.xml file that might get copied in 
+    during a later step. Be sure to either to either not overwrite
+    this file or remember to put it back to your desired settings. 
+
+    [Note:] Although it might be a bit entertaining to set the priority
+    of the root appender to debug to see everything the persistence provider
+    has to say, it is quite noisy. Consider changing to root priority to
+    fatal so that a majority of the log statements are yours.
+
+    []
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration
+    xmlns:log4j="http://jakarta.apache.org/log4j/"
+    debug="false">
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="(%F:%M:%L)  -%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="target/log4j-out.txt"/>
+        <param name="Append" value="false"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+        </layout>
+   </appender>
+
+   <logger name="myorg">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>
+   </logger>
+
+   <root>
+      <priority value="fatal"/>
+      <appender-ref ref="CONSOLE"/>
+   </root>
+
+</log4j:configuration>
+---
+
+    * Create a (Plain Old Java Object (POJO)) Class to represent an
+    automobile. Use class annotations to prvide the following:
+
+        * @Entity annotation on the class to tell persistence provider 
+        this is part of persistence unit
+
+        * @Table(name="EM_AUTO") annotation on the class to match the 
+        table name in the emauto_create.ddl file
+
+        * properties to hold id:long, make:String, model:String, color:String,
+        mileage:int.
+
+        * a public getId():long to return the id field.
+
+        * a private setId(long) to set the primary key. This will be called
+        by the persistence provider. You may want to add a 
+        @SuppressWarnings("unused") if your compiler is warning you that
+        the private setId() is not being used within the class.
+
+        * @Id annotation on the getId() method to tell the persistence 
+        provider the id property is the primary key and to use 
+        PROPERTY type access (get/setId() versus FIELD type access)
+
+        * make the class implement java.io.Serializable. 
+
+---
+package myorg.entitymgrex;
+
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity @Table(name="EM_AUTO")
+public class Auto implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private long id;
+    private String make;
+    private String model;
+    private String color;
+    private int mileage;
+
+    @Id @GeneratedValue
+    public long getId() {
+        return id;
+    }
+    @SuppressWarnings("unused")
+    private void setId(long id) {
+        this.id = id;
+    }
+
+    //more getter/setters go here
+}
+---
+
+    * Add the remaining setter/getter methods to the class. Since we are
+    using generated primary key values, there is no immediate need for a 
+    constructor to set the id. If you add this later, remember to also 
+    add a default constructor, which was removed by the compiler when 
+    you manually add the first constructor.
+    
+---
+    public String getMake() {
+        return make;
+    }
+    public void setMake(String make) {
+        this.make = make;
+    }
+    public int getMileage() {
+        return mileage;
+    }
+    public void setMileage(int mileage) {
+        this.mileage = mileage;
+    }
+    public String getModel() {
+        return model;
+    }
+    public void setModel(String model) {
+        this.model = model;
+    }
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }    
+}
+---
+
+    * You may also want to add a public toString():String method to 
+    conveniently print your Auto objects.
+
+---
+    public String toString() {
+        return super.toString() +
+            ", id=" + id +
+            ", make=" + make +
+            ", model=" + model +
+            ", color=" + color +
+            ", mileage=" + mileage;            
+    }
+---
+
+
+** {Section C}: Setup Core JBoss Test Harness
+
+    * Copy the XML configuration files from the conf directory of the 
+    JBoss Embeddable EJB3.0 downloaded in 
+    {{{./ex0.html#Part G}Exercise 0}}.
+    Place them in src/test/resources.
+
+---
+> ls src/test/resources/
+
+default.persistence.properties  jboss-jms-beans.xml  security-beans.xml
+ejb3-interceptors-aop.xml       log4j.xml
+embedded-jboss-beans.xml        login-config.xml
+---
+
+    * Restore the log4j.xml settings to your desired values if they were 
+    overwritten during this step.
+
+    [Note:] I have noticed with the addition of the JBoss embedded container
+    jar files that the classname:method:line entries in the log have switched
+    from being the caller to logger to being the logger itself. This means
+    that you will not longer be able to get valuable class/line number 
+    information with each log entry until resolved.
+
+---
+(Log4JLogger.java:debug:84)  -closing 1 EntityManagerFactories
+---
+
+    []
+
+    * Add our database configuration to the embedded-jboss-beans.xml file.
+    This is easily done by copying the existing DefaultDSBootstrap and
+    DefaultDS beans at the bottom and then updating the following fields.
+    This will result in our ejava HSQL database showing up in a local JNDI
+    tree under the name java:/ejavaDS.
+
+        * DefaultDSBootstrap -> ejavaDSBootstrap
+
+        * connectionURL=jdbc:hsqldb:hsql://localhost:9001
+
+        * jndiName=java:/ejavaDS
+
+        * DefaultDS -> ejavaDS
+
+        * factory bean=ejavaDSBootstrap
+
+---
+   <bean name="ejavaDSBootstrap" class="org.jboss.resource.adapter.jdbc.local.LocalTxDataSource">
+      <property name="driverClass">org.hsqldb.jdbcDriver</property>
+      <property name="connectionURL">jdbc:hsqldb:hsql://localhost:9001</property>
+      <property name="userName">sa</property>
+      <property name="jndiName">java:/ejavaDS</property>
+      <property name="minSize">0</property>
+      <property name="maxSize">10</property>
+      <property name="blockingTimeout">1000</property>
+      <property name="idleTimeout">100000</property>
+      <property name="transactionManager"><inject bean="TransactionManager"/></property>
+      <property name="cachedConnectionManager"><inject bean="CachedConnectionManager"/></property>
+      <property name="initialContextProperties"><inject bean="InitialContextProperties"/></property>
+   </bean>                                                                      
+   <bean name="ejavaDS" class="java.lang.Object">
+      <constructor factoryMethod="getDatasource">
+         <factory bean="ejavaDSBootstrap"/>
+      </constructor>
+   </bean>                             
+---
+
+    * Add a jndi.properties file to src/test/resources to define the default
+    properties for JNDI InitialContext(). This definition will look local
+    to the JBoss JNDI tree within your JVM.
+
+---
+java.naming.factory.initial=org.jnp.interfaces.LocalOnlyContextFactory
+java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces
+---
+
+    * Create a JBoss JUnit Test to manage the JBoss-specific components and
+    your test classes. Place this class in src/test/myorg/entitymgrex.
+
+---
+package myorg.entitymgrex;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.jboss.ejb3.embedded.EJB3StandaloneBootstrap;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+public class JBossTest extends TestCase {
+    private static Log log = LogFactory.getLog(JBossTest.class);
+    
+}
+---
+
+    * Add a helper method to startup the embedded JBoss container.
+
+---
+    public static void startupEmbeddedJBoss() throws Exception {
+        try {
+            log.debug("starting up embedded JBoss container");     
+            EJB3StandaloneBootstrap.boot(null);
+            EJB3StandaloneBootstrap.scanClasspath();
+            log.debug("embedded JBoss container startup complete");
+        }
+        catch (Exception ex) {
+            log.fatal("error on embbeded JBoss startup" + ex);
+            fail("" + ex);
+        }
+    }
+---
+
+    * Add a helper method to shutdown the embedded JBoss container.
+
+---
+    public static void shutdownEmbeddedJBoss() throws Exception {
+        try {
+            log.debug("shutting down embedded JBoss container");     
+            EJB3StandaloneBootstrap.shutdown();
+            log.debug("embedded JBoss container shutdown complete");
+        }
+        catch (Exception ex) {
+            log.fatal("error on embedded JBoss shutdown", ex);
+            fail("" + ex);
+        }
+    }
+---
+
+    * Add the main suite() method that defines the tests and adds one-time
+    startup and shutdown code to the JVM. Note that it will call 
+    JPAUtil to close the open EntityManagerFactory objects before shutting
+    down the JBoss embedded container.
+
+---
+    public static Test suite() {
+        TestSuite tests = new TestSuite();
+        tests.addTestSuite(EntityMgrExercise.class);
+        
+        TestSetup wrapper = new TestSetup(tests) {
+            public void setUp() throws Exception {
+                startupEmbeddedJBoss();
+            }
+            public void tearDown() throws Exception {
+                JPAUtil.close();
+                shutdownEmbeddedJBoss();
+            }
+        };
+        
+        return wrapper;
+    }
+---
+
+** {Section D}: (Optional!) Setup Ant Build Scripts
+
+    * Create a build.properties to hold the non-portable property definitions.
+
+    [Note:] The paths provided are from a specific system and shell. Take the
+    actual values as notional and not literal. You must adjust the values
+    assigned to be valid for your environment and shell.
+
+    []
+
+---
+# entityMgrEx build.properties
+junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
+commons.logging.classpath=/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
+
+jdbc.classpath=/home/jcstaff/.m2/repository/hsqldb/hsqldb/1.8.0.4/hsqldb-1.8.0.4.jar
+jdbc.driver=org.hsqldb.jdbcDriver
+jdbc.url=jdbc:hsqldb:hsql://localhost:9001
+jdbc.user=sa
+jdbc.password=
+
+
+javaee.classpath=/home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.jar
+ehcache.classpath=/home/jcstaff/.m2/repository/net/sf/ehcache/ehcache/1.2/ehcache-1.2.jar
+jboss.embedded.ejb3=/home/jcstaff/.m2/repository/org/jboss/ejb3/embedded/jboss-ejb3-all/alpha8_patch2/jboss-ejb3-all-alpha8_patch2.jar
+jboss.embedded.hibernate=/home/jcstaff/.m2/repository/org/jboss/ejb3/embedded/hibernate-all/alpha8_patch2/hibernate-all-alpha8_patch2.jar
+jboss.embedded.thirdparty=/home/jcstaff/.m2/repository/org/jboss/ejb3/embedded/thirdparty-all/alpha8_patch2/thirdparty-all-alpha8_patch2.jar
+
+jboss.embedded.classpath=\
+${ehcache.classpath}:\
+${jboss.embedded.ejb3}:\
+${jboss.embedded.hibernate}:\
+${jboss.embedded.thirdparty}
+---
+
+    * Create a build.xml to hold the targets to build and test your project.
+    You will add more targets in the following steps.
+
+---
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="entityMgrEx" default="test" basedir=".">
+    <property file="build.properties"/>
+
+    <property name="artifactId" value="${ant.project.name}"/>
+    <property name="src.dir"    value="${basedir}/src"/>
+    <property name="build.dir"  value="${basedir}/target"/>
+
+    <target name="echo">
+        <echo>basedir=${basedir}</echo>
+        <echo>artifactId=${artifactId}</echo>
+        <echo>src.dir=${src.dir}</echo>
+        <echo>build.dir=${build.dir}</echo>
+        <echo>junit.classpath=${junit.classpath}</echo>
+        <echo>commons.logging.classpath=${commons.logging.classpath}</echo>
+        <echo>log4j.classpath=${log4j.classpath}</echo>
+        <echo>jdbc.classpath=${jdbc.classpath}</echo>
+        <echo>jdbc.driver=${jdbc.driver}</echo>
+        <echo>jdbc.url=${jdbc.url}</echo>
+        <echo>jdbc.user=${jdbc.user}</echo>
+        <echo>jdbc.password=${jdbc.password}</echo>
+        <echo>javaee.classpath=${javaee.classpath}</echo>
+        <echo>jboss.embedded.classpath=${jboss.embedded.classpath}</echo>
+    </target>
+
+    <!-- more targets go here -->
+
+</project>
+---
+---
+> ant echo 
+
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/build.xml
+
+echo:
+     [echo] basedir=/home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx
+     [echo] artifactId=entityMgrEx
+     [echo] src.dir=/home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/src
+     [echo] build.dir=/home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/target
+     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
+     [echo] commons.logging.classpath=/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+     [echo] log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
+     [echo] jdbc.classpath=/home/jcstaff/.m2/repository/hsqldb/hsqldb/1.8.0.4/hsqldb-1.8.0.4.jar
+     [echo] jdbc.driver=org.hsqldb.jdbcDriver
+     [echo] jdbc.url=jdbc:hsqldb:hsql://localhost:9001
+     [echo] jdbc.user=sa
+     [echo] jdbc.password=
+     [echo] javaee.classpath=/home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.jar
+     [echo] jboss.embedded.classpath=/home/jcstaff/.m2/repository/net/sf/ehcache/ehcache/1.2/ehcache-1.2.jar:/home/jcstaff/.m2/repository/org/jboss/ejb3/embedded/jboss-ejb3-all/alpha8_patch2/jboss-ejb3-all-alpha8_patch2.jar:/home/jcstaff/.m2/repository/org/jboss/ejb3/embedded/hibernate-all/alpha8_patch2/hibernate-all-alpha8_patch2.jar:/home/jcstaff/.m2/repository/org/jboss/ejb3/embedded/thirdparty-all/alpha8_patch2/thirdparty-all-alpha8_patch2.jar
+---
+
+    * Add a target to compile and build the archive of your primary 
+    artifact.
+
+---
+    <target name="package">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac srcdir="${src.dir}/main/java"
+               destdir="${build.dir}/classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement path="${commons.logging.classpath}"/>
+                   <pathelement path="${javaee.classpath}"/>
+               </classpath>
+        </javac>
+
+        <copy todir="${build.dir}/classes">
+            <fileset dir="${src.dir}/main/resources"/>
+        </copy>
+
+        <jar destfile="${build.dir}/${artifactId}.jar">
+            <fileset dir="${build.dir}/classes"/>
+        </jar>
+    </target>
+---
+---
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/build.xml
+
+package:
+    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/target/classes
+    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/target/classes
+     [copy] Copying 4 files to /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/target/classes
+      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/target/entityMgrEx.jar
+
+BUILD SUCCESSFUL
+Total time: 1 second
+
+
+---
+
+    * Add a target to build the test classes for your project.
+
+---
+    <target name="test" depends="package">
+        <mkdir dir="${build.dir}/test-classes"/>
+        <javac srcdir="${src.dir}/test/java"
+               destdir="${build.dir}/test-classes"
+               debug="true"
+               source="1.5"
+               target="1.5">
+               <classpath>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement path="${commons.logging.classpath}"/>
+                   <pathelement path="${javaee.classpath}"/>
+                   <pathelement path="${jboss.embedded.classpath}"/>
+               </classpath>
+        </javac>
+
+        <copy todir="${build.dir}/test-classes">
+            <fileset dir="${src.dir}/test/resources"/>
+        </copy>
+
+        <!-- more tasks go here -->
+
+    </target>
+---
+
+    * Add sql tasks to run any drop scripts to remove specific database
+    schema before running tests.
+
+---
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}"
+            onerror="continue">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*drop.ddl"/>
+            </fileset>
+        </sql>
+---
+
+    * Add sql tasks to run any create scripts to create specific database
+    schema before running tests.
+
+---
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*create.ddl"/>
+            </fileset>
+        </sql>
+---
+
+    * Add sql tasks to run any populate scripts to add any test data 
+    to database before running tests.
+
+---
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*populate.ddl"/>
+            </fileset>
+        </sql>
+---
+
+    * Add a junit task to run your tests.
+
+---
+        <mkdir dir="${build.dir}/test-reports"/>
+        <junit printsummary="true" fork="true">
+               <classpath>
+                   <pathelement path="${junit.classpath}"/>
+                   <pathelement location="${build.dir}/${artifactId}.jar"/>
+                   <pathelement location="${build.dir}/test-classes"/>
+                   <pathelement path="${commons.logging.classpath}"/>
+                   <pathelement path="${log4j.classpath}"/>
+                   <pathelement path="${javaee.classpath}"/>
+                   <pathelement path="${jboss.embedded.classpath}"/>
+               </classpath>
+
+            <batchtest fork="true" todir="${build.dir}/test-reports">
+                <fileset dir="${build.dir}/test-classes">
+                    <include name="**/*Test*.class"/>
+                </fileset>
+            </batchtest>
+
+            <formatter type="plain"/>
+            <formatter type="xml"/>
+        </junit>
+---
+
+    * Add sql tasks to run any drop scripts to remove specific database
+    schema after running tests. You may want to comment this part out
+    during development if you wish to see database changes with the DB GUI
+    after running tests.
+
+---
+        <sql driver="${jdbc.driver}"
+            url="${jdbc.url}"
+            userid="${jdbc.user}"
+            password="${jdbc.password}"
+            classpath="${jdbc.classpath}"
+            onerror="continue">
+            <fileset dir="${src.dir}">
+                <include name="main/resources/ddl/**/*drop.ddl"/>
+            </fileset>
+        </sql>
+---
+
+    * Build and run the tests.
+
+---
+> ant test -emacsSearching for build.xml ...
+
+Searching for build.xml ...
+Buildfile: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/build.xml
+
+test:
+Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/src/main/resources/ddl/emauto_drop.ddl
+Failed to execute:  DROP TABLE EM_AUTO
+java.sql.SQLException: Table not found: EM_AUTO in statement [ DROP TABLE EM_AUTO]
+0 of 1 SQL statements executed successfully
+Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/src/main/resources/ddl/emauto_create.ddl
+1 of 1 SQL statements executed successfully
+0 of 0 SQL statements executed successfully
+Running myorg.entitymgrex.JBossTest$1
+Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.204 sec
+Test myorg.entitymgrex.JBossTest$1 FAILED
+Running myorg.entitymgrex.JBossTest
+(JBossTest.java:suite:50 -returning test suite
+(JBossTest.java:startupEmbeddedJBoss:56 -starting up embedded JBoss container
+(JBossTest.java:startupEmbeddedJBoss:59 -embedded JBoss container startup complete
+(EntityMgrExercise.java:setUp:18 -creating entity manager
+(JPAUtil.java:getEntityManagerFactory:36 -creating EntityManagerFactory(entityMgrEx)
+(Ejb3Configuration.java:accept:504 -META-INF/MANIFEST.MFO-:-Ofalse
+(Ejb3Configuration.java:accept:504 -META-INF/.persistence.xml.swpO-:-Ofalse
+(Ejb3Configuration.java:accept:504 -META-INF/persistence.xmlO-:-Ofalse
+(Ejb3Configuration.java:accept:504 -ddl/.emauto_create.ddl.swpO-:-Ofalse
+(Ejb3Configuration.java:accept:504 -ddl/emauto_create.ddlO-:-Ofalse
+(Ejb3Configuration.java:accept:504 -ddl/emauto_delete.ddlO-:-Ofalse
+(Ejb3Configuration.java:accept:504 -ddl/emauto_drop.ddlO-:-Ofalse
+(EntityMgrExercise.java:testTemplate:49 -testTemplate
+(EntityMgrExercise.java:tearDown:27 -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@a415a3
+(EntityMgrExercise.java:tearDown:33 -tearDown() complete, em=org.hibernate.ejb.EntityManagerImpl@a415a3
+(JPAUtil.java:close:51 -closing 1 EntityManagerFactories
+(JPAUtil.java:close:55 -entityMgrEx closed
+(JBossTest.java:shutdownEmbeddedJBoss:68 -shutting down embedded JBoss container
+(JBossTest.java:shutdownEmbeddedJBoss:70 -embedded JBoss container shutdown complete
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 12.273 sec
+Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/src/main/resources/ddl/emauto_drop.ddl
+1 of 1 SQL statements executed successfully
+
+BUILD SUCCESSFUL
+Total time: 14 seconds
+---
+
+
+** {Section D}: Setup Maven Project Definition
+
+    [Note:] This project definition may be long, but realize there is 
+    a very limited amount that is project specific. Maven provides the 
+    mechanism to create a layered set of pom.xml files, which can help
+    establish templates for each lower-level project to take advantage of.
+    The full pom.xml is being provided here to be complete. You would 
+    surely refator repeated details in a non-class environment.
+
+    []
+
+    * Create a pom.xml file to define the project
+
+---
+<?xml version="1.0"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.jpa</groupId>
+    <artifactId>entityMgrEx</artifactId>
+    <name>Entity Manager Exercise</name>
+    <version>1.0-SNAPSHOT</version>
+
+</project> 
+---
+
+    * Add the src/main dependenciies. This represents what your code depends
+    upon at compile time and runtime.
+
+---
+    <dependencies>
+        <dependency>
+          <groupId>javax.javaee</groupId>
+          <artifactId>javaee</artifactId>
+          <version>5</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+        </dependency>
+    </dependencies>
+---
+
+    * Add the src/test standard dependencies. 
+
+---
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.13</version>
+        </dependency>
+---
+
+    * Add the dependencies for the JBoss embedded container.
+
+---
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>1.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ejb3.embedded</groupId>
+            <artifactId>hibernate-all</artifactId>
+            <version>alpha8_patch2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ejb3.embedded</groupId>
+            <artifactId>jboss-ejb3-all</artifactId>
+            <version>alpha8_patch2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ejb3.embedded</groupId>
+            <artifactId>thirdparty-all</artifactId>
+            <version>alpha8_patch2</version>
+            <scope>test</scope>
+        </dependency>
+---
+
+    * Add a repository entry to pickup the JBoss dependency artifacts and
+    a pluginRepository to pickup plugin patches.
+
+---
+    <repositories>
+        <repository>
+            <id>webdev.repository</id>
+            <name>ejava webdev repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <!-- will contain any patched plugins for class -->
+        <pluginRepository>
+            <id>webdev.repository</id>
+            <name>ejava webdev repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
+---
+
+    * Add a build section and begin by specifying Java 1.5.
+
+---
+    <build>
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+---
+
+    * Add a definition for the maven-surefire-plugin so we can set the 
+    java.class.path systemProperty to "target/classes". This enables the
+    persistence provider to scan the exploded classpath for classes to
+    add to the persistence unit.
+
+---
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>java.class.path</name>
+                            <value>target/classes</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+---
+
+    * Add the standard database setup and teardown scripts. This allows us
+    to create a legacy database schema and write classes that map to that
+    schema. We will later have the persistence provider create the schema
+    for us when we are in quick prototype mode.
+
+---
+    <profiles>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>testing</id>
+            <activation>
+                <property>
+                    <name>!maven.test.skip</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>sql-maven-plugin</artifactId>
+                        <!-- ss1 fixes onError issue -->
+                        <version>1.0-beta-2-ss1</version>
+
+                        <dependencies>
+                            <dependency>
+                                <groupId>hsqldb</groupId>
+                                <artifactId>hsqldb</artifactId>
+                                <version>1.8.0.4</version>
+                            </dependency>
+                        </dependencies>
+
+                        <configuration>
+                            <username>${jdbc.user}</username>
+                            <password>${jdbc.password}</password>
+                            <driver>${jdbc.driver}</driver>
+                            <url>${jdbc.url}</url>
+                        </configuration>
+
+                        <executions>
+
+                        <!-- place execution elements here  -->
+
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+---
+
+    * Configure the sql-maven-plugin executions element to run any drop 
+    scripts before running tests.
+
+---
+        <execution>
+            <id>drop-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>
+            <configuration>
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*drop*.ddl</include>
+                    </includes>
+                </fileset>
+                <onError>continue</onError>
+            </configuration>
+        </execution>
+---
+
+    * Configure the sql-maven-plugin executions element to run any scripts 
+    to create schema before running tests.
+
+---
+        <execution>
+            <id>create-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>
+            <configuration>
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*create*.ddl</include>
+
+                    </includes>
+                </fileset>
+                <print>true</print>
+            </configuration>
+        </execution>
+---
+
+    * Configure the sql-maven-plugin executions element to run any populate 
+    scripts to add rows to the database before running tests.
+
+---
+        <execution>
+            <id>populate-db-before-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>
+            <configuration>
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*populate*.ddl</include>
+
+                        </includes>
+                </fileset>
+            </configuration>
+        </execution>
+---
+
+    * Configure the sql-maven-plugin executions element to run any drop
+    scripts after testing. You may want to comment this out if you want
+    to view database changes in a GUI after the test.
+
+---
+        <execution>
+            <id>drop-db-after-test</id>
+            <phase>test</phase>
+            <goals>
+                <goal>execute</goal>
+            </goals>
+            <configuration>
+                <autocommit>true</autocommit>
+                <fileset>
+                    <basedir>${basedir}/src</basedir>
+                    <includes>
+                        <include>main/resources/ddl/**/*drop*.ddl</include>     
+                        </includes>
+                </fileset>
+            </configuration>
+        </execution>
+---
+
+    * Build and run the tests.
+
+---
+> mvn test
+[INFO] ----------------------------------------------------------------------------
+[INFO] Building Entity Manager Exercise
+[INFO]    task-segment: [test]
+[INFO] ----------------------------------------------------------------------------
+[INFO] resources:resources
+[INFO] Using default encoding to copy filtered resources.
+[INFO] compiler:compile
+[INFO] Nothing to compile - all classes are up to date
+[INFO] resources:testResources
+[INFO] Using default encoding to copy filtered resources.
+[INFO] sql:execute {execution: drop-db-before-test}
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/src/main/resources/ddl/emauto_drop.ddl
+[INFO] 1 of 1 SQL statements executed successfully
+[INFO] sql:execute {execution: create-db-before-test}
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/src/main/resources/ddl/emauto_create.ddl
+[INFO] 1 of 1 SQL statements executed successfully
+[INFO] sql:execute {execution: populate-db-before-test}
+[INFO] 0 of 0 SQL statements executed successfully
+[INFO] compiler:testCompile
+[INFO] Nothing to compile - all classes are up to date
+[INFO] surefire:test
+[INFO] Surefire report directory: /home/jcstaff/proj/ejava-javaee/working/solutions/entityMgrEx/target/surefire-reports
+(Log4JLogger.java:debug:84 -returning test suite
+
+ -------------------------------------------------------
+ T E S T S
+ -------------------------------------------------------
+Running myorg.entitymgrex.JBossTest
+(Log4JLogger.java:debug:84 -returning test suite
+(Log4JLogger.java:debug:84 -starting up embedded JBoss container
+(Log4JLogger.java:debug:84 -embedded JBoss container startup complete
+(Log4JLogger.java:debug:84 -creating entity manager
+(Log4JLogger.java:debug:84 -creating EntityManagerFactory(entityMgrEx)
+(Log4JLogger.java:fatal:124 -ddl/emauto_drop.ddlO-:-Ofalse
+(Log4JLogger.java:fatal:124 -ddl/emauto_delete.ddlO-:-Ofalse
+(Log4JLogger.java:fatal:124 -ddl/emauto_create.ddlO-:-Ofalse
+(Log4JLogger.java:fatal:124 -ddl/.emauto_create.ddl.swpO-:-Ofalse
+(Log4JLogger.java:fatal:124 -META-INF/.persistence.xml.swpO-:-Ofalse
+(Log4JLogger.java:fatal:124 -META-INF/persistence.xmlO-:-Ofalse
+(Log4JLogger.java:info:94 -testTemplate
+(Log4JLogger.java:debug:84 -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@180cb01
+(Log4JLogger.java:debug:84 -tearDown() complete, em=org.hibernate.ejb.EntityManagerImpl@180cb01
+(Log4JLogger.java:debug:84 -closing 1 EntityManagerFactories
+(Log4JLogger.java:debug:84 -entityMgrEx closed
+(Log4JLogger.java:debug:84 -shutting down embedded JBoss container
+(Log4JLogger.java:debug:84 -embedded JBoss container shutdown complete
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.065 sec
+
+Results :
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ----------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ----------------------------------------------------------------------------
+[INFO] Total time: 5 second
+[INFO] Finished at: Sun Sep 17 18:28:55 EDT 2006
+[INFO] Memory 2M/7M
+[INFO] ----------------------------------------------------------------------------
+---
+
+** {Section F}: Test Entity Manager Functions
+
+    [Note:] The following changes are all made to the EntityMgrEx.java
+    JUnit test class. Everything is being done within this file to 
+    keep things simple. This test case is playing the role of the 
+    business and persistence logic.
+
+    []
+
+    * Review the setUp() and tearDown() functionality you originally added
+    to the EntityMgrEx.java class. The setUp() method is taking care of 
+    creating an entity manager. The tearDown() method is taking care of
+    flushing the entity manager, listing the contents of the database
+    table, and deleting all rows before the next test. Note that the 
+    logAutos() is using EJB-QL and the removeAutos() is using 
+    native SQL. Each of the test methods uses entities.
+
+---
+    protected void setUp() throws Exception {
+        log.debug("creating entity manager");
+        EntityManagerFactory emf = 
+            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);
+        em = emf.createEntityManager();
+        assertNotNull(em);
+    }
+
+    protected void tearDown() throws Exception {
+        try {
+            log.debug("tearDown() started, em=" + em);
+            em.getTransaction().begin();
+            em.flush();            
+            logAutos();            
+            removeAutos();
+            em.close();
+            em.getTransaction().commit();
+            log.debug("tearDown() complete, em=" + em);
+        }
+        catch (Exception ex) {
+            log.fatal("tearDown failed", ex);
+            throw ex;
+        }
+     }
+    
+    public void logAutos() {
+        Query query = em.createQuery("select a from Auto as a");
+        for (Object o: query.getResultList()) {
+            log.info("EM_AUTO:" + o);
+        }        
+    }
+    public void removeAutos() {
+        Query query = em.createNativeQuery("delete from EM_AUTO");
+        int rows = query.executeUpdate();
+        log.info("removed " + rows + " rows");
+    }
+---
+
+    * add a testCreate() method to test the 
+    functionality of EntityManager.create(). This will add an object to
+    the database once associated with a transaction.
+
+---
+    public void testCreate() {
+        log.info("testCreate");
+        
+        Auto car = new Auto();
+        car.setMake("Chrysler");
+        car.setModel("Gold Duster");
+        car.setColor("Gold");
+        car.setMileage(60*1000);
+        
+        log.info("creating auto:" + car);                        
+        em.persist(car);        
+    }
+---
+---
+ -testCreate
+ -creating auto:myorg.entitymgrex.Auto@c017e9, id=0, make=Chrysler, model=Gold Duster, color=Gold, mileage=60000
+ -EM_AUTO:myorg.entitymgrex.Auto@c017e9, id=0, make=Chrysler, model=Gold Duster, color=Gold, mileage=60000
+ -removed 1 rows
+---
+
+    * add a testMultiCreate() to test creating several objects. This should 
+    also help verify that unique primary keys are being generated.
+
+---
+   public void testMultiCreate() {
+        log.info("testMultiCreate");
+        for(int i=0; i<5; i++) {
+            Auto car = new Auto();
+            car.setMake("Plymouth " + i);
+            car.setModel("Grand Prix");
+            car.setColor("Green");
+            car.setMileage(80*1000);            
+            log.info("creating auto:" + car);                        
+            em.persist(car);        
+        }
+    }
+---
+---
+ -testMultiCreate
+ -creating auto:myorg.entitymgrex.Auto@158291, id=0, make=Plymouth 0, model=Grand Prix, color=Green, mileage=80000
+ -creating auto:myorg.entitymgrex.Auto@2f1e75, id=0, make=Plymouth 1, model=Grand Prix, color=Green, mileage=80000
+ -creating auto:myorg.entitymgrex.Auto@178b64b, id=0, make=Plymouth 2, model=Grand Prix, color=Green, mileage=80000
+ -creating auto:myorg.entitymgrex.Auto@83020, id=0, make=Plymouth 3, model=Grand Prix, color=Green, mileage=80000
+ -creating auto:myorg.entitymgrex.Auto@18f9b75, id=0, make=Plymouth 4, model=Grand Prix, color=Green, mileage=80000
+ -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@127461b
+ -EM_AUTO:myorg.entitymgrex.Auto@158291, id=1, make=Plymouth 0, model=Grand Prix, color=Green, mileage=80000
+ -EM_AUTO:myorg.entitymgrex.Auto@2f1e75, id=2, make=Plymouth 1, model=Grand Prix, color=Green, mileage=80000
+ -EM_AUTO:myorg.entitymgrex.Auto@178b64b, id=3, make=Plymouth 2, model=Grand Prix, color=Green, mileage=80000
+ -EM_AUTO:myorg.entitymgrex.Auto@83020, id=4, make=Plymouth 3, model=Grand Prix, color=Green, mileage=80000
+ -EM_AUTO:myorg.entitymgrex.Auto@18f9b75, id=5, make=Plymouth 4, model=Grand Prix, color=Green, mileage=80000
+ -removed 5 rows
+---
+
+    * add a testFind() to test the ability to find an object by its 
+    primary key value.
+
+---
+   public void testFind() {
+        log.info("testFind");
+        
+        Auto car = new Auto();
+        car.setMake("Ford");
+        car.setModel("Bronco II");
+        car.setColor("Red");
+        car.setMileage(0*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+        
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        Auto car2 = em.find(Auto.class, car.getId());
+        assertNotNull("car not found:" + car.getId(), car2);
+        log.info("found car:" + car2);
+    }
+---
+---
+ -testFind
+ -creating auto:myorg.entitymgrex.Auto@1f195fc, id=0, make=Ford, model=Bronco II, color=Red, mileage=0
+ -found car:myorg.entitymgrex.Auto@1f195fc, id=6, make=Ford, model=Bronco II, color=Red, mileage=0
+ -EM_AUTO:myorg.entitymgrex.Auto@1f195fc, id=6, make=Ford, model=Bronco II, color=Red, mileage=0
+ -removed 1 rows
+---
+
+    * add a getReference() to test the ability to get a reference to an
+    object. With such a shallow object, this will act much like find().
+
+---
+    public void testGetReference() {
+        log.info("testGetReference");
+        
+        Auto car = new Auto();
+        car.setMake("Ford");
+        car.setModel("Escort");
+        car.setColor("Red");
+        car.setMileage(0*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+        
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        Auto car2 = em.getReference(Auto.class, car.getId());
+        assertNotNull("car not found:" + car.getId(), car2);
+        log.info("found car:" + car2);        
+    }
+---
+---
+ -testGetReference
+ -creating auto:myorg.entitymgrex.Auto@e580e1, id=0, make=Ford, model=Escort, color=Red, mileage=0
+ -found car:myorg.entitymgrex.Auto@e580e1, id=7, make=Ford, model=Escort, color=Red, mileage=0
+ -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@10d4f27
+ -EM_AUTO:myorg.entitymgrex.Auto@e580e1, id=7, make=Ford, model=Escort, color=Red, mileage=0
+ -removed 1 rows
+---
+
+    * add a testUpdate() method to test the ability to have the setter()
+    of a managed ubject update the database.
+
+---
+    public void testUpdate() {
+        log.info("testUpdate");
+        
+        Auto car = new Auto();
+        car.setMake("Pontiac");
+        car.setModel("Gran Am");
+        car.setColor("Red");
+        car.setMileage(0*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+        
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        for(int mileage=car.getMileage(); mileage<(100*1000); mileage+=20000) {
+            //here's where the update is done
+            car.setMileage(mileage);
+            
+            //commit the update to the database for query 
+            em.getTransaction().begin();
+            em.getTransaction().commit();
+            
+            //inspect database for value
+            int value = getMileage(car.getId());
+            assertTrue("unexpected mileage:" + value, value == mileage);
+            log.info("found mileage:" + value);        
+        }
+        
+    }
+
+    private int getMileage(long id) {
+        Query query = 
+            em.createQuery("select a.mileage from Auto as a where a.id=:pk");
+        query.setParameter("pk", id);
+        return (Integer)query.getSingleResult();        
+    }
+---
+---
+ -testUpdate
+ -creating auto:myorg.entitymgrex.Auto@15d8d75, id=0, make=Pontiac, model=Gran Am, color=Red, mileage=0
+ -found mileage:0
+ -found mileage:20000
+ -found mileage:40000
+ -found mileage:60000
+ -found mileage:80000
+ -EM_AUTO:myorg.entitymgrex.Auto@15d8d75, id=8, make=Pontiac, model=Gran Am, color=Red, mileage=80000
+ -removed 1 rows
+---
+
+    * add a testMerge() method to test the ability to perform updates based
+    on the current values of a detached object. Note that we are using
+    Java serialization to simulate sending a copy of the object to/from a
+    remote process and then performing the merge based on the updated
+    object.
+
+---
+    public void testMerge() throws Exception {
+        log.info("testMerge");
+        
+        Auto car = new Auto();
+        car.setMake("Chrystler");
+        car.setModel("Concord");
+        car.setColor("Red");
+        car.setMileage(0*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+        
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        for(int mileage=(10*1000); mileage<(100*1000); mileage+=20000) {
+            //simulate sending to remote system for update
+            Auto car2 = updateMileage(car, mileage);
+            
+            //verify the object is not being managed by the EM
+            assertFalse("object was managed", em.contains(car2));
+            assertTrue("object wasn't managed", em.contains(car));
+            assertTrue("mileage was same", 
+                    car.getMileage() != car2.getMileage());
+            
+            //commit the update to the database for query 
+            em.merge(car2);
+            assertTrue("car1 not merged:" + car.getMileage(), 
+                    car.getMileage() == mileage);
+            em.getTransaction().begin();
+            em.getTransaction().commit();
+            
+            //inspect database for value
+            int value = getMileage(car.getId());
+            assertTrue("unexpected mileage:" + value, value == mileage);
+            log.info("found mileage:" + value);        
+        }        
+    }
+    
+    private Auto updateMileage(Auto car, int mileage) throws Exception {
+        //simulate sending the object to a remote system
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(car);
+        oos.close();
+        
+        //simulate receiving an update to the object from remote system
+        ByteArrayInputStream bis = 
+            new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        Auto car2 = (Auto)ois.readObject();
+        ois.close();
+        
+        //here's what they would have changed in remote process 
+        car2.setMileage(mileage);
+        
+        return car2;
+    }
+---
+---
+ -testMerge
+ -creating auto:myorg.entitymgrex.Auto@771eb1, id=0, make=Chrystler, model=Concord, color=Red, mileage=0
+ -found mileage:10000
+ -found mileage:30000
+ -found mileage:50000
+ -found mileage:70000
+ -found mileage:90000
+ -EM_AUTO:myorg.entitymgrex.Auto@771eb1, id=9, make=Chrystler, model=Concord, color=Red, mileage=90000
+ -removed 1 rows
+---
+
+    * add a testRemove() method to verify that we can delete objects from 
+    the database.
+
+---
+    public void testRemove() {
+        log.info("testRemove");
+        
+        Auto car = new Auto();
+        car.setMake("Jeep");
+        car.setModel("Cherokee");
+        car.setColor("Green");
+        car.setMileage(30*1000);
+        log.info("creating auto:" + car);                        
+        em.persist(car);
+
+        //we need to associate the em with a transaction to get a 
+        //primary key generated and assigned to the auto
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        Auto car2 = em.find(Auto.class, car.getId());
+        assertNotNull("car not found:" + car.getId(), car2);
+        log.info("found car:" + car2);
+        
+        //now remove the car
+        log.info("removing car:" + car);
+        em.remove(car);
+        //we need to associate the em with a transaction to  
+        //physically remove from database
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+        
+        Auto car3 = em.find(Auto.class, car.getId());
+        assertNull("car found", car3);
+    }    
+---
+---
+ -testRemove
+ -creating auto:myorg.entitymgrex.Auto@1b8b3bb, id=0, make=Jeep, model=Cherokee, color=Green, mileage=30000
+ -found car:myorg.entitymgrex.Auto@1b8b3bb, id=10, make=Jeep, model=Cherokee, color=Green, mileage=30000
+ -removing car:myorg.entitymgrex.Auto@1b8b3bb, id=10, make=Jeep, model=Cherokee, color=Green, mileage=30000
+ -removed 0 rows
+---
