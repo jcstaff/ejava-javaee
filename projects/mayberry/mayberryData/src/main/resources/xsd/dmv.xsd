@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    attributeFormDefault="unqualified" 
+    elementFormDefault="qualified" 
+    targetNamespace="http://ejava.info/mayberry/1.0-SNAPSHOT" 
+    xmlns:dmv="http://ejava.info/mayberry/1.0-SNAPSHOT" 
+    xmlns:j="http://www.it.ojp.gov/jxdm/3.0.3"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <xsd:import namespace="http://www.it.ojp.gov/jxdm/3.0.3"
+       schemaLocation="jxdm/3.0.3/jxdm.xsd"/>
+                    
+    <xsd:complexType name="PersonsType">
+        <xsd:sequence>
+            <xsd:element ref="j:Person" 
+                         minOccurs="0" 
+                         maxOccurs="unbounded"/>
+        </xsd:sequence>                
+    </xsd:complexType>
+    
+    <!-- 
+        ncic race codes: 
+        A - asian or pacific islander
+        B - black
+        I - amaerican indian or alaskan
+        W - white
+        U - unknown
+        
+        nlets eye colors:
+        Black, Blue, Brown, Gray, Green, Hazel,
+        Maroon, Multicolored, Pink, Unknown
+        
+        nlets hair colors:
+        Bald, Black, Blond, Strawberry Blonde,
+        Brown, Gray, Orange, Purple, partially Gray
+        Red, Auburn, Sandy, White, Green,
+        Pink, Unknown
+    -->
+    
+    <xsd:complexType name="VehicleRegistrationsType">
+    <xsd:sequence>
+        <xsd:element ref="j:VehicleRegistration" 
+                         minOccurs="0" 
+                         maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>    
+    
+    <xsd:element name="dmv">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="people" 
+                    type="dmv:PersonsType" 
+                    minOccurs="0"/>
+                <xsd:element name="vehicleRegistrations" 
+                    type="dmv:VehicleRegistrationsType" 
+                    minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>        
+    </xsd:element>
+    
+</xs:schema>

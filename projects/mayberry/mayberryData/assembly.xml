@@ -1,0 +1,24 @@
+<assembly>
+  <id>sources</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+      <fileSet>
+          <includes>
+              <include>pom.xml</include>
+              <include>assembly.xml</include>
+          </includes>
+          <outputDirectory>${artifactId}</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>src</directory>
+          <outputDirectory>${artifactId}</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>target/generated-sources</directory>
+          <outputDirectory>${artifactId}</outputDirectory>
+      </fileSet>
+  </fileSets>
+</assembly>

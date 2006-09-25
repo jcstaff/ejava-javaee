@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>ejava-javaee</artifactId>
+    <groupId>ejava.javaee</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ejava.javaee.orm</groupId>
+  <artifactId>ormCore</artifactId>
+  <name>JPA Core Object Relational Mapping</name>
+  <description>
+    This module provides a examples of using the Java Persistence API
+    to map object (void of relationships and inheritance) to the database.
+  </description>
+  <version>1.0-SNAPSHOT</version>
+  <dependencies>
+    <!-- core dependencies -->
+    <dependency>
+      <groupId>javax.javaee</groupId>
+      <artifactId>javaee</artifactId>
+      <version>5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+
+    <!-- core project testing dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.0</version>
+      <scope>test</scope>
+    </dependency>        
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.13</version>
+      <scope>test</scope>
+    </dependency>    
+
+    <!-- JBoss-specific testing dependencies -->
+    <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache</artifactId>
+        <version>1.2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.jboss.ejb3.embedded</groupId>
+        <artifactId>hibernate-all</artifactId>
+        <version>alpha8_patch2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.jboss.ejb3.embedded</groupId>
+        <artifactId>jboss-ejb3-all</artifactId>
+        <version>alpha8_patch2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.jboss.ejb3.embedded</groupId>
+        <artifactId>thirdparty-all</artifactId>
+        <version>alpha8_patch2</version>
+        <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+          <!-- make sure we are building java5 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>      
+
+          <!-- set test JVM root classpath so persistence framework
+              can locate entities during classpath scan -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <argLine>${surefire.argLine}</argLine>
+                <systemProperties>
+                    <property>
+                        <name>java.class.path</name>
+                        <value>target/classes</value>
+                    </property>
+                </systemProperties>
+            </configuration>
+        </plugin>
+
+    </plugins>      
+  </build>
+</project>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmv:dmv [<!ENTITY dmv SYSTEM "../../main/resources/xsd/dmv.xsd">
+]>
+<dmv:dmv xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://ejava.info/mayberry/1.0-SNAPSHOT ../../main/resources/xsd/dmv.xsd"
+ xmlns:dmv="http://ejava.info/mayberry/1.0-SNAPSHOT"
+ xmlns:j="http://www.it.ojp.gov/jxdm/3.0.3">
+ 
+ <!-- 
+     ncic race codes: 
+ A - asian or pacific islander
+ B - black
+ I - amaerican indian or alaskan
+ W - white
+ U - unknown
+ 
+     nlets eye colors:
+Black, Blue, Brown, Gray, Green, Hazel,
+Maroon, Multicolored, Pink, Unknown
+     
+     nlets hair colors:
+Bald, Black, Blond, Strawberry Blonde,
+Brown, Gray, Orange, Purple, partially Gray
+Red, Auburn, Sandy, White, Green,
+Pink, Unknown
+ -->
+    <dmv:people>
+        <j:Person id="p100">
+            <j:PersonName>
+                <j:PersonGivenName>john</j:PersonGivenName>
+                <j:PersonMiddleName>j</j:PersonMiddleName>
+                <j:PersonSurName>jones</j:PersonSurName>
+                <j:PersonSuffixName>sr.</j:PersonSuffixName>
+            </j:PersonName>
+            <j:PersonPhysicalDetails>
+                <j:PersonEyeColorCode>Green</j:PersonEyeColorCode>
+                <j:PersonHairColorText>Bald</j:PersonHairColorText>
+                <j:PersonHeightMeasure>80</j:PersonHeightMeasure>
+                <j:PersonWeightMeasure>185</j:PersonWeightMeasure>
+                <j:PersonRaceCode>A</j:PersonRaceCode>
+                <j:PersonSexCode>M</j:PersonSexCode>
+            </j:PersonPhysicalDetails>
+            <j:PersonBirthDate>1980-10-10+13:00</j:PersonBirthDate>
+            <j:Residence>
+                <j:LocationAddress>
+                    <j:LocationStreet>
+                        <j:StreetNumberText>01</j:StreetNumberText>
+                        <j:StreetName>First Street</j:StreetName>
+                    </j:LocationStreet>   
+                    <j:LocationCityName>Raleigh</j:LocationCityName>
+                    <j:LocationStateCode.USPostalService>NC</j:LocationStateCode.USPostalService>
+                    <j:LocationPostalCodeID>
+                        <j:ID>20000</j:ID>
+                    </j:LocationPostalCodeID>
+                </j:LocationAddress>
+                <j:ResidenceStartDate>2000-10-10</j:ResidenceStartDate>
+                <j:ResidenceEndDate>2001-10-10</j:ResidenceEndDate>
+            </j:Residence>
+            <j:Residence>
+                <j:LocationAddress>
+                    <j:LocationStreet>
+                        <j:StreetNumberText>02</j:StreetNumberText>
+                        <j:StreetName>Second Street</j:StreetName>
+                    </j:LocationStreet>   
+                    <j:LocationCityName>Raleigh</j:LocationCityName>
+                    <j:LocationStateCode.USPostalService>NC</j:LocationStateCode.USPostalService>
+                    <j:LocationPostalCodeID>
+                        <j:ID>20000</j:ID>
+                    </j:LocationPostalCodeID>
+                </j:LocationAddress>
+                <j:ResidenceStartDate>2002-10-10</j:ResidenceStartDate>
+            </j:Residence>
+        </j:Person>
+        <j:Person id="p101">
+            <j:PersonName>
+                <j:PersonGivenName>jane</j:PersonGivenName>
+                <j:PersonMiddleName>j</j:PersonMiddleName>
+                <j:PersonSurName>doe</j:PersonSurName>
+                <j:PersonSuffixName>sr.</j:PersonSuffixName>
+            </j:PersonName>
+            <j:PersonPhysicalDetails>
+                <j:PersonEyeColorCode>Brown</j:PersonEyeColorCode>
+                <j:PersonHairColorText>Strawberry Blonde</j:PersonHairColorText>
+                <j:PersonHeightMeasure>70</j:PersonHeightMeasure>
+                <j:PersonWeightMeasure>110</j:PersonWeightMeasure>
+                <j:PersonRaceCode>B</j:PersonRaceCode>
+                <j:PersonSexCode>F</j:PersonSexCode>
+            </j:PersonPhysicalDetails>
+            <j:PersonBirthDate>1983-11-02+13:00</j:PersonBirthDate>
+            <j:Residence>
+                <j:LocationAddress>
+                    <j:LocationStreet>
+                        <j:StreetNumberText>02</j:StreetNumberText>
+                        <j:StreetName>Second Street</j:StreetName>
+                    </j:LocationStreet>   
+                    <j:LocationCityName>Raleigh</j:LocationCityName>
+                    <j:LocationStateCode.USPostalService>NC</j:LocationStateCode.USPostalService>
+                    <j:LocationPostalCodeID>
+                        <j:ID>20000</j:ID>
+                    </j:LocationPostalCodeID>
+                </j:LocationAddress>
+                <j:ResidenceStartDate>2002-10-10</j:ResidenceStartDate>
+            </j:Residence>
+        </j:Person>
+    </dmv:people>
+    <dmv:vehicleRegistrations>
+        <j:VehicleRegistration id="vr500">
+            <j:VehicleLicensePlateID>
+                <j:ID>XXX-007</j:ID>
+            </j:VehicleLicensePlateID>            
+            <j:VehicleRegistrationDecal>
+                <j:DecalMonthDate>--11--</j:DecalMonthDate>
+                <j:DecalYearDate>2006</j:DecalYearDate>
+            </j:VehicleRegistrationDecal>
+            <j:Vehicle>
+                <j:PropertyOwner.Person ref="p100"/>       
+                <j:VehicleID>
+                    <j:ID>vin123</j:ID>
+                </j:VehicleID>
+                <j:VehicleColorPrimaryCode>Red</j:VehicleColorPrimaryCode>
+                <j:VehicleMakeCode>Ford</j:VehicleMakeCode>
+                <j:VehicleModelCode>Bronco II</j:VehicleModelCode>
+                <j:VehicleModelYearDate>2000</j:VehicleModelYearDate>
+            </j:Vehicle>     
+        </j:VehicleRegistration>
+        <j:VehicleRegistration id="vr501">
+            <j:VehicleLicensePlateID>
+                <j:ID>XXX-008</j:ID>
+            </j:VehicleLicensePlateID>            
+            <j:VehicleRegistrationDecal>
+                <j:DecalMonthDate>--11--</j:DecalMonthDate>
+                <j:DecalYearDate>2005</j:DecalYearDate>
+            </j:VehicleRegistrationDecal>
+            <j:Vehicle>
+                <j:PropertyOwner.Person ref="p100"/>       
+                <j:VehicleID>
+                    <j:ID>vin890</j:ID>
+                </j:VehicleID>
+                <j:VehicleColorPrimaryCode>Green</j:VehicleColorPrimaryCode>
+                <j:VehicleMakeCode>Jeep</j:VehicleMakeCode>
+                <j:VehicleModelCode>Cherokee</j:VehicleModelCode>
+                <j:VehicleModelYearDate>1994</j:VehicleModelYearDate>
+            </j:Vehicle>     
+        </j:VehicleRegistration>        
+    </dmv:vehicleRegistrations>
+</dmv:dmv>
