@@ -47,6 +47,13 @@ public class Parser {
         xmlif = XMLInputFactory.newInstance();
         xmlr = xmlif.createXMLStreamReader(is);
     }
+    public Parser(Class rootTypes[], InputStream is) 
+        throws JAXBException, XMLStreamException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(rootTypes);
+        um = jaxbContext.createUnmarshaller();
+        xmlif = XMLInputFactory.newInstance();
+        xmlr = xmlif.createXMLStreamReader(is);
+    }
     
     public void setSchema(InputStream schema) throws SAXException {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

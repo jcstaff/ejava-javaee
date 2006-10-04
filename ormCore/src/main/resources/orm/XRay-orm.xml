@@ -16,7 +16,7 @@
         <table name="ORMCORE_XRAY"/>
         <attributes>
             <id name="id"/>
-            <embedded name="make">
+            <embedded name="maker">
                 <!-- this was being ignored -->
                 <attribute-override name="name">
                     <column name="XRAY_MAKER"/>
@@ -29,13 +29,12 @@
     
     <embeddable class="ejava.examples.orm.core.mapped.Manufacturer"
                 access="PROPERTY">
+                
         <attributes>
             <!-- I had to create mapping here -->
             <basic name="name">
                 <column name="XRAY_MAKER"/>
             </basic>
-            <basic name="address"/>
-            <basic name="phone"/>
         </attributes>
     </embeddable>
     

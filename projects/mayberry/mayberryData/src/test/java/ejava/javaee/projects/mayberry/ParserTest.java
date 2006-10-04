@@ -4,20 +4,21 @@ import ejava.javaee.projects.mayberry.Parser;
 import gov.ojp.it.jxdm._3_0.AddressType;
 import gov.ojp.it.jxdm._3_0.DecalType;
 import gov.ojp.it.jxdm._3_0.ImageType;
+import gov.ojp.it.jxdm._3_0.Person;
 import gov.ojp.it.jxdm._3_0.PersonNameTextType;
 import gov.ojp.it.jxdm._3_0.PersonNameType;
 import gov.ojp.it.jxdm._3_0.PersonPhysicalDetailsType;
-import gov.ojp.it.jxdm._3_0.PersonType;
 import gov.ojp.it.jxdm._3_0.ReferenceType;
 import gov.ojp.it.jxdm._3_0.ResidenceType;
 import gov.ojp.it.jxdm._3_0.StreetType;
 import gov.ojp.it.jxdm._3_0.TextType;
-import gov.ojp.it.jxdm._3_0.VehicleRegistrationType;
+import gov.ojp.it.jxdm._3_0.VehicleRegistration;
 import gov.ojp.it.jxdm._3_0.VehicleType;
 import gov.ojp.it.jxdm._3_0_3.proxy.xsd._1.Base64Binary;
 import gov.ojp.it.jxdm._3_0_3.proxy.xsd._1.Date;
 
 import info.ejava.mayberry._1.Dmv;
+import info.ejava.mayberry._1.PersonsType;
 
 import java.io.InputStream;
 import java.util.List;
@@ -34,16 +35,18 @@ public class ParserTest extends TestCase {
 
     public void testParse() throws Exception {
         try {
-            Parser parser = new Parser(Dmv.class, Parser.getSampleData());
+            Parser parser = new Parser(
+                    new Class[] { Dmv.class },
+                    Parser.getSampleData());
 
             String elements[] = new String[] {"Person", "VehicleRegistration" };
             for (Object o=parser.getObject(elements);
                 o != null; o=parser.getObject(elements)) {
-                if (o instanceof PersonType) {
-                    log((PersonType)o);     
+                if (o instanceof Person) {
+                    log((Person)o);     
                 }
-                else if (o instanceof VehicleRegistrationType) {
-                    log((VehicleRegistrationType)o);                         
+                else if (o instanceof VehicleRegistration) {
+                    log((VehicleRegistration)o);                         
                 }
             }
         }
@@ -53,10 +56,10 @@ public class ParserTest extends TestCase {
         }
     }
     
-    private void log(PersonType p) {
+    private void log(Person p) {
         log.info("person=" + p.getId());
         log(p.getPersonName());
-        log.info("   dob=" + p.getPersonBirthDate().getValue());
+        log.info("   dob=" + p.getPersonBirthDate().getValue().getYear());
         log(p.getPersonPhysicalDetails());
         logResidences(p.getResidence());
     }
@@ -97,9 +100,9 @@ public class ParserTest extends TestCase {
 
     private void log(PersonNameType name) {
         if (name != null) {
-            log.info("    first=" + getNameText(name.getPersonGivenName()));
-            log.info("    middle=" + getNameText(name.getPersonMiddleName()));
-            log.info("    last=" + getNameText(name.getPersonSurName()));
+            log.info("    first=" + getText(name.getPersonGivenName()));
+            log.info("    middle=" + getText(name.getPersonMiddleName()));
+            log.info("    last=" + getText(name.getPersonSurName()));
             log.info("    last=" + getText(name.getPersonSuffixName()));
         }
         else {
@@ -107,14 +110,9 @@ public class ParserTest extends TestCase {
         }
     }
     
-    private String getText(JAXBElement<TextType> name) {
-        return (name != null) ? name.getValue().getValue() : "not supplied";
-    }
-
-    private String getNameText(JAXBElement<PersonNameTextType> name) {
-        return (name != null) ? name.getValue().getValue() : "not supplied";
-    }
-    
+    private String getText(TextType name) {
+        return (name != null) ? name.getValue() : "not supplied";
+    }    
     
     
     private void log(PersonPhysicalDetailsType pd) {
@@ -151,7 +149,7 @@ public class ParserTest extends TestCase {
         }
     }
     
-    private void log(VehicleRegistrationType r) {
+    private void log(VehicleRegistration r) {
         log.info("registration=" + r.getId());
         log.info("    tag=" + r.getVehicleLicensePlateID().getID().getValue());
         log(r.getVehicle());
@@ -163,7 +161,7 @@ public class ParserTest extends TestCase {
             logOwners(v.getPropertyOwnerPerson());
             log.info("    make=" + v.getVehicleMakeCode().getValue());
             log.info("    model=" + v.getVehicleModelCode().getValue());
-            log.info("    year=" + v.getVehicleModelYearDate().getValue());
+            log.info("    year=" + v.getVehicleModelYearDate().getValue().getYear());
             log.info("    color=" + v.getVehicleColorPrimaryCode().getValue());            
         }
         else {
@@ -174,8 +172,8 @@ public class ParserTest extends TestCase {
     private void logOwners(List<ReferenceType> refs) {
         for(ReferenceType ref : refs) {
             Object owner = ref.getRef();
-            if (owner instanceof PersonType) {
-                log.info("    owner=" + ((PersonType)owner).getId());
+            if (owner instanceof Person) {
+                log.info("    owner=" + ((Person)owner).getId());
             }
             else {
                 log.info("unknown owner type:" + owner.getClass().getName());
@@ -185,8 +183,10 @@ public class ParserTest extends TestCase {
 
     private void log(DecalType decal) {
         if (decal != null) {
+            //log.info("    exp month=" + decal.getDecalMonthDate().getValue().getTime());
+            //log.info("    exp year=" + decal.getDecalYearDate().getValue().getTime());
             log.info("    exp month=" + decal.getDecalMonthDate().getValue().getMonth());
-            log.info("    exp year=" + decal.getDecalYearDate().getValue());
+            log.info("    exp year=" + decal.getDecalYearDate().getValue().getYear());
         }
         else {
             log.info("no decal");
