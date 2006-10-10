@@ -33,7 +33,12 @@ public class OneToOneDemo extends DemoBase {
             bos.write(buffer);
         }
         image = bos.toByteArray();
+        
+        //delete any borrowers from other tests so that we don't get PK
+        //violoations
+        em.createQuery("delete Borrower").executeUpdate();
     }
+    
     /**
      * This test provides an example of setting a OneToOne relationship 
      * between two independent obejcts in the database. The Person is 
