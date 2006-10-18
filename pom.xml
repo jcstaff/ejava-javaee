@@ -42,6 +42,7 @@
         <module>ormRelations</module>
         <module>ormInheritance</module>
         <module>ormEJBQL</module>
+        <module>webTier</module>
         <module>solutions</module>
         <module>utils</module>
         <module>projects</module>
@@ -103,11 +104,13 @@
     </contributors>
 
     <dependencies>
-        <!-- needed to resolve JavaEE annotations within Javadoc -->
+        <!-- needed to resolve JavaEE annotations within Javadoc
+      -->
       <dependency>
           <groupId>javax.javaee</groupId>
           <artifactId>javaee</artifactId>
           <version>5</version>
+          <scope>provided</scope>
       </dependency>
     </dependencies>
     

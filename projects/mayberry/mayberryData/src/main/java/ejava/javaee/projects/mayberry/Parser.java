@@ -25,11 +25,12 @@ import org.xml.sax.SAXException;
  * @author jcstaff 
  */
 public class Parser {
+    @SuppressWarnings("unused")
     private Log log = LogFactory.getLog(Parser.class);
     protected XMLInputFactory xmlif = XMLInputFactory.newInstance();
     protected Unmarshaller um;
     protected XMLStreamReader xmlr;
-    public static final String SAMPLE_FILE = "xsd/dmv-sample.xml";
+    public static final String SAMPLE_FILE = "xsd/dmv-sample2.xml";
    
     /**
      * Pass in the JAXB class that represents the root node of the document

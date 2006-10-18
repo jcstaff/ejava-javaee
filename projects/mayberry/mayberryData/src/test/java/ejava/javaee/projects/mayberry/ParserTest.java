@@ -5,7 +5,6 @@ import gov.ojp.it.jxdm._3_0.AddressType;
 import gov.ojp.it.jxdm._3_0.DecalType;
 import gov.ojp.it.jxdm._3_0.ImageType;
 import gov.ojp.it.jxdm._3_0.Person;
-import gov.ojp.it.jxdm._3_0.PersonNameTextType;
 import gov.ojp.it.jxdm._3_0.PersonNameType;
 import gov.ojp.it.jxdm._3_0.PersonPhysicalDetailsType;
 import gov.ojp.it.jxdm._3_0.ReferenceType;
@@ -18,12 +17,9 @@ import gov.ojp.it.jxdm._3_0_3.proxy.xsd._1.Base64Binary;
 import gov.ojp.it.jxdm._3_0_3.proxy.xsd._1.Date;
 
 import info.ejava.mayberry._1.Dmv;
-import info.ejava.mayberry._1.PersonsType;
 
 import java.io.InputStream;
 import java.util.List;
-
-import javax.xml.bind.JAXBElement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,10 +30,39 @@ public class ParserTest extends TestCase {
     Log log = LogFactory.getLog(ParserTest.class);
 
     public void testParse() throws Exception {
+        log.info("*** testParse ***");
         try {
             Parser parser = new Parser(
                     new Class[] { Dmv.class },
                     Parser.getSampleData());
+
+            String elements[] = new String[] {"Person", "VehicleRegistration" };
+            for (Object o=parser.getObject(elements);
+                o != null; o=parser.getObject(elements)) {
+                if (o instanceof Person) {
+                    log((Person)o);     
+                }
+                else if (o instanceof VehicleRegistration) {
+                    log((VehicleRegistration)o);                         
+                }
+            }
+        }
+        catch (Exception ex) {
+            log.fatal("error in parser", ex);
+            fail("goodbye:" + ex);
+        }
+    }
+
+    public void testParse1() throws Exception {
+        log.info("*** testParse1 ***");
+        try {
+            InputStream sample2 = 
+                Thread.currentThread()
+                      .getContextClassLoader()
+                      .getResourceAsStream("xsd/dmv-sample.xml");
+            Parser parser = new Parser(
+                    new Class[] { Dmv.class },
+                    sample2);
 
             String elements[] = new String[] {"Person", "VehicleRegistration" };
             for (Object o=parser.getObject(elements);
@@ -117,12 +142,18 @@ public class ParserTest extends TestCase {
     
     private void log(PersonPhysicalDetailsType pd) {
         if (pd != null) {
-            log.info("   height=" + pd.getPersonHeightMeasure().getValue());
-            log.info("   weight=" + pd.getPersonWeightMeasure().getValue());
-            log.info("   race=" + pd.getPersonRaceCode().getValue());
-            log.info("   eyes=" + pd.getPersonEyeColorCode().getValue());
-            log.info("   hair=" + pd.getPersonHairColorText().getValue());
-            log.info("   sex=" + pd.getPersonSexCode().getValue());
+            log.info("   height=" + (pd.getPersonHeightMeasure()==null ? null:
+                pd.getPersonHeightMeasure().getValue()));
+            log.info("   weight=" + (pd.getPersonWeightMeasure()==null ? null:
+                pd.getPersonWeightMeasure().getValue()));
+            log.info("   race=" + (pd.getPersonRaceCode()==null? null : 
+                pd.getPersonRaceCode().getValue()));
+            log.info("   eyes=" + (pd.getPersonEyeColorCode()==null ? null:
+                pd.getPersonEyeColorCode().getValue()));
+            log.info("   hair=" + (pd.getPersonHairColorText()==null ? null:
+                pd.getPersonHairColorText().getValue()));
+            log.info("   sex=" + (pd.getPersonSexCode()==null ? null:
+                pd.getPersonSexCode().getValue()));
             log(pd.getPersonDigitalImage());
         }
         else {
@@ -185,8 +216,12 @@ public class ParserTest extends TestCase {
         if (decal != null) {
             //log.info("    exp month=" + decal.getDecalMonthDate().getValue().getTime());
             //log.info("    exp year=" + decal.getDecalYearDate().getValue().getTime());
-            log.info("    exp month=" + decal.getDecalMonthDate().getValue().getMonth());
-            log.info("    exp year=" + decal.getDecalYearDate().getValue().getYear());
+            log.info("    exp month=" + (decal.getDecalMonthDate()==null ||
+                    decal.getDecalMonthDate().getValue()==null ? null :
+                        decal.getDecalMonthDate().getValue().getMonth()));
+            log.info("    exp year=" + (decal.getDecalYearDate()==null ||
+                    decal.getDecalYearDate().getValue()==null ? null:
+                        decal.getDecalYearDate().getValue().getYear()));
         }
         else {
             log.info("no decal");
