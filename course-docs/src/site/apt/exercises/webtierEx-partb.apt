@@ -1,0 +1,315 @@
+Web Tier Exercise
+
+* {Part B}: Create the Data Project
+
+** Objectives
+
+    * Create a data project that will house the core Java implementation
+    classes that can be developed and tested outside of a Web container.
+
+** Steps
+
+    [[1]] Create the data project using the maven archetype plugin. You
+    should be in the exercise root project directory when executing this
+    command.
+
+---
+> mvn archetype:create -DgroupId=myorg.webtier -DartifactId=webtierData
+
+[INFO] Scanning for projects...
+
+---
+---
+webtierEx> find webtierData/webtierData/
+webtierData/pom.xml
+webtierData/src
+webtierData/src/main
+webtierData/src/main/java
+webtierData/src/main/java/myorg
+webtierData/src/main/java/myorg/webtier
+webtierData/src/main/java/myorg/webtier/App.java
+webtierData/src/test
+webtierData/src/test/java
+webtierData/src/test/java/myorg
+webtierData/src/test/java/myorg/webtier
+webtierData/src/test/java/myorg/webtier/AppTest.java
+---
+
+    [[1]] Note that the root project pom.xml file was updated to add the child 
+    project as a "module" dependency.
+
+---
+webtierEx> cat pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.webtier</groupId>
+    <artifactId>webtierEx</artifactId>
+    <packaging>pom</packaging>
+    <name>Web Tier Exercise</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>webtierData</module>
+    </modules>
+</project>
+---
+
+    [[1]] Update the data project pom.xml to look like the following. The
+    default dependency on the parent pom is useful to have a central
+    place to define values for multiple projects to inherit. Inherited
+    properties might include a URL to publish artifacts or a common 
+    dependency.  There is no requirement for this to physically be the
+    parent directory. There is actually some value in establisging a
+    sibling project to house the shared properties. That way you avoid
+    the circular dependency between the parent and child projects.
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>webtierEx</artifactId>
+        <groupId>myorg.webtier</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.webtier</groupId>
+    <artifactId>webtierData</artifactId>
+    <name>Web Tier Data</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+              <!-- make sure we are building java5 -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <source>1.5</source>
+              <target>1.5</target>
+            </configuration>
+          </plugin>
+        </plugins>
+    </build>
+</project>
+---
+
+    [[1]] Import the project into Eclipse to modify the Java code. In a
+    multi-project, always run this in the root projecy to allow the plugin 
+    to be aware of sibling source directories. This will allow the WAR 
+    project to have an eclipse project dependency on the data project 
+    rather than a JAR dependency in the repository. This is quite useful 
+    when you are actively devoping two projects concurrently. Notice that 
+    there are no project/classpath files generated for the root project;
+    only for the data project.
+
+---
+webtierEx> mvn eclipse:eclipse
+[INFO] Scanning for projects...
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] ------------------------------------------------------------------------
+[INFO] Web Tier Exercise ..................................... SUCCESS [0.476s]
+[INFO] Web Tier Data ......................................... SUCCESS [0.122s]
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1 second
+[INFO] Finished at: Wed Oct 18 22:02:22 EDT 2006
+[INFO] Final Memory: 2M/4M
+[INFO] ------------------------------------------------------------------------
+---
+---
+webtierEx> find . -name .project
+./webtierData/.project
+
+webtierEx> find . -name .classpath
+./webtierData/.classpath
+---
+
+    [[1]] Create a "myorg.webtier.data" package and remove the App and AppTest 
+    classes created by archetype.
+
+    [[1]] Create a Person class in the myorg.webtier.data package in the 
+    src/main/java tree. Although this class is really trivial, it represents
+    Java logic that can be developed and tested outside of the web tier.
+    All standard/POJO classes should be developed in a JAR project so that
+    they can be more efficiently and effectively tested without the overhead
+    or burden of the WAR.
+
+---
+package myorg.webtier.data;
+
+import java.io.Serializable;
+
+public class Person implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private long id;
+    private String firstName;
+    private String lastName;
+    
+    public Person() {}
+    public Person(long id) { setId(id); }
+    
+    public long getId() {
+        return id;
+    }
+    private void setId(long id) {
+        this.id = id;
+    }
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }    
+    public String toString() {
+        return "" + id + ":" + firstName + " " + lastName;
+    }
+}
+---
+
+    [[1]] Create a PersonTest in the JUnit test class in the
+    myorg.webtier.data package in the src/test/tree. This is a trivial test
+    case, but it represents all the test code you could write as the 
+    non-web tier projects become more complex.
+
+---
+package myorg.webtier.data;
+
+import org.apache.commons.logging.Log;
+
+public class PersonTest extends TestCase {
+    Log log = LogFactory.getLog(PersonTest.class);
+    
+    public void testPerson() {
+        log.info("*** testPerson ***");
+        
+        Person person = new Person();
+        
+        assertEquals("unexpected id:" + person.getId(), 0, person.getId());
+    }
+} 
+---
+
+    [[1]] Add a log4j.xml file to the src/test/resources directory.
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+   <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+         <param name="Target" value="System.out"/>
+
+         <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value=" -%m%n"/>
+         </layout>
+   </appender>
+
+   <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+      <param name="File" value="/tmp/log4j-out.txt"/>
+      <param name="Append" value="false"/>
+      <param name="MaxFileSize" value="100KB"/>
+      <param name="MaxBackupIndex" value="1"/>
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+      </layout>
+
+   </appender>
+
+   <logger name="myorg">
+      <level value="debug"/>
+   </logger>
+   <root>
+      <priority value="fatal"/>
+      <appender-ref ref="CONSOLE"/>
+   </root>
+
+</log4j:configuration>
+---
+
+    [[1]] Build and test the entire application from the root
+    project. Note that the targets are being propogated to the children
+    (only one child so far).
+
+---
+> mvn test
+[INFO] Scanning for projects...
+
+...
+ -------------------------------------------------------
+ T E S T S
+ -------------------------------------------------------
+Running myorg.webtier.data.PersonTest
+ -*** testPerson ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.03 sec
+
+Results :
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO]
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] ------------------------------------------------------------------------
+[INFO] Web Tier Exercise ..................................... SUCCESS [0.006s]
+[INFO] Web Tier Data ......................................... SUCCESS [2.673s]
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3 seconds
+[INFO] Finished at: Wed Oct 18 22:37:16 EDT 2006
+[INFO] Final Memory: 4M/7M
+[INFO] ------------------------------------------------------------------------
+---
+
+** Summary
+
+    * We created a separate sibling project to hold all the implementation 
+    code that has nothing to do with the web tier.
+
+    * We implemented the sibling project below a root "reactor" or "pom" 
+    project. This project not only passes goals down to the child projects,
+    it calls them in the correct order based on their dependencies.
+
+    * We ran the eclipse:eclipse plugin from the root project so that 
+    it can be aware of the development directories of subling projects.
+    This will help us jump between projects within Eclipse.
+
+    

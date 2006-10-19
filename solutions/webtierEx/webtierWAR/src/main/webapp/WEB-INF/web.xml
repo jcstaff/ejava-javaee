@@ -1,0 +1,16 @@
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xmlns="http://java.sun.com/xml/ns/j2ee"
+    version="2.5">
+ 
+  <display-name>Web Tier Exercise Web Application</display-name>
+  
+    <servlet>
+        <servlet-name>Handler</servlet-name>
+        <servlet-class>myorg.webtier.web.HandlerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Handler</servlet-name>
+        <url-pattern>/model/handler</url-pattern>
+    </servlet-mapping>
+</web-app>

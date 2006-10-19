@@ -1,0 +1,112 @@
+Web Tier Exercise
+
+    This exercise consists of multiple projects that are integrated into
+    a single web application; root project, data project, and web project.
+
+    The root project is the parent to each of the other project and can
+    be used to invoke targets that apply to all children. This project
+    is known as a reactor or "pom" project since it has not artifacts
+    other than a pom.xml (and children).
+
+    The data project provides a very simple example of where code can be
+    placed that is not officially part of the web application. This code
+    is developed and tested in standalone. A real project may have more
+    than one of these representing business objects, DAOs, business logic,
+    etc. They will be added to the WAR in the WEB-INF/lib directory.
+
+    The web project actually houses the JSPs, Servlets and pulls in all
+    dependencies of the application to form a deployable WAR application.
+
+* {Part A}: Create the Root Project
+
+** Objectives
+
+    * Create a root project that will house the data project and web project
+
+** Steps
+
+    [[1]] Create a root project for the exercise. Try using the maven
+    archetype plugin to build the basic structure. This will build a
+    project directory with just a pom.xml, a Java class in the src/main,
+    and a JUnit test class in src/test. We won't need the src directory,
+    but we'll use the generated pom.xml as a starting point.
+
+---
+> mvn archetype:create -DgroupId=myorg.webtier -DartifactId=webtierEx
+[INFO] Scanning for projects...
+
+---
+---
+> find webtierEx/
+webtierEx/
+webtierEx/pom.xml
+webtierEx/src
+webtierEx/src/main
+webtierEx/src/main/java
+webtierEx/src/main/java/myorg
+webtierEx/src/main/java/myorg/webtier
+webtierEx/src/main/java/myorg/webtier/App.java
+webtierEx/src/test
+webtierEx/src/test/java
+webtierEx/src/test/java/myorg
+webtierEx/src/test/java/myorg/webtier
+webtierEx/src/test/java/myorg/webtier/AppTest.java
+---
+
+    [[]] Remove the src/main and src/test directories. You can use "rm -rf
+    src" if you are positive about what you are deleting or "rm -ri src" if
+    you want to be prompted.
+
+---
+ rm -ri src/
+ rm: descend into directory `src/'? y
+ rm: descend into directory `src//main'? y
+ rm: descend into directory `src//main/java'? y
+ rm: descend into directory `src//main/java/myorg'? y
+ rm: descend into directory `src//main/java/myorg/webtier'? y
+ rm: remove regular file `src//main/java/myorg/webtier/App.java'? y
+ rm: remove directory `src//main/java/myorg/webtier'? y
+ rm: remove directory `src//main/java/myorg'? y
+ rm: remove directory `src//main/java'? y
+ rm: remove directory `src//main'? y
+ rm: descend into directory `src//test'? y
+ rm: descend into directory `src//test/java'? y
+ rm: descend into directory `src//test/java/myorg'? y
+ rm: descend into directory `src//test/java/myorg/webtier'? y
+ rm: remove regular file `src//test/java/myorg/webtier/AppTest.java'? y
+ rm: remove directory `src//test/java/myorg/webtier'? y
+ rm: remove directory `src//test/java/myorg'? y
+ rm: remove directory `src//test/java'? y
+ rm: remove directory `src//test'? y
+ rm: remove directory `src/'? y
+---
+
+    [[1]] Edit the pom.xml so that it looks like the following. The XML 
+    Schema information is not necessary to build the project, but can be 
+    helpful if you edit the pom.xml file in an XML editor.
+
+    [Note:] You must add the packaging=pom element to override the maven
+    default packaging type of "jar".
+
+    []
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.webtier</groupId>
+    <artifactId>webtierEx</artifactId>
+    <packaging>pom</packaging>
+    <name>Web Tier Exercise</name>
+    <version>1.0-SNAPSHOT</version>
+</project>
+---
+
+** Summary
+
+    * We created a root project to house the data and WAR projects that
+    we'll be created next. We can use this project to execute commands
+    that need to traverse all children.

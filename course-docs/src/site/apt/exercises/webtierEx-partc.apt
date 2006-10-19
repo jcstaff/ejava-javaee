@@ -1,0 +1,764 @@
+Web Tier Exercise
+
+* {Part C}: Create the Web Project
+
+** Objectives
+
+    * Create a web project that will house the core JSP and Servlet
+    implementations.
+
+    * Use the Jetty servlet engine and Jetty plugin for interactive 
+    development.
+
+    * Use the JBoss application server and Cargo plugin remote
+    deployment to our target deployment environment.
+
+** Steps
+
+    [[1]] Create the web project using the maven archetype plugin. This
+    time use the maven-archetype-webapp archetype. You should be in the
+    exercise root project directory when executing this command.
+
+---
+webtierEx> mvn archetype:create -DarchetypeArtifactId=maven-archetype-webapp  -DgroupId=myorg.webtier -DartifactId=webtierWAR
+
+[INFO] Scanning for projects...
+
+---
+---
+> find webtierWAR/
+webtierWAR/
+webtierWAR/pom.xml
+webtierWAR/src
+webtierWAR/src/main
+webtierWAR/src/main/resources
+webtierWAR/src/main/webapp
+webtierWAR/src/main/webapp/index.jsp
+webtierWAR/src/main/webapp/WEB-INF
+webtierWAR/src/main/webapp/WEB-INF/web.xml
+---
+
+    [[1]] Note that the root project pom.xml file was updated to add the child 
+    project as a "module" dependency.
+
+---
+webtierEx> cat pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.webtier</groupId>
+    <artifactId>webtierEx</artifactId>
+    <packaging>pom</packaging>
+    <name>Web Tier Exercise</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>webtierData</module>
+        <module>webtierWAR</module>
+  </modules>
+</project>
+---
+
+    [[1]] Update the data project pom.xml to look like the following. The 
+    dependency on JUnit will not be used in this exercise, but there is
+    no reason why web test tools (like HttpUnit) could not be employed here.
+    
+    [Note:] The dependencies on logging-commons and log4j are removed from
+    the global dependency definitions and moved to the separate profile
+    dependencies so that deployment-specific environments can be accounted
+    for. For instance, JBoss will already have a log4j configuration already
+    in place. We can avoid conflict if it is not placed in the WAR in that 
+    case.
+
+    []
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>webtierEx</artifactId>
+        <groupId>myorg.webtier</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.webtier</groupId>
+    <artifactId>webtierWAR</artifactId>
+    <packaging>war</packaging>
+    <name>Web Tier WAR</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.javaee</groupId>
+            <artifactId>javaee</artifactId>
+            <version>5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>webtierWAR</finalName>
+        <plugins>
+              <!-- make sure we are building java5 -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <source>1.5</source>
+              <target>1.5</target>
+            </configuration>
+          </plugin>
+        </plugins>
+    </build>
+
+</project>
+---
+
+    [[1]] Build the WAR artifact from the root project. Note that the WAR is
+    built within the WAR project's target directory.
+
+---
+> mvn package
+[INFO] Scanning for projects...
+[INFO] Reactor build order:
+[INFO]   Web Tier Exercise
+[INFO]   Web Tier Data
+[INFO]   Web Tier WAR
+...
+---
+---
+webtierEx> find webtierWAR/target/
+webtierWAR/target/
+webtierWAR/target/classes
+webtierWAR/target/webtierWAR
+webtierWAR/target/webtierWAR/WEB-INF
+webtierWAR/target/webtierWAR/WEB-INF/web.xml
+webtierWAR/target/webtierWAR/WEB-INF/lib
+webtierWAR/target/webtierWAR/WEB-INF/lib/commons-logging-1.0.4.jar
+webtierWAR/target/webtierWAR/META-INF
+webtierWAR/target/webtierWAR/index.jsp
+webtierWAR/target/webtierWAR.war
+---
+---
+webtierEx> jar tf webtierWAR/target/webtierWAR.war
+META-INF/
+META-INF/MANIFEST.MF
+WEB-INF/
+WEB-INF/lib/
+WEB-INF/web.xml
+WEB-INF/lib/commons-logging-1.0.4.jar
+index.jsp
+META-INF/maven/
+META-INF/maven/myorg.webtier/
+META-INF/maven/myorg.webtier/webtierWAR/
+META-INF/maven/myorg.webtier/webtierWAR/pom.xml
+META-INF/maven/myorg.webtier/webtierWAR/pom.properties
+---
+
+    [[1]] Manually deploy the WAR archive to a running JBoss server.
+
+---
+webtierEx> cp webtierWAR/target/webtierWAR.war /apps/jboss/server/default/deploy/
+---
+---
+#JBoss console
+
+DEBUG [MainDeployer] Deployed package: file:/home/apps/generic/jboss/jboss-4.0.4.GA/server/default/deploy/webtierWAR.war
+---
+
+    [[1]] Use the browser to access the main web page. You should see a page
+    saying "Hello World!".
+
+---
+http://localhost:8080/webtierWAR/
+---
+
+    [[1]] Remove the project from the JBoss directory and configure the 
+    WAR's pom.xml for the Cargo plugin to perform remote deployment. Once
+    the WAR is deleted from JBoss's server directory, the browser will no
+    longer be able to access the application.
+
+---
+> rm /apps/jboss/server/default/deploy/webtierWAR.war
+---
+
+    [[1]] Add the Cargo plugin with remote jboss4x deployment. Use a profile
+    to house the plugin so we can build/deploy the WAR in multiple ways.
+    While we are at it, you can optionally add some other elements that 
+    allow the profile to tweek the files at a fine-grain level. However,
+    they won't be used as a part of this exercise. These tweeks could 
+    include special "stubs" that might be used in the pure Wed development
+    environment that used in the integration environment.
+
+---
+<profiles>
+    <profile>
+        <id>jboss</id>
+        <build>
+            <!-- could be used to limit property files copied
+            <resources>
+                <resource>
+                    <directory>src/main/resources</directory>
+                    <excludes>
+                    </excludes>
+                </resource>
+            </resources>
+            -->
+            <plugins>
+                <!-- could be used to create an deployment-specific web.xml
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.0.1</version>
+                    <configuration>
+                        <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                    </configuration>
+                </plugin>
+                -->
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <configuration>
+                        <container>
+                            <containerId>jboss4x</containerId>
+                            <type>remote</type>
+                        </container>
+                    </configuration>
+                </plugin>
+            </plugins>
+       </build>
+    </profile>                                                           
+<profiles>
+---
+
+    [[1]] Run the cargo:deploy target using the -Pjboss profile. Navigate 
+    to the URL for the application to verify the application was deployed.
+
+---
+webtierEx> (cd webtierWAR/; mvn cargo:deploy -Pjboss)
+
+[INFO] Scanning for projects...
+[INFO] Searching repository for plugin with prefix: 'cargo'.
+[INFO] ----------------------------------------------------------------------------
+[INFO] Building Web Tier WAR
+[INFO]    task-segment: [cargo:deploy]
+[INFO] ----------------------------------------------------------------------------
+[INFO] [cargo:deploy]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3 seconds
+[INFO] Finished at: Wed Oct 18 23:51:45 EDT 2006
+[INFO] Final Memory: 3M/7M
+[INFO] ------------------------------------------------------------------------
+---
+---
+http://localhost:8080/webtierWAR/
+---
+
+    [[1]] Change the text of the JSP, redeploy, and refresh the browser. 
+    Run this target from the root project. Take into account all changes
+    that might have occured in the siblings prior to building the WAR.
+    When updating the deployed applicaiton, I have noticed a cargo:undeploy
+    is necessary before re-ussing the cargo:deploy.
+
+---
+webtierEx> cat webtierWAR/src/main/webapp/index.jsp
+<html>
+<body>
+<h2>Hello Java EE World!</h2>
+</body>
+</html>
+---
+---
+webtierEx> mvn package; (cd webtierWAR/; mvn cargo:undeploy cargo:deploy -Pjboss)
+---
+
+    [[1]] Add the Jetty plugin to the WAR project's pom.xml file. This will
+    allow you to see changes while you are developing. Place it within a 
+    profile so that it is only run when adding the -Pjetty profile flag.
+    Override the default 8080 port number to use something else; like 9080.
+    Note too that we have added the logging-commons and log4j dependencies
+    to jetty WARS.
+
+---
+</profiles>
+    <profile>
+        <id>jetty</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    <version>6.0.1</version>
+                    <configuration>
+                        <scanIntervalSeconds>10</scanIntervalSeconds>
+                        <connectors>
+                            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                                <port>9080</port>
+                                <maxIdleTime>60000</maxIdleTime>
+                            </connector>
+                        </connectors>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+        <dependencies>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.13</version>
+            </dependency>
+        </dependencies>
+    </profile>
+</profiles>
+---
+
+    [[1]] Start the Jetty plugin using the jetty:run goal. Note that this will
+    download several artifacts the first time it is run. You may have to
+    re-run the command if any of the downloads timeout.
+
+---
+webtierEx> mvn install; (cd webtierWAR/; mvn jetty:run -Pjetty)
+[INFO] Scanning for projects...
+[INFO] Searching repository for plugin with prefix: 'jetty'.
+[INFO] ----------------------------------------------------------------------------
+[INFO] Building Web Tier WAR
+[INFO]    task-segment: [jetty:run]
+[INFO] ----------------------------------------------------------------------------
+[INFO] Preparing jetty:run
+[INFO] [resources:resources]
+[INFO] Using default encoding to copy filtered resources.
+[INFO] [compiler:compile]
+[INFO] Nothing to compile - all classes are up to date
+[INFO] [jetty:run]
+[INFO] Configuring Jetty for project: Web Tier WAR
+[INFO] Webapp source directory = /home/jcstaff/proj/ejava-javaee/working/solutions/webtierEx/webtierWAR/src/main/webapp
+[INFO] web.xml file = /home/jcstaff/proj/ejava-javaee/working/solutions/webtierEx/webtierWAR/src/main/webapp/WEB-INF/web.xml
+[INFO] Classes = /home/jcstaff/proj/ejava-javaee/working/solutions/webtierEx/webtierWAR/target/classes
+2006-10-18 23:30:28.070::INFO:  Logging to STDERR via org.mortbay.log.StdErrLog
+[INFO] Context path = /webtierWAR
+[INFO] Tmp directory = /home/jcstaff/proj/ejava-javaee/working/solutions/webtierEx/webtierWAR/target/work
+[INFO] Web defaults =  jetty default
+[INFO] Webapp directory = /home/jcstaff/proj/ejava-javaee/working/solutions/webtierEx/webtierWAR/src/main/webapp
+[INFO] Starting jetty 6.0.1 ...
+2006-10-18 23:30:28.176::INFO:  jetty-6.0.1
+[INFO] Classpath = [file:/home/jcstaff/proj/ejava-javaee/working/solutions/webtierEx/webtierWAR/target/classes/, file:/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar]
+2006-10-18 23:30:28.629::INFO:  Started SelectChannelConnector @ 0.0.0.0:9080
+[INFO] Started Jetty Server
+[INFO] Starting scanner at interval of 10 seconds.
+---
+
+    [[1]] Use the browser to navigate to the Jetty server page. This page 
+    should look identical to what was deployed to JBoss.
+
+---
+http://localhost:9080/webtierWAR/
+---
+
+    [[1]] Change the index.jsp file, save, and refresh the browser. Notice 
+    the Jetty plugin is monitoring your source directory for changes and
+    will immediately display an updated JSP page.
+
+---
+webtierEx> cat webtierWAR/src/main/webapp/index.jsp
+<html>
+<body>
+<h2>Hello Java ejava World!</h2>
+</body>
+</html>
+---
+---
+http://localhost:9080/webtierWAR/
+---
+
+    [[1]] Import the project into Eclipse to perform further edits. Since
+    the archetype created no Servlets, create the src/main/java directory 
+    in the WAR project so that it is added to the Eclipse project definition.
+
+---
+webtierEx> mkdir -p webtierWAR/src/main/java
+---
+---
+> mvn eclipse:eclipse
+[INFO] Scanning for projects...
+[INFO] Reactor build order:
+[INFO]   Web Tier Exercise
+[INFO]   Web Tier Data
+[INFO]   Web Tier WAR
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Web Tier Exercise ..................................... SUCCESS [0.309s]
+[INFO] Web Tier Data ......................................... SUCCESS [0.051s]
+[INFO] Web Tier WAR .......................................... SUCCESS [0.015s]
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: < 1 second
+[INFO] Finished at: Wed Oct 18 23:13:56 EDT 2006
+[INFO] Final Memory: 2M/4M
+[INFO] ------------------------------------------------------------------------
+---
+
+    [[Note:]] Eclipse will not import a second project with the same name 
+    as an existing project. The example webtier WAR project in the slides
+    was unfortunately also called webtierWAR. You can either rename this
+    WAR or remove that WAR project from Eclipse while doing this exercise.
+
+    [[1]] Add a list to the index.jsp. Add an option to call a second JSP
+    called user/SayName.jsp. When you save the file and refresh the 
+    browser, you should see the list.
+
+---
+webtierEx> cat webtierWAR/src/main/webapp/index.jsp
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<body>
+    <h2>Hello Java EE World!</h2>
+
+    <ul>
+        <li><a href="user/SayName.jsp">Say Name</a></li>
+    </ul>
+</body>
+</html>
+---
+
+    [[1]] Create the src/main/webapp/user directory and create a a JSP
+    named SayName.jsp which uses a form to prompt for first and last name.
+    This form should use an action value of "webtierWAR/model/handler" and
+    a method value of "GET". You should use an expression to fill in the
+    context path so that you don't hard-code the "webtierWAR" in the 
+    form action.
+
+---
+webtierEx> cat webtierWAR/src/main/webapp/user/SayName.jsp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <title>Say Name</title>
+<body>
+    <h2>Say Name</h2>
+
+    <form method="GET"
+        action="<%=request.getContextPath()%>/model/handler">
+        First Name: <input type="text" name="firstName" size="25"/><p/>
+        Last Name : <input type="text" name="lastName" size="25"/><p/>
+        <input type="submit" name="command" value="Say Name"/>
+    </form>
+</body>
+</html>
+---
+
+    [[1]] Once you save the new JSP, you should be able to navigate to
+    it by clicking the "Say Name" option from index.jsp.
+
+    [[1]] Add a Servlet class, called HandlerServlet. Place it in
+    the myorg.webtier.web package of src/main/java.
+
+---
+webtierEx> cat webtierWAR/src/main/java/myorg/webtier/web/HandlerServlet.java
+package myorg.webtier.web;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+@SuppressWarnings("serial")
+public class HandlerServlet extends HttpServlet {
+    Log log = LogFactory.getLog(HandlerServlet.class);
+
+    public void init() {
+        log.debug("init() called");
+    }
+
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
+        throws ServletException, IOException {
+        log.debug("doGet() called");
+    }
+
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
+        throws ServletException, IOException {
+        log.debug("doPost() called, calling doGet()");
+        doGet(request, response);
+    }
+
+    public void destroy() {
+        log.debug("destroy() called");
+    }
+}
+---
+
+    [[1]] Copy the log4j.xml file from the data project into 
+    src/main/resources. Note this, in this case, the file gets placed in the
+    main tree since it is part of the deployed artifact. The Jetty container
+    will honor the values in this file. When we deploy to JBoss, we'll have
+    to update the log4j.xml for the JBoss server to see any of our 
+    messages that are less than fatal.
+
+---
+webtierEx> find . -name log4j.xml
+./webtierData/src/test/resources/log4j.xml
+./webtierWAR/src/main/resources/log4j.xml
+---
+
+    [[1]] From this point forward, issue the jetty command with the following
+    system properties to tell it to use log4j versus an internal logger (I'm 
+    sure there's a better maven way to do this; but this works). The internal
+    logger is compatible with the commons-logging API, but only logs things
+    at INFO and above.
+
+---
+webtierEx> mvn install; (cd webtierWAR/; mvn -Dslf4j=true -Dlog4j.configuration=file:./target/classes/log4j.xml jetty:run -Pjetty)
+---
+
+
+    [[1]] Register the Servlet with web.xml
+
+---
+webtierEx> cat webtierWAR/src/main/webapp/WEB-INF/web.xml
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xmlns="http://java.sun.com/xml/ns/j2ee"
+    version="2.5">
+
+  <display-name>Web Tier Exercise Web Application</display-name>
+
+    <servlet>
+        <servlet-name>Handler</servlet-name>
+        <servlet-class>myorg.webtier.web.HandlerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Handler</servlet-name>
+        <url-pattern>/model/handler</url-pattern>
+    </servlet-mapping>
+</web-app>
+---
+
+    [[1]] Press the "Say Name" submit button in the SayName.jsp. This
+    should result in a blank web page and the following written to the
+    log.
+
+---
+ -init() called
+ -doGet() called
+---
+
+    [[1]] Add a dependency from the web project to the data project by 
+    adding the following to the global pom.xml dependency section. Note
+    we are saying the data project is in the same group and is the same 
+    version as the web project.
+
+---
+#webtierWAR/pom.xml
+
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>webtierData</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+---
+
+    [[1]] Re-run mvn eclipse:eclipse from the root project to register the
+    project dependencies within Eclipse.
+
+---
+webtierEx>mvn eclipse:eclipse
+
+[INFO] Scanning for projects...
+[INFO] Reactor build order:
+[INFO]   Web Tier Exercise
+[INFO]   Web Tier Data
+[INFO]   Web Tier WAR
+...
+---
+
+    [[1]] Refresh the web and data projects within Eclipse.
+
+    [[1]] Add a dependency on the Person object in the HandlerServlet.goGet()
+    method. Create a Person from the first/lastName submitted by the form.
+
+---
+import myorg.webtier.data.Person;
+
+public class HandlerServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
+        throws ServletException, IOException {
+        log.debug("doGet() called");
+
+        Person person = new Person();
+        person.setFirstName(request.getParameter("firstName"));
+        person.setLastName(request.getParameter("lastName"));
+
+...
+---
+
+    [[1]] Add the person to the request attributes and forward this to
+    a JSP that we will write next.
+
+---
+# inside doGet()
+
+        request.setAttribute("person", person);
+
+        RequestDispatcher rd = getServletContext().getRequestDispatcher(
+            "/WEB-INF/content/DisplayName.jsp");
+            rd.forward(request, response);
+---
+
+    [[1]] Add a DisplayName.jsp to the src/main/webapp/WEB-INF/content
+    directory. Note that we put it below WEB-INF because we don't want
+    users navigating directly to this page without going through our 
+    application. First, add an Error Page to catch any uncaught exceptions
+    in the JSP
+
+---
+webtierEx> cat  webtierWAR/src/main/webapp/WEB-INF/content/ErrorPage.jsp
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+
+<%-- ErrorPage.jsp
+     This page is registered to handle errors in JSP files.
+     --%>
+<%@ page isErrorPage="true" %>
+<html>
+<header>
+   <title>General Exception Page</title>
+</header>
+<body>
+   <center><h1>General Exception Page</h1></center>
+   <p>An error was reported by the application. More detailed information
+   may follow.</p>.
+
+   <p><%
+      java.io.PrintWriter writer = new java.io.PrintWriter(out);
+      exception.printStackTrace(writer);
+   %></p>
+
+   <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
+</body>
+</html>
+---
+---
+> cat webtierWAR/src/main/webapp/WEB-INF/content/DisplayName.jsp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+
+<jsp:directive.page errorPage="/WEB-INF/content/ErrorPage.jsp"/>
+<jsp:directive.page import="myorg.webtier.data.*"/>
+<html>
+    <title>Display Name</title>
+    <body>
+
+        <jsp:scriptlet>
+            Person person = (Person)request.getAttribute("person");
+        </jsp:scriptlet>
+
+        First Name: <%=person.getFirstName()%><p/>
+        Last Name: <%=person.getLastName()%><p/>
+
+        <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
+    </body>
+</html>
+---
+
+    [[1]] Enter a first/last name and press "Say Name" again. This time the
+    JSP that was forwarded to by the Servlet should be stating the name
+    entered.
+
+    [[1]] You could optionally go back to the data project and add a middle
+    name and make the changes to SayName.jsp, HandlerServlet, and 
+    DisplayName.jsp to test your ability to make changes. 
+
+    [[1]] Now that you are comfortable your application works in the 
+    maven/Jetty world, deploy it again to JBoss.
+
+---
+webtierEx> mvn install; (cd webtierWAR; mvn cargo:undeploy cargo:deploy -Pjboss)
+---
+---
+http://localhost:8080/webtierWAR
+---
+    
+    [Note:] Its worth noting that the Jetty plugin that watches our
+    directory requires the dependencies to be in the repository; this we
+    are forced to use "mvn install", from the root, prior to running the
+    Jetty plugin.  However, the cargo and war plugins are more flexible
+    and are willing to look into their sibling's target directory to
+    get what they need. If you don't want to sit through the tests that
+    install will execute, add -Dmaven.test.skip=true to the command line.
+
+* Summary
+
+    * We created a WAR project.
+
+    * We defined two deployment environments. 
+
+        * JBoss is our final deployment environment and we used the
+        maven war and cargo plugins to create the proper WAR artifact
+        and remotely deploy it to the server. Note that since the
+        server is localhost, the remote deploy is nearly the functional
+        equivalent of the shell copy command. The main difference is the
+        cargo:deployed WAR s transient and will be forgotten by JBoss
+        on the next restart.
+
+        * Jetty was used to look at our development environment
+        while we were creating it. This is similar to developing the 
+        application in the JBoss deploy directory, but is is much 
+        lighter weight, made part of our portable build environment,
+        and shows off how portable our code is.
+
+
+    * We defined 4 JSPs
+
+        * index.jsp is our front door and helps navigate to helper JSPs.
+        We don't ever expect to secure index.jsp.
+
+        * SayName.jsp is a helper JSP that we placed in the user directory.
+        This can be helpful if we want to secure all user/* files to
+        people that have a valid login.
+
+        * DisplayName.jsp is a View JSP that displays the content 
+        results of our model. It worked directly with the data object.
+
+        * ErrorPage.jsp is a JSP errorPage that is called when a referencing
+        JSP throws an uncaught exception.
+
+
+    * We defined 1 controller/model servlet. This servlet caused some
+    functionality to be executed with the data objects and forwarded
+    the information to the JSP View to be displayed and to interact 
+    further with the user.
+    

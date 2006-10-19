@@ -1,0 +1,75 @@
+Web Tier Exercise
+
+    This exercise consists of multiple projects that are integrated into
+    a single web application; root project, data project, and web project.
+
+    The root project is the parent to each of the other project and can
+    be used to invoke targets that apply to all children. This project
+    is known as a reactor or "pom" project since it has not artifacts
+    other than a pom.xml (and children).
+
+    The data project provides a very simple example of where code can be
+    placed that is not officially part of the web application. This code
+    is developed and tested in standalone. A real project may have more
+    than one of these representing business objects, DAOs, business logic,
+    etc. They will be added to the WAR in the WEB-INF/lib directory.
+
+    The web project actually houses the JSPs, Servlets and pulls in all
+    dependencies of the application to form a deployable WAR application.
+
+* Goals
+
+    * Provide a concrete example in building a Web-based project that
+    includes
+
+        * Basic HTML content (titles, text, hrefs, and forms)
+
+        * JavaServer Pages
+
+        * Servlets
+
+        * Jetty development, JBoss deployment
+
+        * maven multi-project
+
+* Parts
+
+    * {{{./webtierEx-parta.html}Part A}}: Create the Root Project
+
+    * {{{./webtierEx-partb.html}Part B}}: Create the Data Project
+
+    * {{{./webtierEx-partc.html}Part C}}: Create the Web Project
+
+    * Your final source tree will look like the following.
+
+---
+webtierEx> find . -type f
+./pom.xml
+./webtierData/pom.xml
+./webtierData/src/main/java/myorg/webtier/data/Person.java
+./webtierData/src/test/java/myorg/webtier/data/PersonTest.java
+./webtierData/src/test/resources/log4j.xml
+./webtierData/.project
+./webtierData/.classpath
+./webtierWAR/pom.xml
+./webtierWAR/src/main/resources/log4j.xml
+./webtierWAR/src/main/webapp/index.jsp
+./webtierWAR/src/main/webapp/WEB-INF/web.xml
+./webtierWAR/src/main/webapp/WEB-INF/content/ErrorPage.jsp
+./webtierWAR/src/main/webapp/WEB-INF/content/DisplayName.jsp
+./webtierWAR/src/main/webapp/user/SayName.jsp
+./webtierWAR/src/main/java/myorg/webtier/web/HandlerServlet.java
+./webtierWAR/.project
+./webtierWAR/.classpath
+---
+
+* Summary
+
+    The exercise provides a key starting point to creating and using a 
+    multi-pom project. It contains 2 sub-projects. In future work
+    we'll add an EJB and EAR project.
+
+    The root project does more than just fold the child projects. It 
+    determines the order in which sub-projects are invoked and acts as
+    an inetgration point for such commands like eclipse:eclipse to get
+    an overall picture of your full project.
