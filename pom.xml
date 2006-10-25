@@ -46,6 +46,8 @@
         <module>solutions</module>
         <module>utils</module>
         <module>projects</module>
+        <module>ejbsessionBank</module>
+        <module>jndiScheduler</module>
   </modules>
   
     <developers>
@@ -147,9 +149,9 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>verify</phase>
                         <goals>
-                            <goal>assembly</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>

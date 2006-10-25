@@ -1,0 +1,267 @@
+Project2: N-Tier Application
+
+    10/24/2006 Draft
+
+* Goals
+
+    * Deploy data acess tier and business logic as an EJB component
+
+    * Provide a remote interface and client to business logic
+
+    * Provide a local interface and Web client to business logic
+
+    * Provide a Web tier 
+
+* Objectives
+
+    * Create a multi-module project consisting of a data access,
+    EJB, EAR, and Test sub-projects for the Raleigh DMV.
+
+    * Create a multi-module project consisting of a data access,
+    EJB, WAR, EAR, and Test sub-project for the Mayberry Sherrif Dept.
+
+    * Re-host the data access tiers and initial business logic from 
+    project 1 within the two new multi-module projects.
+
+    * Create the EAR sub-project to host the Java EE components.
+
+    * Create the Test sub-project to deploy and run tests using the
+    remote EJB interface.
+
+    * Create and test the EJB sub-project to host the business logic
+    and data access tier. Any unit tests will be hosted within this
+    project. Functional testing involving the application server
+    will require the component added to the EAR, deployed 
+    to the application server, and tested by the Test sub-project.
+
+    * Create and test the WAR sub-project to host the user interface.
+    This component will ultimately be deployed within the EAR to 
+    the application server and use local interfaces of the EJB to
+    access business logic. 
+
+* Technical Overview
+
+    The project will again be broken into two separate systems: MayberrySD
+    and RaileighDMV. However, this time we need to account for several
+    other project types; EJB, WAR, EAR, and Test. A new root project 
+    will be established for each system and the data access tier from
+    project 1 will be inserted as the first sub-project. All other
+    components within the system will either directly or indirectly depend
+    on the data access tier project. 
+    
+    You have finished the hardest part of RalieghDMV during project 1. 
+    You will need to ingest the full data set located at 
+    http://ejava.info:8080/files. This large file should _not_ be added
+    to your project. You should default to a smaller file and allow a 
+    -Dsystem.property variable to tell your ingest a different location.
+    You will now host the data access tier and business logic within 
+    an EJB component. This EJB component will supply the EntityManager,
+    control transaction boundaries, and secure access to the business
+    logic (security is not required as a part of project 2). You will
+    deploy this to the application server as part of an EAR (a separate 
+    sibling project). The remote interface of the EJB will be tested
+    with a sibling Test project and used by the Mayberry SD business logic.
+
+    Mayberry SD will require some additional work. The same EJB tier will
+    be added to Mayberry, however, the primary client will be a new Web
+    Tier. The Web Tier will be used to input and update persons of
+    interest and submit queries. The business logi, hosted within the
+    EJB tier will be used to integrate actions of the local data tier and
+    the remote Raliegh business logic.
+
+    There should be no use of System.out.println() in the code and all
+    implementations must use the jakarta commons loggin API with the 
+    log4j logging provider.  You may leave debug in your code, but this 
+    should be able to be turned on/off with the proper logging priority
+    changes in the log4j.xml configuration.
+
+    You may develop your Web tier in an alternate environment, such as
+    Jetty. However, it must be submitted as part of the application that
+    runs within JBoss.
+
+* Technical Details
+
+    [[1]] Provide all functionality from project1; especially the ability 
+    to test the data access tier and to ingest the test data.
+
+        * Allow the default ingest file to be overridden with a 
+        -Draleigh.xmlfile=(path) system property. The graders will 
+        have a copy of the 2MB full data file locally in their 
+        environment. You should test with this file, but should not
+        supply it as a part of your submission.
+
+    [[1]] Create and test an EJB Tier for the Raleigh DMV data access tier 
+    and business logic from project 1. 
+
+        * Provide a remote interface for the EJB that will be used 
+        by the functional testing and Mayberry SD.
+    
+        * Require a JTA transaction as part of each 
+        remote access and the EntityManager must be integrated such 
+        that it uses the JTA transaction.
+
+        * (optional for project 2) Restrict access to the EJB methods
+        to users within the raleigh-tactical and federated-tectical roles.
+
+    [[1]] Deploy the Raleigh EJB within an EAR. Use a separate sub-project 
+    for this type of component. Make sure to supply an application.xml 
+    file configures the EJB as an EAR moedule and also contains dependency
+    archives (i.e., commons-logging.jar, data-access-tier.jar)
+
+    [[1]] Create a Test sub-project that exercises the core access
+    methods to the Raleigh DMV. This should be written as part of a 
+    JUnit test case.
+
+    [[1]] Create and test an EJB Tier for the Mayberry SD data access tier 
+    and business logic from project 1. 
+
+        * Provide a remote interface for the EJB that will be used 
+        by the functional testing and possibly the web tier during 
+        development.
+    
+        * Require a JTA transaction as part of each 
+        remote access and the EntityManager must be integrated such 
+        that it uses the JTA transaction.
+
+        * (optional for project 2) Restrict read access to the EJB methods
+        to users in within the mayberry-tactical roles. Restrict all 
+        write access to EJB methods to users with mayberry-analytical roles.
+
+    [[1]] Deploy the Mayberry EJB and WAR within an EAR. Use a separate 
+    sub-project 
+    for this type of component. Make sure to supply an application.xml 
+    file configures the EJB and WAR as EAR moedules and also contains 
+    dependency archives (i.e., commons-logging.jar, data-access-tier.jar).
+    Be sure to note the web context for the WAR in the readme so the
+    graders know how to easily access it.
+
+    [[1]] Add the ability to do the following use cases within the 
+    Mayberry EJB.
+
+        * Create a person of interest.
+
+        * Add activities to the person of interest.
+
+        * Delete person of interest
+
+        * find person of interest
+
+        * Determine if the person of interest is dangerous (search the
+        activity text for the word "danger").
+
+        * Find a person from Raliegh DMV. This can be by name and return
+        a list.
+
+        * Associate the DMV person with the SD person of interest.
+
+        * Get information on the person of interest. This should involve
+        a combination of Mayberry POI and activity data as well as 
+        Raleigh Person information obtained through the remote interface
+        of their EJB tier.
+
+    [[1]] Create a Test sub-project that exercises the core access
+    methods to the Mayberry DMV. This should be written as part of a 
+    JUnit test case.
+
+    [[1]] Create a WAR sub-project that implements as user interface
+    to the EJB tier. 
+
+        * (optional for project 2) Protect all entry fields to 
+        mayberry-tactical and all query information to mayberry-analytical 
+        roles.
+
+        * Create a person of interest
+
+        * Add activities to the person of interest
+
+        * Get information for a person of interest, including whether
+        they are dangerous. Also include information provided for 
+        their physical properties and residence information.
+
+* Testing
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    Raleigh DMV accessed through its remote interface.
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    Mayberry SD. You may use a remote interface to test the EJB. 
+
+    [[1]] Perform and document a Web use case where
+
+        * Create a person of interest
+
+        * Add activity information.
+
+        * Look for information on the person (using DMV)
+
+        * Associate the DMV information with the person of interest.
+
+        * View the person of interest with associated data,
+
+        * Delete the person of interest.
+
+* Grading
+
+    Your project will be graded on completeness and quality of product. In
+    order for you to recieve full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The breakdown of grading 
+    will be as follows:
+
+        * README provided that describes where each requirement satisfield: 10pts
+
+        * projects cleanly builds with Maven or Ant: 15pts
+
+        * project1 functionality: 5pts
+
+        * EJB Tier: 30pts
+
+        * Transactions: 10pts
+
+        * Remote Integration: 10pts
+
+        * EAR deployment: 5pts
+
+        * Web Tier: 15pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implamantation supplied: 30%
+
+        * testing: 10%
+
+* Submission Guidelines
+
+    You should test your application prior to submission by 
+
+        * running the clean targets before zipping up the source code
+
+        * removing (or moving) your M2_REPO
+        
+        * unzipping your source code into a new directory.
+        
+        * building and running the tests for your application(s) from scratch.
+
+    You will e-mail the projects to both graders with the following subject
+    line
+
+        * (your name) project 1; revision 0; part # of #
+
+    Your submission will include source zip, README (could be in source
+    zip), and built project artifact(s) (e.g., jar, war, ear, etc.).
+
+    
+    If you need to make a correction, the correction should have the
+    following e-mail subject. The body should describe what you wish to 
+    revise.
+
+        * (your name) project 1; revision N; part # of #
+
+    Grader e-mails (mail to both):
+
+        * BenButler@comcast.net
+
+        * j_faniyi@yahoo.com

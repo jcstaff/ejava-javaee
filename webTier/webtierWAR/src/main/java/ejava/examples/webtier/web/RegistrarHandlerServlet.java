@@ -229,6 +229,7 @@ public class RegistrarHandlerServlet extends HttpServlet {
             }
             
             
+            
             try {
                 log.debug("getting student:");
                 Student student = registrar.getStudent(id);
