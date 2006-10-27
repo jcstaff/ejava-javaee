@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.javaee</groupId>
+    <artifactId>javaeeExTest</artifactId>
+    <packaging>jar</packaging>
+    <name>Java EE Exercise Remote Test</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This project is used to deploy and test the server-side components
+        for the JNDI Scheduler project.
+    </description>
+
+    <dependencies>
+        <!-- core dependencies -->
+        <dependency>
+            <groupId>javax.javaee</groupId>
+            <artifactId>javaee</artifactId>
+            <version>5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
+        <!-- include this to compile tests -->
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>javaeeExEJB</artifactId>
+            <version>${pom.version}</version>
+            <type>ejb</type>
+        </dependency>
+
+        <!-- package being deployed must be a dependency -->
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>javaeeExEAR</artifactId>
+            <version>${pom.version}</version>
+            <type>ear</type>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
+        <plugins>
+              <!-- tell it to run, even though we are a pom project -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testResources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+              <!-- make sure we are building java5 and tell it to compile, 
+                    even though we are a pom project -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>      
+
+            <!-- THE PROFILE-SPECIFIC DEPLOY WILL EXECUTE HERE -->
+
+              <!-- tell it to run, even though we are a pom project -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                    <systemProperties>
+                        <property>
+                          <name>jndi.name.registrar</name>
+                          <value>
+                              myorg/javaeeEx/RegistrarEJB/remote
+                          </value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- ignored:( running during test phase -->
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>      
+    </build>
+
+    <profiles>
+<profile>
+    <id>jboss</id>
+    <activation>
+        <activeByDefault>true</activeByDefault>
+    </activation>
+    <properties>
+          <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
+          </java.naming.factory.initial>
+          <java.naming.provider.url>jnp://localhost:1099
+          </java.naming.provider.url>
+          <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
+          </java.naming.factory.url.pkgs>
+    </properties>
+    <!-- use system reference instead; getting invalid class for
+            jboss-ejb3-client.jar 
+    <repositories>
+        <repository>
+            <id>jboss.repository</id>
+            <name>ejava webdev repository</name>
+            <url>http://team.andromda.org/maven2</url>
+        </repository>
+    </repositories>
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jbossall-client</artifactId>
+            <version>4.0.4-GA</version>            
+            <scope>system</scope>
+            <systemPath>${jboss.home}/client/jbossall-client.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jboss-ejb3-client</artifactId>
+            <version>4.0.4-GA</version>            
+            <scope>system</scope>
+            <systemPath>${jboss.home}/client/jboss-ejb3-client.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jboss-aop-jdk50-client</artifactId>
+            <version>4.0.4-GA</version>            
+            <scope>system</scope>
+            <systemPath>${jboss.home}/client/jboss-aop-jdk50-client.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jboss-aspect-jdk50-client</artifactId>
+            <version>4.0.4-GA</version>            
+            <scope>system</scope>
+            <systemPath>${jboss.home}/client/jboss-aspect-jdk50-client.jar</systemPath>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+        <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration>
+                <container>
+                    <containerId>jboss4x</containerId>
+                    <type>remote</type>                
+                </container>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>deploy-component</id>
+                    <!-- jump into a phase before surefire runs tests -->
+                    <phase>test-compile</phase>
+                    <goals>
+                        <goal>undeploy</goal>
+                        <goal>deploy</goal>
+                    </goals>
+                    <configuration>
+                        <deployer>
+                            <type>remote</type>
+                            <deployables>
+                                <deployable>
+                                    <groupId>${pom.groupId}</groupId>
+                                    <artifactId>javaeeExEAR</artifactId>
+                                    <type>ear</type>
+                                </deployable>
+                            </deployables>
+                        </deployer>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>                    
+        </plugins>
+    </build>
+</profile>
+    </profiles>
+</project>

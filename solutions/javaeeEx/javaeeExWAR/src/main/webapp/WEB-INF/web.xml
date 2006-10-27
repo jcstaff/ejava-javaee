@@ -1,0 +1,41 @@
+<web-app 
+    xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
+    
+  <display-name>Web Tier Exercise Web Application</display-name>
+  
+    <servlet>
+        <servlet-name>Handler</servlet-name>
+        <servlet-class>myorg.webtier.web.RegistrarHandlerServlet</servlet-class>
+        <init-param>      
+            <param-name>type</param-name>
+            <param-value>admin</param-value>
+        </init-param>        
+        <init-param>      
+            <param-name>java.naming.factory.initial</param-name>
+            <param-value>org.jnp.interfaces.NamingContextFactory</param-value>
+        </init-param>
+        <init-param>      
+            <param-name>java.naming.provider.url</param-name>
+            <param-value>jnp://localhost:1099</param-value>
+        </init-param>
+        <init-param>
+            <param-name>java.naming.factory.url.pkgs</param-name> 
+            <param-value>org.jboss.naming:org.jnp.interfaces</param-value>
+        </init-param>
+        <init-param>
+            <param-name>registrar.local</param-name> 
+            <param-value>/myorg/javaeeEx/RegistrarEJB/local</param-value>
+        </init-param>
+        <init-param>
+            <param-name>registrar.remote</param-name> 
+            <param-value>/myorg/javaeeEx/RegistrarEJB/remote</param-value>
+        </init-param>        
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Handler</servlet-name>
+        <url-pattern>/model/admin/handler</url-pattern>
+    </servlet-mapping>
+</web-app>
