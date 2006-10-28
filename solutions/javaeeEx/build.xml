@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<project name="javaeeExDA" default="test" basedir=".">
+
+    <macrodef name="sub-project">
+        <attribute name="target"/>
+        <sequential>
+            <ant antfile="javaeeExDA/build.xml" target="@{target}"/>
+            <ant antfile="javaeeExEJB/build.xml" target="@{target}"/>
+            <ant antfile="javaeeExWAR/build.xml" target="@{target}"/>
+            <ant antfile="javaeeExEAR/build.xml" target="@{target}"/>
+            <ant antfile="javaeeExTest/build.xml" target="@{target}"/>
+        </sequential>
+    </macrodef>
+
+    <target name="package">
+        <sub-project target="package"/>
+    </target>
+
+    <target name="test">
+        <sub-project target="test"/>
+    </target>
+
+    <target name="clean">
+        <sub-project target="clean"/>
+    </target>
+
+</project>
