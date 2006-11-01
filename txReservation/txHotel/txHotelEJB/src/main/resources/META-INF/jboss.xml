@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss_5_0.xsd"
+    version="3.0">
+    
+    <enterprise-beans>
+        <session>
+            <ejb-name>HotelRegistrationEJB</ejb-name>
+            <jndi-name>/ejava/examples/txhotel/HotelRegistrationEJB/remote
+            </jndi-name>
+            <local-jndi-name>
+                /ejava/examples/txhotel/HotelRegistrationEJB/local
+            </local-jndi-name>
+        </session>        
+        <session>
+            <ejb-name>RequiredEJB</ejb-name>
+            <jndi-name>/ejava/examples/txhotel/RequiredEJB/remote
+            </jndi-name>
+            <local-jndi-name>/ejava/examples/txhotel/RequiredEJB/local
+            </local-jndi-name>
+        </session>
+        <session>
+            <ejb-name>RequiresNewEJB</ejb-name>
+            <jndi-name>/ejava/examples/txhotel/RequiresNewEJB/remote
+            </jndi-name>
+            <local-jndi-name>/ejava/examples/txhotel/RequiresNewEJB/local
+            </local-jndi-name>
+        </session>
+     
+     <!-- jboss reports a null pointer exception when a custom JNDI name 
+         is suppplied for stateful session beans (at least in this case)
+        <session>
+            <ejb-name>HotelReservationSessionEJB</ejb-name>
+            <jndi-name>
+                /ejava/examples/txhotelsession/HotelRegistrationEJB/remote
+            </jndi-name>
+            <local-jndi-name>
+                /ejava/examples/txhotelsession/HotelRegistrationEJB/local
+            </local-jndi-name>
+        </session>        
+            <session>
+            <ejb-name>RequiredSessionEJB</ejb-name>
+            <jndi-name>/ejava/examples/txhotelsession/RequiredEJB/remote
+            </jndi-name>
+            <local-jndi-name>/ejava/examples/txhotelsession/RequiredEJB/local
+            </local-jndi-name>
+        </session>        
+        <session>
+            <ejb-name>RequiresNewSessionEJB</ejb-name>
+            <jndi-name>/ejava/examples/txhotelsession/RequiresNewEJB/remote
+            </jndi-name>
+            <local-jndi-name>/ejava/examples/txhotelsession/RequiresNewEJB/local
+            </local-jndi-name>
+        </session>
+        -->
+        
+    </enterprise-beans>
+</jboss>

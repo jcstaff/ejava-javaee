@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<ejb-jar
+    xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd"
+    version="3.0">
+    
+    <enterprise-beans>
+        <session>
+            <ejb-name>BookingAgentEJB</ejb-name>
+            <ejb-ref>
+                <ejb-ref-name>ejb/HotelReservation</ejb-ref-name>
+                <ejb-ref-type>Session</ejb-ref-type>
+                <remote>
+                    ejava.examples.txhotel.ejb.HotelRegistrationRemote                    
+                </remote>
+                <injection-target>
+                    <injection-target-class>
+                        ejava.examples.txagent.ejb.BookingAgentEJB
+                    </injection-target-class>
+                    <injection-target-name>
+                        hotel
+                    </injection-target-name>
+                </injection-target>
+            </ejb-ref>
+        </session>
+        
+        <session>                      
+            <ejb-name>AgentReservationSessionEJB</ejb-name>
+            <ejb-class>
+                ejava.examples.txagent.ejb.AgentReservationSessionEJB
+            </ejb-class>
+            <session-type>Stateful</session-type>
+            <remove-method>
+                <bean-method>
+                    <method-name>commit</method-name>
+                </bean-method>
+                <retain-if-exception>false</retain-if-exception>
+            </remove-method>
+            <ejb-ref>
+                <ejb-ref-name>ejb/HotelReservationSession</ejb-ref-name>
+                <ejb-ref-type>Session</ejb-ref-type>
+                <remote>
+                    ejava.examples.txhotel.ejb.HotelReservationSessionRemote
+                </remote>           
+                <injection-target>
+                    <injection-target-class>
+                        ejava.examples.txagent.ejb.AgentReservationSessionEJB
+                    </injection-target-class>
+                    <injection-target-name>
+                        reservationSession
+                    </injection-target-name>
+                </injection-target>
+            </ejb-ref>
+        </session>        
+    </enterprise-beans>
+    
+    <assembly-descriptor>
+        <!-- perform all stateless methods within a tx -->
+        <!-- this example will define these within the bean class
+        <container-transaction>
+            <method>
+                <ejb-name>BookingAgentEJB</ejb-name>
+                <method-name>*</method-name>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+        </container-transaction>
+        -->
+        
+        <!-- only create a transaction for the commit() method -->
+        <!-- this example will define these within the bean class 
+            <container-transaction>
+            <method>
+                <ejb-name>AgentReservationSessionEJB</ejb-name>
+                <method-name>*</method-name>
+            </method>
+            <trans-attribute>NotSupported</trans-attribute>
+        </container-transaction>
+        <container-transaction>
+            <method>
+                <ejb-name>AgentReservationSessionEJB</ejb-name>
+                <method-name>commit</method-name>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+        </container-transaction>
+        -->
+    </assembly-descriptor>
+</ejb-jar>

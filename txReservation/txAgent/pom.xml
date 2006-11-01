@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>txReservation</artifactId>
+        <groupId>ejava.javaee.txreservation</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.txreservation</groupId>
+    <artifactId>txAgent</artifactId>
+    <packaging>pom</packaging>
+    <name>Tx Agent Application</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This project is the root project for the example Java EE
+        Application that makes use of JTA transactions and a RMI
+        connection to another application.
+    </description>
+
+    <modules>
+        <module>txAgentBO</module>
+        <module>txAgentDA</module>
+        <module>txAgentImpl</module>
+        <module>txAgentEJB</module>
+        <!--
+        <module>txAgentWAR</module>
+        -->
+        <module>txAgentEAR</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>functional-tests</id>
+            <activation>
+                <property>
+                    <name>!maven.test.skip</name>
+                </property>
+            </activation>
+            <modules>
+                <module>txAgentTest</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>

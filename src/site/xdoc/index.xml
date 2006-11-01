@@ -13,6 +13,8 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2006-10-31: Posted transaction materials
+          </li>
           <li>2006-10-24: Posted project 2
           </li>
           <li>2006-10-24: Posted ejb sesion bean, jndi, and ear materials
@@ -42,12 +44,14 @@
       </subsection>
       <subsection name="To Do" id="todo">
       <ul>
-          <li>Finish going through exercises</li>
-          <li>Creating project 1 project directories</li>
-          <li>Creating project 1 database schema</li>
-          <li>Create project 1 DAOs and Test</li>
-          <li>Create project 1 Business Objects</li>
-          <li>Begin mapping a few business objects to DB with JPA</li>
+          <li>Create a 3 tier, multi-project structure (root; mayberry and raliegh; xxxDAT, xxxEJB, etc.)</li>
+          <li>Create pom projects in upper two tiers (root; mayberry and raliegh)</li>
+          <li>Move project 1 projects (xxxDAT) below appropriate mid-level pom projects (mayberry and raliegh)</li>
+          <li>Create a set of EJBs to host the business logic and data access tiers</li>
+          <li>Create a set of EARs to host the EJBs and their depenencies</li>
+          <li>Create a set of Test projects to test the EJBs using their remote interfaces</li>
+          <li>Once you have the remote interfaces of the EJBs tested, move onto connecting the two projects and building Web Tier</li>
+          <li>Don't forget to add transaction declarations before complete</li>
       </ul>
       </subsection>
     </section>

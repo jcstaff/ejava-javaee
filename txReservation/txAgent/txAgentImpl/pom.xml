@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+        <artifactId>txAgent</artifactId>
+        <groupId>ejava.javaee.txreservation</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.txreservation</groupId>
+    <artifactId>txAgentImpl</artifactId>
+    <name>Tx Agent Business Logic</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+          <groupId>javax.javaee</groupId>
+          <artifactId>javaee</artifactId>
+          <version>5</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>txAgentBO</artifactId>
+          <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>txAgentDA</artifactId>
+          <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>txHotelEJB</artifactId>
+          <version>${pom.version}</version>
+          <type>ejb-client</type>
+          <exclusions>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelEJB</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelImpl</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelDA</artifactId>
+              </exclusion>
+          </exclusions>
+        </dependency>
+    
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>      
+      
+              <!-- pass in driver information to JUnit -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                </configuration>
+            </plugin>            
+        </plugins>    
+    </build>
+
+    <profiles>
+
+        <profile> <!-- jboss/hibernate javax.persistence provider -->
+            <id>jboss</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <!-- dependencies for JBoss Embedded Container -->
+                <dependency>
+                    <groupId>net.sf.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                    <version>1.2</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.ejb3.embedded</groupId>
+                    <artifactId>hibernate-all</artifactId>
+                    <version>alpha8_patch2</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.ejb3.embedded</groupId>
+                    <artifactId>jboss-ejb3-all</artifactId>
+                    <version>alpha8_patch2</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.ejb3.embedded</groupId>
+                    <artifactId>thirdparty-all</artifactId>
+                    <version>alpha8_patch2</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>    
+                      <!-- pass in driver information to JUnit -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>${surefire.argLine}</argLine>
+                            <systemProperties>
+                        <property>
+                            <name>java.class.path</name>
+                            <value>target/classes</value>
+                        </property>
+                        <property>
+                          <name>hotel.jndi.url</name>
+                          <value>jnp://localhost:1099</value>
+                        </property>
+                        <property>
+                          <name>hotel.jndi.factory</name>
+                          <value>org.jnp.interfaces.NamingContextFactory</value>
+                        </property>
+                        <property>
+                          <name>hotel.jndi.pkgs</name>
+                          <value>org.jboss.naming:org.jnp.interfaces</value>
+                        </property>
+                        <property>
+                          <name>jndi.name.hotel</name>
+                          <value>ejava/examples/txhotel/RequiredEJB/remote
+                          </value>
+                        </property>
+                        <property>
+                          <name>jndi.name.hotelsession</name>
+                          <value>txHotelEAR-1.0-SNAPSHOT/RequiredSessionEJB/remote
+                          </value>
+                        </property>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>            
+                </plugins>    
+            </build>
+        </profile>
+
+    </profiles>
+</project>

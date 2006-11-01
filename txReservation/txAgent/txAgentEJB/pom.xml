@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+        <artifactId>txAgent</artifactId>
+        <groupId>ejava.javaee.txreservation</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.txreservation</groupId>
+    <artifactId>txAgentEJB</artifactId>
+    <packaging>ejb</packaging>
+    <name>Tx Agent Business EJB</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <!-- core dependencies -->
+        <dependency>
+          <groupId>javax.javaee</groupId>
+          <artifactId>javaee</artifactId>
+          <version>5</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>txAgentImpl</artifactId>
+          <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>txAgentDA</artifactId>
+          <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>txHotelEJB</artifactId>
+          <version>${pom.version}</version>
+          <type>ejb-client</type>
+          <exclusions>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelEJB</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelImpl</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelDA</artifactId>
+              </exclusion>
+          </exclusions>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.13</version>
+          <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>      
+
+              <!-- tell the EJB plugin we are using EJB3  and configure client-jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <version>2.1-SNAPSHOT</version>
+                <configuration>
+                    <ejbVersion>3.0</ejbVersion>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                    <generateClient>true</generateClient>
+                    <clientExcludes>
+                    <!-- jboss stateful remote proxies need local class
+                        <clientExclude>**/*Local.class</clientExclude>
+                        -->
+                        <clientExclude>**/*EJB.class</clientExclude>
+                        <clientExclude>META-INF/*.xml</clientExclude>
+                    </clientExcludes>
+                </configuration>
+            </plugin>      
+
+            <!-- add the debug argument and supply the class.path if we debug JPA here -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>java.class.path</name>
+                            <value>target/classes</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>      
+    </build>
+
+</project>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>txReservation</artifactId>
+        <groupId>ejava.javaee.txreservation</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.txreservation</groupId>
+    <artifactId>txHotel</artifactId>
+    <packaging>pom</packaging>
+    <name>Tx Hotel Application</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This project is the root project for the example Java EE
+        Application that makes use of JTA transactions.
+    </description>
+
+    <modules>
+        <module>txHotelBO</module>
+        <module>txHotelDA</module>
+        <module>txHotelImpl</module>
+        <module>txHotelEJB</module>
+        <!--
+        <module>txHotelWAR</module>
+        -->
+        <module>txHotelEAR</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>functional-tests</id>
+            <activation>
+                <property>
+                    <name>!maven.test.skip</name>
+                </property>
+            </activation>
+            <modules>
+                <module>txHotelTest</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>
