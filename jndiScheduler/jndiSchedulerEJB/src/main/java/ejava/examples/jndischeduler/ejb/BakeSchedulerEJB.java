@@ -15,11 +15,9 @@ import javax.persistence.PersistenceContextType;
 import ejava.examples.jndischeduler.JNDIHelper;
 
 @Stateful(name="BakeScheduler")
-//@EJBs({
-//    @EJB(name="ejb/cook", beanInterface=CookLocal.class, beanName="CookEJB",
-//            mappedName="jndiSchedulerEAR-1.0-SNAPSHOT/CookEJB/local")
-//})
-@Resource(name="ejb/cook", type=CookLocal.class)
+@EJBs({
+    @EJB(name="ejb/cook", beanInterface=CookLocal.class, beanName="CookEJB")
+})
 public class BakeSchedulerEJB 
     extends SchedulerBase implements BakeSchedulerRemote {
 
@@ -35,7 +33,8 @@ public class BakeSchedulerEJB
         super.ctx = ctx;
     }
     
-    @EJB
+    //we will assign this value using a JNDI lookup from the injection at the
+    //beginning of the class; this works in JBoss 4.0.5, but not in 4.0.4
     protected CookLocal cook; 
 
     @Resource(name="ejb/cook", mappedName="jndiSchedulerEAR-1.0-SNAPSHOT/CookEJB/local")
@@ -54,6 +53,7 @@ public class BakeSchedulerEJB
         log.debug("message=" + message);
         log.debug("cook=" + cook);
         log.debug("cook2=" + cook2);
+        cook = (CookLocal)ctx.lookup("ejb/cook");
         try { new JNDIHelper().dump(new InitialContext(), "java:comp.ejb3");
         } catch (NamingException e) { log.fatal("" + e); }
     }

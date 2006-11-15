@@ -1,0 +1,325 @@
+Project2: Secure and Asynchronous N-Tier Application
+
+    11/14/2006 Draft
+
+* Goals
+
+    * Secure access to EJB and Web applications
+
+    * Provide for asynchronous publish/subscribe processing.
+
+* Objectives
+
+    * Re-use the Raleigh and Mayberry implementations from projects 1 and 2.
+
+    * Define users and roles for both applications.
+
+    * Define access controls and implement authentication mechanisms for 
+    Raleigh DMV.
+
+    * Define access controls and implement authentication mechanisms for
+    Mayberry Sherrif Dept.
+
+    * Configure JMS destinations used for applications.
+
+    * Implement a publish/subscribe capability to consume information on
+    Mayberry Persons of Interest.
+
+* Technical Overview
+
+    The project will build on the core implementation from projects 1 and
+    2. We will mostly extend existing projects with security and
+    asynchronous logic. Any new projects will be done only to make it
+    convenient to isolate the implementation (i.e., run a specific client).
+
+    Although logically independent, the Raleigh and Mayberry EARs are
+    expected to be deployed to the same application server for the project
+    implementation and testing. Using JBoss in its common classloader, 
+    we need to account for and take advantage of this fact. This primary
+    means that:
+
+        * limit the amount of resources (JARs) that duplicate what the
+        JBoss server environment will provide (e.g., commons-logging, 
+        log4j, hsqldb)
+
+        * limit the amount of resources (JARs) duplicated in each EAR
+
+    Java EE defines authentication and authorization to be independent of
+    the overall API and capabaility. JBoss and other application servers
+    provide simple, "hello world", mechanisms that are easy to demonstrate
+    and more sophisticated mechanisms that are realistic for deployments.
+    We will use the simple "other" authentication application policy 
+    defined within the standard JBoss installation. This method takes two
+    files: 
+
+        * users.properties - defines username=password lines that list the
+        login username and plaintext password
+
+        * roles.properties - defines username=role1,role2 lines that list
+        the login username and assigned roles.
+
+    These two files must be available in the root package within the
+    classloader classpath. This means that they would be at the root
+    directory of an EJB or WEB-INF/classes. Knowing our environment, we'll
+    create a single set to be shared between Raleigh and Mayberry and place
+    this in the RaleighEJB.
+
+    We are going to have a couple types of users. Some of the users will
+    have zero, one, or more of these roles.
+
+        * raleigh-tactical - these users can read/write information in raleigh
+
+        * federated-tactical - these users can only read information from
+        raleigh.
+
+        * mayberry-tactical - these users can read/write information in
+        mayberry (and read information from raleigh through mayberry).
+
+        * mayberry-analytical - these users can only read information from
+        mayberry (and raleigh through mayberry)
+
+    MayberryEJB will be configured with run-as to operate as an
+    authenticated user of Raleigh, without Raleigh specifically knowing
+    about the actual Mayberry user.
+
+    RMI Tests will be updated with JAAS configuration and login logic.
+
+    We will implement at least one asynchronous interface; a
+    publish/subscribe from MayberryEJB to a Java SE Subscriber. A topic
+    will need to be added to your JMS Server and you will need to design
+    the type, structure, and payload of the JMS Message that will be sent. 
+
+    The publisher will send a JMS Message whenever there is a change for a
+    person of interest. The subscriber will register a JMS Selector so that
+    it only consumes a message when there is a dangerous person of
+    interest. The subscriber only needs to log the message received.
+
+* Technical Details
+
+    [[1]] Provide all functionality from project1; especially the ability 
+    to test the data access tier and to ingest the test data.
+
+        * Unit tests can be done with canned objects and the smaller sample 
+        XML file.
+
+        * A final ingest capability needs to be supplied after unit testing
+        so that the entire system can be tested under load. This extra test
+        can be best performed by a separate, optional, project that leaves 
+        the results of the XML ingest in place. The actual file used by the 
+        ingest should be modifiable by the grader with the
+        -Draleigh.xmlfile=(path) argument.
+
+    [[1]] Provide all the functionality from project2. Especially with 
+    integration tests that test the remote interfaces of the EJB logic.
+
+    [[1]] Add a users/roles.properties set of files to RaleighEJB that 
+    defines the combined set of users and roles between the two
+    applications. The files should define the following usernames and
+    roles (all users should have a password of "password".
+
+        * known=(no roles)
+
+        * kathy=raleigh-tactical
+
+        * sherri=raleigh-tactical
+
+        * sysRaleigh=raleigh-tactical
+
+        * sysMayberry=federated-tactical,mayberry-tactical,mayberry-analytical
+
+        * andy=mayberry-tactical,mayberry-analytical
+
+        * barney=mayberry-tactical
+
+        * gomer=mayberry-analytical
+
+    [[1]] Enhance RaleighEJB with access restrictions.
+
+        * Assign the EJB to the "other" security domain.
+
+        * Restrict access to the EJB methods
+        to users within the raleigh-tactical and federated-tectical roles.
+
+    [[1]] Extend your existing RMI Test project to address new
+    authentication requirements.
+
+        * Add JAAS Configuration for JBoss the ClientLoginModule.
+
+        * Add a new unit test that verifies that read methods are
+        restricted to the raleigh-tactical and federated-tactical roles.
+    
+        * Add a valid login to your existing tests to re-enable them under
+        the new secure environment.
+
+    [[1]] Enhance MayberryEJB with access restrictions and the ability
+    to run as an authenticated system account for accessing Raleigh.
+
+        * Assign the EJB to the "other" security domain.
+
+        * Restrict access to the EJB read methods to users with the
+        mayberry-analytical or mayberry-tactical roles.
+
+        * Restrict access to the EJB write methods to users with the 
+        mayberry-tactical role.
+
+        * Update the RMI call to RaleighEJB to run-as sysMayberry and
+        use the federated-tactical role.
+
+    [[1]] Extend your existing RMI Test project to address new
+    authentication requirements.
+
+        * Add JAAS Configuration for JBoss the ClientLoginModule.
+
+        * Add a new unit test that verifies that read methods are
+        restricted to mayberry-analytical and mayberry-tactical roles. It
+        should also verify that write methods are restricted to the
+        mayberry-tactical role.
+
+        * Add a valid login to your existing tests to re-enable them under 
+        the new secure environment.
+
+    [[1]] Enhance MayberryWAR with access restrictions.
+
+        * Assign the WAR to the "java:jass/other" security domain.
+
+        * Restrict access beyond the main page to users with
+        mayberry-tactical or mayberry-analytical roles. You may use FORM or
+        BASIC authentication.
+
+        * Permit only users with mayberry-tactical role to be able to 
+        update any information. Users without this role should never be
+        given the option to make a change. request.isUserInRole() can be
+        very helpful in changing the look of a dual-purpose JSP page.
+
+    [[1]] Extend your MayberryEJB to publish changes to Persons of
+    Interest to a topic.
+
+        * Add the JMS topic to your JBoss server.
+
+        * Design your JMS Message. You can use any JMS Type and JMS/custom
+        properties you wish.  However, you need to account for the fact
+        that subscribers will be filtering on such things as whether
+        the person is dangerous.
+
+        * Have you MayberryEJB publish the JMS Message to the topic when 
+        changes to the Persons of Interest occur.
+
+    [[1]] Add a Java SE JMS subscriber to consume events about Persons of 
+    Interest that are dangerous.
+
+        * Create a new project to house this implementation of this client.
+        This will make it easy to isolate the client within a stand-alone,
+        optional, integration test. 
+
+        * Implement a Java SE JMS subscriber that listens for Persons of
+        Interest and uses a JMS selector to only receive events concerning 
+        POIs that are dangerous. This must be a JMS selector, not
+        client-side Java logic. All this client has to do is log the
+        information from the message.
+
+        * Like the Ingest, you may launch/test this subscriber using a
+        JUnit testcase.
+
+* Testing
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    Raleigh DMV accessed through its remote interface using new
+    access control restrictions.
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    Mayberry SD using its new access control restrictions and run-as 
+    configuration. 
+
+    [[1]] Perform the following scripted use case with a fully ingested
+    Raleigh database.
+
+        * Start Mayberry Java SE JMS Dangerous Person of Interest
+        Subscriber.
+
+        * Access Mayberry Web Interface.
+
+        * As user "andy", create a person of interest 
+
+        * Add activity information.
+
+        * View the person of interest with associated DMV data,
+
+        * Signify that the person of interest is dangerous.
+
+        * Verify that, only now, the Java SE Dangerous Person of Interest
+        Subscriber consumes and prints a message.
+
+        * As user "gomer", view a person of interest with DMV data.
+
+        * As user "gomer", attempt and fail to create a person of interest.
+
+* Grading
+
+    Your project will be graded on completeness and quality of product. In
+    order for you to recieve full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The breakdown of grading 
+    will be as follows:
+
+        * README provided that describes where each requirement satisfield: 10pts
+
+        * projects cleanly builds with Maven or Ant: 15pts
+
+        * project1 functionality: 5pts
+
+        * project2 functionality: 5pts
+
+        * EJB Security: 20pts
+
+        * JAAS Client Security: 10pts
+
+        * WAR Security: 10pts
+
+        * EJB JMS Publisher: 15pts
+
+        * Java SE JMS Listener: 10pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implamantation supplied: 30%
+
+        * testing: 10%
+
+* Submission Guidelines
+
+    You should test your application prior to submission by 
+
+        * running the clean targets before zipping up the source code
+
+        * removing (or moving) your M2_REPO (with the exception of 
+        javaee.jar).
+
+        * deleting your data/hypersonic/ejava.* database files
+        
+        * unzipping your source code into a new directory.
+        
+        * building and running the tests for your application(s) from scratch.
+
+    You will e-mail the projects to both graders with the following subject
+    line
+
+        * (your name) project 3; revision 0; part # of #
+
+    Your submission will include source zip, README (could be in source
+    zip), and built project artifact(s) (e.g., jar, war, ear, etc.).
+
+    
+    If you need to make a correction, the correction should have the
+    following e-mail subject. The body should describe what you wish to 
+    revise.
+
+        * (your name) project 3; revision N; part # of #
+
+    Grader e-mails (mail to both):
+
+        * BenButler@comcast.net
+
+        * j_faniyi@yahoo.com

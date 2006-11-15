@@ -1,0 +1,32 @@
+<assembly>
+  <id>sources</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <includes>
+        <include>ejava.javaee.secureping:securePingClientEJB</include>
+        <include>ejava.javaee.secureping:securePingClientEAR</include>
+        <include>ejava.javaee.secureping:securePingClientTest</include>
+      </includes>
+      <sources>
+        <outputDirectory>${artifactId}</outputDirectory>
+      </sources>
+    </moduleSet>
+  </moduleSets>
+  <fileSets>
+      <fileSet>
+          <includes>
+              <include>pom.xml</include>
+              <include>assembly.xml</include>
+          </includes>
+          <outputDirectory>${artifactId}</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>src</directory>
+          <outputDirectory>${artifactId}</outputDirectory>
+      </fileSet>
+  </fileSets>
+</assembly>

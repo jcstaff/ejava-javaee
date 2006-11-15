@@ -125,15 +125,17 @@
                         </property>
                     </systemProperties>
                 </configuration>
+                        <!-- ignored:( running during test phase -->
+                <!--
                 <executions>
                     <execution>
-                        <!-- ignored:( running during test phase -->
                         <phase>integration-test</phase>
                         <goals>
                             <goal>test</goal>
                         </goals>
                     </execution>
                 </executions>
+                -->
             </plugin>
 
         </plugins>      

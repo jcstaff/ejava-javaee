@@ -1,0 +1,73 @@
+Exercise: Enable JBoss HTTPS
+
+* Goal/Objective
+
+    * Enable use of HTTPS with JBoss.
+
+* Steps
+
+    [[1]] Use the keytool program that is part of the JDK to generate a self-signed
+    digital certificate and keystore for the server. Feel free to use different values 
+    than shown below. However,
+
+        * the file name and location must match the keystoreFile path you use in 
+        server.xml in a later step.
+
+        * the password used for the keystore must match the keystorePass used in
+        server.xml in a later step.
+
+        []
+
+---
+server/default/conf> keytool -genkey -alias tomcat -keyalg RSA -keystore ejava.keystore
+Enter keystore password:  password
+What is your first and last name?
+  [Unknown]:  jboss
+What is the name of your organizational unit?
+  [Unknown]:  ejava
+What is the name of your organization?
+  [Unknown]:  jhu
+What is the name of your City or Locality?
+  [Unknown]:  laurel
+What is the name of your State or Province?
+  [Unknown]:  md
+What is the two-letter country code for this unit?
+  [Unknown]:  us
+Is CN=jboss, OU=ejava, O=jhu, L=laurel, ST=md, C=us correct?
+  [no]:  yes
+
+Enter key password for <tomcat>
+        (RETURN if same as keystore password): (press RETURN here)
+---
+
+    [[1]] Enable the SSL Port on JBoss/Tomcat by first uncommenting 
+    the SSL/TLS section of 
+    server/default/deploy/jbossweb-tomcat55.sar/server.xml.
+
+---
+      <!-- SSL/TLS Connector configuration using the admin devl guide keystore
+      -->
+      <Connector port="8443" address="${jboss.bind.address}"
+           maxThreads="100" strategy="ms" maxHttpHeaderSize="8192"
+           emptySessionPath="true"
+           scheme="https" secure="true" clientAuth="false"
+           keystoreFile="${jboss.server.home.dir}/conf/chap8.keystore"
+           keystorePass="rmi+ssl" sslProtocol = "TLS" />
+---
+
+    [[1]] Change the keystoreFile and keystorePass values to match what 
+    was used in when creating the keystore in the first step.
+
+---
+      <Connector port="8443" address="${jboss.bind.address}"
+           maxThreads="100" strategy="ms" maxHttpHeaderSize="8192"
+           emptySessionPath="true"
+           scheme="https" secure="true" clientAuth="false"
+           keystoreFile="${jboss.server.home.dir}/conf/ejava.keystore"
+           keystorePass="password" sslProtocol = "TLS" />
+---
+
+    [[1]] Start/Restart JBoss.
+
+    [[1]] Test the configuration by navigating to
+    https://localhost:8443/jmx-console with the browser.

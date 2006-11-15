@@ -13,6 +13,10 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2006-11-14: Posted project 3
+          </li>
+          <li>2006-11-14: Posted security materials
+          </li>
           <li>2006-10-31: Posted transaction materials
           </li>
           <li>2006-10-24: Posted project 2
@@ -44,14 +48,11 @@
       </subsection>
       <subsection name="To Do" id="todo">
       <ul>
-          <li>Create a 3 tier, multi-project structure (root; mayberry and raliegh; xxxDAT, xxxEJB, etc.)</li>
-          <li>Create pom projects in upper two tiers (root; mayberry and raliegh)</li>
-          <li>Move project 1 projects (xxxDAT) below appropriate mid-level pom projects (mayberry and raliegh)</li>
-          <li>Create a set of EJBs to host the business logic and data access tiers</li>
-          <li>Create a set of EARs to host the EJBs and their depenencies</li>
-          <li>Create a set of Test projects to test the EJBs using their remote interfaces</li>
-          <li>Once you have the remote interfaces of the EJBs tested, move onto connecting the two projects and building Web Tier</li>
-          <li>Don't forget to add transaction declarations before complete</li>
+          <li>Add user/role.properties files to Raleigh (to be shared by
+          both applications)</li>
+          <li>Add security constraints to EJB Tiers</li>
+          <li>Add JAAS Configuration and Logic to RMI Tests</li>
+          <li>Add security constraints to Mayberry Web Tier</li>
       </ul>
       </subsection>
     </section>
