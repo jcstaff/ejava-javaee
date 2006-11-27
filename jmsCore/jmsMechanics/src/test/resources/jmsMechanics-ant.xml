@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jmsMechanics" basedir="..">
+
+    <property file="test-classes/${ant.project.name}.properties"/>
+
+    <path id="demo.classpath">
+        <pathelement path="${commons.logging.classpath}"/>
+        <pathelement path="${log4j.classpath}"/>
+        <pathelement path="${javaee.classpath}"/>
+        <pathelement path="${jbossall-client.classpath}"/>
+        <pathelement path="test-classes"/>
+        <pathelement path="classes"/>
+    </path>
+
+    <description>
+    This Ant script can perform an installation of the server resources
+    required to run the jmsMechanics tests. It requires jboss.home to be
+    defined during build time or JBOSS_HOME to be defined during runtime.
+    </description>
+
+    <target name="echo">
+        <property name="demo-classpath" refid="demo.classpath"/>
+        <echo>basedir=${basedir}</echo>
+        <echo>commons.logging.classpath=${commons.logging.classpath}</echo>
+        <echo>demo.classpath=${demo-classpath}</echo>
+    </target>
+
+    <target name="init">
+        <copy todir="${JBOSS_HOME}/server/default/deploy"
+              file="test-classes/${ant.project.name}-jms-service.xml"/>
+        <sleep seconds="1"/>
+    </target>
+</project>

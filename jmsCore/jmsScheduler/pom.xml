@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+        <artifactId>jmsCore</artifactId>
+        <groupId>ejava.javaee.jmscore</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.jmscore</groupId>
+    <artifactId>jmsScheduler</artifactId>
+    <packaging>jar</packaging>
+    <name>JMS Scheduler</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This project provides a small example of a scheduling application
+        and N-number of providers that will fight for requests off a queue.
+        They only take what they can process and will transactionally reply 
+        with a result when complete.
+    </description>
+
+    <dependencies>
+        <!-- core dependencies -->
+        <dependency>
+            <groupId>javax.javaee</groupId>
+            <artifactId>javaee</artifactId>
+            <version>5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+        <!-- filter resource files for profile-specific values -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.xml</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <!-- copy the jms-services.xml file to the server -->
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                 <execution>
+                   <phase>process-test-resources</phase>
+                   <configuration>
+                     <tasks>
+                       <copy 
+                          todir="${jboss.home}/server/default/deploy">
+                          <fileset dir="${basedir}/target/test-classes"
+                              includes="*jms-service.xml"/>
+                       </copy>
+                     </tasks>
+                   </configuration>
+                   <goals>
+                     <goal>run</goal>
+                   </goals>
+                 </execution>
+                </executions>
+            </plugin> 
+
+              <!-- make sure we are building java5 and tell it to compile, 
+                    even though we are a pom project -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>      
+
+        </plugins>      
+    </build>
+
+    <profiles>        
+        <profile>
+            <id>jboss</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                  <java.naming.factory.initial>
+                      org.jnp.interfaces.NamingContextFactory
+                  </java.naming.factory.initial>
+                  <java.naming.provider.url>
+                      jnp://localhost:1099
+                  </java.naming.provider.url>
+                  <java.naming.factory.url.pkgs>
+                      org.jboss.naming:org.jnp.interfaces
+                  </java.naming.factory.url.pkgs>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss</groupId>
+                    <artifactId>jbossall-client</artifactId>
+                    <version>4.0.4-GA</version>            
+                    <scope>system</scope>
+                    <systemPath>
+                        ${jboss.home}/client/jbossall-client.jar
+                    </systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    
+</project>

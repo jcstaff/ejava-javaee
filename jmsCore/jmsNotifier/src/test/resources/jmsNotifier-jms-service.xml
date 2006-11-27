@@ -1,0 +1,9 @@
+<server>
+
+  <mbean code="org.jboss.mq.server.jmx.Topic"
+         name="jboss.mq.destination:service=Topic,name=ejava/examples/jmsNotifier/topic1">
+    <depends optional-attribute-name="DestinationManager">
+        jboss.mq:service=DestinationManager
+    </depends>
+  </mbean>
+</server>

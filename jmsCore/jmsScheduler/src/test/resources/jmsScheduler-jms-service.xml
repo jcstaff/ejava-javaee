@@ -1,0 +1,33 @@
+<server>
+
+  <mbean code="org.jboss.mq.server.jmx.Queue"
+         name="jboss.mq.destination:service=Queue,name=ejava/examples/jmsScheduler/requestQueue">
+     <depends optional-attribute-name="DestinationManager">
+        jboss.mq:service=DestinationManager
+     </depends>
+     <!-- the following attribute allows the queue to do a more eager job
+          at round-robin distribution of outstanding messages than the
+          default implementation. Without it, all messages tend to go to a 
+          single receiver. See discussion at
+
+          http://jboss.org/index.html?module=bb&op=viewtopic&t=67524
+          http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossMQReceiverImpl
+
+          Note that adding this may distribute more of the load than you 
+          want to. If a single server can keep up with the load, it may 
+          help to keep all work within the single server rather than
+          spreading things such as sessions, locks, etc across multiple
+          instances.
+          -->
+     <attribute name="ReceiversImpl">
+         org.jboss.mq.server.ReceiversImplLinkedList
+     </attribute>
+  </mbean>
+
+  <mbean code="org.jboss.mq.server.jmx.Queue"
+         name="jboss.mq.destination:service=Queue,name=ejava/examples/jmsScheduler/DLQ">
+     <depends optional-attribute-name="DestinationManager">
+        jboss.mq:service=DestinationManager
+     </depends>
+  </mbean>
+</server>
