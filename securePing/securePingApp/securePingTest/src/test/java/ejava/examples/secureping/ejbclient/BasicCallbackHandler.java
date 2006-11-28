@@ -45,11 +45,11 @@ public class BasicCallbackHandler implements CallbackHandler {
 
         for (Callback cb : callbacks) {
             if (cb instanceof NameCallback) {
-                log_.debug("name callback");
+                log_.debug("name callback:" + name_);
                 ((NameCallback)cb).setName(name_);                
             }
             else if (cb instanceof PasswordCallback) {
-                log_.debug("password callback");
+                log_.debug("password callback:" + new String(password_));
                 ((PasswordCallback)cb).setPassword(password_);
             }
             else {
