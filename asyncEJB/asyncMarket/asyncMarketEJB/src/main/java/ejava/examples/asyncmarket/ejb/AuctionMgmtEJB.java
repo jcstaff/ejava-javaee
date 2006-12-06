@@ -1,5 +1,6 @@
 package ejava.examples.asyncmarket.ejb;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -227,7 +228,7 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
     public List<AuctionItem> getItems(int index, int count) 
         throws MarketException {
         try {
-            return auctionItemDAO.getItems(index, count);
+            return makeDTO(auctionItemDAO.getItems(index, count));
         }
         catch (Exception ex) {
             log.error("error getting auction items", ex);
@@ -244,4 +245,38 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
             throw new MarketException("error removing auction items" + ex);
         }
     }
+    
+    private List<AuctionItem> makeDTO(List<AuctionItem> items) {
+        List<AuctionItem> dto = new ArrayList<AuctionItem>();
+        for (AuctionItem item : items) {
+            dto.add(makeDTO(item));
+        }
+        return dto;
+    }
+
+    private AuctionItem makeDTO(AuctionItem item) {
+        AuctionItem dto = new AuctionItem(item.getId());
+        dto.setVersion(item.getVersion());
+        dto.setName(item.getName());
+        dto.setStartDate(item.getStartDate());
+        dto.setEndDate(item.getEndDate());
+        dto.setMinBid(item.getMinBid());
+        dto.setBids(makeDTO(item.getBids(), dto));
+        dto.setWinningBid(null);
+        dto.setClosed(item.isClosed());
+        return dto;
+    }
+
+    private List<Bid> makeDTO(List<Bid> bids, AuctionItem item) {
+        List<Bid> dtos = new ArrayList<Bid>();
+        for (Bid bid : bids) {
+            Bid dto = new Bid(bid.getId());
+            dto.setAmount(bid.getAmount());
+            dto.setItem(item);
+            item.getBids().add(dto);
+            dto.setBidder(makeDTO(bid.getBidder(),dto));
+            dtos.add(dto);
+        }
+        return dtos;
+    }    
 }

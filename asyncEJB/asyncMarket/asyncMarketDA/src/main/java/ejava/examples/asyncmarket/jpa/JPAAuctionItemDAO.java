@@ -1,5 +1,6 @@
 package ejava.examples.asyncmarket.jpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,13 +72,18 @@ public class JPAAuctionItemDAO implements AuctionItemDAO {
 
     public void removeItem(long id) {
         AuctionItem item = getItem(id);
-        for (Bid bid : item.getBids()) {
-            bid.setItem(null);
-            item.getBids().remove(bid);
+        //create a copy to prevent iterating over changing collection
+        List<Bid> bids = new ArrayList<Bid>(item.getBids());
+        for (Bid bid : bids) {
             bid.getBidder().getBids().remove(bid);
+            item.getBids().remove(bid);
             em.remove(bid);
         }
         item.getOwner().getItems().remove(item);
+        em.createQuery("delete from Order o " +
+                "where o.item.id = :itemId")
+          .setParameter("itemId", id)
+          .executeUpdate();
         em.remove(item);
     }
 

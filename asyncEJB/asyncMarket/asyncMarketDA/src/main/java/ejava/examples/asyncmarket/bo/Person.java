@@ -77,8 +77,8 @@ public class Person implements Serializable {
         text.append(", version=" + version);
         text.append(", userId=" + userId);
         text.append(", name=" + name);
-        text.append(", bids(" + bids.size() + ")=" + bids);
-        text.append(", items(" + items.size() + ")=" + items);
+        text.append(", bids(" + bids.size() + ")");
+        text.append(", items(" + items.size() + ")");
         return text.toString();
     }
 }

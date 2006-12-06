@@ -54,7 +54,7 @@ public class UserMgmtEJB implements UserMgmtRemote, UserMgmtLocal {
 
     public List<Person> getUsers(int index, int count) throws MarketException {
         try {
-            return userDAO.getPeople(index, count);
+            return makeDTO(userDAO.getPeople(index, count));
         }
         catch (Exception ex) {
             log.error("error getting users", ex);
@@ -95,6 +95,14 @@ public class UserMgmtEJB implements UserMgmtRemote, UserMgmtLocal {
         }
     }
     
+    private List<Person> makeDTO(List<Person> people) {
+        List<Person> dtos = new ArrayList<Person>();
+        for (Person person : people) {
+            dtos.add(makeDTO(person));
+        }
+        return dtos;
+    }
+
     private Person makeDTO(Person user) {
         Person dto = new Person(user.getId());
         dto.setUserId(user.getUserId());

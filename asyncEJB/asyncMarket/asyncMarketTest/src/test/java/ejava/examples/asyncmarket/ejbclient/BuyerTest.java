@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xml.security.keys.content.MgmtData;
 
 import ejava.examples.asyncmarket.AuctionMgmt;
 import ejava.examples.asyncmarket.Buyer;
@@ -54,11 +55,18 @@ public class BuyerTest extends TestCase {
         log.debug("looking up:" + buyerJNDI);
         buyer = (BuyerRemote)jndi.lookup(buyerJNDI);
         
-        cleanup();
+        try {
+            cleanup();
+        } catch (UndeclaredThrowableException ue) {
+            log.error("error in cleanup:", ue.getUndeclaredThrowable());
+            fail("" + ue.getUndeclaredThrowable());
+        }
     }
     
     private void cleanup() throws Exception {
         int index = 0;
+        
+        auctionmgmt.cancelTimers();
         
         List<AuctionItem> items = null;
         index=0;

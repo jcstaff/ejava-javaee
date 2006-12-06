@@ -236,12 +236,15 @@ public class SellerEJB
         Session session = null;
         try {
             AuctionItem item = auctionItemDAO.getItem(itemId);
-            item.closeBids();          
-            log.info("ending auction for:" + item);
-
-            connection = connFactory.createConnection();
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            publishSold(session, item);
+            if (item != null) {
+                item.closeBids();          
+                log.info("ending auction for:" + item);
+    
+                connection = connFactory.createConnection();
+                session = connection.createSession(
+                        false, Session.AUTO_ACKNOWLEDGE);
+                publishSold(session, item);
+            }
         }
         catch (JMSException jex) {
             log.error("error publishing jms message:", jex);

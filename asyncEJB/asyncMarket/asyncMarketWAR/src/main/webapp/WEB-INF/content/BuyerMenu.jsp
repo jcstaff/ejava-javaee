@@ -23,15 +23,6 @@
             <p/><input type="submit" name="command" value="Get Available Items"/>
         </form>
         </li>
-        <li> XXX
-        <form method="GET" action="<%=action%>">
-            <p/>Name:<input type="text" name="name" value="chocolate chip cookies"/>
-            <p/>Duration (secs):<input type="text" name="delay" value="60"/>
-            <p/>Min Bid:<input type="text" name="midBid" value="5.00"/>
-            <p/>User Id:<input type="text" name="userId" value="aseller"/>        
-            <p/><input type="submit" name="command" value="Sell Product"/>
-        </form>
-        </li>
     </ul>
         
         <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>        

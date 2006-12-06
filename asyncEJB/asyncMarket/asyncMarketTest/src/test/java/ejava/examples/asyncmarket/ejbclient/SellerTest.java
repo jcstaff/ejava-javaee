@@ -53,11 +53,18 @@ public class SellerTest extends TestCase {
         log.debug("looking up:" + buyerJNDI);
         buyer = (BuyerRemote)jndi.lookup(buyerJNDI);
         
-        cleanup();
+        try {
+            cleanup();
+        } catch (UndeclaredThrowableException ue) {
+            log.error("error in cleanup:", ue.getUndeclaredThrowable());
+            fail("" + ue.getUndeclaredThrowable());
+        }
     }
     
     private void cleanup() throws Exception {
         int index = 0;
+        
+        auctionmgmt.cancelTimers();
         
         List<AuctionItem> items = null;
         index=0;
