@@ -37,7 +37,7 @@ public class BakeSchedulerEJB
     //beginning of the class; this works in JBoss 4.0.5, but not in 4.0.4
     protected CookLocal cook; 
 
-    @Resource(name="ejb/cook", mappedName="jndiSchedulerEAR-1.0-SNAPSHOT/CookEJB/local")
+    @Resource(name="ejb/cook", mappedName="jndiSchedulerEAR-1.0.2006.3/CookEJB/local")
     protected CookLocal cook2; 
     
     @Resource(name="vals/message")
