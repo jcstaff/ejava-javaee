@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ejbsessionBank</artifactId>
         <groupId>ejava.javaee.ejb</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,6 @@
     <artifactId>ejbsessionBankEJB</artifactId>
     <packaging>ejb</packaging>
     <name>Session Bank EJB</name>
-    <version>1.0.2006.3</version>
     <description>
         This project provides an example of the core properties of a session bean.
     </description>
@@ -30,12 +29,14 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
           <version>1.0.4</version>
+          <scope>compile</scope>
         </dependency>
 
         <dependency>
           <groupId>${pom.groupId}</groupId>
           <artifactId>ejbsessionBankDA</artifactId>
           <version>${pom.version}</version>
+          <scope>compile</scope>
         </dependency>
 
         <!-- test dependencies -->

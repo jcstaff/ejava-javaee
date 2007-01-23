@@ -6,14 +6,13 @@
     <parent>
         <artifactId>ejbsessionBank</artifactId>
         <groupId>ejava.javaee.ejb</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ejava.javaee.ejb</groupId>
     <artifactId>ejbsessionBankDA</artifactId>
     <name>Session Bank Data Access</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <dependency>
@@ -43,6 +42,14 @@
     </dependencies>
 
     <build>
+     <!--tell the resource plugin to perform filtering on resources 
+         to fill in JDBC URL, etc. -->
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+    </resources>
         <plugins>
               <!-- make sure we are building java5 -->
             <plugin>
@@ -66,67 +73,54 @@
     </build>
 
     <profiles>
-
-        <profile> <!-- jboss/hibernate javax.persistence provider -->
-            <id>jboss</id>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
             </activation>
-            <dependencies>
-                <!-- dependencies for JBoss Embedded Container -->
-                <dependency>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache</artifactId>
-                    <version>1.2</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.ejb3.embedded</groupId>
-                    <artifactId>hibernate-all</artifactId>
-                    <version>alpha8_patch2</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.ejb3.embedded</groupId>
-                    <artifactId>jboss-ejb3-all</artifactId>
-                    <version>alpha8_patch2</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.ejb3.embedded</groupId>
-                    <artifactId>thirdparty-all</artifactId>
-                    <version>alpha8_patch2</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-
-            <repositories>
-                <repository>
-                    <id>webdev.repository</id>
-                    <name>ejava webdev repository</name>
-                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
-                </repository>
-            </repositories>
-
-            <build>
-                <plugins>    
-                      <!-- pass in driver information to JUnit -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>${surefire.argLine}</argLine>
-                            <systemProperties>
-                                <property>
-                                    <name>java.class.path</name>
-                                    <value>target/classes</value>
-                                </property>
-                            </systemProperties>
-                        </configuration>
-                    </plugin>            
-                </plugins>    
-            </build>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+            </properties>
         </profile>
 
+        <profile> <!-- defines our default persistence provider -->
+            <id>hibernate</id>
+            <activation>
+                <property> <!-- use this property to name alt persistence provider -->
+                    <name>!jpa</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>3.2.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-annotations</artifactId>
+                    <version>3.2.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>3.2.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
+        </profile>
     </profiles>
 </project>
