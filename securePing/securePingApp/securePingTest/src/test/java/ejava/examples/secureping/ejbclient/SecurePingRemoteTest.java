@@ -26,12 +26,15 @@ public class SecurePingRemoteTest extends TestCase {
     String jndiName = System.getProperty("jndi.name.secureping");
     String adminUser = System.getProperty("admin.username");
     String userUser = System.getProperty("user.username");
+    String jmxUser = System.getProperty("jmx.username");
+    String jmxPassword = System.getProperty("jmx.password");
     
     SecurePing securePing;
     Map<String,CallbackHandler> logins = new HashMap<String, CallbackHandler>();
     CallbackHandler knownLogin;
     CallbackHandler userLogin;
     CallbackHandler adminLogin;
+    CallbackHandler jmxLogin;
     String skipFlush = System.getProperty("skip.flush");
     
     public void setUp() throws Exception {
@@ -57,11 +60,19 @@ public class SecurePingRemoteTest extends TestCase {
         ((BasicCallbackHandler)adminLogin).setName(adminUser);
         ((BasicCallbackHandler)adminLogin).setPassword("password");
         
+        jmxLogin = new BasicCallbackHandler();
+        log.debug("using jmx username=" + jmxUser);
+        ((BasicCallbackHandler)jmxLogin).setName(jmxUser);
+        ((BasicCallbackHandler)jmxLogin).setPassword(jmxPassword);
+
         //account for how maven and Ant will expand string
         if (skipFlush == null || 
             "${skip.flush}".equals(skipFlush) ||
             "false".equalsIgnoreCase(skipFlush)) {
+        	LoginContext lc = new LoginContext("securePingTest", jmxLogin);
+        	lc.login();
             new ResetAuthenticationCache().execute();
+            lc.logout();
         }
     }
     

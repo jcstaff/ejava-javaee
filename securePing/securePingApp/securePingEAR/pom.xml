@@ -6,7 +6,7 @@
     <parent>
         <artifactId>securePingApp</artifactId>
         <groupId>ejava.javaee.secureping</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,6 @@
     <artifactId>securePingEAR</artifactId>
     <packaging>ear</packaging>
     <name>Secure Ping EAR</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <dependency>
@@ -22,6 +21,13 @@
             <artifactId>securePingEJB</artifactId>
             <version>${pom.version}</version>
             <type>ejb</type>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -29,8 +35,13 @@
             <artifactId>securePingWAR</artifactId>
             <version>${pom.version}</version>
             <type>war</type>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <build>
+       <finalName>securePingEAR</finalName>
+    </build>
 
     <profiles>
     <!-- this profiles allow the EAR to be undeployed before it is deleted
@@ -68,8 +79,8 @@
                         <configuration>
                             <type>runtime</type>
                             <properties>
-                            <cargo.remote.username>admin</cargo.remote.username>
-                            <cargo.remote.password>admin</cargo.remote.password>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
                             </properties>
                         </configuration>
                         <deployer>

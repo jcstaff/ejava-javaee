@@ -6,7 +6,7 @@
     <parent>
         <artifactId>securePingClientApp</artifactId>
         <groupId>ejava.javaee.secureping</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,6 @@
     <artifactId>securePingClientEJB</artifactId>
     <packaging>ejb</packaging>
     <name>Secure Ping Client EJB</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <!-- core dependencies -->
@@ -28,7 +27,7 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
           <version>1.0.4</version>
-          <scope>provided</scope>
+          <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -36,6 +35,7 @@
           <artifactId>securePingEJB</artifactId>
           <version>${pom.version}</version>
           <type>ejb-client</type>
+          <scope>compile</scope>
         </dependency>
 
         <!-- test dependencies -->

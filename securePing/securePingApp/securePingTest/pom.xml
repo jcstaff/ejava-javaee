@@ -6,7 +6,7 @@
     <parent>
         <artifactId>securePingApp</artifactId>
         <groupId>ejava.javaee.secureping</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,6 @@
     <artifactId>securePingTest</artifactId>
     <packaging>jar</packaging>
     <name>Secure Ping Remote Test</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <!-- core dependencies -->
@@ -28,7 +27,7 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!-- include this to compile tests -->
@@ -37,14 +36,16 @@
             <artifactId>securePingEJB</artifactId>
             <version>${pom.version}</version>
             <type>ejb-client</type>
+            <scope>test</scope>
         </dependency>
 
-        <!-- package being deployed must be a dependency -->
+        <!-- package being deployed must be a scope=compile dependency -->
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>securePingEAR</artifactId>
             <version>${pom.version}</version>
             <type>ear</type>
+            <scope>compile</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -138,6 +139,14 @@
                             <name>user.username</name>
                             <value>${user.username}</value>
                         </property>                        
+                        <property>
+                            <name>jmx.username</name>
+                            <value>${jboss.user}</value>
+                        </property>                        
+                        <property>
+                            <name>jmx.password</name>
+                            <value>${jboss.password}</value>
+                        </property>                        
                     </systemProperties>
                 </configuration>
                 <executions>
@@ -170,6 +179,10 @@
           </java.naming.provider.url>
           <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
           </java.naming.factory.url.pkgs>
+          <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+          <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+          <jdbc.user>sa</jdbc.user>
+          <jdbc.password/>
     </properties>
     <!-- use system reference instead; getting invalid class for
             jboss-ejb3-client.jar 
@@ -185,49 +198,49 @@
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jbossall-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jbossall-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-common-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-common-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jnpserver</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/server/default/lib/jnpserver.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-ejb3-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-ejb3-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-ejb3x</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-ejb3x.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aop-jdk50-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-aop-jdk50-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aspect-jdk50-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-aspect-jdk50-client.jar</systemPath>
         </dependency>
@@ -253,6 +266,13 @@
                         <goal>deploy</goal>
                     </goals>
                     <configuration>
+                        <configuration>
+                            <type>runtime</type>
+                            <properties>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
+                            </properties>
+                        </configuration>
                         <deployer>
                             <type>remote</type>
                             <deployables>

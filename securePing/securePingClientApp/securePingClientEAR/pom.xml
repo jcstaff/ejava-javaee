@@ -6,7 +6,7 @@
     <parent>
         <artifactId>securePingClientApp</artifactId>
         <groupId>ejava.javaee.secureping</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,6 @@
     <artifactId>securePingClientEAR</artifactId>
     <packaging>ear</packaging>
     <name>Secure Ping Client EAR</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <dependency>
@@ -22,6 +21,12 @@
             <artifactId>securePingClientEJB</artifactId>
             <version>${pom.version}</version>
             <type>ejb</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -61,8 +66,8 @@
                         <configuration>
                             <type>runtime</type>
                             <properties>
-                            <cargo.remote.username>admin</cargo.remote.username>
-                            <cargo.remote.password>admin</cargo.remote.password>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
                             </properties>
                         </configuration>
                         <deployer>
