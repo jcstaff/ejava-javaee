@@ -6,5 +6,4 @@ import ejava.examples.txagent.bl.BookingAgent;
 
 @Local
 public interface BookingAgentLocal extends BookingAgent {
-
 }

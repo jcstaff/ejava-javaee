@@ -63,6 +63,39 @@ public class BookingAgentEJB implements BookingAgentRemote,
         log.debug("ctx=" + ctx);
         log.debug("hotel=" + hotel);
         
+        //the following ugly debug was for testing with classloader issues
+        if (hotel == null) {
+	        StringBuilder text = new StringBuilder();
+	        try {
+	            Object object = ctx.lookup("ejb/HotelReservation");
+	            text.append("ctx.lookup(ejb/HotelReservation)=" + object);
+	            text.append(", class=" + object.getClass().getName());
+	            Class clazz = object.getClass();
+	            for (Object iface : clazz.getInterfaces()) {
+	            	text.append(", iface=" + iface);
+	            }
+	            hotel = (HotelRegistrationRemote) object;
+	        }
+	        catch (Exception ex) { 
+	        	text.append(", exception=" + ex);
+	        	try {
+		            Object object = new javax.naming.InitialContext().lookup(
+		            		"ejava/examples/txhotel/HotelRegistrationEJB/remote");
+		            text.append(", jndi.lookup(HotelRegistrationEJB)=" + object);
+		            text.append(", class=" + object.getClass().getName());
+		            Class clazz = object.getClass();
+		            for (Object iface : clazz.getInterfaces()) {
+		            	text.append(", iface=" + iface);
+		            }
+		            hotel = (HotelRegistrationRemote) object;
+	        	}
+		        catch (Exception ex2) { 
+		         	text.append(", exception=" + ex2);
+		        }
+	        }
+	        finally              { log.debug(text); }
+        }
+        
         //manual construction
         JPAUtil.setEntityManager(em);
         agent = new AgentImpl();

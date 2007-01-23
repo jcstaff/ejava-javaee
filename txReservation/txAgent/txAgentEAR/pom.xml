@@ -6,7 +6,7 @@
     <parent>
         <artifactId>txAgent</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,6 @@
     <artifactId>txAgentEAR</artifactId>
     <packaging>ear</packaging>
     <name>Tx Agent Business EAR</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <dependency>
@@ -22,17 +21,29 @@
             <artifactId>txAgentEJB</artifactId>
             <version>${pom.version}</version>
             <type>ejb</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <!-- un-comment these when using a shared unified classloader i
+                     with txHotel; however, make sure to undeploy this application
+                     when updating txHotel since it will be using the classes -->
+                <exclusion>
+                    <artifactId>txHotelEJB</artifactId>
+                    <groupId>${pom.groupId}</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>txHotelBO</artifactId>
+                    <groupId>${pom.groupId}</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
-        <!-- not yet
-        <dependency>
-            <groupId>${pom.groupId}</groupId>
-            <artifactId>txAgentWAR</artifactId>
-            <version>${pom.version}</version>
-            <type>war</type>
-        </dependency>
-        -->
     </dependencies>
+
+    <build>
+        <finalName>txAgentEAR</finalName>
+    </build>
 
 <profiles>
     <!-- this profiles allow the EAR to be undeployed before it is deleted
@@ -70,8 +81,8 @@
                         <configuration>
                             <type>runtime</type>
                             <properties>
-                            <cargo.remote.username>admin</cargo.remote.username>
-                            <cargo.remote.password>admin</cargo.remote.password>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
                             </properties>
                         </configuration>
                         <deployer>

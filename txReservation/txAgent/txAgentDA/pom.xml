@@ -6,14 +6,13 @@
     <parent>
         <artifactId>txAgent</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ejava.javaee.txreservation</groupId>
     <artifactId>txAgentDA</artifactId>
     <name>Tx Agent Data Access Tier</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <dependency>
@@ -26,13 +25,14 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
           <version>1.0.4</version>
-          <scope>provided</scope>
+          <scope>compile</scope>
         </dependency>
 
         <dependency>
           <groupId>${pom.groupId}</groupId>
           <artifactId>txAgentBO</artifactId>
           <version>${pom.version}</version>
+          <scope>compile</scope>
         </dependency>
     
         <dependency>
@@ -45,11 +45,20 @@
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
           <version>1.2.13</version>
-            <scope>test</scope>
+          <scope>test</scope>
         </dependency>    
     </dependencies>
 
     <build>
+         <!--tell the resource plugin to perform filtering on resources 
+             to fill in JDBC URL, etc. -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
               <!-- make sure we are building java5 -->
             <plugin>
@@ -67,64 +76,66 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>java.class.path</name>
+                            <value>target/classes</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>            
         </plugins>    
     </build>
 
     <profiles>
-
-        <profile> <!-- jboss/hibernate javax.persistence provider -->
-            <id>jboss</id>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+            </properties>
+        </profile>
+
+        <profile> <!-- defines our default persistence provider -->
+            <id>hibernate</id>
+            <activation>
+                <property> <!-- use this property to name alt persistence provider -->
+                    <name>!jpa</name>
+                </property>
             </activation>
             <dependencies>
-                <!-- dependencies for JBoss Embedded Container -->
                 <dependency>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache</artifactId>
-                    <version>1.2</version>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>3.2.1.ga</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
-                    <groupId>org.jboss.ejb3.embedded</groupId>
-                    <artifactId>hibernate-all</artifactId>
-                    <version>alpha8_patch2</version>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-annotations</artifactId>
+                    <version>3.2.1.ga</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
-                    <groupId>org.jboss.ejb3.embedded</groupId>
-                    <artifactId>jboss-ejb3-all</artifactId>
-                    <version>alpha8_patch2</version>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>3.2.1.ga</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
-                    <groupId>org.jboss.ejb3.embedded</groupId>
-                    <artifactId>thirdparty-all</artifactId>
-                    <version>alpha8_patch2</version>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
                     <scope>test</scope>
-                </dependency>
+                </dependency>       
             </dependencies>
-
-            <build>
-                <plugins>    
-                      <!-- pass in driver information to JUnit -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>${surefire.argLine}</argLine>
-                            <systemProperties>
-                                <property>
-                                    <name>java.class.path</name>
-                                    <value>target/classes</value>
-                                </property>
-                            </systemProperties>
-                        </configuration>
-                    </plugin>            
-                </plugins>    
-            </build>
         </profile>
 
     </profiles>

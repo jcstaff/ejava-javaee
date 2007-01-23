@@ -34,10 +34,9 @@
             <ejb-ref>
                 <ejb-ref-name>ejb/HotelReservation</ejb-ref-name>
                 <jndi-name>
-                    ejava/examples/txhotel/RequiredEJB/remote
+                    jnp://localhost:1099/ejava/examples/txhotel/RequiredEJB/remote
                 </jndi-name>
             </ejb-ref>
-            
         </session>
         
         <session>
@@ -50,7 +49,7 @@
                 <ejb-ref-name>ejb/HotelReservationSession</ejb-ref-name>
                 <!-- you should see this name in the global JNDI tree -->
                 <jndi-name>
-                    txHotelEAR-1.0.2006.3/RequiredSessionEJB/remote
+                    jnp://localhost:1099/txHotelEAR/RequiredSessionEJB/remote
                 </jndi-name>
             </ejb-ref>
         </session>        
