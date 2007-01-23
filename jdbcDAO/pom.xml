@@ -5,7 +5,7 @@
   <parent>
     <artifactId>ejava-javaee</artifactId>
     <groupId>ejava.javaee</groupId>
-    <version>1.0.2006.3</version>
+    <version>1.0.2007.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>ejava.javaee.dao</groupId>
@@ -15,7 +15,7 @@
     This module provides an basic example of using JDBC and SQL to map a 
     flat POJO to a database.
   </description>
-  <version>1.0.2006.3</version>
+  <version>1.0.2007.1-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>commons-logging</groupId>
@@ -33,11 +33,13 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.13</version>
+      <scope>test</scope>
     </dependency>    
     <dependency>
       <groupId>hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <version>1.8.0.4</version>
+      <scope>test</scope>
     </dependency>       
     
   </dependencies>
@@ -83,6 +85,21 @@
   </build>
   
   <profiles>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+            </properties>
+        </profile>
+
     <profile>
       <id>testing</id>
       <activation>
