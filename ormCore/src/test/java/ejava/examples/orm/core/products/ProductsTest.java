@@ -2,7 +2,6 @@ package ejava.examples.orm.core.products;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.embedded.EJB3StandaloneBootstrap;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -44,49 +43,12 @@ public class ProductsTest extends TestCase {
         
         TestSetup wrapper = new TestSetup(tests) {
             public void setUp() throws Exception {
-                startupEmbeddedJBoss();
             }
             public void tearDown() throws Exception {
                 JPAUtil.close();
-                shutdownEmbeddedJBoss();
             }
         };
         
         return wrapper;
     }
-
-    /**
-     * This method performs the one-time JBoss embbedded container startup
-     * calls. It is invoked by the TestSetup that was returned as part of 
-     * the TestSuite.
-     */
-    public static void startupEmbeddedJBoss() throws Exception {
-        try {
-            log_.debug("starting up embedded JBoss container");     
-            EJB3StandaloneBootstrap.boot(null);
-            EJB3StandaloneBootstrap.scanClasspath();
-            log_.debug("embedded JBoss container startup complete");
-        }
-        catch (Exception ex) {
-            log_.fatal("error on embbeded JBoss startup" + ex);
-            fail("" + ex);
-        }
-    }
-    
-    /**
-     * This method performs the one-time JBoss embedded container shutdown
-     * calls. It is invoked by the TestSetup that was returned as part of the 
-     * TestSuite.
-     */
-    public static void shutdownEmbeddedJBoss() throws Exception {
-        try {
-        log_.debug("shutting down embedded JBoss container");     
-        EJB3StandaloneBootstrap.shutdown();
-        log_.debug("embedded JBoss container shutdown complete");
-        }
-        catch (Exception ex) {
-            log_.fatal("error on embedded JBoss shutdown", ex);
-            fail("" + ex);
-        }
-    }    
 }
