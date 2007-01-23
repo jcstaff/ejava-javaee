@@ -4,16 +4,56 @@
     <parent>
         <artifactId>ejava-javaee</artifactId>
         <groupId>ejava.javaee</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ejava.javaee</groupId>
     <artifactId>course-docs</artifactId>
-    <version>1.0.2006.3</version>
+    <version>1.0.2007.1-SNAPSHOT</version>
     <name>Course Docs</name>
     <description>
         This module contains all general supporting documentation 
         for the Enterprise Java 605.784 course.
     </description>
+    <repositories>
+        <repository>
+            <id>andromda.skin.repository</id>
+            <name>Andromda Site Skin Repository</name>
+            <url>http://team.andromda.org/maven2</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>andromda.plugin.repository</id>
+            <name>Andromda Site Plugin Repository</name>
+            <url>http://team.andromda.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+<!--
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.andromda.maven.site</groupId>
+                <artifactId>andromda-site-plugins</artifactId>
+                <version>3.2-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>profile-transform</id>
+                        <goals>
+                            <goal>profile-xsl</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>namespace-transform</id>
+                        <goals>
+                            <goal>namespace-xsl</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin> 
+        </plugins>
+    </build>
+-->
 </project>

@@ -6,9 +6,8 @@ Exercise 1: First Simple Application
     encouraged to also use Maven 2 to build and test the projects you submit.
     If you are unable to tackle the complexity of Maven 2, you may seek
     permission to use Ant instead. If you use Ant, there must be a single 
-    build.xml and build.properties file at the project root that performs
-    all tasks. Your build.xml must be portable and import non-portable
-    property values from the single build.properties file.
+    build.properties file at the project root that defines any non-portable values
+    that must be changed when porting to the grader's environment.
     
     [Note:] If you do not have Ant installed on your system, it can be 
     from {{http://ant.apache.org/}}
@@ -253,6 +252,11 @@ Total time: 1 second
 
         </junit>
 ---
+
+    [Note:] You may need to copy your junit.jar file into $ANT_HOME/lib to get the
+    junit task correctly recognoized by Ant.
+
+    []
 
 ---
 

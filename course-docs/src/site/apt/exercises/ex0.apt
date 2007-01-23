@@ -7,42 +7,42 @@ Exercise 0: Development Environment Setup
 
 * Objectives
 
-    * (Optional!) {{{#Part A}Download and install}}
+    [Note:] As a general rule, it is strongly recommended that you avoid
+    the use of spaces in paths used in class. There will be specific
+    issues encountered if you have spaces in your login name (e.g., use
+    "JohnSmith", not "John Smith"), the root of your source tree (e.g.,
+    don't use "Documents and Settings\..."), and installed applications
+    (e.g., don't use "Program Files\...") that will be used to form
+    classpaths.
+
+    []
+
+    * (Optional!) {{{#Part A}Download and install Cygwin}}
     if you are a Unix/bash developer
     and feel helpless when looking at a DOS prompt.
 
-    * {{{#Part B}Download and install}}
-    J2SE 1.5 JDK to compile and run our applications.
+    * {{{#Part B}Download and install J2SE 1.5 JDK}} 
+    to compile and run our applications.
 
-    * {{{#Part C}Download and install}}
-    Java EE 5 and its application server
-    just to get a measily javaee.jar. We may use their server for some
-    portability testing (TBD).
+    * {{{#Part C} Download and install Java EE 5}}
+    just to get a measily javaee.jar and comply with licensing restrictions.
 
-    * {{{#Part D} Download and install}} 
-    a Subversion Client (ex. TortoiseSVN)
-    to obtain source code from course and other repositories.
+    * {{{#Part D} Download and install a Subversion Client}} 
+    to obtain source code for this course.
 
-    * {{{#Part E}Download and install}} 
-    Maven Build System to manage our portable build environment.
+    * {{{#Part E}Download and install the Maven 2 Build System}} 
+    to manage our portable build environment.
 
-    * {{{#Part F}Download and install}}
-    JBoss Application Server with EJB3 Support to supply a database
-    and application server for our projects.
+    * {{{#Part F}Download and install the JBoss Application Server}}
+    with EJB3 Support to supply a database and application server for our projects.
 
-    * {{{#Part G}Download and install}}
-    JBoss Embeddable EJB3.0 to supply a Java Persistence Provider
-    that will operate outside of the applicaiton server. One could 
-    have also gotten a similar capability from the Hibernate site.
-
-    * {{{#Part H}Download and install}}
-    Eclipse IDE to provide a mechanism
+    * {{{#Part G}Download and install Eclipse IDE}} to provide a mechanism
     for enhanced code development and debugging support.
 
-    * (Optional!) {{{#Part I}Download and install}}
-    Ant Build Tool to act as a fallback 
-    for those who really cannot handle the power and mystery of
-    Maven.
+    * {{{#Part H}Download and install Ant Build Tool}}
+    Ant Build Tool to act as an optional fallback for those who really cannot 
+    handle the power and mystery of Maven. It will also be as a portable scripting
+    environment for interactive demos.
 
 * {Part A}: (Optional!) Download and install Cygwin
 
@@ -62,18 +62,21 @@ Exercise 0: Development Environment Setup
     cygwin installation example snapshot trail}}
     may be of some assistance in installation. It has a few hints as to how
     to download enough without getting the entire application. Be sure
-    to also select the subvsersion client.
+    to also select the subversion client.
 
     [[1]] Windows users; welcome to the sane world of the bash shell and vi.
 
 * {Part B}: Download and Install J2SE 1.5 JDK
 
     [[1]] Go to the 
-    {{{http://java.sun.com/javase/downloads/index.jsp}
-    Sun J2SE Download Page}} and download JDK 5.0. If you download it 
-    without Java EE, you can get the latest version. If you download it
-    with Java EE, I found it hiding in Sun/AppServer/jdk/bin after 
-    installing it.
+    {{{http://java.sun.com/javase/downloads/index_jdk5.jsp}
+    Sun Java SE 5 Download Page}} and download JDK 5.0. JDK 6.0 has been released
+    but we will be using JDK 5.0 for compatibility with legacy Java EE 5
+    implementations.  If you download the JDK with Java EE, it I will be hiding in 
+    Sun/AppServer/jdk/bin.
+
+    [[1]] Change the installation directory so that it does not have a spaces in its
+    path. I changed mine to C:\jdk1.5.0_10\ and C:\jre1.5.0_10\
 
     [[1]] Go through Control Panel -> System -> Advanced -> Environment
     Variables and add jdk/bin to your classpath.
@@ -83,9 +86,15 @@ Exercise 0: Development Environment Setup
 
 * {Part C}: Download and Install Java EE 5 API
 
-    [[1]] Download and install 
-    {{{http://java.sun.com/javaee/}Java EE 5}} and its application server
-    if you did not already do this as a part of the JDK installation.
+    [[1]] Download and install
+    {{{http://java.sun.com/javaee/downloads/index.jsp}Java EE 5}} if
+    you did not already do this as a part of the JDK installation. We
+    are only in search of the the javaee.jar file from this download
+    and Sun licensing requires you obtain it directly from them. They
+    bundle it with their application server, so you will be prompted for
+    several things during the installation we don't care about. I chose
+    the Download Components Independently->Sun Java Application Server
+    Platform Edition 9.0 Update 1 Patch 1.
 
     [[1]] Verify you have javaee.jar. We'll use this during 
     {{{./Part E}Part E}}.
@@ -111,13 +120,18 @@ c:/Sun/AppServer/lib/javaee.jar
         client, but I'll go through some of the steps for
         {{{http://tortoisesvn.tigris.org/}TortoiseSVN}} here.
 
-            [[1]] I didn't like the warnings on the 1.4.0RC1 release, so 
-            I went with the the 1.3.5 release.
+            [[1]] I chose the TortoiseSVN-1.4.1.7992 version. 
+
+            [[1]] The path for this tool won't be a part of any path we use to build
+            or run projects, so I chose the default installation directory.
 
             [[2]] The install, of course, wants you to reboot your system.
 
             [[3]] TortoiseSVN launchers have been added to your right click
-            menus and available from the explorer window as well.
+            menus and available from the explorer window as well. There was an issue
+            reported by a student last semester that the ToroiseSVN processing
+            took over their CPU and had to remove it. I have not encountered that
+            issue. Your mileage may vary.
 
         [All:] Test out your subversion installation by performing a checkout
         of the ejava-javaee course files. 
@@ -127,16 +141,30 @@ c:/Sun/AppServer/lib/javaee.jar
             [[1]] Browse the repository to determine the URL for the 
             project you wish to checkout. You can start at the root 
             using the following
-            {{https://ejava.info:8443/repos/class/trunk/ejava-javaee}}
-            URL .
+            {{https://ejava.info:8443/repos/class/branches/2007-spring-ejava-javaee}}
+            URL.
 
             [[1]] Check out a level of the SVN repository to your class
-            work directory. If you mess up, you can delete it and retry.
+            work directory. You can check it out to a directory called ejava-javaee
+            (c:/jhu/784/ejava-javaee) or anything you choose.
+            If you mess up, you can delete it and retry.
+
+            [[1]] You will be asked to verify the self-signed certificate for the 
+            SVN repository. You must use https to access the repository.
+
+        [Eclipse Users:] There is an subversion plugin for Eclipse available
+        called {{{http://subclipse.tigris.org/}Subclipse}}. You can install it
+        by following the instructions located at
+        {{http://subclipse.tigris.org/install.html}} once you have Eclipse 
+        installed. However, use of this plugin is of best use when you are
+        commiting changes to the baseline. You will not be doing this during class.
+        This the file browser options mentioned above are more pertinent for class
+        use.
 
         []
 
 ---
-$ svn checkout https://ejava.info:8443/repos/class/trunk/ejava-javaee ejava-javaee
+$ svn checkout https://ejava.info:8443/repos/class/branches/2007-spring-ejava-javaee ejava-javaee
 A  ejava-javaee/.project
 A  ejava-javaee/jdbcDAO
 A  ejava-javaee/jdbcDAO/.classpath
@@ -170,34 +198,43 @@ At revision 24.
     version for your platform. You don't need the Tasks for Ant. Those
     are for when you want to call Maven from within Ant.
 
-    [[1]] Unzip the archive. I put mine in c:\, which resulted in a
+    [[1]] Unzip the archive. I put mine in c:/, which resulted in a
     c:/maven-2.0.4 directory. 
 
-    [[1]] Add MAVEN_HOME/bin to your PATH
+    [[1]] Add $MAVEN_HOME/bin to your PATH
 
-    [[1]] Add JAVA_HOME to your path (maven will try to execute
-    $JAVA_HOME/bin/java. On Windows, I set mine to c:\Sun\AppServer\jdk\jre
+    [[1]] Add JAVA_HOME to your environment (maven will try to execute
+    $JAVA_HOME/bin/java. On Windows, I set mine to c:/jdk1.5.0_10
 
     [[1]] Execute "mvn -version" as a test.
+
 ---
 $ mvn --version
 Maven version: 2.0.4
 ---
 
+    [[1]] add a personal maven configuration file, called settings.xml, to your $HOME/.m2
+    directory. This file will be used to point to a custom repository location (i.e.,
+    one that does have spaces in the path) and reference the class repositories. Use
+    the <<{{{../files/maven/settings.xml} following file}}>> as a starting point.
+
     [[1]] cd to the root directory you checked out from subversion and
     attempt to build the project.
 
 ---
-$ cd c:/
-$ cd c:/jhu/784/ejava-javaee
+$ cd c:/jhu/784/ejava-javaee/javase5Enhancements/
 
-$ mvn package -Dmaven.test.skip=true
+$ mvn install -Dmaven.test.skip=true
 ---
 
-    [[1]] Maven will begin downloading dependencies, but will unfortunately 
-    run into several "Error transferring file" problems before we get all
-    dependencies. Just grit your teeth and re-issue the command until it
-    completes or you hit a real error.
+    [[1]] Maven will begin downloading dependencies, but will
+    unfortunately run into several "Error transferring file" problems
+    before we get all dependencies. Just grit your teeth and re-issue
+    the command until it completes or you hit a real error. The transfer
+    errors have to do with the fact you are downloading files from a set
+    of mirror sites that is shared with the rest of the internet. Once
+    these files are downloaded once, the local copies will be used
+    instead.
 
 ---
 [ERROR] BUILD ERROR
@@ -227,9 +264,11 @@ Project ID: null:plexus-compiler-api:jar:1.5.2
 Reason: Cannot find parent: org.codehaus.plexus:plexus-compiler for project: nul
 l:plexus-compiler-api:jar:1.5.2
 ---
-    [[1]] When you get to the following error, you'll need to install
+    [[1]] If you get to the following error, you'll need to install
     the javaee.jar file downloaded as a part of Java EE 5 from Sun to
-    go any further.
+    go any further. If you do not get this error, then you have successfully gotten 
+    a copy from one of the repositories listed in the settings.xml you put in 
+    place in an earlier step.
 
 ---
 ...
@@ -249,24 +288,21 @@ Missing:
 ...
 ---
 ---
-> mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
--Dversion=5 -Dpackaging=jar -Dfile=/apps/linux/SUNWappserver/lib/javaee.jar \
+$ mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
+> -Dversion=5 -Dpackaging=jar -Dfile=c:/Sun/AppServer/lib/javaee.jar \
 -DgeneratePom=true
 ...
-
 [INFO] [install:install-file]
-[INFO] Installing /apps/linux/SUNWappserver/lib/javaee.jar to /home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.jar
+[INFO] Installing c:\Sun\AppServer\lib\javaee.jar to c:\jhu\repository\javax\java
+ee\javaee\5\javaee-5.jar
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ------------------------------------------------------------------------
 ---
 
-    [[1]] TADA!!! right? We'll look at and configure Maven a bit more in 
-    Exercise 1, but we don't want to dwell on it. There's too much to cover
-    and address the topics of the course. You'll just be responsible for 
-    some of the basic tasks of building and testing an application. There 
-    will be plenty of examples supplied in class.
-    
+    [[1]] We'll look at and configure Maven a bit more in Exercise 1. 
+    You'll be responsible for basic tasks of building and 
+    testing an application. There will be plenty of examples supplied in class.
 
 * {Part F}: Download and install JBoss Application Server with EJB3
 
@@ -275,36 +311,66 @@ Missing:
     Download site for the JBoss Application Server}}. I normally would
     select the archive format of the download to keep the installation 
     a bit less mysterious. However, Burke's EJB3 with JBoss workbook
-    shows an example of using the "Run Installer" that seems to 
-    walk you through the right options to get JBoss <<AND>> EJB3. 
+    shows an example of using the "Run Installer" that 
+    walks you through the right options to get JBoss <<AND>> EJB3. 
     Run the installer and walk-thru the installation with Burke's text
     nearby for reference.
 
     [[1]] On Windows, I installed mine into c:/jboss rather than the
-    default path since I normally have to cd into that directory.
+    default path to avoid spaces in the path and since I normally have to cd 
+    into that directory a lot.
 
-    [[1]] Be sure to pick the "ejb3" option. I don't know what the 
-    "ejb3-clustered" really has, but we won't need clustering in class.
+    [[1]] Be sure to pick the "ejb3" option. Do not pick the clustered version.
+
+    [[1]] You'll need to switch to the ADVANCED mode to change any of the following
+    properties.
 
     [[1]] I typically just use the "default" server name.
 
-    [[1]] Leave the isolation/call by value de-selected. We'll 
-    be able to change it later if we have to.
+    [[1]] Leave the isolation/call by value de-selected. Much of this is documented
+    at the following URLs. However, the early implementation of EJB3 in the 4.0.x
+    release seems to invalidate some of the facts stated in these papers for the
+    isolated mode. Therefore we will use their default unified classloader
+    approach.
+    
+        * {{http://wiki.jboss.org/wiki/Wiki.jsp?page=ClassLoadingConfiguration}}
 
-    [[1]] Leave the administrative interfaces unsecured; especially if
-    you will be working behind a firewall.
+        * {{http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossClassLoadingUseCases}}
+
+    [[1]] Securing the administrative interfaces is not required for class.
+    However, whatever you assign for the username/password must be updated in the
+    $HOME/.m2/settings.xml file values for jboss.user/password.  The default 
+    value assigned in settings.xml is "admin"/"password".
 
     [[1]] Add a configuration file that will define a database
     we'll be using for class. Although we can start/stop the database
     without using JBoss and won't need the server for a while, it is 
     very easy to have the all servers managed under a single set of
-    run/shutdown scripts. Paste the following
-    {{{../files/jboss/deploy/ejava-jdbc-ds.xml}
-    file}} into the JBOSS_HOME/servers/default/deploy directory
+    run/shutdown scripts. Paste the 
+    <<{{{../files/jboss/deploy/ejava-jdbc-ds.xml}
+    following file}}>> into the JBOSS_HOME/servers/default/deploy directory
+
+    [[1]] Configure the server to handle Java 5 inside JSPs by un-commenting the
+    following line in 
+    $JBOSS_HOME/servers/default/deploy/jbossweb-tomcat55.sar/conf/web.xml
+
+---
+      <!-- Uncomment to use jdk1.5 features in jsp pages
+      -->
+      <init-param>
+         <param-name>compilerSourceVM</param-name>
+         <param-value>1.5</param-value>
+      </init-param>
+---
 
     [[1]] Start the server and look for the following lines towards the end
     of its output. This means that our Hypersonic "ejava" database has 
     started.
+
+        [Note:] JBoss will open a listen port that may trigger a firewall alert. You
+        will need to permit JBoss to open the listen port(s) in order to operate.
+
+        []
 
 ---
 $ c:/jboss/bin/run.sh
@@ -320,14 +386,22 @@ ms.
  01:12:55,625 INFO  [STDOUT] [Server@1479ef9]: From command line, use [Ctrl]+[C] to abort abruptly
 ---
 
-    [[1]] Start the database UI to verify that the database is up. 
+    [[1]] Start the database UI to verify that the database is up. There are two ways;
+    using hsqldb.jar and through the JBoss JMX console. The hsqldb.jar approach has
+    always worked for me. The web browser approach failed to work the first time I
+    tried it under 4.0.5.GA.
 
 ---
 $ java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
+
     [[1]] Select HSQL Database Engine Server from the "Type" pulldown. 
     Everything else can stay defaulted. After you hit OK, the GUI should
     connect to the database using port 9001.
+
+    [[1]] Navigate to {{http://localhost:8080/jmx-console}} with your browser. Click 
+    service=ejavaDB under the "jboss" heading. Click "Invoke" under
+    startDatabaseManager(). A browser version of the DB UI should appear.
 
     [[1]] Shutdown your server using the shutdown.sh script.
 
@@ -335,32 +409,16 @@ $ java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.Databas
     desktop launch icons since you be starting and stopping this server
     quite a bit over the semester.
 
-* {Part G}: Download and install JBoss Embeddable EJB3.0
+    [[1]] Add support for https protocol by following the instructions in the
+    {{{./jboss-https.html} Enable JBoss HTTPS Exercise}}
 
-        [Note:] This set of files will be used to create applications
-        that use Java Persistence outside of the container. One could get 
-        a similar capability from the Hibernate.org site.
+* {Part G}: Download and install Eclipse IDE
 
-        [Note:] One annoying issue with this download is that the main 
-        links take you to an older version. Their links point to 
-        alpha5. You must use the search engine or the link I have provided 
-        to locate the alpha8_patch2 release. The following 
-        {{{http://docs.jboss.org/ejb3/embedded/embedded.html}
-        URL}} contains some good information. Just don't follow the
-        download link off those pages.
-
-    [[1]] Download and install 
-    {{{http://sourceforge.net/project/showfiles.php?group_id=22866&package_id=132063&release_id=421939} 
-    JBoss Embeddable EJB3.0 alpha 8, patch2 release}}. It doesn't really
-    matter where you install these files since you'll just use them as 
-    the source of a copy to start certain projects.
-
-* {Part H}: Download and install Eclipse IDE
-
-            [Note:] Okay; an IDE and specifically Eclipse is <<NOT>> a
+            [Note:] An IDE, and specifically Eclipse, is <<NOT>> a
             requirement for class. The memory requirements for an IDE and 
             the application server may have your machine swapping quite a bit.
-            I have included only as a productivity tool. You may use vi and
+            I have included coverage of an IDE only as a productivity tool. 
+            You may use vi and
             command line tools (I do!) or something like NetBeans from 
             Sun. I do find the ability to step through an execution
             with a graphical debugger priceless.
@@ -388,18 +446,15 @@ $ java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.Databas
     Eclipse setup.
 
         
-* {Part I}: (Optional!) Download and install Ant Build Tool
+* {Part H}: Download and install Ant Build Tool
 
-        [Note:] It's optional, but what geek doesn't have a copy of Ant
-        laying around. You'll be able to use it in Exercise 1, but
-        hopefully never need it after that. Students may use it as
-        a safety net for a build tool if they find Maven 2 impossible
-        to work with (not likely, but possible).
+        [Note:] I use Ant as a portable scripting tool for interactive demos and
+        permit it to be used as an optional build tool for those that want to try to
+        avoid using Maven with their projects.
 
     [[1]] Download and install {{{http://ant.apache.org/}Ant}}. I
-    downloaded the 1.6.5 version to avoid potential headaches with 
-    the 1.7 beta.
-
+    downloaded the 1.6.5 version and have seen minor porting issues with 1.7. If you
+    use 1.7, you may need to implement a minor amount of porting.
 
     [[1]] Add ANT_HOME/bin to your classpath so you can run it whenever 
     you have the urge.

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<settings xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <!-- this overrides the default $HOME/.m2/repository location. -->
+    <localRepository>c:/jhu/repository</localRepository>
+  
+    <profiles>
+        <profile>
+            <id>ejavaPC</id>
+            <!-- some of these paths will need to be updated to match your
+                 specific configuration -->
+            <properties>
+                <m2.repo>c:/jhu/repository</m2.repo>
+                <jboss.home>c:/apps/jboss</jboss.home>
+                <jboss.protocol>http</jboss.protocol>
+                <jboss.host>localhost</jboss.host>
+                <jboss.servlet.port>8080</jboss.servlet.port>
+                <jboss.user>admin</jboss.user>
+                <jboss.password>password</jboss.password>
+            </properties>                                  
+        </profile>        
+
+        <profile>
+            <id>webdev-repositories</id>
+            <repositories>
+                <repository>
+                    <id>webdev-baseline</id>
+                    <name>webdev.apl.jhu.edu baseline</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+                </repository>
+                <repository>
+                    <id>webdev-snapshot</id>
+                    <name>webdev.apl.jhu.edu SNAPSHOT</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>webdev-plugins</id>
+                    <name>ejava webdev repository</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>        
+
+        <profile>
+            <id>debugger</id>
+            <!-- this should only be activated when performing interactive
+                 debugging -->
+            <activation>
+                <property>
+                    <name>debugger</name>
+                </property>
+            </activation>
+            <properties>
+                <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
+            </properties>                                  
+        </profile>        
+    
+    </profiles>
+    <activeProfiles>
+        <activeProfile>webdev-repositories</activeProfile>
+        <activeProfile>ejavaPC</activeProfile>
+    </activeProfiles>
+</settings>

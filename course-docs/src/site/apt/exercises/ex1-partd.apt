@@ -82,8 +82,10 @@ Exercise 1: First Simple Application
         appended with the word SNAPSHOT are handled differently. This is 
         applied to a project in progress prior to release.
 
-        * dependency.scope - not that we only need junit and log4j during
-        testing; not compilation or deployment.
+        * dependency.scope - note that we only need junit and log4j during
+        testing; not compilation or deployment. The default scope (if missing)
+        is "compile"; which means your core code depends on this library and
+        it must be deployed with the primary artifact from this project.
 
         * maven-compiler-plugin - this declaration is not necessary
         for this exercise, but like our Ant script, specify the Java
@@ -107,6 +109,7 @@ Exercise 1: First Simple Application
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -385,32 +388,121 @@ Compiling 1 source file to
         Settings Descriptor}} for detailed information on settings.xml.
 
     [[1]] Let's start a settings.xml file to store properties that 
-    are specific to out build site. We'll start out with some core mirror 
-    properties described in
-    {{{http://maven.apache.org/guides/mini/guide-mirror-settings.html}
-    Mirror Settings}}.  Add the following contents to your
-    $HOME/.m2/settings.xml. This will keep you from hitting the same
-    ibiblio.org server each time you go to retrieve a dependency.
+    are specific to out build site. You can find details about each setting
+    at the following {{{http://maven.apache.org/settings.html}URL}}. I suggest 
+    you start with the {{{../files/maven/}settings.xml}} with this site.
 
 ---
-<settings>
-
-  <mirrors>
-    <mirror>
-      <id>ibiblio.net</id>
-      <url>http://www.ibiblio.net/pub/packages/maven2</url>
-      <mirrorOf>central</mirrorOf>
-      <!-- United States, North Carolina -->
-    </mirror>
-    <mirror>
-      <id>lsu.edu</id>
-      <url>http://ibiblio.lsu.edu/main/pub/packages/maven2</url>
-      <mirrorOf>central</mirrorOf>
-      <!-- United States, Louisiana -->
-     </mirror>
-  </mirrors>
+<?xml version="1.0"?>
+<settings xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
 </settings>
+---
+
+    [[1]] The first thing Windows users will want to do is provide an override
+    for the localRepository. Provide a custom path that does not contain spaces.
+    This value will default to a "$HOME/.m2/repository" directory. 
+
+---
+    <!-- this overrides the default $HOME/.m2/repository location. -->
+    <localRepository>c:/jhu/repository</localRepository>
+---
+
+    [[1]] Add a profiles section that defines property values for this local system.
+    The profile can have any "id" value, but must be listed as an activeProfile to 
+    have an impact on the maven environment.
+
+---
+    <profiles>
+        <profile>
+            <id>ejavaPC</id>
+            <!-- some of these paths will need to be updated to match your
+                 specific configuration -->
+            <properties>
+                <m2.repo>c:/jhu/repository</m2.repo>
+                <jboss.home>c:/apps/jboss</jboss.home>
+                <jboss.protocol>http</jboss.protocol>
+                <jboss.host>localhost</jboss.host>
+                <jboss.servlet.port>8080</jboss.servlet.port>
+                <jboss.user>admin</jboss.user>
+                <jboss.password>password</jboss.password>
+            </properties>                                  
+        </profile>        
+    </profiles>
+    <activeProfiles>
+        <activeProfile>ejavaPC</activeProfile>
+    </activeProfiles>
+---
+
+    [[1]] Add another activeProfile to define the location for the maven2 repositories
+    used in class. 
+
+        * webdev-baseline - contains baseline versions of class and external 
+        artifacts.
+
+        * webdev-snapshot - contains in-progress versions of class artifacts.
+
+        * webdev-plugins - contains baseline versions of maven plugins. These are 
+        typically plugins where a particular SNAPSHOT version was made into a 
+        baseline version for use in class.
+
+        []
+
+---
+        <profile>
+            <id>webdev-repositories</id>
+            <repositories>
+                <repository>
+                    <id>webdev-baseline</id>
+                    <name>webdev.apl.jhu.edu baseline</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+                </repository>
+                <repository>
+                    <id>webdev-snapshot</id>
+                    <name>webdev.apl.jhu.edu SNAPSHOT</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>webdev-plugins</id>
+                    <name>ejava webdev repository</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>        
+
+...
+
+        <activeProfile>webdev-repositories</activeProfile>
+---    
+
+    [[1]] While you are in this file, add an optional profile that changes the 
+    command line to the maven/junit invocation to allow remote debugging. More will
+    be covered on this later. However, it should be noted that this profile
+    is not active unless someone specifically asks for it (-Pdebugger) or the 
+    "debugger" environment variable is set (-Ddebugger=(anything)).
+
+---
+        <profile>
+            <id>debugger</id>
+            <!-- this should only be activated when performing interactive
+                 debugging -->
+            <activation>
+                <property>
+                    <name>debugger</name>
+                </property>
+            </activation>
+            <properties>
+                <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
+            </properties>                                  
+        </profile>        
 ---
 
         [Note:] At times you will need access to a dependency that is not 
@@ -418,6 +510,10 @@ Compiling 1 source file to
         available at ibiblio.org and even Sun's Java EE 5 API is not 
         available from a Maven repository. You must download it 
         and manually install it locally.
+
+        [Note:] The javaee.jar was added to the class repository after this step was
+        written. If you do not get this error, then it was downloaded as designed.
+        However, the information in the steps covered next are useful to know.
 
     [[1]] This step will go though 
     importing a stand-alone archive into the repository to resolve

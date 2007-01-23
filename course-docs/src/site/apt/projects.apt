@@ -1,15 +1,14 @@
 Projects
 
-* Project 1: Data Access Tier 
+* {Project 1}: Data Access Tier 
 
-    The data access tier used in follow-on projects is built
-during project 1.  All database schema, mapping, and direct access
-methods will be provided by this tier. Follow-on tiers will augment this
-tier with business logic, presentation, transaction, and security logic.
-There is no separate application server used in project 1. All code is
-executes within a single JVM and database.
+    Project 1 will require the development of the business objects
+    and O/R mapping of the business objects to a relational database.
+    The artifacts from project 1 will also be used as a foundation for
+    all follow-on projects as well.  There is no application server used
+    in project 1. All code is executes within a single JVM and database.
 
-    * Specific Goals
+    Specific Goals:
 
         * Develop and test a Java application
 
@@ -25,50 +24,50 @@ executes within a single JVM and database.
 
         * Manipulate data in database using EJB3 Entity DAO
 
-* Project 2: N-Tier Application
+* {Project 2}: N-Tier Application
 
-    Project 2 wraps the data access tier from project 1 within a set of
-business logic and deploys this within separate applications; Web-centric
-and N-Tier applications.  A Web-centric application provides an example
-of how JavaEE can be used without within the Servlet container and not
-introducing an EJB container. The N-Tier application provides an example
-of how to provide remote access, security, and integrated transaction
-management to the business logic using the EJB container. An application
-server is used to host the Web and EJB tiers. A stand-alone client is
-developed to be an RMI client of the EJB tier.
+    Project 2 wraps the data access in a set of business logic with
+    user interface access. The business logic will be hosted in an EJB
+    tier; providing resource management, transactions, security (added
+    in project 3), and RMI access. The user interface will be supplied
+    through the use of Servlets and JSPs. A stand-alone RMI client will
+    also be developed.
 
-    * Goals
+    Specific Goals:
+
         * Develop and test business logic that uses the data access tier
 
-        * Deploy business logic within a Web application
+        * Integrate business logic with a Web tier
 
         * Deploy business logic within an EJB application using Session Beans
 
-        * Integrate application with JTA
-
-        * Protect business logic using EJB security
-
         * Access EJB business logic using RMI
 
-* Project 3: Asynchronous Application
+        * Integrate application with JTA
 
-    Project 3 adds publish/subscribe topics, request/reply queues, and
-timers to the application to better handle long running use cases. An
-application server is used to host the application logic and JMS
-components. A stand-alone client is also developed to interface with the
-appication through JMS messages.
+* {Project 3}: Secure and Asynchronous Application
 
-    * Goals
+    Project 3 enacts security for Project 2 and adds publish/subscribe
+    topics, request/reply queues, and timers.  An application server is
+    used to host the application logic and JMS components. A stand-alone
+    client is also developed to interface with the appication through
+    JMS messages.
 
-        * Design asynchronous interfaces to long-running activities
+    Specific Goals:
+
+        * Protect access to applications using Java EE security
+
+        * Authenticate users using Java EE security means
+
+        * Design asynchronous interactions
 
         * Design JMS messages 
 
-        * Develop and test EJB and stand-alone JMS clients
+        * Develop and test MDB and stand-alone JMS clients
 
         * Develop and test EJB Timers
 
-* General Requirements
+* {General Requirements}
 
     * Projects must build using {{{http://maven.apache.org/}Maven 2}}. 
     {{{http://ant.apache.org/}Ant}} may also be used as an alternative.
@@ -81,4 +80,77 @@ appication through JMS messages.
     * Projects must be supplied with a README that points out how project
     meets requirements.
 
-* Submission Guidelines
+* {Grading}
+
+    Your projects will be graded on completeness and quality of product. In
+    order for you to recieve full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The specific breakdown of grading 
+    criteria will be supplied with each project description. However, they 
+    commonly contain the following areas.
+
+        * README provided that describes where each requirement satisfield: 10pts
+
+        * projects cleanly builds with Maven or Ant: 15pts
+
+        * functionality X: 25pts
+
+        * functionality Y: 35pts
+
+        * functionality Z: 15pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implamantation supplied: 30%
+
+        * testing: 10%
+
+* {Submission Guidelines}
+
+    You should test your application prior to submission by 
+
+        * running the clean targets before zipping up the source code. This
+        will make sure you don't have any old .class files hanging around.
+
+        * removing (or moving) your M2_REPO. This will make sure that
+        you are not depending on any manually installed archives -or- 
+        remind you of the ones that you did install so that they can be
+        either corrected or documented for the grader. 
+
+        * deleting your database files (rm
+        $JBOSS_HOME/server/default/data/hypersonic/ejava.*). This makes
+        sure your population scripts actually create your database schema
+        and that you are not relying on local changes made manually during
+        development.
+        
+        * unzipping your source code into a new directory. This will
+        simulate what the grader will see when they unzip your project.
+        
+        * building and running the tests for your application(s) from scratch.
+        Much of this can help populate the README file.
+
+    You will e-mail the projects to both graders with the following subject
+    line
+
+        * (your name) project 1; revision 0; part # of #
+
+    Your submission will include source zip, README (could be in source
+    zip), and built project artifact(s) (e.g., jar, war, ear, etc.).
+
+    
+    If you need to make a correction, the correction should have the
+    following e-mail subject. The body should describe what you wish to 
+    revise.
+
+        * (your name) project 1; revision N; part # of #
+
+    Grader e-mails ({{{mailto:BenButler@comcast.net,j_faniyi@yahoo.com}
+    mail to both}}):
+
+
+        * BenButler@comcast.net
+
+        * j_faniyi@yahoo.com
