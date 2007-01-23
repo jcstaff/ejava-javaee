@@ -5,7 +5,7 @@
   <parent>
     <artifactId>ejava-javaee</artifactId>
     <groupId>ejava.javaee</groupId>
-    <version>1.0.2006.3</version>
+    <version>1.0.2007.1-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -16,7 +16,7 @@
     This module provides a examples of using the Java Persistence API
     to map object relations to the database.
   </description>
-  <version>1.0.2006.3</version>
+  <version>1.0.2007.1-SNAPSHOT</version>
   <dependencies>
     <!-- core dependencies -->
     <dependency>
@@ -29,6 +29,7 @@
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.0.4</version>
+      <scope>compile</scope>
     </dependency>
 
     <!-- core project testing dependencies -->
@@ -73,6 +74,15 @@
   </dependencies>
 
   <build>
+     <!--tell the resource plugin to perform filtering on resources 
+         to fill in JDBC URL, etc. -->
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+    </resources>
+
     <plugins>
           <!-- make sure we are building java5 -->
       <plugin>
@@ -102,4 +112,56 @@
 
     </plugins>      
   </build>
+
+    <profiles>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+            </properties>
+        </profile>
+
+        <profile> <!-- defines our default persistence provider -->
+            <id>hibernate</id>
+            <activation>
+                <property> <!-- use this property to name alt persistence provider -->
+                    <name>!jpa</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>3.2.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-annotations</artifactId>
+                    <version>3.2.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>3.2.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

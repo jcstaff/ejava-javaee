@@ -1,8 +1,5 @@
 package ejava.examples.orm.rel;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import ejava.examples.orm.rel.annotated.Applicant;
 import ejava.examples.orm.rel.annotated.Borrower;
 import ejava.examples.orm.rel.annotated.Person;
