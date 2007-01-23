@@ -6,7 +6,7 @@
     <parent>
         <artifactId>txHotel</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,6 @@
     <artifactId>txHotelEAR</artifactId>
     <packaging>ear</packaging>
     <name>Tx Hotel Business EAR</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <dependency>
@@ -29,16 +28,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- not yet
-        <dependency>
-            <groupId>${pom.groupId}</groupId>
-            <artifactId>txHotelWAR</artifactId>
-            <version>${pom.version}</version>
-            <type>war</type>
-        </dependency>
-        -->
     </dependencies>
+
+    <build>
+        <finalName>txHotelEAR</finalName>
+    </build>
 
 <profiles>
     <!-- this profiles allow the EAR to be undeployed before it is deleted
@@ -76,8 +70,8 @@
                         <configuration>
                             <type>runtime</type>
                             <properties>
-                            <cargo.remote.username>admin</cargo.remote.username>
-                            <cargo.remote.password>admin</cargo.remote.password>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
                             </properties>
                         </configuration>
                         <deployer>

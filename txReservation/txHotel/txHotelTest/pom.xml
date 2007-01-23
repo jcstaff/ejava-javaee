@@ -6,7 +6,7 @@
     <parent>
         <artifactId>txHotel</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,6 @@
     <artifactId>txHotelTest</artifactId>
     <packaging>jar</packaging>
     <name>Tx Hotel Business Remote Test</name>
-    <version>1.0.2006.3</version>
 
     <dependencies>
         <!-- core dependencies -->
@@ -28,7 +27,7 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
 
         <!-- include this to compile tests -->
@@ -37,20 +36,23 @@
             <artifactId>txHotelEJB</artifactId>
             <version>${pom.version}</version>
             <type>ejb-client</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>txHotelBO</artifactId>
             <version>${pom.version}</version>
             <type>jar</type>
+            <scope>test</scope>
         </dependency>
 
-        <!-- package being deployed must be a dependency -->
+        <!-- package being deployed must be a scope=compile dependency -->
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>txHotelEAR</artifactId>
             <version>${pom.version}</version>
             <type>ear</type>
+            <scope>compile</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -126,7 +128,7 @@
                         </property>
                         <property>
                           <name>jndi.name.hotelsession</name>
-                          <value>txHotelEAR-1.0.2006.3</value>
+                          <value>txHotelEAR</value>
                           <!-- jboss fails when assign custom name to stateful
                           <value>ejava/examples/txhotelsession</value>
                           -->
@@ -175,28 +177,28 @@
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jbossall-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jbossall-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-ejb3-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-ejb3-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aop-jdk50-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-aop-jdk50-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aspect-jdk50-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-aspect-jdk50-client.jar</systemPath>
         </dependency>
@@ -225,8 +227,8 @@
                         <configuration>
                             <type>runtime</type>
                             <properties>
-                            <cargo.remote.username>admin</cargo.remote.username>
-                            <cargo.remote.password>admin</cargo.remote.password>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
                             </properties>
                         </configuration>
                         <deployer>
