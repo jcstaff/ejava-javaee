@@ -16,7 +16,7 @@
     <path id="test.classpath"> 
         <pathelement path="${log4j.classpath}"/>
         <pathelement path="${junit.classpath}"/>
-        <pathelement path="${jboss.embedded.classpath}"/>
+        <pathelement path="${persistence.provider.classpath}"/>
     </path>
 
     <path id="provided.classpath"> 
@@ -38,7 +38,7 @@
         <echo>jdbc.user=${jdbc.user}</echo>
         <echo>jdbc.password=${jdbc.password}</echo>
         <echo>javaee.classpath=${javaee.classpath}</echo>
-        <echo>jboss.embedded.classpath=${jboss.embedded.classpath}</echo>
+        <echo>persistence.provider.classpath=${persistence.provider.classpath}</echo>
 
         <echo>javaeeExDA.classpath=${javaeeExDA.classpath}</echo>
         <echo>javaeeExEJB-client.classpath=${javaeeExEJB-client.classpath}</echo>
@@ -152,7 +152,7 @@
 
             <batchtest fork="true" todir="${build.dir}/test-reports">
                 <fileset dir="${build.dir}/test-classes">
-                    <include name="**/*Test*.class"/>
+                    <include name="**/*Test.class"/>
                 </fileset>
             </batchtest>
 

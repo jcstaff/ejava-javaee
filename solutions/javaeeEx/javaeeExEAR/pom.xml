@@ -26,6 +26,13 @@
             <artifactId>javaeeExEJB</artifactId>
             <version>${pom.version}</version>
             <type>ejb</type>
+            <exclusions>
+                <!-- jboss doesn't want to see already provided jars -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -33,6 +40,13 @@
             <artifactId>javaeeExWAR</artifactId>
             <version>${pom.version}</version>
             <type>war</type>
+            <exclusions>
+                <!-- jboss doesn't want to see already provided jars -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

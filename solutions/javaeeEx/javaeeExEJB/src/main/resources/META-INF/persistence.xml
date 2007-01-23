@@ -5,6 +5,7 @@
 
     <persistence-unit name="javaeeEx">
         <jta-data-source>java:/ejavaDS</jta-data-source>
+        <class>myorg.javaeeex.bo.Person</class>
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="create"/>
         </properties>

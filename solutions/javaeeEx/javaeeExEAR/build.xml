@@ -20,7 +20,7 @@
         <echo>jdbc.user=${jdbc.user}</echo>
         <echo>jdbc.password=${jdbc.password}</echo>
         <echo>javaee.classpath=${javaee.classpath}</echo>
-        <echo>jboss.embedded.classpath=${jboss.embedded.classpath}</echo>
+        <echo>persistence.provider.classpath=${persistence.provider.classpath}</echo>
         <echo>javaeeExDA.classpath=${javaeeExDA.classpath}</echo>
         <echo>javaeeExEJB.classpath=${javaeeExEJB.classpath}</echo>
     </target>
@@ -31,8 +31,10 @@
         <mkdir dir="${build.dir}/${artifactId}"/>
         <copy todir="${build.dir}/${artifactId}/META-INF"
             file="${src.dir}/main/ant/application.xml"/>
+            <!-- jboss won't tolerate additional commons.logging
         <copy todir="${build.dir}/${artifactId}"
             file="${commons.logging.classpath}"/>
+            -->
         <copy todir="${build.dir}/${artifactId}"
             file="${javaeeExDA.classpath}"/>
         <copy todir="${build.dir}/${artifactId}"

@@ -36,7 +36,7 @@
         <echo>jdbc.user=${jdbc.user}</echo>
         <echo>jdbc.password=${jdbc.password}</echo>
         <echo>javaee.classpath=${javaee.classpath}</echo>
-        <echo>jboss.embedded.classpath=${jboss.embedded.classpath}</echo>
+        <echo>persistence.provider.classpath=${persistence.provider.classpath}</echo>
         <echo>jboss.rmi.classpath=${jboss.rmi.classpath}</echo>
         <echo>java.naming.factory.initial=${java.naming.factory.initial}</echo>
         <echo>java.naming.provider.url=${java.naming.provider.url}</echo>
@@ -66,7 +66,7 @@
 
     <target name="deploy">
         <copy file="${javaeeExEAR.path}" 
-              todir="${jboss.home}/server/default/deploy"/>
+              todir="${JBOSS_HOME}/server/default/deploy"/>
         <echo message="pausing for server to deploy..."/>
         <sleep seconds="5"/>
     </target>
@@ -182,7 +182,7 @@
 
             <batchtest fork="true" todir="${build.dir}/test-reports">
                 <fileset dir="${build.dir}/test-classes">
-                    <include name="**/*Test*.class"/>
+                    <include name="**/*Test.class"/>
                 </fileset>
             </batchtest>
 
@@ -206,7 +206,7 @@
 
     <target name="clean">
         <delete dir="${build.dir}"/>
-        <delete file="${jboss.home}/server/default/deploy/javaeeExEAR.ear"/>
+        <delete file="${JBOSS_HOME}/server/default/deploy/javaeeExEAR.ear"/>
     </target>
 
 </project>
