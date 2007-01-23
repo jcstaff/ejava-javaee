@@ -5,7 +5,7 @@
     <parent>
         <artifactId>asyncMarket</artifactId>
         <groupId>ejava.javaee.asyncejb</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,6 @@
     <artifactId>asyncMarketTest</artifactId>
     <packaging>jar</packaging>
     <name>Async Market Test</name>
-    <version>1.0.2006.3</version>
     <description>
         This project is used to deploy and test the server-side components
         for the Async Market project.
@@ -31,6 +30,7 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- component to test within deployment-->
@@ -38,15 +38,17 @@
             <groupId>${pom.groupId}</groupId>
             <artifactId>asyncMarketEJB</artifactId>
             <version>${pom.version}</version>
-            <type>ejb</type>
+            <type>ejb-client</type>
+            <scope>test</scope>
         </dependency>
         
-        <!-- package being deployed must be a dependency -->
+        <!-- package being deployed must be a scope=compile dependency -->
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>asyncMarketEAR</artifactId>
             <version>${pom.version}</version>
             <type>ear</type>
+            <scope>compile</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -165,28 +167,28 @@
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jbossall-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jbossall-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-ejb3-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-ejb3-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aop-jdk50-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-aop-jdk50-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aspect-jdk50-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-aspect-jdk50-client.jar</systemPath>
         </dependency>
@@ -239,8 +241,8 @@
                         <configuration>
                             <type>runtime</type>
                             <properties>
-                            <cargo.remote.username>admin</cargo.remote.username>
-                            <cargo.remote.password>admin</cargo.remote.password>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
                             </properties>
                         </configuration>
                         <deployer>

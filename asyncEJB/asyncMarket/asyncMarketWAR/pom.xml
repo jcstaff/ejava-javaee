@@ -6,7 +6,7 @@
     <parent>
         <artifactId>asyncMarket</artifactId>
         <groupId>ejava.javaee.asyncejb</groupId>
-        <version>1.0.2006.3</version>
+        <version>1.0.2007.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,6 @@
     <artifactId>asyncMarketWAR</artifactId>
     <packaging>war</packaging>
     <name>Async Market WAR</name>
-    <version>1.0.2006.3</version>
     <description>
         This project provides a utility Web interface to the Async Market
         JMS Example.
@@ -92,41 +91,49 @@
             <artifactId>asyncMarketEJB</artifactId>
             <version>${pom.version}</version>
             <type>ejb-client</type>
+            <scope>compile</scope>
         </dependency>        
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.13</version>
+            <scope>compile</scope>
         </dependency>    
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jbossall-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-ejb3-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-ejb3x-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aop-jdk50-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aspect-jdk50-client</artifactId>
-            <version>4.0.4-GA</version>            
+            <version>4.0.5-GA</version>            
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </profile>
