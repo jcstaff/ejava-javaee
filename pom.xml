@@ -5,12 +5,14 @@
     <groupId>ejava.javaee</groupId>
     <artifactId>ejava-javaee</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2006.3</version>
+    <version>1.0.2007.1-SNAPSHOT</version>
     <name>Enterprise Java (605.784) Root</name>
     <description>
         This is the course home page for the Enterprise Java Course
         (605.784), taught at John's Hopkins University, Engineering Programs 
-        for Professionals.
+        for Professionals. This site will be populated as the semester progresses
+        and topics are addressed. If you are looking for a version of the full content
+        for ejava-javaee, refer to http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee.
     </description>
     <url>http://webdev.apl.jhu.edu/~jcs/ejava-javaee</url>
     <organization>
@@ -24,34 +26,18 @@
             <name>class newsgroup (for class use)</name>
             <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
         </mailingList>
-        <mailingList>
-            <name>corej2ee newsgroup</name>
-            <subscribe>http://groups.yahoo.com/group/corej2ee/</subscribe>
-        </mailingList>
     </mailingLists>
     <scm>
-        <url>https://ejava.info:8443/repos/class/tags/2006-fall-ejava-javaee</url>
-        <connection>scm:svn:https://ejava.info:8443/repos/class/tags/2006-fall-ejava-javaee</connection>
+        <url>https://ejava.info:8443/repos/class/branches/2007-spring-ejava-javaee</url>
+        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2007-spring-ejava-javaee</connection>
     </scm>
   <modules>
+        <module>site-skin</module>
         <module>course-docs</module>
         <module>solutions</module>
         <module>utils</module>
         <module>projects</module>
         <module>javase5Enhancements</module>
-        <module>jdbcDAO</module>
-        <module>jpaDAO</module>
-        <module>ormCore</module>
-        <module>ormRelations</module>
-        <module>ormInheritance</module>
-        <module>ormEJBQL</module>
-        <module>webTier</module>
-        <module>ejbsessionBank</module>
-        <module>jndiScheduler</module>
-        <module>txReservation</module>
-        <module>securePing</module>
-        <module>jmsCore</module>
-        <module>asyncEJB</module>
   </modules>
   
     <developers>
@@ -215,21 +201,6 @@
     </reporting>
 
     <profiles>
-        <profile> <!-- defines our default database -->
-            <id>hsqldb</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>!jdbcdb</name>
-                </property>
-            </activation>
-            <properties>
-                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
-                  <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
-            </properties>
-        </profile>
-
         <profile> <!-- tells surefire to run JUnit tests with remote debug -->
             <id>debugger</id>
             <activation>
@@ -249,7 +220,7 @@
                     <site>
                         <id>webdev.website</id>
                         <name>ejava JHU webdev website</name>
-                        <url>${webdev.scp.root}/legacy-ejava-javaee</url>
+                        <url>${webdev.scp.root}/ejava-javaee</url>
                     </site>
                     <repository>
                         <id>webdev.repository</id>
@@ -270,7 +241,7 @@
                     <site>
                         <id>ejava.website</id>
                         <name>ejava local website</name>
-                        <url>${ejavainfo.scp.root}/legacy-ejava-javaee</url>
+                        <url>${ejavainfo.scp.root}/ejava-javaee</url>
                     </site>
                     <repository>
                         <id>ejava.repository</id>
@@ -291,7 +262,7 @@
                     <site>
                         <id>localhost.website</id>
                         <name>localhost website</name>
-                        <url>${localhost.scp.root}/2006-fall-ejava-javaee</url>
+                        <url>${localhost.scp.root}/ejava-javaee</url>
                     </site>
                     <repository>
                         <id>localhost.repository</id>
