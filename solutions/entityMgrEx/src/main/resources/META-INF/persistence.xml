@@ -4,12 +4,19 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" version="1.0">
 
     <persistence-unit name="entityMgrEx">
-        <jta-data-source>java:/ejavaDS</jta-data-source>
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
-        <!-- uncomment this ti have persistence provider create tables
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-        -->
+            <property name="hibernate.dialect" value="
+                org.hibernate.dialect.HSQLDialect"/>
+            <property name="hibernate.connection.url"
+                value="${jdbc.url}"/>
+            <property name="hibernate.connection.driver_class" 
+                value="${jdbc.driver}"/>
+            <property name="hibernate.connection.password" 
+                value="${jdbc.password}"/>
+            <property name="hibernate.connection.username" 
+                value="${jdbc.user}"/>
+            <property name="hibernate.show_sql" value="false"/>            
         </properties>
-    </persistence-unit>        
-    
+    </persistence-unit>            
 </persistence>
