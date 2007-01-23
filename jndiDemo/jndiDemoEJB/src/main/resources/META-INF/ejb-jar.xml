@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<ejb-jar
+    xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd"
+    version="3.0">
+    
+    <enterprise-beans>
+        <session>
+            <ejb-name>AidScheduler</ejb-name>
+            <mapped-name>ejava/examples/jndidemo/AidSchedulerEJB</mapped-name>
+            <env-entry>
+                <env-entry-name>vals/message</env-entry-name>
+                <env-entry-type>java.lang.String</env-entry-type>
+                <env-entry-value>Hello Helping World</env-entry-value>
+                <injection-target>
+                    <injection-target-class>
+                        ejava.examples.jndidemo.ejb.AidSchedulerEJB
+                    </injection-target-class>
+                    <injection-target-name>message</injection-target-name>
+                </injection-target>
+            </env-entry>
+            <ejb-local-ref>
+                <ejb-ref-name>ejb/hospital</ejb-ref-name>
+                <ejb-ref-type>Session</ejb-ref-type>
+                <local>ejava.examples.jndidemo.ejb.HospitalLocal</local>
+                <ejb-link>HospitalEJB</ejb-link>
+                <injection-target>
+                    <injection-target-class>
+                        ejava.examples.jndidemo.ejb.AidSchedulerEJB
+                    </injection-target-class>
+                    <injection-target-name>hospital</injection-target-name>
+                </injection-target>
+            </ejb-local-ref>
+            <persistence-context-ref>
+                <persistence-context-ref-name>
+                    persistence/jndidemo
+                </persistence-context-ref-name>
+                <persistence-unit-name>jndidemo</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+                <injection-target>
+                    <injection-target-class>
+                        ejava.examples.jndidemo.ejb.AidSchedulerEJB
+                    </injection-target-class>
+                    <injection-target-name>em</injection-target-name>
+                </injection-target>
+            </persistence-context-ref>
+
+            <post-construct>
+                <lifecycle-callback-method>init</lifecycle-callback-method>
+            </post-construct>
+        </session>
+    </enterprise-beans>   
+</ejb-jar>
