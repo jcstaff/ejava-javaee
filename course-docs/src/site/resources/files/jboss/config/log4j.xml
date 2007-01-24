@@ -43,28 +43,6 @@
       </layout>
    </appender>
 
-   <appender name="AVALON_FILE" class="org.jboss.logging.appender.DailyRollingFileAppender">
-      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
-      <param name="File" value="${jboss.server.log.dir}/avalon.log"/>
-      <param name="Append" value="true"/>
-
-      <!-- Rollover at midnight each day -->
-      <param name="DatePattern" value="'.'yyyy-MM-dd"/>
-
-      <!-- Rollover at the top of each hour
-      <param name="DatePattern" value="'.'yyyy-MM-dd-HH"/>
-      -->
-
-      <layout class="org.apache.log4j.PatternLayout">
-         <!-- The default pattern: Date Priority [Category] Message\n -->
-         <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
-
-         <!-- The full pattern: Date MS Priority [Category] (Thread:NDC) Message\n
-         <param name="ConversionPattern" value="%d %-5r %-5p [%c] (%t:%x) %m%n"/>
-          -->
-      </layout>
-   </appender>
-
    <!-- A size based file rolling appender
    <appender name="FILE" class="org.jboss.logging.appender.RollingFileAppender">
      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
@@ -94,7 +72,10 @@
       </layout>
    </appender>
 
-   <logger name="com.sra">
+   <logger name="myorg">
+       <level value="debug"/>
+   </logger>
+   <logger name="ejava.info">
        <level value="debug"/>
    </logger>
    <logger name="org">
@@ -218,11 +199,6 @@
    <!-- Limit the JSR77 categories -->
    <category name="org.jboss.management">
       <priority value="INFO"/>
-   </category>
-
-   <category name="com.sra.ramp.avalon.wsproxy.security">
-     <priority value="WARN"/>
-     <appender-ref ref="AVALON_FILE"/>
    </category>
 
    <!-- Enable JBossWS message tracing -->
