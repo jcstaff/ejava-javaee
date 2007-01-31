@@ -182,7 +182,7 @@ log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
         </copy>
 ---
 ---
-        <junit printsummary="true" fork="true">
+        <junit printsummary="true" showoutput="true" fork="true">
                <classpath>
                    <pathelement path="${junit.classpath}"/>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>

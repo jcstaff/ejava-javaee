@@ -1,0 +1,453 @@
+Project2: eMarket N-Tier Application
+
+    01/30/2007 Draft
+
+* Goals
+
+    * Continue to re-use and update the implementations from the previously
+    implemented data access tier and initial business logic.
+
+    * Deploy data access tier and business logic as an EJB component
+
+    * Provide a remote interface and client to business logic
+
+    * Provide a local interface and Web client to business logic
+
+    * Provide a Web tier 
+
+* Objectives
+
+    * Expand the current project development architecture to include EJB,
+    WAR, EAR, and Test sub-projects for eSales.
+
+    * Expand the current project development architecture to include EJB,
+    EAR, and Test sub-projects for eBidbot.
+
+    * Re-host the data access tiers and initial business logic from 
+    Project 1 within the new EJB and WEB tiers.
+
+    * Design the data transfer objects (DTOs) to be used to communicate
+    with clients using the remote interface.
+
+    * Create the EAR sub-project to host the Java EE components.
+
+    * Create the Test sub-project to deploy and run tests using the
+    remote EJB interface.
+
+    * Create and test the WAR sub-project to host the user interface.
+    This component will ultimately be deployed within the EAR to 
+    the application server and use local interfaces of the EJB to
+    access business logic. 
+
+* Technical Overview
+
+    [Note:] This project and the final project rely heavily on the
+    components from Project 1. You are encouraged to make sure your
+    implementation of Project 1 is sound and well tested prior to doing too
+    much work on Project 2. You should continue to maintain your JUnit
+    tests for the earlier components while working on these higher level
+    tiers.
+
+    []
+
+    The project will continue along two parallel paths; eSales and eBidbot.
+    However, this time we will add several new project types; EJB, EAR,
+    WAR, and Test. These new sub-projects will become siblings to your
+    existing BO, DAO, and BLImpl sub-projects. The new projects will 
+    depend on your legacy work. The remote interface of the EJB will also
+    require specific design of what gets externalized to the client. The
+    remote clients do not share the same address space we had in Project 1
+    and we cannot afford to serialize the entire contents of a database
+    full of related information. Data Transfer Objects (DTOs) will be part
+    of the EJB remote interface design.
+
+    You have finished a significant amount of eSales during Project 1; the
+    O/R mapping and core business logic of a non-trivial business model.
+    You will now host the data access tier and business logic within an
+    EJB component.  This EJB component will supply the EntityManager,
+    control transaction boundaries, provide local interaction for the
+    Web Tier, and a RMI interface for remote clients. Security will be
+    addressed in the next project. To limit the scope of the project, the
+    Web UI requirements will be limited to only a few of the Buyer
+    interaction use cases. The EJB and WAR will be deployed as a part of an
+    EAR by a Test project. The Test project will host RMI testing of the
+    EJB methods that are to be used eSales remote clients, including
+    eBidbot business logic. 
+
+    eBidbot will require additional work as well. With a remote interface
+    for eSales in hand and the ability to either simulate or operate with a
+    live instance, we can now begin to implement much of the business logic
+    that will also be hosted within an EJB. The development of a Web UI for
+    eBidbot is not required at this time. All functionality is permitted to
+    be demonstrated through RMI calls to the EJB.
+
+    You may develop your Web tier in an alternate environment, such as
+    Jetty. However, it must be submitted as part of the application that
+    runs within JBoss.
+
+    [Note:] As with the previous project, the use of the name eMarket,
+    eSales, and eBidbot within the project specification are to be taken as
+    placeholders. Please make an effort to uniquely name your directories,
+    components, Java packages, JNDI names, etc. to help logically separate
+    the parallel project implementations.
+
+    [Note:] There should be no use of System.out.println() in the code
+    and all implementations must use the jakarta commons logging API
+    with the log4j logging provider.  You may leave debug in your code,
+    but this should be able to be turned on/off with the proper logging
+    priority changes in the log4j.xml configuration.
+
+* Technical Details
+
+    [[1]] Continue to provide all functionality from Project 1; especially
+    the unit tests as upgrades to your earlier logic is revisited.
+
+===
+
+    [[1]] Create an EJB tier to host your eSales business logic and
+    data access tiers. Each of the EJBs provided will provide the
+    necessary dependency injection and initialization for the business
+    objects. Transaction scope will be added as a part of a separate
+    requirement. Security will be added in the next project. The main
+    construction, deployment, and remote interfaces of the EJB will be
+    the focus of this requirement.  You will have to address the data
+    that gets serialized to the client in a set of Data Transfer Objects
+    (DTOs).
+
+        [[A]] EJBs - The EJBs will be used to inject and initialize
+        implementation objects and provide a remote interface.
+
+[../images/esales-ejbtier.jpg] eSales EJB Tier
+
+            [[a]] AccountMgmtEJB - this EJB will primarily host the 
+            AccountMgmtImpl business logic. An AccountMgmtRemote interface 
+            and bean implementation will need to be designed for this EJB.
+
+            [[a]] SellerMgmtEJB - this EJB will primarily host the 
+            SellerMgmtImpl business logic. A SellerMgmtRemote interface and
+            bean implementation will need to be designed for this EJB.
+
+            [[a]] BuyerMgmtEJB - this EJB will primarily host the 
+            BuyerMgmtImpl business logic. A BuyerMgmtRemote interface and bean 
+            implementation will need to be designed for this EJB.
+
+            [[a]] TestSupportEJB - this support EJB will primarily host the
+            TestSupportImpl business logic to support remote testing
+            requirements. A TestSupportRemote interface and bean implementation
+            will need to be designed for this EJB.
+
+        [[A]] DTOs - The DTOs will be used to serialize the state of the
+        business objects between the EJB and client when using the remote
+        interface.
+
+[../images/esales-dtos.jpg] eSales DTOs
+
+            [[a]] AccountDTO - This class is meant to primarily be
+            an aggregation of the state found in the Account and related POC
+            business objects.
+
+            [[a]] AddressDTO - This class is meant to be a representation
+            of the state found in the Address business object. Depending
+            on how the Address business object is designed, there may
+            not be a need for this stand-in.
+
+            [[a]] AuctionDTO - This class is meant to be a representation
+            of the state found in the AuctionItem and POC business objects.
+
+            [[b]] BidDTO - This class is meant to be a representation of
+            the state found in the Bid and related POC business objects.
+
+        [[A]] EAR - Create an EAR to host the eSales server-side
+        components; including the EJB component just developed.
+
+        [[A]] Test - Create a Test project that will deploy the EAR to the
+        application server and run through a set of JUnit test using the
+        remote interface of the EJB. 
+
+===
+    
+    [[1]] Implement and test the eBidbot business logic using the remote
+    interface of eSales.
+
+[../images/ebidbot-ejbtier.jpg] eBidbot Business Logic and EJB Tiers
+
+        [[A]] OrderMgmt/OrderMgmtImpl - encapsulates the functionality
+        required to create an automated bidding account, place an order,
+        and check the status of that order. You should be able to test this
+        component using the running eSales application or implement a stub
+        that implements the BuyerMgmtRemote interface.
+
+===
+
+    [[1]] Create an EJB tier to host your eBidbot business logic and
+    data access tiers. The EJB(s) provided will provide the
+    necessary dependency injection and initialization for the business
+    objects. Transaction scope will be added as a part of a separate
+    requirement. Security will be added in the next project. The main
+    construction, deployment, and remote interfaces of the EJB will be
+    the focus of this requirement.  You will have to address the data
+    that gets serialized to the client in a set of Data Transfer Objects
+    (DTOs).
+
+        [[A]] EJBs - The EJBs will be used to inject and initialize
+        implementation objects and provide a remote interface.
+
+[../images/ebidbot-ejbtier.jpg] eBidbot Business Logic and EJB Tiers
+
+
+            [[a]] OrderMgmtEJB - this EJB will primarily host the 
+            OrderMgmtImpl business logic. An OrderMgmtRemote interface 
+            and bean implementation will need to be designed for this EJB.
+
+        [[A]] DTOs - The DTOs are be used to serialize the state of the
+        business objects between the EJB and client when using the remote
+        interface. However, the simplicity of the business objects used
+        will allow us to take another approach for DTOs in this remote
+        interface. The EJB Tier will create new instances of the classes
+        to clear them of any persistence provider classes before
+        serializing them to the client. This is a design option and not 
+        a requirement.
+
+        [[A]] EAR - Create an EAR to host the eBidbot server-side
+        components; including the EJB component just developed.
+
+        [[A]] Test - Create a Test project that will deploy the EAR to the
+        application server and run through a set of JUnit test using the
+        remote interface of the EJB. 
+
+===
+
+    [[1]] Add a Web UI to the eSales application. This should use the local
+    interface EJB, which can be identical to the interface implemented for
+    the business logic. The WAR for the Web UI must be deployed as part of 
+    the eSales EAR. The Web UI must have the following functionality.
+
+        * List open auctions
+
+        * Get details for specific auction.
+
+        * Place bid for buyer
+
+===
+
+[../images/emarket-client.jpg] eBidbot Business Logic and EJB Tiers
+
+    [[1]] Develop a Client component for eSales that can issue specific
+    commands to the eSales application through remote interfaces.
+    This remote client can optionally be replaced with a set of Web
+    UI functionality. It is only being expressed here as a command
+    line client to offer a way to simplify/speed implementation. The client
+    implementations must have the ability to issue the following commands.
+    All command line implementations must be wrapped in an Ant runtime script
+    to encapulsate the classpath details in a portable manner (see the class
+    jdbcDAO project for an example of using an Ant runtime script).
+
+        * ingest data (using Ingestor)
+
+        * createAccount for seller, buyer1, and buyer2 (using
+        AccountMgmtRemote)
+
+        * createAuction (using SellerMgmtRemote)
+
+        * getUserAuctions (using SellerMgmtRemote)
+
+        * getAuction (using SellerMgmtRemote)
+
+===
+
+    [[1]] Develop a Client component for eBidbot that can issue specific
+    commands to the eBidbot application through remote interfaces.
+    This remote client can optionally be replaced with a set of Web
+    UI functionality. It is only being expressed here as a command
+    line client to offer a way to simplify/speed implementation. The client
+    implementations must have the ability to issue the following commands.
+    All command line implementations must be wrapped in an Ant runtime script
+    to encapulsate the classpath details in a portable manner (see the class
+    jdbcDAO project for an example of using an Ant runtime script).
+
+        * createAccount (using OrderMgmtRemote)
+
+        * placeOrder (using OrderMgmtRemote)
+
+===
+
+    [[1]] Add transaction properties to the EJBs. 
+
+        [[A]] Transaction Scope - all session bean methods in these two
+        applications should require a transaction.
+
+        [[A]] Transaction Integrity - add transaction rollback logic to
+        EJBs that detect a bid could not be executed because it was either
+        too low or was for a closed auction.
+
+        [[A]] Test - update the test project(s) to verify the transaction
+        logic.
+
+* Testing
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    eSales accessed through its remote interface. Theses tests should be
+    packaged in the eSales RMI Test project.
+
+    [[1]] Provide JUnit tests that verify the business logic functionality
+    of eBidbot.
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    eBidbot accessed through its remote interface. Theses tests should be
+    packaged in the eBidbot RMI Test project.
+
+    [[1]] Perform and document an end-to-end use case to do the following. 
+    
+    [Note:]Any actions, including the ingest, that must be executed from
+    the command line must be wrapped inside an <<RUN>> script similar
+    to ones demonstrated in class (see the class jdbcDAO project for an 
+    example of using an Ant script to encapsulate command-line details).
+
+    []
+
+        * ingest data (using Ingestor)
+
+        * createAccount for seller, buyer1, and buyer2 in ejbSales (using
+        either a command line client or Web UI)
+
+        * createAccount for buyer2 in eBidbot (using either a command line
+        client or Web UI)
+
+        * createAuction (using command line client or Web UI)
+
+        * getUserAuctions (using command line client or Web UI)
+
+        * getAuction (using command line client or Web UI)
+
+        * getOpenAuctions (using Web UI)
+
+        * placeBid for buyer1 (using Web UI)
+
+        * getAuction for (using Web UI)
+
+        * placeOrder for buyer2 in eBidbot (using either a command line 
+        client or Web UI)
+
+* Getting Started
+
+    The following sketch of directory structure can be used as a starting
+    point for your overall application. It assumes you already have a BO,
+    DAO, and BLImpl set of projects in place. Note that all "e"Market,
+    "e"Sales, and "e"Bidbot names should be changed to your specific
+    name mangler. The same type of modification needs to occur for the
+    java package names.
+
+---
+`-- eMarket
+    |-- eBidbot
+    |   |-- eBidbotBO
+    |   |-- eBidbotDAO
+    |   |-- eBidbotBLImpl
+    |   |-- eBidBotEAR
+    |   |   `-- pom.ml
+    |   |-- eBidbotEJB
+    |   |   |-- pom.ml
+    |   |   `-- src
+    |   |       `-- main
+    |   |           |-- java
+    |   |           |   `-- ebidbot
+    |   |           |       `-- ejb
+    |   |           `-- resources
+    |   |               |-- META-INF
+    |   |               |   `-- persistence.xml
+    |   |               |-- ejb-jar.xml
+    |   |               `-- jboss.xml
+    |   `-- eBidbotTest
+    |       |-- pom.ml
+    |       `-- src
+    |           `-- test
+    |               |-- java
+    |               |   `-- ebidbot
+    |               |       `-- ejbclient
+    |               `-- resources
+    |                   |-- eBidbot-ant.xml
+    |                   |-- eBidbot.properties
+    |                   `-- jndi.properties
+    |-- eSales
+    |   |-- eSalesBLImpl
+    |   |-- eSalesBO
+    |   |-- eSalesDAO
+    |   |-- eSalesEAR
+    |   |   `-- pom.ml
+    |   |-- eSalesEJB
+    |   |   |-- pom.ml
+    |   |   `-- src
+    |   |       `-- main
+    |   |           |-- java
+    |   |           |   `-- esales
+    |   |           |       `-- ejb
+    |   |           `-- resources
+    |   |               |-- META-INF
+    |   |               |   `-- persistence.xml
+    |   |               |-- ejb-jar.xml
+    |   |               `-- jboss.xml
+    |   |-- eSalesTest
+    |   |   |-- pom.ml
+    |   |   `-- src
+    |   |       `-- test
+    |   |           |-- java
+    |   |           |   `-- esales
+    |   |           |       `-- ejbclient
+    |   |           `-- resources
+    |   |               |-- eSales-ant.xml
+    |   |               |-- eSales.properties
+    |   |               `-- jndi.properties
+    |   `-- eSalesWAR
+    |       |-- pom.ml
+    |       `-- src
+    |           `-- main
+    |               |-- java
+    |               |   `-- esales
+    |               |       `-- web
+    |               |-- resources
+    |               `-- webapp
+    |                   |-- WEB-INF
+    |                   |   |-- content
+    |                   |   `-- web.xml
+    |                   `-- index.jsp
+    `-- pom.xml
+---
+
+
+* Grading
+
+    Your project will be graded on completeness and quality of product. In
+    order for you to receive full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The breakdown of grading 
+    will be as follows:
+
+        * README provided that describes where each requirement satisfied: 10pts
+
+        * projects cleanly builds with Maven or Ant: 15pts
+
+        * Project 1 functionality: 10pts
+
+        * EJB Tier, remote interface, and EAR deployment: 30pts
+
+        * Web UI integration: 15pts
+
+        * Client access: 10pts
+
+        * Transactions: 10pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implementation supplied: 30%
+
+        * testing: 10%
+
+* Submission Guidelines
+
+    Please follow the 
+    {{{../../../course-docs/projects.html#Submission%20Guidelines}
+    project submission guidelines}}
+    posted in the course overview.

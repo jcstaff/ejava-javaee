@@ -59,7 +59,7 @@
         </copy>
 
         <mkdir dir="${build.dir}/test-reports"/>
-        <junit printsummary="true" fork="true">
+        <junit printsummary="true" showoutput="true" fork="true">
                <classpath>
                    <pathelement path="${junit.classpath}"/>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>

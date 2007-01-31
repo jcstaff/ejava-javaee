@@ -45,6 +45,24 @@
   </dependencies>
 
   <build>
+    <!-- filter resource files for profile-specific values -->
+    <testResources>
+        <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+            <excludes>
+                <exclude>**/*-ant.xml</exclude>
+            </excludes>
+        </testResource>
+        <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>false</filtering>
+            <includes>
+                <include>**/*-ant.xml</include>
+            </includes>
+        </testResource>
+    </testResources>
+
     <plugins>
           <!-- make sure we are building java5 -->
       <plugin>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jdbcDAO" default="run" basedir="..">
+
+    <property file="test-classes/${ant.project.name}.properties"/>
+
+    <path id="demo.classpath">
+        <pathelement path="${commons.logging.classpath}"/>
+        <pathelement path="${log4j.classpath}"/>
+        <pathelement path="${jdbc.classpath}"/>
+        <pathelement path="test-classes"/>
+        <pathelement path="classes"/>
+    </path>
+
+    <description>
+    This Ant script will run the command line demos for this project. There
+    is one target; connectdemo. This target requires no command line arguments.
+    It will connect to the database populated by the project setup and dump
+    the contents of one of the tables.
+    </description>
+
+    <target name="echo">
+        <property name="demo-classpath" refid="demo.classpath"/>
+        <echo>basedir=${basedir}</echo>
+        <echo>commons.logging.classpath=${commons.logging.classpath}</echo>
+        <echo>demo.classpath=${demo-classpath}</echo>
+    </target>
+
+    <target name="run" depends="connectdemo"/>
+
+    <target name="connectdemo">
+        <java classname="ejava.examples.jdbc.ConnectDemo">
+            <classpath>
+                <path refid="demo.classpath"/>
+            </classpath>
+            <sysproperty key="jdbc.driver" value="${jdbc.driver}"/>
+            <sysproperty key="jdbc.url" value="${jdbc.url}"/>
+            <sysproperty key="jdbc.user" value="${jdbc.user}"/>
+            <sysproperty key="jdbc.password" value="${jdbc.password}"/>
+        </java>
+    </target>
+</project>

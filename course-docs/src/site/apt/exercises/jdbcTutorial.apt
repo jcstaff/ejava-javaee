@@ -31,7 +31,7 @@ Exercise: JDBC Tutorial
     taking advantage of the fact it will start and stop the database 
     process.
 
-    [Note:] You can also start the databaase manually to save some room 
+    [Note:] You can also start the database manually to save some room 
     on your system for now. You should try both commands at first and
     verify both approaches result in the same database using the DB GUI.
 
@@ -77,13 +77,24 @@ CREATE TABLE COFFEES (
 DELETE * FROM COFFEES;
 
 # coffee_drop.ddl
-DROP TABLE COFFEES;
+DROP TABLE COFFEES if EXISTS;
+---
+
+    * Create a ddl script to supply some test data. This will go in
+    src/test/resources/ddl since its normally specific to the test harness.
+    Make sure this script has "populate" in its name.
+
+---
+# coffee_populate.ddl
+INSERT INTO COFFEES VALUES('juan', 3, 10.0, 40, 100)
 ---
 
     * Create a Coffee.java class in src/main/java/(package) to contain 
     sections of the JDBC code from the tutorial.
 
         * Create a logger.
+
+        []
 
 ---
 public class Coffee {
@@ -92,6 +103,8 @@ public class Coffee {
 
         * Add a demoSelect method to provide a template for all follow-on
         methods.
+
+        []
 
 ---
     public void demoSelect(Connection connection) throws SQLException {
@@ -223,6 +236,7 @@ public void testDemoSelect() throws Exception {
 ./src/main/resources/ddl/coffee_delete.ddl
 ./src/test/java/myorg/jdbctutorial/CoffeeTest.java
 ./src/test/resources/log4j.xml
+./src/test/resources/ddl/coffee_populate.ddl
 ---
 
 ** {Section C}: (Optional!) Setup Ant Build Scripts
@@ -232,11 +246,14 @@ public void testDemoSelect() throws Exception {
 
 ---
 # jdbctutorial build.properties
-junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
-commons.logging.classpath=/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
-log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
+M2_REPO=/home/jcstaff/.m2/repository
 
-jdbc.classpath=/home/jcstaff/.m2/repository/hsqldb/hsqldb/1.8.0.4/hsqldb-1.8.0.4.jar
+junit.classpath=${M2_REPO}/junit/junit/4.0/junit-4.0.jar
+commons.logging.classpath=${M2_REPO}/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar
+hsql.classpath=${M2_REPO}/hsqldb/hsqldb/1.8.0.4/hsqldb-1.8.0.4.jar
+
+jdbc.classpath=${hsql.classpath}
 jdbc.driver=org.hsqldb.jdbcDriver
 jdbc.url=jdbc:hsqldb:hsql://localhost:9001
 jdbc.user=sa
@@ -376,6 +393,12 @@ myorg/jdbctutorial/Coffee.class
     scripts as appropriate. Drop the schema, re-create, and populate
     before each test. Drop the tables after each test.
 
+    [Note:] Remember...the populate.ddl file was placed in the test branch 
+    of the source tree so that it would not be packaged with the final 
+    project archive.
+
+    []
+
 ---
         <sql driver="${jdbc.driver}"
             url="${jdbc.url}"
@@ -402,7 +425,7 @@ myorg/jdbctutorial/Coffee.class
             password="${jdbc.password}"
             classpath="${jdbc.classpath}">
             <fileset dir="${src.dir}">
-                <include name="main/resources/ddl/**/*populate.ddl"/>
+                <include name="test/resources/ddl/**/*populate.ddl"/>
             </fileset>
         </sql>
  
@@ -454,35 +477,28 @@ myorg/jdbctutorial/Coffee.class
 ---
 > ant test
 
-Searching for build.xml ...
+earching for build.xml ...
 Buildfile: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/build.xml
 
-package:
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
-     [copy] Copying 3 files to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
-      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/coffee.jar
-
 test:
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-classes
-     [copy] Copying 1 file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-classes
       [sql] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
-      [sql] Failed to execute:  DROP TABLE COFFEES
-      [sql] java.sql.SQLException: Table not found: COFFEES in statement [ DROP TABLE COFFEES]
-      [sql] 0 of 1 SQL statements executed successfully
+      [sql] 1 of 1 SQL statements executed successfully
       [sql] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_create.ddl
       [sql] 1 of 1 SQL statements executed successfully
-      [sql] 0 of 0 SQL statements executed successfully
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-reports
+      [sql] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/test/resources/ddl/coffee_populate.ddl
+      [sql] 1 of 1 SQL statements executed successfully
     [junit] Running myorg.jdbctutorial.CoffeeTest
     [junit] (CoffeeTest.java:setUp:26)  -loading driver:org.hsqldb.jdbcDriver
     [junit] (CoffeeTest.java:setUp:28)  -getting connection: url=jdbc:hsqldb:hsql://localhost:9001, user=sa, password=
     [junit] (CoffeeTest.java:testDemoSelect:39)  -testDemoSelect
+    [junit] (Coffee.java:demoSelect:31)  -COF_NAME=juan, SUP_ID=3, PRICE=10.0, SALES10.0, TOTAL=100
     [junit] (CoffeeTest.java:tearDown:34)  -closing connection
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.12 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.141 sec
       [sql] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
       [sql] 1 of 1 SQL statements executed successfully
+
+BUILD SUCCESSFUL
+Total time: 1 second
 
 ---
 
@@ -528,23 +544,26 @@ test:
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
           <version>1.0.4</version>
+          <scope>compile</scope>
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.0</version>
-            <scope>test</scope>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.0</version>
+          <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
           <version>1.2.13</version>
+          <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>hsqldb</groupId>
           <artifactId>hsqldb</artifactId>
           <version>1.8.0.4</version>
+          <scope>test</scope>
         </dependency>
     </dependencies>
 ---
@@ -667,6 +686,12 @@ test:
 
     * Add the test setup executions.
 
+    [Note:] Remember...the populate.ddl file was placed in the test branch 
+    of the source tree so that it would not be packaged with the final 
+    project archive.
+
+    []
+
 ---
         <execution>
             <id>drop-db-before-test</id>
@@ -715,7 +740,7 @@ test:
                 <fileset>
                     <basedir>${basedir}/src</basedir>
                     <includes>
-                        <include>main/resources/ddl/**/*populate*.ddl</include> 
+                        <include>test/resources/ddl/**/*populate*.ddl</include> 
                         </includes>
                 </fileset>
             </configuration>
@@ -747,28 +772,27 @@ test:
 
 ---
 [INFO] Scanning for projects...
-[INFO] -------------------------------------------------------------------------
+[INFO] ----------------------------------------------------------------------------
 [INFO] Building JDBC Tutorial
 [INFO]    task-segment: [test]
-[INFO] -------------------------------------------------------------------------
+[INFO] ----------------------------------------------------------------------------
 [INFO] [resources:resources]
 [INFO] Using default encoding to copy filtered resources.
 [INFO] [compiler:compile]
-Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/classes
+[INFO] Nothing to compile - all classes are up to date
 [INFO] [resources:testResources]
 [INFO] Using default encoding to copy filtered resources.
 [INFO] [sql:execute {execution: drop-db-before-test}]
 [INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
-[ERROR] Failed to execute:  DROP TABLE COFFEES
-[ERROR] java.sql.SQLException: Table not found: COFFEES in statement [ DROP TABLE COFFEES]
-[INFO] 0 of 1 SQL statements executed successfully
+[INFO] 1 of 1 SQL statements executed successfully
 [INFO] [sql:execute {execution: create-db-before-test}]
 [INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_create.ddl
 [INFO] 1 of 1 SQL statements executed successfully
 [INFO] [sql:execute {execution: populate-db-before-test}]
-[INFO] 0 of 0 SQL statements executed successfully
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/test/resources/ddl/coffee_populate.ddl
+[INFO] 1 of 1 SQL statements executed successfully
 [INFO] [compiler:testCompile]
-Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/test-classes
+[INFO] Nothing to compile - all classes are up to date
 [INFO] [surefire:test]
 [INFO] Surefire report directory: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/surefire-reports
 
@@ -779,8 +803,9 @@ Running myorg.jdbctutorial.CoffeeTest
 (CoffeeTest.java:setUp:26)  -loading driver:org.hsqldb.jdbcDriver
 (CoffeeTest.java:setUp:28)  -getting connection: url=jdbc:hsqldb:hsql://localhost:9001, user=sa, password=
 (CoffeeTest.java:testDemoSelect:39)  -testDemoSelect
+(Coffee.java:demoSelect:31)  -COF_NAME=juan, SUP_ID=3, PRICE=10.0, SALES10.0, TOTAL=100
 (CoffeeTest.java:tearDown:34)  -closing connection
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.149 sec
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.182 sec
 
 Results :
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
@@ -791,9 +816,9 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 3 seconds
-[INFO] Finished at: Wed Sep 13 00:55:21 EDT 2006
-[INFO] Final Memory: 5M/10M
+[INFO] Total time: 2 seconds
+[INFO] Finished at: Tue Jan 30 00:40:21 EST 2007
+[INFO] Final Memory: 3M/7M
 [INFO] ------------------------------------------------------------------------
 ---
 

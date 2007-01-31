@@ -92,7 +92,7 @@
             password="${jdbc.password}"
             classpath="${jdbc.classpath}">
             <fileset dir="${src.dir}">
-                <include name="main/resources/ddl/**/*populate.ddl"/>
+                <include name="test/resources/ddl/**/*populate.ddl"/>
             </fileset>
         </sql>
 
