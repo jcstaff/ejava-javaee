@@ -17,6 +17,9 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-02-07: Posted JPA and Core ORM materials</li>
+          <li>2007-02-07: Posted Entity Manager Exercise</li>
+          <li>2007-02-07: Posted Project test data and example thread</li>
           <li>2007-01-30: Posted project descriptions</li>
           <li>2007-01-30: Posted JDBC materials</li>
           <li>2007-01-22: Posted initial class site</li>
@@ -24,25 +27,45 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-          <li>read through project description and post any clarification
-          questions</li>
-          <li>go through JDBC tutorial and use this project to try out any
-          test JDBC code you have questions on</li>
-          <li>look through the jdbcDAO project</li>
-          <li>start your project directory tree</li>
-          <li>design your project business objects within the "BO" project areas; provide unit tests</li>
-          <li>create the structure of the JDBC Ingest DAO within the "DAO" project; this will mature
-          over time</li>
-          <li>create the schema file for the project; this will mature over time</li>
-          <li>build your project from the root; all supplied artifacts should build and test</li>
+        <li>look over the posted eSales test data, parser, and example thread; you
+        will directly reuse the eSalesTestUtil and eSalesDTO pojects; you will look
+        over the other example sibling project for ideas on how to design your
+        project.</li>
+        <li>create your ingest capability by integrating with eSalesTestUtil; your
+        schema still may mature in the next few weeks, so don't worry too much 
+        about how much you actually write to the DB at this time.</li>
+        <li>go through the entityMgrEx exercise</li>
+        <li>go through the jpaDAO example</li>
+        <li>create JPA DAO(s) implementation classes for your projects; design how
+        they will get a shared EntityManager and implement the CRUD methods;
+        provide a persistence.xml file; define all Collections to be @Transient
+        and observe the default behavior of mapping just your Account class.</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="todo">
       <ul>
+      <li><ul>
+          <li>read through project description and post any clarification
+          questions</li>
+          <li>went through JDBC tutorial and used this project to try out any
+          test JDBC code you had questions on</li>
+          <li>looked through the jdbcDAO project</li>
+          <li>started your project directory tree</li>
+          <li>designed your project business objects within the "BO" project areas;
+          provided unit tests</li>
+          <li>created the structure of the JDBC Ingest DAO within the "DAO" project
+          to mature over time</li>
+          <li>created the schema file for the project; to mature over time</li>
+          <li>built your project from the root; all supplied artifacts should built 
+          and tested correctly</li>
+      </ul></li>
+
+      <li><ul>
           <li>registered for newsgroup and setup e-mail handling (all e-mails will have
           ejava_class in subject)</li>
           <li>posted at least 1 test message to newsgroup</li>
           <li>setup development environment by going through exercises 0 and 1</li>
+      </ul></li>
       </ul>
       </subsection>
     </section>

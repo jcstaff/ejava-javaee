@@ -3,7 +3,17 @@
   <formats>
     <format>jar</format>
   </formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <includes>
+        <include>ejava.javaee.projects.eMarket:eSales</include>
+      </includes>
+      <sources>
+        <outputDirectory>${artifactId}</outputDirectory>
+      </sources>
+    </moduleSet>
+  </moduleSets>
   <fileSets>
       <fileSet>
           <includes>
