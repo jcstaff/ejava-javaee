@@ -17,9 +17,11 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-02-12: Posted updates to Core ORM materials</li>
+          <li>2007-02-12: Posted Project "rc2" test data</li>
           <li>2007-02-07: Posted JPA and Core ORM materials</li>
           <li>2007-02-07: Posted Entity Manager Exercise</li>
-          <li>2007-02-07: Posted Project test data and example thread</li>
+          <li>2007-02-07: Posted Project "rc1" test data and example thread</li>
           <li>2007-01-30: Posted project descriptions</li>
           <li>2007-01-30: Posted JDBC materials</li>
           <li>2007-01-22: Posted initial class site</li>
@@ -27,23 +29,37 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-        <li>look over the posted eSales test data, parser, and example thread; you
-        will directly reuse the eSalesTestUtil and eSalesDTO pojects; you will look
-        over the other example sibling project for ideas on how to design your
-        project.</li>
-        <li>create your ingest capability by integrating with eSalesTestUtil; your
-        schema still may mature in the next few weeks, so don't worry too much 
-        about how much you actually write to the DB at this time.</li>
-        <li>go through the entityMgrEx exercise</li>
-        <li>go through the jpaDAO example</li>
-        <li>create JPA DAO(s) implementation classes for your projects; design how
-        they will get a shared EntityManager and implement the CRUD methods;
-        provide a persistence.xml file; define all Collections to be @Transient
-        and observe the default behavior of mapping just your Account class.</li>
+        <li>update your BLImpl project dependency to use the eSalesTestUtil,
+        version 1.0.2007.1rc2. This adds auction category and account e-mail
+        address. It also contains sanity checked Bid ordering and moves auctions
+        with the images closer to the top of all sorts.</li>
+        <li>read the text chapters on the EntityManager and Mapping Entities</li>
+        <li>Ignoring relationships in your business objects (mark them @Transient),
+        add either JPA @Annotations to the .java files, an orm.xml descriptor
+        file, or both to map the business objects to the database. You may accept
+        JPA defaults and modify your existing .ddl scripts and JDBC code or 
+        provide JPA overrides to have it match your existing code.</li>
+        <li>Enhance your JPA DAO Unit tests to test the ability to manipulate
+        the business objects using your JPA DAO(s).</li>
       </ul>
       </subsection>
-      <subsection name="Things you should have finished!" id="todo">
+      <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+        <li>looked over the posted eSales test data, parser, and example thread; you
+        have directly reused the eSalesTestUtil and eSalesDTO pojects; you haved looked
+        over the other example sibling project for ideas on how to design your
+        project.</li>
+        <li>created your ingest capability by integrating with eSalesTestUtil; your
+        schema may still be maturing, so your are not worry too much 
+        about how much you actually write to the DB at this time.</li>
+        <li>went through the entityMgrEx exercise</li>
+        <li>went through the jpaDAO example</li>
+        <li>created JPA DAO(s) implementation classes for your projects; designed how
+        they get a shared EntityManager and implemented the CRUD methods;
+        provided a persistence.xml file; defined all Collections to be @Transient
+        and observed the default behavior of mapping just your Account class.</li>
+      </ul></li>
       <li><ul>
           <li>read through project description and post any clarification
           questions</li>

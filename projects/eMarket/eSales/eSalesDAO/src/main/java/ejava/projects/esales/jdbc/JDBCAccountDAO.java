@@ -44,7 +44,6 @@ public class JDBCAccountDAO implements AccountDAO {
 	                "INSERT INTO ESALES_ADDRESS " +
 	                "(ID, NAME, CITY) " +
 	                "VALUES (null, ?, ?)");
-			//this is HSQL-specific
 			statement3 = connection.createStatement(); 
 			statement4 = connection.prepareStatement(
 	                "INSERT INTO ESALES_ACCT_ADDRESS_LINK " +
@@ -60,6 +59,7 @@ public class JDBCAccountDAO implements AccountDAO {
 				statement2.setString(2, address.getCity());
 				statement2.execute();
 				
+				//this is HSQL-specific
 				//gets its db-generated primary key
 				rs = statement3.executeQuery("call identity()");
 				rs.next();

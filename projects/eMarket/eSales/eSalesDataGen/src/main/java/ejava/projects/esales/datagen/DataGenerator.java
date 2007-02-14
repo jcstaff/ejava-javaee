@@ -3,12 +3,16 @@ package ejava.projects.esales.datagen;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Properties;
 import java.util.Set;
 
@@ -54,21 +58,17 @@ public class DataGenerator {
 		ESales root = new ESales();
 		
     	log.debug("getting " + auctionCount + " auctions");
-    	Collection<Auction> auctions = dao.getAuctions(0, auctionCount);
+    	List<Auction> auctions = dao.getAuctions(auctionCount);
     	log.debug("got " + auctions.size() + " auctions");
+    	log.debug("with " + getBidCount(auctions) + " bids");
+    	
+    	cleanupBids(auctions);
 		Collection<Account> accounts = getUsersForAuctions(auctions);
     	log.debug("got " + accounts.size() + " accounts");
 		Collection<Address> addresses = getAddresses(accounts, auctions);
     	log.debug("got " + addresses.size() + " addresses");
-    	List<Integer> auctionIds = getAuctionIds(auctions);
-    	Collection<Image> images = new ArrayList<Image>();
-    	for (int index=0; index < auctionIds.size(); index += 100) {
-    		int max = (index + 100 <= auctionIds.size()) ?  
-    				(index + 100) : auctionIds.size();
-    		images.addAll(dao.getImagesForAuctions(
-    				auctionIds.subList(index, max),0,-1));
-        	log.debug("got " + images.size() + " images");
-    	}
+    	Collection<Image> images = dao.getImagesForAuctions(auctions);
+    	log.debug("got " + images.size() + " images");
     	
     	dao.clear(); //detatch all from DB before making local changes
     	
@@ -77,7 +77,6 @@ public class DataGenerator {
 		assignIdsForAccounts(accounts);		
     	log.debug("assigned all ids for accounts");
 
-    	
     	root.getAccount().addAll(accounts);
     	root.getAuction().addAll(auctions);
         root.getAddress().addAll(addresses);
@@ -113,8 +112,6 @@ public class DataGenerator {
 		}
 	}
 	
-	
-	
 	private Collection<Address> getAddresses(Collection<Account> accounts, 
 			Collection<Auction> auctions) {
 		Collection<Address> addresses = new HashSet<Address>();
@@ -147,14 +144,59 @@ public class DataGenerator {
 		return accounts;
 	}
 	
-	private List<Integer> getAuctionIds(Collection<Auction> auctions) {
-		List<Integer> ids = new ArrayList<Integer>();
+	private int getBidCount(Collection<Auction> auctions) {
+		int count=0;
 		for(Auction a : auctions) {
-			ids.add(a.getId());
+			count += a.getBid().size();
 		}
-		return ids;
+		return count;
 	}
-
+	
+	private void cleanupBids(List<Auction> auctions) {
+		for(Auction auction : auctions) {
+			int bidCount = auction.getBid().size();
+			cleanupBids(auction);
+			log.debug("action-" + auction.getId() + 
+					", bids before=" + bidCount +
+					", bids after=" + auction.getBid().size());
+		}
+		
+	}
+	/** 
+	 * The bids in the database are random values within a range. This 
+	 * method will throw away any later bid that is of equal or lesser value
+	 * than a time-ordered value.
+	 * 
+	 * @param auction
+	 */
+	private void cleanupBids(Auction auction) {
+		if (auction.getBid().size() > 0) {
+			
+			List<Bid> bids = new ArrayList<Bid>();
+			Bid prev = null;
+			while (auction.getBid().size() > 0) {
+				Bid next = getOldest(auction.getBid());
+				if (prev == null ||
+						next.getAmount() > prev.getAmount()) {					
+			        bids.add(next);	
+			        prev = next;
+				}
+				auction.getBid().remove(next);
+			}
+			auction.getBid().addAll(bids);
+		}		
+	}
+	
+	private Bid getOldest(List<Bid> bids) {
+		Bid oldest = null;
+		for (Bid bid : bids) {
+			if (oldest == null || 
+					bid.getBidTime().getTime() < oldest.getBidTime().getTime()) {
+				oldest = bid;
+			}
+		}
+		return oldest;
+	}
 	
 	public static DataGenerator createDataGenerator(
 			Map<String, String> props) throws JAXBException {		
@@ -186,22 +228,5 @@ public class DataGenerator {
 			}
 		}
 		return props;
-	}
-	
-	public static void main(String args[]) {
-		String outputPath = System.getProperty(OUTPUT_FILE);
-		if (outputPath == null) {
-			System.err.println(OUTPUT_FILE + " property not defined");
-		}
-		try {
-			DataGenerator gen = createDataGenerator(getProps("emf"));
-			Writer writer = new FileWriter(outputPath);
-			//gen.generate(writer);
-		}
-		catch (Exception ex) {
-			System.err.print("error generating document");
-			ex.printStackTrace();
-			System.exit(-1);
-		}
-	}
+	}	
 }

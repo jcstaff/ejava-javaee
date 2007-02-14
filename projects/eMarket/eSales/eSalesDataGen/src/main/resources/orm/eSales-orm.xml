@@ -26,6 +26,13 @@
                     length="50"
                     insertable="true"/>
             </basic>
+            <basic name="catgory">
+                <column name="CATEGORY"
+                    nullable="false"
+                    updatable="true"
+                    length="20"
+                    insertable="true"/>
+            </basic>
             <basic name="description">
                 <column name="DESCRIPTION"
                     length="4000"
@@ -181,6 +188,13 @@
                     insertable="true"
                     length="20"
                     updatable="true"/>                
+            </basic>
+            <basic name="email">
+                <column name="EMAIL"
+                    nullable="false"
+                    insertable="true"
+                    length="30"
+                    updatable="true"/>
             </basic>
             <basic name="startDate">
                 <column name="START_DATE"
