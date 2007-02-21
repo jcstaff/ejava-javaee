@@ -18,6 +18,7 @@ public abstract class DemoBase extends TestCase {
         EntityManagerFactory emf = 
             JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);   
         em = emf.createEntityManager();
+        precleanup();
         em.getTransaction().begin();
     }
 
@@ -27,6 +28,10 @@ public abstract class DemoBase extends TestCase {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
             else                              { tx.commit(); }
         }
+        postcleanup();
         em.close();
     }
+    
+    protected void precleanup() throws Exception {}
+    protected void postcleanup() throws Exception {}
 }

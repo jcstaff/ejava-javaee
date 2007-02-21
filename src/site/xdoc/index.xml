@@ -17,6 +17,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-02-20: Posted Entity Relations material</li>
           <li>2007-02-12: Posted updates to Core ORM materials</li>
           <li>2007-02-12: Posted Project "rc2" test data</li>
           <li>2007-02-07: Posted JPA and Core ORM materials</li>
@@ -29,22 +30,39 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-        <li>update your BLImpl project dependency to use the eSalesTestUtil,
-        version 1.0.2007.1rc2. This adds auction category and account e-mail
-        address. It also contains sanity checked Bid ordering and moves auctions
-        with the images closer to the top of all sorts.</li>
-        <li>read the text chapters on the EntityManager and Mapping Entities</li>
-        <li>Ignoring relationships in your business objects (mark them @Transient),
-        add either JPA @Annotations to the .java files, an orm.xml descriptor
+        <li>read the text chapter on Entity Relationships.</li>
+        <li>Update your business objects to map each of the relationships (remove the
+        @Transient annotations). 
+        Add either JPA @Annotations to the .java files, an orm.xml descriptor
         file, or both to map the business objects to the database. You may accept
         JPA defaults and modify your existing .ddl scripts and JDBC code or 
         provide JPA overrides to have it match your existing code.</li>
         <li>Enhance your JPA DAO Unit tests to test the ability to manipulate
-        the business objects using your JPA DAO(s).</li>
+        the business object relationships using your JPA DAO(s).</li>
+        <li>Add initial business logic interfaces and implementation classes
+        for AuctionMgmt, SellerMgmt, BuyerMgmt, and TestSupport. These implementation
+        classes should delegate data access to the DAO classes.</li>
+        <li>Add a JUnit test that will implements the end-to-end scenario discussed 
+        at the end of the testing section of the project 1 spec. You may place this in
+        a separate functional test project if you wish.</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+        <li>updated your BLImpl project dependency to use the eSalesTestUtil,
+        version 1.0.2007.1rc2. This added auction category and account e-mail
+        address. It also contained sanity checked Bid ordering and moved auctions
+        with the images closer to the top of all sorts.</li>
+        <li>read the text chapters on the EntityManager and Mapping Entities</li>
+        <li>Ignored relationships in your business objects (marked them @Transient),
+        added either JPA @Annotations to the .java files, an orm.xml descriptor
+        file, or both to map the business objects to the database. Accepted
+        JPA defaults and modifed your existing .ddl scripts and JDBC code or 
+        provided JPA overrides to have it match your existing code.</li>
+        <li>Enhanced your JPA DAO Unit tests to test the ability to manipulate
+        the business objects using your JPA DAO(s).</li>
+      </ul></li>
       <li><ul>
         <li>looked over the posted eSales test data, parser, and example thread; you
         have directly reused the eSalesTestUtil and eSalesDTO pojects; you haved looked
