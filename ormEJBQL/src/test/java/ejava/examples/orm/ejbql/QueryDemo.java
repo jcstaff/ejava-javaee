@@ -3,7 +3,6 @@ package ejava.examples.orm.ejbql;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
@@ -24,45 +23,30 @@ public class QueryDemo extends DemoBase {
         assertNotNull("store is null", store);
         log.info("found store:" + store);
         
-        //JBoss/Hibernate is throwing incorrect exception in this case
-        //as per Javadoc and EJB3 text
         boolean noResult = false;
-        boolean entityNotFound = false;
         try {
             query = em.createQuery(
                "select s from Store s where s.name='A1 Sales'");
             store = (Store)query.getSingleResult();
         }
-        catch (NoResultException ex) { //JBoss/Hibernate throwing this
-            log.debug("incorrected exception thrown:" + ex);
+        catch (NoResultException ex) {
+            log.debug("expected exception thrown:" + ex);
             noResult = true;
         }
-        catch (EntityNotFoundException ex) { //spec says throw this
-            log.debug("expected exception thrown:" + ex);
-            entityNotFound = true;
-        }
-        assertTrue("NoResultExcetion not thrown", noResult || entityNotFound);
+        assertTrue("NoResultExcetion not thrown", noResult);
         
-        //JBoss/Hibernate is trying to create the right exception, but 
-        //incorrectly looking for a form that accepts a source throwable
         boolean nonUniqueResult = false;
-        boolean noSuchMethod = false;
         try {
             query = em.createQuery(
                     "select c from Clerk c where lastName='Pep'");
             Clerk clerk = (Clerk)query.getSingleResult();
             log.info("found clerk:" + clerk);
         }
-        catch (NoSuchMethodError ex) { //JBoss/Hibernate fails to construct ex
-            log.debug("incorrect implementation exception thrown:" + ex);
-            noSuchMethod = true;
-        }
         catch (NonUniqueResultException ex) {
             log.info("expected exception thrown:" + ex);
             nonUniqueResult = true;
         }
-        assertTrue("NonUniqueResultException not thrown", 
-                nonUniqueResult || noSuchMethod);
+        assertTrue("NonUniqueResultException not thrown", nonUniqueResult);
     }
 
     @SuppressWarnings("unchecked")
