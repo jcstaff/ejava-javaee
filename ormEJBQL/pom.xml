@@ -136,6 +136,83 @@
                     <scope>test</scope>
                 </dependency>       
             </dependencies>
+
+            <!-- define this to get hibernate3-maven-plugin -->            
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>snapshots</id>
+                    <name>Maven Central Development Plugin Repository</name>
+                    <url>http://snapshots.repository.codehaus.org</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </pluginRepository>
+            </pluginRepositories>
+                        
+            <build>
+                <plugins>
+                    <!-- generates a DDL file for persistence unit -->
+                    <plugin>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>2.0-SNAPSHOT</version>
+                        <executions>
+                            <execution>
+                                <id>generate-drop-ddl</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-drop.ddl
+                                        </outputfilename>
+                                        <drop>true</drop>
+                                        <create>false</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-create-ddl</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-create.ddl
+                                        </outputfilename>
+                                        <drop>false</drop>
+                                        <create>true</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <components>
+                                <component>
+                                    <name>hbm2ddl</name>
+                                    <implementation>
+                                        jpaconfiguration
+                                    </implementation>
+                                    <outputDirectory>
+                                        target/classes/ddl
+                                    </outputDirectory>
+                                </component>
+                            </components>
+                            <componentProperties>
+                                <persistenceunit>
+                                    ormEJBQL
+                                </persistenceunit>
+                                <export>false</export>
+                                <format>true</format>
+                            </componentProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
