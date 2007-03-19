@@ -1,4 +1,4 @@
-package ejava.examples.ejbsessionbank.bo;
+package ejava.examples.ejbsessionbank.dto;
 
 import java.io.Serializable;
 

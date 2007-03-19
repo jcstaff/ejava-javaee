@@ -11,15 +11,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.ejbsessionbank.bo.Account;
-import ejava.examples.ejbsessionbank.bo.LedgerDTO;
 import ejava.examples.ejbsessionbank.da.AccountDAO;
 import ejava.examples.ejbsessionbank.da.AccountDAOException;
+import ejava.examples.ejbsessionbank.dto.LedgerDTO;
 
 public class JPAAccountDAO implements AccountDAO {
     private static Log log = LogFactory.getLog(JPAAccountDAO.class); 
     public static final String ACCOUNT_BY_NUM = "getAccountsByAccountNumber"; 
     public static final String ACCOUNT_NUM_PARAM = "accountNumber"; 
     public static final String GET_LEDGER = "getLedger"; 
+    public static final String GET_LEDGER_AVE = "getLedgerAveBalance"; 
+    public static final String GET_LEDGER_CNT = "getLedgerCount"; 
+    public static final String GET_LEDGER_SUM = "getLedgerSum"; 
 
     public Account createAccount(Account account) throws AccountDAOException {
         try {
@@ -27,6 +30,7 @@ public class JPAAccountDAO implements AccountDAO {
             return account;
         }
         catch (Throwable ex) {
+            log.fatal("error in createAccount", ex);
             throw new AccountDAOException(
                     "error creating account:" + account,ex);
         }
@@ -50,6 +54,7 @@ public class JPAAccountDAO implements AccountDAO {
             return query.getResultList();
         }
         catch (Throwable ex) {
+            log.fatal("error in findAccounts", ex);
             throw new AccountDAOException(
                     "error executing named query:" + queryName,ex);
         }
@@ -60,6 +65,7 @@ public class JPAAccountDAO implements AccountDAO {
             return JPAUtil.getEntityManager().find(Account.class, id);
         }
         catch (Throwable ex) {
+            log.fatal("error in getAccountById", ex);
             throw new AccountDAOException(
                     "error finding account:" + id,ex);
         }
@@ -84,6 +90,7 @@ public class JPAAccountDAO implements AccountDAO {
             return account;
         }
         catch (Throwable ex) {
+            log.fatal("error in removeAccount", ex);
             throw new AccountDAOException(
                     "error removing account:" + account,ex);
         }
@@ -95,6 +102,7 @@ public class JPAAccountDAO implements AccountDAO {
             return account;
         }
         catch (Throwable ex) {
+            log.fatal("error in updateAccount", ex);
             throw new AccountDAOException(
                     "error removing account:" + account,ex);
         }
@@ -107,8 +115,50 @@ public class JPAAccountDAO implements AccountDAO {
                                       .getSingleResult();
         }
         catch (Throwable ex) {
+            log.fatal("error in getLedger", ex);
             throw new AccountDAOException(
-                    "error getting edger",ex);
+                    "error getting ledger",ex);
+        }
+    }
+
+    public double getLedgerAveBalance() throws AccountDAOException {
+        try {
+            return (Double) JPAUtil.getEntityManager()
+                                      .createNamedQuery(GET_LEDGER_AVE)
+                                      .getSingleResult();
+        }
+        catch (Throwable ex) {
+            log.fatal("error in getLedgerBalance", ex);
+            throw new AccountDAOException(
+                    "error getting ledger ave balance",ex);
+        }
+    }
+
+    public long getLedgerCount() throws AccountDAOException {
+        try {
+            Object count =  JPAUtil.getEntityManager()
+                                      .createNamedQuery(GET_LEDGER_CNT)
+                                      .getSingleResult();
+            log.fatal("getLedgerCount data type=" + count.getClass());            
+            return ((Long)count).longValue();
+        }
+        catch (Throwable ex) {
+            log.fatal("error in getLedgerCount", ex);
+            throw new AccountDAOException(
+                    "error getting ledger count",ex);
+        }
+    }
+
+    public double getLedgerSum() throws AccountDAOException {
+        try {
+            return (Double) JPAUtil.getEntityManager()
+                                      .createNamedQuery(GET_LEDGER_SUM)
+                                      .getSingleResult();
+        }
+        catch (Throwable ex) {
+            log.fatal("error in getLedgerSum", ex);
+            throw new AccountDAOException(
+                    "error getting ledger sum",ex);
         }
     }
 }

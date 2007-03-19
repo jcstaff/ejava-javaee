@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.ejbsessionbank.DemoBase;
+import ejava.examples.ejbsessionbank.dto.LedgerDTO;
 
 public class AccountDemo extends DemoBase {
     Log log = LogFactory.getLog(AccountDemo.class);
@@ -34,7 +35,7 @@ public class AccountDemo extends DemoBase {
         em.flush();
         
         Query query = em.createQuery(
-                "select new ejava.examples.ejbsessionbank.bo.LedgerDTO(" +
+                "select new ejava.examples.ejbsessionbank.dto.LedgerDTO(" +
                 "count(a), sum(a.balance), avg(a.balance)) " +
                 "from Account a");
         Object result = query.getSingleResult();

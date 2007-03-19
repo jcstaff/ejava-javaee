@@ -18,9 +18,9 @@ import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bl.Teller;
 import ejava.examples.ejbsessionbank.bl.TellerImpl;
 import ejava.examples.ejbsessionbank.bo.Account;
-import ejava.examples.ejbsessionbank.bo.LedgerDTO;
 import ejava.examples.ejbsessionbank.da.AccountDAO;
 import ejava.examples.ejbsessionbank.da.AccountDAOException;
+import ejava.examples.ejbsessionbank.dto.LedgerDTO;
 import ejava.examples.ejbsessionbank.jpa.JPAUtil;
 
 /**
@@ -102,7 +102,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal error creating account:" + ex);
+            log.fatal("internal error creating account", ex);
             throw new BankException("internal error creating account:" + ex);
         }
     }
@@ -114,7 +114,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal error closing account:" + ex, ex);
+            log.fatal("internal error closing account", ex);
             throw new BankException("internal error closing account:" + ex);
         }
     }
@@ -126,7 +126,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal error getting account:" + ex);
+            log.fatal("internal error getting account", ex);
             throw new BankException("internal error getting account:" + ex);
         }
     }
@@ -138,8 +138,8 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal getting accounts:" + ex);
-            throw new BankException("internal getting accounts:" + ex);
+            log.fatal("internal getting accounts" + ex);
+            throw new BankException("internal getting accounts:", ex);
         }
     }
 
@@ -150,8 +150,8 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal getting accounts:" + ex);
-            throw new BankException("internal getting accounts:" + ex);
+            log.fatal("internal getting accounts" + ex);
+            throw new BankException("internal getting accounts:", ex);
         }
     }
 
@@ -163,7 +163,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal error updating account:" + ex);
+            log.fatal("internal error updating account", ex);
             throw new BankException("internal error updating account:" + ex);
         }
     }
@@ -171,12 +171,84 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public LedgerDTO getLedger() throws BankException {
         debug();
         try {
+            LedgerDTO ledger = new LedgerDTO(
+                    teller.getLedgerCount(),
+                    teller.getLedgerSum(),
+                    teller.getLedgerAveBalance());            
+            return ledger;
+        }
+        catch (AccountDAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error getting ledger", ex);
+            throw new BankException("internal error getting ledger:" + ex);
+        }
+    }
+
+    /**
+     * This method takes advantage of the DAO/Business logic knowledge
+     * of how to create a DTO. Note that the query is not actually known
+     * to the business logic or DAO. It is expressed in an ORM.xml file.
+     */
+    public LedgerDTO getLedger2() throws BankException {
+        debug();
+        try {
             return teller.getLedger();
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal error getting ledger:" + ex);
+            log.fatal("internal error getting ledger", ex);
             throw new BankException("internal error getting ledger:" + ex);
+        }
+    }
+    
+    /**
+     * This method is and example of a method that may be too fine for a 
+     * remote method and should be encapsulated in a remote facade call.
+     */
+    public double getLedgerAveBalance() throws BankException {
+        debug();
+        try {
+            return teller.getLedgerAveBalance();
+        }
+        catch (AccountDAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error getting ledger ave balance", ex);
+            throw new BankException(
+                    "internal error getting ledger ave balance:" + ex);
+        }
+    }
+
+    /**
+     * This method is and example of a method that may be too fine for a 
+     * remote method and should be encapsulated in a remote facade call.
+     */
+    public long getLedgerCount() throws BankException {
+        debug();
+        try {
+            return teller.getLedgerCount();
+        }
+        catch (AccountDAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error getting ledger count", ex);
+            throw new BankException(
+                    "internal error getting ledger count:" + ex);
+        }
+    }
+
+    /**
+     * This method is and example of a method that may be too fine for a 
+     * remote method and should be encapsulated in a remote facade call.
+     */
+    public double getLedgerSum() throws BankException {
+        debug();
+        try {
+            return teller.getLedgerSum();
+        }
+        catch (AccountDAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error getting ledger sum", ex);
+            throw new BankException(
+                    "internal error getting ledger sum:" + ex);
         }
     }
     

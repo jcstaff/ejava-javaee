@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bo.Account;
-import ejava.examples.ejbsessionbank.bo.LedgerDTO;
+import ejava.examples.ejbsessionbank.dto.LedgerDTO;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
 public class TellerRemoteTest extends TestCase {
@@ -85,7 +85,10 @@ public class TellerRemoteTest extends TestCase {
             teller.createAccount(account.getAccountNumber());
             fail("created account with duplicate number");
         }
-        catch (BankException expected) {}
+        catch (BankException expected) {
+            log.info("got expected exception trying to create " +
+                    "duplicate account:" + expected);
+        }
     }
     
     public void testGetAccount() throws Exception {
@@ -268,6 +271,32 @@ public class TellerRemoteTest extends TestCase {
         catch (BankException ex) {
             log.fatal("error getting ledger:" + ex, ex);
             fail("error getting ledger:" + ex);
+        }
+    }
+
+    public void testGetLedger2() throws Exception {
+        log.info("*** testGetLedger2 ***");
+        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
+        int TOTAL = 100;
+
+        try {
+            for(int i=0; i<TOTAL; i++) {
+                Account account = teller.createAccount("" + i);
+                account.deposit(i);
+                teller.updateAccount(account);                
+            }
+
+            LedgerDTO ledger = teller.getLedger2();
+            assertNotNull("ledger is null", ledger);
+            log.debug("got ledger:" + ledger);
+            
+            assertEquals("unexpected number of accounts:"+
+                    ledger.getNumberOfAccounts(), 
+                    TOTAL, ledger.getNumberOfAccounts());
+        }
+        catch (BankException ex) {
+            log.fatal("error getting ledger2:" + ex, ex);
+            fail("error getting ledger2:" + ex);
         }
     }
 

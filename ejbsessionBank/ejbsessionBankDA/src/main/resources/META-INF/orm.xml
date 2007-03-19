@@ -29,9 +29,27 @@
                 ]]>
             </query>
         </named-query>
+        <named-query name="getLedgerAveBalance">
+            <query><![CDATA[
+                select avg(a.balance) from Account a
+                ]]>
+            </query>
+        </named-query>
+        <named-query name="getLedgerSum">
+            <query><![CDATA[
+                select sum(a.balance) from Account a
+                ]]>
+            </query>
+        </named-query>
+        <named-query name="getLedgerCount">
+            <query><![CDATA[
+                select count(a) from Account a
+                ]]>
+            </query>
+        </named-query>
         <named-query name="getLedger">
             <query><![CDATA[
-                select new ejava.examples.ejbsessionbank.bo.LedgerDTO(
+                select new ejava.examples.ejbsessionbank.dto.LedgerDTO(
                 count(a), sum(a.balance), avg(a.balance)) from Account a
                 ]]>
             </query>

@@ -6,8 +6,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.ejbsessionbank.bo.Account;
-import ejava.examples.ejbsessionbank.bo.LedgerDTO;
 import ejava.examples.ejbsessionbank.da.AccountDAO;
+import ejava.examples.ejbsessionbank.dto.LedgerDTO;
 
 public class TellerImpl implements Teller {
     Log log = LogFactory.getLog(TellerImpl.class);
@@ -95,5 +95,15 @@ public class TellerImpl implements Teller {
     }
     public LedgerDTO getLedger() throws BankException {
         return acctDAO.getLedger();
+    }
+    
+    public double getLedgerAveBalance() throws BankException {
+        return acctDAO.getLedgerAveBalance();
+    }
+    public long getLedgerCount() throws BankException {
+        return acctDAO.getLedgerCount();
+    }
+    public double getLedgerSum() throws BankException {
+        return acctDAO.getLedgerSum();
     }    
 }

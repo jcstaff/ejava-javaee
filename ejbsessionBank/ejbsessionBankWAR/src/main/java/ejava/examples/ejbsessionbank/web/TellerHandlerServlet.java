@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.ejbsessionbank.bl.Teller;
 import ejava.examples.ejbsessionbank.bo.Account;
-import ejava.examples.ejbsessionbank.bo.LedgerDTO;
+import ejava.examples.ejbsessionbank.dto.LedgerDTO;
 import ejava.examples.ejbsessionbank.ejb.TellerLocal;
 
 @SuppressWarnings("serial")

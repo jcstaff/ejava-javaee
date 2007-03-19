@@ -17,6 +17,10 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-03-18: Posted JNDI EJC materials</li>
+          <li>2007-03-18: Posted EAR materials</li>
+          <li>2007-03-18: Posted EJB Session Bean materials</li>
+          <li>2007-03-05: Posted Inheritance materials</li>
           <li>2007-02-27: Posted EJB-QL material</li>
           <li>2007-02-20: Posted Entity Relations material</li>
           <li>2007-02-12: Posted updates to Core ORM materials</li>
@@ -31,15 +35,28 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-        <li>Complete your project.</li>
-        <li>Test your submission by going through the submission test steps.</li>
-        <li>Submit your project to the graders</li>
-        <li>Look for the take home quiz to be distributed in the newsgroup
-            by the time the project is due.</li>
+        <li>Create an EJB project to house Remote Facade.</li>
+        <li>Create the shell of AccountMgmt, SellerMgmt, BuyerMgmt, and TestUtilMgmt,
+        EJBs. Design a simple remote interface for each. Add no-op methods.</li>
+        <li>Create an EJB project. Add the EJB to the EAR</li>
+        <li>Create a (RMI)Test project. Write a set of JUnit tests to access your EJBs</li>
+        <li>Add a dependency on your implementation projects and have the EJB
+        @PostConstruct method setup each implementation object for use. Verify
+        functionality with log statements.</li>
+        <li>Update the Remote Interface, DTOs, EJB implementation, and JUnit tests a 
+        method/use case at a time to add required functionality.</li>
+        <li>You need to finish the week with at least eSalesEJB, EAR, and Test
+        operating end-to-end with some or all of your business logic.</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+        <li>Completed your project.</li>
+        <li>Tested your submission by going through the submission test steps.</li>
+        <li>Submitted your project to the graders</li>
+        <li>Completed take home quiz to be distributed in the newsgroup</li>
+      </ul></li>
       <li><ul>
         <li>Reviewed updated syllabus and noted the 1 week extension for the project and
         change to quiz #1 due to the snow date.</li>
