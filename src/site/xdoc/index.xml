@@ -17,6 +17,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-03-28: Posted Transaction materials</li>
           <li>2007-03-18: Posted JNDI EJC materials</li>
           <li>2007-03-18: Posted EAR materials</li>
           <li>2007-03-18: Posted EJB Session Bean materials</li>
@@ -35,22 +36,35 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-        <li>Create an EJB project to house Remote Facade.</li>
-        <li>Create the shell of AccountMgmt, SellerMgmt, BuyerMgmt, and TestUtilMgmt,
-        EJBs. Design a simple remote interface for each. Add no-op methods.</li>
-        <li>Create an EJB project. Add the EJB to the EAR</li>
-        <li>Create a (RMI)Test project. Write a set of JUnit tests to access your EJBs</li>
-        <li>Add a dependency on your implementation projects and have the EJB
-        @PostConstruct method setup each implementation object for use. Verify
-        functionality with log statements.</li>
-        <li>Update the Remote Interface, DTOs, EJB implementation, and JUnit tests a 
-        method/use case at a time to add required functionality.</li>
-        <li>You need to finish the week with at least eSalesEJB, EAR, and Test
-        operating end-to-end with some or all of your business logic.</li>
+        <li>If you haven't done so, read the text chapters on Session
+        Beans</li>
+        <li>Finish the remaining set of use cases from the RMI test
+        client(s). Implement your dto package as a part of this task</li>
+        <li>Read the text chapter on Transactions</li>
+        <li>Define transaction properties on your EJBs</li>
+        <li>You need to finish the week with all business methods exposed
+        and tested through the @Remote interface.</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+        <li>Created an EJB project to house Remote Facade.</li>
+        <li>Created the shell of AccountMgmt, SellerMgmt, BuyerMgmt,
+        and TestUtilMgmt, EJBs. Designed a simple remote interface for
+        each. Add no-op methods.</li>
+        <li>Created an EAR project. Added the EJB to the EAR</li>
+        <li>Created a (RMI)Test project. Wrote a set of JUnit tests to
+        access your EJBs</li>
+        <li>Added a dependency on your implementation projects and have the EJB
+        @PostConstruct method setup each implementation object for use.
+        Verified functionality with log statements.</li>
+        <li>Updated the Remote Interface, DTOs, EJB implementation,
+        and JUnit tests a method/use case at a time to add required
+        functionality.</li>
+        <li>Finished the week with at least eSalesEJB, EAR, and Test
+        operating end-to-end with some or all of your business logic.</li>
+      </ul></li>
       <li><ul>
         <li>Completed your project.</li>
         <li>Tested your submission by going through the submission test steps.</li>

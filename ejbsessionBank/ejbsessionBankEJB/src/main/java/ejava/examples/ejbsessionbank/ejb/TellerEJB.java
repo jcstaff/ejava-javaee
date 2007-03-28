@@ -138,8 +138,8 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal getting accounts" + ex);
-            throw new BankException("internal getting accounts:", ex);
+            log.fatal("internal getting accounts", ex);
+            throw new BankException("internal getting accounts:" + ex);
         }
     }
 
@@ -150,8 +150,8 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         }
         catch (AccountDAOException ex) {
             ctx.setRollbackOnly();
-            log.fatal("internal getting accounts" + ex);
-            throw new BankException("internal getting accounts:", ex);
+            log.fatal("internal getting accounts", ex);
+            throw new BankException("internal getting accounts:" + ex);
         }
     }
 
