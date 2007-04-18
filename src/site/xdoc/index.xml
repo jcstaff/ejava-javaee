@@ -17,6 +17,8 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-04-17: Posted JMS materials</li>
+          <li>2007-04-17: Posted Security materials</li>
           <li>2007-03-28: Posted Transaction materials</li>
           <li>2007-03-18: Posted JNDI EJC materials</li>
           <li>2007-03-18: Posted EAR materials</li>
@@ -36,18 +38,28 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-        <li>If you haven't done so, read the text chapters on Session
-        Beans</li>
-        <li>Finish the remaining set of use cases from the RMI test
-        client(s). Implement your dto package as a part of this task</li>
-        <li>Read the text chapter on Transactions</li>
-        <li>Define transaction properties on your EJBs</li>
-        <li>You need to finish the week with all business methods exposed
-        and tested through the @Remote interface.</li>
+          <li>Add the user/roles.properties files to your eSales application</li>
+          <li>Define access restrictions for your EJBs</li>
+          <li>Enable your RMI tests to access the EJBs using a JAAS login</li>
+          <li>Enable your RMI command line clients to access the EJBs using a JAAS login</li>
+          <li>Enable your Web Tier to access the EJBs using a security context</li>
+          <li>Protect your Web pages from unauthorized access to information</li>
+          <li>Begin to design your JMS message(s) and a utility class that 
+              can publish them.
+          </li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+        <li>Read the text chapters on Session Beans</li>
+        <li>Finished the remaining set of use cases from the RMI test
+        client(s). Implemented your dto package as a part of this task</li>
+        <li>Read the text chapter on Transactions</li>
+        <li>Defined transaction properties on your EJBs</li>
+        <li>Finished the week with all business methods exposed
+        and tested through the @Remote interface.</li>
+      </ul></li>
       <li><ul>
         <li>Created an EJB project to house Remote Facade.</li>
         <li>Created the shell of AccountMgmt, SellerMgmt, BuyerMgmt,

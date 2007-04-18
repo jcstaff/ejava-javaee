@@ -3,6 +3,7 @@ package ejava.examples.jmsnotifier;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
@@ -79,7 +80,8 @@ public class Subscriber implements Runnable {
             connection.setClientID(name);
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             if (durable == false) {                
-                try { session.unsubscribe(name); } catch (Exception ignored) {}
+                try { session.unsubscribe(name); } 
+                catch (JMSException ignored) {}
                 consumer = session.createConsumer(destination, selector);                
             }
             else {
