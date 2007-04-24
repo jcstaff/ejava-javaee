@@ -17,6 +17,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-04-23: Posted Async EJB materials</li>
           <li>2007-04-17: Posted JMS materials</li>
           <li>2007-04-17: Posted Security materials</li>
           <li>2007-03-28: Posted Transaction materials</li>
@@ -38,19 +39,32 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-          <li>Add the user/roles.properties files to your eSales application</li>
-          <li>Define access restrictions for your EJBs</li>
-          <li>Enable your RMI tests to access the EJBs using a JAAS login</li>
-          <li>Enable your RMI command line clients to access the EJBs using a JAAS login</li>
-          <li>Enable your Web Tier to access the EJBs using a security context</li>
-          <li>Protect your Web pages from unauthorized access to information</li>
-          <li>Begin to design your JMS message(s) and a utility class that 
+          <li>Complete design of your JMS message(s) and a utility class that 
               can publish them.
           </li>
+          <li>Implement a Java SE subscriber, with selector, that can be invoked 
+              from the command line. This should be wrapped as an Ant script.</li>
+          <li>Integrate JMS utility publishing class into eSales EJB to publish changes 
+              about auctions.</li>
+          <li>Implement an EJBTimer to trigger eSales to check for closed auctions.</li>
+          <li>Implement an MDB in eBidbot that will subscribe to auction closings
+              and perform end of order processing.</li>
+          <li>Implement an EJBTimer to trigger eBidbot to check auctions.</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+          <li>Added the user/roles.properties files to your eSales application</li>
+          <li>Defined access restrictions for your EJBs</li>
+          <li>Enabled your RMI tests to access the EJBs using a JAAS login</li>
+          <li>Enabled your RMI command line clients to access the EJBs using a JAAS login</li>
+          <li>Enabled your Web Tier to access the EJBs using a security context</li>
+          <li>Protected your Web pages from unauthorized access to information</li>
+          <li>Began to design your JMS message(s) and a utility class that 
+              can publish them.
+          </li>
+      </ul></li>
       <li><ul>
         <li>Read the text chapters on Session Beans</li>
         <li>Finished the remaining set of use cases from the RMI test

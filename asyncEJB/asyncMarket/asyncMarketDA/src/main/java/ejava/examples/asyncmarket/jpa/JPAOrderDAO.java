@@ -27,7 +27,7 @@ public class JPAOrderDAO implements OrderDAO {
 
     @SuppressWarnings("unchecked")
     public List<Order> getOrdersforItem(long itemId, int index, int count) {
-        return em.createNamedQuery("getOrdersForItem")
+        return em.createNamedQuery("AsyncMarket_getOrdersForItem")
                         .setParameter("itemId", itemId)
                         .setFirstResult(index)
                         .setMaxResults(count)
@@ -36,7 +36,7 @@ public class JPAOrderDAO implements OrderDAO {
 
     @SuppressWarnings("unchecked")
     public List<Order> getOrders(int index, int count) {
-        return em.createNamedQuery("getOrders")
+        return em.createNamedQuery("AsyncMarket_getOrders")
                  .getResultList();
     }
 

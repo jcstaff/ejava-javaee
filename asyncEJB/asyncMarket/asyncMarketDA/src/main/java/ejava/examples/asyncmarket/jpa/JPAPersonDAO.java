@@ -10,8 +10,8 @@ import ejava.examples.asyncmarket.bo.Person;
 import ejava.examples.asyncmarket.dao.PersonDAO;
 
 public class JPAPersonDAO implements PersonDAO {
-    private static final String GET_ALL_PEOPLE = "getAllPeople";    
-    private static final String GET_PEOPLE_BY_USERID = "getPersonByUserId";    
+    private static final String GET_ALL_PEOPLE = "AsyncMarket_getAllPeople";    
+    private static final String GET_PEOPLE_BY_USERID = "AsyncMarket_getPersonByUserId";    
     private EntityManager em;
     
     public void setEntityManager(EntityManager em) {

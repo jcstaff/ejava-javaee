@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/html4/strict.dtd">
             
 <html>
-  <head><title>SecurePing Login Form</title></head>
+  <head><title>Async Market Login Form</title></head>
   <body>
     <h1>Login Required</h1>
     <form action="j_security_check" method="POST">

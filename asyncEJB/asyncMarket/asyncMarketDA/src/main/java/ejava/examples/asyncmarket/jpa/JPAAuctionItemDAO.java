@@ -41,7 +41,7 @@ public class JPAAuctionItemDAO implements AuctionItemDAO {
     
     @SuppressWarnings("unchecked")
     public List<AuctionItem> getItems(int index, int count) {
-        Query query = em.createNamedQuery("getAuctionItems")
+        Query query = em.createNamedQuery("AsyncMarket_getAuctionItems")
                         .setFirstResult(index)
                         .setMaxResults(count);
         return query.getResultList();
@@ -49,7 +49,7 @@ public class JPAAuctionItemDAO implements AuctionItemDAO {
     
     @SuppressWarnings("unchecked")
     public List<AuctionItem> getAvailableItems(int index, int count) {
-        Query query = em.createNamedQuery("getAvailableAuctionItems")
+        Query query = em.createNamedQuery("AsyncMarket_getAvailableAuctionItems")
                         .setFirstResult(index)
                         .setMaxResults(count);
         return query.getResultList();

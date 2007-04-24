@@ -8,9 +8,9 @@ import javax.persistence.*;
 
 @Entity @Table(name="ASYNCMARKET_BIDDER")
 @NamedQueries({
-    @NamedQuery(name="getAllPeople", 
+    @NamedQuery(name="AsyncMarket_getAllPeople", 
             query="select p from Person p"),
-    @NamedQuery(name="getPersonByUserId", 
+    @NamedQuery(name="AsyncMarket_getPersonByUserId", 
                 query="select p from Person p " +
                         "where p.userId=:userId")
 })

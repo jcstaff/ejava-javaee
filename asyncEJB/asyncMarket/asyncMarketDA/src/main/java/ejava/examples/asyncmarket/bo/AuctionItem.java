@@ -8,9 +8,9 @@ import java.util.Date;
 import javax.persistence.*;
 
 @NamedQueries({
-    @NamedQuery(name="getAuctionItems",
+    @NamedQuery(name="AsyncMarket_getAuctionItems",
             query="select ai from AuctionItem ai"),
-    @NamedQuery(name="getAvailableAuctionItems",
+    @NamedQuery(name="AsyncMarket_getAvailableAuctionItems",
             query="select ai from AuctionItem ai " +
                     "where ai.closed = false")
 })

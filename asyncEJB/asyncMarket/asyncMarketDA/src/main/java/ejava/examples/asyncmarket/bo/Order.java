@@ -6,9 +6,9 @@ import javax.persistence.*;
 
 @Entity @Table(name="ASYNCMARKET_ORDER")
 @NamedQueries({
-    @NamedQuery(name="getOrders",
+    @NamedQuery(name="AsyncMarket_getOrders",
                 query="select o from Order o"),
-    @NamedQuery(name="getOrdersForItem",
+    @NamedQuery(name="AsyncMarket_getOrdersForItem",
                 query="select o from Order o " +
                       "where o.item.id = :itemId")
 })
