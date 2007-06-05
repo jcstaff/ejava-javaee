@@ -1,8 +1,4 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-        http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/maven-v4_0_0.xsd">
         
     <parent>
         <groupId>ejava.javaee.projects.eMarket</groupId>
@@ -131,19 +127,15 @@
                     <phase>generate-sources</phase>                    
                     <configuration>
                         <tasks>
-                            <taskdef classname="com.sun.tools.xjc.XJCTask" 
-                                name="xjc">
-                                <classpath refid="maven.plugin.classpath"/>
+                            <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
+                                <classpath refid="maven.plugin.classpath" />
                             </taskdef>
                             
-                            <mkdir dir="target/generated-sources/xjc"/>
-                            <xjc schema="src/main/resources/xsd/eSales.xsd"
-                                target="target/generated-sources/xjc"
-                                extension="true"
-                                package="ejava.projects.esales.dto">
-                                <arg value="-Xvalue-constructor"/>                      
-                                <depends dir="src/main/resources/xsd"/>
-                                <produces dir="target/generated-sources/xjc"/>
+                            <mkdir dir="target/generated-sources/xjc" />
+                            <xjc schema="src/main/resources/xsd/eSales.xsd" target="target/generated-sources/xjc" extension="true" package="ejava.projects.esales.dto">
+                                <arg value="-Xvalue-constructor" />                      
+                                <depends dir="src/main/resources/xsd" />
+                                <produces dir="target/generated-sources/xjc" />
                             </xjc>
                         </tasks>
                         <sourceRoot>target/generated-sources/xjc</sourceRoot>

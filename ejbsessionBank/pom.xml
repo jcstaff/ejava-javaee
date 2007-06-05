@@ -3,7 +3,7 @@
     <parent>
         <artifactId>ejava-javaee</artifactId>
         <groupId>ejava.javaee</groupId>
-        <version>1.0.2007.1-SNAPSHOT</version>
+        <version>1.0.2007.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -11,7 +11,7 @@
     <artifactId>ejbsessionBank</artifactId>
     <packaging>pom</packaging>
     <name>Session Bean</name>
-    <version>1.0.2007.1-SNAPSHOT</version>
+    <version>1.0.2007.1</version>
     <description>
         This project is the root project for the core session bean example.
     </description>
@@ -28,7 +28,9 @@
         <profile>
             <id>functional-tests</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>!maven.test.skip</name>
+                </property>
             </activation>
             <modules>
                 <module>ejbsessionBankTest</module>
