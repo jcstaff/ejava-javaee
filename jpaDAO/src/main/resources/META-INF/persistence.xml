@@ -9,8 +9,8 @@
         <mapping-file>META-INF/orm.xml</mapping-file>
         -->
         <properties>
-            <property name="hibernate.dialect" value="
-                org.hibernate.dialect.HSQLDialect"/>
+            <property name="hibernate.dialect" 
+                value="${hibernate.dialect}"/>
             <property name="hibernate.connection.url"
                 value="${jdbc.url}"/>
             <property name="hibernate.connection.driver_class" 

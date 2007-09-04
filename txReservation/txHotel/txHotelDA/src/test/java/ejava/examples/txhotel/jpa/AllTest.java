@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.txhotel.jpa.HotelRegistrationDAODemo;
-import ejava.examples.txhotel.jpa.JPAUtil;
 import ejava.examples.txhotel.jpa.OptimisticLockingDemo;
 
 
@@ -34,7 +33,6 @@ public class AllTest extends TestCase {
             public void setUp() throws Exception {
             }
             public void tearDown() throws Exception {
-                JPAUtil.close();
             }
         };
         

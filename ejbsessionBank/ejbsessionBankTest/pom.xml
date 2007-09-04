@@ -19,12 +19,6 @@
     <dependencies>
         <!-- core dependencies -->
         <dependency>
-            <groupId>javax.javaee</groupId>
-            <artifactId>javaee</artifactId>
-            <version>5</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
@@ -142,7 +136,9 @@
 <profile>
     <id>jboss</id>
     <activation>
-        <activeByDefault>true</activeByDefault>
+        <property> <!-- activate this unless -Dserver present -->
+            <name>!server</name>
+        </property>
     </activation>
     <properties>
           <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
@@ -166,28 +162,28 @@
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jbossall-client</artifactId>
-            <version>4.0.5-GA</version>            
+            <version>4.2.1-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jbossall-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-ejb3-client</artifactId>
-            <version>4.0.5-GA</version>            
+            <version>4.2.1-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-ejb3-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aop-jdk50-client</artifactId>
-            <version>4.0.5-GA</version>            
+            <version>4.2.1-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-aop-jdk50-client.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-aspect-jdk50-client</artifactId>
-            <version>4.0.5-GA</version>            
+            <version>4.2.1-GA</version>            
             <scope>system</scope>
             <systemPath>${jboss.home}/client/jboss-aspect-jdk50-client.jar</systemPath>
         </dependency>

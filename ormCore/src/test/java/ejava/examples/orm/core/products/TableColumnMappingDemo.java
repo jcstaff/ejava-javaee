@@ -3,6 +3,7 @@ package ejava.examples.orm.core.products;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,38 +49,51 @@ public class TableColumnMappingDemo extends TestCase {
      */
     public void testTableColumnMapping() {
         log.info("testTableColumnMapping");
-        ejava.examples.orm.core.mapped.Car car = new Car(2);
-        car.setMake("chevy");
-        car.setModel("tahoe");
-        car.setYear(2002);
-        car.setCost(10000.00);
         
-        //insert a row in the database
-        em.persist(car);
-        log.info("created car:" + car);
-        
-        //find the inserted object
-        Car car2 = em.find(Car.class, 2L); 
+        try {
+            ejava.examples.orm.core.mapped.Car car = new Car(2);
+            car.setMake("chevy");
+            car.setModel("tahoe");
+            car.setYear(2002);
+            car.setCost(10000.00);
+            
+            //insert a row in the database
+            em.persist(car);
+            log.info("created car:" + car);
+            
+            //find the inserted object
+            Car car2 = em.find(Car.class, 2L); 
+    
+            log.info("found car:" + car2);
+            assertNotNull(car2);
+            assertEquals(car.getYear(), car2.getYear());
+            
+            //lets update the year
+            car.setYear(2000);
+            em.flush();
+            //since the persistence context is still active, cars
+            //are actually the same object 
+            assertEquals(car.getYear(), car2.getYear());
+            log.info("updated car:" + car2);
+            
+            //lets delete the object
+            em.remove(car);
+            em.flush();
+            log.info("removed car:" + car);
+            
+            //lets put a car back in at end of test so we can see it in database 
+            em.persist(car2);
+            log.info("created leftover car:" + car2);
+        } catch (PersistenceException ex) {
+            StringBuilder text = new StringBuilder(ex.getMessage());
+            Throwable cause = ex.getCause();
+            while (cause != null) {
+                text.append("\nCaused By:" + cause);
+                cause = cause.getCause();
+            }
+            log.error("error in testTableColumnMapping:" + text, ex);
+            fail("error in testTableColumnMapping:" + text);
+        }
 
-        log.info("found car:" + car2);
-        assertNotNull(car2);
-        assertEquals(car.getYear(), car2.getYear());
-        
-        //lets update the year
-        car.setYear(2000);
-        em.flush();
-        //since the persistence context is still active, cars
-        //are actually the same object 
-        assertEquals(car.getYear(), car2.getYear());
-        log.info("updated car:" + car2);
-        
-        //lets delete the object
-        em.remove(car);
-        em.flush();
-        log.info("removed car:" + car);
-        
-        //lets put a car back in at end of test so we can see it in database 
-        em.persist(car2);
-        log.info("created leftover car:" + car2);
     }        
 }

@@ -19,8 +19,8 @@ import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.blimpl.HotelReservationImpl;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
+import ejava.examples.txhotel.dao.ReservationDAO;
 import ejava.examples.txhotel.jpa.JPAReservationDAO;
-import ejava.examples.txhotel.jpa.JPAUtil;
 
 /**
  * This class provides a stateless EJB wrapper around stateless logic 
@@ -31,7 +31,7 @@ import ejava.examples.txhotel.jpa.JPAUtil;
 @Stateless
 public class HotelRegistrationEJB implements HotelRegistrationRemote,
         HotelRegistrationLocal {
-    Log log = LogFactory.getLog(HotelRegistrationEJB.class);
+    private Log log = LogFactory.getLog(HotelRegistrationEJB.class);
     
     @PersistenceContext(unitName="txhotel")
     private EntityManager em;
@@ -53,9 +53,11 @@ public class HotelRegistrationEJB implements HotelRegistrationRemote,
         log.info("*** HotelRegistrationEJB initializing ***");
         log.debug("em=" + em);
         log.debug("ctx=" + ctx);
-        JPAUtil.setEntityManager(em);
+        
+        ReservationDAO dao = new JPAReservationDAO();
+        ((JPAReservationDAO)dao).setEntityManager(em);
         reservationist = new HotelReservationImpl();
-        ((HotelReservationImpl)reservationist).setDao(new JPAReservationDAO());
+        ((HotelReservationImpl)reservationist).setDao(dao);
     }
     
     /**
@@ -65,7 +67,6 @@ public class HotelRegistrationEJB implements HotelRegistrationRemote,
      */
     @PreDestroy
     public void close() {
-        JPAUtil.setEntityManager(null);
         reservationist=null;
     }    
 

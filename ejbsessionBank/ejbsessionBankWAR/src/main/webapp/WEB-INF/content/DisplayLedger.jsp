@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/html4/strict.dtd">
             
 <jsp:directive.page errorPage="/WEB-INF/content/ErrorPage.jsp"/>
-<jsp:directive.page import="ejava.examples.ejbsessionbank.bo.*"/>
+<jsp:directive.page import="ejava.examples.ejbsessionbank.dto.*"/>
 <html>
     <title>Ledger Display</title>
     <body>

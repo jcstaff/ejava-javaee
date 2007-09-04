@@ -19,8 +19,8 @@ import ejava.examples.txagent.bl.AgentReservationException;
 import ejava.examples.txagent.bl.BookingAgent;
 import ejava.examples.txagent.blimpl.AgentImpl;
 import ejava.examples.txagent.bo.Booking;
+import ejava.examples.txagent.dao.BookingDAO;
 import ejava.examples.txagent.jpa.JPABookingDAO;
-import ejava.examples.txagent.jpa.JPAUtil;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 
 /**
@@ -35,7 +35,7 @@ import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class BookingAgentEJB implements BookingAgentRemote,
         BookingAgentLocal {
-    Log log = LogFactory.getLog(BookingAgentEJB.class);
+    private Log log = LogFactory.getLog(BookingAgentEJB.class);
     
     //injected by container based on descriptor
     private HotelRegistrationRemote hotel;
@@ -54,6 +54,7 @@ public class BookingAgentEJB implements BookingAgentRemote,
      * This method creates the business logic, assigns a DAO, and registers
      * the EntityManager for the DAO(s) to use.
      */
+    @SuppressWarnings("unchecked")
     @PostConstruct
     public void init() {
         log.info("*** BookingAgentEJB initializing ***");
@@ -97,10 +98,11 @@ public class BookingAgentEJB implements BookingAgentRemote,
         }
         
         //manual construction
-        JPAUtil.setEntityManager(em);
+        BookingDAO dao = new JPABookingDAO();
+        ((JPABookingDAO)dao).setEntityManager(em);
         agent = new AgentImpl();
         ((AgentImpl)agent).setReservationist(hotel);
-        ((AgentImpl)agent).setBookingDAO(new JPABookingDAO());
+        ((AgentImpl)agent).setBookingDAO(dao);
     }
     
     /**
@@ -111,7 +113,6 @@ public class BookingAgentEJB implements BookingAgentRemote,
     @PreDestroy
     public void close() {
         log.info("*** BookingAgentEJB closing ***");
-        JPAUtil.setEntityManager(null);
         agent=null;
         hotel=null;
     }    

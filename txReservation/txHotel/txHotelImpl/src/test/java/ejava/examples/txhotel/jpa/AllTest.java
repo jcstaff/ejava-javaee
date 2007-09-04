@@ -5,8 +5,6 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.txhotel.jpa.HotelRegistrationDemo;
 import ejava.examples.txhotel.jpa.HotelReservationSessionDemo;
-import ejava.examples.txhotel.jpa.JPAUtil;
-
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -34,7 +32,6 @@ public class AllTest extends TestCase {
             public void setUp() throws Exception {
             }
             public void tearDown() throws Exception {
-                JPAUtil.close();
             }
         };
         

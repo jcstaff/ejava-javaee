@@ -10,181 +10,31 @@
       This is the course home page for the Enterprise Java Course
       (605.784), taught at John's Hopkins University, Engineering Programs
       for Professionals.  
-      <!--
       This site will be populated as the semester progresses
       and topics are addressed. If you are looking for a version of the full content
       for ejava-javaee, refer to
       <a href="http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee">
       http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee</a>.
-      -->
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
-          <li>2007-06-05: Baselined semester materials</li>
-          <li>2007-04-23: Posted Async EJB materials</li>
-          <li>2007-04-17: Posted JMS materials</li>
-          <li>2007-04-17: Posted Security materials</li>
-          <li>2007-03-28: Posted Transaction materials</li>
-          <li>2007-03-18: Posted JNDI EJC materials</li>
-          <li>2007-03-18: Posted EAR materials</li>
-          <li>2007-03-18: Posted EJB Session Bean materials</li>
-          <li>2007-03-05: Posted Inheritance materials</li>
-          <li>2007-02-27: Posted EJB-QL material</li>
-          <li>2007-02-20: Posted Entity Relations material</li>
-          <li>2007-02-12: Posted updates to Core ORM materials</li>
-          <li>2007-02-12: Posted Project "rc2" test data</li>
-          <li>2007-02-07: Posted JPA and Core ORM materials</li>
-          <li>2007-02-07: Posted Entity Manager Exercise</li>
-          <li>2007-02-07: Posted Project "rc1" test data and example thread</li>
-          <li>2007-01-30: Posted project descriptions</li>
-          <li>2007-01-30: Posted JDBC materials</li>
-          <li>2007-01-22: Posted initial class site</li>
+          <li>2007-09-04: Posted initial class site</li>
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-          <li>Have a nice summer.</li>
+          <li>register for newsgroup and setup e-mail handling (all e-mails will have
+          ejava_class in subject)</li>
+          <li>posted at least 1 test message to newsgroup</li>
+          <li>setup development environment by going through exercises 0 and 1</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
       <li><ul>
-          <li>Completed design of your JMS message(s) and a utility class that 
-              can publish them.
-          </li>
-          <li>Implemented a Java SE subscriber, with selector, that can be invoked 
-              from the command line. This should have been wrapped as an Ant script.</li>
-          <li>Integrated JMS utility publishing class into eSales EJB to publish changes 
-              about auctions.</li>
-          <li>Implemented an EJBTimer to trigger eSales to check for closed auctions.</li>
-          <li>Implemented an MDB in eBidbot that will subscribe to auction closings
-              and perform end of order processing.</li>
-          <li>Implemented an EJBTimer to trigger eBidbot to check auctions.</li>
-      </ul></li>
-      <li><ul>
-          <li>Added the user/roles.properties files to your eSales application</li>
-          <li>Defined access restrictions for your EJBs</li>
-          <li>Enabled your RMI tests to access the EJBs using a JAAS login</li>
-          <li>Enabled your RMI command line clients to access the EJBs using a JAAS login</li>
-          <li>Enabled your Web Tier to access the EJBs using a security context</li>
-          <li>Protected your Web pages from unauthorized access to information</li>
-          <li>Began to design your JMS message(s) and a utility class that 
-              can publish them.
-          </li>
-      </ul></li>
-      <li><ul>
-        <li>Read the text chapters on Session Beans</li>
-        <li>Finished the remaining set of use cases from the RMI test
-        client(s). Implemented your dto package as a part of this task</li>
-        <li>Read the text chapter on Transactions</li>
-        <li>Defined transaction properties on your EJBs</li>
-        <li>Finished the week with all business methods exposed
-        and tested through the @Remote interface.</li>
-      </ul></li>
-      <li><ul>
-        <li>Created an EJB project to house Remote Facade.</li>
-        <li>Created the shell of AccountMgmt, SellerMgmt, BuyerMgmt,
-        and TestUtilMgmt, EJBs. Designed a simple remote interface for
-        each. Add no-op methods.</li>
-        <li>Created an EAR project. Added the EJB to the EAR</li>
-        <li>Created a (RMI)Test project. Wrote a set of JUnit tests to
-        access your EJBs</li>
-        <li>Added a dependency on your implementation projects and have the EJB
-        @PostConstruct method setup each implementation object for use.
-        Verified functionality with log statements.</li>
-        <li>Updated the Remote Interface, DTOs, EJB implementation,
-        and JUnit tests a method/use case at a time to add required
-        functionality.</li>
-        <li>Finished the week with at least eSalesEJB, EAR, and Test
-        operating end-to-end with some or all of your business logic.</li>
-      </ul></li>
-      <li><ul>
-        <li>Completed your project.</li>
-        <li>Tested your submission by going through the submission test steps.</li>
-        <li>Submitted your project to the graders</li>
-        <li>Completed take home quiz to be distributed in the newsgroup</li>
-      </ul></li>
-      <li><ul>
-        <li>Reviewed updated syllabus and noted the 1 week extension for the project and
-        change to quiz #1 due to the snow date.</li>
-        <li>Completed all O/R mapping implementations and unit tests</li>
-        <li>read the text chapter on EJB-QL.</li>
-        <li>Adaedd desired EJB-QL queries to JPA DAO.</li>
-        <li>Completed business logic implementation classes and unit tests.</li>
-        <li>Completed end-to-end test.</li>
-        <li>Test your submission by going through the submission test steps.</li>
-      </ul></li>
-      <li><ul>
-        <li>read the text chapter on Entity Relationships.</li>
-        <li>Updated your business objects to map each of the relationships (removed the
-        @Transient annotations). 
-        Added either JPA @Annotations to the .java files, an orm.xml descriptor
-        file, or both to map the business objects to the database. You either accepted
-        JPA defaults and modifed your existing .ddl scripts and JDBC code or 
-        provided JPA overrides to have it match your existing code.</li>
-        <li>Enhanced your JPA DAO Unit tests to test the ability to manipulate
-        the business object relationships using your JPA DAO(s).</li>
-        <li>Added initial business logic interfaces and implementation classes
-        for AuctionMgmt, SellerMgmt, BuyerMgmt, and TestSupport. These implementation
-        classes should have delegated data access to the DAO classes.</li>
-        <li>Added a JUnit test that implements the end-to-end scenario discussed 
-        at the end of the testing section of the project 1 spec. You might have 
-        placed this in a separate functional test project.</li>
-      </ul></li>
-      <li><ul>
-        <li>updated your BLImpl project dependency to use the eSalesTestUtil,
-        version 1.0.2007.1rc2. This added auction category and account e-mail
-        address. It also contained sanity checked Bid ordering and moved auctions
-        with the images closer to the top of all sorts.</li>
-        <li>read the text chapters on the EntityManager and Mapping Entities</li>
-        <li>Ignored relationships in your business objects (marked them @Transient),
-        added either JPA @Annotations to the .java files, an orm.xml descriptor
-        file, or both to map the business objects to the database. Accepted
-        JPA defaults and modifed your existing .ddl scripts and JDBC code or 
-        provided JPA overrides to have it match your existing code.</li>
-        <li>Enhanced your JPA DAO Unit tests to test the ability to manipulate
-        the business objects using your JPA DAO(s).</li>
-      </ul></li>
-      <li><ul>
-        <li>looked over the posted eSales test data, parser, and example thread; you
-        have directly reused the eSalesTestUtil and eSalesDTO pojects; you haved looked
-        over the other example sibling project for ideas on how to design your
-        project.</li>
-        <li>created your ingest capability by integrating with eSalesTestUtil; your
-        schema may still be maturing, so your are not worry too much 
-        about how much you actually write to the DB at this time.</li>
-        <li>went through the entityMgrEx exercise</li>
-        <li>went through the jpaDAO example</li>
-        <li>created JPA DAO(s) implementation classes for your projects; designed how
-        they get a shared EntityManager and implemented the CRUD methods;
-        provided a persistence.xml file; defined all Collections to be @Transient
-        and observed the default behavior of mapping just your Account class.</li>
-      </ul></li>
-      <li><ul>
-          <li>read through project description and post any clarification
-          questions</li>
-          <li>went through JDBC tutorial and used this project to try out any
-          test JDBC code you had questions on</li>
-          <li>looked through the jdbcDAO project</li>
-          <li>started your project directory tree</li>
-          <li>designed your project business objects within the "BO" project areas;
-          provided unit tests</li>
-          <li>created the structure of the JDBC Ingest DAO within the "DAO" project
-          to mature over time</li>
-          <li>created the schema file for the project; to mature over time</li>
-          <li>built your project from the root; all supplied artifacts should built 
-          and tested correctly</li>
-      </ul></li>
-
-      <li><ul>
-          <li>registered for newsgroup and setup e-mail handling (all e-mails will have
-          ejava_class in subject)</li>
-          <li>posted at least 1 test message to newsgroup</li>
-          <li>setup development environment by going through exercises 0 and 1</li>
       </ul></li>
       </ul>
       </subsection>
     </section>
   </body>
 </document>
-

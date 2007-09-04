@@ -1,13 +1,11 @@
 package ejava.examples.webtier.web;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -129,6 +127,7 @@ public class RegistrarHandlerServlet extends HttpServlet {
                     Student student = new Student();
                     student.setFirstName("gen");
                     student.setLastName("student" + i);
+                    @SuppressWarnings("unused")
                     Student newStudent = registrar.addStudent(student);
                     students.add(student);
                 }

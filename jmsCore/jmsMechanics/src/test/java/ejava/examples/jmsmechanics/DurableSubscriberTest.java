@@ -294,11 +294,11 @@ public class DurableSubscriberTest extends TestCase {
             assertEquals(1, syncClient.getCount());
         }
         finally {
-            if (session != null) { session.unsubscribe("async1"); }
-            if (session != null) { session.unsubscribe("sync1"); }
             if (connection != null) { connection.stop(); }
             if (asyncConsumer != null) { asyncConsumer.close(); }
             if (syncConsumer != null) { syncConsumer.close(); }
+            if (session != null) { session.unsubscribe("async1"); }
+            if (session != null) { session.unsubscribe("sync1"); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
             if (connection != null) { connection.close(); }

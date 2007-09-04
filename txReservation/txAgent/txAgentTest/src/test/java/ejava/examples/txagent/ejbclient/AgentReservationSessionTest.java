@@ -2,14 +2,9 @@ package ejava.examples.txagent.ejbclient;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.naming.Binding;
 import javax.naming.InitialContext;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingEnumeration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +15,6 @@ import ejava.examples.txagent.bl.BookingAgent;
 import ejava.examples.txagent.bo.Booking;
 import ejava.examples.txagent.ejb.AgentReservationSessionRemote;
 import ejava.examples.txagent.ejb.BookingAgentRemote;
-import ejava.examples.txhotel.bl.HotelReservationSession;
 import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;

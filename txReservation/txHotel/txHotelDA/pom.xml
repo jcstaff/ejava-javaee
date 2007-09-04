@@ -86,10 +86,11 @@
 
     <profiles>
         <profile> <!-- defines our default database -->
-            <id>hsqldb</id>
+            <id>hsql</id>
             <activation>
                 <property> <!-- use this property to name another db -->
-                    <name>!jdbcdb</name>
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
                 </property>
             </activation>
             <properties>
@@ -97,8 +98,46 @@
                   <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password />
+                  <hibernate.dialect>
+                      org.hibernate.dialect.HSQLDialect
+                  </hibernate.dialect>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
         </profile>
+        <profile> <!-- defines our default database -->
+            <id>mysql</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>jdbcdb</name>
+                    <value>mysql</value>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:mysql://localhost:3306/test</jdbc.url>
+                  <jdbc.user>jboss</jdbc.user>
+                  <jdbc.password>password</jdbc.password>
+                  <hibernate.dialect>
+                      org.hibernate.dialect.MySQLDialect
+                  </hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>5.0.5</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
+        </profile>
+
 
         <profile> <!-- defines our default persistence provider -->
             <id>hibernate</id>
@@ -126,12 +165,6 @@
                     <version>3.2.1.ga</version>
                     <scope>test</scope>
                 </dependency>
-                <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <version>1.8.0.4</version>
-                    <scope>test</scope>
-                </dependency>       
             </dependencies>
         </profile>
     </profiles>

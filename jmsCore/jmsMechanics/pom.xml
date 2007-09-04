@@ -80,6 +80,8 @@
                        <copy todir="${jboss.home}/server/default/deploy">
                           <fileset dir="${basedir}/target/test-classes" includes="*jms-service.xml" />
                        </copy>
+                       <!-- give the server time to deploy -->
+                        <sleep seconds="5"/>
                      </tasks>
                    </configuration>
                    <goals>
@@ -105,6 +107,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
                     <systemProperties>
                         <property>
                           <name>testx</name>

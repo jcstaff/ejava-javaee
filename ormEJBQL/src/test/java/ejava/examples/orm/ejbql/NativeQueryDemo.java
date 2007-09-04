@@ -8,13 +8,14 @@ import ejava.examples.orm.ejbql.annotated.Customer;
 
 public class NativeQueryDemo extends DemoBase {
 
+    @SuppressWarnings("unchecked")
     public void testScalarNativeQuery() {
         log.info("testSimpleNativeQuery");
         
         Query query = em.createNativeQuery(
                 "select * from ORMQL_CUSTOMER " +
                 "where ORMQL_CUSTOMER.firstName = :first");
-        List results = query.setParameter("first", "thing").getResultList();
+        List<Object> results = query.setParameter("first", "thing").getResultList();
         assertTrue("no customers found", results.size() > 0);
         for(Object o: results) {
             StringBuilder text = new StringBuilder();

@@ -1,6 +1,5 @@
 package ejava.examples.webtier.jpa;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;

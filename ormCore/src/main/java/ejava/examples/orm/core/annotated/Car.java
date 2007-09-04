@@ -13,7 +13,7 @@ import javax.persistence.*;
  */
 
 @Entity
-@Table(name="ORMCORE_CAR", schema="PUBLIC")
+@Table(name="ORMCORE_CAR")//, schema="PUBLIC")
 //we use the @Table name property to specifically name the table in DB
 //we can also specify vendor-specific constraints with uniqueConstraints prop
 public class Car implements Serializable {    

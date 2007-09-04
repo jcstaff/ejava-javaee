@@ -115,8 +115,8 @@ DROP TABLE EM_AUTO if EXISTS;
     <persistence-unit name="entityMgrEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
-            <property name="hibernate.dialect" value="
-                org.hibernate.dialect.HSQLDialect"/>
+            <property name="hibernate.dialect"
+                value="${hibernate.dialect}"/>
             <property name="hibernate.connection.url"
                 value="${jdbc.url}"/>
             <property name="hibernate.connection.driver_class"
@@ -546,7 +546,7 @@ public class AllTest extends TestCase {
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.0</version>
+            <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -622,19 +622,33 @@ public class AllTest extends TestCase {
 ---
     <profiles>
         <profile> <!-- defines our default database -->
-            <id>hsqldb</id>
+            <id>hsql</id>
             <activation>
                 <property> <!-- use this property to name another db -->
-                    <name>!jdbcdb</name>
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
                 </property>
             </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
+                  <hibernate.dialect>
+                      org.hibernate.dialect.HSQLDialect
+                  </hibernate.dialect>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
+
+
         <profile> <!-- defines our default persistence provider -->
             <id>hibernate</id>
             <activation>
@@ -659,12 +673,6 @@ public class AllTest extends TestCase {
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
                     <version>3.2.1.ga</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <version>1.8.0.4</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

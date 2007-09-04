@@ -16,12 +16,17 @@ import ejava.examples.txagent.dao.BookingDAO;
 
 public class JPABookingDAO implements BookingDAO {
     Log log = LogFactory.getLog(JPABookingDAO.class);
+    
+    private EntityManager em;
+    
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+    }
 
     public Booking createBooking(Booking booking)
             throws DAOException {      
         try {
             log.debug("persisting booking:" + booking);
-            EntityManager em = JPAUtil.getEntityManager();
             
             em.persist(booking);            
 
@@ -38,8 +43,7 @@ public class JPABookingDAO implements BookingDAO {
     public Booking getBooking(long id) throws DAOException {
         try {
             log.debug("getting booking:" + id);
-            Booking booking = 
-                JPAUtil.getEntityManager().find(Booking.class, id);            
+            Booking booking = em.find(Booking.class, id);            
             log.debug("found booking:" + booking);
             return booking;
         }
@@ -60,10 +64,9 @@ public class JPABookingDAO implements BookingDAO {
             int index, int count) 
             throws DAOException {
         try {
-            Query query = JPAUtil.getEntityManager()
-                                 .createNamedQuery(queryName)
-                                 .setFirstResult(index)
-                                 .setMaxResults(count);
+            Query query = em.createNamedQuery(queryName)
+                            .setFirstResult(index)
+                            .setMaxResults(count);
             if (params != null && !params.keySet().isEmpty()) {
                 for(String key: params.keySet()) {
                     query.setParameter(key, params.get(key));
@@ -85,7 +88,6 @@ public class JPABookingDAO implements BookingDAO {
         throws DAOException {
         try {
             log.debug("removing booking:" + booking);
-            EntityManager em = JPAUtil.getEntityManager(); 
             booking = em.find(Booking.class, 
                     booking.getId());
             em.remove(booking);
@@ -102,8 +104,7 @@ public class JPABookingDAO implements BookingDAO {
     public Booking updateBooking(Booking booking) throws DAOException {
         try {
             log.debug("merging booking:" + booking);
-            Booking updated = 
-                JPAUtil.getEntityManager().merge(booking); 
+            Booking updated = em.merge(booking); 
             log.debug("merged booking:" + updated);
             return updated;
         }

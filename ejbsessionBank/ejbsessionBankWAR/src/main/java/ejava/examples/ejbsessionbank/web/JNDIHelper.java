@@ -25,6 +25,7 @@ public class JNDIHelper {
         log.debug("\nlisting " + name + "\n" + text.toString());
     }
 
+    @SuppressWarnings("unchecked")
     private void doDump(int level, StringBuilder text, Context context, String name) 
         throws NamingException {
         for (NamingEnumeration ne = context.list(name); ne.hasMore();) {
@@ -41,6 +42,7 @@ public class JNDIHelper {
         }
     }
     
+    @SuppressWarnings("unchecked")
     protected boolean isContext(String className) {
         try {
             Class objectClass = Thread.currentThread().getContextClassLoader()

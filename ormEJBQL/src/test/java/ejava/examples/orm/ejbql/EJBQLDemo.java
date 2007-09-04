@@ -9,10 +9,11 @@ import javax.persistence.Query;
 
 public class EJBQLDemo extends DemoBase {
     
-    private List executeQuery(String ejbqlString) {
+    @SuppressWarnings("unchecked")
+    private List<Object> executeQuery(String ejbqlString) {
         Query query = em.createQuery(ejbqlString);
         log.info("executing query:" + ejbqlString);
-        List objects = query.getResultList();
+        List<Object> objects = query.getResultList();
         for(Object o: objects) {
            log.info("found result:" + o);
         }
@@ -26,14 +27,15 @@ public class EJBQLDemo extends DemoBase {
         assertTrue("unexpected number of customers:" + rows, rows > 0);
     }
     
+    @SuppressWarnings("unchecked")
     public void testEntityProperties() {
         log.info("testEntityProperties");
         
         Query query = em.createQuery(
                 "select c.firstName, c.hireDate from Clerk c");
-        List results = query.getResultList();
+        List<Object> results = query.getResultList();
         assertTrue("no results", results.size() > 0);
-        for(Iterator itr=results.iterator(); itr.hasNext(); ) {
+        for(Iterator<Object> itr=results.iterator(); itr.hasNext(); ) {
             Object[] result = (Object[])itr.next();
             assertNotNull("no result array", result);
             assertEquals("unexpected result length:" + result.length, 
@@ -44,14 +46,15 @@ public class EJBQLDemo extends DemoBase {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public void testEntityRelationships() {
         log.info("testEntityRelationships");
         
         Query query = em.createQuery(
                 "select s.id, s.store.name from Sale s");
-        List results = query.getResultList();
+        List<Object> results = query.getResultList();
         assertTrue("no results", results.size() > 0);
-        for(Iterator itr=results.iterator(); itr.hasNext(); ) {
+        for(Iterator<Object> itr=results.iterator(); itr.hasNext(); ) {
             Object[] result = (Object[])itr.next();
             assertNotNull("no result array", result);
             assertEquals("unexpected result length:" + result.length, 
@@ -62,6 +65,7 @@ public class EJBQLDemo extends DemoBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testConstructorExpressions() {
         log.info("testConstructorExpressions");
         
@@ -69,9 +73,9 @@ public class EJBQLDemo extends DemoBase {
                 "select new ejava.examples.orm.ejbql.Receipt(" +
                 "s.id,s.buyerId,s.date, s.amount) " +
                 "from Sale s");
-        List results = query.getResultList();
+        List<Object> results = query.getResultList();
         assertTrue("no results", results.size() > 0);
-        for(Iterator itr=results.iterator(); itr.hasNext(); ) {
+        for(Iterator<Object> itr=results.iterator(); itr.hasNext(); ) {
             Receipt receipt = (Receipt)itr.next();
             assertNotNull("no receipt", receipt);
             log.info("receipt=" + receipt);
@@ -102,6 +106,7 @@ public class EJBQLDemo extends DemoBase {
         assertTrue("unexpected number of sales:" + rows, rows > 0);
     }
     
+    @SuppressWarnings("unchecked")
     public void testOuterJoin() {
         log.info("testOuterJoin");
         
@@ -109,9 +114,9 @@ public class EJBQLDemo extends DemoBase {
             "select c.id, c.firstName, sale.amount " +
             "from Clerk c " +
             "LEFT JOIN c.sales sale");
-        List results = query.getResultList();
+        List<Object> results = query.getResultList();
         assertTrue("no results", results.size() > 0);
-        for(Iterator itr=results.iterator(); itr.hasNext(); ) {
+        for(Iterator<Object> itr=results.iterator(); itr.hasNext(); ) {
             Object[] result = (Object[])itr.next();
             assertNotNull("no result array", result);
             assertEquals("unexpected result length:" + result.length, 

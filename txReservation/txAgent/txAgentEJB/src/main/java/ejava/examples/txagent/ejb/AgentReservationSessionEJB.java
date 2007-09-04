@@ -23,8 +23,8 @@ import ejava.examples.txagent.bl.AgentReservationException;
 import ejava.examples.txagent.bl.AgentReservationSession;
 import ejava.examples.txagent.blimpl.AgentSessionImpl;
 import ejava.examples.txagent.bo.Booking;
+import ejava.examples.txagent.dao.BookingDAO;
 import ejava.examples.txagent.jpa.JPABookingDAO;
-import ejava.examples.txagent.jpa.JPAUtil;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
 
@@ -85,9 +85,10 @@ public class AgentReservationSessionEJB
         //this object was injected using a ejb-ref in ejb-jar.xml
         log.debug("reservationSession=" + reservationSession);
         
-        JPAUtil.setEntityManager(em);
+        BookingDAO dao = new JPABookingDAO();
+        ((JPABookingDAO)dao).setEntityManager(em);
         agentSession = new AgentSessionImpl();
-        ((AgentSessionImpl)agentSession).setBookingDAO(new JPABookingDAO());
+        ((AgentSessionImpl)agentSession).setBookingDAO(dao);
         ((AgentSessionImpl)agentSession).setReservationist(reservationSession);
     }
     

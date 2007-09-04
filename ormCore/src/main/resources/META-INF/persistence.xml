@@ -16,7 +16,11 @@
         <mapping-file>orm/Car-orm.xml</mapping-file>
         <mapping-file>orm/Drill-orm.xml</mapping-file>
         <mapping-file>orm/EggBeater-orm.xml</mapping-file>
+
+        <!-- this entity requires DB support for sequences
+        -->
         <mapping-file>orm/Fan-orm.xml</mapping-file>
+
         <mapping-file>orm/Gadget-orm.xml</mapping-file>
         <mapping-file>orm/Mower-orm.xml</mapping-file>
         <mapping-file>orm/Napsack-orm.xml</mapping-file>
@@ -26,9 +30,31 @@
         <mapping-file>orm/Vase-orm.xml</mapping-file>
         <mapping-file>orm/Watch-orm.xml</mapping-file>
         <mapping-file>orm/XRay-orm.xml</mapping-file>
+
+        <class>ejava.examples.orm.core.annotated.Bike</class>
+        <class>ejava.examples.orm.core.annotated.Car</class>
+        <class>ejava.examples.orm.core.annotated.Drill</class>
+        <class>ejava.examples.orm.core.annotated.EggBeater</class>
+
+        <!-- this entity requires DB support for sequences
+        -->
+        <class>ejava.examples.orm.core.annotated.Fan</class>
+
+        <class>ejava.examples.orm.core.annotated.Manufacturer</class>
+        <class>ejava.examples.orm.core.annotated.Gadget</class>
+        <class>ejava.examples.orm.core.annotated.Pen</class>
+        <class>ejava.examples.orm.core.annotated.Mower</class>
+        <class>ejava.examples.orm.core.annotated.Napsack</class>
+        <class>ejava.examples.orm.core.annotated.Tank</class>
+        <class>ejava.examples.orm.core.annotated.Umbrella</class>
+        <class>ejava.examples.orm.core.annotated.Vase</class>
+        <class>ejava.examples.orm.core.annotated.Watch</class>
+        <class>ejava.examples.orm.core.annotated.XRay</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
         <properties>
             <property name="hibernate.dialect" 
-                value="org.hibernate.dialect.HSQLDialect"/>
+                value="${hibernate.dialect}"/>
             <property name="hibernate.connection.url"
                 value="${jdbc.url}"/>
             <property name="hibernate.connection.driver_class" 
@@ -37,7 +63,7 @@
                 value="${jdbc.password}"/>
             <property name="hibernate.connection.username" 
                 value="${jdbc.user}"/>
-            <property name="hibernate.show_sql" value="false"/>            
+            <property name="hibernate.show_sql" value="true"/>            
             <property name="hibernate.hbm2ddl.auto" value="create"/>
         </properties>
     </persistence-unit>        

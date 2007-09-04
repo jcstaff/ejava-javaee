@@ -50,6 +50,7 @@ public class Borrower implements Serializable {
             fetch=FetchType.LAZY)   //try to limit what we get back
     private Collection<Checkout> checkouts = new ArrayList<Checkout>();
     
+    @SuppressWarnings("unused")
     private Borrower() { log.info(super.toString() + ", ctor()"); }
     public Borrower(Person identity) {
         log.info(super.toString() + ", ctor():" + identity);

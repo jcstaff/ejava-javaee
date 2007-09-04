@@ -1,10 +1,6 @@
 package ejava.examples.orm.map;
 
 import java.util.List;
-import java.util.Map;
-
-import javax.persistence.ManyToMany;
-import javax.persistence.MapKey;
 
 import ejava.examples.orm.map.annotated.ManyManyEntity;
 import ejava.examples.orm.map.annotated.ManyManyInverseEntity;
@@ -26,7 +22,7 @@ import ejava.examples.orm.rel.DemoBase;
  * information about the relationship is stored in a link/join table, this
  * is almost identical to the case described above except that the non-owning
  * side has no knowledge of the relationship. All this means is that the 
- * application code has no reponsibility to update the inverse side.</li>
+ * application code has no responsibility to update the inverse side.</li>
  * </nl><p/>
  * 
  * @author jcstaff

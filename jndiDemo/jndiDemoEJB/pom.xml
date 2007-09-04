@@ -45,6 +45,15 @@
     </dependencies>
 
     <build>
+         <!--tell the resource plugin to perform filtering on resources 
+             to fill in dialect, etc. -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
               <!-- make sure we are building java5 -->
             <plugin>
@@ -92,4 +101,36 @@
             </plugin>
         </plugins>      
     </build>
+
+    <profiles>
+        <profile> <!-- defines our persistence.xml dialect -->
+            <id>hsql</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
+                </property>
+            </activation>
+            <properties>
+                  <hibernate.dialect>
+                      org.hibernate.dialect.HSQLDialect
+                  </hibernate.dialect>
+            </properties>
+        </profile>
+        <profile>
+            <id>mysql</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>jdbcdb</name>
+                    <value>mysql</value>
+                </property>
+            </activation>
+            <properties>
+                  <hibernate.dialect>
+                      org.hibernate.dialect.MySQLDialect
+                  </hibernate.dialect>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>

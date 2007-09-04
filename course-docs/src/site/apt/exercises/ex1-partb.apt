@@ -21,11 +21,15 @@ Exercise 1: First Simple Application
 ** Steps
 
     [[1]] Create a build.properties file in PROJECT_BASEDIR. This will be
-    used to define any non-portable property values.
+    used to define any non-portable property values. Place the most non-portable
+    base variables (.e.g, M2_REPO location) towards the top and build lower-level 
+    paths from them. This makes the scripts much easier to port to another environment.
 
 ---
 #ex1 build.properties
-unit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
+M2_REPO=c:/jhu/repository
+
+junit.classpath=${M2_REPO}/junit/junit/3.8.1/junit-3.8.1.jar
 ---
 
     [[1]] Create a build.xml file in PROJECT_BASEDIR. Note the following 
@@ -253,8 +257,34 @@ Total time: 1 second
         </junit>
 ---
 
-    [Note:] You may need to copy your junit.jar file into $ANT_HOME/lib to get the
-    junit task correctly recognoized by Ant.
+    [Note:] You may need to copy your junit.jar file into $ANT_HOME/lib
+    to get the junit task correctly recognized by Ant. Until you do that,
+    you may get the following error.
+
+---
+Buildfile: build.xml
+
+package:
+
+test:
+
+BUILD FAILED
+C:\cygwin\home\jcstaff\proj\784\excercises\ex1\build.xml:49: Could not create ta
+sk or type of type: junit.
+
+Ant could not find the task or a class this task relies upon.
+
+This is common and has a number of causes; the usual
+solutions are to read the manual pages then download and
+install needed JAR files, or fix the build file:
+ - You have misspelt 'junit'.
+
+...
+
+Remember that for JAR files to be visible to Ant tasks implemented
+in ANT_HOME/lib, the files must be in the same directory or on the
+classpath
+---
 
     []
 
@@ -354,6 +384,9 @@ Total time: 0 seconds
     large as the project matures. The developer knowledge of how to work 
     within that configuration is not generally portable to other projects.
 
-    You won't have too worry about Ant in this class unless you get 
-    totally lost with Maven (covered later). It is covered here to
-    contrast Maven in its support for Enterprise Java applications. 
+    Although interactive demos (i.e., main programs not driven by JUnit)
+    in class are wrapped in Ant scripts, you won't have too worry about
+    Ant for a build environment in class. We will primarily use Maven
+    to manage the builds (covered later). The Ant build capability is
+    covered here to contrast Maven in its support for Enterprise Java
+    applications.

@@ -43,31 +43,6 @@
       <scope>test</scope>
     </dependency>    
 
-    <!-- JBoss-specific testing dependencies -->
-    <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache</artifactId>
-        <version>1.2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.jboss.ejb3.embedded</groupId>
-        <artifactId>hibernate-all</artifactId>
-        <version>alpha8_patch2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.jboss.ejb3.embedded</groupId>
-        <artifactId>jboss-ejb3-all</artifactId>
-        <version>alpha8_patch2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.jboss.ejb3.embedded</groupId>
-        <artifactId>thirdparty-all</artifactId>
-        <version>alpha8_patch2</version>
-        <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -112,10 +87,11 @@
 
     <profiles>
         <profile> <!-- defines our default database -->
-            <id>hsqldb</id>
+            <id>hsql</id>
             <activation>
                 <property> <!-- use this property to name another db -->
-                    <name>!jdbcdb</name>
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
                 </property>
             </activation>
             <properties>
@@ -123,7 +99,44 @@
                   <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password />
+                  <hibernate.dialect>
+                      org.hibernate.dialect.HSQLDialect
+                  </hibernate.dialect>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
+        </profile>
+        <profile> <!-- defines our default database -->
+            <id>mysql</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>jdbcdb</name>
+                    <value>mysql</value>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:mysql://localhost:3306/test</jdbc.url>
+                  <jdbc.user>jboss</jdbc.user>
+                  <jdbc.password>password</jdbc.password>
+                  <hibernate.dialect>
+                      org.hibernate.dialect.MySQLDialect
+                  </hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>5.0.5</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
         </profile>
 
         <profile> <!-- defines our default persistence provider -->
@@ -152,13 +165,84 @@
                     <version>3.2.1.ga</version>
                     <scope>test</scope>
                 </dependency>
-                <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <version>1.8.0.4</version>
-                    <scope>test</scope>
-                </dependency>       
             </dependencies>
+
+            <!-- define this to get hibernate3-maven-plugin -->            
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>snapshots</id>
+                    <name>Maven Central Development Plugin Repository</name>
+                    <url>http://snapshots.repository.codehaus.org</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </pluginRepository>
+            </pluginRepositories>
+                        
+            <build>
+                <plugins>
+                    <!-- generates a DDL file for persistence unit -->
+                    <plugin>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>2.0-alpha-2-ss1</version>
+                        <executions>
+                            <execution>
+                                <id>generate-drop-ddl</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-drop.ddl
+                                        </outputfilename>
+                                        <drop>true</drop>
+                                        <create>false</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-create-ddl</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-create.ddl
+                                        </outputfilename>
+                                        <drop>false</drop>
+                                        <create>true</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <components>
+                                <component>
+                                    <name>hbm2ddl</name>
+                                    <implementation>
+                                        jpaconfiguration
+                                    </implementation>
+                                    <outputDirectory>
+                                        target/classes/ddl
+                                    </outputDirectory>
+                                </component>
+                            </components>
+                            <componentProperties>
+                                <persistenceunit>
+                                    ormInheritance
+                                </persistenceunit>
+                                <export>false</export>
+                                <format>true</format>
+                            </componentProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

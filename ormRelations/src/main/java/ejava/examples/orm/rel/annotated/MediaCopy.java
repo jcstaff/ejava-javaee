@@ -73,6 +73,7 @@ public class MediaCopy implements Serializable {
     private long mediaId;    
     private Media media;
     
+    @SuppressWarnings("unused")
     private MediaCopy() { log.debug(super.toString() + ": ctor()"); }
     public MediaCopy(Media media, int copyNo) {
         log.debug(super.toString() + ": ctor() mediaId="

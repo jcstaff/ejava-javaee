@@ -3,7 +3,9 @@ package ejava.examples.txhotel.jpa;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,8 +18,6 @@ import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.dao.ReservationDAO;
 import ejava.examples.txhotel.jpa.JPAReservationDAO;
-import ejava.examples.txhotel.jpa.JPAUtil;
-
 
 import junit.framework.TestCase;
 
@@ -30,8 +30,11 @@ public abstract class DemoBase extends TestCase {
     protected EntityManager em;
 
     protected void setUp() throws Exception {
-        em = JPAUtil.getEntityManager(PERSISTENCE_UNIT);
+        EntityManagerFactory emf = 
+            Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+        em = emf.createEntityManager();
         ReservationDAO dao = new JPAReservationDAO();
+        ((JPAReservationDAO)dao).setEntityManager(em);
         reservationist = new HotelReservationImpl();
         ((HotelReservationImpl)reservationist).setDao(dao);
         reservationSession = new HotelReservationSessionImpl();
@@ -42,18 +45,17 @@ public abstract class DemoBase extends TestCase {
     }
 
     protected void tearDown() throws Exception {
-        EntityTransaction tx = JPAUtil.getEntityManager().getTransaction();
+        EntityTransaction tx = em.getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
             else                              { tx.commit(); }
         }
-        JPAUtil.closeEntityManager();
+        em.close();
     }
     
     @SuppressWarnings("unchecked")
     protected void cleanup() {
         log.info("cleaning up database");
-        EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().begin();
         List<Reservation> reservations = 
             em.createQuery("select r from Reservation r").getResultList();

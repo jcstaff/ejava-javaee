@@ -30,12 +30,6 @@
           <version>1.2.13</version>
           <scope>test</scope>
         </dependency>    
-        <dependency>
-          <groupId>hsqldb</groupId>
-          <artifactId>hsqldb</artifactId>
-          <version>1.8.0.4</version>
-          <scope>test</scope>
-        </dependency>       
     </dependencies>
 
     <pluginRepositories>
@@ -90,18 +84,27 @@
 
     <profiles>
         <profile> <!-- defines our default database -->
-            <id>hsqldb</id>
+            <id>hsql</id>
             <activation>
                 <property> <!-- use this property to name another db -->
-                    <name>!jdbcdb</name>
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
                 </property>
             </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
         </profile>
 
         <profile>

@@ -3,8 +3,6 @@ package ejava.examples.txagent.jpa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ejava.examples.txagent.jpa.JPAUtil;
-
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -33,7 +31,6 @@ public class AllTest extends TestCase {
             public void setUp() throws Exception {
             }
             public void tearDown() throws Exception {
-                JPAUtil.close();
             }
         };
         

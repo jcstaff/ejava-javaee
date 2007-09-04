@@ -33,6 +33,7 @@ public class JPAFilter implements Filter {
     private EntityManager pc;
 
     
+    @SuppressWarnings("unchecked")
     public void init(FilterConfig config) throws ServletException {
         log.debug("filter initializing JPA DAOs"); 
         new JPADAOTypeFactory();
@@ -91,6 +92,7 @@ public class JPAFilter implements Filter {
     }        
 
     
+    @SuppressWarnings("unused")
     private Properties getInitialContextProperties() {
        Properties props = new Properties();
        props.put("java.naming.factory.initial", 
@@ -100,6 +102,7 @@ public class JPAFilter implements Filter {
        return props;
     }    
 
+    @SuppressWarnings("unused")
     private Properties getEntityManagerFactoryProperties() {
         Properties props = new Properties();
         props.put("hibernate.jndi.naming.factory.initial", 
@@ -110,6 +113,7 @@ public class JPAFilter implements Filter {
         return props;
      }    
     
+    @SuppressWarnings("unused")
     private void dump(Context context, String name) {
         StringBuilder text = new StringBuilder();
         try {
@@ -119,6 +123,7 @@ public class JPAFilter implements Filter {
         log.debug(text.toString());
     }
 
+    @SuppressWarnings("unchecked")
     private void doDump(int level, StringBuilder text, Context context, String name) 
         throws NamingException {
         for (NamingEnumeration ne = context.list(name); ne.hasMore();) {
@@ -135,6 +140,7 @@ public class JPAFilter implements Filter {
         }
     }
     
+    @SuppressWarnings("unchecked")
     protected boolean isContext(String className) {
         try {
             Class objectClass = Thread.currentThread().getContextClassLoader()

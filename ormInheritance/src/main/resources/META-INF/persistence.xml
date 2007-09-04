@@ -7,7 +7,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
             <property name="hibernate.dialect" value="
-                org.hibernate.dialect.HSQLDialect"/>
+                ${hibernate.dialect}"/>
             <property name="hibernate.connection.url"
                 value="${jdbc.url}"/>
             <property name="hibernate.connection.driver_class" 

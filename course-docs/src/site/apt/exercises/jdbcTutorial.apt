@@ -46,7 +46,7 @@ java -classpath ${JBOSS_HOME}/server/default/lib/hsqldb.jar org.hsqldb.Server -d
     option.
 
 ---
-java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+java -classpath c:/apps/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
 ** {Section B}: Setup project structure
@@ -535,8 +535,8 @@ Total time: 1 second
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 ---
 
-    * Add compilation and test dependencies. Be sure to add dependency
-    on the HSQL driver for the test scope.
+    * Add compilation and test dependencies. We'll add dependency on the 
+    HSQL driver later using a profile to try to remain DB-agnostic.
 
 ---
     <dependencies>
@@ -557,12 +557,6 @@ Total time: 1 second
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
           <version>1.2.13</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>hsqldb</groupId>
-          <artifactId>hsqldb</artifactId>
-          <version>1.8.0.4</version>
           <scope>test</scope>
         </dependency>
     </dependencies>
@@ -617,23 +611,42 @@ Total time: 1 second
 
     * Add a definition of the database properties in the profile 
     section. This will allow you to define other databases to use
-    (not yet).
+    (not yet). 
+
+        [Note:] You should have defined profile "hsql" as being an
+        activeProfile in $HOME/.m2/settings.xml during exercise 0.
+
+---
+    <activeProfiles>
+        <activeProfile>hsql</activeProfile>
+---
+
+        []
 
 ---
     <profiles>
         <profile> <!-- defines our default database -->
-            <id>hsqldb</id>
+            <id>hsql</id>
             <activation>
                 <property> <!-- use this property to name another db -->
-                    <name>!jdbcdb</name>
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
                 </property>
             </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 ----

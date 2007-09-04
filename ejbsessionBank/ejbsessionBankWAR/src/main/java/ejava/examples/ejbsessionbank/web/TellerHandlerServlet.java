@@ -148,6 +148,7 @@ public class TellerHandlerServlet extends HttpServlet {
      * development environment may need to establish a remote connection.
      * @throws NamingException
      */
+    @SuppressWarnings("unchecked")
     protected void initTeller() throws NamingException {
         ServletConfig config = getServletConfig();
         try {

@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.orm.core.mapped.Drill;
 import ejava.examples.orm.core.mapped.EggBeater;
-import ejava.examples.orm.core.mapped.Fan;
 import ejava.examples.orm.core.mapped.Gadget;
 
 import junit.framework.TestCase;
@@ -104,19 +103,7 @@ public class PKGenMappingDemo extends TestCase {
     }
 
     public void testSEQUENCE() {
-        log.info("testSEQUENCE");
-        //note that since PKs are generated, we must pass in an object that
-        //has not yet been assigned a PK value.
-        ejava.examples.orm.core.mapped.Fan fan = new Fan(0);
-        fan.setMake("cool runner 2");
-        
-        //insert a row in the database
-        em.persist(fan);
-        log.info("created fan (before flush):" + fan);
-        em.flush(); 
-        log.info("created fan (after flush):" + fan);
-        
-        assertFalse(fan.getId() == 0L);                
+        log.info("testSEQUENCE - see PKSequenceGenMappingDemo");
     }
 
     public void testIDENTITY() {

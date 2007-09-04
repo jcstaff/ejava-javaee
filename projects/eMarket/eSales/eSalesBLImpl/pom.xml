@@ -3,7 +3,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eMarket</groupId>
         <artifactId>eSales</artifactId>
-        <version>1.0.2007.1rc2</version>
+        <version>1.0.2007.2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -16,6 +16,13 @@
     </description>
 
     <dependencies>
+        <dependency>
+          <groupId>javax.javaee</groupId>
+          <artifactId>javaee</artifactId>
+          <version>5</version>
+          <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>eSalesDAO</artifactId>
@@ -37,7 +44,7 @@
         <dependency>
             <groupId>ejava.javaee.projects.eMarket.eSales</groupId>
             <artifactId>eSalesTestUtil</artifactId>
-            <version>1.0.2007.1rc2</version>
+            <version>1.0.2007.2</version>
             <scope>provided</scope>
         </dependency>
         

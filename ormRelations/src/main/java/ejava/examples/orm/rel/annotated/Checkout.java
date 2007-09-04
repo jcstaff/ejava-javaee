@@ -26,6 +26,7 @@ public class Checkout implements Serializable {
     @JoinColumn(name="CHECKOUT_BID")
     private Borrower borrower;
     
+    @SuppressWarnings("unused")
     private Checkout() {  //this is needed by persistence layer
         log.debug(super.toString() + ": ctor()");
     }  

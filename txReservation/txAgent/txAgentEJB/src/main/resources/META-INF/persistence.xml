@@ -8,7 +8,7 @@
         <jta-data-source>java:/ejavaDS</jta-data-source>
         <properties>
             <property name="hibernate.dialect" 
-                value="org.hibernate.dialect.HSQLDialect"/>
+                value="${hibernate.dialect}"/>
             <property name="hibernate.show_sql" value="false"/>            
             <property name="hibernate.hbm2ddl.auto" value="create"/>
         </properties>

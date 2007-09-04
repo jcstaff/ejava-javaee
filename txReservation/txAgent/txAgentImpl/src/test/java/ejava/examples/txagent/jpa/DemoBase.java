@@ -6,7 +6,9 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +48,11 @@ public abstract class DemoBase extends TestCase {
         System.getProperty("hotel.jndi.pkgs");
 
     protected void setUp() throws Exception {
-        em = JPAUtil.getEntityManager(PERSISTENCE_UNIT);
+        EntityManagerFactory emf = 
+            Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+        em = emf.createEntityManager();
+        bookingDAO = new JPABookingDAO();
+        ((JPABookingDAO)bookingDAO).setEntityManager(em);
         
         //initialize JNDI tree to txHotel
         Properties jndiProps = new Properties();
@@ -86,19 +92,17 @@ public abstract class DemoBase extends TestCase {
     }
 
     protected void tearDown() throws Exception {
-        EntityTransaction tx = 
-            JPAUtil.getEntityManager().getTransaction();
+        EntityTransaction tx = em.getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
             else                              { tx.commit(); }
         }
-        JPAUtil.closeEntityManager();
+        em.close();
     }
     
     @SuppressWarnings("unchecked")
     protected void cleanup() {
         log.info("cleaning up database");
-        EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().begin();
         List<Booking> bookings = 
             em.createQuery("select b from Booking b").getResultList();

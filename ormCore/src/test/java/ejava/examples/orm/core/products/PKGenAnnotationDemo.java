@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.orm.core.annotated.Drill;
 import ejava.examples.orm.core.annotated.EggBeater;
-import ejava.examples.orm.core.annotated.Fan;
 import ejava.examples.orm.core.annotated.Gadget;
 
 import junit.framework.TestCase;
@@ -41,6 +40,16 @@ public class PKGenAnnotationDemo extends TestCase {
             else                              { tx.commit(); }
         }
         em.close();
+    }
+    
+    static String getText(Throwable ex) {
+        StringBuilder text = new StringBuilder(ex.getMessage());
+        Throwable cause = ex.getCause();
+        while (cause != null) {
+            text.append("\nCaused By:" + cause);
+            cause = cause.getCause();
+        }
+        return text.toString();
     }
     
     /**
@@ -104,33 +113,27 @@ public class PKGenAnnotationDemo extends TestCase {
     }
 
     public void testSEQUENCE() {
-        log.info("testSEQUENCE");
-        //note that since PKs are generated, we must pass in an object that
-        //has not yet been assigned a PK value.
-        ejava.examples.orm.core.annotated.Fan fan = new Fan(0);
-        fan.setMake("cool runner 1");
-        
-        //insert a row in the database
-        em.persist(fan);
-        log.info("created fan (before flush):" + fan);
-        em.flush(); 
-        log.info("created fan (after flush):" + fan);
-        
-        assertFalse(fan.getId() == 0L);                
+        log.info("testSEQUENCE - see PKSequenceGenAnnotationDemo");
     }
 
     public void testIDENTITY() {
         log.info("testIDENTITY");
-        ejava.examples.orm.core.annotated.Gadget gadget = new Gadget(0);
-        gadget.setMake("gizmo 1");
-        
-        //insert a row in the database
-        em.persist(gadget);
-        log.info("created gadget (before flush):" + gadget);
-        em.flush(); 
-        log.info("created gadget (after flush):" + gadget);
-        
-        assertFalse(gadget.getId() == 0L);                
+        try {
+            ejava.examples.orm.core.annotated.Gadget gadget = new Gadget(0);
+            gadget.setMake("gizmo 1");
+            
+            //insert a row in the database
+            em.persist(gadget);
+            log.info("created gadget (before flush):" + gadget);
+            em.flush(); 
+            log.info("created gadget (after flush):" + gadget);
+            
+            assertFalse(gadget.getId() == 0L);                
+        } catch (PersistenceException ex) {
+            String text = getText(ex);
+            log.error("error in testIDENTITY:" + text, ex);
+            fail("error in testIDENTITY:" + text);
+        }
     }
     
 }

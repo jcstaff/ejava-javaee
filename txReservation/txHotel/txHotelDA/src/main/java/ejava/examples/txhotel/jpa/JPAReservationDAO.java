@@ -16,13 +16,18 @@ import ejava.examples.txhotel.dao.DAOException;
 import ejava.examples.txhotel.dao.ReservationDAO;
 
 public class JPAReservationDAO implements ReservationDAO {
-    Log log = LogFactory.getLog(JPAReservationDAO.class);
+    private Log log = LogFactory.getLog(JPAReservationDAO.class);
+    
+    private EntityManager em;
+    
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+    }
 
     public Reservation createReservation(Reservation reservation)
             throws DAOException {      
         try {
             log.debug("persisting reservation:" + reservation);
-            EntityManager em = JPAUtil.getEntityManager();
             
             //look for the person in the database
             Person person = reservation.getPerson();
@@ -46,8 +51,7 @@ public class JPAReservationDAO implements ReservationDAO {
     public Reservation getReservation(long id) throws DAOException {
         try {
             log.debug("getting reservation:" + id);
-            Reservation reservation = 
-                JPAUtil.getEntityManager().find(Reservation.class, id);            
+            Reservation reservation = em.find(Reservation.class, id);            
             log.debug("found reservation:" + reservation);
             return reservation;
         }
@@ -68,10 +72,9 @@ public class JPAReservationDAO implements ReservationDAO {
             int index, int count) 
             throws DAOException {
         try {
-            Query query = JPAUtil.getEntityManager()
-                                 .createNamedQuery(queryName)
-                                 .setFirstResult(index)
-                                 .setMaxResults(count);
+            Query query = em.createNamedQuery(queryName)
+                            .setFirstResult(index)
+                            .setMaxResults(count);
             if (params != null && !params.keySet().isEmpty()) {
                 for(String key: params.keySet()) {
                     query.setParameter(key, params.get(key));
@@ -93,7 +96,6 @@ public class JPAReservationDAO implements ReservationDAO {
         throws DAOException {
         try {
             log.debug("removing reservation:" + reservation);
-            EntityManager em = JPAUtil.getEntityManager(); 
             reservation = em.find(Reservation.class, 
                     reservation.getId());
             em.remove(reservation);
@@ -110,8 +112,7 @@ public class JPAReservationDAO implements ReservationDAO {
     public Reservation updateReservation(Reservation reservation) throws DAOException {
         try {
             log.debug("merging reservation:" + reservation);
-            Reservation updated = 
-                JPAUtil.getEntityManager().merge(reservation); 
+            Reservation updated = em.merge(reservation); 
             log.debug("merged reservation:" + updated);
             return updated;
         }

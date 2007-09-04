@@ -4,8 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.txagent.jpa.AgentDAODemo;
-import ejava.examples.txagent.jpa.JPAUtil;
-
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -32,7 +30,6 @@ public class AllTest extends TestCase {
             public void setUp() throws Exception {
             }
             public void tearDown() throws Exception {
-                JPAUtil.close();
             }
         };
         

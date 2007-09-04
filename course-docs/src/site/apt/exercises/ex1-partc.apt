@@ -149,10 +149,17 @@ public class AppTest extends TestCase {
 
 ---
 # ex1 build.properties
-commons.logging.classpath=/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
-log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
+commons.logging.classpath=${M2_REPO}/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar
 ---
 
+---
+    <target name="echo">
+        ...
+        <echo>commons.logging.classpath=${commons.logging.classpath}</echo>
+        <echo>log4j.classpath=${log4j.classpath}</echo>
+    </target>
+---
 ---
         <javac srcdir="${src.dir}/main/java"
                destdir="${build.dir}/classes"
@@ -225,6 +232,12 @@ test:
 BUILD SUCCESSFUL
 Total time: 3 seconds
 ---
+
+        [Note:] I didn't see the output to STDOUT the last time I tested this. Ant may
+        be obscuring STDOUT, so use the following commands to view the logging output.
+
+        []
+    
 ---
 > more target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
 Testsuite: myorg.mypackage.ex1.AppTest

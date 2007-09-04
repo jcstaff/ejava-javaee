@@ -4,7 +4,7 @@ Exercise 1: First Simple Application
 
     [Note:] This part requires junit.jar. If you do not already have 
     this, it can be downloaded from the 
-    {{{http://repo1.maven.org/maven2/junit/junit/4.0/junit-4.0.jar} 
+    {{{http://repo1.maven.org/maven2/junit/junit/3.8/junit-3.8.jar} 
     ibiblio.org/maven2 repository}}.
 
 
@@ -27,8 +27,9 @@ Exercise 1: First Simple Application
    alternative for CLASS_HOME might be c:/jhu/784.
 
 ---
-export CLASS_HOME=$HOME/proj/784
-export PROJECT_BASEDIR=$CLASS_HOME/exercises/ex1
+$ export CLASS_HOME=$HOME/proj/784
+$ export PROJECT_BASEDIR=$CLASS_HOME/exercises/ex1
+$ mkdir -p $PROJECT_BASEDIR
 ---
 
    [[1]] Create project directory structure. In this example, the 
@@ -117,7 +118,8 @@ myorg/mypackage/ex1/App.class
    target/test-classes. 
    
 ---
-> javac -classpath target/ex1.jar:$JUNIT_REPO/junit-4.0.jar \
+> export JUNIT_JAR=`cygpath --windows c:/jhu/repository/junit/junit/3.8.1/junit-3.8.1.jar`
+> javac -classpath "target/ex1.jar;$JUNIT_JAR" \
 src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
 
 target/
@@ -130,7 +132,7 @@ target/
    [[1]] Run the JUnit test framework.
 
 ---
-> java -classpath target/ex1.jar:$JUNIT_REPO/junit-4.0.jar:target/test-classes \
+> java -classpath "target/ex1.jar;$JUNIT_JAR;target/test-classes" \
 junit.textui.TestRunner myorg.mypackage.ex1.AppTest
 .testApp
 Here's One!
