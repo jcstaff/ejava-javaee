@@ -1,0 +1,437 @@
+Project3: eSport Secure and Asynchronous N-Tier Application
+
+    09/18/2007 
+
+* Goals
+
+    * Secure access to EJB and Web applications
+
+    * Provide for asynchronous publish/subscribe processing.
+
+* Objectives
+
+    * Re-use the eLeague and eClub implementations from projects 1 and 2.
+
+    * Define users and roles for both applications.
+
+    * Define access controls and implement authentication mechanisms for 
+    eLeague.
+
+    * Define access controls and implement authentication mechanisms for
+    eClub.
+
+    * Configure JMS destinations used for applications.
+
+    * Implement a publish/subscribe capability between the eLeague, eClub
+    and stand-alone client applications.
+
+* Technical Overview
+
+    The project will build on the core implementation from Projects 1 and
+    2. We will mostly extend existing projects with security and
+    asynchronous logic. 
+
+    Although logically independent, the eLeague and eClub EARs are
+    expected to be deployed to the same application server for the project
+    implementation and testing. This may require us to define and deploy a
+    resource within the eLeague application rather than have a
+    duplicate/independent copy in eClub. If they were physically
+    separate, this would not be an issue.
+
+    Java EE defines authentication and authorization to be independent of
+    the overall API and capability. JBoss and other application servers
+    provide simple, "hello world", mechanisms that are easy to demonstrate
+    and more sophisticated mechanisms that are realistic for deployments.
+    We will use the simple "other" authentication application policy 
+    defined within the standard JBoss installation. This method takes two
+    files: 
+
+        * users.properties - defines username=password lines that list the
+        login username and plain-text password
+
+        * roles.properties - defines username=role1,role2 lines that list
+        the login username and assigned roles.
+
+    These two files must be available in the root package within the
+    classloader classpath. This means that they would be at the root
+    directory of an EJB or WEB-INF/classes. Knowing our environment, we'll
+    create a single set to be shared between eLeague and eClub and place
+    this in the eLeague.
+
+    We are going to have a couple types of users. Some of the users will
+    have zero, one, or more of these roles. Because of the static nature of
+    our authentication, all users will have a login configured long before
+    they register for an account.
+
+        * eleague-admin - this role is authorized to run LeagueTestUtil
+        operations.
+
+        * eleague-coord - this role is authorized to create season, 
+        divisions, clubs, and schedule contests.
+
+        * eleague-clubcoord - this role is authorized to create teams,
+        provide contacts for the teams, and assign them to divisions.
+
+        * eleague-divcoord - this role is authorized to report scores.
+
+        * eclub-admin - this role is authorized to run ClubTestUtil
+        operations.
+
+        * eclub-member - this role is authorized to obtain team rosters and
+        update contact and role information.
+
+        * eclub-coord - this role is authorized to create teams and assign
+        players, coaches, and managers.
+
+    If a user has a login for one application, they will use the same
+    account to access the other application (e.g., user1 might have
+    both eclub-coord and eleague-clubcoord roles).
+
+    Some actions are open to any users; authenticated or not.
+    Authenticate will be performed using a JAAS configuration and
+    login logic.  RMI Tests will be updated with JAAS configuration and
+    login logic.
+
+    We will implement a ScheduleTopic where eLeague will publish messages
+    related to team schedules. eClub will subscribe to the topic using a
+    Message Driven Bean to keep members up to date on schedule changes.
+    A stand-alone client will also be used to subscribe to schedule
+    events. A topic will have to be added to your JMS Server within
+    JBoss. You will have to design the type, structure, and payload of
+    the messages sent on that topic.
+
+    eLeague will use EJB Timers to send out schedule reminders.
+
+* Technical Details
+
+    [[1]] Provide all functionality from Projects 1 and 2.
+
+===
+
+    [[1]] Add a users/roles.properties set of files to eLeagueEJB that 
+    defines the combined set of users and roles between the two
+    applications. The files should define the following usernames and
+    roles (all users should have a password of "password".
+
+        * admin1=eleague-admin,eclub-admin
+
+        * user1=eleague-coord
+
+        * user2=eleague-clubcoord,eclub-member
+
+        * user3=eleague-divcoord,eclub-member
+
+        * user4=eclub-coord,eclub-member
+
+        * ...
+
+===
+
+    [[1]] Enhance eLeague with access restrictions.
+
+        * Assign the EJB to the "other" security domain.
+
+        * Restrict access to the EJB write methods to appropriate roles
+        using declarative security.
+
+            [[1]] Only Administrators may run the test utility functions.
+
+            [[1]] Only League Coordinators may create clubs, seasons, and
+            divisions. They may also schedule contests.
+
+            [[1]] Only Club Coordinators may create venues, teams, and
+            assign teams to divisions.
+
+            [[1]] Division coordinators may report scores.
+
+        * Perform additional programmatic security checks to verify 
+        the right user is accessing the appropriate information.
+
+            [[1]] Club coordinators may only manage teams and venues
+            associated with their club.
+
+            [[1]] Division coordinators may only report scores for contests 
+            in their assigned division.
+
+        * Allow any user to perform read operations.
+
+===
+
+    [[1]] Extend your existing RMI Test project and any RMI client(s) to
+    address new authentication requirements.
+
+        * Add JAAS Configuration for JBoss the ClientLoginModule.
+
+        * Add a new unit test that verifies the access controls of the
+        protected and open methods.
+    
+        * Add a valid login to your existing tests to re-enable them under
+        the new secure environment.
+
+===
+
+    [[1]] Enhance eClub with access restrictions.
+
+        * Assign the EJB to the "other" security domain.
+
+        * Restrict access to the EJB write methods to appropriate roles
+        using declarative security.
+
+            [[1]] Only Administrators may run the test utility functions.
+
+            [[1]] Only members may update contact information and 
+            obtain roster information.
+
+            [[1]] Only Organization coordinators may create teams and
+            assign players, coaches, and managers.
+
+        * Perform additional programmatic security checks to verify 
+        the right user is accessing the appropriate information.
+
+            [[1]] Members are accessing rosters for teams they are
+            associated with.
+            
+===
+
+    [[1]] Extend your existing RMI Test project and any RMI client(s) to
+    address new authentication requirements.
+
+        * Add JAAS Configuration for JBoss the ClientLoginModule.
+
+        * Add a new unit test that verifies the access controls of the
+        protected and open methods.
+
+        * Add a valid login to your existing tests to re-enable them under 
+        the new secure environment.
+
+===
+
+    [[1]] Enhance eLeagueWAR with access restrictions.
+
+        * Assign the WAR to the "java:jass/other" security domain.
+
+        * Restrict access beyond the main page to users with
+        the appropriate roles. You may use FORM or BASIC authentication.
+
+        * Permit only users to only ask the EJB tier for
+        information that is associated with their login. For example,
+        a Club Coordinator should not have to tell the Web UI what
+        club they are managing. It should be derived from their identity
+        and information in the database.
+
+===
+
+    [[1]] Enhance eClubWAR with access restrictions.
+
+        * Assign the WAR to the "java:jass/other" security domain.
+
+        * Restrict access beyond the main page to users with
+        the appropriate roles. You may use FORM or BASIC authentication.
+
+        * Permit only users to only ask the EJB tier for information that
+        is associated with their login. For example, a Member should not
+        have to tell the Web UI what team they are associated with. It
+        should be derived from their identity and information in the
+        database.
+
+===
+
+[../images/eSport_async.jpg] eSport Async
+
+    [[1]] Extend your eLeague EJB implementations to publish changes to 
+    Contests.
+
+        * Add the JMS topic to your JBoss server.
+
+        * Design your JMS Message. You can use any JMS Type and JMS/custom
+        properties you wish.  However, you need to account for the fact
+        that subscribers will be filtering on such things as the impacted
+        team or type of event.
+
+        * Have your eLeague EJBs publish JMS Messages to the topic when 
+        a Contest changes state (created, canceled, completed).
+
+===
+
+    [[1]] Add a Java SE JMS subscriber eLeague to consume events about
+    Contests pertaining to a specific team.
+
+        * Implement a Java SE JMS subscriber that listens for Schedule
+        messages with a team identifier matching a JMS Selector.
+        This must be a JMS selector, not client-side Java logic. All
+        this client has to do is log the information from the message.
+
+        * You must launch this subscriber using an Ant wrapper script.
+
+===
+
+    [[1]] Implement a Message Driven Bean within eClub to subscribe to 
+    contests that are new or rescheduled; but not completed (i.e. it 
+    should have a selector that causes the MDB to not be told about
+    scores being reported).
+
+        * Use a JMS Selector for the MDB to limit the type of messages
+        consumed.
+
+        * Obtain the e-mail address for each individual associated with
+        the team effected by the event. Print a textual message and the
+        address list to the log. You do not have to physically send an
+        e-mail as a part of this project.
+
+===
+
+    [[1]] Implement an EJB Timer that will allow eLeague to automatically
+    wake-up and send out schedule reminders for contests that have not yet
+    finished. Depending on the provided test data, you might want to limit
+    the number of reminders sent. The main goal of this requirement is
+    that you make use of an EJBTimer.
+
+* Testing
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    eLeague accessed through its remote interface using new
+    access control restrictions.
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    eClub using its new access control restrictions.
+
+    [[1]] Perform the following scripted use case.  All command
+    line implementations must be wrapped in an Ant runtime script to
+    encapsulate the classpath details in a portable manner (see the
+    class jdbcDAO project for an example of using an Ant runtime script).
+    Although an automated JUnit test is not required here, developing one
+    can be quite helpful.
+
+        * admin1=eleague-admin,eclub-admin
+
+        * user1=eleague-coord
+
+        * user2=eleague-clubcoord,eclub-member
+
+        * user3=eleague-divcoord,eclub-member
+
+        * user4=eclub-coord,eclub-member
+
+        * user5=eclub-member
+
+        * user6=eclub-member
+
+        []
+
+        [[1]] the applications deploy and/or started
+
+            * eLeagueEJB sets a timer for schedule reminders 
+        
+            * eClubEJB subscribes to pending contest events.
+
+            * the eLeague Java SE LeagueListener subscribes for events
+            related to a specific team.
+
+        [[1]] admin1 resets all eLeague tables (using the LeagueTestUtilEJB)
+
+        [[1]] admin1 populates the eLeague tables (using the LeagueIngestor)
+
+        [[1]] admin1 resets the eClub tables (using the ClubTestUtilEJB)
+
+        [[1]] admin1 populates the eClub tables (using the ClubTestUtilEJB)
+        if necessary
+
+        [[1]] user1 creates a Club in eLeague (using the LeagueMgmtEJB)
+
+        [[1]] user2 adds Venue for Club in eLeague (using ClubMgmtEJB)
+
+        [[1]] user3 creates Parent in eClub (using MemberMgmtEJB)
+
+        [[1]] user3 creates Player in eClub (using MemberMgmtEJB) for their
+        child
+
+        [[1]] user3 adds a Coach role in eClub (using MemberMgmtEJB) to
+        their identity
+
+        [[1]] user4 creates a Team in eClub (using OrgMgmtEJB)
+
+        [[1]] user4 assigns Players to a Team in eClub (using OrgMgmtEJB)
+
+        [[1]] user4 assigns Coach to a Team in eClub (using OrgMgmtEJB)
+
+        [[1]] user4 assigns Manager to a Team in eClub (using OrgMgmtEJB)
+
+        [[1]] user3 views their team roster in eClub (using OrgMgmtEJB)
+
+        [[1]] user2 adds a Team for Club in eLeague (using ClubMgmtEJB)
+
+        [[1]] user2 adds a contact for a Team eLeague (using ClubMgmtEJB)
+
+        [[1]] user2 assigns a Team to an existing Division eLeague (using ClubMgmtEJB)
+
+        [[1]] user1 schedules a Season eLeague (using ContestMgmtEJB)
+
+        [[1]] ContestMgmtEJB plublishes schedule events to Schedule Topic
+
+        [[1]] LeagueSubscriber receives messages related to its team. It
+        prints the contents of the message.
+
+        [[1]] LeagueListenerMDB receives messages related to unfinished
+        contests. It obtains the e-mail addresses for members associated
+        with the team references in the message. It logs the message and
+        e-mail addresses.
+
+        [[1]] anonymous users views Team Schedule in eClub (using OrgMgmtEJB)
+
+        [[1]] EJBTimer fires a callback in ContestMgmtEJB
+
+        [[1]] ContestMgmtEJB publishes reminder messages to the Schedule
+        Topic (same message processing occurs in LeagueSubscriber and
+        LeagueListerMDB).
+
+        [[1]] user3 reports a Score in eLeague (using ContestMgmtEJB)
+
+        [[1]] anonymous user views Division Standings in eLeague (using LeagueMgmtEJB)
+
+        
+[../images/eSport_full_sequence.jpg] eSport Full Sequence
+
+
+* Grading
+
+    Your project will be graded on completeness and quality of product. In
+    order for you to receive full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The breakdown of grading 
+    will be as follows:
+
+        * README provided that describes where each requirement satisfied: 10pts
+
+        * projects cleanly builds with Maven: 15pts
+
+        * Project 1 and 2 functionality: 5pts
+
+        * EJB Security: 10pts
+
+        * JAAS Client Security: 10pts
+
+        * WAR Security: 10pts
+
+        * EJB JMS Publisher: 10pts
+
+        * EJB MDB Subscriber: 10pts
+
+        * Java SE JMS Listener: 10pts
+
+        * EJB Timers: 10pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implementation supplied: 30%
+
+        * testing: 10%
+
+* Submission Guidelines
+
+    Please follow the 
+    {{{../../../course-docs/projects.html#Submission%20Guidelines}
+    project submission guidelines}}
+    posted in the course overview.

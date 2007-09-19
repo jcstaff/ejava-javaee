@@ -1,0 +1,555 @@
+Project2: eSport N-Tier Application
+
+    09/17/2007
+
+* Goals
+
+    * Continue to re-use and update the implementations from the previously
+    implemented data access tier and initial business logic.
+
+    * Deploy data access tier and business logic as an EJB component
+
+    * Provide a remote interface and client to business logic
+
+    * Provide a local interface and Web client to business logic
+
+    * Provide a Web tier 
+
+* Objectives
+
+    * Expand the current project development architecture to include EJB,
+    WAR, EAR, and remote Test sub-projects for eLeague.
+
+    * Expand the current project development architecture to include EJB,
+    WAR, EAR, and remote Test sub-projects for eClub.
+
+    * Re-host the data access tiers and initial business logic from 
+    Project 1 within the new EJB and WEB tiers.
+
+    * Design the data transfer objects (DTOs) to be used to communicate
+    with clients using the remote interface.
+
+    * Create the EAR sub-project to host the Java EE components.
+
+    * Create the remote Test sub-project to deploy and run tests using the
+    remote EJB interface.
+
+    * Create and test the WAR sub-project to host the user interface.
+    This component will ultimately be deployed within the EAR to 
+    the application server and use local interfaces of the EJB to
+    access business logic. 
+
+* Technical Overview
+
+    [Note:] This project and the final project rely heavily on the
+    components from Project 1. You are encouraged to make sure your
+    implementation of Project 1 is sound and well tested prior to doing too
+    much work on Project 2. You should continue to maintain your JUnit
+    tests for the earlier components while working on these higher level
+    tiers.
+
+    []
+
+    The project will continue along two parallel paths; eLeague and eClub.
+    However, this time we will add several new project types; EJB, EAR,
+    WAR, and Test. These new sub-projects will become siblings to your
+    existing Impl -or- BO, DAO, and BLImpl sub-projects. The new projects
+    will depend on your legacy work. The remote interface of the EJB
+    will also require specific design of what gets externalized to the
+    client. The remote clients do not share the same address space we had
+    in Project 1 and we cannot afford to serialize the entire contents
+    of a database full of related information. Data Transfer Objects
+    (DTOs) will be part of the EJB remote interface design.
+
+    You have finished a significant amount of eLeague during Project 1; the
+    O/R mapping and core business logic of a non-trivial business model.
+    You will now host the data access tier and business logic within an
+    EJB component.  This EJB component will supply the EntityManager,
+    control transaction boundaries, provide local interaction for the
+    Web Tier, and a RMI interface for remote clients. Security will be
+    addressed in the next project. To limit the scope of the project, the
+    Web UI requirements will be constrained to a limited number of
+    use cases. The EJB and WAR will be deployed as a part of an
+    EAR by a Test project. The Test project will host RMI testing of the
+    EJB methods that are to be used by eLeague remote clients, including
+    eClub business logic. 
+
+    eClub will require additional work as well. With a remote interface
+    for eLeague in hand and the ability to either simulate or operate with a
+    live instance, we can now complete the rest of the the business logic
+    that will also be hosted within an EJB tier. We'll try to keep the Web-UI
+    minimal at this time as well. 
+
+    You may develop your Web tier in an alternate environment, such as
+    Jetty. However, it must be submitted as part of the application that
+    runs within JBoss.
+
+    [Note:] As with the previous project, the use of the name eSport,
+    eLeague, and eClub within the project specification are to be taken as
+    placeholders. Please make an effort to uniquely name your directories,
+    components, Java packages, JNDI names, etc. to help logically separate
+    the parallel project implementations.
+
+    [Note:] There should be no use of System.out.println() in the code
+    and all implementations must use the jakarta commons logging API
+    with the log4j logging provider.  You may leave debug in your code,
+    but this should be able to be turned on/off with the proper logging
+    priority changes in the log4j.xml configuration.
+
+* Technical Details
+
+    [[1]] Continue to provide all functionality from Project 1;
+    especially the unit tests as you revise your earlier implementations
+    For example, you should continue to have the ability to run the
+    unit and end-to-end tests implemented in project 1. Make sure you 
+    design your project 2 testing such that it does not depend on residue
+    from project 1 tests.
+
+===
+
+    [[1]] Create an EJB tier to host your eLeague business logic and
+    data access tiers. Each of the EJBs provided will supply the
+    necessary dependency injection and initialization for the business
+    objects. Transaction scope will be added as a part of a separate
+    requirement. Security will be added in the next project. The main
+    construction, deployment, and remote interfaces of the EJB will be
+    the focus of this requirement.  You will have to address the data
+    that gets serialized to the client in a set of Data Transfer Objects
+    (DTOs).
+
+        [[A]] EJBs - The EJBs will be used to inject and initialize
+        implementation objects and provide a remote interface.
+
+[../images/eLeague_ejbtier.jpg] eLeague Candidate EJB Tier
+
+            [[a]] LeagueMgmtEJB - this EJB will primarily host the 
+            LeagueMgmtImpl business logic. A remote interface 
+            and bean implementation will need to be designed for this EJB.
+
+            [[a]] ContestMgmtEJB - this EJB will primarily host the 
+            ContestMgmtImpl business logic. A remote interface and
+            bean implementation will need to be designed for this EJB.
+
+            [[a]] ClubMgmtEJB - this EJB will primarily host the 
+            ClubMgmtImpl business logic. A remote interface and bean 
+            implementation will need to be designed for this EJB.
+
+            [[a]] LeagueTestUtilEJB - this support EJB will primarily
+            host the LeagueTestUtilImpl business logic to support
+            remote testing requirements. A remote interface and bean
+            implementation will need to be designed for this EJB.
+
+        [[A]] DTOs - The DTOs will be used to serialize the state of the
+        business objects between the EJB and client when using the remote
+        interface. Remember that there can be more than 1 DTO to represent
+        the same information related to a business object. For example,
+        collections might contain summary information only
+        and a single result might contain full details. The following is
+        only provided as a reasonable starting point.
+
+[../images/eLeague_dtos.jpg] eLeague Candidate DTOs
+
+            [[a]] ContactDTO - This class is meant to hold contact
+            information. This is primarily made up of Contact and
+            TeamContactRole business object information.
+
+            [[a]] TeamDTO - This class is meant to hold team information
+            relative to the current season. This is primarily made up
+            of Team and TeamSeason business object information and the
+            sum of wins/losses/ties.
+
+            [[a]] ContestDTO - This class is meant to hold contest
+            information relative to a specific team. This is primarily
+            made up of Contest business object information.
+
+            [[a]] DivisionStandingDTO - This class is meant to hold an 
+            ordered list of TeamDTOs according to the team's rank within
+            the division. This is primarily made up of Season and Division
+            business object information and the result of comparing 
+            team results within the division.
+
+            [[a]] VenueDTO - This class is used to represent a summary
+            of the Venue business object information. As an example of
+            this, the address is expressed as a String rather than an
+            embedded object.
+
+            [[a]] AddressDTO - This class is meant to represent the 
+            Addess of a Venue, but is only used when setting the address
+            of a Venue. 
+
+            [[a]] ClubDTO - This class is meant to hold the Club
+            information, which includes Venues and Teams. However, team
+            schedules are not necessary when used within this context.
+
+
+        [[A]] EAR - Create an EAR to host the eLeague server-side
+        components; including the EJB component just developed.
+
+        [[A]] Test - Create a Test project that will deploy the EAR to the
+        application server and run through a set of JUnit test using the
+        remote interface of the EJBs. 
+
+===
+    
+    [[1]] Complete and test the eClub business logic using the remote
+    interface of eLeague. The diagram below shows the business logic within
+    the context of the EJB Tier implemented as a part of a separate
+    requirement.
+
+[../images/eClub_ejbtier.jpg] eBidbot Candidate Business Logic and EJB Tiers
+
+        [[A]] OrganizationMgmt/OrganizationMgmtImpl - update this 
+        business logic interface and implementation to be able to obtain
+        team schedule and divisional standings for a team from eLeague.
+        This implementation may return the eLeague DTO classes if desired.
+
+===
+
+    [[1]] Create an EJB tier to host your eClub business logic and
+    data access tiers. The EJB(s) provided will provide the
+    necessary dependency injection and initialization for the business
+    objects. Transaction scope will be added as a part of a separate
+    requirement. Security will be added in the next project. The main
+    construction, deployment, and remote interfaces of the EJB will be
+    the focus of this requirement.  You will have to address the data
+    that gets serialized to the client in a set of Data Transfer Objects
+    (DTOs).
+
+        [[A]] EJBs - The EJBs will be used to inject and initialize
+        implementation objects and provide a remote interface. Refer to
+        the previous diagram for a view of the EJBs within the context
+        of the business logic, DAOs, and eLeague remote interface.
+
+
+            [[a]] OrgMgmtEJB - this EJB will primarily host the 
+            OrganizationMgmtImpl business logic. A remote interface 
+            and bean implementation will need to be designed for this EJB.
+
+            [[a]] MemberMgmtEJB - this EJB will primarily host the 
+            MemberMgmtImpl business logic. A remote interface and bean
+            implementation will need to be designed for this EJB.
+
+            [[a]] ClubTestUtilEJB - this support EJB will primarily
+            host the ClubTestUtilImpl business logic to support
+            remote testing requirements. A remote interface and bean
+            implementation will need to be designed for this EJB.
+
+        [[A]] DTOs - The DTOs are be used to serialize the state of the
+        business objects between the EJB and client when using the remote
+        interface. However, with care, business objects can be directly
+        used as DTOs. This specification shows us using this approach
+        for eClub.  This is a design option and not a requirement.
+        The EJB Tier will create new instances of the classes to clear
+        them of any persistence provider classes before serializing them
+        to the client. 
+
+        [[A]] EAR - Create an EAR to host the eBidbot server-side
+        components; including the EJB component just developed.
+
+        [[A]] Test - Create a Test project that will deploy the EAR to the
+        application server and run through a set of JUnit test using the
+        remote interface of the EJB. 
+
+===
+
+    [[1]] Add a Web UI to the eLeague application. This should use the EJB
+    local interfaces, which can be identical to the interface implemented for
+    the business logic. The WAR for the Web UI must be deployed as part of 
+    the eLeague EAR. The Web UI must have the following functionality. Note
+    that the test data will already have a current season, divisions,
+    other clubs, teams, etc. We will just be adding eClub information 
+    to that information prior to the season being scheduled.
+
+        * Test Admin
+
+            * reset All tables
+
+            * populate tables
+
+        * League Officials
+
+            * create Club
+
+            * schedule a Season
+
+        * Club Coordinators
+
+            * add Venue for Club
+
+            * add a Team for Club
+
+            * add a contact for a Team
+
+            * assign a Team to a Division
+
+        * Division Coordinators
+
+            * report a Score
+
+        * Any User
+
+            * show Division Standings
+
+===
+
+    [[1]] Add a Web UI to the eClub application. This should use the EJB
+    local interfaces, which can be identical to the interface implemented for
+    the business logic. The WAR for the Web UI must be deployed as part of 
+    the eClub EAR. The Web UI must have the following functionality.
+
+        * Test Admin
+
+            * reset All tables
+
+            * populate tables
+
+        * Members
+
+            * create Parent
+
+            * create Player
+
+            * add Coach Role
+
+            * get Team Roster for their teams
+
+            * get Team Schedule for their teams
+
+        * Organization Officials
+
+            * create Team
+
+            * assign Players to Team
+
+            * assign Coach to Team
+
+            * assign Manager to Team
+
+===
+
+    [[1]] Add transaction properties to the EJBs. 
+
+        [[A]] Transaction Scope - all session bean methods in these two
+        applications should require a transaction.
+
+        [[A]] Transaction Integrity - add transaction rollback logic to
+        EJBs that detect a bid could not be executed because it was either
+        too low or was for a closed auction.
+
+        [[A]] Test - update the test project(s) to verify the transaction
+        logic.
+
+===
+* Testing
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of
+    eLeague accessed through its remote interface. This will also test the
+    DTOs. These tests should be packaged in the eLeague RMI Test project.
+
+    [[1]] Provide JUnit tests that verify the extra business logic
+    functionality of eClub interfacing with eLeague. These tests may
+    be placed in either with the business logic project or the RMI Test
+    project for eClub.
+
+    [[1]] Provide JUnit tests that verify the EJB functionality of eClub
+    accessed through its remote interface. This will also test its use of
+    DTOs. Theses tests should be packaged in the eClub RMI Test project.
+
+    [[1]] Perform an end-to-end use case to do the following. This must be 
+    demonstrated in an automated JUnit test and then be manually
+    implementable using the Web UI and any implemented command line
+    interfaces.
+    
+    [Note:]Any actions, including the ingest, that must be executed from
+    the command line must be wrapped inside an <<RUN>> script similar
+    to ones demonstrated in class (see the class jdbcDAO project for an 
+    example of using an Ant script to encapsulate command-line details).
+
+    []
+
+        [[a]] reset all eLeague tables (using the LeagueTestUtilEJB)
+
+        [[a]] populate the eLeague tables (using the LeagueIngestor)
+
+        [[a]] create a Club in eLeague (using the LeagueMgmtEJB)
+
+        [[a]] add Venue for Club in eLeague (using ClubMgmtEJB)
+
+        [[a]] create Parent in eClub (using MemberMgmtEJB)
+
+        [[a]] create Player in eClub (using MemberMgmtEJB)
+
+        [[a]] add a Coach role in eClub (using MemberMgmtEJB)
+
+        [[a]] create a Team in eClub (using OrgMgmtEJB)
+
+        [[a]] assign Players to a Team in eClub (using OrgMgmtEJB)
+
+        [[a]] assign Coach to a Team in eClub (using OrgMgmtEJB)
+
+        [[a]] assign Manager to a Team in eClub (using OrgMgmtEJB)
+
+        [[a]] show team roster in eClub (using OrgMgmtEJB)
+
+        [[a]] add a Team for Club in eLeague (using ClubMgmtEJB)
+
+        [[a]] add a contact for a Team eLeague (using ClubMgmtEJB)
+
+        [[a]] assign a Team to an existing Division eLeague (using ClubMgmtEJB)
+
+        [[a]] schedule a Season eLeague (using ContestMgmtEJB)
+
+        [[a]] show a Team Schedule in eClub (using OrgMgmtEJB)
+
+        [[a]] report a Score in eLeague (using ContestMgmtEJB)
+
+        [[a]] show Division Standings in eLeague (using LeagueMgmtEJB)
+
+
+    [Note:] To be clear. The above scenario should be both automated with a
+    single JUnit test and then repeated with interactive Web UI actions. 
+    It is suggested that you start by implementing the JUnit version
+    first and then begin the Web UI in backwards sequence order (i.e.,
+    implement the Web UI for "show Division Standings in eLeague" first),
+    using a copy of the full JUnit implementation that you remove one
+    step at a time.
+
+* Getting Started
+
+    The following sketch of directory structure can be used as a starting
+    point for your overall application. It assumes you already have either
+    a consolidated Impl -or- a BO, DAO, and BLImpl set of projects in
+    place from Project 1. You will not have the option of consolidating
+    the EJB, WAR, EAR, and RMI Test into a single project. They must be
+    implemented as separate projects with proper dependencies between
+    them declared.  Note that all "e"Sport, "e"League, and "e"Club names
+    should be changed to your specific name mangler. The same type of
+    modification needs to occur for the java package names.
+
+---
+`-- eSport
+    |-- eLeague
+    |   |-- eLeagueBO
+    |   |-- eLeagueDAO
+    |   |-- eLeagueBLImpl
+    |   |-- eLeagueEJB
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- main
+    |   |           |-- java
+    |   |           |   `-- eleague
+    |   |           |       `-- ejb
+    |   |           `-- resources
+    |   |               |-- META-INF
+    |   |               |   `-- persistence.xml
+    |   |               |-- ejb-jar.xml
+    |   |               `-- jboss.xml
+    |   |-- eLeagueWAR
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- main
+    |   |           |-- java
+    |   |           |   `-- eleague
+    |   |           |       `-- web
+    |   |           |-- resources
+    |   |           `-- webapp
+    |   |               |-- WEB-INF
+    |   |               |   |-- content
+    |   |               |   `-- web.xml
+    |   |               `-- index.jsp
+    |   |-- eLeagueEAR
+    |   |   `-- pom.xml
+    |   |-- eLeagueTest
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- test
+    |   |           |-- java
+    |   |           |   `-- eleague
+    |   |           |       `-- ejbclient
+    |   |           `-- resources
+    |   |               |-- eLeague-ant.xml
+    |   |               |-- eLeague.properties
+    |   |               `-- jndi.properties
+    |   `-- pom.xml
+    |-- eClub
+    |   |-- eClubBO
+    |   |-- eClubDAO
+    |   |-- eClubBLImpl
+    |   |-- eClubEJB
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- main
+    |   |           |-- java
+    |   |           |   `-- eclub
+    |   |           |       `-- ejb
+    |   |           `-- resources
+    |   |               |-- META-INF
+    |   |               |   `-- persistence.xml
+    |   |               |-- ejb-jar.xml
+    |   |               `-- jboss.xml
+    |   |-- eClubWAR
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- main
+    |   |           |-- java
+    |   |           |   `-- eclub
+    |   |           |       `-- web
+    |   |           |-- resources
+    |   |           `-- webapp
+    |   |               |-- WEB-INF
+    |   |               |   |-- content
+    |   |               |   `-- web.xml
+    |   |               `-- index.jsp
+    |   |-- eClubEAR
+    |   |   `-- pom.xml
+    |   |-- eClubTest
+    |   |   |-- pom.xml
+    |   |   `-- src
+    |   |       `-- test
+    |   |           |-- java
+    |   |           |   `-- eclub
+    |   |           |       `-- ejbclient
+    |   |           `-- resources
+    |   |               |-- eClub-ant.xml
+    |   |               |-- eClub.properties
+    |   |               `-- jndi.properties
+    |   `-- pom.xml
+    `-- pom.xml
+---
+
+
+* Grading
+
+    Your project will be graded on completeness and quality of product. In
+    order for you to receive full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The breakdown of grading 
+    will be as follows:
+
+        * README provided that describes where each requirement satisfied: 10pts
+
+        * projects cleanly builds with Maven: 15pts
+
+        * Project 1 functionality: 10pts
+
+        * EJB Tier, remote interface, and EAR deployment: 30pts
+
+        * Web UI integration: 25pts
+
+        * Transactions: 10pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implementation supplied: 30%
+
+        * testing: 10%
+
+* Submission Guidelines
+
+    Please follow the 
+    {{{../../../course-docs/projects.html#Submission%20Guidelines}
+    project submission guidelines}}
+    posted in the course overview.
