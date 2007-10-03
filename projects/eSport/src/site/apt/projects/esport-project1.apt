@@ -248,6 +248,10 @@ Project1: eSport Data Access Tier and Initial Business Logic
 
                 * END_DATE
 
+                * LEAGUE_ID - (N:1 relation to ELEAGUE_LEAGUE). This 
+                relationship allows all seasons to form a DB relationship
+                to the league.
+
             [[1]] ELEAGUE_DIVISION - design a table that represents
             a division for teams, for a single season. Divisions
             will be arranged by group (i.e., age) and level of play.
@@ -326,6 +330,9 @@ Project1: eSport Data Access Tier and Initial Business Logic
 
                 * CLUB_NAME - the textual name for the club. This value
                 must be supplied, may be changed, and must be unique.
+
+                * REP_ID - (N:1 to ELEAGUE_CONTACT). This reference
+                supplies the contact information for the club rep.
 
             [[1]] ELEAGUE_VENUE - design a field that represents a venue 
             for holding contests. Venues are owned by a club, but are given

@@ -34,6 +34,12 @@
     
     <dependencies>
         <dependency>
+          <groupId>javax.javaee</groupId>
+          <artifactId>javaee</artifactId>
+          <version>5</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>eSalesDTO</artifactId>
             <version>${pom.version}</version>
@@ -202,6 +208,68 @@
                             </systemProperties>
                         </configuration>
                     </plugin>
+
+                    <!-- generates a DDL file for persistence unit -->
+                    <plugin>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>2.0-alpha-2-ss1</version>
+                        <executions>
+                            <execution>
+                                <id>generate-drop-ddl</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-drop.ddl
+                                        </outputfilename>
+                                        <drop>true</drop>
+                                        <create>false</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-create-ddl</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-create.ddl
+                                        </outputfilename>
+                                        <drop>false</drop>
+                                        <create>true</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <components>
+                                <component>
+                                    <name>hbm2ddl</name>
+                                    <implementation>
+                                        jpaconfiguration
+                                    </implementation>
+                                    <outputDirectory>
+                                        target/classes/ddl
+                                    </outputDirectory>
+                                </component>
+                            </components>
+                            <componentProperties>
+                                <persistenceunit>
+                                    eSalesData
+                                </persistenceunit>
+                                <export>false</export>
+                                <format>true</format>
+                            </componentProperties>
+                        </configuration>
+                    </plugin>
+
                 </plugins>
             </build>
         </profile>

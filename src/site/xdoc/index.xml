@@ -18,31 +18,62 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-10-02: Posted JPA/Inheritance materials</li>
+          <li>2007-10-02: Posted JPA/EJB-QL materials</li>
+          <li>2007-10-02: Posted JPA/Relationship materials</li>
+          <li>2007-10-02: Posted alpha version of eLeagueTestUtil w/ parser</li>
+          <li>2007-09-25: Posted JPA/Entity Mapping materials</li>
+          <li>2007-09-18: Posted JPA/Entity Manager materials</li>
+          <li>2007-09-18: Posted Project 1 Spec</li>
+          <li>2007-09-11: Posted JDBC/DAO materials</li>
           <li>2007-09-04: Posted initial class site</li>
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-          <li>read through project description and post any clarification
-          questions</li>
-          <li>start your project directory tree</li>
-          <li>design your project business objects within the "BO" 
-            project areas; provide unit tests</li>
-          <li>create the schema file for the project; to mature over time</li>
-          <li>create the structure of the JDBC eLeague Ingest DAO within 
-            the "DAO" project; to mature over time</li>
-          <li>build your project from the root; all supplied artifacts 
-            should build and test correctly</li>
-          <li>go through the entityMgrEx exercise</li>
-          <li>look through the jpaDAO project</li>
-          <li>create the shell of the JPA DAO implementation classes for 
-            your projects; design how they share an EntityManager and
-            implement the CRUD methods;
-          </li>
+        <li>read the text chapter on Entity Relationships.</li>
+        <li>Update your business objects to map each of the relationships (remove the
+        @Transient annotations). 
+        Adde either JPA @Annotations to the .java files, an orm.xml descriptor
+        file, or both to map the business objects to the database. Either accept
+        JPA defaults and modify your existing .ddl scripts and JDBC code or 
+        provide JPA overrides to have it match your existing code.</li>
+        <li>Enhance your JPA DAO Unit tests to test the ability to manipulate
+        the business object relationships using your JPA DAO(s).</li>
+        <li>Add initial business logic interfaces and implementation classes,
+        including TestUtils. These implementation
+        classes should have delegated data access to the DAO classes.</li>
+        <li>Add a JUnit test that implements the end-to-end scenario discussed 
+        at the end of the testing section of the project 1 spec. You might have 
+        placed this in a separate functional test project.</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+        <li>created JPA DAO(s) implementation classes for your projects; designed how
+        they get a shared EntityManager and implemented the CRUD methods;
+        provided a persistence.xml file; defined all Collections to be @Transient
+        and observed the default behavior of mapping classes.</li>
+      </ul></li>
+      <li><ul>
+          <li>read through project description and posted any clarification
+          questions</li>
+          <li>started your project directory tree</li>
+          <li>designed your project business objects within the "BO" 
+            project areas; provided unit tests</li>
+          <li>created the schema file for the project; to mature over time</li>
+          <li>created the structure of the JDBC eLeague Ingest DAO within 
+            the "DAO" project; to mature over time</li>
+          <li>built your project from the root; all supplied artifacts 
+            should have built and test correctly</li>
+          <li>gone through the entityMgrEx exercise</li>
+          <li>looked through the jpaDAO project</li>
+          <li>created the shell of the JPA DAO implementation classes for 
+            your projects; design how they share an EntityManager and
+            implement the CRUD methods;
+          </li>
+      </ul></li>
       <li><ul>
           <li>went through JDBC tutorial and used this project to try out any
           test JDBC code you had questions on</li>
