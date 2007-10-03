@@ -70,9 +70,8 @@ public class JDBCClubDAOTest extends TestCase {
 		Statement statement=null;
 		try {
 			statement = connection.createStatement();
-			statement.execute("DELETE FROM ESALES_ACCT_ADDRESS_LINK");
-			statement.execute("DELETE FROM ESALES_ADDRESS");
-			statement.execute("DELETE FROM ESALES_ACCT");
+			statement.execute("DELETE FROM ELEAGUE_VEN");
+			statement.execute("DELETE FROM ELEAGUE_ADDR");
 		}
 		finally {
             if (statement != null) { statement.close(); }			
@@ -126,8 +125,8 @@ public class JDBCClubDAOTest extends TestCase {
     	    
     	    rs = statement.executeQuery(
     	    	"SELECT CITY " +
-    	    	"FROM ELEAGUE_VEN, ESALES_ADDR " +
-    	    	"WHERE ESALES_ADDR.ID = ELEAGUE_VEN.ADDR_ID " +
+    	    	"FROM ELEAGUE_VEN, ELEAGUE_ADDR " +
+    	    	"WHERE ELEAGUE_ADDR.ID = ELEAGUE_VEN.ADDR_ID " +
     	    		"AND ELEAGUE_VEN.ID = " + venue.getId());
     	    if (rs.next()) {
     	    	String city = rs.getString("CITY");
