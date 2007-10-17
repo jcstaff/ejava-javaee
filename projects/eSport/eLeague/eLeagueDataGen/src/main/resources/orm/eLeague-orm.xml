@@ -265,7 +265,7 @@
                     nullable="false"/>
             </id>
             <basic name="group">
-                <column name="GROUP"
+                <column name="DIVGROUP"
                     nullable="false"
                     unique="false"
                     updatable="false"
@@ -273,7 +273,7 @@
                     length="10"/>
             </basic>
             <basic name="level">
-                <column name="LEVEL"
+                <column name="DIVLEVEL"
                     nullable="false"
                     unique="false"
                     updatable="false"
@@ -339,6 +339,7 @@
         <table name="ELEAGUE_LEAGUE"/>
         <attributes>
             <id name="name">
+                <!-- should have been LEAGUE_NAME -->
                 <column name="CLUB_NAME"
                     nullable="false"
                     length="40"/>
@@ -354,7 +355,7 @@
         </attributes>
     </entity>
 
-    <!--
+<!--
     <entity class="ejava.projects.eleague.dto.ELeague">
         <table name="ELEAGUE_LEAGUE"/>
         <attributes>
@@ -394,8 +395,7 @@
             </one-to-one>
         </attributes>
     </entity>
-    -->
-    
+-->    
     <entity class="ejava.projects.eleague.dto.AddressType" 
         access="FIELD">
         <table name="ELEAGUE_ADDRESS"/>
