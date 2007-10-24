@@ -48,6 +48,8 @@ public class JNDIHelper {
         try {
             Class objectClass = Thread.currentThread().getContextClassLoader()
                     .loadClass(className);
+            log.debug(objectClass.getName() + " isAssignable=" + 
+                    Context.class.isAssignableFrom(objectClass));
             return Context.class.isAssignableFrom(objectClass);
         }
         catch (ClassNotFoundException ex) {

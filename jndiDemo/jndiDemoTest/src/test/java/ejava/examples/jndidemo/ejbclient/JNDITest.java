@@ -33,16 +33,16 @@ public class JNDITest extends TestCase {
         String encname = "ejb/hospital";
         String jndiname = "java:comp/env/" + encname;
         String jbossname = "java:comp.ejb3/env/" + encname;
-        log.debug("jndi:" + jndiname + "=" + s.getJndiProperty(jndiname));
-        log.debug("jndi:" + jbossname + "=" + s.getJndiProperty(jbossname));
-        log.debug("ctx :" + encname + "=" + s.getCtxProperty(encname));
+        log.debug("jndi: " + jndiname + "=" + s.getJndiProperty(jndiname));
+        log.debug("jndi: " + jbossname + "=" + s.getJndiProperty(jbossname));
+        log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
 
         encname = "persistence/jndidemo";
         jndiname = "java:comp/env/" + encname;
         jbossname = "java:comp.ejb3/env/" + encname;
-        log.debug("jndi:" + jndiname + "=" + s.getJndiProperty(jndiname));
-        log.debug("jndi:" + jbossname + "=" + s.getJndiProperty(jbossname));
-        log.debug("ctx :" + encname + "=" + s.getCtxProperty(encname));
+        log.debug("jndi: " + jndiname + "=" + s.getJndiProperty(jndiname));
+        log.debug("jndi: " + jbossname + "=" + s.getJndiProperty(jbossname));
+        log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
     }
     
     public void testAnnotationPopulation() throws Exception {
@@ -57,15 +57,15 @@ public class JNDITest extends TestCase {
         String encname = "ejb/cook";
         String jndiname = "java:comp/env/" + encname;
         String jbossname = "java:comp.ejb3/env/" + encname;
-        log.debug("jndi:" + jndiname + "=" + s.getJndiProperty(jndiname));
-        log.debug("jndi:" + jbossname + "=" + s.getJndiProperty(jbossname));
-        log.debug("ctx :" + encname + "=" + s.getCtxProperty(encname));
+        log.debug("jndi: " + jndiname + "=" + s.getJndiProperty(jndiname));
+        log.debug("jndi: " + jbossname + "=" + s.getJndiProperty(jbossname));
+        log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
 
         encname = "persistence/jndidemo";
         jndiname = "java:comp/env/" + encname;
         jbossname = "java:comp.ejb3/env/" + encname;
-        log.debug("jndi:" + jndiname + "=" + s.getJndiProperty(jndiname));
-        log.debug("jndi:" + jbossname + "=" + s.getJndiProperty(jbossname));
-        log.debug("ctx :" + encname + "=" + s.getCtxProperty(encname));
+        log.debug("jndi: " + jndiname + "=" + s.getJndiProperty(jndiname));
+        log.debug("jndi: " + jbossname + "=" + s.getJndiProperty(jbossname));
+        log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
     }
 }

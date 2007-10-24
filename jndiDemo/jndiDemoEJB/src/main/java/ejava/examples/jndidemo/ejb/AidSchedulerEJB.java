@@ -9,12 +9,25 @@ import javax.persistence.EntityManager;
 
 import ejava.examples.jndidemo.JNDIHelper;
 
+/**
+ * This class is primarily an example of an EJB mostly configured through 
+ * an external ejb-jar.xml deployment descriptor. There are very few Java
+ * @Annotations defined here. All properties are injected through definitions
+ * in the ejb-jar.xml file.
+ *  
+ * @author jcstaff
+ *
+ */
+
 @Stateless(name="AidScheduler")
 public class AidSchedulerEJB extends SchedulerBase
     implements AidSchedulerLocal, AidSchedulerRemote {
         
+    //this is injected by ejb-jar.xml entry
     private EntityManager em;
+    //this is injected by ejb-jar.xml entry
     private String message;
+    //this is injected by ejb-jar.xml entry
     private HospitalLocal hospital;
     
     @Resource 
@@ -27,7 +40,10 @@ public class AidSchedulerEJB extends SchedulerBase
         log.debug("message=" + message);
         log.debug("em=" + em);
         log.debug("hospital=" + hospital);
+        //see common in BaseSchedulerEJB about java:comp/env and java:comp.ejb3
         try { new JNDIHelper().dump(new InitialContext(), "java:comp.ejb3");
+        } catch (NamingException e) { log.fatal("" + e); }        
+        try { new JNDIHelper().dump(new InitialContext(), "java:comp/env");
         } catch (NamingException e) { log.fatal("" + e); }        
     }
     

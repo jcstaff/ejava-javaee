@@ -18,6 +18,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-10-24: Posted Session Bean and JNDI materials</li>
           <li>2007-10-16: Posted rc1 version of eLeagueTestUtil w/ parser</li>
           <li>2007-10-02: Posted JPA/Inheritance materials</li>
           <li>2007-10-02: Posted JPA/EJB-QL materials</li>
@@ -32,12 +33,39 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-        <li>Finish up project 1</li>
-        <li>Get help if needed</li>
+        <li>Add an EJB project to eLeague</li>
+        <li>Add a skeletal Remote interface for one of your business
+        object classes with no methods.</li>
+        <li>Add a skeletal EJB implementation with a @PostConstruct method
+        that will log a message stating it had been invoked</li>
+        <li>Add an EAR project to eLeague to house the EJB</li>
+        <li>Add an RMI Test project to eLeague. Have this project deploy the EAR
+        to the application server</li>
+        <li>Deploy the EAR to the application server and look for the Remote
+        interface in the JNDI Tree</li>
+        <li>Add a JUnit test to the RMI Test project that looks up/locates the
+        Remote interface of the EJB. Look for your log message from the
+        @PostConstruct method</li>
+        <li>Add a simple method to the Remote interface and EJB class</li>
+        <li>Update the RMI Test to invoke the new method</li>
+        <li>Update the EJB to instantiate and properly configure your business 
+        logic and DAO classes.</li>
+        <li>Enhance the Remote interface, 1 method at a time, with business
+        methods you will need to implement your end-to-end scenario. Define
+        a set of DTOs that will be used to transport the information to/from
+        the remote client. Have the EJB Tier perform the translation between
+        remote calls/DTOs and local business logic methods/BOs.</li>
+        <li>Continue adding additional EJBs/Remote interfaces, remote interface
+        methods/implementations, and JUnit tests until you have finished the
+        specified end-to-end scenario for eLeague</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+        <li>Finished project 1</li>
+        <li>Gotten help if needed</li>
+      </ul></li>
       <li><ul>
         <li>read the text chapter on Entity Relationships.</li>
         <li>Updated your business objects to map each of the relationships (remove the

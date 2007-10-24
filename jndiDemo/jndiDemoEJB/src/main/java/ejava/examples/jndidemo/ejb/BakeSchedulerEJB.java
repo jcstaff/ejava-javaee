@@ -1,7 +1,6 @@
 package ejava.examples.jndidemo.ejb;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+import javax.annotation.PostConstruct;import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.EJBs;
 import javax.ejb.SessionContext;
@@ -14,7 +13,17 @@ import javax.persistence.PersistenceContextType;
 
 import ejava.examples.jndidemo.JNDIHelper;
 
+/**
+ * This class is primarily an example of configuring an EJB through 
+ * @Annotations. There is no external ejb-jar.xml deployment descriptor 
+ * entries for this EJB.
+ * 
+ * @author jcstaff
+ *
+ */
 @Stateful(name="BakeScheduler")
+// This populates the local JNDI ENC with EJBs that can be de-referenced
+// within the EJB.
 @EJBs({
     @EJB(name="ejb/cook", beanInterface=CookLocal.class, beanName="CookEJB")
 })
@@ -23,23 +32,44 @@ public class BakeSchedulerEJB
 
     public String getName() { return "BakeSchedulerEJB"; }
     
+    /*
+     * This declaration creates an EntityManager, with an extended
+     * persistence context (only legal in Stateful session beans), 
+     * for the named persistence unit, and places it in the JNDI context 
+     * java:comp/env/persistence/jndidemo
+     */
     @PersistenceContext(unitName="jndidemo",
                         name="persistence/jndidemo",
                         type=PersistenceContextType.EXTENDED)
     private EntityManager em;
 
+    /*
+     * This declaration will cause the container to inject a SessionContext
+     * into the EJB at startup.
+     */
     @Resource
     protected void setSessionContext(SessionContext ctx) {
         super.ctx = ctx;
     }
     
-    //we will assign this value using a JNDI lookup from the injection at the
-    //beginning of the class; this works in JBoss 4.0.5, but not in 4.0.4
+    /* 
+     * We will manually assign this value using a JNDI lookup inside the 
+     * @PostConstruct method
+     */
     protected CookLocal cook; 
 
-    @Resource(name="ejb/cook", mappedName="jndiSchedulerEAR-1.0.2007.1/CookEJB/local")
+    /*
+     * This reference will be injected by the container based on the name
+     * provided here and the information either located within the @EJBs spec
+     * at the top of the class or the ejb-jar.xml deployment descriptor file. 
+     */
+    @Resource(name="ejb/cook")
     protected CookLocal cook2; 
-    
+
+    /*
+     * This won't resolve to anything since this example does not use an 
+     * external deployment descriptor to give us a value.
+     */
     @Resource(name="vals/message")
     String message;
 
@@ -54,7 +84,13 @@ public class BakeSchedulerEJB
         log.debug("cook=" + cook);
         log.debug("cook2=" + cook2);
         cook = (CookLocal)ctx.lookup("ejb/cook");
+        //note that JBoss stashes things in a proprietary context in v4.x -
+        //java:comp/env doesn't end up really holding anything although
+        //lookups act like they really resolve to expected objects (see output
+        //from running the RMI test program
         try { new JNDIHelper().dump(new InitialContext(), "java:comp.ejb3");
+        } catch (NamingException e) { log.fatal("" + e); }
+        try { new JNDIHelper().dump(new InitialContext(), "java:comp/env");
         } catch (NamingException e) { log.fatal("" + e); }
     }
 }

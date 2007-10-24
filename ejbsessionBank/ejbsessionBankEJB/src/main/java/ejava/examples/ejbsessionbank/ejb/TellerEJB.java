@@ -25,7 +25,7 @@ import ejava.examples.ejbsessionbank.jpa.JPAUtil;
 
 /**
  * This class implements a Stateless Session Bean wrapper around the 
- * Teller business logic. With the lite-weight EJB3 design for session 
+ * Teller business logic. With the light-weight EJB3 design for session 
  * beans, there is no reason why the TellerImpl couldn't be the session bean
  * and we could possibly do so through the deployment descriptor. However,
  * adding this specific class permits a clear separation between implementing
@@ -49,7 +49,6 @@ public class TellerEJB implements TellerLocal, TellerRemote {
 
     /** The peristence context will be defined as a property to allow a 
      * derived class to override this value and assist in unit testing.
-     * @return
      */    
     @PersistenceContext(unitName="ejbsessionbank")
     public void setEm(EntityManager em) {

@@ -51,10 +51,11 @@ public class TellerHandlerServlet extends HttpServlet {
      * application server with the TellerEJB.
      */
     //not working:( 
-    //@EJB(name="ejb/teller", 
+    //@javax.ejb.EJB(name="ejb/teller", 
     //     beanName="TellerEJB", 
     //     beanInterface=TellerLocal.class,
     //     mappedName="ejava/examples/ejbsessionbank/TellerEJB/local")
+    //not working either:((
     @Resource(name="ejb/teller", 
          type=TellerLocal.class,
          mappedName="ejava/examples/ejbsessionbank/TellerEJB/local")
