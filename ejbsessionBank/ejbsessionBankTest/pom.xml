@@ -30,7 +30,14 @@
             <groupId>${pom.groupId}</groupId>
             <artifactId>ejbsessionBankEJB</artifactId>
             <version>${pom.version}</version>
-            <type>ejb</type>
+            <type>ejb-client</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>ejbsessionBankDA</artifactId>
+            <version>${pom.version}</version>
+            <scope>compile</scope>
         </dependency>
         
         <!-- package being deployed must be a dependency -->

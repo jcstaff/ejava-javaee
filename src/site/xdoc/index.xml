@@ -8,16 +8,16 @@
     <section name="Enterprise Java (605.784.31) Root">
       <p>
       This is the course home page for the Enterprise Java Course
-      (605.784), taught at John's Hopkins University, Engineering Programs
-      for Professionals.  
-      This site will be populated as the semester progresses
-      and topics are addressed. If you are looking for a version of the full content
-      for ejava-javaee, refer to
+      (605.784), taught at John's Hopkins University, Engineering
+      Programs for Professionals.  This site will be populated as the
+      semester progresses and topics are addressed. If you are looking
+      for a version of the full content for ejava-javaee, refer to
       <a href="http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee">
       http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee</a>.
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2007-10-30: Posted EAR and Transaction materials</li>
           <li>2007-10-24: Posted Session Bean and JNDI materials</li>
           <li>2007-10-16: Posted rc1 version of eLeagueTestUtil w/ parser</li>
           <li>2007-10-02: Posted JPA/Inheritance materials</li>
@@ -33,35 +33,40 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-        <li>Add an EJB project to eLeague</li>
-        <li>Add a skeletal Remote interface for one of your business
-        object classes with no methods.</li>
-        <li>Add a skeletal EJB implementation with a @PostConstruct method
-        that will log a message stating it had been invoked</li>
-        <li>Add an EAR project to eLeague to house the EJB</li>
-        <li>Add an RMI Test project to eLeague. Have this project deploy the EAR
-        to the application server</li>
-        <li>Deploy the EAR to the application server and look for the Remote
-        interface in the JNDI Tree</li>
-        <li>Add a JUnit test to the RMI Test project that looks up/locates the
-        Remote interface of the EJB. Look for your log message from the
-        @PostConstruct method</li>
-        <li>Add a simple method to the Remote interface and EJB class</li>
-        <li>Update the RMI Test to invoke the new method</li>
-        <li>Update the EJB to instantiate and properly configure your business 
-        logic and DAO classes.</li>
-        <li>Enhance the Remote interface, 1 method at a time, with business
-        methods you will need to implement your end-to-end scenario. Define
-        a set of DTOs that will be used to transport the information to/from
-        the remote client. Have the EJB Tier perform the translation between
-        remote calls/DTOs and local business logic methods/BOs.</li>
         <li>Continue adding additional EJBs/Remote interfaces, remote interface
         methods/implementations, and JUnit tests until you have finished the
-        specified end-to-end scenario for eLeague</li>
+        specified end-to-end scenario for eLeague and eClub</li>
+        <li>Add Transaction declarations to EJB classes</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+        <li>Added an EJB project to eLeague</li>
+        <li>Added a skeletal Remote interface for one of your business
+        object classes with no methods.</li>
+        <li>Added a skeletal EJB implementation with a @PostConstruct method
+        that will log a message stating it had been invoked</li>
+        <li>Added an EAR project to eLeague to house the EJB</li>
+        <li>Added an RMI Test project to eLeague. Had this project deploy
+        the EAR to the application server</li>
+        <li>Deployed the EAR to the application server and look for the Remote
+        interface in the JNDI Tree</li>
+        <li>Added a JUnit test to the RMI Test project that looks up/locates the
+        Remote interface of the EJB. Looked for your log message from the
+        @PostConstruct method</li>
+        <li>Added a simple method to the Remote interface and EJB class</li>
+        <li>Updated the RMI Test to invoke the new method</li>
+        <li>Updated the EJB to instantiate and properly configure your business 
+        logic and DAO classes.</li>
+        <li>Enhanced the Remote interface, 1 method at a time, with business
+        methods you will need to implement your end-to-end scenario.  Defined
+        a set of DTOs that will be used to transport the information to/from
+        the remote client. Had the EJB Tier perform the translation between
+        remote calls/DTOs and local business logic methods/BOs.</li>
+        <li>Continued adding additional EJBs/Remote interfaces, remote interface
+        methods/implementations, and JUnit tests.</li>
+      </ul></li>
       <li><ul>
         <li>Finished project 1</li>
         <li>Gotten help if needed</li>

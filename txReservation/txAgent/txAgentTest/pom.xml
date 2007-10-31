@@ -41,6 +41,19 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>txHotelEJB</artifactId>
+            <version>${pom.version}</version>
+            <type>ejb-client</type>
+        </dependency>
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>txHotelBO</artifactId>
+            <version>${pom.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- package being deployed must be a scope=compile dependency -->
         <dependency>
