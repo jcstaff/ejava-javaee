@@ -1,6 +1,6 @@
 Project3: eSport Secure and Asynchronous N-Tier Application
 
-    09/18/2007 
+    11/27/2007 - update username/test data value mappings
 
 * Goals
 
@@ -125,6 +125,23 @@ Project3: eSport Secure and Asynchronous N-Tier Application
 
         * ...
 
+        [Note:] In looking at the rc1 test data, the following mappings can be applied.
+
+        * admin1 can still be the master admin account for both eleague and eclub.
+
+        * Assign eleague-coord to lmtucker instead of user1
+
+        * Assign eleague-clubcoord to tbswanson, kdromero, sthart, lmfuller, 
+            rgrobbins, gchamilton, avschultz, jcbell, user4 
+
+        * There are no division coordinators defined in th rc1 data. You can assign
+        the eleague-divcoord role to lmtucker.
+
+        * Assign the eclub-coord, and eclub-member role to user4 and have that be 
+        the login for your eClub coordinator.
+
+        []
+
 ===
 
     [[1]] Enhance eLeague with access restrictions.
@@ -151,7 +168,9 @@ Project3: eSport Secure and Asynchronous N-Tier Application
             associated with their club.
 
             [[1]] Division coordinators may only report scores for contests 
-            in their assigned division.
+            in their assigned division. Since there are no assigned division
+            coordinators in the rc1 test data, you may either assign one or
+            allow the eleague-coord supply scores.
 
         * Allow any user to perform read operations.
 
