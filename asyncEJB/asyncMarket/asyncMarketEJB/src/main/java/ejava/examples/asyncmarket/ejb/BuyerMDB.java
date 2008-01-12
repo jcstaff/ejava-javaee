@@ -88,7 +88,7 @@ public class BuyerMDB implements MessageListener {
             log.debug("kludged buyer=" + buyer);
         }
 
-        //lots of debug that should have been unecessary!!!
+        //lots of debug that should have been unnecessary!!!
         
         String name="java:/comp.ejb3/env";
         StringBuilder text = new StringBuilder("jndi("+name+")=");
