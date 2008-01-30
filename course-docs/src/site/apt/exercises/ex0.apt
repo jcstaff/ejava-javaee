@@ -68,22 +68,16 @@ Exercise 0: Development Environment Setup
 
 * {Part B}: Download and Install J2SE 1.5 JDK
 
-    [Note:] The Java EE API is necessary to compile Java EE source code. This API can
-    both be obtained from Sun as well from JBoss. However, Sun packages it in a
-    convenient, single .jar file and JBoss spreads it across many .jar files. We will
-    start by using the one from Sun and switch to the JBoss version as necessary.
+    [[1]] Go to the
+    {{{http://java.sun.com/javase/downloads/index_jdk5.jsp} Sun Java SE
+    5 Download Page}} and download JDK 5.0. JDK 6.0 has been released
+    but we will be using JDK 5.0 for compatibility with legacy Java EE
+    5 implementations.  If you download the JDK with Java EE, Java SE 
+    will be hiding in Sun/AppServer/jdk/bin.
 
-    []
-
-    [[1]] Go to the 
-    {{{http://java.sun.com/javase/downloads/index_jdk5.jsp}
-    Sun Java SE 5 Download Page}} and download JDK 5.0. JDK 6.0 has been released
-    but we will be using JDK 5.0 for compatibility with legacy Java EE 5
-    implementations.  If you download the JDK with Java EE, it I will be hiding in 
-    Sun/AppServer/jdk/bin.
-
-    [[1]] Change the installation directory so that it does not have a spaces in its
-    path. I changed mine to C:\apps\jdk1.5.0_12\ and C:\apps\jre1.5.0_12\
+    [[1]] Change the installation directory so that it does not have
+    a spaces in its path. I changed mine to C:\apps\jdk1.5.0_14\ and
+    C:\apps\jre1.5.0_14\
 
     [[1]] Go through Control Panel -> System -> Advanced -> Environment
     Variables and add jdk/bin to your classpath.
@@ -92,6 +86,14 @@ Exercise 0: Development Environment Setup
     determine you can find the JDK and verify the version.
 
 * {Part C}: Download and Install Java EE 5 SDK (to get the Java EE API .jar file)
+
+    [Note:] The Java EE API is necessary to compile Java EE source
+    code. This API can both be obtained from Sun as well from
+    JBoss. However, Sun packages it in a convenient, single .jar file
+    and JBoss spreads it across many .jar files. We will start by using
+    the one from Sun and switch to the JBoss version as necessary.
+
+    []
 
     [[1]] Download and install
     {{{http://java.sun.com/javaee/downloads/index.jsp}Java EE 5}} if
@@ -132,7 +134,7 @@ c:/apps/Sun/SDK/lib/javaee.jar
             client, but I'll go through some of the steps for
             {{{http://tortoisesvn.tigris.org/}TortoiseSVN}} here.
 
-                [[1]] I chose the TortoiseSVN-1.4.5 version. 
+                [[1]] I chose the TortoiseSVN-1.4.7 version. 
 
                 [[1]] The path for this tool won't be a part of any path we use to build
                 or run projects, so I chose the default installation directory.
@@ -162,7 +164,7 @@ c:/apps/Sun/SDK/lib/javaee.jar
             [[1]] Browse the repository to determine the URL for the 
             project you wish to checkout. You can start at the root 
             using the following
-            {{https://ejava.info:8443/repos/class/branches/2007-fall-ejava-javaee}}
+            {{https://ejava.info:8443/repos/class/branches/2008-spring-ejava-javaee}}
             URL.
 
             [[1]] Check out a level of the SVN repository to your class
@@ -174,7 +176,7 @@ c:/apps/Sun/SDK/lib/javaee.jar
             SVN repository. You must use https to access the repository.
 
 ---
-$ svn checkout https://ejava.info:8443/repos/class/branches/2007-fall-ejava-javaee ejava-javaee
+$ svn checkout https://ejava.info:8443/repos/class/branches/2008-spring-ejava-javaee ejava-javaee
 A  ejava-javaee/.project
 A  ejava-javaee/jdbcDAO
 A  ejava-javaee/jdbcDAO/.classpath
@@ -209,7 +211,7 @@ At revision 24.
     are for when you want to call Maven from within Ant.
 
     [[1]] Unzip the archive. I put mine in c:/apps/, which resulted in a
-    c:/apps/maven-2.0.7 directory. 
+    c:/apps/apache-maven-2.0.8 directory. 
 
     [[1]] Add $MAVEN_HOME/bin to your PATH
 
@@ -219,10 +221,10 @@ At revision 24.
     [[1]] Execute "mvn -version" as a test.
 
 ---
-$ mvn --version
-Maven version: 2.0.7
-Java version: 1.5.0_12
-OS name: "windows xp" version: "5.1" arch: "x86"
+> mvn --version
+Maven version: 2.0.8
+Java version: 1.5.0_14
+OS name: "windows xp" version: "5.1" arch: "x86" Family: "windows"
 ---
     [Cywin Users:] You must express all PATHs in unix form. Unix PATHs use ":" as a 
     PATH separator and "/" as a directory separator. /cygdrive/c can be used to refer
@@ -234,10 +236,10 @@ $ cygpath --unix c:/
 /cygdrive/c
 
 $ cygpath --unix $MAVEN_HOME
-/cygdrive/c/apps/maven-2.0.7
+/cygdrive/c/apps/apache-maven-2.0.8
 
 $ cygpath --windows $MAVEN_HOME
-c:\apps\maven-2.0.7
+c:\apps\apache-maven-2.0.8
 
 $ cygpath --windows /cygdrive/c
 c:\
@@ -350,19 +352,27 @@ ee\javaee\5\javaee-5.jar
     You'll be responsible for basic tasks of building and 
     testing an application. There will be plenty of examples supplied in class.
 
-* {Part F}: Download and install JBoss Application Server with EJB3
+* {Part F}: Download and install JBoss Application Server
 
     [[1]] Go to the 
     {{{http://labs.jboss.com/portal/jbossas/download}
-    Download site for the JBoss Application Server}}.  Burke's EJB3 with JBoss workbook
-    shows an example of using the "Run Installer" that 
-    walks you through the right options to get JBoss <<AND>> EJB3. However,
-    that was for 4.0.4/5. EJB3 is enabled by default, starting with 4.2.
+    Download site for the JBoss Application Server}}.  Download version
+    4.2.2.GA. Burke's EJB3 with JBoss workbook shows an example of using
+    the "Run Installer" that walks you through the right options to get
+    JBoss <<AND>> EJB3. However, that was for 4.0.4/5. EJB3 is enabled
+    by default, starting with 4.2.
 
-    [[1]] On Windows, I installed mine into c:/apps/jboss to keep the name simple and
-    to avoid spaces in the path.
+    [[1]] On Windows, I unzipped mine to c:/apps to avoid having any spaces in the
+    path. This produced a directory called c:/apps/jboss-4.2.2.GA.
+    I renamed the directory to c:/apps/jboss to keep the name simple. 
 
-    [[1]] We'll use the "default" server name.
+    [Note:] If you choose a directory other than c:/apps/jboss, make sure to 
+    update the value for jboss.home in the MAVEN %HOME%/.m2/settings.xml file.
+
+    []
+
+    [[1]] We'll be using the "default" server.
+
 ---
 $ ls c:/apps/jboss/server/default
 conf  deploy  lib
@@ -409,6 +419,15 @@ $ java -classpath c:/apps/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.Da
     Everything else can stay defaulted. After you hit OK, the GUI should
     connect to the database using port 9001.
 
+    [Note:] You can run just the database application by executing the following.
+
+---
+> cd c:/apps/jboss/server/default/data/hypersonic
+> java -classpath c:/apps/jboss/server/default/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+---
+
+    []    
+
     [[1]] Navigate to {{http://localhost:8080/jmx-console}} with your browser. Click 
     service=ejavaDB under the "jboss" heading. Click "Invoke" under
     startDatabaseManager(). A browser version of the DB UI should appear. If it
@@ -425,24 +444,8 @@ Server shutdown may take a while - check logfiles for completion
 ---
 
     [[1]] You might want to map the run and shutdown scripts to some
-    desktop launch icons since you be starting and stopping this server
+    desktop launch icons since you'll be starting and stopping this server
     quite a bit over the semester.
-
-    [[1]] Add support for Java 1.5 within JSPs. Add the following element to
-    JBOSS_HOME/server/default/deploy/jboss-web.deployer/conf/web.xml
-
----
-    <servlet>
-            <servlet-name>jsp</servlet-name>
-                    <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
-
-        ...
-
-        <init-param>
-            <param-name>compilerSourceVM</param-name>
-            <param-value>1.5</param-value>
-        </init-param>
----
 
     [[1]] Change the data source used to persist EJB Timers to be the same as the
     one used to persist your EJB application data. This helps avoid issues with
@@ -457,6 +460,13 @@ Server shutdown may take a while - check logfiles for completion
     -->
     <depends optional-attribute-name="DataSource">jboss.jca:service=DataSourceBinding,name=ejavaDS</depends>
 ---
+
+    [Note:] Performing the above step triggered my anti-virus internet
+    work auto-protection since JBoss is now opening up a port that is
+    actively being connected to (from localhost). I had to temporarily
+    disable the auto-protection in order to successfully start JBoss
+    on windows at this point.
+
 
     [[1]] Add support for https protocol by following the instructions in the
     {{{./jboss-https.html} Enable JBoss HTTPS Exercise}}
@@ -474,9 +484,9 @@ Server shutdown may take a while - check logfiles for completion
 
     [[1]] Download and install
     {{{http://www.eclipse.org/}Eclipse}}. They now have a separate download
-    for Java Developers and another for Java EE Developers. This version and 
-    packaging is new for me, but lets try the Java EE Developer version and
-    see what additional has been added.
+    for Java Developers and another for Java EE Developers. It won't really matter
+    which you select, but I have been using the Java EE version lately with no
+    complaints.
 
         * I extracted the files to c:/apps, which resulted in a c:/apps/eclipse 
         directory.

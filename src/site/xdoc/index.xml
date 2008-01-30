@@ -10,162 +10,33 @@
       This is the course home page for the Enterprise Java Course
       (605.784), taught at John's Hopkins University, Engineering
       Programs for Professionals.  
-      <!--
+
       This site will be populated as the
       semester progresses and topics are addressed. If you are looking
       for a version of the full content for ejava-javaee, refer to
       <a href="http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee">
       http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee</a>.
-      -->
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
-          <li>2008-01-12: Baselned semester materials</li>
-          <li>2007-11-27: Posted JMS materials</li>
-          <li>2007-11-13: Posted Security materials</li>
-          <li>2007-11-06: Posted Web Tier materials</li>
-          <li>2007-10-30: Posted EAR and Transaction materials</li>
-          <li>2007-10-24: Posted Session Bean and JNDI materials</li>
-          <li>2007-10-16: Posted rc1 version of eLeagueTestUtil w/ parser</li>
-          <li>2007-10-02: Posted JPA/Inheritance materials</li>
-          <li>2007-10-02: Posted JPA/EJB-QL materials</li>
-          <li>2007-10-02: Posted JPA/Relationship materials</li>
-          <li>2007-10-02: Posted alpha version of eLeagueTestUtil w/ parser</li>
-          <li>2007-09-25: Posted JPA/Entity Mapping materials</li>
-          <li>2007-09-18: Posted JPA/Entity Manager materials</li>
-          <li>2007-09-18: Posted Project 1 Spec</li>
-          <li>2007-09-11: Posted JDBC/DAO materials</li>
-          <li>2007-09-04: Posted initial class site</li>
+          <li>2008-01-28: Posted initial class site</li>
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-        <li>Enjoy the holidays.</li>
+          <li>register for newsgroup and setup e-mail handling (all e-mails will have
+          ejava_class in subject)</li>
+          <li>post at least 1 test message to newsgroup</li>
+          <li>setup development environment by going through exercises 0 and 1</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
-      <li><ul>
-        <li>Integrated publishing of Contest JMS messages into EJB tier</li>
-        <li>Added MDB in eClub to receive Contest updates</li>
-        <li>Added EJBTimers</li>
-        <li>Wrapped-up and submitted project</li>
-      </ul></li>
-      <li><ul>
-        <li>Completed security updates</li>
-        <li>Defined JMS message for Contests</li>
-        <li>Built utility class to publish Contest JMS messages</li>
-        <li>Built JSE subscriber to receive Contest JMS messages</li>
-      </ul></li>
-      <li><ul>
-        <li>Configured EJB to use security-domain</li>
-        <li>Added declarative security constraints to EJB methods</li>
-        <li>Added programmatic security checks to restrict entity/row updates to 
-        proper owner</li>
-        <li>Updated EJB methods to remove redundant entity/row Id information
-        that can be derived from the authenticated user's identity.</li>
-        <li>Updated RMI Tests to properly authenticate</li>
-        <li>Configured WAR to use security-domain</li>
-        <li>Added security constraints to url-patterns</li>
-        <li>Updated JSP forms to remove redundant entity/row Id information
-        that can be derived from the authenticated user's identity.</li>
-      </ul></li>
-      <li><ul>
-        <li>Complete web tier</li>
-        <li>Cleanup and turn in projects</li>
-      </ul></li>
-      <li><ul>
-        <li>Started work on web tier</li>
-        <li>Finished remote interface implementation and testing for 
-        eLeague, eClub, and eClub to eLeague from a JUnit test harness.</li>
-        <li>Have the end-to-end scenario implemented from JUnit</li>
-        <li>Added Transaction declarations to EJB classes</li>
-      </ul></li>
-      <li><ul>
-        <li>Added an EJB project to eLeague</li>
-        <li>Added a skeletal Remote interface for one of your business
-        object classes with no methods.</li>
-        <li>Added a skeletal EJB implementation with a @PostConstruct method
-        that will log a message stating it had been invoked</li>
-        <li>Added an EAR project to eLeague to house the EJB</li>
-        <li>Added an RMI Test project to eLeague. Had this project deploy
-        the EAR to the application server</li>
-        <li>Deployed the EAR to the application server and look for the Remote
-        interface in the JNDI Tree</li>
-        <li>Added a JUnit test to the RMI Test project that looks up/locates the
-        Remote interface of the EJB. Looked for your log message from the
-        @PostConstruct method</li>
-        <li>Added a simple method to the Remote interface and EJB class</li>
-        <li>Updated the RMI Test to invoke the new method</li>
-        <li>Updated the EJB to instantiate and properly configure your business 
-        logic and DAO classes.</li>
-        <li>Enhanced the Remote interface, 1 method at a time, with business
-        methods you will need to implement your end-to-end scenario.  Defined
-        a set of DTOs that will be used to transport the information to/from
-        the remote client. Had the EJB Tier perform the translation between
-        remote calls/DTOs and local business logic methods/BOs.</li>
-        <li>Continued adding additional EJBs/Remote interfaces, remote interface
-        methods/implementations, and JUnit tests.</li>
-      </ul></li>
-      <li><ul>
-        <li>Finished project 1</li>
-        <li>Gotten help if needed</li>
-      </ul></li>
-      <li><ul>
-        <li>read the text chapter on Entity Relationships.</li>
-        <li>Updated your business objects to map each of the relationships (remove the
-        @Transient annotations). 
-        Added either JPA @Annotations to the .java files, an orm.xml descriptor
-        file, or both to map the business objects to the database. Either accepted
-        JPA defaults and modified your existing .ddl scripts and JDBC code or 
-        provided JPA overrides to have it match your existing code.</li>
-        <li>Enhanced your JPA DAO Unit tests to test the ability to manipulate
-        the business object relationships using your JPA DAO(s).</li>
-        <li>Added initial business logic interfaces and implementation classes,
-        including TestUtils. These implementation
-        classes should have delegated data access to the DAO classes.</li>
-        <li>Added a JUnit test that implements the end-to-end scenario discussed 
-        at the end of the testing section of the project 1 spec. You might have 
-        placed this in a separate functional test project.</li>
-      </ul></li>
-      <li><ul>
-        <li>created JPA DAO(s) implementation classes for your projects; designed how
-        they get a shared EntityManager and implemented the CRUD methods;
-        provided a persistence.xml file; defined all Collections to be @Transient
-        and observed the default behavior of mapping classes.</li>
-      </ul></li>
-      <li><ul>
-          <li>read through project description and posted any clarification
-          questions</li>
-          <li>started your project directory tree</li>
-          <li>designed your project business objects within the "BO" 
-            project areas; provided unit tests</li>
-          <li>created the schema file for the project; to mature over time</li>
-          <li>created the structure of the JDBC eLeague Ingest DAO within 
-            the "DAO" project; to mature over time</li>
-          <li>built your project from the root; all supplied artifacts 
-            should have built and test correctly</li>
-          <li>gone through the entityMgrEx exercise</li>
-          <li>looked through the jpaDAO project</li>
-          <li>created the shell of the JPA DAO implementation classes for 
-            your projects; design how they share an EntityManager and
-            implement the CRUD methods;
-          </li>
-      </ul></li>
-      <li><ul>
-          <li>went through JDBC tutorial and used this project to try out any
-          test JDBC code you had questions on</li>
-          <li>looked through the jdbcDAO project</li>
-          <li>performed a sample JDBC O/R Mapping with CLUB, VENUE, and 
-            ADDRESS tables to Club and Venue Java classes</li>
-      </ul></li>
 
       <li><ul>
-          <li>registered for newsgroup and setup e-mail handling (all e-mails will have
-          ejava_class in subject)</li>
-          <li>posted at least 1 test message to newsgroup</li>
-          <li>setup development environment by going through exercises 0 and 1</li>
+        <li>Nothing Yet</li>
       </ul></li>
+
       </ul>
       </subsection>
     </section>

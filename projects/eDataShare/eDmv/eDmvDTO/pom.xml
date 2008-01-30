@@ -1,0 +1,220 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/maven-v4_0_0.xsd">
+        
+    <parent>
+        <groupId>ejava.javaee.projects.eDataShare.eDmv</groupId>
+        <artifactId>eDmv</artifactId>
+        <version>1.0.2008.1-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>eDmvDTO</artifactId>
+    <version>1.0.2008.1rc1</version>
+    <name>eDmv DTO</name>
+    <description>
+        This project provides the data transfer objects and XML parser
+        used to provide an initial starting point for ingesting data
+        into the class database. The parser and DTOs are to be
+        used to obtain data for project-specific business objects for
+        ingest. Once the ingest is complete, there should not longer be
+        any downstream dependency on this project or classes/interfaces
+        within. A separate project is provided to provide test data. Use
+        that project for your primary dependency as it will bring in
+        default implementation classes for JAXB and StAX needed for
+        runtime use.
+    </description>
+
+    <repositories>
+        <repository>
+            <id>java.net</id>
+            <name>java.net Maven Repository</name>
+            <url>https://maven-repository.dev.java.net/nonav/repository</url>
+            <layout>legacy</layout>
+        </repository>
+    </repositories>
+    
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <!-- StAX API (javax.xml.stream); 
+            this is needed by the parser
+            this is an API-only, the end user will have to supply a runtime impl
+        -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jsr173_api</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- JAXB API (javax.xml.bind); 
+            this is needed by the classes that are generated
+            this is an API-only, the end user will have to supply a runtime impl
+        -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- StAX Reference Impl (javax.xml.stream.XMLInputFactory) 
+            this is an implementation for StAX; it can be defined/used by anyone
+            for runtime use.
+        -->
+        <dependency>
+            <groupId>com.sun.xml.stream</groupId>
+            <artifactId>sjsxp</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.stream</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- JAXB Reference Impl (com.sun.xml.bind.v2.ContextFactory)
+            this is an implementation for JAXB; it can be defined/used by anyone
+            for runtime use.
+        -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.0.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- core project testing dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>        
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile> <!-- place in profile to limit when code generated -->
+            <id>jaxbgen</id>
+            <activation>
+                <property> <!-- setting this property will turn off XML gen -->
+                    <name>!nojaxb</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+
+        <plugin>
+        <!-- this plugin is used to generate Java classes from an XML schema.
+            There is also a maven2 version of this plugin, but I haven't been
+            able to get it to use -Xextensions. Using the Ant task will have
+            to do for now.
+            -->
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>generate-classes-from-xsd</id>
+                    <phase>generate-sources</phase>                    
+                    <configuration>
+                        <tasks>
+                            <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
+                                <classpath refid="maven.plugin.classpath" />
+                            </taskdef>
+                            
+                            <mkdir dir="target/generated-sources/xjc" />
+                            <xjc target="target/generated-sources/xjc" 
+                                 extension="true">
+                                <schema dir="src/main/resources/xsd" includes="dmv.xsd"/>
+                                <binding dir="src/main/resources/xsd" includes="**/*.xjb"/>
+                                <arg value="-Xvalue-constructor" />                      
+                                <depends dir="src/main/resources/xsd" />
+                                <produces dir="target/generated-sources/xjc" />
+                            </xjc>
+                        </tasks>
+                        <sourceRoot>target/generated-sources/xjc</sourceRoot>
+                    </configuration>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                </execution>
+            </executions>
+
+            <dependencies>
+                <!-- this defines the JAXB API that is used by the XJC compiler
+                    and for that classes it produces. The overall project 
+                    should also have a dependency on this artifact 
+                    -->
+                <dependency>                    
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                    <version>2.0</version>
+                    <scope>provided</scope>                    
+                </dependency>
+                <!-- this defines names Sun's JAXB reference implementation 
+                    to be our provider for JAXB functinality. 
+                    -->
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                    <version>2.0.3</version>
+                    <scope>provided</scope>                    
+                </dependency>
+                <!-- this provides the Sun XJC JAXB compiler to take the XML
+                    schema and create Java classes 
+                    -->
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-xjc</artifactId>
+                    <version>2.0.3</version>
+                    <scope>provided</scope>
+                </dependency>
+                <!-- this is an extension for the XJC JAXB compiler. It is used
+                    to add a constructor that accepts a value for each property.
+                    This is convenient for when building nested object trees. i
+                    -->
+                <dependency>
+                    <groupId>jaxb2-commons</groupId>
+                    <artifactId>value-constructor</artifactId>
+                    <version>1.5</version>
+                    <scope>provided</scope>                    
+                </dependency>
+            </dependencies>
+        </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

@@ -1,0 +1,1002 @@
+Project1: eDataShare Data Access Tier and Initial Business Logic
+
+    1/28/2008
+
+* Goals
+
+    * Build the data access tier and initial business logic for an
+    application.
+
+    * Gain experience with JDBC and Java Persistence API technologies.
+
+    * Gain experience designing and testing project implementations around
+    layered boundaries.
+
+* Objectives
+
+    * Design a relational database schema for your project.
+
+    * Design a set of business objects to represent the data in the system.
+
+    * Incorporate JDBC technology for bulk ingest database operations.
+
+    * Incorporate the Java Persistence API for mapping objects to 
+    the database schema.
+
+    * Provide a layer of business logic that coordinates interaction with
+    the data access objects.
+
+    * Test our implementations.
+
+* Business Description
+
+    The  Mayberry Sheriff's Department has a very small budget and will want
+    to team up with the Department of Motor Vehicles (DMV) in Raleigh to
+    obtain most of their information. Often, deputies are sent to stakeout
+    a suspected criminal where all they may know is their name.  They will
+    interface with the DMV to get a residence, physical description,
+    and drivers license photo.  Once at the residence, they may see
+    vehicles on the premises. The tag information is checked against
+    the DMV database to help determine people associated with the
+    premises. The owners of the vehicle are searched against their own
+    database of "persons of interest" to help officers be aware of
+    any immediate danger or actions to take.
+
+    Both the DMV and Mayberry Sheriff's Department have come to you to
+    develop the initial phase of their applications.  You are tasked
+    with implementing a low-cost prototype, based on current standards,
+    to automate much of this activity. At this point in the project we
+    are primarily looking to build the data access tiers for both the DMV
+    (eDmv) and Mayberry Sheriff's (eMayberry) department (two separate
+    systems). We will also add a minor amount of business logic to
+    coordinate the data access between the individual data access objects.
+
+    For eDmv, the system is initialized with a starting set of information
+    pertaining to drivers, vehicle registrations, and the vehicle owners.
+    New information can be added and updated, but the primary focus within
+    this project is for eDmv to respond to queries from approved clients.
+
+    For eMayberry, the system will is initialized with an empty database that
+    is designed to hold people of interest and their activities.
+    The people of interest will be supplied by eMayberry users. Contact
+    information for the people of interest will be supplied through a later
+    integration with eDmv.
+
+    eDmv will track name, date of birth, physical description, and
+    residency information for people. These people can be either drivers,
+    vehicle owners, or both. eDmv will track vehicle description,
+    VIN, tag, and owner information for vehicle registrations.
+
+    eMayberry will track name, alias, and activity information for people
+    of interest. 
+    
+* Technical Overview
+
+    The work done during this project focuses on the business objects
+    (BOs), the data access objects (DAOs) of the data access tier,
+    and some initial business logic interfaces (BL) and business
+    logic implementations (BLImpl). There will be two sets of DAO
+    implementations; one based on the JDBC API (for eDmv only) and a
+    second based the one the Java Persistence API (JPA; for both eDmv
+    and eMayberry). There will only be a single version of the business
+    logic implementations (BLImpl).
+
+    Since the work is for separate applications, we will need to establish
+    two separate application projects for this work; eDmv and eMayberry.
+    How you partition the implementations into separate physical
+    sub-projects beyond that is up to you.  Since the work is for separate
+    applications, we will need to establish two separate application
+    projects for this work; eDmv and eMayberry.  The development can
+    physically share resources (e.g., same database and application
+    server), but should be easily separated. It is suggested that you
+    form a root for the overall eDataShare work to coordinate integration
+    testing, and then group the lower-level work under two child projects;
+    eDmv and eMayberry.  See some suggested project layouts at the bottom
+    of this specification.  A sample set of projects that implement a
+    thin eDmv thread is also supplied in subversion.
+
+    The business objects encapsulate the core business data and rules
+    of the application. You will design the business objects and then
+    map them to the database using JDBC (for eDmv) and JPA (for both
+    eDmv and eMayberry). You are only required to implement a create
+    capability within the JDBC DAO. This will be used during ingest.
+    You are required to implement full CRUD (Create, Read, Update, and
+    Delete) capability with JPA. You will be required to encapsulate
+    all object to relational (O/R) mapping within the DAOs, descriptor
+    files, and business object annotations.  You will be given a set of
+    test data to initially populate your applications and be the source
+    of data for the ingest requirement. This will be provided through
+    a maven repository and a declared project dependency.
+
+    [Note:] Its is expected/required that you implement and maintain
+    both a set of JDBC and JPA DAOs in order to develop and demonstrate an
+    understanding of how database table and Java class designs can
+    impact your JPA implementations.  You will always use the JDBC DAO
+    to implement the eDmv ingest and you will always use the JPA
+    implementation for general CRUD operations in this and follow-on
+    projects.
+
+    []
+
+    The business logic will provide a set of classes with concise methods
+    that map easily to use cases. The business logic will ensure proper
+    use of the overall application, delegating some business logic
+    functionality to the business objects and full O/R responsibility
+    to the DAOs. eDmv will have an ingest requirement as well as the
+    requirement to manipulate and add to what was ingested. eMayberry will
+    start fresh and obtain all data from users and coordinate with eDmv. 
+    However, for project 1, eMayberry will be unable to fully implement 
+    data sharing with eDmv because remote interfaces will not be
+    implemented until project2.  Some of that must be stubbed at this point. 
+    You are only required to implement enough business logic methods
+    that it takes to implement the end-to-end scenarios specified later
+    within this specification.
+
+    The test acceptance for the first project will be the unit tests and
+    a set of functional test that takes the business logic, data access
+    tier, and business objects through  a set of specified, end-to-end
+    use cases.
+    
+    [Note:] Since the class will be producing parallel implementations for
+    the applications and submitting them for evaluation, it is asked
+    that you come up with unique names for your artifacts. This could
+    be done by replacing the "e" in eDataShare, eDmv, and eMayberry with a
+    unique name that corresponds to your newsgroup or college login
+    (ex. ejavaguyDataShare, ejavaguyDmv, ejavaguyMayberry -or-
+    jcstaffDataShare,
+    jcstaffDmv, jcstaffMayberry). You should also use this same pattern for
+    java packages (ex. ejavaguy.dmv, ejavaguy.mayberry -or-
+    jcstaff.dmv, jcstaff.mayberry), JNDI names, DB tables, etc.
+
+    [Note:] There should be no use of System.out.println() in the code and all
+    implementations must use the jakarta commons logging API with the 
+    log4j logging provider.  You may leave debug in your code, but this 
+    should be able to be turned on/off with the proper logging priority
+    changes in the log4j.xml configuration.
+
+    []
+
+* Technical Details
+
+    [Note:] Project development can take either a database-first or
+    business-object first approach. The database-first approach simulates 
+    integration with a legacy database or development of an application
+    with a very database-centric solution. The business object-first
+    approach simulates a green-field implementation that has more modest
+    database requirements. Whichever technique you chose is up to you, but
+    the two must integrate in the end.
+
+    [Note:] There are a lot of technical details presented with this 
+    specification. This is done to provide clarity and a starting point for
+    design discussion. However, it is not done so to specify specific class
+    or method naming, project layout, or order of work. You are free to
+    make many technical adjustments to the ideas presented.
+
+    []
+
+    [[1]] Design 2 sets of database schema that account for the following
+    information. Although we will deploy the 2 database schemas to
+    the same database for the project, they should be designed to be
+    independently deployed to separate databases. eDmv and eMayberry are
+    two independent applications. This will primarily affect your attempt
+    re-use tables or to make primary key assumptions between the two.
+
+        [[A]] eDmv Candidate Database Schema
+
+[../images/eDmv_dbschema.jpg] eDmv Database Schema 
+
+            [[1]] EDMV_PERSON - this table is used to hold core information
+            about drivers and vehicle owners.
+
+                * ID - this is an artificial field to identify a specific
+                person.
+
+                * FIRST_NAME - this is a required text field to hold a
+                person's first name.
+
+                * MIDDLE_NAME - this is a text field to hold a person's
+                middle name.
+
+                * LAST_NAME - this is a required text field to hold a 
+                person's last name.
+
+                * NAME_SUFFIX - this is an optional text field to hold 
+                any name suffix information, such as III, Jr., Sr, etc.
+
+            [[1]] EDMV_PHYSICAL_DETAILS - this table holds the physical
+            description of an individual. This information is required 
+            for a driver's license, but not for a vehicle owner.
+
+                * PERSON_ID (0..1:1 relationship with EDMV_PERSON) - this
+                is used to form a primary key join with the EDMV_PERSON.
+
+                * SEX - This is a field to indicate male or female. This 
+                can be an ordinal code (0,1,2), symbolic character (U,M,F), or 
+                textual word (Unknown, Male, Female).
+
+                * DOB - This is holds the person's date of birth.
+
+                * HEIGHT (inches) - This numeric field holds the height
+                measurement for a person.
+
+                * WEIGHT (lbs) - This numeric field holds the weight 
+                measurement for a person.
+
+                * EYE_COLOR - This field holds either the ordinal code
+                or textual name for a person's eye color.
+
+                * HAIR_COLOR - This field holds either the ordinal code
+                or textual name for the person's hair color.
+
+            [[1]] EDMV_PHOTO - this table holds photos for the drivers.
+
+                * PERSON_ID (0..1:1 relationship with PHYSICAL_DETAILS) - 
+                this is used to form a primary key join with either the 
+                physical details or person.
+
+                * IMAGE - this blob field holds the digital image for the
+                photo. It might also be useful to have a field to indicate
+                the image type.
+
+            [[1]] EDMV_LOCATION - this table holds a location that 
+            refers to a place without regard to time. One can have this
+            table encapsulate the address information for a specific person
+            or be used to also hold the common address record for multiple
+            people with the same address. The former will result in
+            multiple rows for the same physical address. The later will 
+            require some de-duping when new information is inserted.
+
+                * ID - this is an artificial to identify a specific
+                address.
+
+                * STREET_NO - this is a text field to hold the street
+                number for an address.
+
+                * STREET_NAME -this is a text field to hold the street
+                name for an address.
+
+                * CITY - this is a text field to hold the city name for
+                an address.
+
+                * STATE_CODE - this is a text field to hold the state code
+                name for an address.
+
+                * ZIP - this is a text field to hold the postal zip code
+                for an address.
+
+            [[1]] EDMV_RESIDENCE - this table provides a start/end address
+            for a location to form a residence.
+
+                * PERSON_ID (N:1 relationship with EDMV_PERSON) - this is used
+                to form a primary key join with the EDMV_PERSON table.
+
+                * LOCATION_ID (N:1 relationship with EDMV_LOCATION) - this
+                is used to form a foreign key join with the EDMV_LOCATION
+                table.
+
+                * START_DATE - this required date field indicates when
+                the residency started.
+
+                * END_DATE - this optional date field indicates if/when the 
+                residency ended.
+
+            [[1]] EDMV_VEHICLE_REGISTRATION - this table is used to hold
+            the core information for a vehicle registration. This table
+            will also have a many-to-many relationship with EDMV_PERSON
+            to hold current ownership information.
+
+                * ID - this is an artificial value to identify a specific 
+                vehicle registration.
+
+                * TAG_NO - this is a textual field to hold the current
+                tag number for the vehicle.
+
+                * VIN - this is a textual field to hold the DMV identity
+                for the vehicle. This could also be used as a primary key
+                but would require one to solve seller/buyer overlap for 
+                the same physical vehicle.
+
+                * MAKE - this is a textual field to hold the make name for 
+                the registered vehicle.
+
+                * MODEL - this is a textual field to hold the model name
+                for the registered vehicle.
+
+                * YEAR - this is a numeric field to hold the model year 
+                for the registered vehicle.
+
+                * EXPIRATION - this date field holds the registration
+                expiration date.
+
+            [[1]] EDMV_VEHICLE_OWNER_LINK - this table is used to hold
+            the many-to-many relationship between EDMV_PERSON and
+            EDMV_VEHICLE_REGISTRATION to represent vehicle owners in a 
+            registration.
+
+                * OWNER_ID (0..N:0..M) - foreign key reference to
+                EMDV_PERSON.
+
+                * VEHICLE_ID (0..N:0..M) - foreign key reference to 
+                EDMV_VEHICLE_REGISTRATION.
+
+                []
+
+            []
+ 
+        [[A]] eMayberry Candidate Database Schema 
+
+[../images/eMayberry_dbschema.jpg] eMayberry Database Schema
+
+            [[1]] EMAY_POI - this table is used to hold the core
+            information for a person of interest.
+
+                * ID - this is an artificial value used to identify the
+                record within eMayberry. This will not be the same ID
+                value from eDmv due to the fact that they are separate
+                systems.
+
+                * FIRST_NAME - this textual field holds the first name
+                for a person of interest.
+
+                * MIDDLE_NAME - this textual field holds the middle name 
+                for a person of interest.
+
+                * LAST_NAME - this textual field holds the middle name
+                for a person of interest.
+                
+                * ALIAS_FOR - (0..N:1 to EMAY_POI) this holds the foreign
+                key from an alias name to the primary name for a person
+                of interest.
+
+                * DMV_ID - this field could be potentially inserted to
+                hold PK information for the person of interest's identity
+                within DMV. If used, this should not be declared as a
+                foreign key reference since DMV and Mayberry are meant to 
+                be deployed to separate physical databases. If it is not
+                used, then a search by first, middle, and last name would
+                be required each time; knowing that this does not uniquely 
+                identify a person in all cases.
+
+            [[1]] ACTIVITY - this table holds activity (traffic ticket,
+            crime, etc.) for a person of interest.
+
+                * ID - this is an artificial value used to identify a 
+                specific activity record.
+
+                * POI_ID (0..N:1) this is a foreign key reference to 
+               EMAY_POI to form a many-to-one relationship. 
+
+                * DATE - this field holds the date of occurrence for the
+                activity. At this point we are not worrying about a
+                start/end date that spans more than a day.
+
+                * CODE - this field holds a value that indicates the type
+                of activity record for the person of interest.
+
+                * DESCRIPTION - this is a narrative description specific
+                to the actual event.
+
+
+            []
+
+        []
+
+===
+
+    [[1]] Design a set of business objects to represent the data in the 
+    system.
+
+        [[A]] eDmv Candidate Business Objects
+
+[../images/eDmv_classes.jpg] eDmv Business Objects
+
+
+            [[1]] Person - design a class that encapsulates information
+            for a Driver and/or Vehicle Owner.
+
+                * id:long
+
+                * firstName:String
+
+                * middleName:String
+
+                * lastName:String
+
+                * nameSuffix:String
+
+                * currentResidence:Residence
+
+                * residences:Collection\<Residence\>
+
+                * physicalDetails:PhysicalDetails
+
+            [[1]] PhysicalDetails - design a class that encapsulates
+            the physical details used to describe the person. This
+            information is primarily used for driver's licenses and not
+            needed for vehicle registrations.
+
+                * id:long
+
+                * sex: SEX (enum)
+
+                * dob: Date
+
+                * height:int
+
+                * weight:int
+
+                * eyeColor: COLOR (enum)
+
+                * hairColor: COLOR (enum)
+
+                * photo:byte[]
+
+            [[1]] Photo - design a class to hold the photo for a physical
+            details. By separating this from the physical details, we can
+            more easily limit the size/amount of information returned for
+            basic queries.
+
+                * id:long
+
+                * image:byte[]
+
+            [[1]] Residence - design a class (or set of classes) to 
+            represent the residence for people. The address information
+            can be either a unique instance for each residence/Person
+            or a shared instance across residences/People.
+
+                * locationId:long
+
+                * streetNo:int
+
+                * streetName:String
+
+                * city:String
+
+                * state:STATE (enum)
+
+                * zip:String
+
+            [[1]] VehicleRegistration - design a class to represent a
+            vehicle registration.
+
+                * id:long
+
+                * tagNo:String
+
+                * vin:String
+
+                * make:String
+
+                * model:String
+
+                * color:COLOR (enum)
+
+                * year:Date
+
+                * expiration:Date
+
+                * owners:Collection\<Person\>
+
+                []
+
+            []
+                
+        [[A]] eMayberry Candidate Business Objects
+
+[../images/eMayberry_classes.jpg] eMayberry Business Objects
+
+
+            [[1]] POI - design a class that encapsulates 
+            the identity of for a person of interest. A person may have 
+            zero-to-many aliases.
+
+                * id:long
+
+                * firstName:String
+
+                * middleName:String
+
+                * lastName:String
+
+                * aliases:Collection\<POI\>
+
+                * activities:Collection\<Activity\>
+
+            [[1]] Activity - design a class that encapsulates 
+            a specific event/activity for a person of interest.
+
+                * id:long
+
+                * date:Date
+
+                * type:enum
+
+                * description:String 
+
+            []
+
+        []
+
+===
+    [[1]] Design and implement a mechanism to ingest a starting state for
+    eDmv based on a provided data file and parser.  You will implement
+    two primary sets of classes to support this requirement; JDBC Ingest
+    DAO(s) and an Ingestor. 
+
+[../images/eDmv_ingest_dao.jpg] eDmv Ingest and JDBC DAO
+
+        [[a]] Design and implement a set of DAOs that can be used
+        to ingest eDmv business data into the database using the
+        JDBC API and the database schema you designed as a part of a
+        separate requirement. These DAOs can optionally implement a
+        common interface with the JPA DAOs you implement as a part of a
+        separate requirement -or- can be unique in how they achieve what
+        can be thought of as a performance goal (rather than working
+        within business rules).  The JDBC Ingest DAO need only support
+        create/insert operations.
+
+        [[b]] Design and implement an Ingestor that will use an externally
+        provided parser to obtain business data for eDmv and use the JDBC
+        Ingest DAO to populate the database. You will be provided the
+        parser when the test data and sample project thread is posted.
+
+        []
+
+===
+
+    [[1]] Design and implement a DAO layer that will map the business
+    objects between the object model and the database using the Java
+    Persistence API (JPA). These DAOs will support all standard CRUD
+    operations and can optionally implement the same interface as other
+    potential DAO implementations. The implementation can make liberal use
+    of JPA @Annotations, descriptor files, or a combination of both. Your 
+    interface should encapsulate the fact that an EntityManager is being
+    used and the same EntityManager should be shared among other DAOs in
+    the same Thread. Using either (a crude form of) dependency injection
+    or ThreadLocal can be quite useful here. Your DAOs should not attempt
+    to control the transaction or they will <NOT> be portable to the EJB
+    tier.
+
+        [[A]] eDmv DAOs
+
+[../images/eDmv_daos.jpg] eDmv Candidate JPA DAOs
+
+            [[1]] PersonDAO/JPAPersonDAO - encapsulates the use of JPA when
+            mapping Person and closely associated business objects (Person,
+            PhysicalDetails, Photo, and Residence) to/from the database.
+
+            [[1]] VehicleDAO/JPAVehicleDAO - encapsulates the use of JPA when
+            mapping Vehicle and closely associated business objects
+            (VehicleRegistration and Owner) to/from the database.
+
+        [[A]] eMayberry Candidate DAOs
+
+[../images/eMayberry_daos.jpg] eMayberry JPA DAOs
+
+            [[1]] PoiDAO/JPAPoiDAO - encapsulates the use of JPA when
+            mapping POI and closely associated business objects
+            (POI and Activity) to/from the database.
+
+        []
+===
+
+    [[1]] Design an initial business interface and business logic for
+    the applications. The core O/R mapping work will be done
+    by the DAOs.  However, it is the ultimate responsibility of these
+    business logic implementations that either it or the business objects
+    enforce the business rules of the application. The DAOs only perform
+    O/R mapping and do not enforce such things as a physical details
+    required for a driver's license. The
+    business logic is assumed to work within the context of a single,
+    externally controlled transaction. Do not attempt to control the
+    transaction of the EntityManager within these objects or you will
+    <NOT> be portable to the EJB tier. You need only implement the behavior
+    required to implement the end-to-end use case listed in the testing
+    section. Some of the anticipated methods are listed below.
+
+        [[A]] eDmv Candidate Business Logic
+
+[../images/eDmv_business_logic.jpg] eDmv Business Logic
+
+            [[a]] DriverMgmt/DriverMgmtImpl - encapsulate the actions
+            required to manage Drivers and their associated information.
+            The project is primarily interested in query methods after
+            ingest. 
+
+                * addDriver - design the ability to add a driver
+                with their physical details and residence.
+
+                * moveResidence - design the ability to change the
+                residence for a driver.
+
+                * getDriver - you will need to be able to return a 
+                driver by id.
+
+                * getDrivers - you will need to be able to return a 
+                collection of drivers by such things as ByName.
+
+            [[a]] VehicleMgmt/VehicleMgmtImpl - encapsulate the actions
+            required to manage Vehicle Registrations and ownership. The
+            project is primarily interested in query methods after ingest.
+
+                * addRegistration - design the ability to add a new 
+                registration with references to owners.
+                
+                * getRegistrationsByMakeModel - design the ability to
+                return a collection of registrations by such things as
+                make/model or owner name.
+
+                * getRegistrationsByOwner - design the ability to return
+                registrations for a specific owner.
+
+            [[a]] PersonMgmt/PersonMgmtImpl - encapsulate the actions
+            to query for individuals within eDmv. This will include
+            drivers and owners.
+
+                * getPeopleByName - design the ability to return a 
+                collection of people (drivers and owners) by their
+                name.
+
+                * getPerson - design the ability to return a specific
+                person (driver or owner).
+
+            [[a]] DmvTestUtil/DmvTestUtilImpl - a useful tool during
+            testing that encapsulates how to get the application back into
+            a known state prior to running a test or to inspect values not
+            normally exposed through the normal business interfaces.
+
+                * resetAll - sanely take the state of the system down to a
+                coldstart.
+
+                * populate - you might want the database populated with 
+                a known state prior to running a test. This may delegate
+                to the DmvIngestor.
+
+            [[a]] DmvIngestor - the Ingestor written as a part of a separate
+            requirement is also logically considered part of this tier.
+            
+                * populate - point an externally provided parser at a
+                set of test data and use the DAOs to populate the system
+                to a known state.
+
+                []
+
+            []
+
+        [[A]] eMayberry Candidate Business Logic
+
+[../images/eMayberry_business_logic.jpg] eMayberry Business Logic
+
+            [[a]] PoiMgmt/PoiMgmtImpl - encapsulates the actions
+            required to manage persons of interest.
+
+                * addPOI - add a person of interest to the system.
+
+                * addActivity - add a specific activity for a person of
+                interest.
+
+                * getPOI - get a specific person of interest. This will
+                initially return just the POI information and Actvities.
+                In the follow-on projects, we'll add contact information
+                from eDmv.
+
+                * isDangerous - determine if a person of interest is 
+                considered dangerous. The implementation of this method
+                could be as simple as the presence of the word "dangerous"
+                being present in any activity description associated with
+                the person of interest.
+
+            [[a]] MayberryTestUtil/MayberryTestUtilImpl - a useful tool during
+            testing that encapsulates how to get the application back into
+            a known state prior to running a test or to inspect values not
+            normally exposed through the normal business interfaces.
+
+                * resetAll - sanely take the state of the system down to a
+                coldstart.
+
+                * populate - it may be helpful to return the database to
+                a known populated state between tests.
+
+                []
+
+            []
+
+===
+
+* Testing
+
+    [[1]] Provide a JUnit test for your business objects (BOs) that test
+    the manipulation of the structure. An example test might be to try
+    adding a residence to a Person without a start date.  These tests
+    should be packaged with the BOs.
+    
+    [[1]] Provide a JUnit test for the eDmv JDBC DAOs. Verify they can 
+    functionally create new objects within the eDmv system. This test
+    should be packaged with the DAOs.
+
+    [[1]] Provide a JUnit test for your eDmv and eMayberry JPA DAOs. This
+    should test the implementation for the fundamental CRUD operations
+    for each type of object. It is understood that some of the objects
+    will be handled by cascades, so you might not have a set of methods
+    handling each type of business object.  This test should be packaged
+    with the DAOs.
+
+    [[1]] Provide a JUnit test for your business logic to test the
+    basic functionality of your business logic design, including ingest.
+    The ingestor test should be able to reference a known data file and
+    ingest records into the database using the JDBC DAOs. These tests
+    should be packaged with the business logic implementation.
+
+    [[1]] Provide a set of JUnit test programs to verify the following
+    end-to-end scenario in eDmv.  This test should be implemented as
+    a JUnit test and packaged with the business logic implementation.
+
+        * reset (using DmvTestUtilImpl)
+
+        * populate (using DmvIngestor)
+
+        * addDriver (using DriverMgmtImpl)
+
+        * moveResidence (using DriverMgmtImpl)
+
+        * addRegistration (using VehicleMgmtImpl)
+
+        * getRegistrationByMakeModel (using VehicleMgmtImpl)
+
+        * getPeopleByName (using PeopleMgmtImpl)
+
+        * getPerson (using PeopleMgmtImpl)
+
+        * getRegistrationByOwner (using VehicleMgmtImpl)
+
+    [[1]] Provide a set of JUnit test programs to verify the following
+    end-to-end scenario in eMayberry.  This test should be implemented as
+    a JUnit test and packaged with the business logic implementation.
+
+        * reset (using MayberryTestUtilImpl)
+
+        * addPoi (PoiMgmtImpl)
+
+        * addActivity (PoiMgmtImpl)
+
+        * getPoi (PoiMgmtImpl)
+
+        * isDangerous (PoiMgmtImpl)
+
+* Getting Started
+
+    The following sketch of two directory structures can be used as a
+    starting point for your overall application. The first is a simplified
+    project layout that collapses the number of sub-projects into a single
+    "Impl" project. It is suggested that you use this layout if you
+    are new to maven and want the simplest configuration possible. The
+    second is a more robust layout and is closer to a multi-developer
+    environment.  Use the later structure if you want to better simulate a
+    work environment where the work of multiple developers needs clearer
+    separation. 
+    
+        [Note:] All "e"DataShare, "e"Dmv, and "e"Mayberry names
+        should be changed to your specific name mangler. The same type of
+        modification needs to occur for the java package names.
+
+        [Note:] Other than a README, it is not anticipated that you
+        will have any artifacts at the eDataShare layer. It should be
+        used only as a convenience wrapper to perform goals across both
+        projects. All details will be specified at the eDmv and eMayberry
+        levels and below; with the leaf-level projects being your default
+        choice for detailed information (e.g., DB drivers, etc.)
+
+        []
+
+    []
+
+---
+eDataShare
+|-- eDmv
+|   +--eDmvImpl
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- bo
+|   |       |   |       |-- dao
+|   |       |   |       |-- jdbc
+|   |       |   |       |-- jpa
+|   |       |   |       |-- bl
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       |-- META-INF
+|   |       |       |   `-- persistence.xml
+|   |       |       `-- ddl
+|   |       |           |-- eDmv-create.ddl
+|   |       |           `-- eDmv-drop.ddl
+|   |       |-- test
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- bo
+|   |       |   |       |-- jdbc
+|   |       |   |       |-- jpa
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `log4j.xml
+|   |       `-- pom.xml
+|   `-- pom.xml
+|-- eMayberry
+|   +--eMayberryImpl
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       |-- bo
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   |       |-- bl
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |       |   `-- persistence.xml
+|   |       |       `-- ddl
+|   |       |           |-- eMayberry-create.ddl
+|   |       |           `-- eMayberry-drop.ddl
+|   |       |-- test
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       |-- bo
+|   |       |   |       |-- jpa
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `log4j.xml
+|   |       `-- pom.xml
+|   `-- pom.xml
+`-- pom.xml
+---
+---
+eDataShare
+|-- eDmv
+|   +--eDmvBO
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- bo
+|   |       |   |       `-- bl
+|   |       |-- test
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       `-- bo
+|   |       |   `-- resources
+|   |       |       `log4j.xml
+|   |       `-- pom.xml
+|   +--eDmvDAO
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- dao
+|   |       |   |       |-- jdbc
+|   |       |   |       `-- jpa
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |       |   `-- persistence.xml
+|   |       |       `-- ddl
+|   |       |           |-- eDmv-create.ddl
+|   |       |           `-- eDmv-drop.ddl
+|   |       |-- test
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- jdbc
+|   |       |   |       `-- jpa
+|   |       |   `-- resources
+|   |       |       `log4j.xml
+|   |       `-- pom.xml
+|   +--eDmvBLImpl
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |           `-- persistence.xml
+|   |       |-- test
+|   |       |   |-- java
+|   |       |   |   `-- edmv
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `log4j.xml
+|   |       `-- pom.xml
+|   `-- pom.xml
+|-- eMayberry
+|   +--eMayberryBO
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       |-- bo
+|   |       |   |       `-- bl
+|   |       |-- test
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       `-- bo
+|   |       |   `-- resources
+|   |       |       `log4j.xml
+|   |       `-- pom.xml
+|   +--eMayberryDAO
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |       |   `-- persistence.xml
+|   |       |       `-- ddl
+|   |       |           |-- eMayberry-create.ddl
+|   |       |           `-- eMayberry-drop.ddl
+|   |       |-- test
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       `-- jpa
+|   |       |   `-- resources
+|   |       |       `log4j.xml
+|   |       `-- pom.xml
+|   +--eMayberryBLImpl
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       `-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |           `-- persistence.xml
+|   |       |-- test
+|   |       |   |-- java
+|   |       |   |   `-- emayberry
+|   |       |   |       `-- blimpl
+|   |       |   `-- resources
+|   |       |       `log4j.xml
+|   |       `-- pom.xml
+|   `-- pom.xml
+`-- pom.xml
+---
+
+* Grading
+
+    Your project will be graded on completeness and quality of product. In
+    order for you to receive full credit in each area, it must be a)
+    complete, b) done well, and c) tested.  The breakdown of grading 
+    will be as follows:
+
+        * README provided that describes where each requirement satisfied: 10pts
+
+        * projects cleanly builds with Maven: 15pts
+
+        * business objects: 15pts
+
+        * JDBC DAO: 15pts
+
+        * JPA DAO and JPA O/R Mapping: 25pts
+
+        * Ingest: 10pts
+
+        * Business Logic: 10pts
+
+    Each area will be judged according to the following breakdown. For
+    areas where testing does not apply (e.g., README and build), those 
+    points will be assigned to quality:
+
+        * complete: 60%
+
+        * quality of implementation supplied: 30%
+
+        * testing: 10%
+
+* Submission Guidelines
+
+    Please follow the 
+    {{{../../../course-docs/projects.html#Submission%20Guidelines}
+    project submission guidelines}}
+    posted in the course overview.
+

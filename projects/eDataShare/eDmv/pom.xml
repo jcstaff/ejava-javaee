@@ -1,0 +1,67 @@
+<?xml version="1.0"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>eDataShare</artifactId>
+        <groupId>ejava.javaee.projects</groupId>
+        <version>1.0.2008.1-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.projects.eDataShare.eDmv</groupId>
+    <artifactId>eDmv</artifactId>
+    <packaging>pom</packaging>
+    <name>eDmv</name>
+    <version>1.0.2008.1-SNAPSHOT</version>
+    <description>
+        This project provides test data and sample code to be used in the
+        eDmv project.
+    </description>
+
+    <!-- a student project module dependency would look like the following
+        and not need separate profiles to support XML data file creation
+    <modules>
+        <module>eDmvBO</module>
+        <module>eDmvDAO</module>
+        <module>eDmvBLImpl</module>
+    </modules>
+    -->
+
+    <profiles>
+        <!-- this profile is only used by the instructor to create
+             and test the XML data file -->
+        <profile>
+            <id>devel</id>
+            <activation>
+                <property>
+                    <name>devel</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>eDmvDTO</module>
+                <module>eDmvDataGen</module>
+                <module>eDmvTestUtil</module>
+            </modules>
+        </profile>
+
+        <!-- this profile is used by the instructor to build and post the
+           DTO and TestUtil projects for student re-use. It is also used
+           to build the _sparse_ downstream examples that mimic student
+           project artifacts.
+           -->
+        <profile>
+            <id>normal</id>
+            <activation>
+                <property>
+                    <name>!devel</name>
+                </property>
+            </activation>
+            <modules>
+                <module>eDmvDTO</module>
+                <module>eDmvTestUtil</module>
+                <module>eDmvBO</module>
+                <module>eDmvDAO</module>
+                <module>eDmvBLImpl</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>

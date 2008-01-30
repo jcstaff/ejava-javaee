@@ -1,0 +1,21 @@
+<projectDescription>
+  <name>eDmvTestUtil</name>
+  <comment>This project wraps the DTO project by supplying physical test data 
+        and a default set of runtime specifications for the StAX parser and
+        JAXB framework.
+
+        Class projects will declare a dependency on this project. This project
+        will automatically bring in the XML data file, the XML Parser and JAXB/DTO
+        classes, and the XML parsing libraries.</comment>
+  <projects>
+    <project>eDmvDTO</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>
