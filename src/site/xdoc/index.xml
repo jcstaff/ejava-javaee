@@ -26,16 +26,28 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>map your business objects to the database for
+          objects/properties and tables/columns. Mark relationships as
+          @Transient at this point. Test the ability to create, find,
+          update, and delete each object type.</li>
+          <li>continue with the JDBC ingest implementation</li>
+          <li>make sure your JDBC mapping and JPA mapping stay consistent</li>
+          <li><b>send a zip file of your project, in any consistent state, to
+          the instructor for a sanity check. Include comments on where
+          you believe you are relative to the project and the weekly class todo
+          list.</b></li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
           <li>complete the structure of the JDBC Ingest DAO within the "DAO" project;
           to continue to mature over time</li>
           <li>create JPA DAO(s) implementation classes for your projects;
           design how they get a shared EntityManager and implement the CRUD methods;
           provide a persistence.xml file; define all Collections to
           be @Transient and observed the default behavior of mapping classes.</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>read through project description and post any clarification
           questions</li>
