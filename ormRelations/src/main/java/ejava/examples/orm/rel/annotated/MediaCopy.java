@@ -83,22 +83,24 @@ public class MediaCopy implements Serializable {
         setCopyNo(copyNo);
     }    
 
-    @Id @Column(name="COPYNO")
     public int getCopyNo()                { return copyNo; }    
     @SuppressWarnings("unused")
     private void setCopyNo(int copyNo)    { this.copyNo = copyNo; }
     
-    //this property is used for the composite primary key
+    //this property is used for the composite primary key and is mapped to
+    //the same column as the media @ManyToOne property FK
     @Id @Column(name="MEDIACOPY_MID")
     public long getMediaId()              { return mediaId; }
     @SuppressWarnings("unused")
     private void setMediaId(long mediaId) { this.mediaId = mediaId; }
     
-    @ManyToOne(optional=false) //use m2o to have media automatically associated
+    @ManyToOne //use m2o to have media automatically associated
+    //define as insertable/updatable=false since this FK is part of our
+    //compound primary key
     @JoinColumn(
-            name="MEDIACOPY_MID", referencedColumnName="MEDIA_ID",
-            nullable=false, updatable=false)
-    //@Transient//mark transient to avoid extra col that violates legacy schema
+            name="MEDIACOPY_MID",
+            insertable=false,
+            updatable=false)
     public Media getMedia()               { return media; }    
     @SuppressWarnings("unused")
     private void setMedia(Media media)    { this.media = media; }

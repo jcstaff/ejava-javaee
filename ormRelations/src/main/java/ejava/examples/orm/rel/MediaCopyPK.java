@@ -2,6 +2,8 @@ package ejava.examples.orm.rel;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+
 public class MediaCopyPK implements Serializable {
     private static final long serialVersionUID = 1L;
     private long mediaId;
@@ -12,12 +14,14 @@ public class MediaCopyPK implements Serializable {
         this.mediaId = mediaId;
         this.copyNo = copyNo;
     }
+    @Column(name="COPY_NO")    
     public int getCopyNo() {
         return copyNo;
     }
     public void setCopyNo(int copyNo) {
         this.copyNo = copyNo;
     }
+    @Column(name="MEDIACOPY_MID")
     public long getMediaId() {
         return mediaId;
     }
