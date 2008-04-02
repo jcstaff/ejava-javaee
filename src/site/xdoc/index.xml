@@ -19,6 +19,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2008-04-01: Posted EJB todo-s</li>
           <li>2008-03-18: Posted server-side materials</li>
           <li>2008-02-26: Posted ormRelation updates</li>
           <li>2008-02-13: Posted JPA materials</li>
@@ -28,6 +29,36 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>inject a JDBC Connection into your @Stateless session bean</li>
+          <li>inject a JPA EntityManager into your @Stateless session bean</li>
+          <li>add business logic and DAOs to your @Stateless session bean</li>
+          <li>perform at least one business method, end-to-end from the
+          JUnit client, through the server/EJB, to the database.</li>
+          <li>implement the remainder of the remote methods, adding DTOs
+          where necessary</li>
+          <li>add @Transaction declarations</li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
+          <li>add an EJB project to Dmv and register it with the parent
+          project</li>
+          <li>add a simple @Stateless session bean implementation (e.g.,
+          TestUtilEJB)</li>
+          <li>define a simple @Remote interface for the @Stateless
+          session bean. Include only a simple ping() method.</li>
+          <li>add an EAR project to Dmv and register it with the parent
+          project</li>
+          <li>define an EAR dependency on the EJB project</li>
+          <li>add an RMI Test project to Dmv and register it with the 
+          parent project. Include the cargo deployment of the EAR to
+          JBoss</li>
+          <li>add a JUnit test and jndi.properties file that will locate
+          the JNDI tree, lookup the @Remote interface, and invoke the 
+          simple method</li>
+      </ul></li>
+      <li><ul>
           <li>turn in your project 1</li>
           <li>implement any project 1 cleanup or refactoring for use
           in projects 2 and 3.</li>
@@ -37,10 +68,7 @@
           a ejavaDS data source configured.</li>
           <li>build the example tree from the root using 
           "mvn clean install" and report any issues encountered</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>finish up with the JDBC ingest implementation.
           Make sure your JDBC mapping and JPA mapping stay consistent.</li>
