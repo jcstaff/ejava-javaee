@@ -19,6 +19,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2008-04-08: Posted Web Tier todo-s</li>
           <li>2008-04-01: Posted EJB todo-s</li>
           <li>2008-03-18: Posted server-side materials</li>
           <li>2008-02-26: Posted ormRelation updates</li>
@@ -29,6 +30,31 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>finish implementing the remainder of the remote methods,
+          adding DTOs where necessary, and testing from the RMI Client</li>
+          <li>add a WAR project to the Dmv and register it with the 
+          parent project</li>
+          <li>declare the project as type=war and make sure to 
+          declare all dependencies in such a way that no jars 
+          deployed with the EAR are duplicated in WEB-INF/lib. This
+          is normally done by declaring all dependencies as 
+          scope=provided.</li>
+          <li>Add a controller servlet and have it locate one or
+          more of your session beans in the init() method. You may
+          use either the @Local or @Remote interface of the EJB.</li>
+          <li>Add a JSP main page and an option to invoke the 
+          controller servlet to force the init() and verify that
+          it can locate the EJB.</li>
+          <li>Add an action class to the controller servlet that
+          will invoke the EJB as a part of one of the use cases.
+          Add a menu option to initiate the call. Add a view JSP
+          to display the results.</li>
+          <li>Add remaining use cases to the WAR.</li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
           <li>inject a JDBC Connection into your @Stateless session bean</li>
           <li>inject a JPA EntityManager into your @Stateless session bean</li>
           <li>add business logic and DAOs to your @Stateless session bean</li>
@@ -37,10 +63,7 @@
           <li>implement the remainder of the remote methods, adding DTOs
           where necessary</li>
           <li>add @Transaction declarations</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>add an EJB project to Dmv and register it with the parent
           project</li>
