@@ -10,6 +10,7 @@ import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
+import javax.sql.DataSource;
 
 import ejava.examples.jndidemo.JNDIHelper;
 
@@ -43,6 +44,13 @@ public class BakeSchedulerEJB
                         type=PersistenceContextType.EXTENDED)
     private EntityManager em;
 
+    /*
+     * This declaration obtains a reference to the SQL DataSource in the '
+     * global JNDI tree and initializes ds to that value
+     */
+    @Resource(mappedName="java:/ejavaDS")
+    private DataSource ds;
+    
     /*
      * This declaration will cause the container to inject a SessionContext
      * into the EJB at startup.
@@ -79,6 +87,7 @@ public class BakeSchedulerEJB
         log.debug("ctx=" + ctx);
         log.debug("ejb/cook=" + ctx.lookup("ejb/cook"));
         log.debug("em=" + em);
+        log.debug("ds=" + ds);
         log.debug("persistence/jndidemo=" + ctx.lookup("persistence/jndidemo"));
         log.debug("message=" + message);
         log.debug("cook=" + cook);

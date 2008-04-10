@@ -8,7 +8,6 @@
     <enterprise-beans>
         <session>
             <ejb-name>AidScheduler</ejb-name>
-            <mapped-name>ejava/examples/jndidemo/AidSchedulerEJB</mapped-name>
             <env-entry>
                 <env-entry-name>vals/message</env-entry-name>
                 <env-entry-type>java.lang.String</env-entry-type>
@@ -32,6 +31,17 @@
                     <injection-target-name>hospital</injection-target-name>
                 </injection-target>
             </ejb-local-ref>
+            <resource-ref>
+            	<res-ref-name>jdbc/myds</res-ref-name>
+                <res-type>javax.sql.DataSource</res-type>
+                <res-auth>Container</res-auth>
+                <injection-target>
+                	<injection-target-class>
+                		ejava.examples.jndidemo.ejb.AidSchedulerEJB
+                	</injection-target-class>
+                	<injection-target-name>ds</injection-target-name>
+                </injection-target>
+            </resource-ref>
             <persistence-context-ref>
                 <persistence-context-ref-name>
                     persistence/jndidemo
