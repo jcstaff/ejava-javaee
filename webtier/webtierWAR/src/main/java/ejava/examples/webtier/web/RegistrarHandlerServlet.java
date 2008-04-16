@@ -35,7 +35,7 @@ public class RegistrarHandlerServlet extends HttpServlet {
         //create proper handlers per role
         if (level != null && "admin".equals(level)) {
             handlers.put("Create Student", new CreateStudent());
-            handlers.put("Generate Students", new GenerateStudents());
+            handlers.put("Generate Students",  new GenerateStudents());
             handlers.put("Find Students", new GetStudents());
             handlers.put("Get Student", new GetStudent());
             handlers.put("Remove Student", new RemoveStudent());

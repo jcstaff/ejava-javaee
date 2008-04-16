@@ -19,6 +19,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2008-04-15: Posted Security materials</li>
           <li>2008-04-08: Posted Web Tier todo-s</li>
           <li>2008-04-01: Posted EJB todo-s</li>
           <li>2008-03-18: Posted server-side materials</li>
@@ -30,6 +31,28 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>finish and submit project 2</li>
+          <li>add user.properties and roles.properties to Dmv project</li>
+          <li>assign EJB to security-domain "other".
+          The RMI Tests should fail access at this point.</li>
+          <li>specify required roles to access each EJB method</li>
+          <li>add a java.security.auth.login.config to the RMI Test client</li>
+          <li>add a LoginContext with a CallbackHandler. The RMI Tests should 
+          be able to access the EJB methods they are authorized to access.
+          You should have at least one test that verifies an unauthorized
+          user is refused access.</li>
+          <li>assign WAR to security-domain "java:/jaas/other"</li>
+          <li>add security-constraint elements to the WAR web.xml. The 
+          user should be prompted for a login at this point and be able to
+          access web pages and EJB methods that they are authorized for
+          and be refused access to what they are un-authorized to access</li>
+          <li>eliminate access to any information or option the user does
+          not have access to see or use</li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
           <li>finish implementing the remainder of the remote methods,
           adding DTOs where necessary, and testing from the RMI Client</li>
           <li>add a WAR project to the Dmv and register it with the 
@@ -50,10 +73,7 @@
           Add a menu option to initiate the call. Add a view JSP
           to display the results.</li>
           <li>Add remaining use cases to the WAR.</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>inject a JDBC Connection into your @Stateless session bean</li>
           <li>inject a JPA EntityManager into your @Stateless session bean</li>
