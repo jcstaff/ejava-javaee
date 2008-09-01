@@ -42,12 +42,8 @@ Exercise 1: First Simple Application
         {{{http://docs.codehaus.org/display/MAVENUSER/FAQs-1}
         Contributed FAQ}} contains a user-maintained FAQ.
 
-        * {{{http://maven.apache.org/where-is-it.html}
-        Links to Assorted Resources}} - this includes a seach engine for
-        the 
-        {{{http://www.nabble.com/Maven---Users-f178.html}
-        Maven User}} and Developer Groups as well as configuration
-        file references.
+        * {{{http://www.nabble.com/Maven---Users-f178.html}
+        Maven User Group}} on Nabble
 
         * {{{http://maven.apache.org/articles.html}Books and Articles}}
         This has a huge collection of information; which is why you won't 
@@ -61,10 +57,10 @@ Exercise 1: First Simple Application
     busy. Don't worry. As annoying as it is, just execute the build
     again (and again) until all dependences have been successfully
     resolved. If you consistently get connection timeouts with
-    no success, register some mirror repositories as described in
-    {{{http://maven.apache.org/guides/mini/guide-mirror-settings.html}
-    Using Mirrors for Repositories}}
-
+    no success, these repositories can be down. If you know you already
+    have everything you need, you can run in off-line mode using the
+    "-o" flag on the command line or its equivalent entry within the
+    settings.xml file.
 
 ** Steps
 
@@ -78,9 +74,12 @@ Exercise 1: First Simple Application
         * groupId - earlier in the exercise, we found junit.jar in a junit
         directory on ibiblio. That is one area where the groupId comes in.
 
-        * version - Maven has a whole versioning system and versions 
-        appended with the word SNAPSHOT are handled differently. This is 
-        applied to a project in progress prior to release.
+        * version - Maven has a strong versioning system and versions 
+        appended with the word SNAPSHOT are handled differently. Projects
+        with a version ending in -SNAPSHOT are thought to be in constant
+        change, with no official release yet available. Projects with a 
+        version lacking the -SNAPSHOT ending are meant to be an official
+        release, with no other variants available with the same tag.
 
         * dependency.scope - note that we only need junit and log4j during
         testing; not compilation or deployment. The default scope (if missing)
@@ -115,7 +114,7 @@ Exercise 1: First Simple Application
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.0</version>
+            <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -414,6 +413,17 @@ Compiling 1 source file to
     The profile can have any "id" value, but must be listed as an activeProfile to 
     have an impact on the maven environment.
 
+        * m2.repo - this is used by class examples to create expanded classpaths 
+        at build time. It needs to be the same value as localRepository at all
+        times. 
+
+        * jboss.home - this is used by class examples to directly reference
+        the JBoss installation instance for client jarfiles. This assures your
+        testing is being done against the same version installed on your system.
+
+        * jboss.(remaining) - used by the Maven cargo plugin to set deployment
+        variables to their non-default values
+
 ---
     <profiles>
         <profile>
@@ -511,10 +521,6 @@ Compiling 1 source file to
         available from a Maven repository. You must download it 
         and manually install it locally.
 
-        [Note:] The javaee.jar was added to the class repository after this step was
-        written. If you do not get this error, then it was downloaded as designed.
-        However, the information in the steps covered next are useful to know.
-
     [[1]] This step will go though 
     importing a stand-alone archive into the repository to resolve
     any dependencies. Start by declaring a dependency before we do the 
@@ -526,19 +532,17 @@ Compiling 1 source file to
 
 ---
         <dependency>
-            <groupId>javax.javaee</groupId>
-            <artifactId>javaee</artifactId>
-            <version>5</version>
+            <groupId>foo</groupId>
+            <artifactId>bar</artifactId>
+            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
 ---
 ---
 > mvn package
 ...
-Downloading: http://www.ibiblio.org/maven2/javax/javaee/javaee/5/javaee-5.pom
-[WARNING] Unable to get resource from repository central (http://repo1.maven.org/maven2)
-Downloading: http://www.ibiblio.org/maven2/javax/javaee/javaee/5/javaee-5.jar
-[WARNING] Unable to get resource from repository central (http://repo1.maven.org/maven2)
+Downloading: http://repo1.maven.org/maven2/foo/bar/1.1/bar-1.1.pom
+Downloading: http://repo1.maven.org/maven2/foo/bar/1.1/bar-1.1.jar
 [INFO] ------------------------------------------------------------------------
 [ERROR] BUILD ERROR
 [INFO] ------------------------------------------------------------------------
@@ -546,71 +550,72 @@ Downloading: http://www.ibiblio.org/maven2/javax/javaee/javaee/5/javaee-5.jar
 
 Missing:
  ----------
-1) javax.javaee:javaee:jar:5
+1) foo:bar:jar:1.1
 
   Try downloading the file manually from the project website.
 
   Then, install it using the command:
-      mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
-          -Dversion=5 -Dpackaging=jar -Dfile=/path/to/file
+      mvn install:install-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackaging=jar -Dfile=/path/to/file
+
+  Alternatively, if you host your own repository you can deploy the file there:
+      mvn deploy:deploy-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackaging=jar -Dfile=/path/to/file -Durl=[url] -DrepositoryId=[id]
 
   Path to dependency:
-        1) myorg.myproject:ex1:jar:1.0-SNAPSHOT
-        2) javax.javaee:javaee:jar:5
+        1) myorg.myproject:ex1:jar:1.0.2008.2-SNAPSHOT
+        2) foo:bar:jar:1.1
 
  ----------
 1 required artifact is missing.
 
 for artifact:
-  myorg.myproject:ex1:jar:1.0-SNAPSHOT
+  myorg.myproject:ex1:jar:1.0.2008.2-SNAPSHOT
 
 from the specified remote repositories:
   central (http://repo1.maven.org/maven2)
 ---
 
-    [[1]] Okay; that was a pretty good error message.  If you haven't
-    already done so, manually download the Java EE 5 API from 
-    {{{http://java.sun.com/javaee/downloads/index.jsp}
-    Sun's Java EE SDK Page}}
-
-    [[1]] Manually install the downloaded lib/javaee.jar. Assign it a 
-    groupId of javax.javaee and an artifactId of javaee. Don't forget to 
+    [[1]] Okay; that was a pretty good error message.  Now
+    manually install a jar file that represents the declaration. Assign it a 
+    groupId of foo, an artifactId of bar, and a version of 1.1. Don't forget to 
     add the -DgeneratePom=true or you will get a download warning 
-    everytime you try to build.
+    everytime you try to build. All we need is a valid .jar file. If you 
+    don't have one laying around, just create one with valid structure.
 
 ---
-> mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
--Dversion=5 -Dpackaging=jar -Dfile=/apps/linux/SUNWappserver/lib/javaee.jar \
--DgeneratePom=true
+> jar cf bar.jar pom.xml
+> mvn install:install-file -DgroupId=foo -DartifactId=bar \
+> -Dversion=1.1 -Dpackaging=jar -Dfile=bar.jar \
+> -DgeneratePom=true
 ...
 
 [INFO] [install:install-file]
-[INFO] Installing /apps/linux/SUNWappserver/lib/javaee.jar to /home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.jar
+[INFO] Installing /home/jcstaff/proj/ejava-javaee/working/solutions/ex1/bar.jar to /home/jcstaff/.m2/repository/foo/bar/1.1/bar-1.1.jar
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2 seconds
+[INFO] Finished at: Sun Aug 24 17:45:42 EDT 2008
+[INFO] Final Memory: 4M/7M
+[INFO] ------------------------------------------------------------------------
 ---
 ---
-> find /home/jcstaff/.m2/repository/javax/javaee/javaee/5/ -type f
-/home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.jar
-/home/jcstaff/.m2/repository/javax/javaee/javaee/5/javaee-5.pom
+> find /home/jcstaff/.m2/repository/foo/ -type f
+/home/jcstaff/.m2/repository/foo/bar/maven-metadata-local.xml
+/home/jcstaff/.m2/repository/foo/bar/1.1/bar-1.1.jar
+/home/jcstaff/.m2/repository/foo/bar/1.1/bar-1.1.pom
 
-
-//generated .m2/repository/javax/javaee/javaee/5/javaee-5.pom
+> more /home/jcstaff/.m2/repository/foo/bar/1.1/bar-1.1.pom
 <?xml version="1.0" encoding="UTF-8"?><project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>javax.javaee</groupId>
-  <artifactId>javaee</artifactId>
-  <version>5</version>
+  <groupId>foo</groupId>
+  <artifactId>bar</artifactId>
+  <version>1.1</version>
   <description>POM was created from install:install-file</description>
-  <distributionManagement>
-    <status>deployed</status>
-  </distributionManagement>
 </project>
 ---
 
     [[1]] Now try running "mvn package" and it should successfully 
-    resolve the fake dependency on the Java EE 5 API.
+    resolve the fake dependency on the bar.jar.
 
     []
 

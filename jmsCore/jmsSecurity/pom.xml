@@ -3,7 +3,7 @@
     <parent>
         <artifactId>jmsCore</artifactId>
         <groupId>ejava.javaee.jmscore</groupId>
-        <version>1.0.2008.1-SNAPSHOT</version>
+        <version>1.0.2008.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -11,17 +11,26 @@
     <artifactId>jmsSecurity</artifactId>
     <packaging>jar</packaging>
     <name>JMS Security</name>
-    <version>1.0.2008.1-SNAPSHOT</version>
+    <version>1.0.2008.2-SNAPSHOT</version>
     <description>
         This project demonstrates some techniques to secure use of JMS.
     </description>
 
+   <!-- this repositories holds many of the javaee5 jar files -->
+   <repositories>
+       <repository>
+           <id>jboss-repo</id>
+           <name>JBoss Maven Repository</name>
+           <url>http://repository.jboss.org/maven2</url>
+       </repository>
+    </repositories>
+
     <dependencies>
         <!-- core dependencies -->
         <dependency>
-            <groupId>javax.javaee</groupId>
-            <artifactId>javaee</artifactId>
-            <version>5</version>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

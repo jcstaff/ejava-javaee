@@ -1,6 +1,6 @@
 Project2: eMarket N-Tier Application
 
-    03/18/2007
+    08/31/2008 Draft
 
 * Goals
 
@@ -21,7 +21,7 @@ Project2: eMarket N-Tier Application
     WAR, EAR, and Test sub-projects for eSales.
 
     * Expand the current project development architecture to include EJB,
-    EAR, and Test sub-projects for eBidbot.
+    WAR, EAR, and Test sub-projects for eBidbot.
 
     * Re-host the data access tiers and initial business logic from 
     Project 1 within the new EJB and WEB tiers.
@@ -29,14 +29,14 @@ Project2: eMarket N-Tier Application
     * Design the data transfer objects (DTOs) to be used to communicate
     with clients using the remote interface.
 
-    * Create the EAR sub-project to host the Java EE components.
+    * Create the EAR sub-projects to host the Java EE components.
 
-    * Create the Test sub-project to deploy and run tests using the
+    * Create the Test sub-projects to deploy and run tests using the
     remote EJB interface.
 
-    * Create and test the WAR sub-project to host the user interface.
+    * Create and test the WAR sub-projects to host the user interface.
     This component will ultimately be deployed within the EAR to 
-    the application server and use local interfaces of the EJB to
+    the application server and may use local interfaces of the EJB to
     access business logic. 
 
 * Technical Overview
@@ -82,8 +82,17 @@ Project2: eMarket N-Tier Application
     be demonstrated through RMI calls to the EJB.
 
     You may develop your Web tier in an alternate environment, such as
-    Jetty. However, it must be submitted as part of the application that
+    Jetty. However, it must operate within the EAR that is deployed and
     runs within JBoss.
+
+* Assembly Overview
+
+    You will be adding several sibling projects to both eSales and eBidbot.
+    See suggestions for the layout towards the bottom of this specification.
+    Once you add a new project, make sure to add a reference to it in the 
+    parent pom.xml. Spelling and case count. Ignoring case of characters 
+    (e.g. eBidbot versus eBidBot) will make your project non-portable to
+    Unix file systems. 
 
     [Note:] As with the previous project, the use of the name eMarket,
     eSales, and eBidbot within the project specification are to be taken as
@@ -96,6 +105,7 @@ Project2: eMarket N-Tier Application
     with the log4j logging provider.  You may leave debug in your code,
     but this should be able to be turned on/off with the proper logging
     priority changes in the log4j.xml configuration.
+
 
 * Technical Details
 
@@ -217,57 +227,57 @@ Project2: eMarket N-Tier Application
 
 ===
 
-    [[1]] Add a Web UI to the eSales application. This should use the local
-    interface EJB, which can be identical to the interface implemented for
-    the business logic. The WAR for the Web UI must be deployed as part of 
-    the eSales EAR. The Web UI must have the following functionality.
+[../images/emarket-client.jpg] eMarket Clients
 
-        * List open auctions
+    [[1]] Add a Web UI to the eSales application. This may use either
+    the remote interface (already implemented and tested with RMI Test
+    project) or the local interface of the EJB. The remote will bne a
+    distinct interface that is designed to handle remote clients. The
+    local interface can be identical to the interface implemented for
+    the business logic. The WAR for the Web UI must be deployed as part
+    of the eSales EAR. The Web UI must have the following functionality.
 
-        * Get details for specific auction.
+        * Anonymous User
 
-        * Place bid for buyer
+            * List open auctions
+
+            * Get details for specific auction.
+
+            * createAccount (using AccountMgmtEJB)
+
+        * Test Admin
+
+            * reset All tables
+
+            * populate tables (using Ingestor)
+
+        * Seller
+
+            * createAuction (using SellerMgmtEJB)
+
+            * getUserAuctions (using SellerMgmtEJB)
+
+            * getAuction (using SellerMgmtEJB)
+
+        * Buyer
+
+            * Place bid (using BuyerMgmtEJB)
 
 ===
 
-[../images/emarket-client.jpg] eBidbot Business Logic and EJB Tiers
+    [[1]] Add a WebUI to the eBidbot application. This may use either 
+    the remote interface (already implemented and tested with RMI Test
+    project) or the local interface of the EJB. The WAR for the Web UI 
+    must be deployed as part of the eBidbot EAR. The Web UI must have 
+    the following functionality.
 
-    [[1]] Develop a Client component for eSales that can issue specific
-    commands to the eSales application through remote interfaces.
-    This remote client can optionally be replaced with a set of Web
-    UI functionality. It is only being expressed here as a command
-    line client to offer a way to simplify/speed implementation. The client
-    implementations must have the ability to issue the following commands.
-    All command line implementations must be wrapped in an Ant runtime script
-    to encapulsate the classpath details in a portable manner (see the class
-    jdbcDAO project for an example of using an Ant runtime script).
+        * Admin
 
-        * ingest data (using Ingestor)
+            * createAccount (using OrderMgmtEJB)
 
-        * createAccount for seller, buyer1, and buyer2 (using
-        AccountMgmtRemote)
+        * Bidder
 
-        * createAuction (using SellerMgmtRemote)
-
-        * getUserAuctions (using SellerMgmtRemote)
-
-        * getAuction (using SellerMgmtRemote)
-
-===
-
-    [[1]] Develop a Client component for eBidbot that can issue specific
-    commands to the eBidbot application through remote interfaces.
-    This remote client can optionally be replaced with a set of Web
-    UI functionality. It is only being expressed here as a command
-    line client to offer a way to simplify/speed implementation. The client
-    implementations must have the ability to issue the following commands.
-    All command line implementations must be wrapped in an Ant runtime script
-    to encapulsate the classpath details in a portable manner (see the class
-    jdbcDAO project for an example of using an Ant runtime script).
-
-        * createAccount (using OrderMgmtRemote)
-
-        * placeOrder (using OrderMgmtRemote)
+            * placeOrder (using OrderMgmtEJB)
 
 ===
 
@@ -298,35 +308,36 @@ Project2: eMarket N-Tier Application
 
     [[1]] Perform and document an end-to-end use case to do the following. 
     
-    [Note:]Any actions, including the ingest, that must be executed from
-    the command line must be wrapped inside an <<RUN>> script similar
-    to ones demonstrated in class (see the class jdbcDAO project for an 
+    [Note:]Any actions, if any, that must be executed from the command
+    line must be wrapped inside an <<RUN>> script similar to ones
+    demonstrated in class (see the example eSalesBLImpl  project for an
     example of using an Ant script to encapsulate command-line details).
 
     []
 
-        * ingest data (using Ingestor)
+        * reset database
 
-        * createAccount for seller, buyer1, and buyer2 in ejbSales (using
-        either a command line client or Web UI)
+        * ingest data
 
-        * createAccount for buyer2 in eBidbot (using either a command line
-        client or Web UI)
+        * createAccount for seller, buyer1, and buyer2 in eSales 
 
-        * createAuction (using command line client or Web UI)
+        * createAccount for buyer2 in eBidbot
 
-        * getUserAuctions (using command line client or Web UI)
+        * createAuction for seller
 
-        * getAuction (using command line client or Web UI)
+        * getUserAuctions for seller
 
-        * getOpenAuctions (using Web UI)
+        * getAuction for the one created in earlier step
 
-        * placeBid for buyer1 (using Web UI)
+        * getOpenAuctions 
 
-        * getAuction for (using Web UI)
+        * placeBid for buyer1 
 
-        * placeOrder for buyer2 in eBidbot (using either a command line 
-        client or Web UI)
+        * getAuctions for buyer1
+
+        * placeOrder for buyer2 in eBidbot (stimulate a bid)
+
+        * getAuction to verify bids were placed for buyer1 and buyer2
 
 * Getting Started
 
@@ -344,7 +355,7 @@ Project2: eMarket N-Tier Application
     |   |-- eBidbotDAO
     |   |-- eBidbotBLImpl
     |   |-- eBidBotEAR
-    |   |   `-- pom.ml
+    |   |   `-- pom.xml
     |   |-- eBidbotEJB
     |   |   |-- pom.ml
     |   |   `-- src
@@ -373,9 +384,9 @@ Project2: eMarket N-Tier Application
     |   |-- eSalesBO
     |   |-- eSalesDAO
     |   |-- eSalesEAR
-    |   |   `-- pom.ml
+    |   |   `-- pom.xml
     |   |-- eSalesEJB
-    |   |   |-- pom.ml
+    |   |   |-- pom.xml
     |   |   `-- src
     |   |       `-- main
     |   |           |-- java
@@ -387,7 +398,7 @@ Project2: eMarket N-Tier Application
     |   |               |-- ejb-jar.xml
     |   |               `-- jboss.xml
     |   |-- eSalesTest
-    |   |   |-- pom.ml
+    |   |   |-- pom.xml
     |   |   `-- src
     |   |       `-- test
     |   |           |-- java
@@ -398,7 +409,7 @@ Project2: eMarket N-Tier Application
     |   |               |-- eSales.properties
     |   |               `-- jndi.properties
     |   `-- eSalesWAR
-    |       |-- pom.ml
+    |       |-- pom.xml
     |       `-- src
     |           `-- main
     |               |-- java

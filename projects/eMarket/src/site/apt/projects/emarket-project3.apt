@@ -1,12 +1,12 @@
 Project3: eMarket Secure and Asynchronous N-Tier Application
 
-    01/30/2007 Draft - details of the final scenario will be updated
+    08/31/2008 Draft
 
 * Goals
 
     * Secure access to EJB and Web applications
 
-    * Provide for asynchronous publish/subscribe processing.
+    * Provide for asynchronous processing.
 
 * Objectives
 
@@ -24,6 +24,9 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
 
     * Implement a publish/subscribe capability between the eSales, eBidbot
     and stand-alone client applications.
+
+    * Implement timers within eSales and eBidbot applications to 
+    handle scheduled actions.
 
 * Technical Overview
 
@@ -56,21 +59,41 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     classloader classpath. This means that they would be at the root
     directory of an EJB or WEB-INF/classes. Knowing our environment, we'll
     create a single set to be shared between eSales and eBidbot and place
-    this in the eSales.
+    this in the eSalesEJB.
 
     We are going to have a couple types of users. Some of the users will
     have zero, one, or more of these roles. Because of the static nature of
     our authentication, all users will have a login configured long before
     they register for an account.
 
-        * esales-user - these users can create accounts for themselves,
-        create and auction, and bid on auctions.
+        * (anonymous) - these users can view auctions and create an account.
 
-        * ebidbot-user - these users can create accounts for themselves
-        and manage their orders.
+        * esales-admin - these users will be able to perform management 
+        and test functions on eSales.
 
-    eBidbot will authenticate with eSales using the user credentials of the
-    buyer using a JAAS configuration and login logic.
+        * esales-user - these users can create and auction, and bid on auctions.
+
+        * esales-trusted - these users can bid on auctions on behalf of a 
+        specified user.
+
+        * ebidbot-admin - these users will be able to perform management 
+        and test functions on eBidbot.
+
+        * ebidbot-user - these users can and manage their orders.
+
+    [Note:] To clarify, your application will have a static set of logins
+    and will ingest a set of accounts. A user with a login and no account
+    can login, but won't be able to do anything meaningful. A user with an
+    account and no login won't be able to access the system. Normally the
+    login would be created at the same time as the account.  Except for
+    your JBoss configuration and your "Create Account" logic, no other
+    part of your project should be aware of this tradeoff made for class
+    project simplicity.
+
+    []
+
+    eBidbot will run-as an esales-trusted user and pass the userId
+    for the eSales bidder with the placed bid.
 
     RMI Tests will be updated with JAAS configuration and login logic.
 
@@ -96,15 +119,17 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     applications. The files should define the following usernames and
     roles (all users should have a password of "password".
 
-        * user1=esales
+        * user1=esales-user
 
-        * user2=esales
+        * user2=esales-user
 
-        * user3=esales,ebidbot
+        * user3=esales-user,ebidbot-user
 
-        * admin1=esalesadmin
+        * admin1=esales-admin
 
-        * admin2=ebidbotadmin
+        * admin2=ebidbot-admin
+
+        * bidbot=esales-trusted
 
 ===
 
@@ -119,7 +144,7 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
 
         * Allow any user to perform read operations.
 
-        * Restrict any administrative functions to the esalesadmin role.
+        * Restrict any administrative functions to the esales-admin role.
 
 ===
 
@@ -144,6 +169,9 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
         * Restrict access to the OrderMgmt to users in the ebidbot role
         once they get beyond creating an account.
 
+        * run-as an esales-trusted user when making bids on behalf of 
+        a user.
+
 ===
 
     [[1]] Extend your existing RMI Test project and RMI client(s) to
@@ -165,6 +193,8 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
 
         * Restrict access beyond the main page to users with
         the esales role.  You may use FORM or BASIC authentication.
+        It is suggested that you use FORM authentication to make it easier
+        to logout/login as separate users.
 
         * Permit only users to only ask the EJB tier for account
         information that is associated with their login.
@@ -233,53 +263,57 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     ingested eSales database and accounts created.  All command
     line implementations must be wrapped in an Ant runtime script to
     encapulsate the classpath details in a portable manner (see the
-    class jdbcDAO project for an example of using an Ant runtime script).
+    class example eSalesBLImpl project for an example of using an Ant
+    runtime script).
 
-        [[1]] user1 creates auction (using command line client or Web UI)
+        [[1]] eSales initializes the EJB Timer to check for expired 
+        auctions
 
-        [[1]] user2 gets a list of open auctions (using Web UI)
+        [[1]] eBidbot initializes the EJB Timer to check auctions
+        associated with its bids.
 
-        [[1]] Web UI obtains the open auctions from the EJB Tier (using the
-        BuyerMgmtLocal interface)
+        [[1]] admin1 resets all eSales tables (using the eSalesTestUtilEJB)
 
-        [[1]] user2 places bid on an auction (using Web UI)
+        [[1]] admin1 populates the eDmv tables (using the ESalesIngestor)
 
-        [[1]] Web UI places bid using EJB Tier (using the BuyerMgmtLocal
-        interface)
+        [[1]] admin2 resets the eBidbot tables (using the
+        EBidbotTestUtilEJB)
+
+        [[1]] admin2 populates the eBidbot tables (using the
+        EBidTestUtilEJB) if necessary. Suggest adding account for user3
+        at this point.
+
+        [[1]] user1 creates auction 
+
+        [[1]] user2 gets a list of open auctions
+
+        [[1]] user2 places bid on an auction
 
         [[1]] user2 views the current status of the auction they are
-        bidding on (using the Web UI)
+        bidding on
 
-        [[1]] Web UI obtains the requested auction from the EJB Tier (using
-        the BuyerMgmtLocal interface)
-
-        [[1]] user3 gets a list of open auctions (using Web UI)
-
-        [[1]] Web UI obtains the open auctions from the EJB Tier (using the
-        BuyerMgmtLocal interface)
+        [[1]] user3 gets a list of open auctions
 
         [[1]] user3 views the current status of the auction that was bid by
-        user2 (using the Web UI)
+        user2
 
-        [[1]] Web UI obtains the requested auction from the EJB Tier (using
-        the BuyerMgmtLocal interface)
+        [[1]] user3 places order with eBidbot
 
-        [[1]] user3 places order with eBidbot (using command line interface
-        or a Web UI)
+        [[1]] eBidbot EJB wakes up from an EJB Timer
 
-        [[1]] eBidbot EJB wakes up from an EJB Timer and places bid for
-        user3 (using BuyerMgmtRemote)
+        [[1]] eBidbot EJB places bid for user3 
 
-        [[1]] user2 places another bid on auction (using Web UI)
+        [[1]] user2 places another bid on auction
 
-        [[1]] Web UI places bid using the EJB Tier (using BuyerMgmtLocal)
+        [[1]] eBidbot EJB wakes up again from an EJBTimer
 
-        [[1]] eBidbot EJB wakes up again to see they have been raised and
-        places another bid for user3 (using BuyerMgmtRemote)
+        [[1]] eBidbot EJB sees they have been raised and places another
+        bid for user3
 
-        [[1]] eSales EJB wakes up and closes the auction. A message is
-        published to the topic that informs everyone of the closing and
-        that user3 has win.
+        [[1]] eSales EJB wakes up from an EJBTimer and closes the auction
+
+        [[1]] eSales EJB publishes a message to the topic that informs
+        everyone of the closing and that user3 has win.
 
         [[1]] The eBidbot MDB receives the message and updates the order.
 
@@ -287,7 +321,6 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
         their JMS selector for a specific category.
 
         [[1]] user3 checks their order with eBidbot and finds out they won
-        (using a command line client or Web UI).
         
 [../images/emarket-async-auction.jpg] eMarket Async Auction
 

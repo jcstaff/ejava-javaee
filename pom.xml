@@ -5,7 +5,7 @@
     <groupId>ejava.javaee</groupId>
     <artifactId>ejava-javaee</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2008.1-SNAPSHOT</version>
+    <version>1.0.2008.2-SNAPSHOT</version>
     <name>Enterprise Java (605.784) Root</name>
     <description>
         This is the course home page for the Enterprise Java Course
@@ -30,11 +30,13 @@
         </mailingList>
     </mailingLists>
     <scm>
-        <url>https://ejava.info:8443/repos/class/branches/2008-spring-ejava-javaee</url>
-        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2008-spring-ejava-javaee</connection>
+        <url>https://ejava.info:8443/repos/class/branches/2008-fall-ejava-javaee</url>
+        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2008-fall-ejava-javaee</connection>
     </scm>
   <modules>
+  <!--
         <module>site-skin</module>
+        -->
         <module>course-docs</module>
         <module>solutions</module>
         <module>utils</module>
@@ -54,6 +56,8 @@
         <module>securePing</module>
         <module>jmsCore</module>
         <module>asyncEJB</module>
+        <!--
+        -->
     </modules>
   
     <developers>
@@ -62,8 +66,8 @@
             <name>Jim Stafford</name>
             <email>jcstaff@apl.jhu.edu</email>
             <url>http://www.apl.jhu.edu/~jcstaff</url>
-            <organization>RABA Technologies</organization>
-            <organizationUrl>http://www.raba.com</organizationUrl>
+            <organization>SRA International</organization>
+            <organizationUrl>http://www.sra.com</organizationUrl>
             <timezone>-4</timezone>
             <roles>
                 <role>Instructor</role>
@@ -73,19 +77,29 @@
     </developers>
     <contributors>
         <contributor>
-            <name>Joy Faniyi</name>
-            <email>j_faniyi@yahoo.com</email>
+            <name>Mark Sholund</name>
+            <email>mdsholund@gmail.com</email>
             <timezone>-4</timezone>
             <roles>
                 <role>Grader</role>
             </roles>
         </contributor>
         <contributor>
-            <name>Mark Sholund</name>
-            <email>mdsholund@gmail.com</email>
+            <name>Bruce Cohen</name>
+            <email>ejava@cohenmail.net</email>
+            <organization>SRA International</organization>
+            <organizationUrl>http://www.sra.com</organizationUrl>
             <timezone>-4</timezone>
             <roles>
                 <role>Grader</role>
+            </roles>
+        </contributor>
+        <contributor>
+            <name>Joy Faniyi</name>
+            <email>j_faniyi@yahoo.com</email>
+            <timezone>-4</timezone>
+            <roles>
+                <role>Former Grader</role>
             </roles>
         </contributor>
         <contributor>
@@ -113,9 +127,7 @@
             <plugin> <!-- generates site documentation -->
                 <artifactId>maven-site-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <!--
-                <version>2.0-beta-5</version>
-                -->
+                <version>2.0-beta-7</version>
                 <configuration>
                     <locales>en</locales>
                 </configuration>
@@ -236,13 +248,58 @@
                         <uniqueVersion>false</uniqueVersion>
                     </snapshotRepository>
                 </distributionManagement>
+
+               <!-- this repositories holds many of the javaee5 jar files -->
+                <repositories>
+                    <repository>
+                        <id>jboss-repo</id>
+                        <name>JBoss Maven Repository</name>
+                        <url>http://repository.jboss.org/maven2</url>
+                    </repository>
+                    <repository>
+                        <id>javanet-repo</id>
+                        <name>java.net Maven Repository</name>
+                        <url>http://download.java.net/maven/2/</url>
+                    </repository>
+                </repositories>
+
                 <dependencies>
                     <!-- needed to resolve JavaEE annotations within Javadoc
                   -->
                     <dependency>
-                        <groupId>javax.javaee</groupId>
-                        <artifactId>javaee</artifactId>
-                        <version>5</version>
+                        <groupId>javax.annotation</groupId>
+                        <artifactId>jsr250-api</artifactId>
+                        <version>1.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.persistence</groupId>
+                        <artifactId>persistence-api</artifactId>
+                        <version>1.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.ejb</groupId>
+                        <artifactId>ejb-api</artifactId>
+                        <version>3.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.jms</groupId>
+                        <artifactId>jms</artifactId>
+                        <version>1.1</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                        <version>2.5</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.xml</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.0</version>
                         <scope>provided</scope>
                     </dependency>
                 </dependencies>
@@ -267,13 +324,58 @@
                         <uniqueVersion>false</uniqueVersion>
                     </snapshotRepository>
                 </distributionManagement>
+
+               <!-- this repositories holds many of the javaee5 jar files -->
+                <repositories>
+                    <repository>
+                        <id>jboss-repo</id>
+                        <name>JBoss Maven Repository</name>
+                        <url>http://repository.jboss.org/maven2</url>
+                    </repository>
+                    <repository>
+                        <id>javanet-repo</id>
+                        <name>java.net Maven Repository</name>
+                        <url>http://download.java.net/maven/2/</url>
+                    </repository>
+                </repositories>
+
                 <dependencies>
                     <!-- needed to resolve JavaEE annotations within Javadoc
                   -->
                     <dependency>
-                        <groupId>javax.javaee</groupId>
-                        <artifactId>javaee</artifactId>
-                        <version>5</version>
+                        <groupId>javax.annotation</groupId>
+                        <artifactId>jsr250-api</artifactId>
+                        <version>1.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.persistence</groupId>
+                        <artifactId>persistence-api</artifactId>
+                        <version>1.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.ejb</groupId>
+                        <artifactId>ejb-api</artifactId>
+                        <version>3.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.jms</groupId>
+                        <artifactId>jms</artifactId>
+                        <version>1.1</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                        <version>2.5</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.xml</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.0</version>
                         <scope>provided</scope>
                     </dependency>
                 </dependencies>
@@ -298,13 +400,58 @@
                         <uniqueVersion>false</uniqueVersion>
                     </snapshotRepository>
                 </distributionManagement>
+
+               <!-- this repositories holds many of the javaee5 jar files -->
+                <repositories>
+                    <repository>
+                        <id>jboss-repo</id>
+                        <name>JBoss Maven Repository</name>
+                        <url>http://repository.jboss.org/maven2</url>
+                    </repository>
+                    <repository>
+                        <id>javanet-repo</id>
+                        <name>java.net Maven Repository</name>
+                        <url>http://download.java.net/maven/2/</url>
+                    </repository>
+                </repositories>
+
                 <dependencies>
                     <!-- needed to resolve JavaEE annotations within Javadoc
                   -->
                     <dependency>
-                        <groupId>javax.javaee</groupId>
-                        <artifactId>javaee</artifactId>
-                        <version>5</version>
+                        <groupId>javax.annotation</groupId>
+                        <artifactId>jsr250-api</artifactId>
+                        <version>1.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.persistence</groupId>
+                        <artifactId>persistence-api</artifactId>
+                        <version>1.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.ejb</groupId>
+                        <artifactId>ejb-api</artifactId>
+                        <version>3.0</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.jms</groupId>
+                        <artifactId>jms</artifactId>
+                        <version>1.1</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                        <version>2.5</version>
+                        <scope>provided</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.xml</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.0</version>
                         <scope>provided</scope>
                     </dependency>
                 </dependencies>

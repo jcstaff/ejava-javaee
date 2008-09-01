@@ -19,176 +19,22 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
-          <li>2008-04-15: Posted JMS materials</li>
-          <li>2008-04-15: Posted Security materials</li>
-          <li>2008-04-08: Posted Web Tier todo-s</li>
-          <li>2008-04-01: Posted EJB todo-s</li>
-          <li>2008-03-18: Posted server-side materials</li>
-          <li>2008-02-26: Posted ormRelation updates</li>
-          <li>2008-02-13: Posted JPA materials</li>
-          <li>2008-02-04: Posted JDBC materials</li>
-          <li>2008-01-28: Posted initial class site</li>
+          <li>2008-09-01: Posted initial class site</li>
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-          <li>finish security configuration, implementation, and testing</li>
-          <li>add JMS configuration file to JBoss server. Be sure
-          to keep a copy in your source tree and refer to file in 
-          project README if you don't auto-deploy the file.</li>
-          <li>Design your JMS message type(s). Write and test a utility
-          class that publishes the messages in the DMV BLImpl project</li>
-          <li>Implement a Java SE Client to receive and log the JMS
-          messages. This client can be placed in BLImpl, must use a
-          selector, and be launchable by the grader using an Ant script.
-          The Ant script can be part of either the BLImpl or RMI Test
-          project. See class examples on how write the Ant script.</li>
+          <li>register for newsgroup and setup e-mail handling (all e-mails will have
+          ejava_class in subject)</li>
+          <li>post at least 1 test message to newsgroup</li>
+          <li>setup development environment by going through exercises 0 and 1</li>
       </ul>
       </subsection>
       <subsection name="Things you should have finished!" id="completed">
       <ul>
       <li><ul>
-          <li>finish and submit project 2</li>
-          <li>add user.properties and roles.properties to Dmv project</li>
-          <li>assign EJB to security-domain "other".
-          The RMI Tests should fail access at this point.</li>
-          <li>specify required roles to access each EJB method</li>
-          <li>add a java.security.auth.login.config to the RMI Test client</li>
-          <li>add a LoginContext with a CallbackHandler. The RMI Tests should 
-          be able to access the EJB methods they are authorized to access.
-          You should have at least one test that verifies an unauthorized
-          user is refused access.</li>
-          <li>assign WAR to security-domain "java:/jaas/other"</li>
-          <li>add security-constraint elements to the WAR web.xml. The 
-          user should be prompted for a login at this point and be able to
-          access web pages and EJB methods that they are authorized for
-          and be refused access to what they are un-authorized to access</li>
-          <li>eliminate access to any information or option the user does
-          not have access to see or use</li>
+          <li>enjoyed your summer!</li>
       </ul></li>
-      <li><ul>
-          <li>finish implementing the remainder of the remote methods,
-          adding DTOs where necessary, and testing from the RMI Client</li>
-          <li>add a WAR project to the Dmv and register it with the 
-          parent project</li>
-          <li>declare the project as type=war and make sure to 
-          declare all dependencies in such a way that no jars 
-          deployed with the EAR are duplicated in WEB-INF/lib. This
-          is normally done by declaring all dependencies as 
-          scope=provided.</li>
-          <li>Add a controller servlet and have it locate one or
-          more of your session beans in the init() method. You may
-          use either the @Local or @Remote interface of the EJB.</li>
-          <li>Add a JSP main page and an option to invoke the 
-          controller servlet to force the init() and verify that
-          it can locate the EJB.</li>
-          <li>Add an action class to the controller servlet that
-          will invoke the EJB as a part of one of the use cases.
-          Add a menu option to initiate the call. Add a view JSP
-          to display the results.</li>
-          <li>Add remaining use cases to the WAR.</li>
-      </ul></li>
-      <li><ul>
-          <li>inject a JDBC Connection into your @Stateless session bean</li>
-          <li>inject a JPA EntityManager into your @Stateless session bean</li>
-          <li>add business logic and DAOs to your @Stateless session bean</li>
-          <li>perform at least one business method, end-to-end from the
-          JUnit client, through the server/EJB, to the database.</li>
-          <li>implement the remainder of the remote methods, adding DTOs
-          where necessary</li>
-          <li>add @Transaction declarations</li>
-      </ul></li>
-      <li><ul>
-          <li>add an EJB project to Dmv and register it with the parent
-          project</li>
-          <li>add a simple @Stateless session bean implementation (e.g.,
-          TestUtilEJB)</li>
-          <li>define a simple @Remote interface for the @Stateless
-          session bean. Include only a simple ping() method.</li>
-          <li>add an EAR project to Dmv and register it with the parent
-          project</li>
-          <li>define an EAR dependency on the EJB project</li>
-          <li>add an RMI Test project to Dmv and register it with the 
-          parent project. Include the cargo deployment of the EAR to
-          JBoss</li>
-          <li>add a JUnit test and jndi.properties file that will locate
-          the JNDI tree, lookup the @Remote interface, and invoke the 
-          simple method</li>
-      </ul></li>
-      <li><ul>
-          <li>turn in your project 1</li>
-          <li>implement any project 1 cleanup or refactoring for use
-          in projects 2 and 3.</li>
-          <li>download the updates to the class SVN tree to pick up
-          the additional server-side projects.</li>
-          <li>make sure you can start your JBoss server and have
-          a ejavaDS data source configured.</li>
-          <li>build the example tree from the root using 
-          "mvn clean install" and report any issues encountered</li>
-      </ul></li>
-      <li><ul>
-          <li>finish up with the JDBC ingest implementation.
-          Make sure your JDBC mapping and JPA mapping stay consistent.</li>
-          <li>add any necessary use of EJBQL to your projects. This 
-          is normally used in cleanup methods, but could also be 
-          used in various business logic queries.  </li>
-      </ul></li>
-      <li><ul>
-          <li>add relationship mappings to your business objects
-          Test the ability to create, get, update, and remove
-          relationships between objects.</li>
-          <li>continue with the JDBC ingest implementation.
-          Make sure your JDBC mapping and JPA mapping stay consistent.</li>
-          <li>send a zip file of your project, in any consistent state, to
-          the instructor for a sanity check. Include comments on where
-          you believe you are relative to the project and the weekly class todo
-          list.</li>
-      </ul></li>
-      <li><ul>
-          <li>map your business objects to the database for
-          objects/properties and tables/columns. Mark relationships as
-          @Transient at this point. Test the ability to create, find,
-          update, and delete each object type.</li>
-          <li>continue with the JDBC ingest implementation.
-          Make sure your JDBC mapping and JPA mapping stay consistent.</li>
-          <li>send a zip file of your project, in any consistent state, to
-          the instructor for a sanity check. Include comments on where
-          you believe you are relative to the project and the weekly class todo
-          list.</li>
-      </ul></li>
-
-      <li><ul>
-          <li>complete the structure of the JDBC Ingest DAO within the "DAO" project;
-          to continue to mature over time</li>
-          <li>create JPA DAO(s) implementation classes for your projects;
-          design how they get a shared EntityManager and implement the CRUD methods;
-          provide a persistence.xml file; define all Collections to
-          be @Transient and observed the default behavior of mapping classes.</li>
-      </ul></li>
-      <li><ul>
-          <li>read through project description and post any clarification
-          questions</li>
-          <li>go through JDBC tutorial and use this project to try out any
-          JDBC/SQL cwcommands you had questions on</li>
-          <li>look through the example BO and DAO thread for the project</li>
-          <li>start your project directory tree</li>
-          <li>design your project business objects within the "BO" project areas;
-          provide unit tests</li>
-          <li>create the schema file for a portion of the project; to mature over 
-          time</li>
-          <li>create the structure of the JDBC Ingest DAO within the "DAO" project;
-          to mature over time</li>
-          <li>built your project from the root; all supplied artifacts should build 
-          and test correctly</li>
-      </ul></li>
-      <li><ul>
-        <li></li>
-          <li>register for newsgroup and setup e-mail handling (all e-mails will have
-          ejava_class in subject)</li>
-          <li>post at least 1 test message to newsgroup</li>
-          <li>setup development environment by going through exercises 0 and 1</li>
-      </ul></li>
-
       </ul>
       </subsection>
     </section>

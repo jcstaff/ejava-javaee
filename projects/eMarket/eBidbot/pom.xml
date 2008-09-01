@@ -1,0 +1,31 @@
+<?xml version="1.0"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!-- this parent dependency is only here to pick up site deployment properties
+        when being deployed to the web site, It normally would not be needed to 
+        compile and test the application.
+        -->
+    <parent>
+        <artifactId>eMarket</artifactId>
+        <groupId>ejava.javaee.projects</groupId>
+        <version>1.0.2008.2-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.projects.eMarket</groupId>
+    <artifactId>eBidbot</artifactId>
+    <packaging>pom</packaging>
+    <name>eBidbot</name>
+    <version>1.0.2008.2-SNAPSHOT</version>
+    <description>
+        This project provides example structure for how the student project
+        can be formed.
+    </description>
+
+    <modules>
+    <!-- not supplied yet in example 
+        <module>eBidbotBO</module>
+        <module>eBidbotDAO</module>
+        <module>eBidbotBLImpl</module>
+        -->
+    </modules>
+</project>

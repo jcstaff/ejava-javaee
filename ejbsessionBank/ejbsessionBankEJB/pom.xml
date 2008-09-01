@@ -2,7 +2,7 @@
     <parent>
         <artifactId>ejbsessionBank</artifactId>
         <groupId>ejava.javaee.ejb</groupId>
-        <version>1.0.2008.1-SNAPSHOT</version>
+        <version>1.0.2008.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,12 +14,33 @@
         This project provides an example of the core properties of a session bean.
     </description>
 
+   <!-- this repositories holds many of the javaee5 jar files -->
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- core dependencies -->
         <dependency>
-          <groupId>javax.javaee</groupId>
-          <artifactId>javaee</artifactId>
-          <version>5</version>
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.ejb</groupId>
+          <artifactId>ejb-api</artifactId>
+          <version>3.0</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
@@ -91,21 +112,6 @@
                     </clientExcludes>
                 </configuration>
             </plugin>      
-
-            <!-- add the debug argument and supply the class.path if we debug JPA here -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                            <name>java.class.path</name>
-                            <value>target/classes:target/test-classes</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
         </plugins>      
     </build>
 

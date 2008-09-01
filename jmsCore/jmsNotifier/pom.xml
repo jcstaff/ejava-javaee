@@ -3,7 +3,7 @@
     <parent>
         <artifactId>jmsCore</artifactId>
         <groupId>ejava.javaee.jmscore</groupId>
-        <version>1.0.2008.1-SNAPSHOT</version>
+        <version>1.0.2008.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -11,19 +11,28 @@
     <artifactId>jmsNotifier</artifactId>
     <packaging>jar</packaging>
     <name>JMS Notifier</name>
-    <version>1.0.2008.1-SNAPSHOT</version>
+    <version>1.0.2008.2-SNAPSHOT</version>
     <description>
         This project provides a small example of a notification application
         and N-number of non-durable and durable subscribers that use a JMS
         topic to distribute information.
     </description>
 
+   <!-- this repositories holds many of the javaee5 jar files -->
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- core dependencies -->
         <dependency>
-            <groupId>javax.javaee</groupId>
-            <artifactId>javaee</artifactId>
-            <version>5</version>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -130,7 +139,7 @@
                 <dependency>
                     <groupId>org.jboss</groupId>
                     <artifactId>jbossall-client</artifactId>
-                    <version>4.0.4-GA</version>            
+                    <version>4.2.3-GA</version>            
                     <scope>system</scope>
                     <systemPath>
                         ${jboss.home}/client/jbossall-client.jar

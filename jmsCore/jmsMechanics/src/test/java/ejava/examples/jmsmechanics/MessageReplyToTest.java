@@ -16,7 +16,6 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Queue;
-import javax.mail.search.SentDateTerm;
 import javax.naming.InitialContext;
 
 import junit.framework.TestCase;

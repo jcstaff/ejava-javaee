@@ -2,7 +2,7 @@
     <parent>
         <artifactId>webTier</artifactId>
         <groupId>ejava.javaee.webtier</groupId>
-        <version>1.0.2008.1-SNAPSHOT</version>
+        <version>1.0.2008.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -23,9 +23,9 @@
             profile list contains the deployment-specific dependencies 
         -->
         <dependency>
-            <groupId>javax.javaee</groupId>
-            <artifactId>javaee</artifactId>
-            <version>5</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
             <scope>provided</scope>
         </dependency>        
         <dependency>
@@ -102,6 +102,16 @@
                     </plugin>          
                 </plugins>
             </build>
+
+           <!-- needed to resolve some hibernate dependencies -->
+            <repositories>
+                <repository>
+                    <id>jboss-repo</id>
+                    <name>JBoss Maven Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
+            </repositories>
+
             <dependencies>
                 <dependency>
                     <groupId>commons-logging</groupId>
@@ -116,22 +126,17 @@
                     <scope>compile</scope>
                 </dependency>    
                 <!-- this brings in the hibernate provider for JPA -->
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate</artifactId>
-                    <version>3.2.1.ga</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-annotations</artifactId>
-                    <version>3.2.1.ga</version>
-                    <scope>compile</scope>
-                </dependency>
+                <!-- hibernate version used with JBoss 4.2.x -->
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.2.1.ga</version>
+                    <version>3.3.1.ga</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>3.2.4.sp1</version>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>

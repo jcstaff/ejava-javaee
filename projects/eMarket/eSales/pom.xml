@@ -7,7 +7,7 @@
     <parent>
         <artifactId>eMarket</artifactId>
         <groupId>ejava.javaee.projects</groupId>
-        <version>1.0.2007.2</version>
+        <version>1.0.2008.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,46 +15,18 @@
     <artifactId>eSales</artifactId>
     <packaging>pom</packaging>
     <name>eSales</name>
-    <version>1.0.2007.2</version>
+    <version>1.0.2008.2-SNAPSHOT</version>
     <description>
-        This project provides the test data, parser and several example artifacts
+        This project provides several example artifacts
         for the class project. Students will create a dependency on the
-            eSalesTestUtil project and ingest Java obejcts returned from the
-            provided parser. You can find an example of how to setup and use the
-            parser within the eSalesBLImpl sub-project.
+        eSalesTestUtil project and ingest Java obejcts returned from the
+        provided parser. You can find an example of how to setup and use the
+        parser within the eSalesBLImpl sub-project.
     </description>
-    <profiles>
-        <profile>
-            <id>devel</id>
-            <activation>
-                <property>
-                    <name>devel</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <modules>
-                <module>eSalesDTO</module>
-                <module>eSalesDataGen</module>
-                <module>eSalesTestUtil</module>
-                <module>eSalesBO</module>
-                <module>eSalesDAO</module>
-                <module>eSalesBLImpl</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>deploy</id>
-            <activation>
-                <property>
-                    <name>!devel</name>
-                </property>
-            </activation>
-            <modules>
-                <module>eSalesDTO</module>
-                <module>eSalesTestUtil</module>
-                <module>eSalesBO</module>
-                <module>eSalesDAO</module>
-                <module>eSalesBLImpl</module>
-            </modules>
-        </profile>
-    </profiles>
+    <modules>
+        <module>eSalesBO</module>
+        <module>eSalesDAO</module>
+        <module>eSalesBLImpl</module>
+    </modules>
+
 </project>

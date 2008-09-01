@@ -23,25 +23,24 @@ import ejava.examples.jndidemo.JNDIHelper;
  *
  */
 @Stateful(name="BakeScheduler")
-// This populates the local JNDI ENC with EJBs that can be de-referenced
+// This populates the local JNDI ENC so that they can be de-referenced
 // within the EJB.
 @EJBs({
     @EJB(name="ejb/cook", beanInterface=CookLocal.class, beanName="CookEJB")
 })
+@PersistenceContext(unitName="jndidemo",
+                    name="persistence/jndidemo",
+                    type=PersistenceContextType.EXTENDED)
 public class BakeSchedulerEJB 
     extends SchedulerBase implements BakeSchedulerRemote {
 
     public String getName() { return "BakeSchedulerEJB"; }
     
     /*
-     * This declaration creates an EntityManager, with an extended
-     * persistence context (only legal in Stateful session beans), 
-     * for the named persistence unit, and places it in the JNDI context 
-     * java:comp/env/persistence/jndidemo
+     * This declaration references the declared EntityManager declared 
+     * in the JNDI context java:comp/env/persistence/jndidemo
      */
-    @PersistenceContext(unitName="jndidemo",
-                        name="persistence/jndidemo",
-                        type=PersistenceContextType.EXTENDED)
+    @Resource(name="persistence/jndidemo")
     private EntityManager em;
 
     /*

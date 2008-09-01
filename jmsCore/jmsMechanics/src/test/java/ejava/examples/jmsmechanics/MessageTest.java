@@ -30,7 +30,6 @@ import javax.jms.Session;
 import javax.jms.Queue;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
-import javax.mail.search.SentDateTerm;
 import javax.naming.InitialContext;
 
 import junit.framework.TestCase;

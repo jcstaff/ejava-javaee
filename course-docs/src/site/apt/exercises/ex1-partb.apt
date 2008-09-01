@@ -2,12 +2,12 @@ Exercise 1: First Simple Application
 
 * {Part B}: Automate build and testing with Ant (OPTIONAL!)
 
-    [Note:] All course examples will be written using Maven 2. You are 
-    encouraged to also use Maven 2 to build and test the projects you submit.
-    If you are unable to tackle the complexity of Maven 2, you may seek
-    permission to use Ant instead. If you use Ant, there must be a single 
-    build.properties file at the project root that defines any non-portable values
-    that must be changed when porting to the grader's environment.
+    [Note:] All course examples and projects submitted will use Maven 2. 
+    Ant will be used to wrap command lines for Java SE clients executed
+    outside the normal build environment. However, this exercise shows
+    Ant only being used as part of the artifact build and test environment
+    as a stepping stone to understanding some of the basic build and
+    test concepts within Maven.
     
     [Note:] If you do not have Ant installed on your system, it can be 
     from {{http://ant.apache.org/}}
@@ -97,7 +97,7 @@ echo:
      [echo] artifactId=ex1
      [echo] src.dir=/home/jcstaff/proj/ejava-javaee/solutions/ex1/src
      [echo] build.dir=/home/jcstaff/proj/ejava-javaee/solutions/ex1/target
-     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.0/junit-4.0.jar
+     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar
 
 BUILD SUCCESSFUL
 Total time: 0 seconds
@@ -257,9 +257,9 @@ Total time: 1 second
         </junit>
 ---
 
-    [Note:] You may need to copy your junit.jar file into $ANT_HOME/lib
-    to get the junit task correctly recognized by Ant. Until you do that,
-    you may get the following error.
+    [Note:] For older versions of Ant prior to 1.7.1, you may need to copy
+    your junit.jar file into $ANT_HOME/lib to get the junit task correctly
+    recognized by Ant. Until you do that, you may get the following error.
 
 ---
 Buildfile: build.xml
@@ -384,9 +384,9 @@ Total time: 0 seconds
     large as the project matures. The developer knowledge of how to work 
     within that configuration is not generally portable to other projects.
 
-    Although interactive demos (i.e., main programs not driven by JUnit)
-    in class are wrapped in Ant scripts, you won't have too worry about
-    Ant for a build environment in class. We will primarily use Maven
-    to manage the builds (covered later). The Ant build capability is
-    covered here to contrast Maven in its support for Enterprise Java
-    applications.
+    Although command lines for Java SE clients (i.e., main programs not
+    driven by JUnit) will be wrapped by Ant within class examples and
+    projects submitted, you won't have to worry about Ant for a build
+    environment in class. We will exclusively use Maven to manage the builds
+    (covered later). The Ant build capability is covered here to contrast
+    Maven in its support for Enterprise Java applications.

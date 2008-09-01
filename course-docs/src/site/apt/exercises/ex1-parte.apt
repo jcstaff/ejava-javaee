@@ -4,16 +4,35 @@ Exercise 1: First Simple Application
 
 ** Objectives
 
-    * {{{#Section A}Import a project into Eclipse}}
+    * {{{Section_A}Register JDK as a valid JRE instance}}
+
+    * {{{Section_B}Import a project into Eclipse}}
     using maven-eclipse-plugin goals
 
-    * {{{#Section B}Setup Eclipse to be able to execute Maven project goals}}
+    * {{{Section_C}Setup Eclipse to be able to execute Maven project goals}}
 
-    * {{{#Section C}Setup environment to enable interactive debugging}} 
+    * {{{Section_D}Setup environment to enable interactive debugging}} 
 
 ** Steps
 
-*** {Section A}: Importing a Maven project into Eclipse
+*** {Section A}: Register your JDK as a JRE option for running maven 
+    plugin commands.
+
+    [[1]] Register your JDK with Eclipse as a valid JRE option. Eclipse
+    will, by default, launch external commands using the default JRE.
+    Maven wants this to be a JDK, since it invokes the compiler.
+
+        * Window -> Preferences -> Java -> Installed JREs 
+
+        * Select "Add.." for a Standard VM
+
+        * Select your JDK instance for the JRE Home. This was 
+        c:/apps/jdk1.5.0_16 on my system.
+
+        * You may optionally set this as the default. However, we
+        will specifically point to this later.
+
+*** {Section B}: Importing a Maven project into Eclipse
 
         [Note:] If you haven't already done so, download and install
         {{{http://www.eclipse.org/}Eclipse}} as described in
@@ -72,7 +91,7 @@ Downloading: http://repo1.maven.org/maven2/log4j/log4j/1.2.13/log4j-1.2.13.jar
        Please run the same goal with the -DdownloadSources=true parameter in order to check remote repositories for sources.
        List of artifacts without a source archive:
          o commons-logging:commons-logging:1.0.4
-         o junit:junit:4.0
+         o junit:junit:3.8.1
          o log4j:log4j:1.2.13
 
 [INFO] ------------------------------------------------------------------------
@@ -110,8 +129,8 @@ es"/>
 1.0.4/commons-logging-1.0.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.13/log4j-1.2.13.jar"
 sourcepath="M2_REPO/log4j/log4j/1.2.13/log4j-1.2.13-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/junit/junit/4.0/junit-4.0.jar" source
-path="M2_REPO/junit/junit/4.0/junit-4.0-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar" source
+path="M2_REPO/junit/junit/3.8.1/junit-3.8.1-sources.jar"/>
 </classpath>
 ---
 
@@ -134,6 +153,18 @@ staff/workspace/
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 ---
+
+    [[1]] Since the above is a one-time setup, I always forget the name of the
+    command and parameters. The easier alternative is to set the M2_REPO property
+    within Eclipse.
+
+        * once a project is defined (see next full step), right-click on project
+        and select Properties -> Java Build Path -> Libraries -> Add Variable
+
+        * Click "Configure Variables..." and "New..."
+
+        * Enter name="M2_REPO" and value=(the location of your repository;
+        e.g., c:/jhu/repository)
 
     [[1]] Inside Eclipse, import the project using
 
@@ -158,7 +189,7 @@ staff/workspace/
             junit are labelled as unresolved. Check that the M2_REPO 
             defined correctly (to point to .../.m2/repository)
 
-* {Section B}: Setup Eclipse to be able to execute Maven project goals
+*** {Section C}: Setup Eclipse to be able to execute Maven project goals
 
     [[1]] View the 
     {{{http://m2eclipse.codehaus.org/Maven_2.0_Plugin_for_Eclipse.html}
@@ -188,7 +219,7 @@ staff/workspace/
         will be reusable on all projects; not just a named one.
 
         * The debugger requires more setup than they describe. See
-        the {{{#Section C}next section}} for setting up the debugger.
+        the {{{Section_C}next section}} for setting up the debugger.
 
 
     [[1]] Right-click on the pom.xml file and execute Run As->"maven2 build".
@@ -200,6 +231,9 @@ staff/workspace/
         * set the Goals to "test"
 
         * change the Name of the external tool to "mvn test"
+
+        * using the JRE tab, select an instance of a Java 5 JDK
+        setup in {{{Section_A}Section A}}
 
         * press Run
 
@@ -226,10 +260,15 @@ staff/workspace/
 
         * set the goal for "mvn clean" to clean
 
-        * set the goal for "mvn debug" to test. Add a parameter called
-        "debugger". The value won't matter, but Eclipse requires you
-        to supply a value. This will equate to "-Ddebugger" being added
-        to the command line.
+        * set the goal for "mvn debug" to test. Do one of the following:
+        
+            ** Add the name "debugger" to the Profiles text box. This is
+            the newer way to do it within the m2eclipse plugin.
+
+            ** Add a parameter called "debugger". The value won't matter,
+            but Eclipse requires you to supply a value. This will equate 
+            to "-Ddebugger" being added to the command line. This is the
+            older way to do it within the m2eclipse plugin.
 
     [[1]] Click Run->"External Tools"->"mvn clean". Once you've run it 
     once, it shows up on the re-call and the toolbar icon always defaults
@@ -237,7 +276,7 @@ staff/workspace/
     of your target directory was cleaned out.
 
 
-* {Section C}: Setup environment to enable interactive debugging
+*** {Section D}: Setup environment to enable interactive debugging
 
         [Note:] The 
         {{{http://m2eclipse.codehaus.org/Maven_2.0_Plugin_for_Eclipse.html}
@@ -338,12 +377,12 @@ Listening for transport dt_socket at address: 8000
     doesn't take a variable argument for the project, so we'll have to 
     create a new one for each project we debug (or edit a common one).
 
-        * Right-click on the pom.xml and select "Debug As..."->"Debug..."
+        * With a file from your current project selected, click on the 
+        debugger icon (the bug icon on the toolbar) and select Debugger
+        Configurations.
 
-        * Open "Remote Java Application" and select "ex1"
-
-        * Change the name to "ex1 debug" to better describe the 
-        configuration. 
+        * Double click Remote Java Application. The name should be the
+        name of your project and the port should be 8000 on localhost.
 
         * Click "Debug". The paused application should run to completion.
 

@@ -67,18 +67,22 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         teller = new TellerImpl();
         
         try {
+            AccountDAO dao = new ejava.examples.ejbsessionbank.jpa.JPAAccountDAO();
+            /* TODO:resolve 
+            http://www.jboss.com/index.html?module=bb&op=viewtopic&p=4170954#4170954
             AccountDAO dao = (AccountDAO)Thread.currentThread()
                                                .getContextClassLoader()
                                                .loadClass(daoClassName)
                                                .newInstance();            
+                                               */
             ((TellerImpl)teller).setAcctDAO(dao);
         }
         catch (Exception ex) {
-            throw new EJBException("error loading dao class:" + daoClassName);
+            log.fatal("error loading dao class:" + daoClassName, ex);
+            throw new EJBException("error loading dao class:" + daoClassName 
+               + ", " + ex);
         }
         
-        log.debug("setting JPAUtil with entity manager=" + em);
-        JPAUtil.setEntityManager(em);        
     }
 
     /**
@@ -97,6 +101,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public Account createAccount(String accountNumber) throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.createAccount(accountNumber);
         }
         catch (AccountDAOException ex) {
@@ -109,6 +114,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public Account closeAccount(String acctNum) throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.closeAccount(acctNum);
         }
         catch (AccountDAOException ex) {
@@ -121,6 +127,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public Account getAccount(String acctNum) throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.getAccount(acctNum);
         }
         catch (AccountDAOException ex) {
@@ -133,6 +140,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public List<Account> getOverdrawnAccounts(int index, int count) throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.getOverdrawnAccounts(index, count);
         }
         catch (AccountDAOException ex) {
@@ -145,6 +153,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public List<Account> getAccounts(int index, int count) throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.getAccounts(index, count);
         }
         catch (AccountDAOException ex) {
@@ -157,6 +166,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public void updateAccount(Account account) throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             log.debug("in EJB, about to update account:" + account);
             teller.updateAccount(account);
         }
@@ -170,6 +180,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public LedgerDTO getLedger() throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             LedgerDTO ledger = new LedgerDTO(
                     teller.getLedgerCount(),
                     teller.getLedgerSum(),
@@ -191,6 +202,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public LedgerDTO getLedger2() throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.getLedger();
         }
         catch (AccountDAOException ex) {
@@ -207,6 +219,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public double getLedgerAveBalance() throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.getLedgerAveBalance();
         }
         catch (AccountDAOException ex) {
@@ -224,6 +237,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public long getLedgerCount() throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.getLedgerCount();
         }
         catch (AccountDAOException ex) {
@@ -241,6 +255,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public double getLedgerSum() throws BankException {
         debug();
         try {
+            JPAUtil.setEntityManager(em);        
             return teller.getLedgerSum();
         }
         catch (AccountDAOException ex) {

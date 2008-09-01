@@ -264,6 +264,17 @@ public class SecurePingRemoteClientTest extends TestCase {
         }
 
         try {
+            LoginContext lc = new LoginContext("securePingTest", adminLogin);
+            lc.login();
+            log.info(securePing.pingAdmin());
+            lc.logout();
+        }
+        catch (Exception ex) {
+            log.info("error calling pingAdmin:" + ex, ex);
+            fail("error calling pingAdmin:" +ex);
+        }
+        
+        try {
             LoginContext lc = new LoginContext("securePingTest", knownLogin);
             lc.login();
             log.info(securePing.pingAdmin());
@@ -285,17 +296,6 @@ public class SecurePingRemoteClientTest extends TestCase {
             fail("error calling pingAdmin:" +ex);
         }        
 
-        try {
-            LoginContext lc = new LoginContext("securePingTest", adminLogin);
-            lc.login();
-            log.info(securePing.pingAdmin());
-            lc.logout();
-        }
-        catch (Exception ex) {
-            log.info("error calling pingAdmin:" + ex, ex);
-            fail("error calling pingAdmin:" +ex);
-        }
-        
     }
 
     /**

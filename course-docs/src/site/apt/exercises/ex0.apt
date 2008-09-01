@@ -17,32 +17,28 @@ Exercise 0: Development Environment Setup
 
     []
 
-    * (Optional!) {{{#Part A}Download and install Cygwin}}
+    * (Optional!) {{{Part_A}Download and install Cygwin}}
     if you are a Unix/bash developer
     and feel helpless when looking at a DOS prompt.
 
-    * {{{#Part B}Download and install J2SE 1.5 JDK}} 
+    * {{{Part_B}Download and install J2SE 1.5 JDK}} 
     to compile and run our applications.
 
-    * {{{#Part C} Download and install Java EE 5}}
-    just to get a measily javaee.jar and comply with licensing restrictions.
-
-    * {{{#Part D} Download and install a Subversion Client}} 
+    * {{{Part_C} Download and install a Subversion Client}} 
     to obtain source code for this course.
 
-    * {{{#Part E}Download and install the Maven 2 Build System}} 
+    * {{{Part_D}Download and install the Maven 2 Build System}} 
     to manage our portable build environment.
 
-    * {{{#Part F}Download and install the JBoss Application Server}}
+    * {{{Part_E}Download and install the JBoss Application Server}}
     with EJB3 Support to supply a database and application server for our projects.
 
-    * {{{#Part G}Download and install Eclipse IDE}} to provide a mechanism
+    * {{{Part_F}Download and install Eclipse IDE}} to provide a mechanism
     for enhanced code development and debugging support.
 
-    * {{{#Part H}Download and install Ant Build Tool}}
-    Ant Build Tool to act as an optional fallback for those who really cannot 
-    handle the power and mystery of Maven. It will also be as a portable scripting
-    environment for interactive demos.
+    * {{{Part_G}Download and install Ant Build Tool}} to act as a portable 
+    launching environment for interactive demos and Java SE clients turned
+    in as a part of class projects.
 
 * {Part A}: (Optional!) Download and install Cygwin
 
@@ -60,9 +56,31 @@ Exercise 0: Development Environment Setup
     [[1]] The following
     {{{./cygwininstall/cygwin_install.html}
     cygwin installation example snapshot trail}}
-    may be of some assistance in installation. It has a few hints as to how
-    to download enough without getting the entire application. Be sure
-    to also select the subversion client.
+    may be of some assistance in installation. A full installation can 
+    take many, many hours. The example has a few hints as to how
+    to download enough without getting the entire application. If you find
+    out you are missing a command/tool, you can go back to the installer
+    later and download/install that specific package. Use {{{http://cygwin.com/packages/}
+    Setup Package Search}} to help locate anything that you are missing. Be sure
+    to also select the following
+
+        * Archive -> zip & unizip
+
+        * Development -> subversion  - 
+        a command-line interface to the class code repository. 
+
+        * Editors -> vim - a standard unix text editor
+    
+        * Net -> openssh - a command line interface to remotely login and 
+        transfer files over the network
+
+        * Shells -> bash - a standard unix shell, emulated to run within
+        the Windows environment
+
+        * System -> ping - helpful when debugging a failed URL
+
+        * Utils ->util-linux - to get a larger collection of command line
+        utilities, including "more"
 
     [[1]] Windows users; welcome to the sane world of the bash shell and vi.
 
@@ -70,51 +88,30 @@ Exercise 0: Development Environment Setup
 
     [[1]] Go to the
     {{{http://java.sun.com/javase/downloads/index_jdk5.jsp} Sun Java SE
-    5 Download Page}} and download JDK 5.0. JDK 6.0 has been released
+    5 Download Page}} and download JDK 5.0. JDK 6.0, of course, is available
     but we will be using JDK 5.0 for compatibility with legacy Java EE
     5 implementations.  If you download the JDK with Java EE, Java SE 
     will be hiding in Sun/AppServer/jdk/bin.
 
     [[1]] Change the installation directory so that it does not have
-    a spaces in its path. I changed mine to C:\apps\jdk1.5.0_14\ and
-    C:\apps\jre1.5.0_14\
+    a spaces in its path. I changed mine to C:\apps\jdk1.5.0_16\ and
+    C:\apps\jre1.5.0_16\
 
     [[1]] Go through Control Panel -> System -> Advanced -> Environment
-    Variables and add jdk/bin to your classpath.
+    Variables and add ia definition for JAVA_HOME and add jdk/bin to your path.
 
     [[1]] Open up a new command shell and execute "javac -version" to
     determine you can find the JDK and verify the version.
 
-* {Part C}: Download and Install Java EE 5 SDK (to get the Java EE API .jar file)
-
-    [Note:] The Java EE API is necessary to compile Java EE source
-    code. This API can both be obtained from Sun as well from
-    JBoss. However, Sun packages it in a convenient, single .jar file
-    and JBoss spreads it across many .jar files. We will start by using
-    the one from Sun and switch to the JBoss version as necessary.
-
-    []
-
-    [[1]] Download and install
-    {{{http://java.sun.com/javaee/downloads/index.jsp}Java EE 5}} if
-    you did not already do this as a part of the JDK installation. We
-    are only in search of the the javaee.jar file from this download
-    and Sun licensing requires you obtain it directly from them. They
-    bundle it with their application server, so you will be prompted for
-    several things during the installation we don't care about. Select the 
-    options that will cause it just do the software install. 
-
-    [[1]] I installed mine in C:\apps\Sun\SDK.
-
-    [[1]] Verify you have .../Sun/SDK/lib/javaee.jar. We'll use this during 
-    {{{./Part E}Part E}}.
+    [[1]] Cygwin users may want to add the following to their .bashrc file to
+    make sure the desired instance is used instead of what is located in 
+    /usr/bin
 
 ---
-$ find c:/apps -name javaee.jar
-c:/apps/Sun/SDK/lib/javaee.jar
+PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
 ---
 
-* {Part D}: Download and install a Subversion Client
+* {Part C}: Download and install a Subversion Client
 
         [[1]] Install the subversion client. You will only be performing checkouts
         and updates from the repository. This is pretty simple once you have access
@@ -134,7 +131,7 @@ c:/apps/Sun/SDK/lib/javaee.jar
             client, but I'll go through some of the steps for
             {{{http://tortoisesvn.tigris.org/}TortoiseSVN}} here.
 
-                [[1]] I chose the TortoiseSVN-1.4.7 version. 
+                [[1]] I chose the latest, TortoiseSVN-1.5.2, version. 
 
                 [[1]] The path for this tool won't be a part of any path we use to build
                 or run projects, so I chose the default installation directory.
@@ -164,7 +161,7 @@ c:/apps/Sun/SDK/lib/javaee.jar
             [[1]] Browse the repository to determine the URL for the 
             project you wish to checkout. You can start at the root 
             using the following
-            {{https://ejava.info:8443/repos/class/branches/2008-spring-ejava-javaee}}
+            {{https://ejava.info:8443/repos/class/branches/2008-fall-ejava-javaee}}
             URL.
 
             [[1]] Check out a level of the SVN repository to your class
@@ -203,7 +200,7 @@ $ svn update
 At revision 24.
 ---
 
-* {Part E}: Download and install Maven Build System
+* {Part D}: Download and install Maven Build System
 
     [[1]] Go to the 
     {{{http://maven.apache.org/}Maven Site}}  and download the latest
@@ -211,21 +208,30 @@ At revision 24.
     are for when you want to call Maven from within Ant.
 
     [[1]] Unzip the archive. I put mine in c:/apps/, which resulted in a
-    c:/apps/apache-maven-2.0.8 directory. 
+    c:/apps/apache-maven-2.0.9 directory. 
 
-    [[1]] Add $MAVEN_HOME/bin to your PATH
+    [[1]] Define MAVEN_HOME and add $MAVEN_HOME/bin to your PATH. My Windows
+    PATH at this point looks like the following.
+
+---
+%JAVA_HOME%/bin;%MAVEN_HOME%\bin;%PATH%
+---
 
     [[1]] Add JAVA_HOME to your environment (maven will try to execute
-    $JAVA_HOME/bin/java. On Windows, I set mine to c:/apps/jdk1.5.0_12
+    $JAVA_HOME/bin/java. On Windows, I set mine to c:/apps/jdk1.5.0_14
 
     [[1]] Execute "mvn -version" as a test.
 
 ---
-> mvn --version
-Maven version: 2.0.8
-Java version: 1.5.0_14
+$ which mvn
+/cygdrive/c/apps/apache-maven-2.0.9/bin/mvn
+
+$ mvn --version
+Maven version: 2.0.9
+Java version: 1.5.0_16
 OS name: "windows xp" version: "5.1" arch: "x86" Family: "windows"
 ---
+
     [Cywin Users:] You must express all PATHs in unix form. Unix PATHs use ":" as a 
     PATH separator and "/" as a directory separator. /cygdrive/c can be used to refer
     to "c:\". You can programmatically change a PATH using the cygpath command and
@@ -236,10 +242,10 @@ $ cygpath --unix c:/
 /cygdrive/c
 
 $ cygpath --unix $MAVEN_HOME
-/cygdrive/c/apps/apache-maven-2.0.8
+/cygdrive/c/apps/apache-maven-2.0.9
 
 $ cygpath --windows $MAVEN_HOME
-c:\apps\apache-maven-2.0.8
+c:\apps\apache-maven-2.0.9
 
 $ cygpath --windows /cygdrive/c
 c:\
@@ -257,10 +263,21 @@ $ export PATH=$PATH:`cygpath --unix $MAVEN_HOME/bin`
     following file}}>> as a starting point.
 
 ---
+$ mkdir %HOME%/.m2
+
 jcstaff@bullet /cygdrive/c/Documents and Settings/jcstaff/.m2
 $ ls
 settings.xml
 ---
+
+        [Note:] The settings.xml file must be in a .m2 directory below the
+        HOME directory recognized by your operating system. For Windows users,
+        no matter if you are using Cygwin or DOS, this will be what Windows
+        uses for you (ex. c:\Documents and Settings\jcstaff\.m2). 
+
+        [Note:] If you place the settings.xml file in the correct location,
+        Windows users will end up with a new c:/jhu/repository directory
+        created when they issue the mvn command in the following steps.
 
     [[1]] cd to the root directory you checked out from subversion and
     attempt to build the project.
@@ -308,41 +325,6 @@ Project ID: null:plexus-compiler-api:jar:1.5.2
 Reason: Cannot find parent: org.codehaus.plexus:plexus-compiler for project: nul
 l:plexus-compiler-api:jar:1.5.2
 ---
-    [[1]] If you get to the following error, you'll need to install
-    the javaee.jar file downloaded as a part of Java EE 5 from Sun to
-    go any further. If you do not get this error, then you have successfully gotten 
-    a copy from one of the repositories listed in the settings.xml you put in 
-    place in an earlier step.
-
----
-...
-[INFO] Failed to resolve artifact.
-
-Missing:
- ----------
-1) javax.javaee:javaee:jar:5
-
-  Try downloading the file manually from the project website.
-
-  Then, install it using the command:
-      mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
-          -Dversion=5 -Dpackaging=jar -Dfile=/path/to/file
-
-  Path to dependency:
-...
----
----
-$ mvn install:install-file -DgroupId=javax.javaee -DartifactId=javaee \
-> -Dversion=5 -Dpackaging=jar -Dfile=c:/Sun/AppServer/lib/javaee.jar \
--DgeneratePom=true
-...
-[INFO] [install:install-file]
-[INFO] Installing c:\Sun\AppServer\lib\javaee.jar to c:\jhu\repository\javax\java
-ee\javaee\5\javaee-5.jar
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
-[INFO] ------------------------------------------------------------------------
----
 
     [[1]] If you get an error looking for JBoss artifacts,
     don't worry. You may have attempted to build from the root or build a sub-project
@@ -352,15 +334,19 @@ ee\javaee\5\javaee-5.jar
     You'll be responsible for basic tasks of building and 
     testing an application. There will be plenty of examples supplied in class.
 
-* {Part F}: Download and install JBoss Application Server
+* {Part E}: Download and install JBoss Application Server
 
     [[1]] Go to the 
     {{{http://labs.jboss.com/portal/jbossas/download}
     Download site for the JBoss Application Server}}.  Download version
-    4.2.2.GA. Burke's EJB3 with JBoss workbook shows an example of using
+    4.2.3.GA. Burke's EJB3 with JBoss workbook shows an example of using
     the "Run Installer" that walks you through the right options to get
     JBoss <<AND>> EJB3. However, that was for 4.0.4/5. EJB3 is enabled
-    by default, starting with 4.2.
+    by default, starting with 4.2. You will notice a jdk6 version. If you 
+    read the release notes, you'll see that the jdk5 version is considered
+    the most stable version and JBoss requires extra setup to get to work
+    under JavaSE 6. Please download the stanard/jdk5 version (has no 
+    jdk suffix).
 
     [[1]] On Windows, I unzipped mine to c:/apps to avoid having any spaces in the
     path. This produced a directory called c:/apps/jboss-4.2.2.GA.
@@ -471,25 +457,37 @@ Server shutdown may take a while - check logfiles for completion
     [[1]] Add support for https protocol by following the instructions in the
     {{{./jboss-https.html} Enable JBoss HTTPS Exercise}}
 
-* {Part G}: Download and install Eclipse IDE
+* {Part F}: Download and install Eclipse IDE
 
-            [Note:] An IDE, and specifically Eclipse, is <<NOT>> a
-            requirement for class. The memory requirements for an IDE and 
-            the application server may have your machine swapping quite a bit.
-            I have included coverage of an IDE only as a productivity tool. 
-            You may use vi and
-            command line tools (I do!) or something like NetBeans from 
-            Sun. I do find the ability to step through an execution
-            with a graphical debugger priceless.
+        [Note:] An IDE, and specifically Eclipse, is <<NOT>> a
+        requirement for class. The memory requirements for an IDE and the
+        application server may have your machine swapping quite a bit.
+        I have included coverage of an IDE only as a productivity tool.
+        You may use vi and command line tools (I do!) or something like
+        NetBeans from Sun. I do find the ability to step through an
+        execution with a graphical debugger priceless.
+
+        [Note:] Some products, including MyEclipse, provide a full download
+        of Eclipse as a part of their installation. Feel free to try those 
+        installations and fall back to a bare install if you encounter 
+        problems that cannot be worked around. For example, one student 
+        experienced issues integrating the Maven m2eclipse into their
+        MyEclipse environment and dropped back to a pure Eclipse instance
+        to get that optional piece running.
 
     [[1]] Download and install
     {{{http://www.eclipse.org/}Eclipse}}. They now have a separate download
-    for Java Developers and another for Java EE Developers. It won't really matter
-    which you select, but I have been using the Java EE version lately with no
-    complaints.
+    for Java Developers and another for Java EE Developers. Most of the 
+    features for Java EE Developers is centered around DB and web tier 
+    development. It also contains support for working with XML.  Choose 
+    the "JEE" version.
 
         * I extracted the files to c:/apps, which resulted in a c:/apps/eclipse 
         directory.
+
+        * I created a shortcut to c:/apps/eclipse/eclipse. Since the install
+        was just an unzip, there was nothing automatically added to your
+        start menu.
 
     [[1]] I found that Eclipse 3.3 is no longer intelligently
     ignoring subversion directories when it builds. You may see
@@ -498,42 +496,40 @@ Server shutdown may take a while - check logfiles for completion
     go to Window->Preferences->Java->Compiler->Building->"Filtered
     Resources". Add ",.svn/" to the list.
 
-    [[1]] Install the Maven.2x Plug-in for Eclipse as demonstrated
-    with the flash demo on the following 
-    {{{http://m2eclipse.codehaus.org/}page at Mergere}}. You don't need 
-    to manually download the binaries. You install the plugin by 
-    registering their site with the Eclipse plugin manager. Go ahead, 
-    {{{http://m2eclipse.codehaus.org/Installing_Maven_2.0_plugin_for_Eclipse.html}
-    watch the demo}}. In case you forgot to pause it, the URL for the 
-    plugin was {{http://m2eclipse.codehaus.org/}}. 
-    
-        [Note:] I usually install my plugins in a personal
-        directory so they live beyond Eclipse upgrades. You may want 
-        to do that as well.
+    [[1]] Install the Maven Integration for Eclipse Plug-in to allow maven
+    builds to be kicked off within Eclipse. Core documentation is located 
+    at {{{http://m2eclipse.codehaus.org/} the Codehaus site}}. You don't
+    manually download any artifacts. All downloads and installation are
+    handled within the Eclipse software updates mechanism.
 
-    [[1]] Go ahead and watch the 
-    {{{http://m2eclipse.codehaus.org/Maven_2.0_Plugin_for_Eclipse.html}
-    Using the plugin demo}}. It normally starts for me on the second load.
-    We will be performing most of these actions as a part of Exercise 1's
-    Eclipse setup.
+        * Open Help -> Software Updates -> Available Software (tab)
 
+        * Click "Add Site..." and enter "http://m2eclipse.codehaus.org/update/site.xml"
+
+        * Check "Maven Integration" and click "Install..."
+
+        * Follow instructions to complete installation.
+
+    [Note:] You will notice other packages that are available for update.
+    Update these packages if you wish. Remember that it is very easy to get back to
+    a clean installation if something goes terribly wrong.
         
-* {Part H}: Download and install Ant Build Tool
+* {Part G}: Download and install Ant Build Tool
 
-        [Note:] I use Ant as a portable scripting tool for interactive demos and
-        permit it to be used as an optional build tool for those that want to try to
-        avoid using Maven with their projects.
+        [Note:] I use Ant as a portable scripting tool for interactive demos. You will 
+        use it to wrap setup commands and Java SE clients for projects you submit.
 
     [[1]] Download and install {{{http://ant.apache.org/}Ant}}. I
-    downloaded the 1.6.5 version and have seen minor porting issues with 1.7. If you
-    use 1.7, you may need to implement a minor amount of porting.
+    downloaded the 1.7.1 version. 
 
-    [[1]] Add ANT_HOME/bin to your classpath so you can run it whenever 
-    you have the urge.
+        * I installed mine in c:/apps, which resulted in c:/apps/apache-ant-1.7.1 
+        being created and now being my ANT_HOME.
+
+    [[1]] Add ANT_HOME/bin to your PATH.
 
 ---
-$ ant -version
-Apache Ant version 1.6.5 compiled on June 2 2005
+> ant -version
+Apache Ant version 1.7.1 compiled on June 27 2008
 ---
 
 * Summary

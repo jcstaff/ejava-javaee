@@ -8,13 +8,13 @@
     <groupId>myorg.jpa</groupId>
     <artifactId>entityMgrEx</artifactId>
     <name>Entity Manager Exercise</name>
-    <version>1.0.2008.1-SNAPSHOT</version>
+    <version>1.0.2008.2-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
-          <groupId>javax.javaee</groupId>
-          <artifactId>javaee</artifactId>
-          <version>5</version>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
@@ -65,10 +65,12 @@
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <systemProperties>
+                    <!--
                         <property>
-                            <name>java.class.path</name>
-                            <value>target/classes</value>
+                            <name>name</name>
+                            <value>value</value>
                         </property>
+                        -->
                     </systemProperties>
                 </configuration>
             </plugin>            
@@ -111,23 +113,28 @@
                     <name>!jpa</name>
                 </property>
             </activation>
+
+           <!-- needed to resolve some hibernate dependencies -->
+            <repositories>
+                <repository>
+                    <id>jboss-repo</id>
+                    <name>JBoss Maven Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
+            </repositories>
+
             <dependencies>
+                <!-- this is what is used within JBoss 4.2.x -->
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate</artifactId>
-                    <version>3.2.1.ga</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-annotations</artifactId>
-                    <version>3.2.1.ga</version>
+                    <version>3.2.4.sp1</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.2.1.ga</version>
+                    <version>3.3.1.ga</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -146,8 +153,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>sql-maven-plugin</artifactId>        
-                        <!-- ss1 fixes onError issue -->
-                        <version>1.0-beta-2-ss1</version>        
+                        <version>1.0</version>        
                     
                         <dependencies>
                             <dependency>

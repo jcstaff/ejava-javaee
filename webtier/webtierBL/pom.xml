@@ -2,7 +2,7 @@
   <parent>
     <artifactId>webTier</artifactId>
     <groupId>ejava.javaee.webtier</groupId>
-    <version>1.0.2008.1-SNAPSHOT</version>
+    <version>1.0.2008.2-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -16,12 +16,6 @@
   
   <dependencies>
     <!-- core dependencies -->
-    <dependency>
-      <groupId>javax.javaee</groupId>
-      <artifactId>javaee</artifactId>
-      <version>5</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
@@ -66,32 +60,6 @@
       <version>1.2.13</version>
       <scope>test</scope>
     </dependency>    
-
-    <!-- JBoss-specific testing dependencies -->
-    <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache</artifactId>
-        <version>1.2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.jboss.ejb3.embedded</groupId>
-        <artifactId>hibernate-all</artifactId>
-        <version>alpha8_patch2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.jboss.ejb3.embedded</groupId>
-        <artifactId>jboss-ejb3-all</artifactId>
-        <version>alpha8_patch2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.jboss.ejb3.embedded</groupId>
-        <artifactId>thirdparty-all</artifactId>
-        <version>alpha8_patch2</version>
-        <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -113,14 +81,69 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
                 <argLine>${surefire.argLine}</argLine>
-                <systemProperties>
-                    <property>
-                        <name>java.class.path</name>
-                        <value>target/classes</value>
-                    </property>
-                </systemProperties>
             </configuration>
         </plugin>
     </plugins>      
   </build>
+
+    <profiles>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password />
+                  <hibernate.dialect>
+                      org.hibernate.dialect.HSQLDialect
+                  </hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
+        </profile>
+
+        <profile> <!-- defines our default persistence provider -->
+            <id>hibernate</id>
+            <activation>
+                <property> <!-- use this property to name alt persistence provider -->
+                    <name>!jpa</name>
+                </property>
+            </activation>
+
+           <!-- needed to resolve some hibernate dependencies -->
+            <repositories>
+                <repository>
+                    <id>jboss-repo</id>
+                    <name>JBoss Maven Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
+            </repositories>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>3.2.4.sp1</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>3.3.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

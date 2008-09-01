@@ -526,9 +526,9 @@ public class AllTest extends TestCase {
 ---
     <dependencies>
         <dependency>
-          <groupId>javax.javaee</groupId>
-          <artifactId>javaee</artifactId>
-          <version>5</version>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
@@ -594,11 +594,9 @@ public class AllTest extends TestCase {
     </build>
 ---
 
-    * Add a definition for the maven-surefire-plugin so we can set the 
-    java.class.path systemProperty to "target/classes". This enables the
-    persistence provider to scan the exploded classpath for classes to
-    add to the persistence unit. I am not sure if Hibernate really needs this
-    but a previous provided did (I haven't tested it).
+    * Add a definition for the maven-surefire-plugin so we can set 
+    properties needed for testing. At this point, we are just allowing
+    the argLine defined in the settings.xml to be optionally specified.
 
 ---
             <plugin>
@@ -607,10 +605,12 @@ public class AllTest extends TestCase {
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <systemProperties>
+                    <!--
                         <property>
-                            <name>java.class.path</name>
-                            <value>target/classes</value>
+                            <name>name</name>
+                            <value>value</value>
                         </property>
+                        -->
                     </systemProperties>
                 </configuration>
             </plugin>
@@ -657,22 +657,17 @@ public class AllTest extends TestCase {
                 </property>
             </activation>
             <dependencies>
+                <!-- this is what is used within JBoss 4.2.x -->
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate</artifactId>
-                    <version>3.2.1.ga</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-annotations</artifactId>
-                    <version>3.2.1.ga</version>
+                    <version>3.2.4.sp1</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.2.1.ga</version>
+                    <version>3.3.1.ga</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

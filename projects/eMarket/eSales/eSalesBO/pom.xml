@@ -3,7 +3,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eMarket</groupId>
         <artifactId>eSales</artifactId>
-        <version>1.0.2007.2</version>
+        <version>1.0.2008.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -20,18 +20,17 @@
 
     <dependencies>
         <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-          <groupId>javax.javaee</groupId>
-          <artifactId>javaee</artifactId>
-          <version>5</version>
-          <scope>provided</scope>
-        </dependency>
-
         <!-- true test dependencies -->
         <dependency>
             <groupId>junit</groupId>

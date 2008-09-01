@@ -154,6 +154,7 @@ public class SecurePingRemoteTest extends TestCase {
 
     public void testPingAll() throws Exception {
         log.info("*** testPingAll ***");
+        /*
         try {
             log.info(securePing.pingAll());
         }
@@ -183,7 +184,8 @@ public class SecurePingRemoteTest extends TestCase {
             log.info("error calling pingAll:" + ex, ex);
             fail("error calling pingAll:" +ex);
         }        
-
+*/
+        for(int i=0; i<10; i++) {
         try {
             LoginContext lc = new LoginContext("securePingTest", adminLogin);
             lc.login();
@@ -194,6 +196,7 @@ public class SecurePingRemoteTest extends TestCase {
             log.info("error calling pingAll:" + ex, ex);
             fail("error calling pingAll:" +ex);
         }        
+        }
     }
     
     public void testPingUser() throws Exception {

@@ -2,7 +2,7 @@
     <parent>
         <artifactId>asyncMarket</artifactId>
         <groupId>ejava.javaee.asyncejb</groupId>
-        <version>1.0.2008.1-SNAPSHOT</version>
+        <version>1.0.2008.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,12 +15,39 @@
         within the EJB tier.
     </description>
 
+    <!-- this repositories holds many of the javaee5 jar files -->
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- core dependencies -->
         <dependency>
-          <groupId>javax.javaee</groupId>
-          <artifactId>javaee</artifactId>
-          <version>5</version>
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.jms</groupId>
+          <artifactId>jms</artifactId>
+          <version>1.1</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.ejb</groupId>
+          <artifactId>ejb-api</artifactId>
+          <version>3.0</version>
           <scope>provided</scope>
         </dependency>
         <dependency>

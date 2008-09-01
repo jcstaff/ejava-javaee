@@ -2,7 +2,7 @@
   <parent>
     <artifactId>webTier</artifactId>
     <groupId>ejava.javaee.webtier</groupId>
-    <version>1.0.2008.1-SNAPSHOT</version>
+    <version>1.0.2008.2-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -17,10 +17,10 @@
   <dependencies>
     <!-- core dependencies -->
     <dependency>
-      <groupId>javax.javaee</groupId>
-      <artifactId>javaee</artifactId>
-      <version>5</version>
-      <scope>provided</scope>
+        <groupId>javax.persistence</groupId>
+        <artifactId>persistence-api</artifactId>
+        <version>1.0</version>
+        <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
@@ -88,12 +88,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
                 <argLine>${surefire.argLine}</argLine>
-                <systemProperties>
-                    <property>
-                        <name>java.class.path</name>
-                        <value>target/classes</value>
-                    </property>
-                </systemProperties>
             </configuration>
         </plugin>
     </plugins>      
@@ -160,23 +154,28 @@
                     <name>!jpa</name>
                 </property>
             </activation>
+
+           <!-- needed to resolve some hibernate dependencies -->
+            <repositories>
+                <repository>
+                    <id>jboss-repo</id>
+                    <name>JBoss Maven Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
+            </repositories>
+
             <dependencies>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate</artifactId>
-                    <version>3.2.1.ga</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-annotations</artifactId>
-                    <version>3.2.1.ga</version>
-                    <scope>test</scope>
-                </dependency>
+                <!-- hibernate version used with JBoss 4.2.x -->
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.2.1.ga</version>
+                    <version>3.3.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>3.2.4.sp1</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

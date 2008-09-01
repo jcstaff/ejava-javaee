@@ -1,6 +1,6 @@
 Project1: eMarket Data Access Tier and Initial Business Logic
 
-    1/30/2007
+    08/31/2008 Draft
 
 * Goals
 
@@ -33,7 +33,7 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     eSales is planning an on-line auction site to allow sellers to auction
     items and buyers to place bids and ultimately purchase products. At the
     same time, eBidbot is planning an on-line automated bidding site that
-    will help bidders make bids with eSales.
+    will help bidders make bids with eSales. 
 
     Sellers can start an auction using the eSales on-line auction site.
     They specify a title, category, description, asking price, start/stop
@@ -42,9 +42,9 @@ Project1: eMarket Data Access Tier and Initial Business Logic
 
     With eBidbot, buyers also have the option of using an independent
     site to place their bids. Buyers place orders with eBidbot, providing
-    them the auction and min/max bidding parameters (along with their
-    eSales credentials; they are trust worthy!). eBidbot will automatically
-    place orders for the buyer.
+    them the auction and min/max bidding parameters. eBidbot will become 
+    a trusted client of eSales and be able to make bids on behalf of the 
+    actual buyer.
 
     Both eSales and eBidbot have come to you to develop the initial phase
     of their applications. They are expecting the core capability of their
@@ -54,14 +54,6 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     informed as to which can be done in command line or Web UI form.
 
 * Technical Overview
-
-    Since the work is for separate applications, we will need to establish
-    two separate application projects for this work; eSales and eBidbot.
-    The development can physically share resources (e.g., same database and
-    application server), but should be easily separated. It is suggested
-    that you form a root for the overall eMarket work to coordinate
-    integration testing, and then group the lower-level work under two
-    child projects; eSales and eBidbot.
 
     The work done during this project will focus on the business objects
     (BOs), the data access objects (DAOs) of the data access tier,
@@ -80,7 +72,9 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     will be required to implement full CRUD capability with JPA. You will
     be required to encapsulate all object to relational (O/R) mapping
     within the DAOs, descriptor files, and business object annotations.
-    You will be given a set of test data to initially populate your
+    You will be given a set of 
+    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eMarket/eMarketData/eSalesTestUtil/src/main/resources/xml/}
+    test data}} to initially populate your
     applications as a part of testing.
 
     The business logic will handle the initial ingest of test data and
@@ -92,10 +86,28 @@ Project1: eMarket Data Access Tier and Initial Business Logic
 
     The test acceptance for the first eSales project will be a set of
     unit tests and at least one functional test that takes the business
-    logic, data access tier, and business objects through a end-to-end
-    eSales use case starting from the seller starting an auction to a
-    buyer placing a winning bid. The test acceptance for eBidbot will be
-    restricted to unit tests.
+    logic, data access tier, and business objects through an end-to-end
+    eSales use case; starting from the seller initiating an auction and
+    ending with a buyer placing a winning bid. The test acceptance for 
+    eBidbot will be restricted to unit tests.
+
+* Assembly Overview
+
+    Since the work is for separate applications, we will need to establish
+    two separate application projects for this work; eSales and eBidbot.
+    The development can physically share resources (e.g., same database and
+    application server), but should be easily separated. It is suggested
+    that you form a root for the overall eMarket work to coordinate
+    integration testing, and then group the lower-level work under two
+    child projects; eSales and eBidbot. 
+    
+        [Note:] The root eMarket project should be very thin and should
+        not have a dependency on the instructor's class examples. Doing
+        so will add unnecessary web site publishing complications to your
+        project that are only needed by posted class examples.
+
+    See the Getting Started section towards the end of this specification
+    for a more detailed sample project layout.
 
     [Note:] Since the class will be producing parallel implementations for
     the applications and submitting them for evaluation, it is asked
@@ -111,7 +123,6 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     log4j logging provider.  You may leave debug in your code, but this 
     should be able to be turned on/off with the proper logging priority
     changes in the log4j.xml configuration.
-
 
 * Technical Details
 
@@ -159,7 +170,7 @@ Project1: eMarket Data Access Tier and Initial Business Logic
                 the application is in operation. The database just needs
                 some type of key to indicate they are no longer active.
 
-            [[1]] ESALES_USER - since we want to protect personal
+            [[1]] ESALES_POC - since we want to protect personal
             information, the public contact information can be placed in a
             separate table so it can be more freely shared. This has a 1:1
             relationship with ESALES_ACCT and could be done as a primary
@@ -167,13 +178,19 @@ Project1: eMarket Data Access Tier and Initial Business Logic
 
                 * USER_ID (1:1 relationship with ESALES_ACCT)
 
-                * EMAIL
+                * EMAIL - valid e-mail address to contact user. This field 
+                should be unique.
 
             [[1]] ESALES_ADDRESS - users can provide various types of
             addresses for use at the site. Each will have a name that
-            defines its purpose. Since billing is not a part of the initial
-            project, the only address we are concerned with is a shipping
-            address.
+            defines its purpose. Since billing is not a part of the
+            initial project, the only address we are concerned with is a
+            shipping address. Items are also shipped to addresses. Note
+            that an address for a shipped item may need a way to keep a
+            user's change-of-address from modifying the historical fact
+            of where it was shipped. This may mean that address fields
+            cannot be changed, changes once referenced, or copied for
+            use by the shipping side of the application.
 
                 * ID - there is no single natural field within address that 
                 forms a primary key, so a generate value can be used.
@@ -195,7 +212,8 @@ Project1: eMarket Data Access Tier and Initial Business Logic
             independent of the private account information, we can form a
             foreign key relationship through a secondary link table. Since
             this is a 1:N relationship, the foreign key pair can be
-            constrained to be unique by the database.
+            constrained to be unique by the database. Otherwise, we can simply 
+            put a foreign key in the address table.
 
                 * USER_ID - (N:1 relation to ESALES_ACCT)
 
@@ -205,7 +223,13 @@ Project1: eMarket Data Access Tier and Initial Business Logic
             associated with an auction. Auctions will progress from bidding
             to sale. Once the bidding is over, the winning bid information
             can be retained within this table and the incremental bid
-            history purged.
+            history purged. Be sure to design in an easy way to determine 
+            if an auction item is expired or officially over; even if it 
+            did not sell or ship yet. Note that end-of-auction processing
+            will be looking for auctions that have expired, but not 
+            officially closed.  Buyers and bidders will be looking for 
+            auctions that have not closed. You may have to adjust the
+            schema suggested below to accommodate.
 
                 * ID - there is no natural field for forming a primary
                 key value within this table.
@@ -264,10 +288,8 @@ Project1: eMarket Data Access Tier and Initial Business Logic
 
                 * IMAGE
 
-            [[1]] ESALES_ITEM_IMAGE_LINK - if we want the auction to own
-            the relationship, we need to create a secondary link table to
-            hold the foreign keys. Otherwise, the foreign key to the
-            auction could be stored with the image.
+            [[1]] ESALES_ITEM_IMAGE_LINK - this could be optionally
+            expressed as a foreign key within the image table.
 
                 * ITEM_ID (N:1 relation to ESALES_AUCTION)
 
@@ -284,13 +306,16 @@ Project1: eMarket Data Access Tier and Initial Business Logic
             [[1]] ESALES_BIDACCT - design a table to store eBidbot user
             account information. No need for names here, we just want a
             userId of some sort and their eSales credentials (they trust
-            us).
+            us). For simplicity, make the eBidbot SALES_ACCOUNT column 
+            have an equal value to the USER_ID column and rely on the fact 
+            that their userIds will be the same. eBidbot will be a trusted
+            user of eSales, but we have no way (within the scope of the 
+            project) to verify the eSales account ID provided by the user
+            unless it is the same as the eBidbot login.
 
                 * USER_ID - this user's login will be used as a primary key.
 
                 * SALES_ACCOUNT - bidder's login name for eSales
-
-                * SALES_PASSWD - bidder's password for eSales
 
             [[1]] EBIDBOT_ORDER - design a table to hold eBidbot
             information associated with an order. This application will use
@@ -408,7 +433,10 @@ Project1: eMarket Data Access Tier and Initial Business Logic
                 * auction:AuctionItem
 
             [[1]] AuctionItem - design a class to encapsulate the
-            information for an auction.
+            information for an auction. AuctionItems will need to know
+            if they are still open, expired but not yet completed, or
+            closed. When searching for an auction to bid on, you should
+            only see items that are still officially open.
 
                 * id:long
 
@@ -519,13 +547,14 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     Persistence API (JPA). These DAOs will support all standard CRUD
     operations and can optionally implement the same interface as other
     potential DAO implementations. The implementation can make liberal use
-    of JPA @Annotations, descriptor files, or a combination of both. Your 
+    of JPA @Annotations, descriptor files, or a combination of both. Your
     interface should encapsulate the fact that an EntityManager is being
     used and the same EntityManager should be shared among other DAOs in
     the same Thread. Using either (a crude form of) dependency injection
-    or ThreadLocal can be quite useful here. Your DAOs should not attempt
-    to control the transaction or they will <NOT> be portable to the EJB
-    tier.
+    or ThreadLocal can be quite useful here. However, you will find
+    that dependency injection works easiest in most cases. Your DAOs
+    should not attempt to control the transaction or they will <NOT>
+    be portable to the EJB tier.
 
 [../images/emarket-daos.jpg] eMarket JPA DAOs
 
@@ -651,36 +680,116 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     with a specific JUnit test. This test should be packaged with the
     business logic implementation.
 
-        * ingest data (using Ingestor)
+        * ingest data (using Ingestor and JDBC DAOs)
 
         * createAccount for seller, buyer1, and buyer2 (using
-        AccountMgmtImpl)
+        AccountMgmtImpl and JPA DAOs)
 
-        * createAuction (using SellerMgmtImpl)
+        * createAuction (using SellerMgmtImpl and JPA DAOs)
 
-        * getUserAuctions (using SellerMgmtImpl)
+        * getUserAuctions (using SellerMgmtImpl and JPA DAOs)
 
-        * getAuction (using SellerMgmtImpl)
+        * getAuction (using SellerMgmtImpl and JPA DAOs)
 
-        * getOpenAuctions (using BuyerMgmtImpl)
+        * getOpenAuctions (using BuyerMgmtImpl and JPA DAOs)
 
-        * placeBid for buyer1 (using BuyerMgmtImpl)
+        * placeBid for buyer1 (using BuyerMgmtImpl and JPA DAOs)
 
-        * placeBid for buyer2 (using BuyerMgmtImpl)
+        * placeBid for buyer2 (using BuyerMgmtImpl and JPA DAOs)
 
-        * getAuction (using BuyerMgmtImpl)
+        * getAuction (using BuyerMgmtImpl and JPA DAOs)
 
 * Getting Started
 
-    The following sketch of directory structure can be used as a 
-    starting point for your overall application. Note that all "e"Market,
-    "e"Sales, and "e"Bidbot names should be changed to your specific 
-    name mangler. The same type of modification needs to occur for the 
-    java package names.
+    The following sketch of two directory structures can be used as a
+    starting point for your overall application. The first is a simplified
+    project layout that collapses the number of sub-projects into a single
+    "Impl" project. It is suggested that you use this layout if you
+    are new to maven and want the simplest configuration possible. The
+    second is a more robust layout and is closer to a multi-developer
+    environment.  Use the later structure if you want to better simulate a
+    work environment where the work of multiple developers needs clearer
+    separation. 
+    
+        [Note:] All "e"Market, "e"Sals, and "e"Bidbot names
+        should be changed to your specific name mangler. The same type of
+        modification needs to occur for the java package names.
 
+        [Note:] Other than a README, it is not anticipated that you
+        will have any artifacts at the eMarket layer. It should be
+        used only as a convenience wrapper to perform goals across both
+        projects. All details will be specified at the eSales and eBidbot
+        levels and below; with the leaf-level projects being your default
+        choice for detailed information (e.g., DB drivers, etc.)
+
+        []
+
+    []
 ---
 eMarket/
 |-- eBidbot
+|   |-- eBidbotImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   `-- ebidbot
+|   |       |       |-- blimpl
+|   |       |       |-- bl
+|   |       |       |-- bo
+|   |       |       |-- dao
+|   |       |       `-- jpa
+|   |       `-- test
+|   |           |-- ebidbot
+|   |           |   |-- blimpl
+|   |           |   |-- bo
+|   |           |   |-- jpa
+|   |           `-- resources
+|   |               `-- META-INF
+|   |                   `-- persistence.xml
+|   `-- pom.xml
+|-- eSales
+|   |-- eSalesImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- esales
+|   |       |   |       |-- blimpl
+|   |       |           |-- bl
+|   |       |           |-- bo
+|   |       |   |       |-- dao
+|   |       |   |       |-- jdbc
+|   |       |   |       `-- jpa
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |           `-- persistence.xml
+|   |       `-- test
+|   |           `-- java
+|   |               `-- esales
+|   |                   |-- blimpl
+|   |                   |-- bo
+|   |                   |-- jdbc
+|   |                   `-- jpa
+|   `-- pom.xml
+`-- pom.xml
+---
+---
+eMarket/
+|-- eBidbot
+|   |-- eBidbotBLImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- ebidbot
+|   |       |   |       `-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |           `-- persistence.xml
+|   |       `-- test
+|   |           `-- java
+|   |               `-- ebidbot
+|   |                   `-- blimpl
 |   |-- eBidbotBO
 |   |   |-- pom.xml
 |   |   `-- src
@@ -691,24 +800,25 @@ eMarket/
 |   |       `-- test
 |   |           `-- ebidbot
 |   |               `-- bo
-|   `-- eBidbotDAO
-|       |-- pom.xml
-|       `-- src
-|           |-- main
-|           |   |-- java
-|           |   |   `-- ebidbot
-|           |   |       |-- dao
-|           |   |       `-- jpa
-|           |   `-- resources
-|           |       `-- META-INF
-|           |           `-- persistence.xml
-|           `-- test
-|               `-- java
-|                   `-- ebidbot
-|                       `-- jpa
+|   |-- eBidbotDAO
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- ebidbot
+|   |       |   |       |-- dao
+|   |       |   |       `-- jpa
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |           `-- persistence.xml
+|   |       `-- test
+|   |           `-- java
+|   |               `-- ebidbot
+|   |                   `-- jpa
+|   `-- pom.xml
 |-- eSales
 |   |-- eSalesBLImpl
-|   |   |-- pom.ml
+|   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
@@ -722,7 +832,7 @@ eMarket/
 |   |               `-- esales
 |   |                   `-- blimpl
 |   |-- eSalesBO
-|   |   |-- pom.ml
+|   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   `-- java
@@ -734,22 +844,23 @@ eMarket/
 |   |               `-- esales
 |   |                   `-- bo
 |   `-- eSalesDAO
-|       |-- pom.ml
-|       `-- src
-|           |-- main
-|           |   |-- java
-|           |   |   `-- esales
-|           |   |       |-- dao
-|           |   |       |-- jdbc
-|           |   |       `-- jpa
-|           |   `-- resources
-|           |       `-- META-INF
-|           |           `-- persistence.xml
-|           `-- test
-|               `-- java
-|                   `-- esales
-|                       |-- jdbc
-|                       `-- jpa
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- esales
+|   |       |   |       |-- dao
+|   |       |   |       |-- jdbc
+|   |       |   |       `-- jpa
+|   |       |   `-- resources
+|   |       |       `-- META-INF
+|   |       |           `-- persistence.xml
+|   |       `-- test
+|   |           `-- java
+|   |               `-- esales
+|   |                   |-- jdbc
+|   |                   `-- jpa
+|   `-- pom.xml
 `-- pom.xml
 ---
 
