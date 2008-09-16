@@ -19,12 +19,57 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2008-09-15: Posted EntityManager updates</li>
           <li>2008-09-09: Posted JDBC and JPA materials</li>
           <li>2008-09-01: Posted initial class site</li>
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>Go through the EntityManager Exercise</li>
+          <li>Look over the class project example implementation</li>
+          <li>Add JPA/Hibernate infrastructure to your DAO project
+          DAO. This should at least consist of a successful connection to the DB.
+          You are done with this step when you have a separate JPA JUnit test
+          for the DAO and the setUp() method is able to create an EntityManager.</li>
+          <li>Define your business objects as being an @Entity and identify the 
+          primary key property with the @Id tag. Make sure you have a default
+          constructor, but leave other things default for now. Annontate all
+          collections with @Transient annotation. We are not ready to cover 
+          relationships just yet.</li>
+
+          <li>Design and implement an initial JPA implementation for your DAO</li>
+
+          <li>Design and implement a set of unit tests for your JPA DAO. Note 
+          how the default schema for the @Entities may not match up with 
+          your DB schema at this point when you run the tests.</li>
+
+          <li>Add JPA @Annotations to your class project business objects to properly 
+          map the @Entities to the database schema design you created last time
+          (primarily a topic for next week)</li>
+
+          <li>Refine your BOs, DB Schema, and DAO based on your understanding 
+          to date.</li>
+
+          <li>Move forward with your DB Schema design, BO classes, and JDBC DAO
+          implementation if there is extra time. You can turn off your JPA 
+          JUnit Test by adding an excludes definition to your surefire 
+          configuration. Perform a google search on "surefire excludes" for
+          details.</li>
+
+          <li><span style="font-weight: bold;"> Send me a copy of your
+          project</span>, in a stable, known state, sometime this week;
+          ideally by early Sunday evening. You do not have to be complete
+          with the TODO items, but you should be able to describe what
+          you know you have left to complete and describe any issues
+          that have gotten in your way. This will not be graded, but
+          that should not stop you from turning it in and making an
+          honest effort to have the TODOs completed.</li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
           <li>Go through the JDBC Exercise</li>
           <li>Look over the class project and post any questions.</li>
           <li>Establish your project directory structure and perform a build from the root.</li>
@@ -39,10 +84,7 @@
           You only need a create method for the project.</li>
           <li>Consider all BO, DB Schema, and DAO work as draft prototypes at this time to get
           something end-to-end running. You will refine over next several weeks.</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>register for newsgroup and setup e-mail handling (all e-mails will have
           ejava_class in subject)</li>

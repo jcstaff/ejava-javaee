@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
@@ -14,17 +15,18 @@ import org.apache.commons.logging.LogFactory;
 
 import junit.framework.TestCase;
 
-public class EntityMgrExercise extends TestCase {
-    private static Log log = LogFactory.getLog(EntityMgrExercise.class);
+public class EntityMgrTest extends TestCase {
+    private static Log log = LogFactory.getLog(EntityMgrTest.class);
     private static final String PERSISTENCE_UNIT = "entityMgrEx";
+    EntityManagerFactory emf;
     private EntityManager em;    
 
     protected void setUp() throws Exception {
         log.debug("creating entity manager");
-        EntityManagerFactory emf = 
-            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
         em = emf.createEntityManager();
         assertNotNull(em);
+        cleanup();
     }
 
     protected void tearDown() throws Exception {
@@ -33,9 +35,9 @@ public class EntityMgrExercise extends TestCase {
             em.getTransaction().begin();
             em.flush();            
             logAutos();            
-            removeAutos();
-            em.close();
             em.getTransaction().commit();
+            em.close();
+            emf.close();
             log.debug("tearDown() complete, em=" + em);
         }
         catch (Exception ex) {
@@ -50,9 +52,11 @@ public class EntityMgrExercise extends TestCase {
             log.info("EM_AUTO:" + o);
         }        
     }
-    public void removeAutos() {
+    public void cleanup() {
+        em.getTransaction().begin();
         Query query = em.createNativeQuery("delete from EM_AUTO");
         int rows = query.executeUpdate();
+        em.getTransaction().commit();
         log.info("removed " + rows + " rows");
     }
     

@@ -97,6 +97,11 @@ INSERT INTO COFFEES VALUES('juan', 3, 10.0, 40, 100)
         []
 
 ---
+package myorg.jdbctutorial;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class Coffee {
     private static final Log log = LogFactory.getLog(Coffee.class);
 ---
@@ -107,6 +112,13 @@ public class Coffee {
         []
 
 ---
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+...
+
     public void demoSelect(Connection connection) throws SQLException {
         Statement st = null;
         ResultSet rs = null;
@@ -116,10 +128,10 @@ public class Coffee {
             while (rs.next()) {
                 log.info("COF_NAME=" + rs.getString("COF_NAME") +
                         ", SUP_ID=" + rs.getInt("SUP_ID") +
-                        ", PRICE=" + rs.getString("PRICE") +
-                        ", SALES" + rs.getFloat("PRICE") +
+                        ", PRICE=" + rs.getFloat("PRICE") +
+                        ", SALES=" + rs.getInt("SALES") +
                         ", TOTAL=" + rs.getInt("TOTAL")
-                        );            
+                        );
             }                                
         }
         finally {
@@ -177,6 +189,13 @@ public class Coffee {
         * declare a logger for the test methods
 
 ---
+package myorg.jdbctutorial;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import junit.framework.TestCase;
+
 public class CoffeeTest extends TestCase {
     private static final Log log = LogFactory.getLog(CoffeeTest.class);
 ---
@@ -195,7 +214,13 @@ private static final String dbPassword = System.getProperty("jdbc.password");
         to the database.
 
 ---
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+...
+
 private Connection connection;
+...
 
 public void setUp() throws ClassNotFoundException, SQLException {
     log.debug("loading driver:" + dbDriver);

@@ -7,15 +7,13 @@ Exercise: Entity Manager
 
 * Objectives
 
-    * {{{#Section A} Setup and Start Database}}
+    * {{{Part_A} Setup and Start Database}}
 
-    * {{{#Section B} Setup Project Structure}}
+    * {{{Part_B} Setup Project Structure}}
 
-    * {{{#Section C} Setup Core Test Harness}}
+    * {{{Part_C} Setup Maven Project Definition}}
 
-    * {{{#Section D} Setup Maven Project Definition}}
-
-    * {{{#Section E} Test Entity Manager Functions}}
+    * {{{Part_D} Test Entity Manager Functions}}
 
 * Steps
 
@@ -24,11 +22,11 @@ Exercise: Entity Manager
     the JDBC Tutorial Exercise completed, you can consider starting 
     with a copy of that project and modifying it.
 
-** {Section A}: Setup and Start Database
+** {Part A}: Setup and Start Database
 
     * If you haven't done so already, perform the setup instructions
     for JBoss and the database as defined in 
-    {{{ex0.html#Part F}Exercise 0}}. Refer back to those instructions for 
+    {{{ex0.html#Part_E}Exercise 0}}. Refer back to those instructions for 
     basic commands.
 
     * Start the database (using the JBoss run.sh command). Note that the 
@@ -36,9 +34,14 @@ Exercise: Entity Manager
     taking advantage of the fact it will start and stop the database 
     process.
 
-    [Note:] You can also start the database manually to save some room 
-    on your system for now. You should try both commands at first and
-    verify both approaches result in the same database using the DB GUI.
+    [Note:] You can also start the database manually to save some resources 
+    on your system for now. You should test that the manual start creates
+    the same instance of the database as JBoss. You can do this by checking
+    that a manual start of the database creates a set of files called "ejava.*"
+    in the JBOSS_HOME/server/default/data/hypersonic directory. If they already
+    exist, you can safely delete them to test for expected behavior. You will
+    do this anyway in the future if you want to coldstart your database after
+    significant schema changes have been made.
 
 ---
 cd ${JBOSS_HOME}/server/default/data/hypersonic
@@ -54,7 +57,7 @@ java -classpath ${JBOSS_HOME}/server/default/lib/hsqldb.jar org.hsqldb.Server -d
 java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
-** {Section B}: Setup Project Structure
+** {Part B}: Setup Project Structure
 
     * Create a set of ddl scripts in src/main/resources/ddl to
     handle creating the schema, deleting rows in the schema, and
@@ -102,7 +105,18 @@ DROP TABLE EM_AUTO if EXISTS;
         obtain a connection to the database as well as some other configuration
         properties. See the example below. Leave the database-specific properties
         as variables. We can get the build environment to fill this in during
-        the build process.
+        the build process. Set the hibernate.show_sql to true to turn on 
+        logging of SQL commands to the database.
+
+            [Note:] The technique demonstrated here, where we place the driver,
+            URL, and credentials within persistence.xml, causes
+            the information to be located within the component's JAR file.
+            This may not be desirable for operational deployments. The
+            JDBC example showed how we could pass in JDBC properties to
+            our unit tests are runtime. You can do the same here. Just
+            pass a HashMap to Persistence.createEntityManagerFactory()
+            with the property names and values shown below. Delete these
+            variables from persistence.xml if that approach is taken.
 
         []
 
@@ -125,83 +139,13 @@ DROP TABLE EM_AUTO if EXISTS;
                 value="${jdbc.password}"/>
             <property name="hibernate.connection.username"
                 value="${jdbc.user}"/>
-            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.show_sql" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>
 ---
 
-    * Create a utility class to hold the open EntityManagerFactory objects.
-    JBoss only allows a single EntityManagerFactory to be created per
-    peristsnce unit, so this must be managed at the application level and
-    not the per-test level (since tests should be allowed to run in 
-    parallel threads).
-
----
-package myorg.entitymgrex;
-
-import java.util.HashMap;
-import java.util.Map;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-public class JPAUtil {
-    private static final Log log = LogFactory.getLog(JPAUtil.class);
-    private static final Map<String, EntityManagerFactory> factories = 
-        new HashMap<String, EntityManagerFactory>();
-}
----
-
-    * Add a public static method to get or create an EntityManagerFactory
-    for a specific persistence unit. You may want to make this thread safe
-    by guarding against concurrent modifications to the singleton map. Note
-    the use of javax.persistence.Persistence.createEntityManagerFactory
-    to bootstrap our application with the persistence provider.
-
----
-    public static EntityManagerFactory getEntityManagerFactory(String puName) {
-        EntityManagerFactory emf = factories.get(puName);
-        if (emf == null) {
-            synchronized(factories) {
-                emf = factories.get(puName);
-                if (emf == null) {
-                    log.debug("creating EntityManagerFactory(" + puName + ")");
-
-                    emf = Persistence.createEntityManagerFactory(puName);
-
-                    factories.put(puName, emf);
-                }
-            }
-        }
-        return emf;
-    }
----
-
-    * Add a public static method to close all open EntityManagerFactory
-    objects and clear the map. You may want to make this thread safe by
-    guarding against concurrent access to the map during modification.
-
----
-    public static void close() {
-        log.debug("closing " + factories.size() + " EntityManagerFactories");
-        synchronized(factories) {
-            for(String puName : factories.keySet()) {
-                factories.get(puName).close();
-                log.debug(puName + " closed");
-            }
-            factories.clear();
-        }
-    }
----
-
-    * Create a JUnit Test case to hold your test code. This test 
-    test case will need to be run within an overall test suite that will 
-    take care of one-time startup and shutdown tasks for the JVM. Therefore,
-    you'll need to leave the word "Test" out of its name so that it is not
-    automatically located by JUnit search expressions looking for 
-    "*Test*.class". 
+    * Create a JUnit Test case to hold your test code.
 
 ---
 package myorg.entitymgrex;
@@ -211,8 +155,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import junit.framework.TestCase;
 
-public class EntityMgrExercise extends TestCase {
-    private static Log log = LogFactory.getLog(EntityMgrExercise.class);
+public class EntityMgrTest extends TestCase {
+    private static Log log = LogFactory.getLog(EntityMgrTest.class);
 
 
     public void testtemplate() {
@@ -222,26 +166,26 @@ public class EntityMgrExercise extends TestCase {
 ---
 
     * Override the JUnit setUp() method to create an entity manager
-    for the tests to use. We are using the global JPAUtil class you wrote
-    earlier to share this global object with multiple test cases and
-    our root test case will take care of closing it out before shutting
-    down.
+    and factory for the tests to use. 
 
 ---
     private static final String PERSISTENCE_UNIT = "entityMgrEx";
+    private EntityManagerFactory emf;    
     private EntityManager em;    
 
     protected void setUp() throws Exception {
         log.debug("creating entity manager");
-        EntityManagerFactory emf = 
-            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
         em = emf.createEntityManager();
         assertNotNull(em);
+
+        //cleanup();
     }
 ---
 
     * Override the JUnit tearDown() method to flush all remaining items
-    in the persistence context to the database and close the entity manager.
+    in the persistence context to the database and close the entity manager
+    and factory.
 
 ---
     protected void tearDown() throws Exception {
@@ -250,9 +194,9 @@ public class EntityMgrExercise extends TestCase {
             em.getTransaction().begin();
             em.flush();
             //logAutos();
-            //deleteAutos();
-            em.close();
             em.getTransaction().commit();
+            em.close();
+            emf.close();
             log.debug("tearDown() complete, em=" + em);
         }
         catch (Exception ex) {
@@ -264,7 +208,7 @@ public class EntityMgrExercise extends TestCase {
 
     * Add in a logAutos() method to query and print all autos in the 
     database. Do this after flushing the entity manager in the tearDown()
-    method so you can see the changes from the previos test. The following
+    method so you can see the changes from the previous test. The following
     example uses the entity manager to create an ad-hoc EJB-QL statement.
 
 ---
@@ -276,14 +220,16 @@ public class EntityMgrExercise extends TestCase {
     }
 ---
 
-    * You might also want to add a deleteAutos() to clear out the Auto
+    * You might also want to add a cleanup() to clear out the Auto
     table between tests. The example below uses the entity manager to
     create a native SQL statement.
     
 ---
-    public void deleteAutos() {
+    public void cleanup() {
+        em.getTransaction().begin();
         Query query = em.createNativeQuery("delete from EM_AUTO");
         int rows = query.executeUpdate();
+        em.getTransaction().commit();
         log.info("removed " + rows + " rows");
     }
 ---
@@ -443,55 +389,7 @@ public class Auto implements Serializable {
     }
 ---
 
-
-** {Section C}: Setup Core Test Harness
-
-    * Create an aggregate JUnit Test to manage the any one-time startup and shutdown
-    tasks. This is probably not necessary for pure Hibernate, however this step is
-    left over from something required by a previous framework used in class. It can't 
-    hurt to learn how something like one-time startup/shutdown actions can be added 
-    to JUnit. Place this class in src/test/myorg/entitymgrex.
-
----
-package myorg.entitymgrex;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-public class AllTest extends TestCase {
-    private static Log log = LogFactory.getLog(AllTest.class);
-    
-}
----
-
-    * Add the main suite() method that defines the tests and adds one-time
-    startup and shutdown code to the JVM. Note that it will call 
-    JPAUtil to close the open EntityManagerFactory objects before shutting
-    down.
-
----
-    public static Test suite() {
-        TestSuite tests = new TestSuite();
-        tests.addTestSuite(EntityMgrExercise.class);
-        
-        TestSetup wrapper = new TestSetup(tests) {
-            public void setUp() throws Exception {
-            }
-            public void tearDown() throws Exception {
-                JPAUtil.close();
-            }
-        };
-        
-        return wrapper;
-    }
----
-
-** {Section D}: Setup Maven Project Definition
+** {Part C}: Setup Maven Project Definition
 
     [Note:] This project definition may be long, but realize there is 
     a very limited amount that is project specific. Maven provides the 
@@ -818,61 +716,14 @@ public class AllTest extends TestCase {
     * Build and run the tests.
 
 
-** {Section E}: Test Entity Manager Functions
+** {Part D}: Test Entity Manager Functions
 
-    [Note:] The following changes are all made to the EntityMgrEx.java
+    [Note:] The following changes are all made to the EntityMgrTest.java
     JUnit test class. Everything is being done within this file to 
     keep things simple. This test case is playing the role of the 
     business and persistence logic.
 
     []
-
-    * Review the setUp() and tearDown() functionality you originally added
-    to the EntityMgrEx.java class. The setUp() method is taking care of 
-    creating an entity manager. The tearDown() method is taking care of
-    flushing the entity manager, listing the contents of the database
-    table, and deleting all rows before the next test. Note that the 
-    logAutos() is using EJB-QL and the removeAutos() is using 
-    native SQL. Each of the test methods uses entities.
-
----
-    protected void setUp() throws Exception {
-        log.debug("creating entity manager");
-        EntityManagerFactory emf = 
-            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);
-        em = emf.createEntityManager();
-        assertNotNull(em);
-    }
-
-    protected void tearDown() throws Exception {
-        try {
-            log.debug("tearDown() started, em=" + em);
-            em.getTransaction().begin();
-            em.flush();            
-            logAutos();            
-            removeAutos();
-            em.close();
-            em.getTransaction().commit();
-            log.debug("tearDown() complete, em=" + em);
-        }
-        catch (Exception ex) {
-            log.fatal("tearDown failed", ex);
-            throw ex;
-        }
-     }
-    
-    public void logAutos() {
-        Query query = em.createQuery("select a from Auto as a");
-        for (Object o: query.getResultList()) {
-            log.info("EM_AUTO:" + o);
-        }        
-    }
-    public void removeAutos() {
-        Query query = em.createNativeQuery("delete from EM_AUTO");
-        int rows = query.executeUpdate();
-        log.info("removed " + rows + " rows");
-    }
----
 
     * add a testCreate() method to test the 
     functionality of EntityManager.create(). This will add an object to

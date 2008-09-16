@@ -30,8 +30,8 @@ public class Coffee {
             while (rs.next()) {
                 log.info("COF_NAME=" + rs.getString("COF_NAME") +
                         ", SUP_ID=" + rs.getInt("SUP_ID") +
-                        ", PRICE=" + rs.getString("PRICE") +
-                        ", SALES" + rs.getFloat("PRICE") +
+                        ", PRICE=" + rs.getFloat("PRICE") +
+                        ", SALES=" + rs.getInt("SALES") +
                         ", TOTAL=" + rs.getInt("TOTAL")
                         );            
             }                                

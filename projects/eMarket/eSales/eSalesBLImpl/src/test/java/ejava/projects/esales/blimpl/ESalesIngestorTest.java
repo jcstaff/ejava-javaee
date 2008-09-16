@@ -16,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import ejava.projects.esales.dao.AccountDAO;
 import ejava.projects.esales.bo.Account;
 import ejava.projects.esales.jdbc.JDBCAccountDAO;
-import ejava.projects.esales.jpa.JPAAccountDAO;
 
 import junit.framework.TestCase;
 
