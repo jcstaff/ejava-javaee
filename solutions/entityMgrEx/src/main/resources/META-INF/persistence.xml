@@ -16,7 +16,10 @@
                 value="${jdbc.password}"/>
             <property name="hibernate.connection.username" 
                 value="${jdbc.user}"/>
-            <property name="hibernate.show_sql" value="true"/>            
+            <property name="hibernate.show_sql" value="false"/>            
+            <!-- adding this property causes schema to be generated at runtime
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            -->
         </properties>
     </persistence-unit>            
 </persistence>

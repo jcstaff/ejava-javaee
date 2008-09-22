@@ -243,6 +243,69 @@
 -->
                         </executions>
                     </plugin>          
+
+
+                    <!-- generates a DDL file for persistence unit 
+                    <plugin>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>2.0</version>
+                        <executions>
+                            <execution>
+                                <id>generate-drop-ddl</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-dropGEN.ddl
+                                        </outputfilename>
+                                        <drop>true</drop>
+                                        <create>false</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-create-ddl</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-createGEN.ddl
+                                        </outputfilename>
+                                        <drop>false</drop>
+                                        <create>true</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <components>
+                                <component>
+                                    <name>hbm2ddl</name>
+                                    <implementation>
+                                        jpaconfiguration
+                                    </implementation>
+                                    <outputDirectory>
+                                        target/classes/ddl
+                                    </outputDirectory>
+                                </component>
+                            </components>
+                            <componentProperties>
+                                <persistenceunit>
+                                    entityMgrEx
+                                </persistenceunit>
+                                <export>false</export>
+                                <format>true</format>
+                            </componentProperties>
+                        </configuration>
+                    </plugin>
+                    -->
                 </plugins>          
             </build>          
         </profile>

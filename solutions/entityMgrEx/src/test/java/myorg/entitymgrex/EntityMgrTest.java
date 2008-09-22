@@ -35,7 +35,7 @@ public class EntityMgrTest extends TestCase {
             em.getTransaction().begin();
             em.flush();            
             logAutos();            
-            em.getTransaction().commit();
+            em.getTransaction().commit();            
             em.close();
             emf.close();
             log.debug("tearDown() complete, em=" + em);
@@ -180,7 +180,7 @@ public class EntityMgrTest extends TestCase {
         car.setColor("Red");
         car.setMileage(0*1000);
         log.info("creating auto:" + car);                        
-        em.persist(car);
+        car = em.merge(car); //using merge to persist new
         
         //we need to associate the em with a transaction to get a 
         //primary key generated and assigned to the auto
