@@ -38,7 +38,6 @@ public class BulkDemo extends DemoBase {
         }
     }
     
-    @SuppressWarnings("unchecked")
     public void testBulkDelete() {
         log.info("testBulkDelete");
         

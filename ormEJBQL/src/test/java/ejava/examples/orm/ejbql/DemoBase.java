@@ -140,7 +140,6 @@ public abstract class DemoBase extends TestCase {
         
         em.persist(sale1);
         em.persist(sale2);
-        em.flush();
         
         em.getTransaction().commit();
     }

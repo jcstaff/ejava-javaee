@@ -2,17 +2,38 @@ package ejava.examples.orm.ejbql;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Query;
 
+import ejava.examples.orm.ejbql.annotated.Clerk;
+import ejava.examples.orm.ejbql.annotated.Customer;
+import ejava.examples.orm.ejbql.annotated.Sale;
+import ejava.examples.orm.ejbql.annotated.Store;
+
 public class EJBQLDemo extends DemoBase {
-    
-    @SuppressWarnings("unchecked")
+
     private List<Object> executeQuery(String ejbqlString) {
+        return executeQuery(ejbqlString, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Object> executeQuery(String ejbqlString, 
+            Map<String, Object> params) {
         Query query = em.createQuery(ejbqlString);
         log.info("executing query:" + ejbqlString);
+        if (params != null && !params.isEmpty()) {
+            StringBuilder text=new StringBuilder();
+            for(String key: params.keySet()) {
+                Object param = params.get(key);
+                text.append(key +"=" + param + ",");
+                query.setParameter(key, param);
+            }
+            log.info("   with params:{" + text + "}");
+        }
         List<Object> objects = query.getResultList();
         for(Object o: objects) {
            log.info("found result:" + o);
@@ -155,6 +176,65 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:" + rows, 1, rows);
     }
     
+    public void testSpecialCharacter() {
+        log.info("testSpecialCharacter");
+        int rows = executeQuery(
+                "select s from Store s " +
+                "where s.name='Big Al''s'"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+    }
+    
+    public void testLike() {
+        log.info("testLike");
+        
+        int rows = executeQuery(
+                  "select c from Clerk c " +
+                  "where c.firstName like 'M%'").size();
+        assertEquals("unexpected number of rows", 2, rows);
+        
+        Map<String,Object> params = new HashMap<String, Object>();
+        params.put("firstName", "M%");
+        rows = executeQuery(
+                "select c from Clerk c " +
+                "where c.firstName like :firstName)",params).size();
+        assertEquals("unexpected number of rows", 2, rows);        
+
+        params = new HashMap<String, Object>();
+        params.put("firstName", "M");
+        rows = executeQuery(
+                "select c from Clerk c " +
+                "where c.firstName like concat(:firstName,'%')",params).size();
+        assertEquals("unexpected number of rows", 2, rows);    
+        
+        rows = executeQuery(
+                "select c from Clerk c " +
+                "where c.firstName like '_anny'").size();
+        assertEquals("unexpected number of rows", 1, rows);
+        
+    }
+    
+    public void testArithmetic() {
+        log.info("testArithmetic");
+        
+        String query = "select s from Sale s " +
+            "where (s.amount * :tax) > :amount";
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("amount", new BigDecimal(10.00));
+                
+        double tax = 0.04;
+        int rows=0;
+        //keep raising taxes until somebody pays $10.00 in tax
+        while (rows==0) {
+            params.put("tax", new BigDecimal(tax));
+            rows = executeQuery(query, params).size();    
+            if (rows == 0) { tax += 0.01; }
+        }
+        log.info("raise taxes to:" + tax);
+        
+        assertEquals("unexpected level for tax:" + tax, 0.07, tax);
+    }
+    
     public void testLogical() {
         log.info("testLogical");
         int rows = executeQuery(
@@ -173,4 +253,291 @@ public class EJBQLDemo extends DemoBase {
                 ).size();
         assertEquals("unexpected number of rows:" + rows, 2, rows);        
     }
+    
+    public void testEquality() {
+        log.info("testEquality");
+        
+        //get a clerk entity
+        Clerk clerk = (Clerk)
+            em.createQuery(
+                "select c from Clerk c where c.firstName = 'Manny'")
+              .getSingleResult();
+        
+        //find all sales that involve this clerk
+        String ejbqlQueryString = 
+            "select s " +
+            "from Sale s, IN (s.clerks) c " +
+            "where c = :clerk";
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("clerk", clerk);
+        int rows=executeQuery(ejbqlQueryString,params).size();
+        assertEquals("unexpected number of rows", 2, rows);
+    }
+    
+    public void testBetween() {
+        log.info("testBetween");
+        
+        String query = "select s from Sale s " +
+            "where s.amount BETWEEN :low AND :high";
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("low", new BigDecimal(90.00));
+        params.put("high", new BigDecimal(110.00));
+                
+        int rows = executeQuery(query, params).size();    
+        assertEquals("unexpected number of rows:", 1, rows);
+    }
+    
+    public void testIsNull() {
+        log.info("testIsNull");
+        
+        String query = "select s from Sale s " +
+            "where s.store IS NULL";
+                
+        int rows = executeQuery(query).size();    
+        assertEquals("unexpected number of rows:", 0, rows);
+
+        query = "select s from Sale s " +
+            "where s.store IS NOT NULL";
+            
+        rows = executeQuery(query).size();    
+        assertEquals("unexpected number of rows:", 2, rows);
+    }
+
+    public void testIsEmpty() {
+        log.info("testIsEmpty");
+        
+        String query = "select c from Clerk c " +
+            "where c.sales IS EMPTY";
+                
+        int rows = executeQuery(query).size();    
+        assertEquals("unexpected number of rows:", 1, rows);
+
+        query = "select c from Clerk c " +
+            "where c.sales IS NOT EMPTY";
+            
+        rows = executeQuery(query).size();    
+        assertEquals("unexpected number of rows:", 2, rows);
+    }
+
+    public void testMemberOf() {
+        log.info("testMemberOf");
+        
+        //get a clerk entity
+        Clerk clerk = (Clerk)
+            em.createQuery(
+                "select c from Clerk c where c.firstName = 'Manny'")
+              .getSingleResult();
+        
+        //find all sales that involve this clerk
+        String ejbqlQueryString = 
+            "select s " +
+            "from Sale s " +
+            "where :clerk MEMBER OF s.clerks";
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("clerk", clerk);
+        int rows=executeQuery(ejbqlQueryString,params).size();
+        assertEquals("unexpected number of rows", 2, rows);
+    }
+    
+    public void testStringFunctions() {
+        log.info("testStringFunctions");
+
+        int rows = executeQuery(
+                "select c from Customer c " +
+                "where c.firstName='CAT'"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 0, rows);
+
+        rows = executeQuery(
+                "select c from Customer c " +
+                "where c.firstName=LOWER('CAT')"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+    
+        rows = executeQuery(
+                "select UPPER(c.firstName) from Customer c " +
+                "where c.firstName=LOWER('CAT')"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+    
+        rows = executeQuery(
+                "select TRIM(LEADING 'c' FROM c.firstName) from Customer c " +
+                "where c.firstName='cat')"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        
+        rows = executeQuery(
+                "select c from Customer c " +
+                "where CONCAT(CONCAT(c.firstName,' '),c.lastName) ='cat inhat')"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        
+        rows = executeQuery(
+                "select c from Customer c " +
+                "where LENGTH(c.firstName) = 3"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        
+        rows = executeQuery(
+                "select c from Customer c " +
+                "where LOCATE('cat',c.firstName,2) > 0"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 0, rows);        
+
+        rows = executeQuery(
+                "select c from Customer c " +
+                "where LOCATE('at',c.firstName,2) > 1"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);        
+
+        rows = executeQuery(
+                "select SUBSTRING(c.firstName,2,2) from Customer c " +
+                "where c.firstName = 'cat'"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        
+        rows = executeQuery(
+                "select c from Customer c " +
+                "where SUBSTRING(c.firstName,2,2) = 'at'"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);        
+    }
+
+    public void testDates() {        
+        log.info("testDates");
+
+        int rows = executeQuery(
+                "select s from Sale s " +
+                "where s.date < CURRENT_DATE"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 2, rows);
+        
+        rows = executeQuery(
+                "select s from Sale s " +
+                "where s.date = CURRENT_DATE"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 0, rows);
+
+        rows = em.createQuery(
+                "update Sale s " +
+                "set s.date = CURRENT_TIMESTAMP"
+                ).executeUpdate();
+        assertEquals("unexpected number of rows:" + rows, 2, rows);
+        
+        em.getTransaction().commit();
+        em.clear();
+        em.getTransaction().begin();
+        
+        rows = executeQuery(
+                "select s from Sale s " +
+                "where s.date = CURRENT_DATE"
+                ).size();
+        assertEquals("unexpected number of rows:" + rows, 2, rows);
+    }
+    
+    public void testCount() {        
+        log.info("testCount");
+
+        List<Object> results= executeQuery(
+                "select COUNT(s) from Sale s");
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 2, ((Long)results.get(0)).intValue());
+    }
+    
+    public void testMaxMin() {        
+        log.info("testMaxMin");
+
+        List<Object> results= executeQuery(
+                "select max(s.amount) from Sale s");
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 150, ((BigDecimal)results.get(0)).intValue());
+        
+        results= executeQuery(
+                "select min(s.amount) from Sale s");
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 100, ((BigDecimal)results.get(0)).intValue());
+    }
+
+    public void testSumAve() {        
+        log.info("testSumAve");
+
+        List<Object> results= executeQuery(
+            "select sum(s.amount) from Sale s");
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 250, ((BigDecimal)results.get(0)).intValue());
+        
+        results= executeQuery(
+                "select avg(s.amount) from Sale s");
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 125, ((Double)results.get(0)).intValue());
+    }
+    
+    public void testOrderBy() {
+        log.info("testOrderBy");
+
+        List<Object> results = executeQuery(
+            "select s from Sale s ORDER BY s.amount ASC"); 
+        assertEquals("unexpected number of rows", 2, results.size());
+        assertEquals("unexpected first element", 
+                100, 
+                ((Sale)results.get(0)).getAmount().intValue());
+        assertEquals("unexpected first element", 
+                150, 
+                ((Sale)results.get(1)).getAmount().intValue());
+
+        
+        results = executeQuery(
+                "select s from Sale s ORDER BY s.amount DESC"); 
+        assertEquals("unexpected number of rows", 2, results.size());
+        assertEquals("unexpected first element", 
+                150, 
+                ((Sale)results.get(0)).getAmount().intValue());
+        assertEquals("unexpected first element", 
+                100, 
+                ((Sale)results.get(1)).getAmount().intValue());
+    }
+    
+    public void testSubqueries() {
+       log.info("testHaving");   
+       
+       List<Object> results = executeQuery(
+               "select c from Customer c " +
+               "where c.id IN " +
+               "   (select s.buyerId from Sale s " +
+               "    where s.amount > 100) "
+              );       
+       assertEquals("unexpected number of rows", 1, results.size());
+    }
+    
+    public void testAll() {
+        log.info("testHaving");  
+        
+        executeQuery("select s from Sale s");
+        
+        List<Object> results = executeQuery(
+                "select c from Clerk c " +
+                "where 125 < ALL " +
+                "   (select s.amount from c.sales s)"
+               );       
+        results = executeQuery(
+                "select c from Clerk c " +
+                "where 125 > ALL " +
+                "   (select s.amount from c.sales s)"
+               );       
+        //assertEquals("unexpected number of rows", 1, results.size());
+        
+        results = executeQuery(
+                "select c from Clerk c " +
+                "where 125 < ANY " +
+                "   (select s.amount from c.sales s)"
+               );       
+        results = executeQuery(
+                "select c from Clerk c " +
+                "where 125 > ANY " +
+                "   (select s.amount from c.sales s)"
+               );       
+        //assertEquals("unexpected number of rows", 1, results.size());
+        
+     }
+
 }
