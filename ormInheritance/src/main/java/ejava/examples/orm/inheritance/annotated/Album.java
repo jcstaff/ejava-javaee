@@ -14,7 +14,6 @@ import javax.persistence.*;
 @Entity 
 @Table(name="ORMINH_ALBUM") //this table holds both this entity and parent class
 @AttributeOverrides({
-    @AttributeOverride(name="id", column=@Column(name="ALBUM_ID")), 
     @AttributeOverride(name="version", column=@Column(name="ALBUM_VERSION"))
 })
 public class Album extends BaseObject {
@@ -22,6 +21,7 @@ public class Album extends BaseObject {
     private String title;
 
     @Id @GeneratedValue //id is being generated independent of other siblings
+    @Column(name="ALBUM_ID") 
     public long getId() {
         return super.getId();
     }

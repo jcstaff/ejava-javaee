@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 @Entity @Table(name="ORMLISTEN_PERSON")
+@EntityListeners(Listener.class)
 public class Person {
     private static final Log log = LogFactory.getLog(Person.class);
     
@@ -34,15 +35,18 @@ public class Person {
     }
     
     @Id 
-    //@GeneratedValue(strategy=GenerationType.SEQUENCE) //not in time
-    //@GeneratedValue(strategy=GenerationType.TABLE) //not in time
-    @GeneratedValue(strategy=GenerationType.IDENTITY) //works
+    //@GeneratedValue(strategy=GenerationType.SEQUENCE)
+    //@GeneratedValue(strategy=GenerationType.TABLE) 
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     public long getId() {
         return id;
     }
     protected void setId(long id) {
         log.debug("Person.setId() called with:" + id);
         this.id = id;
+        if (residence != null && residence.getId() == 0) { 
+            residence.setId(id); 
+        }
     }
     public String getName() {
         return name;
@@ -65,7 +69,6 @@ public class Person {
     }
     @PostPersist public void postPersist() {
         log.debug("postPersist event:" + this.toString());
-        if (residence != null) { residence.setId(id); }
     }
     @PostLoad public void postLoad() {
         log.debug("postLoad event:" + this.toString());

@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 @Entity @Table(name="ORMLISTEN_RESIDENCE")
+@EntityListeners(Listener.class)
 public class Residence {
     private static final Log log = LogFactory.getLog(Residence.class);
     private long id;

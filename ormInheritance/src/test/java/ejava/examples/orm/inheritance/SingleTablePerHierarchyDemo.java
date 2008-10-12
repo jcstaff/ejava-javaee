@@ -60,7 +60,7 @@ public class SingleTablePerHierarchyDemo extends DemoBase {
         
         //query specific tables for columns
         int rows = em.createNativeQuery(
-                "select ID, COST, SOUPTYPE, EXPIRATION, BAKEDON, SLICES " +
+                "select ID, TYPE, COST, SOUPTYPE, EXPIRATION, BAKEDON, SLICES " +
                 " from ORMINH_PRODUCT")
                 .getResultList().size();
         assertEquals("unexpected number of product rows:" + rows, 2, rows);
