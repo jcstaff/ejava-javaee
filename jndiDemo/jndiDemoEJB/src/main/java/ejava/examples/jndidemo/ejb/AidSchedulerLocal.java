@@ -1,10 +1,16 @@
 package ejava.examples.jndidemo.ejb;
 
-import javax.ejb.Local;
-
 import ejava.examples.jndidemo.Scheduler;
 
-@Local
-public interface AidSchedulerLocal extends Scheduler{
+/**
+ * This interface is part of an EJB example to leverage the XML deployment
+ * descriptor as much as possible. There will be very few annotations within
+ * this set of examples.
+ * @author jcstaff
+ *
+ */
+
+//@Local declared by ejb-jar.xml entry
+public interface AidSchedulerLocal extends Scheduler {
 
 }

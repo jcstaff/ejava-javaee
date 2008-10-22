@@ -19,8 +19,7 @@ import ejava.examples.jndidemo.JNDIHelper;
  * @author jcstaff
  *
  */
-
-@Stateless(name="AidScheduler")
+//@Stateless declared by ejb-jar.xml entry
 public class AidSchedulerEJB extends SchedulerBase
     implements AidSchedulerLocal, AidSchedulerRemote {
         

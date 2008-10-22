@@ -1,5 +1,6 @@
 package ejava.examples.ejbsessionbank.ejb;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -16,12 +17,16 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bl.Teller;
-import ejava.examples.ejbsessionbank.bl.TellerImpl;
+import ejava.examples.ejbsessionbank.blimpl.TellerImpl;
 import ejava.examples.ejbsessionbank.bo.Account;
-import ejava.examples.ejbsessionbank.da.AccountDAO;
-import ejava.examples.ejbsessionbank.da.AccountDAOException;
-import ejava.examples.ejbsessionbank.dto.LedgerDTO;
-import ejava.examples.ejbsessionbank.jpa.JPAUtil;
+import ejava.examples.ejbsessionbank.bo.Ledger;
+import ejava.examples.ejbsessionbank.bo.Owner;
+import ejava.examples.ejbsessionbank.dao.AccountDAO;
+import ejava.examples.ejbsessionbank.dao.DAOException;
+import ejava.examples.ejbsessionbank.dao.OwnerDAO;
+import ejava.examples.ejbsessionbank.dto.OwnerDTO;
+import ejava.examples.ejbsessionbank.jpa.JPAAccountDAO;
+import ejava.examples.ejbsessionbank.jpa.JPAOwnerDAO;
 
 /**
  * This class implements a Stateless Session Bean wrapper around the 
@@ -67,15 +72,20 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         teller = new TellerImpl();
         
         try {
-            AccountDAO dao = new ejava.examples.ejbsessionbank.jpa.JPAAccountDAO();
-            /* TODO:resolve 
-            http://www.jboss.com/index.html?module=bb&op=viewtopic&p=4170954#4170954
             AccountDAO dao = (AccountDAO)Thread.currentThread()
                                                .getContextClassLoader()
                                                .loadClass(daoClassName)
                                                .newInstance();            
-                                               */
+            /* TODO:resolve 
+            http://www.jboss.com/index.html?module=bb&op=viewtopic&p=4170954#4170954
+            AccountDAO dao = new ejava.examples.ejbsessionbank.jpa.JPAAccountDAO();
+            */
+            ((JPAAccountDAO)dao).setEntityManager(em);
             ((TellerImpl)teller).setAcctDAO(dao);
+            
+            OwnerDAO ownerDAO = new JPAOwnerDAO();
+            ((JPAOwnerDAO)ownerDAO).setEntityManager(em);            
+            ((TellerImpl)teller).setOwnerDAO(ownerDAO);
         }
         catch (Exception ex) {
             log.fatal("error loading dao class:" + daoClassName, ex);
@@ -94,17 +104,15 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     @PreDestroy
     public void close() {
         log.debug("close");
-        JPAUtil.setEntityManager(null);        
         teller = null;
     }
 
     public Account createAccount(String accountNumber) throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.createAccount(accountNumber);
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error creating account", ex);
             throw new BankException("internal error creating account:" + ex);
@@ -114,10 +122,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public Account closeAccount(String acctNum) throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.closeAccount(acctNum);
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error closing account", ex);
             throw new BankException("internal error closing account:" + ex);
@@ -127,10 +134,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public Account getAccount(String acctNum) throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.getAccount(acctNum);
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error getting account", ex);
             throw new BankException("internal error getting account:" + ex);
@@ -140,10 +146,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public List<Account> getOverdrawnAccounts(int index, int count) throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.getOverdrawnAccounts(index, count);
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal getting accounts", ex);
             throw new BankException("internal getting accounts:" + ex);
@@ -153,10 +158,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public List<Account> getAccounts(int index, int count) throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.getAccounts(index, count);
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal getting accounts", ex);
             throw new BankException("internal getting accounts:" + ex);
@@ -166,28 +170,26 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public void updateAccount(Account account) throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             log.debug("in EJB, about to update account:" + account);
             teller.updateAccount(account);
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error updating account", ex);
             throw new BankException("internal error updating account:" + ex);
         }
     }
 
-    public LedgerDTO getLedger() throws BankException {
+    public Ledger getLedger() throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
-            LedgerDTO ledger = new LedgerDTO(
+            Ledger ledger = new Ledger(
                     teller.getLedgerCount(),
                     teller.getLedgerSum(),
                     teller.getLedgerAveBalance());            
             return ledger;
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error getting ledger", ex);
             throw new BankException("internal error getting ledger:" + ex);
@@ -199,13 +201,12 @@ public class TellerEJB implements TellerLocal, TellerRemote {
      * of how to create a DTO. Note that the query is not actually known
      * to the business logic or DAO. It is expressed in an ORM.xml file.
      */
-    public LedgerDTO getLedger2() throws BankException {
+    public Ledger getLedger2() throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.getLedger();
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error getting ledger", ex);
             throw new BankException("internal error getting ledger:" + ex);
@@ -219,10 +220,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public double getLedgerAveBalance() throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.getLedgerAveBalance();
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error getting ledger ave balance", ex);
             throw new BankException(
@@ -237,10 +237,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public long getLedgerCount() throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.getLedgerCount();
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error getting ledger count", ex);
             throw new BankException(
@@ -255,10 +254,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public double getLedgerSum() throws BankException {
         debug();
         try {
-            JPAUtil.setEntityManager(em);        
             return teller.getLedgerSum();
         }
-        catch (AccountDAOException ex) {
+        catch (DAOException ex) {
             ctx.setRollbackOnly();
             log.fatal("internal error getting ledger sum", ex);
             throw new BankException(
@@ -271,4 +269,114 @@ public class TellerEJB implements TellerLocal, TellerRemote {
             //nothing yet...
         }
     }
+    
+    // -- this half was added to provide a richer data model to demo
+    // -- lazy load issues.
+
+    public Owner addOwner(long ownerId, String accountNumber)
+            throws BankException {
+        try {
+            log.debug("in EJB, about to add owner to account");
+            return teller.addOwner(ownerId, accountNumber);
+        }
+        catch (DAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error updating account", ex);
+            throw new BankException("internal error updating account:" + ex);
+        }
+    }
+
+    public Owner createOwner(String firstName, String lastName, String ssn)
+            throws BankException {
+        try {
+            log.debug("in EJB, about to create owner:" + firstName);
+            return teller.createOwner(firstName, lastName, ssn);
+        }
+        catch (DAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error updating account", ex);
+            throw new BankException("internal error updating account:" + ex);
+        }
+    }
+
+    public Owner openAccount(long ownerId, String accountNumber)
+            throws BankException {
+        try {
+            log.debug("in EJB, about to open account for owner");
+            return teller.openAccount(ownerId, accountNumber);
+        }
+        catch (DAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error updating account", ex);
+            throw new BankException("internal error updating account:" + ex);
+        }
+    }
+
+    public void removeOwner(long ownerId) throws BankException {
+        try {
+            log.debug("in EJB, about to remove owner:" + ownerId);
+            teller.removeOwner(ownerId);
+        }
+        catch (DAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error updating account", ex);
+            throw new BankException("internal error updating account:" + ex);
+        }
+    }
+
+    public List<Owner> getOwners(int index, int count) throws BankException {
+        try {
+            log.debug("in EJB, about to get owners");
+            return teller.getOwners(index, count);
+        }
+        catch (DAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error updating account", ex);
+            throw new BankException("internal error updating account:" + ex);
+        }
+    }
+
+    public List<Owner> getOwnersLoaded(int index, int count) 
+        throws BankException {
+        List<Owner> owners = getOwners(index, count);
+        for(Owner owner : owners) {
+            for (Account account : owner.getAccounts()) {
+                account.getBalance(); //call a method to get loaded
+            }
+        }
+        return owners;
+    }
+    
+    public List<Owner> getOwnersPOJO(int index, int count) 
+        throws BankException {
+        List<Owner> ownersPOJO = new ArrayList<Owner>();
+        for(Owner owner : getOwners(index, count)) {
+            Owner ownerPOJO = new Owner(owner.getId());
+            ownerPOJO.setFirstName(owner.getFirstName());
+            ownerPOJO.setLastName(owner.getLastName());
+            ownerPOJO.setSsn(owner.getSsn());
+            for (Account account : owner.getAccounts()) {
+                Account accountPOJO = new Account(account.getId());
+                accountPOJO.setAccountNumber(account.getAccountNumber());
+                accountPOJO.deposit(account.getBalance());
+                ownerPOJO.getAccounts().add(accountPOJO);
+            }
+            ownersPOJO.add(ownerPOJO);
+        }
+        return ownersPOJO;
+    }
+
+    public List<OwnerDTO> getOwnersDTO(int index, int count) 
+        throws BankException {
+        List<OwnerDTO> ownersDTO = new ArrayList<OwnerDTO>();
+        for(Owner owner : getOwners(index, count)) {
+            OwnerDTO ownerDTO = new OwnerDTO(owner.getId());
+            ownerDTO.setFirstName(owner.getFirstName());
+            ownerDTO.setLastName(owner.getLastName());
+            ownerDTO.setAccounts(owner.getAccounts().size());
+            ownersDTO.add(ownerDTO);
+        }
+        return ownersDTO;
+    }
+
 }

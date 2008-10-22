@@ -2,15 +2,13 @@
             "http://www.w3.org/TR/html4/strict.dtd">
             
 <jsp:directive.page errorPage="/WEB-INF/content/ErrorPage.jsp"/>
-<jsp:directive.page import="ejava.examples.ejbsessionbank.dto.*"/>
+<jsp:directive.page import="ejava.examples.ejbsessionbank.bo.*"/>
 <html>
     <title>Ledger Display</title>
     <body>
         <h2>Ledger Display</h2>
         
-        <jsp:scriptlet>
-            LedgerDTO ledger = (LedgerDTO)request.getAttribute("ledger");
-        </jsp:scriptlet>
+        <jsp:scriptlet>Ledger ledger = (Ledger)request.getAttribute("ledger");</jsp:scriptlet>
         
         Number of Accounts: <%= ledger.getNumberOfAccounts() %><p/>
         Average Balance: <%= ledger.getAverageAssets() %><p/>

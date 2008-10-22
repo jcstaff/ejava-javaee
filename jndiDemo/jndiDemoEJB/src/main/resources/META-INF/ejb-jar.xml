@@ -8,6 +8,9 @@
     <enterprise-beans>
         <session>
             <ejb-name>AidScheduler</ejb-name>
+            <remote>ejava.examples.jndidemo.ejb.AidSchedulerRemote</remote>
+            <local>ejava.examples.jndidemo.ejb.AidSchedulerLocal</local>
+            <ejb-class>ejava.examples.jndidemo.ejb.AidSchedulerEJB</ejb-class>
             <env-entry>
                 <env-entry-name>vals/message</env-entry-name>
                 <env-entry-type>java.lang.String</env-entry-type>
@@ -23,7 +26,7 @@
                 <ejb-ref-name>ejb/hospital</ejb-ref-name>
                 <ejb-ref-type>Session</ejb-ref-type>
                 <local>ejava.examples.jndidemo.ejb.HospitalLocal</local>
-                <ejb-link>HospitalEJB</ejb-link>
+                <ejb-link>Hospital</ejb-link>
                 <injection-target>
                     <injection-target-class>
                         ejava.examples.jndidemo.ejb.AidSchedulerEJB
@@ -59,6 +62,13 @@
             <post-construct>
                 <lifecycle-callback-method>init</lifecycle-callback-method>
             </post-construct>
+        </session>
+        
+        <session>
+            <ejb-name>Hospital</ejb-name>
+            <remote>ejava.examples.jndidemo.ejb.HospitalRemote</remote>
+            <local>ejava.examples.jndidemo.ejb.HospitalLocal</local>
+            <ejb-class>ejava.examples.jndidemo.ejb.HospitalEJB</ejb-class>
         </session>
     </enterprise-beans>   
 </ejb-jar>

@@ -10,8 +10,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.ejbsessionbank.bl.BankException;
+import ejava.examples.ejbsessionbank.bl.Teller;
 import ejava.examples.ejbsessionbank.bo.Account;
-import ejava.examples.ejbsessionbank.dto.LedgerDTO;
+import ejava.examples.ejbsessionbank.bo.Ledger;
+import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
 public class TellerRemoteTest extends TestCase {
@@ -30,24 +32,45 @@ public class TellerRemoteTest extends TestCase {
     private void cleanup() throws Exception {
         if (jndi!=null) {
             TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
-            List<Account> accounts = teller.getAccounts(0, 100);
-            while (accounts.size() > 0) {
-                for(Account a: accounts) {
-                    log.debug("cleaning up account:" + a);
-                    if (a.getBalance() > 0) {
-                       a.withdraw(a.getBalance());
-                       teller.updateAccount(a);
+            if (jndi!=null) {
+                for (int index=0; ; index+=100) {
+                    List<Owner> owners = teller.getOwnersLoaded(index, 100);
+                    if (owners.size() == 0) { break; }
+                    for (Owner owner : owners) {
+                        log.debug("removing owner:" + owner);
+                        for (Account a: owner.getAccounts()) {
+                            zeroAccount(teller, a);
+                        }
+                        teller.removeOwner(owner.getId());
                     }
-                    else if (a.getBalance() < 0) {
-                        a.deposit(a.getBalance() * -1);
-                        teller.updateAccount(a);
-                    }
-                    teller.closeAccount(a.getAccountNumber());                        
                 }
-                accounts = teller.getAccounts(0, 100);
-            }                
+                
+                for (int index=0; ; index+= 100) {
+                    List<Account> accounts = teller.getAccounts(0, 100);
+                    if (accounts.size() == 0) { break; }
+                    for (Account a: accounts) {
+                        log.debug("cleaning up account:" + a);
+                        zeroAccount(teller, a);
+                        teller.closeAccount(a.getAccountNumber());                        
+                    }
+                }
+            }
         }
     }
+    
+    private void zeroAccount(
+            Teller teller, Account account) throws BankException {
+        log.debug("cleaning up account:" + account);
+        if (account.getBalance() > 0) {
+            account.withdraw(account.getBalance());
+           teller.updateAccount(account);
+        }
+        else if (account.getBalance() < 0) {
+            account.deposit(account.getBalance() * -1);
+            teller.updateAccount(account);
+        }
+    }
+
     
     public void testLookupTellerRemote() throws Exception {
         log.info("*** testLookupTellerRemote ***");
@@ -260,7 +283,7 @@ public class TellerRemoteTest extends TestCase {
                 teller.updateAccount(account);                
             }
 
-            LedgerDTO ledger = teller.getLedger();
+            Ledger ledger = teller.getLedger();
             assertNotNull("ledger is null", ledger);
             log.debug("got ledger:" + ledger);
             
@@ -286,7 +309,7 @@ public class TellerRemoteTest extends TestCase {
                 teller.updateAccount(account);                
             }
 
-            LedgerDTO ledger = teller.getLedger2();
+            Ledger ledger = teller.getLedger2();
             assertNotNull("ledger is null", ledger);
             log.debug("got ledger:" + ledger);
             

@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
-            <artifactId>ejbsessionBankDA</artifactId>
+            <artifactId>ejbsessionBankImpl</artifactId>
             <version>${pom.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -73,22 +73,7 @@
         </testResources>
 
         <plugins>
-              <!-- tell it to run, even though we are a pom project -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testResources</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-              <!-- make sure we are building java5 and tell it to compile, 
-                    even though we are a pom project -->
+              <!-- make sure we are building java5 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -96,19 +81,8 @@
                     <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>      
 
-            <!-- THE PROFILE-SPECIFIC DEPLOY WILL EXECUTE HERE -->
-
-              <!-- tell it to run, even though we are a pom project -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -123,17 +97,6 @@
                         </property>
                     </systemProperties>
                 </configuration>
-                        <!-- ignored:( running during test phase -->
-                <!--
-                <executions>
-                    <execution>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                -->
             </plugin>
 
         </plugins>      
@@ -219,11 +182,6 @@
                         <configuration>
                             <type>runtime</type>
                             <properties>
-                            <!-- uncomment and supply values for remote hosts
-                            <cargo.protocol>${jboss.protocol}</cargo.protocol>
-                            <cargo.hostname>${jboss.host}</cargo.hostname>
-                            <cargo.servlet.port>${jboss.servlet.port}</cargo.servlet.port>
-                            -->
                             <cargo.remote.username>${jboss.user}</cargo.remote.username>
                             <cargo.remote.password>${jboss.password}</cargo.remote.password>
                             </properties>

@@ -17,8 +17,17 @@
       <a href="http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee">
       http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee</a>.
       </p>
+      <p>
+      Legal Disclaimer: The information and opinions expressed within the
+      materials located on this site are the personal contributions of
+      Jim Stafford. Content published here is not reviewed or approved by
+      my employers (The Johns Hopkins University and SRA International)
+      before it is posted and does not necessarily represent the views
+      and opinions of my employers.
+      </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2008-10-21: Posted EJB Session Bean updates</li>
           <li>2008-10-12: Posted Callbacks and Listeners updates</li>
           <li>2008-10-12: Posted Inheritance updates</li>
           <li>2008-10-05: Posted Queries and EJB-QL updates</li>
@@ -31,6 +40,61 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>Look over the specification for project 2.</li>
+          <li>add an EJB module to your project.  Add the pom.xml
+          (make sure the packaging type=ejb) and a dependency on
+          your business logic. Add a src/main/java folder, and
+          src/main/resources/META-INF folder.</li>
+          <li>add the TestUtilRemote interface for the TestUtilEJB. Have
+          the first method be a simple ping() method that accepts and
+          returns no arguments.</li>
+          <li>add a @Stateless TestUtilEJB that implements the @Remote
+          interface. Add a @PostConstruct method that does nothing more
+          than print some debug.</li>
+          <li>add the ping() implementation method to the EJB.</li>
+          <li>build the EJB at the leaf level. Add the EJB module
+          to the parent pom.xml and re-build that that level as well.
+          Be sure to execute the mvn "install" goal to place the EJB
+          within the local repository.</li>
+
+          <li>add an EAR module to your project. Add the pom.xml
+          (make sure the packaging type=ear) and a dependency on
+          the EJB.</li>
+          <li>build the EAR at the leaf level. Add the EAR module 
+          to the parent pom.xml are re-build that level as well.
+          Be sure to execute the mvn "install" goal to place the EAR
+          within the local repository.</li>
+
+          <li>add an RMI Test module to your project. Add the pom.xml
+          (packaging type=jar) and a dependency on your EAR. Add the
+          cargo deployment configuration for the EAR. Add
+          a src/test/java folder.</li>
+          <li>Add the JNDI properties to the project to resolve the
+          JNDI tree.</li>
+          <li>add a JUnit test with a setUp() method that instantiates
+          an InitialContext and locates the @Remote interface of 
+          TestUtilEJB.</li>
+          <li>create a testMethod() to invoke the ping() method of
+          TestUtilEJB. Verify the debug output from the EJB is printed
+          to the JBoss console. Make conf/jboss-log4j.xml updates
+          to allow your DEBUG output to be displayed.</li>
+          
+          <li>Add a persistence.xml and EntityManager to your EJB
+          and verify you resolved the EntityManager within your 
+          @PostConstruct.</li>
+          <li>Add your TestUtilImpl business logic to the TestUtilEJB
+          and add an end-to-end test of the resetAll() logic using the
+          EntityManager.</li>
+          <li>Configure your EJB with a javax.sql.DataSource for ejavaDS
+          and implement an end-to-end test of populate().</li>
+
+          <li>Begin adding the other session beans, remote interfaces,
+          business logic integration, and RMI tests for project 2.</li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
           <li>Finish up project 1 and submit to the graders according
           to the submission criteria.</li>
           <li>Perform any desired post-submission refactoring of your 
@@ -39,10 +103,7 @@
           <li>Begin looking at ejbsessionBank example application; 
           which forms an EJB, EAR, RMI Test, as well as a WAR Client.
           These will be key component types within project 2.</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>Refactor or implement any necessary functionality using
           Queries and EJB-QL.</li>

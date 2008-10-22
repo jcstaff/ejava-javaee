@@ -1,10 +1,8 @@
 package ejava.examples.jndidemo.ejb;
 
-import javax.ejb.Local;
-
 import ejava.examples.jndidemo.Scheduler;
 
-@Local
+//@Local declared by ejb-jar.xml entry
 public interface HospitalLocal extends Scheduler {
 
 }

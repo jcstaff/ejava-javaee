@@ -1,9 +1,7 @@
 package ejava.examples.jndidemo.ejb;
 
-import javax.ejb.Remote;
-
 import ejava.examples.jndidemo.Scheduler;
 
-@Remote
+//@Remote declared by ejb-jar.xml entry
 public interface HospitalRemote extends Scheduler {
 }
