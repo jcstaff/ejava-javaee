@@ -7,15 +7,12 @@
   <moduleSets>
     <moduleSet>
       <includes>
-        <include>ejava.javaee.dao:daoJDBC</include>
-        <include>ejava.javaee.dao:daoJPA</include>
-        <include>ejava.javaee.orm:ormCore</include>
-        <include>ejava.javaee.orm:ormRelations</include>
-        <include>ejava.javaee.orm:ormInheritance</include>
-        <include>ejava.javaee.orm:ormEJBQL</include>
-        <include>ejava.javaee.web:webTier</include>
-        <include>ejava.javaee.ejb:ejbsessionBank</include>
-        <include>ejava.javaee.ejb:jndiScheduler</include>
+        <include>ejava.javaee.txreservation.txHotelBO</include>
+        <include>ejava.javaee.txreservation.txHotelDAO</include>
+        <include>ejava.javaee.txreservation.txHotelBLImpl</include>
+        <include>ejava.javaee.txreservation.txHotelEJB</include>
+        <include>ejava.javaee.txreservation.txHotelEAR</include>
+        <include>ejava.javaee.txreservation.txHotelTest</include>
       </includes>
       <sources>
         <outputDirectory>${artifactId}</outputDirectory>

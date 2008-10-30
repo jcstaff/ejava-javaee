@@ -8,16 +8,10 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ejava.javaee.txreservation</groupId>
-    <artifactId>txHotelDA</artifactId>
-    <name>Tx Hotel Data Access Tier</name>
+    <artifactId>txHotelBLImpl</artifactId>
+    <name>Tx Hotel Business Logic</name>
 
     <dependencies>
-        <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
         <dependency>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
@@ -28,6 +22,12 @@
         <dependency>
           <groupId>${pom.groupId}</groupId>
           <artifactId>txHotelBO</artifactId>
+          <version>${pom.version}</version>
+          <scope>compile</scope>
+        </dependency>
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>txHotelDAO</artifactId>
           <version>${pom.version}</version>
           <scope>compile</scope>
         </dependency>
@@ -73,12 +73,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                            <name>java.class.path</name>
-                            <value>target/classes</value>
-                        </property>
-                    </systemProperties>
                 </configuration>
             </plugin>            
         </plugins>    
@@ -137,7 +131,6 @@
                 </dependency>       
             </dependencies>
         </profile>
-
 
         <profile> <!-- defines our default persistence provider -->
             <id>hibernate</id>

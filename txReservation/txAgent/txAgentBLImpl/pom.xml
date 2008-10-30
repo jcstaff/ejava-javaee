@@ -1,15 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     
     <parent>
-        <artifactId>txHotel</artifactId>
+        <artifactId>txAgent</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
         <version>1.0.2008.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ejava.javaee.txreservation</groupId>
-    <artifactId>txHotelImpl</artifactId>
-    <name>Tx Hotel Business Logic</name>
+    <artifactId>txAgentBLImpl</artifactId>
+    <name>Tx Agent Business Logic</name>
 
     <dependencies>
         <dependency>
@@ -21,15 +21,35 @@
 
         <dependency>
           <groupId>${pom.groupId}</groupId>
-          <artifactId>txHotelBO</artifactId>
+          <artifactId>txAgentBO</artifactId>
           <version>${pom.version}</version>
           <scope>compile</scope>
         </dependency>
         <dependency>
           <groupId>${pom.groupId}</groupId>
-          <artifactId>txHotelDA</artifactId>
+          <artifactId>txAgentDAO</artifactId>
           <version>${pom.version}</version>
           <scope>compile</scope>
+        </dependency>
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>txHotelEJB</artifactId>
+          <version>${pom.version}</version>
+          <type>ejb-client</type>
+          <exclusions>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelEJB</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelBLImpl</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>${pom.groupId}</groupId>
+                <artifactId>txHotelDAO</artifactId>
+              </exclusion>
+          </exclusions>
         </dependency>
     
         <dependency>
@@ -73,6 +93,34 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
+                        <systemProperties>
+                            <property>
+                                <name>java.class.path</name>
+                                <value>target/classes</value>
+                            </property>
+                            <property>
+                              <name>hotel.jndi.url</name>
+                              <value>jnp://localhost:1099</value>
+                            </property>
+                            <property>
+                              <name>hotel.jndi.factory</name>
+                              <value>org.jnp.interfaces.NamingContextFactory</value>
+                            </property>
+                            <property>
+                              <name>hotel.jndi.pkgs</name>
+                              <value>org.jboss.naming:org.jnp.interfaces</value>
+                            </property>
+                            <property>
+                              <name>jndi.name.hotel</name>
+                              <value>ejava/examples/txhotel/RequiredEJB/remote
+                              </value>
+                            </property>
+                            <property>
+                              <name>jndi.name.hotelsession</name>
+                              <value>txHotelEAR/RequiredSessionEJB/remote
+                              </value>
+                            </property>
+                        </systemProperties>
                 </configuration>
             </plugin>            
         </plugins>    

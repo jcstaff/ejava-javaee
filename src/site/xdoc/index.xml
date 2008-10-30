@@ -27,6 +27,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2008-10-29: Posted EJB Transaction updates</li>
           <li>2008-10-21: Posted EJB Session Bean updates</li>
           <li>2008-10-12: Posted Callbacks and Listeners updates</li>
           <li>2008-10-12: Posted Inheritance updates</li>
@@ -40,6 +41,34 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>Add the remaining session beans, remote interfaces,
+          business logic to your eSales application and complete
+          eSales end-to-end testing from the RMI Test client.</li>
+          <li>Implement the eBidbit BLImpl using the @Remote interface
+          of the eSales EJB(s). You can either test using a 
+          stub implementation within eBidbotImpl or interface
+          with the eSalesEJB that is deployed on the server. 
+          Feel free to have this project depend on the eSalesEAR
+          already being deployed to the server to avoid redundant 
+          deployment work between the eSalesTest and eBidbotBLImpl
+          projects.</li>
+          <li>Implement the EJB tier for eBidbot. Attempt to reuse
+          your BOs as DTOs instead of creating new classes.</li>
+          <li>Finish end-to-end testing from an RMI Test client 
+          within the eBidbot project. You will need the full end-to-end
+          testing implemented within eBidbot to satisfy the end-to-end
+          testing dependency on both eSales and eBidbot.</li>
+          <li>Add @Transaction declarations</li>
+          <li>Implement the transaction test requirement. You may
+          want to place logic for the transaction test within 
+          the TestUtilEJB since you may end up undesirable business
+          logic in order to demonstrate the rollback of a transaction.
+          </li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
           <li>Look over the specification for project 2.</li>
           <li>add an EJB module to your project.  Add the pom.xml
           (make sure the packaging type=ejb) and a dependency on
@@ -90,10 +119,7 @@
 
           <li>Begin adding the other session beans, remote interfaces,
           business logic integration, and RMI tests for project 2.</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>Finish up project 1 and submit to the graders according
           to the submission criteria.</li>

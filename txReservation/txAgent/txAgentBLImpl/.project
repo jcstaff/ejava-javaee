@@ -1,18 +1,17 @@
 <projectDescription>
-  <name>txAgentImpl</name>
+  <name>txAgentBLImpl</name>
   <comment>This project is the root project for the example Java EE
         Application that makes use of JTA transactions and a RMI
         connection to another application.</comment>
   <projects>
-    <project>txHotelBO</project>
-    <project>txAgentDA</project>
     <project>txAgentBO</project>
+    <project>txHotelBO</project>
+    <project>txAgentDAO</project>
     <project>txHotelEJB</project>
   </projects>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
-      <arguments/>
     </buildCommand>
   </buildSpec>
   <natures>

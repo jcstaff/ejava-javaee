@@ -7,15 +7,12 @@
   <moduleSets>
     <moduleSet>
       <includes>
-        <include>ejava.javaee.dao:daoJDBC</include>
-        <include>ejava.javaee.dao:daoJPA</include>
-        <include>ejava.javaee.orm:ormCore</include>
-        <include>ejava.javaee.orm:ormRelations</include>
-        <include>ejava.javaee.orm:ormInheritance</include>
-        <include>ejava.javaee.orm:ormEJBQL</include>
-        <include>ejava.javaee.web:webTier</include>
-        <include>ejava.javaee.ejb:ejbsessionBank</include>
-        <include>ejava.javaee.ejb:jndiScheduler</include>
+        <include>ejava.javaee.txreservation.txAgentBO</include>
+        <include>ejava.javaee.txreservation.txAgentDAO</include>
+        <include>ejava.javaee.txreservation.txAgentBLImpl</include>
+        <include>ejava.javaee.txreservation.txAgentEJB</include>
+        <include>ejava.javaee.txreservation.txAgentEAR</include>
+        <include>ejava.javaee.txreservation.txAgentTest</include>
       </includes>
       <sources>
         <outputDirectory>${artifactId}</outputDirectory>

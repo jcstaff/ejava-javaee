@@ -50,13 +50,13 @@
 
         <dependency>
           <groupId>${pom.groupId}</groupId>
-          <artifactId>txAgentImpl</artifactId>
+          <artifactId>txAgentBLImpl</artifactId>
           <version>${pom.version}</version>
           <scope>compile</scope>
         </dependency>
         <dependency>
           <groupId>${pom.groupId}</groupId>
-          <artifactId>txAgentDA</artifactId>
+          <artifactId>txAgentDAO</artifactId>
           <version>${pom.version}</version>
           <scope>compile</scope>
         </dependency>
@@ -72,11 +72,11 @@
               </exclusion>
               <exclusion>
                 <groupId>${pom.groupId}</groupId>
-                <artifactId>txHotelImpl</artifactId>
+                <artifactId>txHotelBLImpl</artifactId>
               </exclusion>
               <exclusion>
                 <groupId>${pom.groupId}</groupId>
-                <artifactId>txHotelDA</artifactId>
+                <artifactId>txHotelDAO</artifactId>
               </exclusion>
           </exclusions>
         </dependency>
