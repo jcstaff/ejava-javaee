@@ -3,7 +3,21 @@
   <formats>
     <format>jar</format>
   </formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <includes>
+        <include>ejava.javaee.webtier:webtierBO</include>
+        <include>ejava.javaee.webtier:webtierBL</include>
+        <include>ejava.javaee.webtier:webtierDA</include>
+        <include>ejava.javaee.webtier:webtierJPA</include>
+        <include>ejava.javaee.webtier:webtierWAR</include>
+      </includes>
+      <sources>
+        <outputDirectory>${artifactId}</outputDirectory>
+      </sources>
+    </moduleSet>
+  </moduleSets>
   <fileSets>
       <fileSet>
           <includes>
