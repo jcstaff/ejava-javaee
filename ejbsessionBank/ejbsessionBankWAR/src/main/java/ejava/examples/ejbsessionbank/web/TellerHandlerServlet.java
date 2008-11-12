@@ -50,15 +50,15 @@ public class TellerHandlerServlet extends HttpServlet {
      * This will get automatically injected when running within the 
      * application server with the TellerEJB.
      */
-    //not working:( 
-    //@javax.ejb.EJB(name="ejb/teller", 
-    //     beanName="TellerEJB", 
-    //     beanInterface=TellerLocal.class,
-    //     mappedName="ejava/examples/ejbsessionbank/TellerEJB/local")
-    //not working either:((
-    @Resource(name="ejb/teller", 
-         type=TellerLocal.class,
+    //not working:(
+    @javax.ejb.EJB(name="ejb/teller", 
+         beanName="TellerEJB", 
+         beanInterface=TellerLocal.class,
          mappedName="ejava/examples/ejbsessionbank/TellerEJB/local")
+    //not working either:((
+    //@Resource(name="ejb/teller", 
+    //     type=TellerLocal.class,
+    //     mappedName="ejava/examples/ejbsessionbank/TellerEJB/local")
     private Teller teller;
 
     /**
