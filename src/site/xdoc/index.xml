@@ -27,6 +27,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2008-11-18: Posted JMS and Async updates</li>
           <li>2008-11-11: Posted Security updates</li>
           <li>2008-11-04: Posted WEB Tier updates</li>
           <li>2008-10-29: Posted EJB Transaction updates</li>
@@ -43,9 +44,25 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-          <li>Finish project 2 and e-mail to graders.</li>
+          <li>Finish security configuration, implementation, and testing</li>
+          <li>Add JMS configuration file to JBoss server. Be sure
+          to keep a copy in your source tree and refer to file in 
+          project README if you don't auto-deploy the file.</li>
+          <li>Design your JMS message type(s). Write and test a utility
+          class that publishes the messages. If this class ideally
+          would be plaved in with the BLImpl classes. However, if
+          it publishes DTO classes, the DTOs may have to get moved in
+          with the BO project to satisfy dependency constraints.</li>
+          <li>Implement a Java SE Client to receive and log the JMS
+          messages. This client can be placed in BLImpl, must use a
+          selector, and be launchable by the grader using an Ant script.
+          The Ant script can be part of either the BLImpl or RMI Test
+          project. See class examples on how write the Ant script.</li>
       </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
           <li>Start project 3</li>
           <li>Add user.properties and roles.properties to eSales project</li>
           <li>Assign EJB to security-domain "other".
@@ -68,10 +85,7 @@
           means is to obtain through the EJB or WARs security context. Note
           that eBidbot will still need to pass the userId for bids. However,
           it should run-as a esales-trusted user.</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>Finish implementing the remainder of the remote methods,
           adding DTOs where necessary, and testing from the RMI Client</li>

@@ -48,11 +48,13 @@
                     <description>
                         Example Session Bean Bank Application
                     </description>
-                    <webModule>
-                        <groupId>${pom.groupId}</groupId>
-                        <artifactId>ejbsessionBankWAR</artifactId>
-                        <contextRoot>ejbsessionbank</contextRoot>
-                    </webModule>
+                    <modules>
+                        <webModule>
+                            <groupId>${pom.groupId}</groupId>
+                            <artifactId>ejbsessionBankWAR</artifactId>
+                            <contextRoot>ejbsessionBank</contextRoot>
+                        </webModule>
+                    </modules>
                 </configuration>
             </plugin>
         </plugins>
