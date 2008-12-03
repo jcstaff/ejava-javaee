@@ -25,7 +25,9 @@ public class SecurePingRemoteTest extends TestCase {
     InitialContext jndi;
     String jndiName = System.getProperty("jndi.name.secureping");
     String adminUser = System.getProperty("admin.username");
+    String adminPassword = System.getProperty("admin.password");
     String userUser = System.getProperty("user.username");
+    String userPassword = System.getProperty("user.password");
     String jmxUser = System.getProperty("jmx.username");
     String jmxPassword = System.getProperty("jmx.password");
     
@@ -53,12 +55,12 @@ public class SecurePingRemoteTest extends TestCase {
         userLogin = new BasicCallbackHandler();
         log.debug("using user username=" + userUser);
         ((BasicCallbackHandler)userLogin).setName(userUser);
-        ((BasicCallbackHandler)userLogin).setPassword("password");
+        ((BasicCallbackHandler)userLogin).setPassword(userPassword);
 
         adminLogin = new BasicCallbackHandler();
         log.debug("using admin username=" + adminUser);
         ((BasicCallbackHandler)adminLogin).setName(adminUser);
-        ((BasicCallbackHandler)adminLogin).setPassword("password");
+        ((BasicCallbackHandler)adminLogin).setPassword(adminPassword);
         
         jmxLogin = new BasicCallbackHandler();
         log.debug("using jmx username=" + jmxUser);

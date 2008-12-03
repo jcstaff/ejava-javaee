@@ -27,6 +27,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2008-12-02: Posted Async TODOs</li>
           <li>2008-11-18: Posted JMS and Async updates</li>
           <li>2008-11-11: Posted Security updates</li>
           <li>2008-11-04: Posted WEB Tier updates</li>
@@ -44,6 +45,20 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>Add an EJBTimer to eSales to check for expired auctions.</li>
+          <li>Integrate your JMS message publishing into your 
+          eSales session bean(s) to pubished results of completed auctions.</li>
+          <li>Add an MDB to eBidbot to close out orders for completed auctions.</li>
+          <li>Add an EJBTimer to eBidbot to check for open auctions to bid on.</li>
+      </ul>
+      <ul>
+          <li>Complete any remaining parts of the project, create the README,
+          test your project submission locally, and turn in your project.</li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
           <li>Finish security configuration, implementation, and testing</li>
           <li>Add JMS configuration file to JBoss server. Be sure
           to keep a copy in your source tree and refer to file in 
@@ -58,10 +73,7 @@
           selector, and be launchable by the grader using an Ant script.
           The Ant script can be part of either the BLImpl or RMI Test
           project. See class examples on how write the Ant script.</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>Start project 3</li>
           <li>Add user.properties and roles.properties to eSales project</li>
