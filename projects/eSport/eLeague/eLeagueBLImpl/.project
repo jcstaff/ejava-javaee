@@ -1,19 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>eLeagueBLImpl</name>
-  <comment>This project provides a sparse example of how to setup an ingest and 
+	<name>eLeagueBLImpl</name>
+	<comment>This project provides a sparse example of how to setup an ingest and 
         command line clients for the class project.</comment>
-  <projects>
-    <project>eLeagueDTO</project>
-    <project>eLeagueDAO</project>
-    <project>eLeagueTestUtil</project>
-    <project>eLeagueBO</project>
-  </projects>
-  <buildSpec>
-    <buildCommand>
-      <name>org.eclipse.jdt.core.javabuilder</name>
-    </buildCommand>
-  </buildSpec>
-  <natures>
-    <nature>org.eclipse.jdt.core.javanature</nature>
-  </natures>
+	<projects>
+		<project>eLeagueBO</project>
+		<project>eLeagueDAO</project>
+		<project>eLeagueDTO</project>
+		<project>eLeagueTestUtil</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
 </projectDescription>

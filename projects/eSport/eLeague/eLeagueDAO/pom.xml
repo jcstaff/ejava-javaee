@@ -3,7 +3,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eSport</groupId>
         <artifactId>eLeague</artifactId>
-        <version>1.0.2007.2</version>
+        <version>1.0.2009.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -132,23 +132,27 @@
                     <name>!jpa</name>
                 </property>
             </activation>
+
+           <!-- needed to resolve some hibernate dependencies -->
+            <repositories>
+                <repository>
+                    <id>jboss-repo</id>
+                    <name>JBoss Maven Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
+            </repositories>
+
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate</artifactId>
-                    <version>3.2.1.ga</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-annotations</artifactId>
-                    <version>3.2.1.ga</version>
+                    <version>3.2.4.sp1</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.2.1.ga</version>
+                    <version>3.3.1.ga</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

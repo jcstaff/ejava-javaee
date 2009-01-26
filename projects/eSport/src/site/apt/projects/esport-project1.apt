@@ -1,6 +1,6 @@
 Project1: eSport Data Access Tier and Initial Business Logic
 
-    9/17/2007
+    01/24/2009
 
 * Goals
 
@@ -31,7 +31,7 @@ Project1: eSport Data Access Tier and Initial Business Logic
 * Business Description
 
     eLeague is planning an on-line league site that will allow league
-    coordinators to organize teams into divisions, schedule contents,
+    coordinators to organize teams into divisions, schedule contests,
     and track scores. At the same time, eClub is planning an on-line club
     management site that will allow clubs to organize players, coaches,
     and managers into teams. eClub is designing their software such that it
@@ -62,6 +62,8 @@ Project1: eSport Data Access Tier and Initial Business Logic
     a manager, and players. The team and team points of contact will
     be used to form a registration with eLeague. From the club site, a team
     can get roster information, game schedules, and division standings.
+    The schedules and division standings are obtained from eLeague and 
+    and are not duplicated within eClub to make sure they are up to date.
 
     Both eLeague and eClub have come to you to develop the initial phase
     of their applications. They are expecting the core capability of
@@ -73,27 +75,30 @@ Project1: eSport Data Access Tier and Initial Business Logic
 
 * Technical Overview
 
-    The work done during this project focuses on the business
-    objects (BOs), the data access objects (DAOs) of the data access
-    tier, and some initial business logic interfaces (BL) and business
-    logic implementations (BLImpl). There will be two sets of DAO
-    implementations; one based on the JDBC API (for eLeague only) and a
-    second based the one the Java Persistence API (JPA; for both eLeague
-    and eClub). There will only be a single version of the business logic
-    implementations (BLImpl). 
+    The work done during this project will focus on the business objects
+    (BOs), the data access objects (DAOs) of the data access tier,
+    and some initial business logic (BL). There will be two sets of DAO
+    implementations; one based on the JDBC API and a second based the one
+    the Java Persistence API (JPA). There will only be a single version
+    of the business logic implementation (BLImpl). How you partition the
+    implementations into separate physical sub-projects is up to you.
+    A suggested starting point is provided at the end of this project 
+    description.
     
-    How you partition the implementations into separate physical
-    sub-projects is up to you.  Since the work is for separate
-    applications, we will need to establish two separate application
-    projects for this work; eLeague and eClub.  The development can
-    physically share resources (e.g., same database and application
-    server), but should be easily separated. It is suggested that you
-    form a root for the overall eSport work to coordinate integration
-    testing, and then group the lower-level work under two child projects;
-    eLeague and eClub.  See some suggested project layouts at the bottom
-    of this specification.  A sample set of projects that implement a
-    thin eLeague thread will also be made available shortly after the
-    project description is posted.
+    Since the work is for separate applications, we will need to establish
+    two separate application projects for this work; eLeague and eClub.
+    The development can physically share resources (e.g., same database
+    and application server), but should be easily separated. It is
+    suggested that you form a root for the overall eSport work to
+    coordinate integration testing, and then group the lower-level
+    work under two child projects; eLeague and eClub.  See some
+    suggested project layouts at the bottom of this specification.  A
+    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eSport/}
+    sample set of projects}} that implement a thin eLeague thread has
+    been meade available. Please ignore the TestData sub-project when
+    using the example to craft your source tree. You will depend on
+    projects within that tree -- not reimplement them and not copy
+    them.
 
     The business objects encapsulate the core business data and rules
     of the application. You will design the business objects and then
@@ -104,7 +109,8 @@ Project1: eSport Data Access Tier and Initial Business Logic
     Delete) capability with JPA. You will be required to encapsulate
     all object to relational (O/R) mapping within the DAOs, descriptor
     files, and business object annotations.  You will be given a set of
-    test data to initially populate your applications and be the source
+    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eSport/eSportData/eLeagueTestUtil/src/main/resources/xml/}
+    test data}} to initially populate your applications and be the source
     of data for the ingest requirement.  This will be provided with the
     sample project thread mentioned above.
 
@@ -124,7 +130,7 @@ Project1: eSport Data Access Tier and Initial Business Logic
     functionality to the business objects and full O/R responsibility
     to the DAOs. eLeague will have an ingest requirement as well as the
     requirement to manipulate and add to what was ingested. eClub will
-    start fresh and and coordinate with eLeague for content. However, for
+    start fresh and coordinate with eLeague for content. However, for
     project 1, eClub will be unable to fully implement business logic
     that requires coordination with eLeague through its (project 2)
     remote interface. Some of that must be stubbed at this point. You are 
@@ -136,15 +142,33 @@ Project1: eSport Data Access Tier and Initial Business Logic
     a set of functional test that takes the business logic, data access
     tier, and business objects through  a set of specified, end-to-end
     use cases.
+
+* Assembly Overview
+
+    Since the work is for separate applications, we will need to establish
+    two separate application projects for this work; eLeague and eClub.
+    The development can physically share resources (e.g., same database and
+    application server), but should be easily separated. It is suggested
+    that you form a root for the overall eSport work to coordinate
+    integration testing, and then group the lower-level work under two
+    child projects; eLeague and eClub. 
     
+        [Note:] The root eSport project should be very thin and should
+        not have a dependency on the instructor's class examples. Doing
+        so will add unnecessary web site publishing complications to your
+        project that are only needed by posted class examples.
+
+    See the Getting Started section towards the end of this specification
+    for a more detailed sample project layout.
+
     [Note:] Since the class will be producing parallel implementations for
     the applications and submitting them for evaluation, it is asked
-    that you replace the "e" in eSport, eLeague, and eClub with a
+    that you replace the "e" in eMarket, eSales, and eBidbot with a
     unique name that corresponds to your newsgroup or college login
-    (ex. ejavaguySport, ejavaguyLeague, ejavaguyClub -or- jcstaffSport,
-    jcstaffLeague, jcstaffClub). You should also use this same pattern for
-    java packages (ex. ejavaguy.league, ejavaguy.club -or-
-    jcstaff.league, jcstaff.club), JNDI names, DB tables, etc.
+    (ex. ejavaguyMarket, ejavaguySales, ejavaguyBidbot -or- jcstaffMarket,
+    jcstaffSales, jcstaffBidbot). You should also use this same pattern for
+    java packages (ex. ejavaguy.sales, ejavaguy.bidbot -or-
+    jcstaff.sales, jcstaff.bidbot), JNDI names, DB tables, etc.
 
     [Note:] There should be no use of System.out.println() in the code and all
     implementations must use the jakarta commons logging API with the 
@@ -808,8 +832,7 @@ Project1: eSport Data Access Tier and Initial Business Logic
 
         [[b]] Design and implement an Ingestor that will use an externally
         provided parser to obtain business data for eLeague and use the JDBC
-        Ingest DAO to populate the database. You will be provided the
-        parser when the test data and sample project thread is posted.
+        Ingest DAO to populate the database. 
 
         []
 
@@ -820,13 +843,14 @@ Project1: eSport Data Access Tier and Initial Business Logic
     Persistence API (JPA). These DAOs will support all standard CRUD
     operations and can optionally implement the same interface as other
     potential DAO implementations. The implementation can make liberal use
-    of JPA @Annotations, descriptor files, or a combination of both. Your 
+    of JPA @Annotations, descriptor files, or a combination of both. Your
     interface should encapsulate the fact that an EntityManager is being
     used and the same EntityManager should be shared among other DAOs in
     the same Thread. Using either (a crude form of) dependency injection
-    or ThreadLocal can be quite useful here. Your DAOs should not attempt
-    to control the transaction or they will <NOT> be portable to the EJB
-    tier.
+    or ThreadLocal can be quite useful here. However, you will find
+    that dependency injection works easiest in most cases.  Your DAOs
+    should not attempt to control the transaction or they will <NOT>
+    be portable to the EJB tier.
 
         [[A]] eLeague DAOs
 
@@ -978,6 +1002,9 @@ Project1: eSport Data Access Tier and Initial Business Logic
                 a known state prior to running a test. This may delegate
                 to the LeagueIngestor.
 
+                * get/doXXX - methods that are unsafe for the actual
+                business logic, but are needed for development and test.
+
             [[a]] LeagueIngestor - the Ingestor written as a part of a separate
             requirement is also logically considered part of this tier.
             
@@ -1042,6 +1069,9 @@ Project1: eSport Data Access Tier and Initial Business Logic
                 * populate - it may be helpful to return the database to
                 a known populated state between tests.
 
+                * get/doXXX - methods that are unsafe for the actual
+                business logic, but are needed for development and test.
+
                 []
 
             []
@@ -1085,15 +1115,10 @@ Project1: eSport Data Access Tier and Initial Business Logic
 
         * addTeam (using ClubMgmtImpl)
 
-        * updateContact form team (using ClubMgmtImpl)
+        * updateContact for team (using ClubMgmtImpl)
 
-        * addSeason (using LeagueMgmtImpl)
-
-        * addDivision for current season (using LeagueMgmtImpl)
-
-        * updateContact division (using LeagueMgmtImpl)
-
-        * assignTeamDivision (using ClubMgmtImpl)
+        * assignTeamDivision (using ClubMgmtImpl) - divisions already
+        exist for current/next season within the test data.
 
         * scheduleSeason (using ContestMgmtImpl)
 
@@ -1114,6 +1139,8 @@ Project1: eSport Data Access Tier and Initial Business Logic
     [[1]] Provide a set of JUnit test programs to verify the following
     end-to-end scenario in eClub.  This test should be implemented as
     a JUnit test and packaged with the business logic implementation.
+    Note that it is anticipated that you may only have time to create
+    one team, with one player, manager, parent, and coach for the club.
 
         * createParent (MemberMgmtImpl)
 

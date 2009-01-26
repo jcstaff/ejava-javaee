@@ -94,8 +94,8 @@ Exercise 0: Development Environment Setup
     will be hiding in Sun/AppServer/jdk/bin.
 
     [[1]] Change the installation directory so that it does not have
-    a spaces in its path. I changed mine to C:\apps\jdk1.5.0_16\ and
-    C:\apps\jre1.5.0_16\
+    a spaces in its path. I changed mine to C:\apps\java\jdk1.5.0_17\ and
+    C:\apps\java\jre1.5.0_17\
 
     [[1]] Go through Control Panel -> System -> Advanced -> Environment
     Variables and add ia definition for JAVA_HOME and add jdk/bin to your path.
@@ -152,6 +152,12 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             commiting changes to the baseline. You will not be doing this during class.
             This the file browser options mentioned above are more pertinent for class
             use.
+
+            [Note:] You can checkout the class examples using any of the SVN clients
+            above. However, if you use multiple subversion clients (e.g., mix the
+            usage of ToortuiseSVN with Subclipse), you need to make sure the 
+            products implement the same client version. I have found that TortoiseSVN
+            tends to have a baseline release ahead of many of the other clients.
 
         [[1]] Test out your subversion installation by performing a checkout
         of the ejava-javaee course files. 
@@ -218,7 +224,7 @@ At revision 24.
 ---
 
     [[1]] Add JAVA_HOME to your environment (maven will try to execute
-    $JAVA_HOME/bin/java. On Windows, I set mine to c:/apps/jdk1.5.0_14
+    $JAVA_HOME/bin/java. On Windows, I set mine to c:/apps/java/jdk1.5.0_17
 
     [[1]] Execute "mvn -version" as a test.
 
@@ -226,9 +232,9 @@ At revision 24.
 $ which mvn
 /cygdrive/c/apps/apache-maven-2.0.9/bin/mvn
 
-$ mvn --version
+$ mvn -version
 Maven version: 2.0.9
-Java version: 1.5.0_16
+Java version: 1.5.0_17
 OS name: "windows xp" version: "5.1" arch: "x86" Family: "windows"
 ---
 
@@ -345,14 +351,16 @@ l:plexus-compiler-api:jar:1.5.2
     by default, starting with 4.2. You will notice a jdk6 version. If you 
     read the release notes, you'll see that the jdk5 version is considered
     the most stable version and JBoss requires extra setup to get to work
-    under JavaSE 6. Please download the stanard/jdk5 version (has no 
-    jdk suffix).
+    under JavaSE 6. Please download the standard/jdk5 version (has no 
+    jdk suffix). You will also notice that JBoss 5.0 has been released. 
+    This is a major release for JBoss and has only recently been released
+    in a 5.0.0 revision. Please use version 4.2.3GA (with JDK 5). We know
+    where most of the strong points and issues are with that release.
 
     [[1]] On Windows, I unzipped mine to c:/apps to avoid having any spaces in the
-    path. This produced a directory called c:/apps/jboss-4.2.2.GA.
-    I renamed the directory to c:/apps/jboss to keep the name simple. 
+    path. This produced a directory called c:/apps/jboss-4.2.3.GA.
 
-    [Note:] If you choose a directory other than c:/apps/jboss, make sure to 
+    [Note:] If you choose a directory other than c:/apps/jboss-4.2.3.GA, make sure to 
     update the value for jboss.home in the MAVEN %HOME%/.m2/settings.xml file.
 
     []
@@ -360,7 +368,7 @@ l:plexus-compiler-api:jar:1.5.2
     [[1]] We'll be using the "default" server.
 
 ---
-$ ls c:/apps/jboss/server/default
+$ ls c:/apps/jboss-4.2.3.GA/server/default
 conf  deploy  lib
 ---
 
@@ -382,23 +390,23 @@ conf  deploy  lib
         []
 
 ---
-$ c:/jboss/bin/run.sh
+$ c:/apps/jboss-4.2.3.GA/bin/run.sh
 ---
 ---
-01:12:52,296 INFO  [STDOUT] [Server@1479ef9]: Initiating startup sequence...
-01:12:55,015 INFO  [STDOUT] [Server@1479ef9]: Server socket opened successfully in 2640 ms.
-01:12:55,296 INFO  [STDOUT] [Server@1479ef9]: Database [index=0, id=1, db=file:C:\jboss\server\default\data\hypersonic\ejava, alias=] opened sucessfully in 250
-ms.
-01:12:55,359 INFO  [STDOUT] [Server@1479ef9]: Startup sequence completed in 2984 ms.
- 01:12:55,390 INFO  [STDOUT] [Server@1479ef9]: 2006-09-02 01:12:55.390 HSQLDB ser ver 1.8.0 is online
- 01:12:55,609 INFO  [STDOUT] [Server@1479ef9]: To close normally, connect and exe cute SHUTDOWN SQL
- 01:12:55,625 INFO  [STDOUT] [Server@1479ef9]: From command line, use [Ctrl]+[C] to abort abruptly
+ 10:07:18,953 INFO  [STDOUT] [Server@12a2259]: Initiating startup sequence...
+ 10:07:18,953 INFO  [STDOUT] [Server@12a2259]: Server socket opened successfully in 0 ms.
+ 10:07:19,484 INFO  [STDOUT] [Server@12a2259]: Database [index=0, id=0,
+ db=file:C:\apps\jboss-4.2.3.GA\server\default\data\hypersonic\ejava, alias=] opened sucessfully in 531 ms.
+ 10:07:19,484 INFO  [STDOUT] [Server@12a2259]: Startup sequence completed in 531 ms.
+ 10:07:19,484 INFO  [STDOUT] [Server@12a2259]: 2009-01-25 10:07:19.484 HSQLDB server 1.8.0 is online
+ 10:07:19,484 INFO  [STDOUT] [Server@12a2259]: To close normally, connect and execute SHUTDOWN SQL
+ 10:07:19,484 INFO  [STDOUT] [Server@12a2259]: From command line, use [Ctrl]+[C] to abort abruptly
 ---
 
     [[1]] Start the database UI to verify that the database is up.
 
 ---
-$ java -classpath c:/apps/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+$ java -classpath c:/apps/jboss-4.2.3.GA/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
     [[1]] Select HSQL Database Engine Server from the "Type" pulldown. 
@@ -408,8 +416,8 @@ $ java -classpath c:/apps/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.Da
     [Note:] You can run just the database application by executing the following.
 
 ---
-> cd c:/apps/jboss/server/default/data/hypersonic
-> java -classpath c:/apps/jboss/server/default/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+> cd c:/apps/jboss-4.2.3.GA/server/default/data/hypersonic
+> java -classpath c:/apps/jboss-4.2.3.GA/server/default/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     []    
@@ -489,12 +497,14 @@ Server shutdown may take a while - check logfiles for completion
         was just an unzip, there was nothing automatically added to your
         start menu.
 
-    [[1]] I found that Eclipse 3.3 is no longer intelligently
-    ignoring subversion directories when it builds. You may see
-    complaints about duplicate resources not copied for .svn
-    files checked out of the class repository. If that happens,
+    [[1]] If you see complaints about duplicate resources not copied for .svn
+    files checked out of the class repository, 
     go to Window->Preferences->Java->Compiler->Building->"Filtered
-    Resources". Add ",.svn/" to the list.
+    Resources". Add ",.svn/" to the list. Mine ended up looking like the following
+
+---
+Filtered Resources: *.launch,.svn/
+---
 
     [[1]] Install the Maven Integration for Eclipse Plug-in to allow maven
     builds to be kicked off within Eclipse. Core documentation is located 
@@ -504,7 +514,7 @@ Server shutdown may take a while - check logfiles for completion
 
         * Open Help -> Software Updates -> Available Software (tab)
 
-        * Click "Add Site..." and enter "http://m2eclipse.codehaus.org/update/site.xml"
+        * Click "Add Site..." and enter "http://m2eclipse.sonatype.org/update/ 
 
         * Check "Maven Integration" and click "Install..."
 
@@ -513,7 +523,38 @@ Server shutdown may take a while - check logfiles for completion
     [Note:] You will notice other packages that are available for update.
     Update these packages if you wish. Remember that it is very easy to get back to
     a clean installation if something goes terribly wrong.
+
+    []
+
+    [[1]] I received a warning that the Maven Integration required Eclipse be
+    running with a JDK. I updated my Windows shortcut to the following. Adding
+    the option within eclipse.ini did not work for me.
+
+---
+Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.5.0_17\bin
+---
+
+    [[1]] I also registered the JDK as a JRE to be used.
+
+        * Preferences -> Java -> Installed JREs -> Add...
+
+        * JRE home: c:\apps\java\jdk1.5.0_17
+
+        * Finish
+
+        * OK
         
+
+    [[1]] Register the MAVEN_HOME as an External installation. This
+    configuration is required when working with plugins that significantly
+    change the classpath of the build environment.
+
+        * Window -> Preferences -> Maven.Installations -> Add...
+
+        * (enter MAVEN_HOME location)
+
+        * OK
+
 * {Part G}: Download and install Ant Build Tool
 
         [Note:] I use Ant as a portable scripting tool for interactive demos. You will 

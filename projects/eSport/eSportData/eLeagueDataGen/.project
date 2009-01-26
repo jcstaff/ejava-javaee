@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>eLeagueDataGen</name>
+	<comment>This project builds the test data sets for the eLeague system. It
+        connects to an externally defined database, maps the database
+        directly to eLeague DTO classes, and outputs a set of XML files to
+        be used by the project&apos;s parser during the student ingest. This
+        project cannot be run without a remote connection to the test
+        database. Thus it is not expected to be used by the class.</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+</projectDescription>

@@ -15,6 +15,35 @@ Exercise 1: First Simple Application
 
 ** Steps
 
+    [Note:] Maven/Eclipse integration is probably the most volatile 
+    aspects of the environment. 
+    The Maven side is handled by the
+    {{{http://maven.apache.org/plugins/maven-eclipse-plugin/}
+    Apache Maven Eclipse Plugin}}.
+    The Eclipse side is handled by a set of competing plug-ins that
+    get installed into Eclipse; m2eclipse/M2E and q4e/IAM.  The 
+    {{{http://m2eclipse.codehaus.org/} m2eclipse plugin}}
+    is going through
+    considerable changes and is in the process of becoming an 
+    {{{http://www.eclipse.org/m2e/} Eclipse project (M2E)}}
+    There is an alternative offered by
+    {{{http://code.google.com/p/q4e/} Google's q4e}}
+    , which is soon to be
+    {{{http://www.eclipse.org/iam/} Eclipse IAM}}. A comparison of 
+    the various options is located on the 
+    {{{http://docs.codehaus.org/display/MAVENUSER/Eclipse+Integration}
+    Codehaus Wiki}}. We will be using a combination of the Maven
+    Eclipse Plugin and m2eclipse. The current documentation for
+    m2eclipse makes no mention of using the Eclipse Plugin, but
+    I found that it was necessary to get "src" directories correctly
+    specified during project import. The m2eclipse plugin now no 
+    longer supports normal project imports and external tools. It 
+    must be imported specifically as a maven project and all actions
+    are invoked through the Run... capability.
+
+    []
+
+
 *** {Section A}: Register your JDK as a JRE option for running maven 
     plugin commands.
 
@@ -27,7 +56,7 @@ Exercise 1: First Simple Application
         * Select "Add.." for a Standard VM
 
         * Select your JDK instance for the JRE Home. This was 
-        c:/apps/jdk1.5.0_16 on my system.
+        c:/apps/jdk1.5.0_17 on my system.
 
         * You may optionally set this as the default. However, we
         will specifically point to this later.
@@ -47,15 +76,16 @@ Exercise 1: First Simple Application
         
         [Note:] Any changes to the project dependencies you make within
         Eclipse are not updated in the pom.xml. Use the pom.xml file
-        to specify all project dependencies.
+        to specify all project dependencies and refresh your Eclipse
+        project to see the changes.
 
         [Note:] Documentation on this plugin is located at the
         {{{http://maven.apache.org/plugins/maven-eclipse-plugin/overview.html}
         Maven Eclipse Plugin Site}}
 
 
-    [[1]] Go to the project base directory an execute the eclipse:eclipse
-    goal. 
+    [[1]] Go to the project base directory an execute the eclipse:m2eclipse
+    goal. Note that this is different from the older eclipse:eclipse goal.
     
         [Note:] You'll see a download of the eclipse-plugin and a large 
         number of dependencies the first time you execute the
@@ -69,35 +99,44 @@ Exercise 1: First Simple Application
         internet on my laptop. However, I am careful to execute targets
         ahead of time to make sure I have what I need before I disconnect.
 
-        [Note:] The eclipse plugin will also attempt to download the 
-        source code, if it exsists, for your dependency projects. This is
-        helpful if you wish to step through the dependency within the
-        debugger. We don't need to step through our dependencies in this 
-        case, so don't worry about the message abount -DdownloadSources.
-
         []
 
 ---
-> mvn eclipse:eclipse
-
-...
-
-Downloading: http://repo1.maven.org/maven2/log4j/log4j/1.2.13/log4j-1.2.13.jar
-349K downloaded
-[INFO] Wrote settings to C:\jhu\784\ex1\.settings\org.eclipse.jdt.core.prefs
-[INFO] Wrote Eclipse project for "ex1" to c:\jhu\784\ex1.
+$ mvn eclipse:m2eclipse
+[INFO] Scanning for projects...
+[INFO] Searching repository for plugin with prefix: 'eclipse'.
+[INFO] ------------------------------------------------------------------------
+[INFO] Building My First Simple Project
+[INFO]    task-segment: [eclipse:m2eclipse]
+[INFO] ------------------------------------------------------------------------
+[INFO] Preparing eclipse:m2eclipse
+[INFO] No goals needed for project - skipping
+[INFO] [eclipse:m2eclipse]
+[INFO] Using source status cache: c:\proj\ejava-javaee\working\solutions\ex1\target\mvn-eclipse-cache.properties
+[INFO] Using as WTP server : null
+[INFO] Wrote settings to C:\proj\ejava-javaee\working\solutions\ex1\.settings\org.eclipse.jdt.core.prefs
+[INFO] Wrote Eclipse project for "ex1" to c:\proj\ejava-javaee\working\solutions\ex1.
 [INFO]
-       Sources for some artifacts are not available.
-       Please run the same goal with the -DdownloadSources=true parameter in order to check remote repositories for sources.
-       List of artifacts without a source archive:
-         o commons-logging:commons-logging:1.0.4
-         o junit:junit:3.8.1
-         o log4j:log4j:1.2.13
-
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
----
----
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 4 seconds
+[INFO] Finished at: Sun Jan 25 16:46:08 EST 2009
+[INFO] Final Memory: 6M/11M
+[INFO] ------------------------------------------------------------------------
+
+
+$ cat .classpath
+<classpath>
+  <classpathentry kind="src" path="src/main/java"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes"/>
+  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+</classpath>
+
+
 $ cat .project
 <projectDescription>
   <name>ex1</name>
@@ -106,78 +145,31 @@ $ cat .project
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
-      <arguments/>
+    </buildCommand>
+    <buildCommand>
+      <name>org.maven.ide.eclipse.maven2Builder</name>
     </buildCommand>
   </buildSpec>
   <natures>
     <nature>org.eclipse.jdt.core.javanature</nature>
+    <nature>org.maven.ide.eclipse.maven2Nature</nature>
   </natures>
 </projectDescription>
 ---
----
-$ cat .classpath
-<classpath>
-  <classpathentry kind="src" path="src/main/java"/>
-  <classpathentry kind="src" path="src/test/java" output="target/test-classes"/>
 
-  <classpathentry kind="src" path="src/test/resources" output="target/test-class
-es"/>
-  <classpathentry kind="output" path="target/classes"/>
-  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4
-/commons-logging-1.0.4.jar" sourcepath="M2_REPO/commons-logging/commons-logging/
-1.0.4/commons-logging-1.0.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.13/log4j-1.2.13.jar"
-sourcepath="M2_REPO/log4j/log4j/1.2.13/log4j-1.2.13-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar" source
-path="M2_REPO/junit/junit/3.8.1/junit-3.8.1-sources.jar"/>
-</classpath>
----
-
-    [[1]] You'll notice the depencies are expressed in terms of an M2_REPO 
-    variable. You can manually define it within Eclipse or using the 
-    eclipse:add-maven-repo goal. In this example on my Windows machine,
-    my wrkspace is still in the default location. The supplied path 
-    expression is what is needed by Cygwin bash.
-
----
-$ mvn eclipse:add-maven-repo -Declipse.workspace=C:/Documents\ and\ Settings/jc
-staff/workspace/
-[INFO] Scanning for projects...
-[INFO] Searching repository for plugin with prefix: 'eclipse'.
-[INFO] -------------------------------------------------------------------------
-[INFO] Building My First Simple Project
-[INFO]    task-segment: [eclipse:add-maven-repo] (aggregator-style)
-[INFO] -------------------------------------------------------------------------
-[INFO] [eclipse:add-maven-repo]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
----
-
-    [[1]] Since the above is a one-time setup, I always forget the name of the
-    command and parameters. The easier alternative is to set the M2_REPO property
-    within Eclipse.
-
-        * once a project is defined (see next full step), right-click on project
-        and select Properties -> Java Build Path -> Libraries -> Add Variable
-
-        * Click "Configure Variables..." and "New..."
-
-        * Enter name="M2_REPO" and value=(the location of your repository;
-        e.g., c:/jhu/repository)
 
     [[1]] Inside Eclipse, import the project using
 
         * File->Import
 
-        * Select General->Existing Projects into Workspace
+        * Select General->Maven Projects into Workspace
 
         * Browse to the project directory. The next panel should show 
         a list of projects that include "ex1".
-        
-        * Leave "copy into workspace" de-selected. This will cause 
-        Eclipse to work on the real copy of the project.
 
+        * There may be a noticeable delay while it rebuilds the 
+        workspace.
+        
         * Once imported, you should be able to open a suitable Perspecive 
         and browse the files of the project.
 
@@ -185,57 +177,19 @@ staff/workspace/
 
 [images/first_project_imported_into_eclipse.png] First Project Imported Into Eclipse
 
-            [Note:] If the references to commons-logging, log4j, and 
-            junit are labelled as unresolved. Check that the M2_REPO 
-            defined correctly (to point to .../.m2/repository)
+            [Note:] If the references to commons-logging, log4j, and
+            junit are labelled as unresolved, check that you used the
+            "Maven Projects" import and not the "Existing Project into
+            Workspace" import. Also check the value for Local 
+            Repository under Window->Preferences-> Maven->Installations.
+
 
 *** {Section C}: Setup Eclipse to be able to execute Maven project goals
 
-    [[1]] View the 
-    {{{http://m2eclipse.codehaus.org/Maven_2.0_Plugin_for_Eclipse.html}
-    flash demo}} the plugin capability at the Mergere web site. 
-    I typcially have to load it twice to get it to play. Note the 
-    following exceptions:
 
-        * Since we imported our project from Maven, Maven has already
-        been enabled for the project.
-
-        * Repository seach is nice after it has retrieved its initial
-        listing of the repository. My only beef with this tool is that
-        it re-writes the pom.xml filei rather than editing it. If I 
-        have applied a schema to the file to help manual edits, the 
-        schema declaration is not put back. That might be a small
-        price to pay for automatically filling in these details.
-        However, you might want to save off a copy of your pom.xml file
-        if you like how you have editted and commented it.
-
-        * The automatic download and association of the source code
-        is pretty cool. Remember we could have downloaded the source 
-        for our dependencies when we ran the eclipse:eclipse plugin.
-
-        * I use the Maven external tool to execute Maven targets. 
-        However, I'll show you how to use variables in the specification
-        so you only need to create one external tool per goal. This
-        will be reusable on all projects; not just a named one.
-
-        * The debugger requires more setup than they describe. See
-        the {{{Section_C}next section}} for setting up the debugger.
-
-
-    [[1]] Right-click on the pom.xml file and execute Run As->"maven2 build".
-    You can also get back to this window once the external tool has been
-    created by going through Run->"External Tools"
-
-        * set the Base Directory to the variable $\{project_loc\}
-
-        * set the Goals to "test"
-
-        * change the Name of the external tool to "mvn test"
-
-        * using the JRE tab, select an instance of a Java 5 JDK
-        setup in {{{Section_A}Section A}}
-
-        * press Run
+    [[1]] Right-click on the pom.xml file and execute Run As->"Maven install".
+    You can also get back to this window through the Run As option on the 
+    toolbar once you have the project selective. 
 
     [[1]] Refresh the project directory to be able to see any new target 
     artifacts, including the surefire-repots. 
@@ -253,38 +207,39 @@ staff/workspace/
 
 [images/ex1_separate_eclipse_windows.png] Separate Eclipse Windows
 
-    [[1]] Go through Run->"External Tools" and copy the "mvn test"
-    tool you created. Make one for "clean" and another for "debug". 
-    We still have some other setup to do for the debugger, but do
-    this part now.
+    [[1]] Notice that most maven goals are provided on the Run As pull-down
+    menu. However, some are not and I do not know how the list is determined.
+    If you need a goal accessible that is not listed, then do the following.
 
-        * set the goal for "mvn clean" to clean
+        * Right click on the pom.xml file and select Run As -> Run Configurations.
 
-        * set the goal for "mvn debug" to test. Do one of the following:
-        
-            ** Add the name "debugger" to the Profiles text box. This is
-            the newer way to do it within the m2eclipse plugin.
+        * Double-click on the Maven Build type. A New_configuration shows
+        up.
 
-            ** Add a parameter called "debugger". The value won't matter,
-            but Eclipse requires you to supply a value. This will equate 
-            to "-Ddebugger" being added to the command line. This is the
-            older way to do it within the m2eclipse plugin.
+        * Change the name to "mvn debug"
 
-    [[1]] Click Run->"External Tools"->"mvn clean". Once you've run it 
-    once, it shows up on the re-call and the toolbar icon always defaults
-    to the last tool used. Refresh your project and note that the contents
-    of your target directory was cleaned out.
+        * Set the Base Directory to the variable $\{project_loc\}
+
+        * Set Goals to "test"
+
+        * Set Profiles to "debugger". This should match the profile
+        added in your settings.xml. See next step.
+
+        * Verify that you are using a JDK 5 instance under the JRE tab.
+
+        * press Apply and Close
 
 
 *** {Section D}: Setup environment to enable interactive debugging
 
-        [Note:] The 
-        {{{http://m2eclipse.codehaus.org/Maven_2.0_Plugin_for_Eclipse.html}
-        flash demo}} made it look like the debugger would automatically
-        kick in if you set a breakpoint. That won't happen because
-        the surefire-plugin running JUnit is in a separate JVM. We have
-        to setup remote debugging within Maven and Eclipse to connect
-        the process to the debugger.
+        [Note:] Although it is possible to run JUnit directly from within
+        Eclipse and have test-level granularity, doing so will leave many
+        of the test configuration properties defined within Maven left 
+        behind. For that reason, I will show you how to run the debugger
+        running under a normal Maven configuration. When doing this, you 
+        need to realize that there will be 2 processes; the "remote"
+        application being launched/tested and the "local" debugger that is
+        commanding the remote JVM through its actions.
 
     [[1]] Add the following profile entry to your .m2/settings.xml or pom.xml
     file. I would normally place this in my settings.xml file since it
@@ -318,14 +273,12 @@ staff/workspace/
         [Note:] Profiles are activated by a specific reference in
         activeProfiles, passing -P\<profile name\> on the command line,
         or through a test of a property. We will use the presence of the
-        the "debugger" system property.
+        the "debugger" system property (e.g., -Ddebugger=xxx).
 
         [Note:] Use "!debugger" if you want to test the absence of a 
         property.
 
-    [[1]] Add the following to either your settings.xml or pom.xml. I 
-    would normally put this in the pom.xml file since we may want to
-    configure other properties associated to JUnit (your choice).
+    [[1]] Add the following to your pom.xml.
 
 ---
 <?xml version="1.0"?>
@@ -352,13 +305,13 @@ staff/workspace/
 ---
 
     [[1]] Test the profile and plugin adjustments by executing 
-    "mvn test -Ddebugger" from your base directory command line. This
-    should be the same behavior if you ran the "mvn debug" external 
-    tool from Eclipse. However, run only one at a time, since they 
+    "mvn test -Pdebugger" from your base directory command line. This
+    should be the same behavior if you ran the "mvn debug" Run As
+    configuration from Eclipse. However, run only one at a time, since they 
     attempt to listen on a hard coded port number.
 
 ---
-$ mvn test -Ddebugger=true
+$ mvn test -Pdebugger
 [INFO] Scanning for projects...
 [INFO] -----------------------------------------------------------------
 [INFO] Building My First Simple Project
@@ -373,18 +326,20 @@ $ mvn test -Ddebugger=true
 Listening for transport dt_socket at address: 8000
 ---
 
-    [[1]] Set up your project for remote debugging. This configuration
-    doesn't take a variable argument for the project, so we'll have to 
-    create a new one for each project we debug (or edit a common one).
+    [[1]] Set up the debugger in client mode. This does not 
+    accept a variable project location, so we'll have to set one up
+    to physically point to the project of interest.
 
-        * With a file from your current project selected, click on the 
-        debugger icon (the bug icon on the toolbar) and select Debugger
-        Configurations.
+        * With your pom.xml selected, select Debug As->Debug Configurations.
 
-        * Double click Remote Java Application. The name should be the
-        name of your project and the port should be 8000 on localhost.
+        * Double click Remote Java Application.
+
+        * Most of the important values are filled in with acceptable
+        default values. Verify the Port# is the same as what the 
+        application is waiting for a connect on (8000).
 
         * Click "Debug". The paused application should run to completion.
+        This configuration will be saved under the name "ex1".
 
     [[1]] Add a breakpoint and relaunch the program.
 
@@ -392,11 +347,21 @@ Listening for transport dt_socket at address: 8000
         log.info() in testApp(). One way to do this is to double click on
         the left margin.
 
-        * Run "mvn debug" from "External Tools". It should block, waiting
-        for the debugger.
+        * Run the remote portion of the application within Eclipse by
+        selecting pom.xml -> Debug As -> Debug Configurations... ->
+        "mvn debug". This was created in the previous section.
 
-        * Run "ex1 debug" from "Debugger". This time the program will
+        * Run the debugger in client mode using the configuration from
+        the previous step.  You can get to it by selecting the pom.xml -> 
+        Debug As -> Debug Configurations... and select "ex1". If you cannot 
+        locate it, it can be recreated by double-clicking on Remote Java 
+        Application.
+
+        * This time the application will
         pause at the breakpoint and Eclipse will open the debugger.
+
+        * Use the debugger perspective to look at variables and step
+        through the execution of the code.
 
         []
 

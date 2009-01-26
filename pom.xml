@@ -5,7 +5,7 @@
     <groupId>ejava.javaee</groupId>
     <artifactId>ejava-javaee</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2008.2-SNAPSHOT</version>
+    <version>1.0.2009.1-SNAPSHOT</version>
     <name>Enterprise Java (605.784) Root</name>
     <description>
         This is the course home page for the Enterprise Java Course
@@ -30,8 +30,8 @@
         </mailingList>
     </mailingLists>
     <scm>
-        <url>https://ejava.info:8443/repos/class/tags/2008-fall-ejava-javaee</url>
-        <connection>scm:svn:https://ejava.info:8443/repos/class/tags/2008-fall-ejava-javaee</connection>
+        <url>https://ejava.info:8443/repos/class/branches/2009-spring-ejava-javaee</url>
+        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2009-spring-ejava-javaee</connection>
     </scm>
   <modules>
   <!--
@@ -91,7 +91,7 @@
             <organizationUrl>http://www.sra.com</organizationUrl>
             <timezone>-4</timezone>
             <roles>
-                <role>Grader</role>
+                <role>Former Grader</role>
             </roles>
         </contributor>
         <contributor>
@@ -127,7 +127,9 @@
             <plugin> <!-- generates site documentation -->
                 <artifactId>maven-site-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
+                <!--
                 <version>2.0-beta-7</version>
+                -->
                 <configuration>
                     <locales>en</locales>
                 </configuration>
@@ -141,8 +143,9 @@
                     <locales>en</locales>
                 </configuration>
             </plugin>
-            
-            <plugin> <!-- used to build source.zip files -->
+
+            <!-- used to build source.zip files
+            <plugin> 
                 <artifactId>maven-assembly-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
                 <version>2.1</version>
@@ -159,7 +162,8 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> 
+            -->
 
             <plugin>
                 <artifactId>jxr-maven-plugin</artifactId>

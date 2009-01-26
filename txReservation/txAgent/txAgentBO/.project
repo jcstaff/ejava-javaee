@@ -1,17 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>txAgentBO</name>
-  <comment>This project is the root project for the example Java EE
+	<name>txAgentBO</name>
+	<comment>This project is the root project for the example Java EE
         Application that makes use of JTA transactions and a RMI
         connection to another application.</comment>
-  <projects>
-    <project>txHotelBO</project>
-  </projects>
-  <buildSpec>
-    <buildCommand>
-      <name>org.eclipse.jdt.core.javabuilder</name>
-    </buildCommand>
-  </buildSpec>
-  <natures>
-    <nature>org.eclipse.jdt.core.javanature</nature>
-  </natures>
+	<projects>
+		<project>txHotelBO</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
 </projectDescription>

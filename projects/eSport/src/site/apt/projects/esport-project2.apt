@@ -1,6 +1,6 @@
 Project2: eSport N-Tier Application
 
-    09/17/2007
+    01/24/2009
 
 * Goals
 
@@ -95,6 +95,28 @@ Project2: eSport N-Tier Application
     with the log4j logging provider.  You may leave debug in your code,
     but this should be able to be turned on/off with the proper logging
     priority changes in the log4j.xml configuration.
+
+* Assembly Overview
+
+    You will be adding several sibling projects to both eLeague and eClub.
+    See suggestions for the layout towards the bottom of this specification.
+    Once you add a new project, make sure to add a reference to it in the 
+    parent pom.xml. Spelling and case count. Ignoring case of characters 
+    (e.g. eLeague versus eleague) will make your project non-portable to
+    Unix file systems. 
+
+    [Note:] As with the previous project, the use of the name eSport,
+    eLeague, and eClub within the project specification are to be taken as
+    placeholders. Please make an effort to uniquely name your directories,
+    components, Java packages, JNDI names, etc. to help logically separate
+    the parallel project implementations.
+
+    [Note:] There should be no use of System.out.println() in the code
+    and all implementations must use the jakarta commons logging API
+    with the log4j logging provider.  You may leave debug in your code,
+    but this should be able to be turned on/off with the proper logging
+    priority changes in the log4j.xml configuration.
+
 
 * Technical Details
 
@@ -196,7 +218,7 @@ Project2: eSport N-Tier Application
     the context of the EJB Tier implemented as a part of a separate
     requirement.
 
-[../images/eClub_ejbtier.jpg] eBidbot Candidate Business Logic and EJB Tiers
+[../images/eClub_ejbtier.jpg] eClub Candidate Business Logic and EJB Tiers
 
         [[A]] OrganizationMgmt/OrganizationMgmtImpl - update this 
         business logic interface and implementation to be able to obtain
@@ -243,7 +265,7 @@ Project2: eSport N-Tier Application
         them of any persistence provider classes before serializing them
         to the client. 
 
-        [[A]] EAR - Create an EAR to host the eBidbot server-side
+        [[A]] EAR - Create an EAR to host the eClub server-side
         components; including the EJB component just developed.
 
         [[A]] Test - Create a Test project that will deploy the EAR to the
@@ -333,8 +355,19 @@ Project2: eSport N-Tier Application
         applications should require a transaction.
 
         [[A]] Transaction Integrity - add transaction rollback logic to
-        EJBs that detect a bid could not be executed because it was either
-        too low or was for a closed auction.
+        EJBs that demonstrates this capability. You may add new methods
+        to demonstrate this if existing logic is not complex enough.
+        You may also choose to add this demonstration to the TestUtil
+        EJB if it does not correctly fit within existing business
+        logic.  For example, reportScore() might require scores to be
+        non-negative and rollback the transaction if violated. However,
+        if you report only a single score, there's really nothing to
+        rollback (error checking stopped it from being stored). By adding
+        a reportsScores() demonstration method that reports several scores
+        in one call, breaks them into several lower-level reportScore()
+        calls in a single transaction, and provides a bad score towards
+        the end -- all should be rolled back and fully demonstrate the
+        capability of a transaction.
 
         [[A]] Test - update the test project(s) to verify the transaction
         logic.
@@ -360,10 +393,12 @@ Project2: eSport N-Tier Application
     implementable using the Web UI and any implemented command line
     interfaces.
     
-    [Note:]Any actions, including the ingest, that must be executed from
-    the command line must be wrapped inside an <<RUN>> script similar
-    to ones demonstrated in class (see the class jdbcDAO project for an 
-    example of using an Ant script to encapsulate command-line details).
+    [Note:]Any actions, including the ingest, that must be executed
+    from the command line (versus the Web UI) must be wrapped inside an
+    <<RUN>> script similar to ones demonstrated in class (see the class
+    jdbcDAO project for an example of using an Ant script to encapsulate
+    command-line details. The provided eLeagueBLImpl sample also contains
+    an example of wrapping classpaths and command lines within Ant).
 
     []
 
@@ -371,11 +406,11 @@ Project2: eSport N-Tier Application
 
         [[a]] populate the eLeague tables (using the LeagueIngestor)
 
-        [[a]] create a Club in eLeague (using the LeagueMgmtEJB)
+        [[a]] create a Club in eLeague (using the LeagueMgmtEJB; rep=user2)
 
         [[a]] add Venue for Club in eLeague (using ClubMgmtEJB)
 
-        [[a]] create Parent in eClub (using MemberMgmtEJB)
+        [[a]] create Parent in eClub (using MemberMgmtEJB; loginId=user3)
 
         [[a]] create Player in eClub (using MemberMgmtEJB)
 
@@ -395,7 +430,8 @@ Project2: eSport N-Tier Application
 
         [[a]] add a contact for a Team eLeague (using ClubMgmtEJB)
 
-        [[a]] assign a Team to an existing Division eLeague (using ClubMgmtEJB)
+        [[a]] assign a Team to an existing Division eLeague (using
+        ClubMgmtEJB; division=U13-A, refid="Division-845")
 
         [[a]] schedule a Season eLeague (using ContestMgmtEJB)
 

@@ -1,11 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>securePingClientEAR</name>
-  <comment>This project is the root project for the example 
+	<name>securePingClientEAR</name>
+	<comment>This project is the root project for the example 
         Application that makes use of run-As security features of Java EE</comment>
-  <projects>
-    <project>securePingClientEJB</project>
-    <project>securePingEJB</project>
-  </projects>
-  <buildSpec/>
-  <natures/>
+	<projects>
+		<project>securePingClientEJB</project>
+		<project>securePingEJB</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+	</natures>
 </projectDescription>

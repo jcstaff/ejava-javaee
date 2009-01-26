@@ -2,7 +2,7 @@
     <parent>
         <artifactId>eSport</artifactId>
         <groupId>ejava.javaee.projects</groupId>
-        <version>1.0.2007.2</version>
+        <version>1.0.2009.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -10,41 +10,15 @@
     <artifactId>eLeague</artifactId>
     <packaging>pom</packaging>
     <name>eLeague</name>
-    <version>1.0.2007.2</version>
+    <version>1.0.2009.1-SNAPSHOT</version>
     <description>
         This project provides test data and sample code to be used in the
         eLeague project.
     </description>
 
-    <profiles>
-        <profile>
-            <id>devel</id>
-            <activation>
-                <property>
-                    <name>devel</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <modules>
-                <module>eLeagueDTO</module>
-                <module>eLeagueDataGen</module>
-                <module>eLeagueTestUtil</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>deploy</id>
-            <activation>
-                <property>
-                    <name>!devel</name>
-                </property>
-            </activation>
-            <modules>
-                <module>eLeagueDTO</module>
-                <module>eLeagueTestUtil</module>
-                <module>eLeagueBO</module>
-                <module>eLeagueDAO</module>
-                <module>eLeagueBLImpl</module>
-            </modules>
-        </profile>
-    </profiles>
+    <modules>
+        <module>eLeagueBO</module>
+        <module>eLeagueDAO</module>
+        <module>eLeagueBLImpl</module>
+    </modules>
 </project>

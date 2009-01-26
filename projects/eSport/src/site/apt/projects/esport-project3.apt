@@ -1,6 +1,6 @@
 Project3: eSport Secure and Asynchronous N-Tier Application
 
-    11/27/2007 - update username/test data value mappings
+    01/25/2009
 
 * Goals
 
@@ -35,8 +35,8 @@ Project3: eSport Secure and Asynchronous N-Tier Application
     expected to be deployed to the same application server for the project
     implementation and testing. This may require us to define and deploy a
     resource within the eLeague application rather than have a
-    duplicate/independent copy in eClub. If they were physically
-    separate, this would not be an issue.
+    duplicate/independent copy in eClub. This would not be an issue if
+    they were deployed to physically separate application servers.
 
     Java EE defines authentication and authorization to be independent of
     the overall API and capability. JBoss and other application servers
@@ -83,9 +83,22 @@ Project3: eSport Secure and Asynchronous N-Tier Application
         * eclub-coord - this role is authorized to create teams and assign
         players, coaches, and managers.
 
-    If a user has a login for one application, they will use the same
+
+    [Note:] To clarify, your application will have a static set of
+    logins and will ingest a set of contacts (with the loginId within
+    the contact).  A user with a login and no contact info can login,
+    but won't be able to do anything meaningful. A user with a contact
+    and no login won't be able to access the system. Normally the login
+    would be created at the same time as the contact.  Except for your
+    JBoss configuration and your add contact logic, no other part of
+    your project should be aware of this tradeoff made for class project
+    simplicity.
+
+    [Note:] If a user has a login for one application, they will use the same
     account to access the other application (e.g., user1 might have
     both eclub-coord and eleague-clubcoord roles).
+
+    []
 
     Some actions are open to any users; authenticated or not.
     Authenticate will be performed using a JAAS configuration and
@@ -115,30 +128,26 @@ Project3: eSport Secure and Asynchronous N-Tier Application
 
         * admin1=eleague-admin,eclub-admin
 
-        * user1=eleague-coord
+        * lmtucker=eleague-coord
 
-        * user2=eleague-clubcoord,eclub-member
+        * user2=eleague-clubcoord,eclub-coord,eclub-member
 
-        * user3=eleague-divcoord,eclub-member
+        * user3=eclub-member
 
-        * user4=eclub-coord,eclub-member
+        * jtflynn=eleague-divcoord
 
         * ...
 
-        [Note:] In looking at the test data, the following mappings can be applied.
+        [Note:] In looking at the test data, the other identities can be created,
+        but are not necessarily needed.
 
-        * admin1 can still be the master admin account for both eleague and eclub.
+        * eleague-coord: lmtucker
 
-        * Assign eleague-coord to lmtucker instead of user1
-
-        * Assign eleague-clubcoord to tbswanson, kdromero, sthart, lmfuller, 
+        * eleague-clubcoord: tbswanson, kdromero, sthart, lmfuller, 
             rgrobbins, gchamilton, avschultz, jcbell, user4 
 
-        * There are no division coordinators defined in the test data. You can assign
-        the eleague-divcoord role to lmtucker.
-
-        * Assign the eclub-coord, and eclub-member role to user4 and have that be 
-        the login for your eClub coordinator.
+        * eleague-divcoord: jddavidson, jtflynn,
+            whlee, pjjimenez, ksharrison, acrussell, ckriley5687
 
         []
 
@@ -146,17 +155,21 @@ Project3: eSport Secure and Asynchronous N-Tier Application
 
     [[1]] Enhance eLeague with access restrictions.
 
-        * Assign the EJB to the "other" security domain.
+        * Assign the EJB to the "other" security domain. Define a
+        unauthenticated-principal value to allow anonymous access to
+        selected methods.
 
         * Restrict access to the EJB write methods to appropriate roles
         using declarative security.
 
-            [[1]] Only Administrators may run the test utility functions.
+            [[1]] Administrators may run the test utility functions.
 
-            [[1]] Only League Coordinators may create clubs, seasons, and
-            divisions. They may also schedule contests.
+            [[1]] League Coordinators may create clubs, seasons, and
+            divisions. They may also schedule contests and perform duties
+            normally performed by club and division coordinators -- like
+            report scores.
 
-            [[1]] Only Club Coordinators may create venues, teams, and
+            [[1]] Club Coordinators may create venues, teams, and
             assign teams to divisions.
 
             [[1]] Division coordinators may report scores.
@@ -168,9 +181,8 @@ Project3: eSport Secure and Asynchronous N-Tier Application
             associated with their club.
 
             [[1]] Division coordinators may only report scores for contests 
-            in their assigned division. Since there are no assigned division
-            coordinators in the test data, you may either assign one or
-            allow the eleague-coord supply scores.
+            in their assigned division. Note that the League Coordinator
+            should be able to report a score for any division.
 
         * Allow any user to perform read operations.
 
@@ -196,12 +208,12 @@ Project3: eSport Secure and Asynchronous N-Tier Application
         * Restrict access to the EJB write methods to appropriate roles
         using declarative security.
 
-            [[1]] Only Administrators may run the test utility functions.
+            [[1]] Administrators may run the test utility functions.
 
-            [[1]] Only members may update contact information and 
+            [[1]] Members may update contact information and 
             obtain roster information.
 
-            [[1]] Only Organization coordinators may create teams and
+            [[1]] Organization coordinators may create teams and
             assign players, coaches, and managers.
 
         * Perform additional programmatic security checks to verify 
@@ -323,17 +335,13 @@ Project3: eSport Secure and Asynchronous N-Tier Application
 
         * admin1=eleague-admin,eclub-admin
 
-        * user1=eleague-coord
+        * user1(lmtucker)=eleague-coord
 
-        * user2=eleague-clubcoord,eclub-member
+        * user2=eleague-clubcoord,eclub-coord,eclub-member
 
-        * user3=eleague-divcoord,eclub-member
+        * user3=eleague-eclub-member
 
-        * user4=eclub-coord,eclub-member
-
-        * user5=eclub-member
-
-        * user6=eclub-member
+        * user4(jtflynn)=eleague-divcoord
 
         []
 
@@ -355,7 +363,7 @@ Project3: eSport Secure and Asynchronous N-Tier Application
         [[1]] admin1 populates the eClub tables (using the ClubTestUtilEJB)
         if necessary
 
-        [[1]] user1 creates a Club in eLeague (using the LeagueMgmtEJB)
+        [[1]] user1(lmtucker) creates a Club in eLeague (using the LeagueMgmtEJB; rep=user2)
 
         [[1]] user2 adds Venue for Club in eLeague (using ClubMgmtEJB)
 
@@ -367,13 +375,13 @@ Project3: eSport Secure and Asynchronous N-Tier Application
         [[1]] user3 adds a Coach role in eClub (using MemberMgmtEJB) to
         their identity
 
-        [[1]] user4 creates a Team in eClub (using OrgMgmtEJB)
+        [[1]] user2 creates a Team in eClub (using OrgMgmtEJB)
 
-        [[1]] user4 assigns Players to a Team in eClub (using OrgMgmtEJB)
+        [[1]] user2 assigns Players to a Team in eClub (using OrgMgmtEJB)
 
-        [[1]] user4 assigns Coach to a Team in eClub (using OrgMgmtEJB)
+        [[1]] user2 assigns Coach to a Team in eClub (using OrgMgmtEJB)
 
-        [[1]] user4 assigns Manager to a Team in eClub (using OrgMgmtEJB)
+        [[1]] user2 assigns Manager to a Team in eClub (using OrgMgmtEJB)
 
         [[1]] user3 views their team roster in eClub (using OrgMgmtEJB)
 
@@ -381,9 +389,10 @@ Project3: eSport Secure and Asynchronous N-Tier Application
 
         [[1]] user2 adds a contact for a Team eLeague (using ClubMgmtEJB)
 
-        [[1]] user2 assigns a Team to an existing Division eLeague (using ClubMgmtEJB)
+        [[1]] user2 assigns a Team to an existing Division eLeague
+        (using ClubMgmtEJB; division=U13-A, refid="Division-845")
 
-        [[1]] user1 schedules a Season eLeague (using ContestMgmtEJB)
+        [[1]] user1(lmtucker) schedules a Season eLeague (using ContestMgmtEJB)
 
         [[1]] ContestMgmtEJB plublishes schedule events to Schedule Topic
 
@@ -403,7 +412,8 @@ Project3: eSport Secure and Asynchronous N-Tier Application
         Topic (same message processing occurs in LeagueSubscriber and
         LeagueListerMDB).
 
-        [[1]] user3 reports a Score in eLeague (using ContestMgmtEJB)
+        [[1]] Division coordinator(jtflynn) reports 
+        a Score in eLeague involving our club team (using ContestMgmtEJB)
 
         [[1]] anonymous user views Division Standings in eLeague (using LeagueMgmtEJB)
 
