@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.projects.eleague.dao.ClubDAO;
 import ejava.projects.eleague.dto.ELeague;
+import ejava.projects.eleague.dto.Season;
 import ejava.projects.eleague.xml.ELeagueParser;
 
 public class ELeagueIngestor {
@@ -46,11 +47,26 @@ public class ELeagueIngestor {
 			if (object instanceof ejava.projects.eleague.dto.Club) {
 				createVenue((ejava.projects.eleague.dto.Club)object);
 			}
+			else if (object instanceof ejava.projects.eleague.dto.Season) {
+				checkSeason((ejava.projects.eleague.dto.Season)object);
+			}
 			object = parser.getObject(
 			        "contact", "league-metadata", "club", "season");
 		}
 	}
 	
+	private void checkSeason(Season season) {
+		if ("Spring NeverEnds".equals(season.getName())) {
+			log.info("checking " + season.getName() + " for null contact");
+			for (ejava.projects.eleague.dto.Division division : season.getDivision()) {
+			    if (division.getContact() == null) {
+			    	log.error("current season has no contact, " +
+			    			"check project version: refId" + division.getRefid());
+			    }
+			}
+		}		
+	}
+
 	/**
 	 * This method is called by the main ingest processing loop. The JAXB/StAX
 	 * parser will already have the Venue populated with Address information.

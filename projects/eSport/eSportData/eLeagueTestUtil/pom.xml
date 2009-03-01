@@ -9,19 +9,22 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ejava.javaee.projects.eSport.eSportData</groupId>
     <artifactId>eLeagueTestUtil</artifactId>
-    <version>1.0.2009.1rc1</version>
+    <version>1.0.2009.1rc2</version>
     <name>eLeague TestUtil</name>
     <description>
         This project wraps the DTO project by supplying physical test data 
         and a default set of runtime specifications for the StAX parser and
         JAXB framework.
+        
+        Note that this version contains an updated XML file that should
+        correct the NULL Division contacts for the season "Spring NeverEnds".
     </description>
 
     <dependencies>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>eLeagueDTO</artifactId>
-            <version>${pom.version}</version>
+            <version>1.0.2009.1rc1</version>
             <scope>compile</scope>
         </dependency>
 

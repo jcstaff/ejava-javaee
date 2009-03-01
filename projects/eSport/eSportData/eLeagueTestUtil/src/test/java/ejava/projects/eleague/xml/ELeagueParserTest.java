@@ -13,7 +13,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.projects.eleague.dto.Contest;
+import ejava.projects.eleague.dto.Division;
 import ejava.projects.eleague.dto.ELeague;
+import ejava.projects.eleague.dto.Season;
 
 import junit.framework.TestCase;
 
@@ -47,7 +49,12 @@ public class ELeagueParserTest extends TestCase {
 		do {
 	        object = parser.getObject(
 	                    "contact", "league-metadata", "club", "season");
-			if (object != null) { log.debug(dump(object)); };
+			if (object != null) { 
+				log.debug( dump(object) );
+				if (object instanceof Season) {
+					checkSeason((Season) object);
+				}
+			};			
 		} while (object != null);
 		bis.close();
 	}
@@ -102,5 +109,17 @@ public class ELeagueParserTest extends TestCase {
 		}
 		level -= 1;
 		return text.toString();
+	}
+	
+	public void checkSeason(Season season) {
+		for (Division division : season.getDivision()) {
+			checkDivision(season, division);
+		}
+	}
+	
+	public void checkDivision(Season season, Division division) {
+		if ("Spring NeverEnds".equals(season.getName())) {
+	        assertNotNull("division contact was null", division.getContact());
+		}
 	}
 }
