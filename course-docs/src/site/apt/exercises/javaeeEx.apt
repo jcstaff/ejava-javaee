@@ -1,0 +1,160 @@
+JavaEE EJB, EAR, and RMI Client Exercise
+
+    This exercise consists of multiple projects that are integrated into
+    a single JavaEE application; root project, Impl (BOs,DAOs, and BL) 
+    project, EJB project, WAR project, EAR project, and RMI Test project.
+
+    The root project is the parent to each of the other project and can
+    be used to invoke targets that apply to all children. This project
+    is known as a reactor or "pom" project since it has not artifacts
+    other than a pom.xml (and children).
+
+    The Impl project contains implementation code for the business rules
+    (business logic and business objects) and data access tier. This 
+    has been the focus of other exercises and could have been broken out
+    into separate projects, however, they were condensed into a single
+    project for this exercise since they are not the focus of the exercise.
+
+    The EJB project will host the session beans, define the remote and 
+    local interfaces for the application, and host the application within
+    the application server. The EJB container running within the 
+    application server will provide a runtime environment, thread
+    management, resource management, transaction management and security 
+    (transactions and security not a part of this exercise).
+
+    The WAR project will provide an HTML-based web interface for the 
+    clients to access the application. It will interface to the application
+    using the local interface.
+
+    The EAR project will provide a composite deployment unit to the
+    application server. It will consist of the EJB and WAR modules as 
+    well as any dependencies that they define.
+
+    The RMI Test project will provide a demonstration of the RMI client
+    actions and a test of the application from the RMI interface.
+
+* Goals
+
+    * Provide a concrete example in building a EAR-based project that
+    includes
+
+        * Implementation logic with business rules and data access tier
+
+        * EJB tier with local and remote interfaces, implementation
+        hosting, thread management, resource management, and future 
+        transaction management and security.
+
+        * Web tier with static and dynamic HTML using Servlets and JSPs
+        integrated as part of a WAR.
+
+        * EAR deployment unit.
+
+        * RMI Test of the EAR deployment and EJB+Implementation logic.
+
+        * JBoss deployment
+
+        * Maven multi-project
+
+* Parts
+
+    * {{{./javaeeEx-partA.html}Part A}}: Create the Initial Project Shell
+
+    * {{{./javaeeEx-partB.html}Part B}}: Define a custom JNDI name
+
+    * {{{./javaeeEx-partC.html}Part C}}: Integrate Business Logic,
+        Data Access Tier, and the Persistence Unit within the EJB
+
+    * TODO - handle some issues with the remote interface
+
+    * TODO - integate in a Web Tier
+
+
+    * Your final source tree will look like the following.
+
+---
+partC                                   
+|-- javaeeExEAR                         
+|   `-- pom.xml                         
+|-- javaeeExEJB                         
+|   |-- pom.xml                         
+|   `-- src                             
+|       `-- main                        
+|           |-- java                    
+|           |   `-- myorg               
+|           |       `-- javaeeex        
+|           |           `-- ejb         
+|           |               |-- RegistrarEJB.java
+|           |               |-- RegistrarLocal.java
+|           |               `-- RegistrarRemote.java
+|           `-- resources                           
+|               `-- META-INF                        
+|                   |-- jboss.xml                   
+|                   `-- persistence.xml             
+|-- javaeeExImpl                                    
+|   |-- build.xml                                   
+|   |-- pom.xml                                     
+|   `-- src                                         
+|       |-- main                                    
+|       |   |-- java                                
+|       |   |   `-- myorg                           
+|       |   |       `-- javaeeex                    
+|       |   |           |-- bl                      
+|       |   |           |   |-- Registrar.java      
+|       |   |           |   |-- RegistrarException.java
+|       |   |           |   `-- TestUtil.java          
+|       |   |           |-- blimpl                     
+|       |   |           |   |-- RegistrarImpl.java     
+|       |   |           |   `-- TestUtilImpl.java      
+|       |   |           |-- bo                         
+|       |   |           |   |-- Address.java           
+|       |   |           |   `-- Person.java            
+|       |   |           |-- dao                        
+|       |   |           |   |-- PersonDAO.java
+|       |   |           |   `-- PersonDAOException.java
+|       |   |           `-- jpa
+|       |   |               |-- DBUtil.java
+|       |   |               `-- JPAPersonDAO.java
+|       |   `-- resources
+|       |       `-- META-INF
+|       |           |-- orm.xml
+|       |           `-- persistence.xml
+|       `-- test
+|           |-- java
+|           |   `-- myorg
+|           |       `-- javaeeex
+|           |           |-- blimpl
+|           |           |   |-- RegistrarImplTest.java
+|           |           |   `-- TestUtilTest.java
+|           |           |-- bo
+|           |           |   `-- PersonTest.java
+|           |           `-- jpa
+|           |               |-- DBUtilTest.java
+|           |               |-- DemoBase.java
+|           |               `-- JPAPersonDAOTest.java
+|           `-- resources
+|               `-- log4j.xml
+|-- javaeeExTest
+|   |-- pom.xml
+|   `-- src
+|       `-- test
+|           |-- java
+|           |   `-- myorg
+|           |       `-- javaeeex
+|           |           `-- ejbclient
+|           |               `-- RegistrarTest.java
+|           `-- resources
+|               |-- jndi.properties
+|               `-- log4j.xml
+`-- pom.xml
+
+---
+
+* Summary
+
+    The exercise provides a key starting point to creating and using a 
+    multi-pom project to build EJBs, WARs, EARs, and RMI Tests. 
+
+    The root project does more than just fold the child projects. It 
+    determines the order in which sub-projects are invoked and acts as
+    an inetgration point for such commands like eclipse:eclipse to get
+    an overall picture of your full project.

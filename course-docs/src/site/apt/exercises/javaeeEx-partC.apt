@@ -1,0 +1,466 @@
+Java EE Exercise 
+
+* {Part C}: Integrate Business Logic, Data Access Tier, and the
+Persistence Unit within the EJB
+
+** Objectives
+
+    * Bring in a separate module of code within the EJB. We will
+    be happy to successfully compile and resolve classes at
+    runtime within the EJB. However, we won't be ready to do 
+    anything with them just yet. 
+
+    * Add the necessary Persistence Unit to be able to fully
+    initialize the DAO and begin to make use of the business
+    logic and data access tier.
+
+    * Add a few sample business methods and test end-to-end.
+
+
+** Steps
+
+    [[1]] Copy/paste the javaeeExImpl solution from the SVN repository.
+    You will find a copy within solutions/javaeeEx/partC. Your directory
+    will look like the following when you are complete.
+
+---
+javaeeEx                                   
+|-- javaeeExEAR                         
+|   `-- ...
+|-- javaeeExEJB                         
+|   |-- ...
+|-- javaeeExImpl                                    
+|   |-- build.xml                                   
+|   |-- pom.xml                                     
+|   `-- src                                         
+|       |-- main                                    
+|       |   |-- java                                
+|       |   |   `-- myorg                           
+|       |   |       `-- javaeeex                    
+|       |   |           |-- bl                      
+|       |   |           |   |-- Registrar.java      
+|       |   |           |   |-- RegistrarException.java
+|       |   |           |   `-- TestUtil.java          
+|       |   |           |-- blimpl                     
+|       |   |           |   |-- RegistrarImpl.java     
+|       |   |           |   `-- TestUtilImpl.java      
+|       |   |           |-- bo                         
+|       |   |           |   |-- Address.java           
+|       |   |           |   `-- Person.java            
+|       |   |           |-- dao                        
+|       |   |           |   |-- PersonDAO.java
+|       |   |           |   `-- PersonDAOException.java
+|       |   |           `-- jpa
+|       |   |               |-- DBUtil.java
+|       |   |               `-- JPAPersonDAO.java
+|       |   `-- resources
+|       |       `-- META-INF
+|       |           |-- orm.xml
+|       |           `-- persistence.xml
+|       `-- test
+|           |-- java
+|           |   `-- myorg
+|           |       `-- javaeeex
+|           |           |-- blimpl
+|           |           |   |-- RegistrarImplTest.java
+|           |           |   `-- TestUtilTest.java
+|           |           |-- bo
+|           |           |   `-- PersonTest.java
+|           |           `-- jpa
+|           |               |-- DBUtilTest.java
+|           |               |-- DemoBase.java
+|           |               `-- JPAPersonDAOTest.java
+|           `-- resources
+|               `-- log4j.xml
+|-- javaeeExTest
+|   |-- ...
+`-- pom.xml
+---
+
+    [[1]] Add the Impl sub-project to your root pom.xml file.
+
+---
+    </description>
+    <modules>
+        <module>javaeeExImpl</module>
+        <module>javaeeExEJB</module>
+        <module>javaeeExEAR</module>
+    </modules>
+
+    <profiles>
+---
+
+    [[1]] Verify that the Impl and the entire application compiles and deploys from 
+    the root.
+
+---
+$ mvn clean install
+[INFO] Scanning for projects...
+[INFO] Reactor build order:
+[INFO]   Java EE Exercise
+[INFO]   Java EE Exercise Impl
+[INFO]   Java EE Exercise EJB
+[INFO]   Java EE Exercise EAR
+[INFO]   Java EE Exercise Remote Test
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] ------------------------------------------------------------------------
+[INFO] Java EE Exercise ...................................... SUCCESS [2.360s]
+[INFO] Java EE Exercise Impl ................................. SUCCESS [7.281s]
+[INFO] Java EE Exercise EJB .................................. SUCCESS [0.594s]
+[INFO] Java EE Exercise EAR .................................. SUCCESS [0.453s]
+[INFO] Java EE Exercise Remote Test .......................... SUCCESS [2.937s]
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+---
+
+    [[1]] Add a dependency from the EJB to the Impl project. This edit is done
+    within the EJB/pom.xml. 
+
+---
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>javaeeExImpl</artifactId>
+          <version>${pom.version}</version>
+          <scope>compile</scope>
+        </dependency>
+---
+
+    [[1]] You should rebuild the application to verify that the Impl is 
+    correctly located by the EJB project at this time.
+
+---
+$ mvn clean install
+
+...
+---
+
+    [[1]] Add the business logic and DAO classes for the Impl we are
+    integrating into our stateless session bean.
+
+---
+...
+
+import javax.ejb.EJBException;
+
+import myorg.javaeeex.bl.Registrar;
+import myorg.javaeeex.blimpl.RegistrarImpl;
+import myorg.javaeeex.dao.PersonDAO;
+import myorg.javaeeex.jpa.JPAPersonDAO;
+
+@Stateless
+public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
+    private static Log log = LogFactory.getLog(RegistrarEJB.class);
+    private Registrar registrar;
+
+    @PostConstruct
+    public void init() {
+        try {
+            log.debug("**** init ****");
+            PersonDAO dao = new JPAPersonDAO();
+            //still missing the EntityManager at this point
+
+            registrar = new RegistrarImpl();
+            ((RegistrarImpl)registrar).setDAO(dao);
+            log.debug("init complete, registrar=" + registrar);
+        }
+        catch (Throwable ex) {
+            log.error("error in init", ex);
+            throw new EJBException("error in init" + ex);
+        }
+    }
+
+---
+
+    [[1]] Build your application from the root and look at the output 
+    on the server.
+
+    [Note:] There are occasions where JBoss will not see you changes
+    or refuses a change without a restart. When I hit this step, I ran
+    into the case were I had to restart the server for it to see my
+    new @PostCOnstruct implementation. It does not happen often, 
+    but it does happen.
+
+    []
+
+---
+//SERVER LOG
+
+00:07:20,632 INFO  [EARDeployer] Started J2EE application: file:/C:/proj/ejava-javaee/working/solutions/javaeeEx/partC/javaeeExEAR/target/javaeeEx.ear
+00:07:21,273 DEBUG [RegistrarEJB] **** init ****
+00:07:21,273 DEBUG [RegistrarEJB] init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1b7a531
+00:07:21,273 DEBUG [RegistrarEJB] ping called
+---
+
+    [[1]] Update your EJB implementation to add the PersistenceUnit.
+
+---
+        <dependency>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+---
+---
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+...
+
+@Stateless
+public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
+    @PersistenceContext(unitName="javaeeEx")
+    private EntityManager em;
+---
+
+    [[1]] Update your @PostConstruct to make use of the PersistenceUnit.
+
+---
+            log.debug("**** init ****");
+            log.debug("em=" + em);
+            PersonDAO dao = new JPAPersonDAO();
+            ((JPAPersonDAO)dao).setEntityManager(em);
+---
+
+    [[1]] Copy the persistence.xml file from the Impl project into the EJB
+    project.
+
+---
+$ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/main/resources/META-INF/
+---
+
+    [[1]] Update the definition of the persistence.xml file to provide a jta-data-source
+
+---
+    <persistence-unit name="javaeeEx">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:/ejavaDS</jta-data-source>
+        <properties>
+---
+    
+    [[1]] Since we are using an orm.xml file, we do not need to specify each 
+    entity here using a "class" element. However, you will likely need to do
+    this in your projects that rely strictly on class annotations.
+
+    [Note:] This exercise makes use of the provider automatically creating DB schema
+    and supplies the hibernate.hbm2ddl.auto=true property. A real, non-demo
+    project would not set that property and would design in when schema was created.
+
+    []
+
+
+    [[1]] Rebuild your application and note that the EntityManager was resolved.
+
+---
+00:19:34,694 INFO  [EARDeployer] Started J2EE application: file:/C:/proj/ejava-javaee/working/solutions/javaeeEx/partC/javaeeExEAR/target/javaeeEx.ear
+00:19:35,288 DEBUG [RegistrarEJB] **** init ****
+00:19:35,288 DEBUG [RegistrarEJB] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@182eca8
+00:19:35,288 DEBUG [RegistrarEJB] ping called
+---
+
+    [[1]] Add the ability to add and get a Person to your @Remote interface.
+
+---
+package myorg.javaeeex.ejb;
+
+import javax.ejb.Remote;
+
+import myorg.javaeeex.bl.RegistrarException;
+import myorg.javaeeex.bo.Person;
+
+@Remote
+public interface RegistrarRemote {
+    void ping();
+    Person createPerson(Person person)
+        throws RegistrarException;
+
+    Person getPersonById(long id)
+        throws RegistrarException;
+}
+---
+
+    [[1]] Add the implementation of createPerson() to the EJB class.
+
+---
+import myorg.javaeeex.bl.RegistrarException;
+import myorg.javaeeex.bo.Person;
+---
+---
+    public Person createPerson(Person person)
+        throws RegistrarException {
+        log.debug("*** createPerson() ***");
+
+        //the person we return will have the PK set
+        try {
+            return registrar.createPerson(person);
+        }
+        catch (Throwable ex) {
+            log.error(ex);
+            throw new RegistrarException(ex.toString());
+        }
+    }
+---
+
+    [[1]] Add the implementation of getPersonById() to the EJB class.
+
+---
+    public Person getPersonById(long id)
+        throws RegistrarException {
+        log.debug("*** getPersonById(" + id + ") ***");
+        return registrar.getPersonById(id);
+    }
+---
+
+    [[1]] Add a testCreatePerson() to the RMI Test.
+
+---
+import myorg.javaeeex.bo.Person;
+---
+---
+    protected Person makePerson() {
+        Person person = new Person();
+        person.setFirstName("joe");
+        person.setLastName("smith");
+        person.setSsn("123");
+        return person;
+    }
+
+    public void testCreatePerson() throws Exception {
+        log.info("*** testCreatePerson ***");
+
+        Person person = makePerson();
+        Person person2 = registrar.createPerson(person);
+            //note that our original Person does not have an ID
+        assertEquals("unexpected id", 0, person.getId());
+            //it is separate from the one returned
+        assertFalse("unexpected id:" + person2.getId(), person2.getId()==0);
+
+        Person person3 = registrar.getPersonById(person2.getId());
+        assertEquals("unexpected name",
+            person.getFirstName(),
+            person3.getFirstName());
+    }
+---
+
+    [[1]] Rebuild the application.
+
+---
+$ mvn clean install
+
+...
+
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.407 sec FAILURE!
+
+Results :
+
+Tests in error:
+  testCreatePerson(myorg.javaeeex.ejbclient.RegistrarTest)
+
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
+---
+---
+./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
+::::::::::::::
+ -------------------------------------------------------------------------------
+Test set: myorg.javaeeex.ejbclient.RegistrarTest
+ -------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.407 sec FAILURE!
+testCreatePerson(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.016 sec  ERROR!
+myorg.javaeeex.bl.RegistrarException: myorg.javaeeex.bl.RegistrarException: Person must have 1 address
+        at myorg.javaeeex.ejb.RegistrarEJB.createPerson(RegistrarEJB.java:70)
+---
+
+    [[1]] Add an Address to the makePerson() in the RMI Test.
+
+---
+import myorg.javaeeex.bo.Address;
+---
+---
+    protected Person makePerson() {
+        Person person = new Person();
+        person.setFirstName("joe");
+        person.setLastName("smith");
+        person.setSsn("123");
+        Address address = new Address(0,"street1","city1", "state1", "zip1");
+        person.getAddresses().add(address);
+        return person;
+    }
+---
+
+    [[1]] Rebuild the application.
+
+---
+$ mvn clean install
+
+...
+
+ -*** testCreatePerson ***
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.5 sec
+
+Results :
+
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] [jar:jar]
+[WARNING] JAR will be empty - no content was marked for inclusion!
+[INFO] Building jar: C:\proj\ejava-javaee\working\solutions\javaeeEx\partC\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT
+.jar
+[INFO] [install:install]
+[INFO] Installing C:\proj\ejava-javaee\working\solutions\javaeeEx\partC\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.ja
+r to c:\proj\repository.test\myorg\javaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
+[INFO]
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] ------------------------------------------------------------------------
+[INFO] Java EE Exercise ...................................... SUCCESS [2.375s]
+[INFO] Java EE Exercise Impl ................................. SUCCESS [7.203s]
+[INFO] Java EE Exercise EJB .................................. SUCCESS [0.766s]
+[INFO] Java EE Exercise EAR .................................. SUCCESS [2.078s]
+[INFO] Java EE Exercise Remote Test .......................... SUCCESS [1.609s]
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+---
+
+
+    [[1]] Note the extra output in the server.
+
+---
+//SERVER LOG
+
+00:49:16,476 DEBUG [RegistrarEJB] **** init ****
+00:49:16,476 DEBUG [RegistrarEJB] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@e6f8d7
+00:49:16,491 DEBUG [RegistrarEJB] ping called
+00:49:16,507 DEBUG [RegistrarEJB] *** createPerson() ***
+00:49:16,507 DEBUG [JPAPersonDAO] creating person:id=0:joe smith 123, addresses={{street1 city1, state1 zip1},}
+00:49:16,507 DEBUG [JPAPersonDAO] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@e6f8d7
+00:49:16,507 DEBUG [JPAPersonDAO] person created:id=1:joe smith 123, addresses={{street1 city1, state1 zip1},}
+00:49:16,523 DEBUG [RegistrarEJB] *** getPersonById(1) ***
+---
+
+    []
+
+
+** Summary
+
+    * In this exercise, we put many of the end-to-end pieces together
+    and we are left to add beef to the EJB implementation. Specifically
+    we addressed:
+
+        * adding the Impl classes to the EJB.
+
+        * adding the Persistence Unit to the EJB and completing
+        the initialization of the DAO and business logic.
+
+        * adding a a few sample business methods that used the
+        business logic and DAO to update the database. We first
+        encountered a business rule exception defined within 
+        the impoted business logic.
