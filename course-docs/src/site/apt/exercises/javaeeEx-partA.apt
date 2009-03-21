@@ -1,15 +1,61 @@
 Java EE Exercise 
 
-* {Part A}: Create Project Shell
+Part A: Create Project Shell
 
-** Objectives
+* Objectives
 
     * Create and deploy an EAR with a bare bones EJB.
+
+        * {{{Root_Project} 
+            Create the root Maven project
+            }}
+
+        * {{{EJB_Project} 
+            Create the EJB Maven project
+            }}
+
+        * {{{EAR_Project} 
+            Create the EAR Maven project
+            }}
 
     * Create and run an RMI Test that will locate the JNDI tree,
     lookup the EJBs remote interface, and invoke a simple method.
 
-** Steps
+        * {{{RMI_Test_Project} 
+            Create the RMI Test Maven project
+            }}
+
+        * {{{Start_JBoss} 
+            Start JBoss Application Server
+            }}
+
+        * {{{Deploy} 
+            Deploy the Application
+            }}
+
+        * {{{JNDI_Lookup} 
+            Setup JNDI access to @Remote interface
+            }}
+
+        * {{{Invoke_EJB} 
+            Invoke EJB method through @Remote interface
+            }}
+
+        * {{{Wrapup} 
+            Add a few finishing touches
+            }}
+
+
+* {Root Project} Create the root Maven project
+
+    Each component of the Java EE application will be developed as 
+    as a separate Maven module. Each module will be placed in a 
+    flat structure under a common parent project. This parent project
+    will be used to coordinate goals involved of the entire application.
+    The order in which it builds things can be influenced by the 
+    configuration you supply, however, it will analyze dependencies
+    at build time are either honor the dependency ordering or fail
+    if you have expressed a circular dependency.
 
     [[1]] Create a root directory for the exercise. This will host
     the root project and sub-projects for the Impl, EJB, WAR, EAR,
@@ -80,6 +126,23 @@ javaeeEx\1.0-SNAPSHOT\javaeeEx-1.0-SNAPSHOT.pom
 [INFO] Final Memory: 7M/14M
 [INFO] ------------------------------------------------------------------------
 ---
+
+* {EJB Project} Create the EJB Maven project
+
+    The EJB project will be used to develop one of the EJB components. The
+    term "EJB" gets a little overloaded at times.  There are EJB classes,
+    EJB components, and EJB tiers.  EJB classes break out into the
+    @Remote and @Local interfaces, the EJB implementation class (either
+    @Stateless, @Stateful, or @MessageDriven), and support classes. It
+    is common to think of each cohesive pairing of @Remote, @Local,
+    and implementation class as "an EJB".  You can have many EJBs
+    (the sets of classes) within an EJB component. An EJB component is
+    a materialized as a .jar and there can be many EJB components within
+    your EJB tier. For this exercise we will have only one EJB component
+    and start out with only one EJB.  A second EJB will be added to the
+    single EJB component in a later excercise to help support testing.
+    A single Maven project can build a single EJB component.
+
 
     [[1]] Add an EJB project directory to your project tree.
 
@@ -399,6 +462,15 @@ javaeeEx/
 `-- pom.xml
 ---
 
+* {EAR Project} Create the EAR Maven project
+
+    EARs are Java archives that are used to house the overall application,
+    with all of its components. The EAR can contain many EJB and WAR
+    components as well as their dependencies (and a little-used Java EE
+    Client type).  A single Maven project can house the development of
+    a single EAR. The bulk of the project is solely within the pom.xml
+    as nearly all of its contents are brought in through dependencies.
+
     [[1]] Create the sub-project directory for the EAR.
 
 ---
@@ -497,7 +569,10 @@ ee\javaeeExEAR\1.0-SNAPSHOT\javaeeExEAR-1.0-SNAPSHOT.ear
 [INFO] ------------------------------------------------------------------------
 ---
 
-    [[1]] Verify the contents of the EAR has what you expect.
+    [[1]] Verify the contents of the EAR has what you expect. EARs are required to
+    have a META-INF/application.xml file that describes deployment details of
+    the housed components. The Maven ear plugin will automatically generate this
+    for you.
 
 ---
 $ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
@@ -579,6 +654,19 @@ javaeeEx/
 |                           `-- RegistrarRemote.java
 `-- pom.xml
 ---
+
+* {RMI Test Project} Create the RMI Test Maven project
+
+    Any test we would have created within the EJB would have needed to
+    test the EJB locally as if it were POJO business logic because it 
+    is not until the EJB is deployed to the application server that
+    it can be accessed and tested in its intended runtime environment.
+    Therefore, we add an additional Maven project with a JUnit test and
+    configurations to deploy and test the EJB from its RMI interface.
+    The project will have no target artifact that we care about. One 
+    could do some tweeking of the pom.xml to keep that from being 
+    generated, but I have found that to only confuse Eclipse so we'll
+    just live with and empty, unused RMI Test.jar.
 
     [[1]] Create the sub-project directory for the RMI Test.
 
@@ -795,7 +883,14 @@ java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces
 ---
 
     [[1]] Create the JUnit test that will lookup the EJB and invoke the
-    ping method.
+    ping method. You will be tempted to directly reuse your business logic
+    tests as implementation for the RMI Test. With proper refactoring and
+    design, this can be done. However, realize that a remote interface must 
+    have special design considerations addressed and may not always (even
+    rarely) be the same as a local interface. Remote interfaces pass by value,
+    are used in different JVMs with potentially different classpaths, and
+    may have clients with different concerns. Technically, Java EE has allowed
+    them to be the same, but that ends up biting you in the end.
 
 ---
 package myorg.javaeeex.ejbclient;
@@ -866,7 +961,6 @@ $ cat javaeeExTest/src/test/resources/log4j.xml
 </log4j:configuration>
 ---
 
-
     [[1]] Try building and running the test without the JBoss
     server running.
 
@@ -888,6 +982,12 @@ is java.net.ConnectException: Connection refused: connect]]]
         at org.jnp.interfaces.NamingContext.lookup(NamingContext.java:627)
         at javax.naming.InitialContext.lookup(InitialContext.java:351)
 ---
+
+* {Start JBoss} Start JBoss Application Server
+
+    The EAR and its contents will be deployed to an application server to 
+    provide a container with thread managemement, resource management,
+    security, etc. 
 
     [[1]] Make the following edits to the jboss-log4j.xml file before
     we start the server. These edits will allow debug from our 
@@ -1000,6 +1100,17 @@ vaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
 ...
 ---
 
+* {Deploy} Deploy the Application
+
+    We want tests to run as automated as possible. This allows us to 
+    simplify testing as well as leverage continous integration techniques
+    (e.g., CruiseControl; i.e., nightly builds/tests). To help automate this
+    we are going to leverage the Maven cargo plugin. Cargo, itself, is a
+    Java library that is used to manage Java EE containers. The maven
+    cargo plugin just makes it callable from within Maven. We will add the
+    cargo plugin to the RMI Test project (to deploy the application) since
+    the application isn't ready to be deployed until after the EAR is built.
+
     [[1]] Add the cargo plugin to the RMI Test to deploy the EAR
     to JBoss. This configuration goes in the jboss area of the RMI
     Test's pom.xml.
@@ -1092,6 +1203,12 @@ $ (cd javaeeExTest/; mvn clean install)
 00:00:06,984 INFO  [EARDeployer] Started J2EE application: file:/C:/proj/repository.test/myorg/javaee/javaeeExEAR/1.0-SN
 APSHOT/javaeeExEAR-1.0-SNAPSHOT.ear
 ---
+
+* {JNDI Lookup} Setup JNDI access to @Remote interface
+
+    Each EJB interface will have an entry in the JNDI tree. Clients will use
+    the JNDI tree to locate the interface object they need based on 
+    a hierarchical name.
 
     [[1]] Look for the JNDI name of the EJB in the jmx-console.
 
@@ -1195,6 +1312,8 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.297 sec
 ...
 ---
 
+* {Invoke EJB} Invoke EJB method through @Remote interface
+
     [[1]] Enhance the testPing() method to invoke the ping() method
     of the EJB.
 
@@ -1225,6 +1344,26 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.468 sec
 00:17:52,750 DEBUG [RegistrarEJB] **** init ****
 00:17:52,765 DEBUG [RegistrarEJB] ping called
 ---
+
+* {Wrapup} Add a few finishing touches
+
+    There are two semi-related things we need to do; add the RMI Test to 
+    the root project and provide a clean-only undeploy of the EAR. 
+    
+    When we add the RMI Test to the root project, we do so with some caution.
+    This module only has tests and requires JBoss to be running. There
+    are times when we want the application built without running tests
+    and may do so by using -Dmaven.test.skip=true. We can leverage this
+    common technique by placing the RMI Test within a profile that gets 
+    deactivated when not testing the application.
+
+    The other aspect we'd like to add is the ability to undeploy an EAR
+    during the clean goal. This is helpful when deploying and testing
+    multiple applications at a set. It is impossible to undeploy, build,
+    and re-deploy an application if sibling applications depend on 
+    classes it provides when using the default JBoss common classloader
+    (i.e., all EARs are sharing the same class loader).
+
 
     [[1]] Add the RMI Test to the parent pom.xml configuration. However,
     add it within a profile to keep it from running if we ever invoke
@@ -1450,7 +1589,7 @@ javaeeEx/
 
     []
 
-** Summary
+* Summary
 
     * In this exercise, we created a shell of an EJB, EAR, RMI Test, and
     Maven infrastructure that can be used as the basis for adding the 

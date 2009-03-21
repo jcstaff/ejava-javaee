@@ -64,7 +64,8 @@ JavaEE EJB, EAR, and RMI Client Exercise
     * {{{./javaeeEx-partC.html}Part C}}: Integrate Business Logic,
         Data Access Tier, and the Persistence Unit within the EJB
 
-    * TODO - handle some issues with the remote interface
+    * {{{./javaeeEx-partD.html}Part D}}: Handling Remote Interface Issues
+
 
     * TODO - integate in a Web Tier
 
@@ -72,43 +73,48 @@ JavaEE EJB, EAR, and RMI Client Exercise
     * Your final source tree will look like the following.
 
 ---
-partC                                   
-|-- javaeeExEAR                         
-|   `-- pom.xml                         
-|-- javaeeExEJB                         
-|   |-- pom.xml                         
-|   `-- src                             
-|       `-- main                        
-|           |-- java                    
-|           |   `-- myorg               
-|           |       `-- javaeeex        
-|           |           `-- ejb         
-|           |               |-- RegistrarEJB.java
-|           |               |-- RegistrarLocal.java
-|           |               `-- RegistrarRemote.java
-|           `-- resources                           
-|               `-- META-INF                        
-|                   |-- jboss.xml                   
-|                   `-- persistence.xml             
-|-- javaeeExImpl                                    
-|   |-- build.xml                                   
-|   |-- pom.xml                                     
-|   `-- src                                         
-|       |-- main                                    
-|       |   |-- java                                
-|       |   |   `-- myorg                           
-|       |   |       `-- javaeeex                    
-|       |   |           |-- bl                      
-|       |   |           |   |-- Registrar.java      
+javaeeEx                                                                                         
+|-- javaeeExEAR                                                                               
+|   `-- pom.xml                                                                               
+|-- javaeeExEJB                                                                               
+|   |-- pom.xml                                                                               
+|   `-- src                                                                                   
+|       `-- main                                                                              
+|           |-- java                                                                          
+|           |   `-- myorg                                                                     
+|           |       `-- javaeeex                                                              
+|           |           |-- dto                                                               
+|           |           |   |-- AddressDTO.java                                               
+|           |           |   `-- PersonDTO.java                                                
+|           |           `-- ejb                                                               
+|           |               |-- RegistrarEJB.java                                             
+|           |               |-- RegistrarLocal.java                                           
+|           |               |-- RegistrarRemote.java                                          
+|           |               |-- TestUtilEJB.java                                              
+|           |               `-- TestUtilRemote.java                                           
+|           `-- resources                                                                     
+|               `-- META-INF                                                                  
+|                   |-- jboss.xml                                                             
+|                   `-- persistence.xml                                                       
+|-- javaeeExImpl                                                                              
+|   |-- build.xml                                                                             
+|   |-- pom.xml                                                                               
+|   `-- src                                                                                   
+|       |-- main                                                                              
+|       |   |-- java
+|       |   |   `-- myorg
+|       |   |       `-- javaeeex
+|       |   |           |-- bl
+|       |   |           |   |-- Registrar.java
 |       |   |           |   |-- RegistrarException.java
-|       |   |           |   `-- TestUtil.java          
-|       |   |           |-- blimpl                     
-|       |   |           |   |-- RegistrarImpl.java     
-|       |   |           |   `-- TestUtilImpl.java      
-|       |   |           |-- bo                         
-|       |   |           |   |-- Address.java           
-|       |   |           |   `-- Person.java            
-|       |   |           |-- dao                        
+|       |   |           |   `-- TestUtil.java
+|       |   |           |-- blimpl
+|       |   |           |   |-- RegistrarImpl.java
+|       |   |           |   `-- TestUtilImpl.java
+|       |   |           |-- bo
+|       |   |           |   |-- Address.java
+|       |   |           |   `-- Person.java
+|       |   |           |-- dao
 |       |   |           |   |-- PersonDAO.java
 |       |   |           |   `-- PersonDAOException.java
 |       |   |           `-- jpa
@@ -146,15 +152,9 @@ partC
 |               |-- jndi.properties
 |               `-- log4j.xml
 `-- pom.xml
-
 ---
 
 * Summary
 
     The exercise provides a key starting point to creating and using a 
     multi-pom project to build EJBs, WARs, EARs, and RMI Tests. 
-
-    The root project does more than just fold the child projects. It 
-    determines the order in which sub-projects are invoked and acts as
-    an inetgration point for such commands like eclipse:eclipse to get
-    an overall picture of your full project.

@@ -1,23 +1,41 @@
 Java EE Exercise 
 
-* {Part C}: Integrate Business Logic, Data Access Tier, and the
+Integrate Business Logic, Data Access Tier, and the
 Persistence Unit within the EJB
 
-** Objectives
+* Objectives
 
     * Bring in a separate module of code within the EJB. We will
     be happy to successfully compile and resolve classes at
     runtime within the EJB. However, we won't be ready to do 
     anything with them just yet. 
 
+        * {{{Integrate_Impl} 
+            Integrate Business Logic Classes into EJB
+        }}
+
     * Add the necessary Persistence Unit to be able to fully
     initialize the DAO and begin to make use of the business
     logic and data access tier.
 
+        * {{{EntityManager} 
+            Integrate EntityManager into EJB
+        }}
+
     * Add a few sample business methods and test end-to-end.
 
+        * {{{Test} 
+            End to End Test EJB
+        }}
 
-** Steps
+* {Integrate Impl} Integrate Business Logic Classes into EJB
+
+    No matter how much or little code you place within the EJB,
+    sooner or later you will need to use external logic with
+    the EJB compoonent. In this part, we will integrate in the 
+    classes of the pre-built business logic implementation. 
+    We are only concerned with resolving artifacts and classes
+    at this point. 
 
     [[1]] Copy/paste the javaeeExImpl solution from the SVN repository.
     You will find a copy within solutions/javaeeEx/partC. Your directory
@@ -198,6 +216,18 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
 00:07:21,273 DEBUG [RegistrarEJB] ping called
 ---
 
+* {EntityManager} Integrate EntityManager into EJB
+
+    The business logic was developed and tested outside of the EJB using
+    JUnit and an extended PersistanceContext -- but with an eye towards
+    portability to the EJB tier. That means that this reused logic
+    attempts no direct control of the transaction. All transaction 
+    decisions are handled external to the core business logic. In this
+    case, we will use an EntityManager injected by the container and
+    integrated into the JTA tranactions going on within the application
+    server.
+
+
     [[1]] Update your EJB implementation to add the PersistenceUnit.
 
 ---
@@ -264,6 +294,11 @@ $ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/ma
 00:19:35,288 DEBUG [RegistrarEJB] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@182eca8
 00:19:35,288 DEBUG [RegistrarEJB] ping called
 ---
+
+* {Test} End to End Test EJB
+
+    Lets add additional EJB and RMI Test logic that will leverage the
+    EntityManager and the integated business logic.
 
     [[1]] Add the ability to add and get a Person to your @Remote interface.
 
@@ -449,7 +484,7 @@ r to c:\proj\repository.test\myorg\javaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest
     []
 
 
-** Summary
+* Summary
 
     * In this exercise, we put many of the end-to-end pieces together
     and we are left to add beef to the EJB implementation. Specifically

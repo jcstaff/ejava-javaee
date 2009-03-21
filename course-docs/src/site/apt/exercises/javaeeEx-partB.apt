@@ -1,14 +1,28 @@
 Java EE Exercise 
 
-* {Part B}: Create Custom JNDI Name
+* Create Custom JNDI Name
 
-** Objectives
+* Objectives
 
     * Take control of the JNDI name used for our deployed EJBs
     by specifying deployment descriptor values.
 
+        * {{{Default_Name} 
+            Control the default root JNDI name used
+        }}
 
-** Steps
+        * {{{Custom_Name}
+            Control the complete JNDI name used
+        }} 
+
+
+* {Default Name} Control the default root JNDI name used
+
+    As you witnessed in part A of the exercise, the default JNDI name
+    was derived from the EAR and EJB names. The EAR name was a function
+    of its artifactId and version number. To take a first step in customizing
+    the JNDI name, we might just want version number to not be part of
+    the JNDI name. Lets do that here.
 
     [[1]] Build and deploy you application from partA and note the 
     JNDI name for the application. Use the jmx-console to view 
@@ -143,6 +157,13 @@ r to c:\proj\repository.test\myorg\javaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 ---
+
+* {Custom Name} Control the complete JNDI name used
+
+    Although the above approach was a decent step at making the JNDI name
+    not so version-specific, there are many times when we'll want to 
+    manually control the entire JNDI name used. We can do this by adding
+    a deployment descriptor.
 
 
     [[1]] Now lets add a vender-specific, META-INF/jboss.xml deployment
