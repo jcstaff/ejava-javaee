@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.javaee</groupId>
+    <artifactId>javaeeExEJB</artifactId>
+    <packaging>ejb</packaging>
+    <name>Java EE Exercise EJB</name>
+    <description>
+        This project provides example usages of an EJB tier.
+    </description>
+
+    <!-- this repositories holds many of the javaee5 jar files -->
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- core dependencies -->
+        <dependency>
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.ejb</groupId>
+          <artifactId>ejb-api</artifactId>
+          <version>3.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>javaeeExImpl</artifactId>
+          <version>${pom.version}</version>
+          <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>      
+
+              <!-- tell the EJB plugin we are using EJB3  and configure client-jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <ejbVersion>3.0</ejbVersion>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                    <generateClient>true</generateClient>
+                    <clientExcludes>
+                        <clientExclude>**/META-INF/*.xml</clientExclude>
+                        <clientExclude>**/ejb/*EJB.class</clientExclude>
+                    </clientExcludes>
+                </configuration>
+            </plugin>      
+        </plugins>      
+    </build>
+
+</project>

@@ -6,47 +6,47 @@ Part A: Create Project Shell
 
     * Create and deploy an EAR with a bare bones EJB.
 
-        * {{{Root_Project} 
+        * {{{Create_the_root_Maven_project}
             Create the root Maven project
             }}
 
-        * {{{EJB_Project} 
+        * {{{Create_the_EJB_Maven_project}
             Create the EJB Maven project
             }}
 
-        * {{{EAR_Project} 
+        * {{{Create_the_EAR_Maven_project}
             Create the EAR Maven project
             }}
 
     * Create and run an RMI Test that will locate the JNDI tree,
     lookup the EJBs remote interface, and invoke a simple method.
 
-        * {{{RMI_Test_Project} 
+        * {{{Create_the_RMI_Test_Maven_project}
             Create the RMI Test Maven project
             }}
 
-        * {{{Start_JBoss} 
+        * {{{Start_JBoss_Application_Server}
             Start JBoss Application Server
             }}
 
-        * {{{Deploy} 
+        * {{{Deploy_the_Application}
             Deploy the Application
             }}
 
-        * {{{JNDI_Lookup} 
+        * {{{Setup_JNDI_access_to_Remote_interface}
             Setup JNDI access to @Remote interface
             }}
 
-        * {{{Invoke_EJB} 
+        * {{{Invoke_EJB_method_through_Remote_interface}
             Invoke EJB method through @Remote interface
             }}
 
-        * {{{Wrapup} 
+        * {{{Add_a_few_finishing_touches}
             Add a few finishing touches
             }}
 
 
-* {Root Project} Create the root Maven project
+* {Create the root Maven project}
 
     Each component of the Java EE application will be developed as 
     as a separate Maven module. Each module will be placed in a 
@@ -127,7 +127,7 @@ javaeeEx\1.0-SNAPSHOT\javaeeEx-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 ---
 
-* {EJB Project} Create the EJB Maven project
+* {Create the EJB Maven project}
 
     The EJB project will be used to develop one of the EJB components. The
     term "EJB" gets a little overloaded at times.  There are EJB classes,
@@ -462,7 +462,7 @@ javaeeEx/
 `-- pom.xml
 ---
 
-* {EAR Project} Create the EAR Maven project
+* {Create the EAR Maven project}
 
     EARs are Java archives that are used to house the overall application,
     with all of its components. The EAR can contain many EJB and WAR
@@ -655,7 +655,7 @@ javaeeEx/
 `-- pom.xml
 ---
 
-* {RMI Test Project} Create the RMI Test Maven project
+* {Create the RMI Test Maven project}
 
     Any test we would have created within the EJB would have needed to
     test the EJB locally as if it were POJO business logic because it 
@@ -983,7 +983,7 @@ is java.net.ConnectException: Connection refused: connect]]]
         at javax.naming.InitialContext.lookup(InitialContext.java:351)
 ---
 
-* {Start JBoss} Start JBoss Application Server
+* {Start JBoss Application Server}
 
     The EAR and its contents will be deployed to an application server to 
     provide a container with thread managemement, resource management,
@@ -1100,7 +1100,7 @@ vaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
 ...
 ---
 
-* {Deploy} Deploy the Application
+* {Deploy the Application}
 
     We want tests to run as automated as possible. This allows us to 
     simplify testing as well as leverage continous integration techniques
@@ -1204,7 +1204,7 @@ $ (cd javaeeExTest/; mvn clean install)
 APSHOT/javaeeExEAR-1.0-SNAPSHOT.ear
 ---
 
-* {JNDI Lookup} Setup JNDI access to @Remote interface
+* {Setup JNDI access to Remote interface}
 
     Each EJB interface will have an entry in the JNDI tree. Clients will use
     the JNDI tree to locate the interface object they need based on 
@@ -1312,7 +1312,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.297 sec
 ...
 ---
 
-* {Invoke EJB} Invoke EJB method through @Remote interface
+* {Invoke EJB method through Remote interface}
 
     [[1]] Enhance the testPing() method to invoke the ping() method
     of the EJB.
@@ -1345,7 +1345,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.468 sec
 00:17:52,765 DEBUG [RegistrarEJB] ping called
 ---
 
-* {Wrapup} Add a few finishing touches
+* {Add a few finishing touches}
 
     There are two semi-related things we need to do; add the RMI Test to 
     the root project and provide a clean-only undeploy of the EAR. 

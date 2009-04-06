@@ -66,65 +66,64 @@ JavaEE EJB, EAR, and RMI Client Exercise
 
     * {{{./javaeeEx-partD.html}Part D}}: Handling Remote Interface Issues
 
+    * {{{./javaeeEx-partE.html}Part E}}: Create a WAR Project Shell
 
-    * TODO - integate in a Web Tier
+    * {{{./javaeeEx-partF.html}Part F}}: Handling WAR/EJB Interface Issues
 
-
-    * Your final source tree will look like the following.
+    Your final source tree will look like the following.
 
 ---
-javaeeEx                                                                                         
-|-- javaeeExEAR                                                                               
-|   `-- pom.xml                                                                               
-|-- javaeeExEJB                                                                               
-|   |-- pom.xml                                                                               
-|   `-- src                                                                                   
-|       `-- main                                                                              
-|           |-- java                                                                          
-|           |   `-- myorg                                                                     
-|           |       `-- javaeeex                                                              
-|           |           |-- dto                                                               
-|           |           |   |-- AddressDTO.java                                               
-|           |           |   `-- PersonDTO.java                                                
-|           |           `-- ejb                                                               
-|           |               |-- RegistrarEJB.java                                             
-|           |               |-- RegistrarLocal.java                                           
-|           |               |-- RegistrarRemote.java                                          
-|           |               |-- TestUtilEJB.java                                              
-|           |               `-- TestUtilRemote.java                                           
-|           `-- resources                                                                     
-|               `-- META-INF                                                                  
-|                   |-- jboss.xml                                                             
-|                   `-- persistence.xml                                                       
-|-- javaeeExImpl                                                                              
-|   |-- build.xml                                                                             
-|   |-- pom.xml                                                                               
-|   `-- src                                                                                   
-|       |-- main                                                                              
-|       |   |-- java
-|       |   |   `-- myorg
-|       |   |       `-- javaeeex
-|       |   |           |-- bl
-|       |   |           |   |-- Registrar.java
+javaeeEx                               
+|-- javaeeExEAR                        
+|   `-- pom.xml                        
+|-- javaeeExEJB                        
+|   |-- pom.xml                        
+|   `-- src                            
+|       `-- main                       
+|           |-- java                   
+|           |   `-- myorg              
+|           |       `-- javaeeex       
+|           |           |-- dto        
+|           |           |   |-- AddressDTO.java
+|           |           |   `-- PersonDTO.java 
+|           |           `-- ejb                
+|           |               |-- RegistrarEJB.java
+|           |               |-- RegistrarLocal.java
+|           |               |-- RegistrarRemote.java
+|           |               |-- TestUtilEJB.java    
+|           |               `-- TestUtilRemote.java 
+|           `-- resources                           
+|               `-- META-INF                        
+|                   |-- jboss.xml                   
+|                   `-- persistence.xml             
+|-- javaeeExImpl                                    
+|   |-- pom.xml                                     
+|   `-- src                                         
+|       |-- main                                    
+|       |   |-- java                                
+|       |   |   `-- myorg                           
+|       |   |       `-- javaeeex                    
+|       |   |           |-- bl                      
+|       |   |           |   |-- Registrar.java      
 |       |   |           |   |-- RegistrarException.java
-|       |   |           |   `-- TestUtil.java
-|       |   |           |-- blimpl
-|       |   |           |   |-- RegistrarImpl.java
-|       |   |           |   `-- TestUtilImpl.java
-|       |   |           |-- bo
-|       |   |           |   |-- Address.java
-|       |   |           |   `-- Person.java
-|       |   |           |-- dao
-|       |   |           |   |-- PersonDAO.java
+|       |   |           |   `-- TestUtil.java          
+|       |   |           |-- blimpl                     
+|       |   |           |   |-- RegistrarImpl.java     
+|       |   |           |   `-- TestUtilImpl.java      
+|       |   |           |-- bo                         
+|       |   |           |   |-- Address.java           
+|       |   |           |   `-- Person.java            
+|       |   |           |-- dao                        
+|       |   |           |   |-- PersonDAO.java         
 |       |   |           |   `-- PersonDAOException.java
-|       |   |           `-- jpa
-|       |   |               |-- DBUtil.java
-|       |   |               `-- JPAPersonDAO.java
-|       |   `-- resources
-|       |       `-- META-INF
-|       |           |-- orm.xml
-|       |           `-- persistence.xml
-|       `-- test
+|       |   |           `-- jpa                        
+|       |   |               |-- DBUtil.java            
+|       |   |               `-- JPAPersonDAO.java      
+|       |   `-- resources                              
+|       |       `-- META-INF                           
+|       |           |-- orm.xml                        
+|       |           `-- persistence.xml                
+|       `-- test                                       
 |           |-- java
 |           |   `-- myorg
 |           |       `-- javaeeex
@@ -150,6 +149,32 @@ javaeeEx
 |           |               `-- RegistrarTest.java
 |           `-- resources
 |               |-- jndi.properties
+|               `-- log4j.xml
+|-- javaeeExWAR
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   |-- java
+|       |   |   `-- myorg
+|       |   |       `-- javaeeex
+|       |   |           `-- web
+|       |   |               |-- JPAFilter.java
+|       |   |               `-- RegistrarHandlerServlet.java
+|       |   `-- webapp
+|       |       |-- WEB-INF
+|       |       |   |-- content
+|       |       |   |   |-- DisplayException.jsp
+|       |       |   |   |-- DisplayPeople.jsp
+|       |       |   |   |-- DisplayPerson.jsp
+|       |       |   |   |-- DisplayResult.jsp
+|       |       |   |   |-- ErrorPage.jsp
+|       |       |   |   `-- UnknownCommand.jsp
+|       |       |   `-- web.xml
+|       |       |-- admin
+|       |       |   `-- admin_menu.jsp
+|       |       `-- index.jsp
+|       `-- test
+|           `-- resources
 |               `-- log4j.xml
 `-- pom.xml
 ---

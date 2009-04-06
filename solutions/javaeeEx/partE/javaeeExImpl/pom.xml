@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>javaeeExImpl</artifactId>
+    <name>Java EE Exercise Impl</name>
+    <packaging>jar</packaging>
+    <description>
+        This project provides a sample implementation
+        component, with business logic, business object,
+        DAO, and JPA DAO Implementation.
+    </description>
+
+    <dependencies>
+        <dependency>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+        </dependency>
+    
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+        <!--tell the resource plugin to perform filtering on resources 
+            to fill in JDBC URL, etc. -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>      
+      
+              <!-- pass in driver information to JUnit -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                    <systemProperties>
+                        <property>
+                          <name>dropPath</name>
+                          <value>
+                            ddl/javaeeExImpl-drop.ddl
+                          </value>
+                        </property>
+                        <property>
+                          <name>createPath</name>
+                          <value>
+                            ddl/javaeeExImpl-create.ddl
+                          </value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>            
+        </plugins>    
+    </build>
+
+    <profiles>
+        <profile> <!-- defines our default database -->
+            <id>hsqldb</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
+        </profile>
+
+        <profile> <!-- defines our default persistence provider -->
+            <id>hibernate</id>
+            <activation>
+                <property> <!-- use this property to name alt persistence provider -->
+                    <name>!jpa</name>
+                </property>
+            </activation>
+
+           <!-- needed to resolve some hibernate dependencies -->
+            <repositories>
+                <repository>
+                    <id>jboss-repo</id>
+                    <name>JBoss Maven Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
+            </repositories>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>3.2.4.sp1</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>3.3.1.ga</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <!-- generates a DDL file for persistence unit -->
+                    <plugin>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>2.0</version>
+                        <executions>
+                            <execution>
+                                <id>generate-drop-ddl</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-drop.ddl
+                                        </outputfilename>
+                                        <drop>true</drop>
+                                        <create>false</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-create-ddl</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                                <configuration>
+                                    <componentProperties>
+                                        <outputfilename>
+                                            ${pom.artifactId}-create.ddl
+                                        </outputfilename>
+                                        <drop>false</drop>
+                                        <create>true</create>
+                                    </componentProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <components>
+                                <component>
+                                    <name>hbm2ddl</name>
+                                    <implementation>
+                                        jpaconfiguration
+                                    </implementation>
+                                    <outputDirectory>
+                                        target/classes/ddl
+                                    </outputDirectory>
+                                </component>
+                            </components>
+                            <componentProperties>
+                                <persistenceunit>
+                                    javaeeEx
+                                </persistenceunit>
+                                <export>false</export>
+                                <format>true</format>
+                            </componentProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+          <id>schema</id>
+          <activation>
+            <property>
+              <name>!maven.test.skip</name>
+            </property>
+          </activation>
+          
+          <build>
+            <plugins>
+              <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>        
+                <version>1.0</version>
+                
+                <dependencies>
+                  <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>1.8.0.4</version>            
+                  </dependency>
+                </dependencies>
+                
+                <configuration>
+                  <username>${jdbc.user}</username>
+                  <password>${jdbc.password}</password>
+                  <driver>${jdbc.driver}</driver>
+                  <url>${jdbc.url}</url>          
+                </configuration>
+                
+                <executions>
+                  <execution>
+                    <id>drop-db-before-test</id>
+                    <phase>process-test-resources</phase>
+                    <goals>
+                      <goal>execute</goal>
+                    </goals>    
+                    <configuration>              
+                      <autocommit>true</autocommit>
+                      <fileset>
+                        <basedir>${basedir}/target/classes/ddl</basedir>
+                        <includes>
+                          <include>**/*drop*.ddl</include>                  
+                        </includes>
+                      </fileset>
+                      <!-- the tables may not exist when tests are run -->
+                      <onError>continue</onError>
+                    </configuration>        
+                  </execution>
+                  
+                  <execution>
+                    <id>create-db-before-test</id>
+                    <phase>process-test-resources</phase>
+                    <goals>
+                      <goal>execute</goal>
+                    </goals>    
+                    <configuration>              
+                      <autocommit>true</autocommit>
+                      <fileset>
+                        <basedir>${basedir}/target/classes/ddl</basedir>
+                        <includes>
+                          <include>**/*create*.ddl</include>                  
+                        </includes>
+                      </fileset>
+                      <print>true</print>
+                    </configuration>        
+                  </execution>
+                </executions>
+              </plugin>          
+            </plugins>        
+          </build>
+        </profile>
+    </profiles>
+</project>

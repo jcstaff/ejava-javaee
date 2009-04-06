@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>myorg.javaee</groupId>
+    <artifactId>javaeeExWAR</artifactId>
+    <packaging>war</packaging>
+    <name>Java EE Exercise WAR</name>
+    
+    <dependencies>
+        <dependency>
+          <groupId>javax.transaction</groupId>
+          <artifactId>jta</artifactId>
+          <version>1.1</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+          <version>2.5</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+          <version>2.5</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>javaeeExEJB</artifactId>
+            <version>${pom.version}</version>
+            <scope>provided</scope>
+        </dependency>        
+    </dependencies>
+
+    <build>
+        <plugins>
+              <!-- make sure we are building java5 -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <source>1.5</source>
+              <target>1.5</target>
+            </configuration>
+          </plugin>      
+        </plugins>
+    </build>
+
+    <profiles>
+<profile>
+    <id>jetty</id>
+    <!--
+    Jetty does not use log4j by default. Use the following command line options to force
+    Jetty to use log4j and your verbosity settings.
+
+    mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty
+    -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>6.1.10</version>
+                <configuration>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <connectors>
+                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                            <port>9080</port>
+                            <maxIdleTime>60000</maxIdleTime>
+                        </connector>
+                    </connectors>
+                </configuration>       
+            </plugin>          
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+          <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>compile</scope>
+        </dependency>    
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>javaeeExEJB</artifactId>
+            <version>${pom.version}</version>
+            <type>ejb-client</type>
+            <scope>compile</scope>
+        </dependency>        
+        <dependency>
+            <groupId>org.jboss.client</groupId>
+            <artifactId>jbossall-client</artifactId>
+            <version>4.2.3.GA</version>            
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</profile>
+    </profiles>
+</project>

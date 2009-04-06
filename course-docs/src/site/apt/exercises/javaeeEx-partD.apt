@@ -4,24 +4,24 @@ Part D: Handle Remote Interface Issues
 
 * Objectives
 
-    * {{{Remote_Testing}
-    Controlling the Test Environment for RMI Tests
-    }} 
+    * {{{Controlling_the_Test_Environment_for_RMI_Tests}
+        Controlling the Test Environment for RMI Tests
+        }} 
 
-    * {{{Lazy_Load}
-    Address Lazy load issues in EJB interfaces
-    }} 
+    * {{{Address_Lazy_load_issues_in_EJB_interfaces}
+        Address Lazy load issues in EJB interfaces
+        }} 
 
-    * {{Pure_POJOs}
-    Address provider classes in EJB remote interfaces
-    }}
+    * {{{Address_provider_classes_in_EJB_remote_interfaces}
+        Address provider classes in EJB remote interfaces
+        }}
 
-    * {{{DTOs}
-    Leverage DTOs for interface data transfer
-    }}
+    * {{{Leverage_DTOs_for_interface_data_transfer}
+        Leverage DTOs for interface data transfer
+        }}
 
 
-* {Remote Testing} Controlling the Test Environment for RMI Tests
+* {Controlling the Test Environment for RMI Tests}
 
     In the single-JVM environment, we had all resources within reach; 
     database connection, DDL, JDBC, JPA, DAOs, BOs, etc. It was easy
@@ -376,7 +376,7 @@ import myorg.javaeeex.ejb.TestUtilRemote;
 
     []
 
-* {Lazy Load} Address Lazy load issues in EJB interfaces
+* {Address Lazy load issues in EJB interfaces}
 
     It is temptingly easy to directly return the managed entities returned
     from the entity manager from the interface of the EJB. However, there is
@@ -537,7 +537,7 @@ import org.hibernate.LazyInitializationException;
 
     []
 
-* {Pure POJOs} Address provider classes in EJB remote interfaces
+* {Address provider classes in EJB remote interfaces}
 
     With lazy loading issues addressed, it again becomes tempingly easy
     to directly return (hydrated) entities returned from the entity manager
@@ -704,7 +704,7 @@ Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.75 sec
 
     []
 
-* {DTOs} Leverage DTOs for interface data transfer
+* {Leverage DTOs for interface data transfer}
 
     Entity classes are meant to implement the data-centric business rules
     of an application. Because of their POJO design, it is tempting to

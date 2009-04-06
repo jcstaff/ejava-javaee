@@ -1,6 +1,6 @@
 Java EE Exercise 
 
-Integrate Business Logic, Data Access Tier, and the
+Part C: Integrate Business Logic, Data Access Tier, and the
 Persistence Unit within the EJB
 
 * Objectives
@@ -10,7 +10,7 @@ Persistence Unit within the EJB
     runtime within the EJB. However, we won't be ready to do 
     anything with them just yet. 
 
-        * {{{Integrate_Impl} 
+        * {{{Integrate_Business_Logic_Classes_into_EJB}
             Integrate Business Logic Classes into EJB
         }}
 
@@ -18,17 +18,17 @@ Persistence Unit within the EJB
     initialize the DAO and begin to make use of the business
     logic and data access tier.
 
-        * {{{EntityManager} 
+        * {{{Integrate_EntityManager_into_EJB}
             Integrate EntityManager into EJB
         }}
 
     * Add a few sample business methods and test end-to-end.
 
-        * {{{Test} 
+        * {{{End_to_End_Test_EJB}
             End to End Test EJB
         }}
 
-* {Integrate Impl} Integrate Business Logic Classes into EJB
+* {Integrate Business Logic Classes into EJB}
 
     No matter how much or little code you place within the EJB,
     sooner or later you will need to use external logic with
@@ -216,7 +216,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
 00:07:21,273 DEBUG [RegistrarEJB] ping called
 ---
 
-* {EntityManager} Integrate EntityManager into EJB
+* {Integrate EntityManager into EJB}
 
     The business logic was developed and tested outside of the EJB using
     JUnit and an extended PersistanceContext -- but with an eye towards
@@ -295,7 +295,7 @@ $ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/ma
 00:19:35,288 DEBUG [RegistrarEJB] ping called
 ---
 
-* {Test} End to End Test EJB
+* {End to End Test EJB}
 
     Lets add additional EJB and RMI Test logic that will leverage the
     EntityManager and the integated business logic.
