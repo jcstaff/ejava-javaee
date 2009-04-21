@@ -26,6 +26,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2009-04-22: Posted JMS artifacts</li>
           <li>2009-04-05: Posted WAR parts to JavaEE Exercise</li>
           <li>2009-03-24: Posted Session EJB TODOs</li>
           <li>2009-03-21: Posted JavaEE Exercise RMI Interface updates</li>
@@ -41,6 +42,48 @@
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+          <li>Finish security configuration, implementation, and testing</li>
+          <li>Add JMS configuration file to JBoss server. Be sure
+          to keep a copy in your source tree and refer to file in 
+          project README if you don't auto-deploy the file.</li>
+          <li>Design your JMS message type(s). Write and test a utility
+          class that publishes the messages. This class ideally
+          would be placed in with the BLImpl classes. However, if
+          it publishes DTO classes, the DTOs may have to get moved in
+          with the BO project to satisfy dependency constraints.</li>
+          <li>Implement a Java SE Client to receive and log the JMS
+          messages. This client can be placed in BLImpl, must use a
+          selector, and be launchable by the grader using an Ant script.
+          The Ant script can be part of either the BLImpl or RMI Test
+          project. See class examples on how write the Ant script.</li>
+      </ul>
+      </subsection>
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
+          <li>Complete your projects, finish testing, and turn in.</li>
+          <li>Start project 3</li>
+          <li>Add user.properties and roles.properties to eSales project</li>
+          <li>Assign EJB to security-domain "other".
+          The RMI Tests should fail access at this point.</li>
+
+          <li>Specify required roles to access each EJB method</li>
+          <li>Add a java.security.auth.login.config to the RMI Test client</li>
+          <li>Add a LoginContext with a CallbackHandler. The RMI Tests should 
+          be able to access the EJB methods they are authorized to access.
+          You should have at least one test that verifies an unauthorized
+          user is refused access.</li>
+          <li>Assign WAR to security-domain "java:/jaas/other"</li>
+          <li>Add security-constraint elements to the WAR web.xml. The 
+          user should be prompted for a login at this point and be able to
+          access web pages and EJB methods that they are authorized for
+          and be refused access to what they are un-authorized to access</li>
+          <li>Eliminate access to any information or option the user does
+          not have access to see or use</li>
+          <li>Eliminate the passing of userId information when the appropriate
+          means is to obtain through the EJB or WARs security context.</li>
+      </ul></li>
+      <li><ul>
           <li>Go through Web UI parts of the JavaEE exercise.</li>
           <li>Look over Web UI parts of the ejbsessionBank.</li>
           <li>Add a WAR project to eLeague. Add in the controller,
@@ -49,10 +92,7 @@
           handler, and supporting JSP implementations.
           This WAR should get all of its behavior from eClubEJB
           and not interact directly with eLeague.</li>
-      </ul>
-      </subsection>
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
+      </ul></li>
       <li><ul>
           <li>Finish implementing EJB use cases for end-to-end
           testing.</li>

@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <body>
-<h2>Hello Java EE World!</h2>
+<h2>Hello Cruel Java EE World!</h2>
 
     <ul>
         <li><a href="admin/CreateStudent.jsp">Create Student</a></li>

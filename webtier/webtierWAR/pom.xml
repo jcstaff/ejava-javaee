@@ -75,7 +75,7 @@
             Jetty does not use log4j by default. Use the following command line options to force 
             Jetty to use log4j and your verbosity settings.
 
-            mvn -Dslf4j=true -Dlog4j.configuration=file:./target/classes/log4j.xml jetty:run -Pjetty
+            mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty
             -->
             <build>
                 <plugins>
@@ -100,7 +100,7 @@
                             <scanIntervalSeconds>10</scanIntervalSeconds>
                             <connectors>
                                 <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-                                    <port>9080</port>
+                                    <port>9090</port>
                                     <maxIdleTime>60000</maxIdleTime>
                                 </connector>
                             </connectors>
