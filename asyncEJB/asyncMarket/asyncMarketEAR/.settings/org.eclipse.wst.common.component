@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+<wb-module deploy-name="asyncMarketEAR">
+<wb-resource deploy-path="/" source-path="/src/main/application"/>
+<dependent-module deploy-path="/" handle="module:/resource/asyncMarketWAR/asyncMarketWAR">
+<dependent-object>WebModule_1250690747156</dependent-object>
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module deploy-path="/" handle="module:/resource/asyncMarketEJB/asyncMarketEJB">
+<dependent-object>EjbModule_1250690747218</dependent-object>
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module archiveName="asyncMarketDA-1.0.2009.1.jar" deploy-path="/" handle="module:/resource/asyncMarketDA/asyncMarketDA">
+<dependency-type>uses</dependency-type>
+</dependent-module>
+</wb-module>
+</project-modules>

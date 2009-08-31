@@ -5,10 +5,7 @@
 
     <persistence-unit name="asyncMarket">
         <jta-data-source>java:/ejavaDS</jta-data-source>
-        <class>ejava.examples.asyncmarket.bo.Person</class>
-        <class>ejava.examples.asyncmarket.bo.AuctionItem</class>
-        <class>ejava.examples.asyncmarket.bo.Bid</class>
-        <class>ejava.examples.asyncmarket.bo.Order</class>
+        <jar-file>asyncMarketDA-${pom.version}.jar</jar-file>
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="create"/>
         </properties>

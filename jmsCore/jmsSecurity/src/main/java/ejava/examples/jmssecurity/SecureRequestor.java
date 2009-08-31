@@ -173,7 +173,7 @@ public class SecureRequestor extends Requestor
             Context jndi = new InitialContext();
             secureRequestor.setConnFactory(
                     (ConnectionFactory)jndi.lookup(connFactoryJNDI));
-            secureRequestor.setDestination(
+            secureRequestor.setRequestQueue(
                     (Destination)jndi.lookup(requestQueueJNDI));
             secureRequestor.setReplyTo(
                     (Destination)jndi.lookup(responseQueueJNDI));

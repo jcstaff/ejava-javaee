@@ -210,27 +210,27 @@ log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar
    will only have INFO or higher priority messages logged.
 
 ---
-> ant test
-Searching for build.xml ...
-Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+$ ant clean test
+Buildfile: build.xml
+
+clean:
+   [delete] Deleting directory C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target
 
 package:
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1.jar
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+      [jar] Building jar: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\ex1.jar
 
 test:
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
-     [copy] Copying 1 file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-reports
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
+     [copy] Copying 1 file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-reports
     [junit] Running myorg.mypackage.ex1.AppTest
-    [junit] INFO  01-09 12:58:52,224 (AppTest.java:testApp:26)  -testApp
-    [junit] DEBUG 01-09 12:58:52,232 (App.java:returnOne:11)  -Here's One!
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.018 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.032 sec
 
 BUILD SUCCESSFUL
-Total time: 3 seconds
+Total time: 2 seconds
 ---
 
         [Note:] I didn't see the output to STDOUT the last time I tested this. Ant may
@@ -239,16 +239,21 @@ Total time: 3 seconds
         []
     
 ---
-> more target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
+$ more target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
 Testsuite: myorg.mypackage.ex1.AppTest
-Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.018 sec
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.032 sec
+ ------------- Standard Output ---------------
+INFO  30-08 18:23:34,062 (AppTest.java:testApp:28)  -testApp
+DEBUG 30-08 18:23:34,062 (App.java:returnOne:11)  -Here's One!
+ ------------- ---------------- ---------------
 
-Testcase: testApp took 0.012 sec
+Testcase: testApp took 0 sec
+
 ---
 ---
-> more target/log4j-out.txt
-INFO  01-09 13:07:20,146 [myorg.mypackage.ex1.AppTest] (AppTest.java:testApp:26) -testApp
-DEBUG 01-09 13:07:20,154 [myorg.mypackage.ex1.App] (App.java:returnOne:11)  -Here's One!
+$ more target/log4j-out.txt
+INFO  30-08 18:23:34,062 [myorg.mypackage.ex1.AppTest] (AppTest.java:testApp:28)  -testApp
+DEBUG 30-08 18:23:34,062 [myorg.mypackage.ex1.App] (App.java:returnOne:11)  -Here's One!
 ---
 ---
 > find . -type f

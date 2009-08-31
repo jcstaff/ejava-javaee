@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -31,13 +32,13 @@ import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
  *
  * @author jcstaff
  */
-@Stateless
+//@Stateless
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class BookingAgentEJB implements BookingAgentRemote,
         BookingAgentLocal {
     private Log log = LogFactory.getLog(BookingAgentEJB.class);
     
-    //injected by container based on descriptor
+    @EJB(name="ejb/HotelReservation")
     private HotelRegistrationRemote hotel;
     
     @PersistenceContext(unitName="txagent")

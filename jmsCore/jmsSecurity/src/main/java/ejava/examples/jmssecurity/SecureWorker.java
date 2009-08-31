@@ -27,8 +27,7 @@ public class SecureWorker extends Worker implements Runnable, CallbackHandler {
     private static final Log log = LogFactory.getLog(SecureWorker.class);
     private String loginConfig;
     protected String username;
-    protected String password;
-        
+    protected String password;        
 
     public SecureWorker(String name) {
         super(name);
@@ -99,10 +98,11 @@ public class SecureWorker extends Worker implements Runnable, CallbackHandler {
             System.out.println();
 
             String connFactoryJNDI=null;
-            String destinationJNDI=null;
+            String requestQueueJNDI=null;
             String dlqJNDI=null;
             String name="";
             Integer maxCount=null;
+            boolean noFail=false;
             String username=null;
             String password=null;
             String loginConfig=null;
@@ -110,8 +110,8 @@ public class SecureWorker extends Worker implements Runnable, CallbackHandler {
                 if ("-jndi.name.connFactory".equals(args[i])) {
                     connFactoryJNDI = args[++i];
                 }
-                else if ("-jndi.name.destination".equals(args[i])) {
-                    destinationJNDI=args[++i];
+                else if ("-jndi.name.requestQueue".equals(args[i])) {
+                    requestQueueJNDI=args[++i];
                 }
                 else if ("-jndi.name.DLQ".equals(args[i])) {
                     dlqJNDI=args[++i];
@@ -121,6 +121,9 @@ public class SecureWorker extends Worker implements Runnable, CallbackHandler {
                 }
                 else if ("-max".equals(args[i])) {
                     maxCount=new Integer(args[++i]);
+                }
+                else if ("-noFail".equals(args[i])) {
+                	noFail=Boolean.parseBoolean(args[++i]);
                 }
                 else if ("-username".equals(args[i])) {
                     username=args[++i];
@@ -135,8 +138,8 @@ public class SecureWorker extends Worker implements Runnable, CallbackHandler {
             if (connFactoryJNDI==null) { 
                 throw new Exception("jndi.name.connFactory not supplied");
             }
-            else if (destinationJNDI==null) {
-                throw new Exception("jndi.name.destination not supplied");
+            else if (requestQueueJNDI==null) {
+                throw new Exception("jndi.name.requestQueue not supplied");
             }            
             else if (dlqJNDI==null) {
                 throw new Exception("jndi.name.DLQ not supplied");
@@ -148,11 +151,12 @@ public class SecureWorker extends Worker implements Runnable, CallbackHandler {
             Context jndi = new InitialContext();
             secureWorker.setConnFactory(
                     (ConnectionFactory)jndi.lookup(connFactoryJNDI));
-            secureWorker.setDestination((Destination)jndi.lookup(destinationJNDI));
+            secureWorker.setRequestQueue((Destination)jndi.lookup(requestQueueJNDI));
             secureWorker.setDLQ((Destination)jndi.lookup(dlqJNDI));
             if (maxCount!=null) {
                 secureWorker.setMaxCount(maxCount);
             }
+            secureWorker.setNoFail(noFail);
             secureWorker.setLoginConfig(loginConfig);
             if (username!=null) {
                 secureWorker.setUsername(username);

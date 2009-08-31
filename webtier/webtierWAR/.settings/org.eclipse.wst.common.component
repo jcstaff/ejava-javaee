@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+<wb-module deploy-name="webtierWAR">
+<wb-resource deploy-path="/" source-path="/src/main/webapp"/>
+<wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+<wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+<wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/resources"/>
+<dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/webtierBL/webtierBL">
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/webtierBO/webtierBO">
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/webtierDA/webtierDA">
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/webtierJPA/webtierJPA">
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<property name="context-root" value="webtierWAR"/>
+<property name="java-output-path"/>
+</wb-module>
+</project-modules>

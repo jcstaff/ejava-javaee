@@ -27,11 +27,12 @@ import org.apache.commons.logging.LogFactory;
 public class Worker implements Runnable {
     private static final Log log = LogFactory.getLog(Worker.class);
     protected ConnectionFactory connFactory;
-    protected Destination destination;
+    protected Destination requestQueue;
     protected Destination dlq;
     protected boolean stop = false;
     protected boolean stopped = false;
     protected boolean started = false;
+    protected boolean noFail = false;
     protected String name;
     protected int count=0;
     protected int maxCount=0;
@@ -43,8 +44,8 @@ public class Worker implements Runnable {
     public void setConnFactory(ConnectionFactory connFactory) {
         this.connFactory = connFactory;
     }
-    public void setDestination(Destination destination) {
-        this.destination = destination;
+    public void setRequestQueue(Destination requestQueue) {
+        this.requestQueue = requestQueue;
     }    
     public void setDLQ(Destination dlq) {
         this.dlq = dlq;
@@ -67,6 +68,9 @@ public class Worker implements Runnable {
     public boolean isStarted() {
         return started;
     }
+    public void setNoFail(boolean noFail) {
+    	this.noFail = noFail;
+    }
     protected Connection createConnection(ConnectionFactory connFactory) 
         throws Exception {
         return connFactory.createConnection();
@@ -81,7 +85,7 @@ public class Worker implements Runnable {
             connection = createConnection(connFactory);
             //use a transacted session to join request/response in single Tx
             session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
-            consumer = session.createConsumer(destination);
+            consumer = session.createConsumer(requestQueue);
             producer = session.createProducer(null);
             dlqProducer = session.createProducer(dlq);
             connection.start();
@@ -106,7 +110,7 @@ public class Worker implements Runnable {
                             ", delay=" + sleepTime);
                         log.debug(text.toString());
                         Thread.sleep(sleepTime);
-                        if (count < maxCount || maxCount==0){//fail on last one
+                        if (count < maxCount || maxCount==0 || noFail){//fail on last one
                             Message response = session.createMessage();
                             response.setJMSCorrelationID(
                                     request.getJMSMessageID());
@@ -162,16 +166,17 @@ public class Worker implements Runnable {
             }
 
             String connFactoryJNDI=null;
-            String destinationJNDI=null;
+            String requestQueueJNDI=null;
             String dlqJNDI=null;
             String name="";
             Integer maxCount=null;
+            boolean noFail=false;
             for (int i=0; i<args.length; i++) {
                 if ("-jndi.name.connFactory".equals(args[i])) {
                     connFactoryJNDI = args[++i];
                 }
-                else if ("-jndi.name.destination".equals(args[i])) {
-                    destinationJNDI=args[++i];
+                else if ("-jndi.name.requestQueue".equals(args[i])) {
+                    requestQueueJNDI=args[++i];
                 }
                 else if ("-jndi.name.DLQ".equals(args[i])) {
                     dlqJNDI=args[++i];
@@ -182,12 +187,15 @@ public class Worker implements Runnable {
                 else if ("-max".equals(args[i])) {
                     maxCount=new Integer(args[++i]);
                 }
+                else if ("-noFail".equals(args[i])) {
+                	noFail=Boolean.parseBoolean(args[++i]);
+                }
             }
             if (connFactoryJNDI==null) { 
                 throw new Exception("jndi.name.connFactory not supplied");
             }
-            else if (destinationJNDI==null) {
-                throw new Exception("jndi.name.destination not supplied");
+            else if (requestQueueJNDI==null) {
+                throw new Exception("jndi.name.requestQueue not supplied");
             }            
             else if (dlqJNDI==null) {
                 throw new Exception("jndi.name.DLQ not supplied");
@@ -196,8 +204,9 @@ public class Worker implements Runnable {
             Context jndi = new InitialContext();
             worker.setConnFactory(
                     (ConnectionFactory)jndi.lookup(connFactoryJNDI));
-            worker.setDestination((Destination)jndi.lookup(destinationJNDI));
+            worker.setRequestQueue((Destination)jndi.lookup(requestQueueJNDI));
             worker.setDLQ((Destination)jndi.lookup(dlqJNDI));
+            worker.setNoFail(noFail);
             if (maxCount!=null) {
                 worker.setMaxCount(maxCount);
             }

@@ -24,6 +24,15 @@ import ejava.examples.asyncmarket.ejb.SellerRemote;
 import ejava.examples.asyncmarket.ejb.UserMgmtLocal;
 import ejava.examples.asyncmarket.ejb.UserMgmtRemote;
 
+/**
+ * This is a helper class used to locate application-specific EJBs in the
+ * JNDI tree. It was originally written when JBoss was in the 4.x stage of
+ * adopting Java EE 5 and did not support @EJB injection into the Servlets.
+ * Although @EJB injection is now supported, it is still useful for use
+ * within the Jetty environment. However, the Local interface logic
+ * can be removed at this time.
+ *
+ */
 public class JNDIHelper {
     private static final Log log = LogFactory.getLog(JNDIHelper.class);
     

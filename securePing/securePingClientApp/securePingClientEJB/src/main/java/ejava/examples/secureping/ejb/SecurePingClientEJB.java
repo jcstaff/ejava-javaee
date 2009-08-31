@@ -6,6 +6,7 @@ import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.annotation.security.RunAs;
+import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 
@@ -27,7 +28,7 @@ public class SecurePingClientEJB
     @Resource
     SessionContext ctx;
    
-    //set by dependency injection in ejb-jar.xml
+    @EJB(name="ejb/SecurePingEJB")
     SecurePingRemote securePingServer;
     
     @PostConstruct

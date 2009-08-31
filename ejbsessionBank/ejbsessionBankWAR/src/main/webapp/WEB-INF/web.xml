@@ -41,4 +41,13 @@
         <servlet-name>Handler</servlet-name>
         <url-pattern>/model/admin/handler</url-pattern>
     </servlet-mapping>    
+    
+    <!--  if jetty honored @EJB injection, we could replace the manual JNDI
+        properties above with something like the following. Since the application
+        is local, within JBoss, it does not need the extra help. 
+         -->
+    <ejb-ref>
+        <ejb-ref-name>ejb/tellerRemote</ejb-ref-name>
+        <mapped-name>jnp://localhost:1099/ejava/examples/ejbsessionbank/TellerEJB/remote</mapped-name>
+    </ejb-ref>
 </web-app>

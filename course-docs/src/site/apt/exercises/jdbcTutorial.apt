@@ -36,8 +36,8 @@ Exercise: JDBC Tutorial
     verify both approaches result in the same database using the DB GUI.
 
 ---
-cd ${JBOSS_HOME}/server/default/data/hypersonic
-java -classpath ${JBOSS_HOME}/server/default/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+cd ${JBOSS_HOME}/server/${JBOSS_SERVER}/data/hypersonic
+java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     []
@@ -46,7 +46,7 @@ java -classpath ${JBOSS_HOME}/server/default/lib/hsqldb.jar org.hsqldb.Server -d
     option.
 
 ---
-java -classpath c:/apps/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+java -classpath c:/apps/jboss/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
 ** {Section B}: Setup project structure
@@ -273,7 +273,7 @@ public void testDemoSelect() throws Exception {
 # jdbctutorial build.properties
 M2_REPO=/home/jcstaff/.m2/repository
 
-junit.classpath=${M2_REPO}/junit/junit/3.8.1/junit-3.8.1.jar
+junit.classpath=${M2_REPO}/junit/junit/4.6/junit-4.6.jar
 commons.logging.classpath=${M2_REPO}/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
 log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar
 hsql.classpath=${M2_REPO}/hsqldb/hsqldb/1.8.0.4/hsqldb-1.8.0.4.jar
@@ -323,7 +323,7 @@ echo:
      [echo] artifactId=coffee
      [echo] src.dir=/home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src
      [echo] build.dir=/home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target
-     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar
+     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/4.6/junit-4.6.jar
      [echo] commons.logging.classpath=/home/jcstaff/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
      [echo] log4j.classpath=/home/jcstaff/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar
      [echo] jdbc.classpath=/home/jcstaff/.m2/repository/hsqldb/hsqldb/1.8.0.4/hsqldb-1.8.0.4.jar
@@ -575,7 +575,7 @@ Total time: 1 second
         <dependency>
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
-          <version>3.8.1</version>
+          <version>4.6</version>
           <scope>test</scope>
         </dependency>
         <dependency>

@@ -6,6 +6,10 @@
     <persistence-unit name="txagent">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/ejavaDS</jta-data-source>
+
+        <mapping-file>META-INF/orm.xml</mapping-file>
+        <jar-file>txAgentBO.jar</jar-file>
+
         <properties>
             <property name="hibernate.dialect" 
                 value="${hibernate.dialect}"/>

@@ -196,7 +196,7 @@ public class RegistrarTest extends TestCase {
      *   2) select/display a specific person
      *   3) change address for specific person
      *   4) view changes
-     * We will the core functionality of the EJB first using
+     * We will test the core functionality of the EJB first using
      * the @Remote interface before adding this to the WAR.
      * @throws Exception
      */

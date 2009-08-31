@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -19,12 +20,16 @@ import ejava.examples.asyncmarket.Seller;
 import ejava.examples.asyncmarket.UserMgmt;
 import ejava.examples.asyncmarket.bo.AuctionItem;
 import ejava.examples.asyncmarket.bo.Person;
+import ejava.examples.asyncmarket.ejb.SellerLocal;
+import ejava.examples.asyncmarket.ejb.UserMgmtLocal;
 
 @SuppressWarnings("serial")
 public class SellerHandlerServlet extends HttpServlet {
     private static Log log = LogFactory.getLog(SellerHandlerServlet.class);
     private Map<String, Handler> handlers = new HashMap<String, Handler>();
+    @EJB(beanInterface=SellerLocal.class)
     private Seller seller;
+    @EJB(beanInterface=UserMgmtLocal.class)
     private UserMgmt userMgmt;
 
     public static final String COMMAND_PARAM = "command";
@@ -43,7 +48,7 @@ public class SellerHandlerServlet extends HttpServlet {
         "/WEB-INF/content/UnknownCommand.jsp";
 
     public void init() throws ServletException {
-        log.debug("init() called ");
+        log.debug("init() called, seller=" + seller + ", userMgmt=" + userMgmt);
         try {
             ServletContext ctx = getServletContext();
             JNDIHelper jndi = new JNDIHelper();

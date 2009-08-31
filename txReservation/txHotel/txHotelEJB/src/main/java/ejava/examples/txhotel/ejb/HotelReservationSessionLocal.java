@@ -1,9 +1,9 @@
 package ejava.examples.txhotel.ejb;
 
-import javax.ejb.Remote;
+import javax.ejb.Local;
 
 import ejava.examples.txhotel.bl.HotelReservationSession;
 
-@Remote
+@Local
 public interface HotelReservationSessionLocal extends HotelReservationSession {
 }

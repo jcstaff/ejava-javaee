@@ -92,7 +92,7 @@ public class TemporaryTopicTest extends TestCase {
         try {
             connection = connFactory.createConnection();
             session = connection.createSession(
-                    false, Session.AUTO_ACKNOWLEDGE);
+                    false, Session.CLIENT_ACKNOWLEDGE);
             Topic destination = session.createTemporaryTopic();
             log.debug("created temporary topic=" + destination);
             startCatchers(session, destination);
@@ -124,7 +124,7 @@ public class TemporaryTopicTest extends TestCase {
         try {
             connection = connFactory.createConnection();
             session = connection.createSession(
-                    false, Session.AUTO_ACKNOWLEDGE);
+                    false, Session.CLIENT_ACKNOWLEDGE);
             Topic destination = session.createTemporaryTopic();
             log.debug("created temporary topic=" + destination);
             startCatchers(session, destination);

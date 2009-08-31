@@ -24,6 +24,7 @@ import ejava.examples.ejbsessionbank.bl.Teller;
 import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Ledger;
 import ejava.examples.ejbsessionbank.ejb.TellerLocal;
+import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
 @SuppressWarnings("serial")
 public class TellerHandlerServlet extends HttpServlet {
@@ -48,18 +49,21 @@ public class TellerHandlerServlet extends HttpServlet {
     
     /**
      * This will get automatically injected when running within the 
-     * application server with the TellerEJB.
+     * application server with the TellerEJB. beanInterface is only
+     * needed to resolve the derived type ambiguity for Local and Remote
+     * caused by the design of our example. 
      */
-    //not working:(
-    @javax.ejb.EJB(name="ejb/teller", 
-         beanName="TellerEJB", 
-         beanInterface=TellerLocal.class,
-         mappedName="ejava/examples/ejbsessionbank/TellerEJB/local")
-    //not working either:((
-    //@Resource(name="ejb/teller", 
-    //     type=TellerLocal.class,
-    //     mappedName="ejava/examples/ejbsessionbank/TellerEJB/local")
+    @javax.ejb.EJB(beanInterface=TellerLocal.class)
     private Teller teller;
+
+    /**
+     * For containers that support @EJB injection, this will allow
+     * our deployment descriptor to manually point to the remote 
+     * server and remote interface. Unfortunately, the Jetty container
+     * does not support this feature.
+     */
+    @javax.ejb.EJB(name="ejb/tellerRemote")
+    private TellerRemote tellerRemote;
 
     /**
      * Init verify the teller reference to the EJB logic is in place and
@@ -68,6 +72,7 @@ public class TellerHandlerServlet extends HttpServlet {
      */
     public void init() throws ServletException {
         log.debug("init() called; teller=" + teller);
+        log.debug("init() called; tellerRemote=" + tellerRemote);
         
         try {
             ServletConfig config = getServletConfig();
@@ -154,9 +159,12 @@ public class TellerHandlerServlet extends HttpServlet {
         ServletConfig config = getServletConfig();
         try {
             new JNDIHelper().dump(new InitialContext(), "java:/comp/env");
-            new JNDIHelper().dump(new InitialContext(), "java:/comp.ejb3/env");
         } catch (Exception ex) {}
-        if (teller == null) { //we are in development mode; go remote
+        if (tellerRemote != null && teller == null) {
+        	log.info("using injected remote interface");
+        	teller = tellerRemote;
+        }
+        else if (teller == null) { //get the interface manually
             log.info("teller was null, getting teller manually");
             Properties jndiProperties = new Properties();
             for(Enumeration e=config.getInitParameterNames();

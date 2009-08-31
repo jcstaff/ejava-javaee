@@ -1,0 +1,287 @@
+Porting from JBoss 4.2.3.GA to 5.1.0.GA 
+
+These are the issues encountered and steps taken to port the ejava example
+source tree from JBoss 4.2.3.GA to 5.1.0.GA version. 
+
+    * {{{https://ejava.info:8443/repos/class/tags/2009-spring-ejava-javaee/}
+    4.x baseline}}
+
+    * {{{}
+    5.x baseline}}
+
+    []
+
+
+* Key Issues
+
+    [[1]] Deployment descriptors have gone through some schema and parser changes.
+    Issued ranged from tokens being parsed as strings (leaving extra whitespace)
+    to previously valid descriptors being reported as invalid.
+
+    [[1]] JBoss now ships with a standard and default set of servers. The default
+    server used the legacy common classloader configuration. The standard server
+    uses a more-JavaEE compliant configuration that better isolates deployments.
+    The standard server can be selected from the command line using "-c standard".
+
+* Issues
+
+    [[1]] When using the server built from source, JBoss deployment descriptors
+    were being reported as invalid. Adding the following property to the 
+    startup script (export JAVA_OPTS="-Dxb.builder.useUnorderedSequence=true")
+    corrected the issue. This fix was documented in the following posts, however
+    the pre-built version of the java5 server did not exhibit the issue.
+
+        * {{{http://www.mail-archive.com/jboss-user@lists.jboss.org/msg156896.html}}}
+
+        * {{{https://jira.jboss.org/jira/browse/JBAS-6743}}}
+
+        []
+
+    [[1]] hibernate artifactId changed from hibernate to hibernate-core. 
+    
+    [[1]] Hibernate now seems to require the addition of slf4j-log4j12 to
+    be added to the projects using log4j.
+
+    [[1]] JBoss 5.x uses newer versions of hibernate. The new hibernate configuration
+    is now as follows
+
+---
+            <repositories>
+                <repository>
+                    <id>jboss-repo</id>
+                    <name>JBoss Maven Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
+            </repositories>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>3.4.0.GA</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-core</artifactId>
+                    <version>3.3.1.GA</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <version>1.5.2</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+---
+
+    [[1]] I switched from system-based dependencies on local .jar files to
+    repository-based versions for JBoss clients. JBoss also provides a 
+    jboss-as-client pom project that defines dependencies on common artifacts
+    clients need. This reduced the complexity of the clients significantly.
+    The following is the new standard dependency declaration for RMI Test 
+    projects. This type of change also goes into the Jetty WAR configurations.
+
+---
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>5.1.0.GA</version>            
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+---
+
+    [[1]] JBoss5 changed its jboss.xml schema. This is the error you will get
+    when using the schema definition that was running within JBoss4 deployments.
+
+---
+<jboss xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.jboss.org/j2ee/schema http://www.jboss.org/j2ee/schema/jboss_5_0.xsd"
+    version="3.0">
+
+Failed to parse source: Element {http://java.sun.com/xml/ns/javaee}jboss is not bound as a global element.
+---
+
+    This gets updated to something that makes much more sense.
+
+---
+<jboss 
+    xmlns="http://www.jboss.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation ="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss_5_0.xsd" 
+    version="5.0">
+---
+
+
+
+    [[1]] Whitespace processing in env-entry-value has changed from token form to
+    string form. This means that extra whitespace is not removed from values. Thus
+    the following results in error if the EJB does not remove whitespace.
+
+---
+<session>
+    <ejb-name>TellerEJB</ejb-name>
+    <env-entry>
+        <env-entry-name>daoClass</env-entry-name>
+        <env-entry-type>java.lang.String</env-entry-type>
+        <env-entry-value>ejava.examples.ejbsessionbank.jpa.JPAAccountDAO
+        </env-entry-value>
+    </env-entry>
+</session>
+---
+
+    This corrects the issue within the deployment descriptor
+
+---
+        <env-entry-value>ejava.examples.ejbsessionbank.jpa.JPAAccountDAO</env-entry-value>
+---
+
+    [[1]] Persistence Units are not automatically located in JBoss5. We must
+    specifically reference the .jar with the PU. You could not do that with
+    JBoss4 because it always intrperted that as a path from the server directory.
+    However, it is working as I originally thought it would with JBoss 5.
+
+---
+
+    <persistence-unit name="ejbsessionbank">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:/ejavaDS</jta-data-source>
+
+        <jar-file>ejbsessionBankImpl.jar</jar-file>
+
+        <properties>
+            <property name="hibernate.dialect" 
+                value="${hibernate.dialect}"/>
+            <property name="hibernate.show_sql" value="false"/>            
+            <!-- create is used here for demo project only -->
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+        </properties>
+    </persistence-unit>        
+---
+
+    However, Maven will append a version number to the .jar name in 
+    the EAR.  One way to correct this is to tell maven to use a
+    constant finalName in the PU/pom.xml
+
+---
+
+    <build>
+        <!-- finalName keeps the version information from being carried
+           into the .ear file; allowing the EJB/.../persistence.xml file
+           to use a generic versus version-specific name to refer to this
+           .jar -->
+        <finalName>ejbsessionBankImpl</finalName>
+---
+
+    [[1]] The JNDI example that expressed @Local and @Remote interfaces
+    through the ejb-jar.xml deployment descriptor was mistakenly using
+    local and remote elements. These seem to be tied to EJB 2.x usage,
+    requires a Home to be provided, and do not trigger other EJB 3 
+    functionality. local-business and remote-business elements must 
+    instead be used.
+
+---
+<session>
+    <ejb-name>AidScheduler</ejb-name>
+    <business-local>ejava.examples.jndidemo.ejb.AidSchedulerLocal</business-local>
+    <business-remote>ejava.examples.jndidemo.ejb.AidSchedulerRemote</business-remote>
+    <ejb-class>ejava.examples.jndidemo.ejb.AidSchedulerEJB</ejb-class>
+    <session-type>Stateless</session-type>
+
+//@Local declared by ejb-jar.xml entry
+public interface AidSchedulerLocal extends Scheduler {
+}
+
+//@Remote declared by ejb-jar.xml entry
+public interface AidSchedulerRemote extends Scheduler {
+}
+---
+
+    [[1]] @EJB injection works better now for EJBs
+
+---
+    @EJB
+    protected CookLocal cook2; 
+---
+
+    [[1]] @EJB injection now works for Servlets
+
+---
+    @EJB(beanInterface=TellerLocal.class)
+    private Teller teller;
+    
+    @EJB
+    private TellerLocal teller2;
+    @EJB
+    private TellerRemote teller3;
+---
+
+    [[1]] JBoss has rewritten their JMS Provider and the interface for
+    configuring their topics/queues has changed. I could not locate 
+    the new design of the XML files, but the JMX interface seems to 
+    be the primary way to interface with the new capability. I added
+    a JMX JMSAdmin class within jmsMechanics and now delegatre to that
+    class to setup topics/queues prior to testing.
+
+---
+Bean:jboss.messaging:service=ServerPeer
+---
+
+    [[1]] The 1.0 version of the JBoss Messaging, which comes with
+    the application server, does not appear to address security. 
+    However, the 2.0 BETAs do include security features. I had to 
+    separately download JBoss Messaging 2.0 BETA4 to get the 
+    jmsSecurity working. However, with 2.0, they redesigned the
+    JMX Beans and the configuration changes are unique. I finally
+    gave up on separate JMS descriptors and the runtime JMX
+    interface and now have a cached set of server-wide configuration
+    files that need to be copied over to configure the server
+    the way it needs to be.
+
+---
+conf/props/messaging-roles.properties
+conf/props/messaging-users.properties
+deploy/messaging.sar/jbm-configuration.xml
+deploy/messaging.sar/jbm-jms.xml
+---
+    
+    [[1]] Having a resource-ref in jboss.xml with no definition
+    of it within the EJB or ejb-jar.xml file was causing a 
+    NPE for one of the asyncEJB BuyerEJB. Once removed, the
+    NPE stopped.
+
+    [[1]] Fixed an error with asyncEJB references to @PersistenceContext.
+    I was using "name" versus "unitName". This resulted in a 
+    confusing error where the container wanted to locate a 
+    variable that matched name for injection.
+
+---
+
+    [[1]] Updated the cargo confiurations to use the jboss5x
+    containerId. Also noticed that the 3x-rule for changing
+    directories no longer corrected things. However, a
+    -Pundeploy before changing directories appeared to avoid
+    the problem.
+
+---
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <container>
+                        <containerId>jboss5x</containerId>
+                        <type>remote</type>
+                    </container>
+                </configuration>
+---

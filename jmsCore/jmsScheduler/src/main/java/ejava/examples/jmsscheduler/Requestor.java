@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 public class Requestor implements Runnable, MessageListener {
     private static final Log log = LogFactory.getLog(Requestor.class);
     protected ConnectionFactory connFactory;
-    protected Destination destination;
+    protected Destination requestQueue;
     protected boolean stop = false;
     protected boolean stopped = false;
     protected boolean started = false;
@@ -45,8 +45,8 @@ public class Requestor implements Runnable, MessageListener {
     public void setConnFactory(ConnectionFactory connFactory) {
         this.connFactory = connFactory;
     }
-    public void setDestination(Destination destination) {
-        this.destination = destination;
+    public void setRequestQueue(Destination requestQueue) {
+        this.requestQueue = requestQueue;
     }    
     public int getCount() {
         return count;
@@ -83,7 +83,7 @@ public class Requestor implements Runnable, MessageListener {
         try {
             connection = createConnection(connFactory);
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            producer = session.createProducer(destination);
+            producer = session.createProducer(requestQueue);
             Destination replyTo = getReplyTo(session);
             MessageConsumer consumer = session.createConsumer(replyTo);
             consumer.setMessageListener(this);
@@ -176,7 +176,7 @@ public class Requestor implements Runnable, MessageListener {
             }
             System.out.println();
             String connFactoryJNDI=null;
-            String destinationJNDI=null;
+            String requestQueueJNDI=null;
             String name="";
             Long sleepTime=null;
             Integer maxCount=null;
@@ -184,8 +184,8 @@ public class Requestor implements Runnable, MessageListener {
                 if ("-jndi.name.connFactory".equals(args[i])) {
                     connFactoryJNDI = args[++i];
                 }
-                else if ("-jndi.name.destination".equals(args[i])) {
-                    destinationJNDI=args[++i];
+                else if ("-jndi.name.requestQueue".equals(args[i])) {
+                    requestQueueJNDI=args[++i];
                 }
                 else if ("-name".equals(args[i])) {
                     name=args[++i];
@@ -200,14 +200,14 @@ public class Requestor implements Runnable, MessageListener {
             if (connFactoryJNDI==null) { 
                 throw new Exception("jndi.name.connFactory not supplied");
             }
-            else if (destinationJNDI==null) {
-                throw new Exception("jndi.name.destination not supplied");
+            else if (requestQueueJNDI==null) {
+                throw new Exception("jndi.name.requestQueue not supplied");
             }            
             Requestor requestor = new Requestor(name);
             Context jndi = new InitialContext();
             requestor.setConnFactory(
                     (ConnectionFactory)jndi.lookup(connFactoryJNDI));
-            requestor.setDestination((Destination)jndi.lookup(destinationJNDI));
+            requestor.setRequestQueue((Destination)jndi.lookup(requestQueueJNDI));
             if (maxCount!=null) {
                 requestor.setMaxCount(maxCount);
             }

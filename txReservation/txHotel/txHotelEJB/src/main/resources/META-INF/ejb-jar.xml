@@ -8,18 +8,23 @@
     <enterprise-beans>
         <session>
             <ejb-name>HotelRegistrationEJB</ejb-name>
+            <ejb-class>ejava.examples.txhotel.ejb.HotelRegistrationEJB</ejb-class>
+            <session-type>Stateless</session-type>
         </session>
         <session>
             <ejb-name>RequiredEJB</ejb-name>
             <ejb-class>ejava.examples.txhotel.ejb.HotelRegistrationEJB</ejb-class>
+            <session-type>Stateless</session-type>
         </session>
         <session>
             <ejb-name>RequiresNewEJB</ejb-name>
             <ejb-class>ejava.examples.txhotel.ejb.HotelRegistrationEJB</ejb-class>
+            <session-type>Stateless</session-type>
         </session>
         
         <session>                      
             <ejb-name>HotelReservationSessionEJB</ejb-name>
+            <ejb-class>ejava.examples.txhotel.ejb.HotelReservationSessionEJB</ejb-class>
             <session-type>Stateful</session-type>
             <remove-method>
                 <bean-method>
@@ -27,6 +32,7 @@
                 </bean-method>
                 <retain-if-exception>false</retain-if-exception>
             </remove-method>
+
             <ejb-local-ref>
                 <ejb-ref-name>ejb/HotelReservationist</ejb-ref-name>
                 <ejb-ref-type>Session</ejb-ref-type>
@@ -41,6 +47,7 @@
                     </injection-target-name>
                 </injection-target>
             </ejb-local-ref>
+
             <!-- this seemed to be ignored, so @PostConstruct annotation
                 put back into class -->
             <post-construct>
@@ -54,8 +61,7 @@
         </session>        
         <session>
             <ejb-name>RequiredSessionEJB</ejb-name>                       
-            <ejb-class>ejava.examples.txhotel.ejb.HotelReservationSessionEJB
-            </ejb-class>
+            <ejb-class>ejava.examples.txhotel.ejb.HotelReservationSessionEJB</ejb-class>
             <session-type>Stateful</session-type>
             <remove-method>
                 <bean-method>
@@ -63,6 +69,7 @@
                 </bean-method>
                 <retain-if-exception>false</retain-if-exception>
             </remove-method>            
+
             <ejb-local-ref>
                 <ejb-ref-name>ejb/HotelReservationist</ejb-ref-name>
                 <ejb-ref-type>Session</ejb-ref-type>
@@ -80,8 +87,7 @@
         </session>
         <session>
             <ejb-name>RequiresNewSessionEJB</ejb-name>
-            <ejb-class>ejava.examples.txhotel.ejb.HotelReservationSessionEJB
-            </ejb-class>
+            <ejb-class>ejava.examples.txhotel.ejb.HotelReservationSessionEJB</ejb-class>
             <session-type>Stateful</session-type>
             <remove-method>
                 <bean-method>
@@ -89,6 +95,7 @@
                 </bean-method>
                 <retain-if-exception>false</retain-if-exception>
             </remove-method>            
+
             <ejb-local-ref>
                 <ejb-ref-name>ejb/HotelReservationist</ejb-ref-name>
                 <ejb-ref-type>Session</ejb-ref-type>

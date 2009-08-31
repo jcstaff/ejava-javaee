@@ -43,11 +43,14 @@ public class MessageConsumerQueueTest extends TestCase {
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
         
+        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
+        new JMSAdmin().destroyQueue("queue1")
+                      .deployQueue("queue1", destinationJNDI);        
+
         assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
         log.debug("connection factory name:" + connFactoryJNDI);
         connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
         
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
         log.debug("destination name:" + destinationJNDI);
         destination = (Queue) jndi.lookup(destinationJNDI);
         
@@ -70,6 +73,7 @@ public class MessageConsumerQueueTest extends TestCase {
                 log.debug("onMessage received (" + ++count + 
                         "):" + message.getJMSMessageID());
                 messages.add(message);
+                message.acknowledge();
             } catch (JMSException ex) {
                 log.fatal("error handling message", ex);
             }
@@ -92,7 +96,8 @@ public class MessageConsumerQueueTest extends TestCase {
             if (message != null) {
                 log.debug("receive (" + ++count + 
                         "):" + message.getJMSMessageID());
-            }
+                message.acknowledge();
+            }        
             return message;
         }
     }
@@ -106,8 +111,9 @@ public class MessageConsumerQueueTest extends TestCase {
         MessageConsumer syncConsumer = null;
         try {
             connection = connFactory.createConnection();
+            //need to use CLIENT_ACK to avoid race condition within this app
             session = connection.createSession(
-                    false, Session.AUTO_ACKNOWLEDGE);
+                    false, Session.CLIENT_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
 
             //create a client to asynchronous receive messages through 
@@ -160,8 +166,9 @@ public class MessageConsumerQueueTest extends TestCase {
         MessageConsumer syncConsumer = null;
         try {
             connection = connFactory.createConnection();
+            //need to use CLIENT_ACK to avoid race condition within this app
             session = connection.createSession(
-                    false, Session.AUTO_ACKNOWLEDGE);
+                    false, Session.CLIENT_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
 
             //create a client to asynchronous receive messages through 

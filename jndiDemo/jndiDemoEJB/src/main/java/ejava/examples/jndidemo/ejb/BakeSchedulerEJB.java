@@ -23,11 +23,6 @@ import ejava.examples.jndidemo.JNDIHelper;
  *
  */
 @Stateful(name="BakeScheduler")
-// This populates the local JNDI ENC so that they can be de-referenced
-// within the EJB.
-@EJBs({
-    @EJB(name="ejb/cook", beanInterface=CookLocal.class, beanName="CookEJB")
-})
 @PersistenceContext(unitName="jndidemo",
                     name="persistence/jndidemo",
                     type=PersistenceContextType.EXTENDED)
@@ -66,11 +61,11 @@ public class BakeSchedulerEJB
     protected CookLocal cook; 
 
     /*
-     * This reference will be injected by the container based on the name
-     * provided here and the information either located within the @EJBs spec
-     * at the top of the class or the ejb-jar.xml deployment descriptor file. 
+     * This reference will be injected by the container based on the data
+     * type declared. The resolved EJB also gets placed in the ejb/cook ENC
+     * name so that it can be looked up by code using the JNDI tree directly.
      */
-    @Resource(name="ejb/cook")
+    @EJB(name="ejb/cook")
     protected CookLocal cook2; 
 
     /*
@@ -84,20 +79,14 @@ public class BakeSchedulerEJB
     public void init() {        
         log.info("******************* BakeScheduler Created ******************");
         log.debug("ctx=" + ctx);
-        log.debug("ejb/cook=" + ctx.lookup("ejb/cook"));
         log.debug("em=" + em);
         log.debug("ds=" + ds);
         log.debug("persistence/jndidemo=" + ctx.lookup("persistence/jndidemo"));
         log.debug("message=" + message);
-        log.debug("cook=" + cook);
+        log.debug("cook=" + cook);  //this will be null at this point
         log.debug("cook2=" + cook2);
+        log.debug("ejb/cook=" + ctx.lookup("ejb/cook"));
         cook = (CookLocal)ctx.lookup("ejb/cook");
-        //note that JBoss stashes things in a proprietary context in v4.x -
-        //java:comp/env doesn't end up really holding anything although
-        //lookups act like they really resolve to expected objects (see output
-        //from running the RMI test program
-        try { new JNDIHelper().dump(new InitialContext(), "java:comp.ejb3");
-        } catch (NamingException e) { log.fatal("" + e); }
         try { new JNDIHelper().dump(new InitialContext(), "java:comp/env");
         } catch (NamingException e) { log.fatal("" + e); }
     }

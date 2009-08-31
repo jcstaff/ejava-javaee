@@ -43,11 +43,14 @@ public class MessageConsumerTopicTest extends TestCase {
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
         
+        assertNotNull("jndi.name.testTopic not supplied", destinationJNDI);
+        new JMSAdmin().destroyTopic("topic1")
+                      .deployTopic("topic1", destinationJNDI);
+        
         assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
         log.debug("connection factory name:" + connFactoryJNDI);
         connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
         
-        assertNotNull("jndi.name.testTopic not supplied", destinationJNDI);
         log.debug("destination name:" + destinationJNDI);
         destination = (Topic) jndi.lookup(destinationJNDI);
         
@@ -70,6 +73,7 @@ public class MessageConsumerTopicTest extends TestCase {
                 log.debug("onMessage received (" + ++count + 
                         "):" + message.getJMSMessageID());
                 messages.add(message);
+                message.acknowledge();
             } catch (JMSException ex) {
                 log.fatal("error handling message", ex);
             }
@@ -92,6 +96,7 @@ public class MessageConsumerTopicTest extends TestCase {
             if (message != null) {
                 log.debug("receive (" + ++count + 
                         "):" + message.getJMSMessageID());
+                message.acknowledge();
             }
             return message;
         }
@@ -107,7 +112,7 @@ public class MessageConsumerTopicTest extends TestCase {
         try {
             connection = connFactory.createConnection();
             session = connection.createSession(
-                    false, Session.AUTO_ACKNOWLEDGE);
+                    false, Session.CLIENT_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
 
             //create a client to asynchronous receive messages through 
@@ -162,7 +167,7 @@ public class MessageConsumerTopicTest extends TestCase {
         try {
             connection = connFactory.createConnection();
             session = connection.createSession(
-                    false, Session.AUTO_ACKNOWLEDGE);
+                    false, Session.CLIENT_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
 
             //create a client to asynchronous receive messages through 

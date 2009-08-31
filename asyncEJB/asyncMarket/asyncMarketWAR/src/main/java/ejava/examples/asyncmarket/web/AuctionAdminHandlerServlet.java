@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -16,12 +17,16 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.asyncmarket.AuctionMgmt;
 import ejava.examples.asyncmarket.UserMgmt;
+import ejava.examples.asyncmarket.ejb.AuctionMgmtLocal;
+import ejava.examples.asyncmarket.ejb.UserMgmtLocal;
 
 @SuppressWarnings("serial")
 public class AuctionAdminHandlerServlet extends HttpServlet {
     private static Log log = LogFactory.getLog(AuctionAdminHandlerServlet.class);
     private Map<String, Handler> handlers = new HashMap<String, Handler>();
+    @EJB(beanInterface=AuctionMgmtLocal.class)
     private AuctionMgmt auctionMgmt;
+    @EJB(beanInterface=UserMgmtLocal.class)
     private UserMgmt userMgmt;
 
     public static final String COMMAND_PARAM = "command";
@@ -40,7 +45,7 @@ public class AuctionAdminHandlerServlet extends HttpServlet {
         "/WEB-INF/content/UnknownCommand.jsp";
 
     public void init() throws ServletException {
-        log.debug("init() called ");
+        log.debug("init() called, auctionMgmt=" + auctionMgmt + ", userMgmt=" + userMgmt);
         try {
             JNDIHelper jndi = new JNDIHelper();
             ServletContext ctx = getServletContext();

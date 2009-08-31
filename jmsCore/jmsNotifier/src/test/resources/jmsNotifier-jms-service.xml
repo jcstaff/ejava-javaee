@@ -1,9 +1,11 @@
-<server>
+<?xml version="1.0" encoding="UTF-8"?>
 
-  <mbean code="org.jboss.mq.server.jmx.Topic"
-         name="jboss.mq.destination:service=Topic,name=ejava/examples/jmsNotifier/topic1">
-    <depends optional-attribute-name="DestinationManager">
-        jboss.mq:service=DestinationManager
-    </depends>
-  </mbean>
+<!-- Destination descriptor for the jmsNotifier example -->
+<server>
+   <mbean code="org.jboss.jms.server.destination.TopicService"
+      name="jboss.messaging.destination:service=Topic,name=jmsNotifierTopic1"
+      xmbean-dd="xmdesc/Topic-xmbean.xml">
+      <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+      <depends>jboss.messaging:service=PostOffice</depends>
+   </mbean>
 </server>

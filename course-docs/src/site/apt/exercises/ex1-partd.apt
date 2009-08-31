@@ -13,9 +13,6 @@ Exercise 1: First Simple Application
     as needed.  Connectivity to the internet is required until all
     dependencies have been satisfied.
     
-    [Note:] If you do not have Maven installed on your system, it can be 
-    from {{http://maven.apache.org//}}
-
     [Note:] The people involved with Maven 2 have done a tremendous job at 
     documenting the system and how to get started. If you have not done so,
     you should become familiar with the fact that the following exists:
@@ -114,7 +111,7 @@ Exercise 1: First Simple Application
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -165,52 +162,48 @@ Exercise 1: First Simple Application
     and test. 
 
 ---
-> mvn package
+$ mvn package
 [INFO] Scanning for projects...
-[INFO]
- ----------------------------------------------------------------------------
-[INFO] Building My First Maven Project
+[WARNING]
+        Profile with id: 'hsql' has not been activated.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Building My First Simple Project
 [INFO]    task-segment: [package]
-[INFO]
- ----------------------------------------------------------------------------
-[INFO] [resources:resources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [compiler:compile]
-Compiling 1 source file to
-/home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
-[INFO] [resources:testResources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [compiler:testCompile]
-Compiling 1 source file to
-/home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
-[INFO] [surefire:test]
-[INFO] Surefire report directory:
-/home/jcstaff/proj/ejava-javaee/solutions/ex1/target/surefire-reports
+[INFO] ------------------------------------------------------------------------
+[INFO] [resources:resources {execution: default-resources}]
+[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory C:\cygwin\home\jcstaff\proj\784\exercises\ex1\src\main\resources
+[INFO] [compiler:compile {execution: default-compile}]
+[INFO] Nothing to compile - all classes are up to date
+[INFO] [resources:testResources {execution: default-testResources}]
+[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 1 resource
+[INFO] [compiler:testCompile {execution: default-testCompile}]
+[INFO] Nothing to compile - all classes are up to date
+[INFO] [surefire:test {execution: default-test}]
+[INFO] Surefire report directory: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\surefire-reports
 
  -------------------------------------------------------
  T E S T S
  -------------------------------------------------------
- Running myorg.mypackage.ex1.AppTest
- INFO  01-09 16:42:09,648 (AppTest.java:testApp:26)  -testApp
- DEBUG 01-09 16:42:09,660 (App.java:returnOne:11)  -Here's One!
- Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 sec
+Running myorg.mypackage.ex1.AppTest
+INFO  30-08 18:31:42,796 (AppTest.java:testApp:28)  -testApp
+DEBUG 30-08 18:31:42,796 (App.java:returnOne:11)  -Here's One!
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.047 sec
 
- Results :
- Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+Results :
 
- [INFO] [jar:jar]
- [INFO] Building jar:
- /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1-1.0-SNAPSHOT.jar
- [INFO]
- ------------------------------------------------------------------------
- [INFO] BUILD SUCCESSFUL
- [INFO]
- ------------------------------------------------------------------------
- [INFO] Total time: 3 seconds
- [INFO] Finished at: Fri Sep 01 16:42:09 EDT 2006
- [INFO] Final Memory: 4M/11M
- [INFO]
- ------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] [jar:jar {execution: default-jar}]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2 seconds
+[INFO] Finished at: Sun Aug 30 18:31:43 EDT 2009
+[INFO] Final Memory: 9M/16M
+[INFO] ------------------------------------------------------------------------
 ---
 
 ---
@@ -248,6 +241,18 @@ Compiling 1 source file to
             Ant is still allowed to exist. We could even delegate from
             Maven to Ant using the maven-antrun-plugin if we had legacy
             build.xml scripts that we wanted to leverage.
+
+        [Note:] The [WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent! can be cleaned up by adding the following to the top
+        of the pom.xml
+
+---
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+...
+    <modelVersion>4.0.0</modelVersion>
+---
+        []
 
     [[1]]  For fun, lets add a README that could be used to describe
     your project when it is turned in. Maven supports a couple of 
@@ -421,6 +426,10 @@ Compiling 1 source file to
         the JBoss installation instance for client jarfiles. This assures your
         testing is being done against the same version installed on your system.
 
+        * jboss.server - this is used by class examples to name the
+        the JBoss server profile to use within jboss.home. We will be using the
+        (Java EE 5) "standard" profile (which is _not_ the "default" profile).
+
         * jboss.(remaining) - used by the Maven cargo plugin to set deployment
         variables to their non-default values
 
@@ -433,6 +442,7 @@ Compiling 1 source file to
             <properties>
                 <m2.repo>c:/jhu/repository</m2.repo>
                 <jboss.home>c:/apps/jboss</jboss.home>
+                <jboss.server>standard</jboss.server>
                 <jboss.protocol>http</jboss.protocol>
                 <jboss.host>localhost</jboss.host>
                 <jboss.servlet.port>8080</jboss.servlet.port>

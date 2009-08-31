@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="jmsNotifier" default="run" basedir="..">
+<project name="jmsNotifier" basedir="..">
 
     <property file="test-classes/${ant.project.name}.properties"/>
 
@@ -41,7 +41,7 @@
     </target>
 
     <target name="init">
-        <copy todir="${JBOSS_HOME}/server/default/deploy"
+        <copy todir="${JBOSS_HOME}/server/${JBOSS_SERVER}/deploy"
               file="test-classes/${ant.project.name}-jms-service.xml"/>
         <sleep seconds="5"/>
     </target>

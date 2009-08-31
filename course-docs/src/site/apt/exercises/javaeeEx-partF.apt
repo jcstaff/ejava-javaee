@@ -1170,6 +1170,7 @@ import myorg.javaeeex.ejb.RegistrarRemote;
 
 public class RegistrarHandlerServlet extends HttpServlet {
    ...
+    @EJB(beanInterface=RegistrarLocal.class)
     private Object registrar;
 ---
 

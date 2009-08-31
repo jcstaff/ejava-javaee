@@ -38,12 +38,15 @@ public class TransactedQueueSessionTest extends TestCase {
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
+
+        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
+        new JMSAdmin().destroyQueue("queue1")
+                      .deployQueue("queue1", destinationJNDI);
         
         assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
         log.debug("connection factory name:" + connFactoryJNDI);
         connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
         
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
         log.debug("destination name:" + destinationJNDI);
         destination = (Queue) jndi.lookup(destinationJNDI);
         

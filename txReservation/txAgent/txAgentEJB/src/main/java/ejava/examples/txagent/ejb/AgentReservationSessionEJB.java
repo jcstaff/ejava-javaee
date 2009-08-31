@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.Remove;
 import javax.ejb.SessionContext;
@@ -49,7 +50,7 @@ import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
  *
  * @author jcstaff
  */
-@Stateful
+//@Stateful
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class AgentReservationSessionEJB
     implements AgentReservationSessionLocal, AgentReservationSessionRemote,
@@ -63,7 +64,7 @@ public class AgentReservationSessionEJB
     @PersistenceContext(unitName="txagent")
     private EntityManager em;
     
-    //the deployment descriptor will inject this field
+    @EJB(name="ejb/HotelReservationSession")
     private HotelReservationSessionRemote reservationSession;
 
     private AgentReservationSession agentSession;

@@ -1,29 +1,25 @@
-<server>
-  <mbean code="org.jboss.mq.server.jmx.Queue"
-         name="jboss.mq.destination:service=Queue,name=ejava/examples/asyncMarket/queue1">
-     <depends optional-attribute-name="DestinationManager">
-        jboss.mq:service=DestinationManager
-     </depends>
-    <attribute name="SecurityConf">
-      <security>
-        <role name="guest" read="true" write="true"/>
-        <role name="publisher" read="true" write="true" create="false"/>
-        <role name="durpublisher" read="true" write="true" create="true"/>
-      </security>
-    </attribute>
-  </mbean>
+<?xml version="1.0" encoding="UTF-8"?>
 
-  <mbean code="org.jboss.mq.server.jmx.Topic"
-         name="jboss.mq.destination:service=Topic,name=ejava/examples/asyncMarket/topic1">
-    <depends optional-attribute-name="DestinationManager">
-        jboss.mq:service=DestinationManager
-    </depends>
-    <attribute name="SecurityConf">
-      <security>
-        <role name="guest" read="true" write="true"/>
-        <role name="publisher" read="true" write="true" create="false"/>
-        <role name="durpublisher" read="true" write="true" create="true"/>
-      </security>
-    </attribute>
-  </mbean>
+<!--
+     Messaging Destinations deployment descriptor.
+
+     $Id: destinations-service.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org $
+ -->
+
+<server>
+
+   <mbean code="org.jboss.jms.server.destination.QueueService"
+      name="jboss.messaging.destination:service=Queue,name=asyncMarketQueue1"
+      xmbean-dd="xmdesc/Queue-xmbean.xml">
+      <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+      <depends>jboss.messaging:service=PostOffice</depends>
+   </mbean>
+
+   <mbean code="org.jboss.jms.server.destination.TopicService"
+      name="jboss.messaging.destination:service=Topic,name=asyncMarketTopic1"
+      xmbean-dd="xmdesc/Topic-xmbean.xml">
+      <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+      <depends>jboss.messaging:service=PostOffice</depends>
+   </mbean>
+   
 </server>

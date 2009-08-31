@@ -15,7 +15,7 @@ import myorg.javaeeex.blimpl.TestUtilImpl;
 public class TestUtilEJB implements TestUtilRemote {
     private static Log log = LogFactory.getLog(TestUtilEJB.class);
     
-    @PersistenceContext(name="javaeeEx")
+    @PersistenceContext(unitName="javaeeEx")
     private EntityManager em;
     
     private TestUtil testUtil;

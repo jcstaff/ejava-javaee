@@ -6,10 +6,10 @@
     
   <display-name>Async Market Web Application</display-name>
     
-    <context-param>
-        <param-name></param-name>
-        <param-value></param-value>
-    </context-param>
+        <!-- the following properties are used when EJB wasn't injected by
+            container. This will occur when running externally within Jetty
+            or some other development environment separate from business logic
+            -->
     <context-param>
         <param-name>java.naming.factory.initial</param-name>
         <param-value>org.jnp.interfaces.NamingContextFactory</param-value>

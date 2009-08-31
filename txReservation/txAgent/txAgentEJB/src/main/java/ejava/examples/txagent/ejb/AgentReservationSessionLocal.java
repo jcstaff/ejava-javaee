@@ -1,9 +1,9 @@
 package ejava.examples.txagent.ejb;
 
-import javax.ejb.Remote;
+import javax.ejb.Local;
 
 import ejava.examples.txagent.bl.AgentReservationSession;
 
-@Remote
+@Local
 public interface AgentReservationSessionLocal extends AgentReservationSession {
 }

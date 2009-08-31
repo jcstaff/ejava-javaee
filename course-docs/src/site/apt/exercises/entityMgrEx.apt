@@ -40,14 +40,14 @@ Exercise: Entity Manager
     on your system for now. You should test that the manual start creates
     the same instance of the database as JBoss. You can do this by checking
     that a manual start of the database creates a set of files called "ejava.*"
-    in the JBOSS_HOME/server/default/data/hypersonic directory. If they already
+    in the JBOSS_HOME/server/JBOSS_SERVER/data/hypersonic directory. If they already
     exist, you can safely delete them to test for expected behavior. You will
     do this anyway in the future if you want to coldstart your database after
     significant schema changes have been made.
 
 ---
-cd ${JBOSS_HOME}/server/default/data/hypersonic
-java -classpath ${JBOSS_HOME}/server/default/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+cd ${JBOSS_HOME}/server/${JBOSS_SERVER}/data/hypersonic
+java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     []
@@ -56,7 +56,7 @@ java -classpath ${JBOSS_HOME}/server/default/lib/hsqldb.jar org.hsqldb.Server -d
     option.
 
 ---
-java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
     * You can view the contents of your database at any time through the database
@@ -64,7 +64,7 @@ java -classpath c:/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseM
     and entering the proper query SQL.
 
 ---
-$ java -classpath c:/apps/jboss/server/default/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+$ java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
 ** {Part B}: Setup Project Structure
@@ -149,7 +149,9 @@ DROP TABLE EM_AUTO if EXISTS;
                 value="${jdbc.password}"/>
             <property name="hibernate.connection.username"
                 value="${jdbc.user}"/>
+
             <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>
@@ -480,7 +482,7 @@ src/
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -591,17 +593,22 @@ src/
                 </property>
             </activation>
             <dependencies>
-                <!-- this is what is used within JBoss 4.2.x -->
                 <dependency>
                     <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate</artifactId>
-                    <version>3.2.4.sp1</version>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>3.4.0.GA</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.3.1.ga</version>
+                    <artifactId>hibernate-core</artifactId>
+                    <version>3.3.1.GA</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <version>1.5.2</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

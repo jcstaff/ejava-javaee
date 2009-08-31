@@ -2,7 +2,7 @@
     <parent>
         <artifactId>jmsCore</artifactId>
         <groupId>ejava.javaee.jmscore</groupId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2009.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,7 +18,7 @@
     </description>
 
    <!-- this repositories holds many of the javaee5 jar files -->
-   <repositories>
+    <repositories>
        <repository>
            <id>jboss-repo</id>
            <name>JBoss Maven Repository</name>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -76,29 +76,6 @@
         </testResources>
 
         <plugins>
-            <!-- copy the jms-services.xml file to the server -->
-             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                 <execution>
-                   <phase>process-test-resources</phase>
-                   <configuration>
-                     <tasks>
-                       <copy todir="${jboss.home}/server/default/deploy">
-                          <fileset dir="${basedir}/target/test-classes" includes="*jms-service.xml" />
-                       </copy>
-                       <!-- give the server time to deploy -->
-                        <sleep seconds="5"/>
-                     </tasks>
-                   </configuration>
-                   <goals>
-                     <goal>run</goal>
-                   </goals>
-                 </execution>
-                </executions>
-            </plugin> 
-
               <!-- make sure we are building java5 and tell it to compile, 
                     even though we are a pom project -->
             <plugin>
@@ -168,15 +145,27 @@
                   <jmsmechanics.multi.message.count>20
                   </jmsmechanics.multi.message.count>
             </properties>
+            <repositories>
+                <repository>
+                    <id>jboss-repo</id>
+                    <name>JBoss Maven Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
+            </repositories>
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss</groupId>
-                    <artifactId>jbossall-client</artifactId>
-                    <version>4.2.3-GA</version>            
-                    <scope>system</scope>
-                    <systemPath>
-                        ${jboss.home}/client/jbossall-client.jar
-                    </systemPath>
+                    <groupId>org.jboss.jbossas</groupId>
+                    <artifactId>jboss-as-client</artifactId>
+                    <version>5.1.0.GA</version>            
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.jbossas</groupId>
+                    <artifactId>jboss-as-server</artifactId>
+                    <version>5.1.0.GA</version>            
+                    <classifier>jmx-invoker-adaptor-client</classifier>
+                    <scope>compile</scope>
                 </dependency>
             </dependencies>
         </profile>

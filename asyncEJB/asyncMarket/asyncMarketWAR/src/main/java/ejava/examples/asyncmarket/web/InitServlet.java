@@ -1,5 +1,7 @@
 package ejava.examples.asyncmarket.web;
 
+import javax.ejb.EJB;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
@@ -12,19 +14,19 @@ import ejava.examples.asyncmarket.ejb.AuctionMgmtLocal;
 @SuppressWarnings("serial")
 public class InitServlet extends HttpServlet {
     private static Log log = LogFactory.getLog(InitServlet.class);
+    @EJB(beanInterface=AuctionMgmtLocal.class)
     private AuctionMgmt auctionMgmt;
 
     public void init() throws ServletException {
-        log.debug("init() called ");
+        log.debug("init() called, auctionMgmt=" + auctionMgmt);
         try {
-            if (auctionMgmt == null) {
-                auctionMgmt = new JNDIHelper()
-                    .getAuctionMgmt(getServletContext());
-            }        
-
-            if (auctionMgmt instanceof AuctionMgmtLocal) {
-                ((AuctionMgmtLocal)auctionMgmt).initTimers();
-            }
+        	if (auctionMgmt == null) {
+        		log.error("auctionMgmt is null, timers will not be initialized");
+        	}
+        	else {
+        		log.debug("calling initTimers");
+        		auctionMgmt.initTimers();
+        	}
         }
         catch (Exception ex) {
             log.fatal("error initializing", ex);

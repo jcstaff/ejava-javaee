@@ -38,12 +38,15 @@ public class DupsOKTopicTest extends TestCase {
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
-        
+
+        assertNotNull("jndi.name.testTopic not supplied", destinationJNDI);
+        new JMSAdmin().destroyTopic("topic1")
+                      .deployTopic("topic1", destinationJNDI);
+
         assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
         log.debug("connection factory name:" + connFactoryJNDI);
         connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
         
-        assertNotNull("jndi.name.testTopic not supplied", destinationJNDI);
         log.debug("destination name:" + destinationJNDI);
         destination = (Topic) jndi.lookup(destinationJNDI);
         

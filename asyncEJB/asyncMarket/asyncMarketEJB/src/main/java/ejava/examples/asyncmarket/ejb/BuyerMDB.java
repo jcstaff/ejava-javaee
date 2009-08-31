@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
 import javax.ejb.MessageDrivenContext;
 import javax.jms.MapMessage;
@@ -19,23 +20,39 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.asyncmarket.MarketException;
 import ejava.examples.asyncmarket.bo.AuctionItem;
+import ejava.examples.asyncmarket.bo.Bid;
 import ejava.examples.asyncmarket.bo.Order;
 import ejava.examples.asyncmarket.dao.AuctionItemDAO;
 import ejava.examples.asyncmarket.dao.OrderDAO;
 import ejava.examples.asyncmarket.jpa.JPAAuctionItemDAO;
 import ejava.examples.asyncmarket.jpa.JPAOrderDAO;
 
-//lets put defaults here and let DD provide overrides
-@MessageDriven(name="BuyerMDB", activationConfig={
+
+/**
+ * This class will listen for market events and cause further bidding to 
+ * occur. Note that this is mostly a technology demonstration and not
+ * a great architectural demonstration. It would be best to restrict
+ * this class to only the async/JMS interface and move all detailed
+ * processing and business logic to lower level classes. Architecturally,
+ * MDBs should be restricted to just interface adaption. If you place 
+ * too much business logic here it becomes harder to test and reuse.
+ *  
+ */
+@MessageDriven(activationConfig={
+		/* I placed the first few in the ejb-jar.xml DD
+		 * since they are configuration options that,
+		 * when they change, do not impact the code.
         @ActivationConfigProperty(
                 propertyName="destinationType",
                 propertyValue="javax.jms.Topic"),            
         @ActivationConfigProperty(
                 propertyName="destination",
-                propertyValue="topic/ejava/examples/asyncMarket/topic1"),            
+                propertyValue="topic/asyncMarketTopic1"),            
         @ActivationConfigProperty(
                 propertyName="messageSelector",
                 propertyValue="JMSType in ('forSale', 'saleUpdate')"),
+        */
+		//This one, however, would impact the code if it were changed
         @ActivationConfigProperty(
                 propertyName="acknowledgeMode",
                 propertyValue="Auto-acknowledge")            
@@ -43,17 +60,10 @@ import ejava.examples.asyncmarket.jpa.JPAOrderDAO;
 public class BuyerMDB implements MessageListener {
     private static final Log log = LogFactory.getLog(BuyerMDB.class);
     
-    //ideally this would be mapped in DD, but would not work for 4.0.4GA MDBs
-    //so I'm using a @Resource mapped directly to a JNDI name. Alternately
-    //we could also perform the manual JNDI lookup within the init().
-    @Resource(mappedName="ejava/examples/asyncMarket/BuyerEJB/local")
+    @EJB
     private BuyerLocal buyer;
-    //this is needed if injection didn't set buyer
-    private String buyerJNDI="ejava/examples/asyncMarket/BuyerEJB/local";
-    
-    @Resource(mappedName="ejava/examples/asyncMarket/AuctionMgmtEJB/local")
-    private AuctionMgmtLocal auctionMgmt; 
-    
+    @EJB
+    private AuctionMgmtLocal auctionMgmt;     
     @PersistenceContext(unitName="asyncMarket")
     private EntityManager em;
     
@@ -67,7 +77,6 @@ public class BuyerMDB implements MessageListener {
     public void init() {
         log.info("*** BuyerMDB init() ***");
         log.debug("ctx=" + ctx);
-        log.debug("ctx.lookup(ejb/BuyerEJB)=" + ctx.lookup("ejb/BuyerEJB"));
         log.debug("buyer=" + buyer);
         log.debug("auctionMgmt=" + auctionMgmt);
         log.debug("em=" + em);
@@ -76,50 +85,7 @@ public class BuyerMDB implements MessageListener {
         ((JPAOrderDAO)orderDAO).setEntityManager(em);
         
         auctionItemDAO = new JPAAuctionItemDAO();
-        ((JPAAuctionItemDAO)auctionItemDAO).setEntityManager(em);
-        
-        if (buyer==null) {
-            log.info("injection didn't work for MDB, using manual kludge");
-            try {
-                buyer=(BuyerLocal)new InitialContext().lookup(buyerJNDI);
-            } catch (Exception ex) {
-                log.error("error looking up BuyerEJB:" + ex);
-            }
-            log.debug("kludged buyer=" + buyer);
-        }
-
-        //lots of debug that should have been unnecessary!!!
-        
-        String name="java:/comp.ejb3/env";
-        StringBuilder text = new StringBuilder("jndi("+name+")=");
-        try {
-            text.append(new InitialContext().lookup(name));
-        } catch (Exception ex) {
-            text.append(ex.toString());
-        } finally {
-            log.debug(text.toString());
-        }
-
-        name="java:/comp.ejb3/env/ejb";
-        text = new StringBuilder("jndi("+name+")=");
-        try {
-            text.append(new InitialContext().lookup(name));
-        } catch (Exception ex) {
-            text.append(ex.toString());
-        } finally {
-            log.debug(text.toString());
-        }
-
-        name="java:/comp.ejb3/env/ejb/BuyerEJB";
-        text = new StringBuilder("jndi("+name+")=");
-        try {
-            text.append(new InitialContext().lookup(name));
-        } catch (Exception ex) {
-            text.append(ex.toString());
-        } finally {
-            log.debug(text.toString());
-        }
-        
+        ((JPAAuctionItemDAO)auctionItemDAO).setEntityManager(em);        
     }
 
     public void onMessage(Message message) {
@@ -150,7 +116,8 @@ public class BuyerMDB implements MessageListener {
         log.debug("processing order:" + order);
         try {
             AuctionItem item = order.getItem();
-            if (item.getHighestBid() == null) {
+            Bid highestBid = item.getHighestBid();
+            if (highestBid == null) {
                 if (item.getMinBid() < order.getMaxBid()) {
                     buyer.bidProduct(item.getId(), 
                                      order.getBuyer().getUserId(), 
@@ -158,7 +125,10 @@ public class BuyerMDB implements MessageListener {
                     log.debug("placed initial bid for order:" + order);
                 }
             }
-            else if (item.getHighestBid().getAmount() < order.getMaxBid()){
+            else if (highestBid.getAmount() < order.getMaxBid()
+            		// add don't bid against ourself
+            		&& item.getHighestBid().getBidder().getId() !=
+            		   order.getBuyer().getId()){
                 buyer.bidProduct(item.getId(), 
                                  order.getBuyer().getUserId(), 
                                  item.getHighestBid().getAmount() + 1.00);

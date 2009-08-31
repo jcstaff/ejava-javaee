@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- replace with this declaration when using jboss5
 <jboss 
     xmlns="http://www.jboss.com/xml/ns/javaee" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation ="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss_5_0.xsd" 
-    version="5.0">
--->
-<jboss xmlns="http://java.sun.com/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.jboss.org/j2ee/schema http://www.jboss.org/j2ee/schema/jboss_5_0.xsd"
-    version="5.0">
+    version="3.0">
 
     <enterprise-beans>
         <session>
@@ -58,12 +52,9 @@
             <local-jndi-name>
                 ejava/examples/asyncMarket/BuyerEJB/local
             </local-jndi-name>
-            <resource-ref>
-                <res-ref-name>jms/ConnectionFactory</res-ref-name>
-                <jndi-name>ConnectionFactory</jndi-name>
-            </resource-ref>
         </session>
         
+        <!-- 
         <message-driven>
             <ejb-name>BuyerMDB</ejb-name>
             <destination-jndi-name>
@@ -85,5 +76,6 @@
                 </injection-target>
             </ejb-local-ref>
         </message-driven>
+         -->
     </enterprise-beans>
 </jboss>

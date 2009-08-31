@@ -6,11 +6,7 @@
     <persistence-unit name="ejbsessionbank">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/ejavaDS</jta-data-source>
-        <!-- use the following declaration for jboss5, but not jboss4
         <jar-file>ejbsessionBankImpl.jar</jar-file>
-           * jboss5 wants PU .jar file specified; jboss4 locates automatic
-           * jboss4 uses the file spec relative to $HOME versus the .ear
-           -->
         <properties>
             <property name="hibernate.dialect" 
                 value="${hibernate.dialect}"/>

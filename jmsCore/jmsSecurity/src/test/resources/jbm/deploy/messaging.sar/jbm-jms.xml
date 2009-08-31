@@ -1,0 +1,29 @@
+<configuration xmlns="urn:jboss:messaging"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="urn:jboss:messaging /schema/jbm-jms.xsd">
+
+   <connection-factory name="ConnectionFactory">
+      <connector-ref connector-name="netty"/>
+      <entries>
+         <entry name="ConnectionFactory"/>
+         <entry name="XAConnectionFactory"/>
+      </entries>
+   </connection-factory>
+   
+   <queue name="DLQ">
+      <entry name="/queue/DLQ"/>
+   </queue>
+   <queue name="ExpiryQueue">
+      <entry name="/queue/ExpiryQueue"/>
+   </queue>
+
+   <queue name="jmssecurity.requestQueue">
+      <entry name="/ejava/examples/jmsSecurity/requestQueue"/>
+   </queue>
+   <queue name="jmssecurity.responseQueue">
+      <entry name="/ejava/examples/jmsSecurity/responseQueue"/>
+   </queue>
+   <queue name="jmssecurity.DLQ">
+      <entry name="/ejava/examples/jmsSecurity/DLQ"/>
+   </queue>
+</configuration>

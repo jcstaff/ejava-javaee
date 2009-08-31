@@ -8,21 +8,10 @@
     <enterprise-beans>
         <session>
             <ejb-name>BookingAgentEJB</ejb-name>
-            <ejb-ref>
-                <ejb-ref-name>ejb/HotelReservation</ejb-ref-name>
-                <ejb-ref-type>Session</ejb-ref-type>
-                <remote>
-                    ejava.examples.txhotel.ejb.HotelRegistrationRemote
-                </remote>
-                <injection-target>
-                    <injection-target-class>
-                        ejava.examples.txagent.ejb.BookingAgentEJB
-                    </injection-target-class>
-                    <injection-target-name>
-                        hotel
-                    </injection-target-name>
-                </injection-target>
-            </ejb-ref>
+            <ejb-class>
+                ejava.examples.txagent.ejb.BookingAgentEJB
+            </ejb-class>
+            <session-type>Stateless</session-type>
         </session>
         
         <session>                      
@@ -37,21 +26,6 @@
                 </bean-method>
                 <retain-if-exception>false</retain-if-exception>
             </remove-method>
-            <ejb-ref>
-                <ejb-ref-name>ejb/HotelReservationSession</ejb-ref-name>
-                <ejb-ref-type>Session</ejb-ref-type>
-                <remote>
-                    ejava.examples.txhotel.ejb.HotelReservationSessionRemote
-                </remote>           
-                <injection-target>
-                    <injection-target-class>
-                        ejava.examples.txagent.ejb.AgentReservationSessionEJB
-                    </injection-target-class>
-                    <injection-target-name>
-                        reservationSession
-                    </injection-target-name>
-                </injection-target>
-            </ejb-ref>
         </session>        
     </enterprise-beans>
     

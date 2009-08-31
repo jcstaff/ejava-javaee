@@ -2,11 +2,10 @@
     <parent>
         <artifactId>ejbsessionBank</artifactId>
         <groupId>ejava.javaee.ejb</groupId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2009.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ejava.javaee.ejb</groupId>
     <artifactId>ejbsessionBankEJB</artifactId>
     <packaging>ejb</packaging>
     <name>Session Bank EJB</name>
@@ -61,7 +60,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -125,9 +124,7 @@
                 </property>
             </activation>
             <properties>
-                  <hibernate.dialect>
-                      org.hibernate.dialect.HSQLDialect
-                  </hibernate.dialect>
+                  <hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
             </properties>
         </profile>
         <profile>
@@ -139,9 +136,7 @@
                 </property>
             </activation>
             <properties>
-                  <hibernate.dialect>
-                      org.hibernate.dialect.MySQLDialect
-                  </hibernate.dialect>
+                  <hibernate.dialect>org.hibernate.dialect.MySQLDialect</hibernate.dialect>
             </properties>
         </profile>
     </profiles>

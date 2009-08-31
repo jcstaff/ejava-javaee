@@ -46,11 +46,14 @@ public class MessageReplyToTest extends TestCase {
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
         
+        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
+        new JMSAdmin().destroyQueue("queue1")
+                      .deployQueue("queue1", destinationJNDI);        
+
         assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
         log.debug("connection factory name:" + connFactoryJNDI);
         connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
         
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
         log.debug("destination name:" + destinationJNDI);
         destination = (Queue) jndi.lookup(destinationJNDI);
         
@@ -121,7 +124,7 @@ public class MessageReplyToTest extends TestCase {
         try {
             connection = connFactory.createConnection();
             session = connection.createSession(
-                    false, Session.AUTO_ACKNOWLEDGE);
+                    false, Session.CLIENT_ACKNOWLEDGE);
 
             consumer = session.createConsumer(destination);
             Replier client = new Replier();
@@ -169,6 +172,7 @@ public class MessageReplyToTest extends TestCase {
                     responses.put(m.getJMSCorrelationID(), m);
                     receivedCount[d] += 1;
                     totalCount += 1;
+                    m.acknowledge();
                 }
             }
             log.info("sent=" + sendCount + " messages, received=" + 
@@ -203,7 +207,7 @@ public class MessageReplyToTest extends TestCase {
         try {
             connection = connFactory.createConnection();
             session = connection.createSession(
-                    false, Session.AUTO_ACKNOWLEDGE);
+                    false, Session.CLIENT_ACKNOWLEDGE);
 
             consumer = session.createConsumer(destination);
             Replier client = new Replier();
@@ -253,6 +257,7 @@ public class MessageReplyToTest extends TestCase {
                         responses.put(m.getJMSCorrelationID(), m);
                         receivedCount[d] += 1;
                         totalCount += 1;
+                        m.acknowledge();
                     }
                 }
                 if (totalCount == sendCount) { break; }

@@ -3,7 +3,7 @@
     <parent>
         <artifactId>txAgent</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2009.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -23,9 +23,17 @@
                     <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>${pom.groupId}</groupId>
+                    <artifactId>txHotelBLImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>${pom.groupId}</groupId>
+                    <artifactId>txHotelDAO</artifactId>
+                </exclusion>
                 <!-- un-comment these when using a shared unified classloader
                      with txHotel; however, make sure to undeploy this application
-                     when updating txHotel since it will be using the classes -->
+                     when updating txHotel since it will be using the classes 
                 <exclusion>
                     <artifactId>txHotelEJB</artifactId>
                     <groupId>${pom.groupId}</groupId>
@@ -34,6 +42,7 @@
                     <artifactId>txHotelBO</artifactId>
                     <groupId>${pom.groupId}</groupId>
                 </exclusion>
+                     -->
             </exclusions>
         </dependency>
     </dependencies>

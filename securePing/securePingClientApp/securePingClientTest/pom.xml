@@ -3,7 +3,7 @@
     <parent>
         <artifactId>securePingClientApp</artifactId>
         <groupId>ejava.javaee.secureping</groupId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2009.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -153,67 +153,24 @@
           <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
           </java.naming.factory.url.pkgs>
     </properties>
-    <!-- use system reference instead; getting invalid class for
-            jboss-ejb3-client.jar 
+
     <repositories>
         <repository>
-            <id>jboss.repository</id>
-            <name>ejava webdev repository</name>
-            <url>http://team.andromda.org/maven2</url>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
         </repository>
     </repositories>
-    -->
     <dependencies>
         <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jbossall-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jbossall-client.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-common-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jboss-common-client.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jnpserver</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>system</scope>
-            <systemPath>${jboss.home}/server/default/lib/jnpserver.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-ejb3-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jboss-ejb3-client.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-ejb3x</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jboss-ejb3x.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-aop-jdk50-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jboss-aop-jdk50-client.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-aspect-jdk50-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jboss-aspect-jdk50-client.jar</systemPath>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>5.1.0.GA</version>            
+            <type>pom</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
         <plugin>

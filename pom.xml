@@ -5,7 +5,7 @@
     <groupId>ejava.javaee</groupId>
     <artifactId>ejava-javaee</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2009.1</version>
+    <version>1.0.2009.2-SNAPSHOT</version>
     <name>Enterprise Java (605.784) Root</name>
     <description>
         This is the course home page for the Enterprise Java Course
@@ -30,8 +30,8 @@
         </mailingList>
     </mailingLists>
     <scm>
-        <url>https://ejava.info:8443/repos/class/branches/2009-spring-ejava-javaee</url>
-        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2009-spring-ejava-javaee</connection>
+        <url>https://ejava.info:8443/repos/class/branches/2009-fall-ejava-javaee</url>
+        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2009-fall-ejava-javaee</connection>
     </scm>
   <modules>
   <!--
@@ -91,7 +91,7 @@
             <organizationUrl>http://www.sra.com</organizationUrl>
             <timezone>-4</timezone>
             <roles>
-                <role>Former Grader</role>
+                <role>Grader</role>
             </roles>
         </contributor>
         <contributor>
@@ -165,19 +165,21 @@
             </plugin> 
             -->
 
+            <!--
             <plugin>
                 <artifactId>jxr-maven-plugin</artifactId>
                 <groupId>org.codehaus.mojo</groupId>
                 <version>2.0-beta-1</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>pre-site</phase>
                         <goals>
                             <goal>jxr</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
         
         <extensions><!-- used for scpexe for some platforms -->

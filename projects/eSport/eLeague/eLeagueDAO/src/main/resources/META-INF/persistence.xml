@@ -23,6 +23,11 @@
             <property name="hibernate.connection.username" 
                 value="${jdbc.user}"/>
             <property name="hibernate.show_sql" value="true"/>            
+            <!-- uncomment this property to debug SQL issues when
+                 getting "Could not execute JDBC batch update"
+                 with Hibernate
+            -->
+            <property name="hibernate.jdbc.batch_size" value="0"/>            
             <!-- uncomment this to permit Hibernate to create the schema
                  this is a great Java-first technique for creating schema
             <property name="hibernate.hbm2ddl.auto" value="create"/>

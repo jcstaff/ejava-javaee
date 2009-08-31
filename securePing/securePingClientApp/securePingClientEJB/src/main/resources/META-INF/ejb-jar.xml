@@ -8,19 +8,6 @@
     <enterprise-beans>
         <session>
             <ejb-name>SecurePingClientEJB</ejb-name>
-            <ejb-ref>
-                <ejb-ref-name>ejb/SecurePingEJB</ejb-ref-name>
-                <ejb-ref-type>Session</ejb-ref-type>
-                <remote>ejava.examples.secureping.ejb.SecurePingEJB</remote>
-                <injection-target>
-                    <injection-target-class>
-                        ejava.examples.secureping.ejb.SecurePingClientEJB
-                    </injection-target-class>
-                    <injection-target-name>
-                        securePingServer
-                    </injection-target-name>
-                </injection-target>
-            </ejb-ref>
             <security-identity>
                 <run-as>
                     <role-name>admin</role-name>

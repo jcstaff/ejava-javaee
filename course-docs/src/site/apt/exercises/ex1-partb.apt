@@ -29,7 +29,7 @@ Exercise 1: First Simple Application
 #ex1 build.properties
 M2_REPO=c:/jhu/repository
 
-junit.classpath=${M2_REPO}/junit/junit/3.8.1/junit-3.8.1.jar
+junit.classpath=${M2_REPO}/junit/junit/4.6/junit-4.6.jar
 ---
 
     [[1]] Create a build.xml file in PROJECT_BASEDIR. Note the following 
@@ -88,20 +88,18 @@ junit.classpath=${M2_REPO}/junit/junit/3.8.1/junit-3.8.1.jar
     echo target.
 
 ---
-> ant echo
-Searching for build.xml ...
-Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+$ ant echo
+Buildfile: build.xml
 
 echo:
-     [echo] basedir=/home/jcstaff/proj/ejava-javaee/solutions/ex1
+     [echo] basedir=C:\cygwin\home\jcstaff\proj\784\exercises\ex1
      [echo] artifactId=ex1
-     [echo] src.dir=/home/jcstaff/proj/ejava-javaee/solutions/ex1/src
-     [echo] build.dir=/home/jcstaff/proj/ejava-javaee/solutions/ex1/target
-     [echo] junit.classpath=/home/jcstaff/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar
+     [echo] src.dir=C:\cygwin\home\jcstaff\proj\784\exercises\ex1/src
+     [echo] build.dir=C:\cygwin\home\jcstaff\proj\784\exercises\ex1/target
+     [echo] junit.classpath=c:/jhu/repository/junit/junit/4.6/junit-4.6.jar
 
 BUILD SUCCESSFUL
 Total time: 0 seconds
-
 ---
 
     [[1]] Add the "package" target to compile and archive your /src/main
@@ -141,15 +139,13 @@ Total time: 0 seconds
 ---
 
 ---
-
-> ant package
-Searching for build.xml ...
-Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+$ rm -rf target/; ant package
+Buildfile: build.xml
 
 package:
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1.jar
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+      [jar] Building jar: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\ex1.jar
 
 BUILD SUCCESSFUL
 Total time: 1 second
@@ -190,20 +186,21 @@ Total time: 1 second
 
 ---
 
-> ant test
-Searching for build.xml ...
-Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+$ rm -rf target/; ant
+Buildfile: build.xml
 
 package:
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1.jar
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+      [jar] Building jar: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\ex1.jar
 
 test:
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
 
 BUILD SUCCESSFUL
 Total time: 1 second
+
 
 > find . -type f
 ./src/main/java/myorg/mypackage/ex1/App.java
@@ -290,23 +287,25 @@ classpath
 
 ---
 
-> ant test
-Searching for build.xml ...
-Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+$ rm -rf target/; ant
+Buildfile: build.xml
 
 package:
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/classes
-      [jar] Building jar: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1.jar
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+      [jar] Building jar: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\ex1.jar
 
 test:
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
-    [javac] Compiling 1 source file to /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-classes
-    [mkdir] Created dir: /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/test-reports
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-reports
     [junit] Running myorg.mypackage.ex1.AppTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.04 sec
+    [junit] Tests run: 2, Failures: 1, Errors: 0, Time elapsed: 0.109 sec
+    [junit] Test myorg.mypackage.ex1.AppTest FAILED
 
 BUILD SUCCESSFUL
-Total time: 1 second
+Total time: 2 seconds
+
 
 > find . -type f
 ./src/main/java/myorg/mypackage/ex1/App.java
@@ -324,15 +323,22 @@ Total time: 1 second
     [[1]] Test output of each test is in the TXT and XML reports.
 
 ---
-> cat target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
+$ cat target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
 Testsuite: myorg.mypackage.ex1.AppTest
-Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.04 sec
+Tests run: 2, Failures: 1, Errors: 0, Time elapsed: 0.109 sec
  ------------- Standard Output ---------------
 testApp
 Here's One!
+testFail
+Here's One!
  ------------- ---------------- ---------------
 
-Testcase: testApp took 0.002 sec
+Testcase: testApp took 0.015 sec
+Testcase: testFail took 0 sec
+        FAILED
+app didn't return 0
+junit.framework.AssertionFailedError: app didn't return 0
+        at myorg.mypackage.ex1.AppTest.testFail(AppTest.java:29)
 
 ---
 
@@ -347,12 +353,11 @@ Testcase: testApp took 0.002 sec
 ---
 
 ---
-> ant clean
-Searching for build.xml ...
-Buildfile: /home/jcstaff/proj/ejava-javaee/solutions/ex1/build.xml
+$ ant clean
+Buildfile: build.xml
 
 clean:
-   [delete] Deleting directory /home/jcstaff/proj/ejava-javaee/solutions/ex1/target
+   [delete] Deleting directory C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target
 
 BUILD SUCCESSFUL
 Total time: 0 seconds
@@ -362,6 +367,41 @@ Total time: 0 seconds
 ./src/test/java/myorg/mypackage/ex1/AppTest.java
 ./build.properties
 ./build.xml
+---
+
+    [[1]] Comment out the bogus testFail and rerun.
+
+---
+$ ant clean test
+Buildfile: build.xml
+
+clean:
+
+package:
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\classes
+      [jar] Building jar: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\ex1.jar
+
+test:
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
+    [javac] Compiling 1 source file to C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-classes
+    [mkdir] Created dir: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\test-reports
+    [junit] Running myorg.mypackage.ex1.AppTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.063 sec
+
+BUILD SUCCESSFUL
+Total time: 1 second
+
+jcstaff@ejavaXP ~/proj/784/exercises/ex1
+$ cat target/test-reports/TEST-myorg.mypackage.ex1.AppTest.txt
+Testsuite: myorg.mypackage.ex1.AppTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.063 sec
+ ------------- Standard Output ---------------
+testApp
+Here's One!
+ ------------- ---------------- ---------------
+
+Testcase: testApp took 0.016 sec
 ---
 
 ** Summary

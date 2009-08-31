@@ -32,14 +32,10 @@ Exercise 1: First Simple Application
     {{{http://www.eclipse.org/iam/} Eclipse IAM}}. A comparison of 
     the various options is located on the 
     {{{http://docs.codehaus.org/display/MAVENUSER/Eclipse+Integration}
-    Codehaus Wiki}}. We will be using a combination of the Maven
-    Eclipse Plugin and m2eclipse. The current documentation for
-    m2eclipse makes no mention of using the Eclipse Plugin, but
-    I found that it was necessary to get "src" directories correctly
-    specified during project import. The m2eclipse plugin now no 
-    longer supports normal project imports and external tools. It 
-    must be imported specifically as a maven project and all actions
-    are invoked through the Run... capability.
+    Codehaus Wiki}}. We will be using m2eclipse. m2eclipse is
+    smart enough about Maven that we do not need the Maven-side
+    of the integration. You must import your projects as Maven 
+    Projects and access goals through the "Run..." button.
 
     []
 
@@ -56,7 +52,7 @@ Exercise 1: First Simple Application
         * Select "Add.." for a Standard VM
 
         * Select your JDK instance for the JRE Home. This was 
-        c:/apps/jdk1.5.0_17 on my system.
+        c:/apps/jdk1.5.0_20 on my system.
 
         * You may optionally set this as the default. However, we
         will specifically point to this later.
@@ -67,96 +63,10 @@ Exercise 1: First Simple Application
         {{{http://www.eclipse.org/}Eclipse}} as described in
         {{{ex0.html#Part H}Exercise 0}}. 
 
-        [Note:] In this section, we'll use the maven-eclipse-plugin
-        to generate a set of .project and .classpath files that are
-        used by Eclipse to import the project. You will continue
-        to maintain the project configuration through the pom.xml.
-        When you make changes to the pom.xml file, just re-run the 
-        plugin and hit refresh within Eclipse to see the changes. 
-        
         [Note:] Any changes to the project dependencies you make within
         Eclipse are not updated in the pom.xml. Use the pom.xml file
         to specify all project dependencies and refresh your Eclipse
         project to see the changes.
-
-        [Note:] Documentation on this plugin is located at the
-        {{{http://maven.apache.org/plugins/maven-eclipse-plugin/overview.html}
-        Maven Eclipse Plugin Site}}
-
-
-    [[1]] Go to the project base directory an execute the eclipse:m2eclipse
-    goal. Note that this is different from the older eclipse:eclipse goal.
-    
-        [Note:] You'll see a download of the eclipse-plugin and a large 
-        number of dependencies the first time you execute the
-        plugin. If it fails on any of the downloads, re-execute.
-
-        [Note:] Maven downloads only occur when a dependency is not located
-        in your local repository. Although some failures do happen during
-        download, download attempts will end as you have successfully
-        executed a majority of the goals associated with the examples
-        in class. I work on many of these examples disconnected from the
-        internet on my laptop. However, I am careful to execute targets
-        ahead of time to make sure I have what I need before I disconnect.
-
-        []
-
----
-$ mvn eclipse:m2eclipse
-[INFO] Scanning for projects...
-[INFO] Searching repository for plugin with prefix: 'eclipse'.
-[INFO] ------------------------------------------------------------------------
-[INFO] Building My First Simple Project
-[INFO]    task-segment: [eclipse:m2eclipse]
-[INFO] ------------------------------------------------------------------------
-[INFO] Preparing eclipse:m2eclipse
-[INFO] No goals needed for project - skipping
-[INFO] [eclipse:m2eclipse]
-[INFO] Using source status cache: c:\proj\ejava-javaee\working\solutions\ex1\target\mvn-eclipse-cache.properties
-[INFO] Using as WTP server : null
-[INFO] Wrote settings to C:\proj\ejava-javaee\working\solutions\ex1\.settings\org.eclipse.jdt.core.prefs
-[INFO] Wrote Eclipse project for "ex1" to c:\proj\ejava-javaee\working\solutions\ex1.
-[INFO]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 4 seconds
-[INFO] Finished at: Sun Jan 25 16:46:08 EST 2009
-[INFO] Final Memory: 6M/11M
-[INFO] ------------------------------------------------------------------------
-
-
-$ cat .classpath
-<classpath>
-  <classpathentry kind="src" path="src/main/java"/>
-  <classpathentry kind="src" path="src/test/java" output="target/test-classes"/>
-  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
-  <classpathentry kind="output" path="target/classes"/>
-  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
-</classpath>
-
-
-$ cat .project
-<projectDescription>
-  <name>ex1</name>
-  <comment/>
-  <projects/>
-  <buildSpec>
-    <buildCommand>
-      <name>org.eclipse.jdt.core.javabuilder</name>
-    </buildCommand>
-    <buildCommand>
-      <name>org.maven.ide.eclipse.maven2Builder</name>
-    </buildCommand>
-  </buildSpec>
-  <natures>
-    <nature>org.eclipse.jdt.core.javanature</nature>
-    <nature>org.maven.ide.eclipse.maven2Nature</nature>
-  </natures>
-</projectDescription>
----
-
 
     [[1]] Inside Eclipse, import the project using
 
@@ -192,7 +102,7 @@ $ cat .project
     toolbar once you have the project selective. 
 
     [[1]] Refresh the project directory to be able to see any new target 
-    artifacts, including the surefire-repots. 
+    artifacts, including the surefire-reports. 
 
         [Note:] You can full screen any display by double clicking its tab.
 
@@ -206,6 +116,29 @@ $ cat .project
         []
 
 [images/ex1_separate_eclipse_windows.png] Separate Eclipse Windows
+
+    [[1]] Make a small edit to the pom.xml and notice the change in the 
+    Maven Dependencies within Eclipse. Switch back and forth between these
+    two settings.
+
+---
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+---
+---
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.6</version>
+            <scope>test</scope>
+        </dependency>
+---
+    
+
 
     [[1]] Notice that most maven goals are provided on the Run As pull-down
     menu. However, some are not and I do not know how the list is determined.

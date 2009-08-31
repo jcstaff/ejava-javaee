@@ -203,7 +203,7 @@ javaeeExWAR/
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.10</version>
+                <version>6.1.19</version>
                 <configuration>
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                     <connectors>
@@ -813,10 +813,24 @@ $ mvn clean install
 
 * {Add EJB to Servlet}
 
-    [[1]] Add a dependency on the EJB within the WAR/pom.xml. The 
-    root level dependency will be in the EJB itself since they will
-    be side-by-side in the EAR. The Jetty configuration will be 
-    depenent on the ejb-client; same as the external RMI clients.
+    [[1]] Add a dependency on the EJB API to define @EJB annotation
+    classes used for injection.
+
+---
+    <dependencies>
+        <!-- used for @EJB injection -->
+        <dependency>
+          <groupId>javax.ejb</groupId>
+          <artifactId>ejb-api</artifactId>
+          <version>3.0</version>
+          <scope>provided</scope>
+        </dependency>
+---
+
+    [[1]] Add a dependency on the EJB within the WAR/pom.xml. The root
+    level dependency will be on the EJB itself (scope=provided) since they
+    will be sitting side by side in the same EAR.  The Jetty configuration
+    will be depenent on the ejb-client; same as the external RMI clients.
 
 ---
 //root level dependency
@@ -841,7 +855,9 @@ $ mvn clean install
 ---
 
     [[1]] Add the JNDI names for the Registrar interfaces to 
-    the ServletConfig within web.xml.
+    the ServletConfig within web.xml. This will be used to support
+    the Jetty configuration and will not be needed for the EAR-based
+    configuration.
 
 ---
     <context-param>
@@ -859,11 +875,13 @@ $ mvn clean install
     EAR deployment.
 
 ---
+import javax.ejb.EJB;
 ...
 import myorg.javaeeex.ejb.RegistrarRemote;
 ...
 public class RegistrarHandlerServlet extends HttpServlet {
 ...
+    @EJB
     private RegistrarRemote registrar;
 ---
 

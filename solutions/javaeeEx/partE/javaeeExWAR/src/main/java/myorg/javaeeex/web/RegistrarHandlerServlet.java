@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.naming.InitialContext;
+import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -23,6 +24,8 @@ import org.apache.commons.logging.LogFactory;
 public class RegistrarHandlerServlet extends HttpServlet {
     private static Log log = LogFactory.getLog(RegistrarHandlerServlet.class);
     private Map<String, Handler> handlers = new HashMap<String, Handler>();
+    
+    @EJB
     private RegistrarRemote registrar;
 
     public static final String COMMAND_PARAM = "command";

@@ -28,7 +28,7 @@ import ejava.examples.txhotel.jpa.JPAReservationDAO;
  *
  * @author jcstaff
  */
-@Stateless
+//@Stateless - will be supplied in ejb-jar.xml due to multi deploy
 public class HotelRegistrationEJB implements HotelRegistrationRemote,
         HotelRegistrationLocal {
     private Log log = LogFactory.getLog(HotelRegistrationEJB.class);

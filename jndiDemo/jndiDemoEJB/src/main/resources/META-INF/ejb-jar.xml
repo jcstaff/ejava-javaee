@@ -8,9 +8,10 @@
     <enterprise-beans>
         <session>
             <ejb-name>AidScheduler</ejb-name>
-            <remote>ejava.examples.jndidemo.ejb.AidSchedulerRemote</remote>
-            <local>ejava.examples.jndidemo.ejb.AidSchedulerLocal</local>
+            <business-local>ejava.examples.jndidemo.ejb.AidSchedulerLocal</business-local>
+            <business-remote>ejava.examples.jndidemo.ejb.AidSchedulerRemote</business-remote>
             <ejb-class>ejava.examples.jndidemo.ejb.AidSchedulerEJB</ejb-class>
+            <session-type>Stateless</session-type>
             <env-entry>
                 <env-entry-name>vals/message</env-entry-name>
                 <env-entry-type>java.lang.String</env-entry-type>
@@ -66,8 +67,8 @@
         
         <session>
             <ejb-name>Hospital</ejb-name>
-            <remote>ejava.examples.jndidemo.ejb.HospitalRemote</remote>
-            <local>ejava.examples.jndidemo.ejb.HospitalLocal</local>
+            <business-local>ejava.examples.jndidemo.ejb.HospitalLocal</business-local>
+            <business-remote>ejava.examples.jndidemo.ejb.HospitalRemote</business-remote>
             <ejb-class>ejava.examples.jndidemo.ejb.HospitalEJB</ejb-class>
         </session>
     </enterprise-beans>   

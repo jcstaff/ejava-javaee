@@ -76,10 +76,6 @@ public class TellerEJB implements TellerLocal, TellerRemote {
                                                .getContextClassLoader()
                                                .loadClass(daoClassName)
                                                .newInstance();            
-            /* TODO:resolve 
-            http://www.jboss.com/index.html?module=bb&op=viewtopic&p=4170954#4170954
-            AccountDAO dao = new ejava.examples.ejbsessionbank.jpa.JPAAccountDAO();
-            */
             ((JPAAccountDAO)dao).setEntityManager(em);
             ((TellerImpl)teller).setAcctDAO(dao);
             

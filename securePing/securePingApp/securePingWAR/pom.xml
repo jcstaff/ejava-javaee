@@ -3,7 +3,7 @@
     <parent>
         <artifactId>securePingApp</artifactId>
         <groupId>ejava.javaee.secureping</groupId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2009.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -65,7 +65,7 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.0.1</version>
+                <version>6.1.19</version>
                 <configuration>
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                     <connectors>
@@ -78,7 +78,20 @@
             </plugin>          
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
     <dependencies>
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>5.1.0.GA</version>            
+            <type>pom</type>
+        </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>securePingEJB</artifactId>
@@ -98,36 +111,6 @@
             <version>1.2.13</version>
             <scope>compile</scope>
         </dependency>    
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jbossall-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-ejb3-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-ejb3x-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-aop-jdk50-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-aspect-jdk50-client</artifactId>
-            <version>4.2.3-GA</version>            
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 </profile>
 

@@ -267,12 +267,25 @@ $ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/ma
 ---
 
     [[1]] Update the definition of the persistence.xml file to provide a jta-data-source
+    and a reference to the entity jar-file. Since we are now using a DataSource from the
+    JNDI tree, we no longer need the connection information. It can be deleted from the
+    EJB's copy.
 
 ---
     <persistence-unit name="javaeeEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/ejavaDS</jta-data-source>
+        <jar-file>javaeeExImpl-${pom.version}.jar</jar-file>
         <properties>
+        <properties>
+            <property name="hibernate.dialect" 
+                value="${hibernate.dialect}"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.formal_sql" value="true"/>
+        </properties>
+    </persistence-unit>
 ---
     
     [[1]] Since we are using an orm.xml file, we do not need to specify each 
@@ -284,6 +297,39 @@ $ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/ma
     project would not set that property and would design in when schema was created.
 
     []
+
+    [[1]] Update your pom.xml to expand the variables defined within the persistence.xml
+    file.
+
+---
+    <build>
+         <!--tell the resource plugin to perform filtering on resources
+             to fill in dialect, etc. -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+    ...
+
+    </build>
+    <profiles>
+        <profile> <!-- defines our persistence.xml dialect -->
+            <id>hsql</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
+                </property>
+            </activation>
+            <properties>
+                  <hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
+            </properties>
+        </profile>
+    </profiles>
+---
 
 
     [[1]] Rebuild your application and note that the EntityManager was resolved.

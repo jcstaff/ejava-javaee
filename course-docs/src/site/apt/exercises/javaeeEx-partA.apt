@@ -727,7 +727,7 @@ $ cat javaeeExTest/pom.xml
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -755,11 +755,11 @@ $ cat javaeeExTest/pom.xml
 ---
 
     [[1]] Add the dependencies required to be an RMI client of JBoss. We
-    will use system references to .jars located within your system. Make
-    sure you have jboss.home set to point to your JBoss installation
-    directory in your .m2/settings.xml file. We are using a profile in 
-    this case to cleary isolate the JBoss-specific aspects of this pom.xml
-    file. You could also roll these dependencies up to the root level.
+    will use a convenient type=pom dependency provided by JBoss to define
+    all required client dependencies in a single declaration.  We are
+    using a profile in this case to cleary isolate the JBoss-specific
+    aspects of this pom.xml file. You could also roll these dependencies
+    up to the root level.
 
 ---
 <profile>
@@ -772,34 +772,20 @@ $ cat javaeeExTest/pom.xml
     <properties>
       <!-- more here later -->
     </properties>
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jbossall-client</artifactId>
-            <version>4.2.3-GA</version>
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jbossall-client.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-ejb3-client</artifactId>
-            <version>4.2.3-GA</version>
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jboss-ejb3-client.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-aop-jdk50-client</artifactId>
-            <version>4.2.3-GA</version>
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jboss-aop-jdk50-client.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-aspect-jdk50-client</artifactId>
-            <version>4.2.3-GA</version>
-            <scope>system</scope>
-            <systemPath>${jboss.home}/client/jboss-aspect-jdk50-client.jar</systemPath>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>5.1.0.GA</version>            
+            <type>pom</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -985,6 +971,14 @@ is java.net.ConnectException: Connection refused: connect]]]
 
 * {Start JBoss Application Server}
 
+    [Note:] JBoss provides several profiles for its application server. It's
+    default profile is an optimized starting point. However, it is not 
+    fully Java EE-compliant. They provide a standard configuration that is
+    suppose to be fully Java EE-compliant. To use the non-default profiles, 
+    we need to add a -c (profile-name) switch to the command line.
+
+    []
+
     The EAR and its contents will be deployed to an application server to 
     provide a container with thread managemement, resource management,
     security, etc. 
@@ -1003,7 +997,7 @@ is java.net.ConnectException: Connection refused: connect]]]
         * add logger entries for myorg and the ejava class examples.
 
 ---
-$ cat server/default/conf/jboss-log4j.xml
+$ cat server/standard/conf/jboss-log4j.xml
 
 ...
    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
@@ -1036,35 +1030,31 @@ $ cat server/default/conf/jboss-log4j.xml
 
 ---
 $ pwd
-/cygdrive/c/apps/jboss-4.2.3.GA
+/cygdrive/c/apps/jboss-5.1.0.GA
 
-$ ./bin/run.sh
-StaffordJ@takedown /cygdrive/c/apps/jboss-4.2.3.GA
-$ ./bin/run.sh
- =========================================================================
+$ ./bin/run.sh -c standard
+Calling C:\apps\jboss-5.1.0.GA\bin\run.conf.bat
+===============================================================================
 
   JBoss Bootstrap Environment
 
-  JBOSS_HOME: c:\apps\jboss-4.2.3.GA
+  JBOSS_HOME: C:\apps\jboss-5.1.0.GA
 
-  JAVA: /cygdrive/c/apps/java/jdk1.5.0_17/bin/java
+  JAVA: c:\apps\java\jdk1.5.0_17\bin\java
 
-  JAVA_OPTS: -Dprogram.name=run.sh -server -Xms128m -Xmx512m -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.serve
-r.gcInterval=3600000
+  JAVA_OPTS: -Dprogram.name=run.bat -Xms128M -Xmx512M -XX:MaxPermSize=256M -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Dorg.jboss.resolver.warning=true -server
 
-  CLASSPATH: c:\apps\jboss-4.2.3.GA\bin\run.jar;c:\apps\java\jdk1.5.0_17\lib\tools.jar
+  CLASSPATH: C:\apps\jboss-5.1.0.GA\bin\run.jar
 
- =========================================================================
+===============================================================================
 
-23:47:45,890 INFO  [Server] Starting JBoss (MX MicroKernel)...
+18:10:34,218 INFO  [ServerImpl] Starting JBoss (Microcontainer)...
 
 ...
 
-23:50:02,437 DEBUG [config] No FacesServlet found in deployment descriptor - bypassing configuration
-23:50:02,546 INFO  [Http11Protocol] Starting Coyote HTTP/1.1 on http-127.0.0.1-8080
-23:50:02,562 INFO  [AjpProtocol] Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
-23:50:02,562 INFO  [Server] JBoss (MX MicroKernel) [4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181417)] Started i
-n 13s:469ms
+19:29:53,703 INFO  [Http11Protocol] Starting Coyote HTTP/1.1 on http-127.0.0.1-8080
+19:29:53,734 INFO  [AjpProtocol] Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
+19:29:53,750 INFO  [ServerImpl] JBoss (Microcontainer) [5.1.0.GA (build: SVNTag=JBoss_5_1_0_GA date=200905221053)] Started in 53s:141ms
 ---
 
     [[1]] Re-run the RMI Test again.
@@ -1124,7 +1114,7 @@ vaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
             <artifactId>cargo-maven2-plugin</artifactId>
             <configuration>
                 <container>
-                    <containerId>jboss4x</containerId>
+                    <containerId>jboss5x</containerId>
                     <type>remote</type>
                 </container>
             </configuration>
@@ -1395,6 +1385,12 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.468 sec
     3rd time fully clears and works. This error only occurs when you switch 
     directories. If you always build from the root, it will remain constant.
 
+    [Note:] I have noticed that JBoss 5 is not as forgiving as earlier versions
+    and the 3-time rule may not apply. Run "mvn clean -Pundeploy" before changing
+    directories.
+
+    []
+
 ---
 $ mvn clean install
 [INFO] Scanning for projects...
@@ -1465,7 +1461,7 @@ eady registered.
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <configuration>
                     <container>
-                        <containerId>jboss4x</containerId>
+                        <containerId>jboss5x</containerId>
                         <type>remote</type>
                     </container>
                 </configuration>
@@ -1549,8 +1545,17 @@ $ mvn clean -Pundeploy
 ---
 //SERVER LOG
 
-22:20:35,476 INFO  [EARDeployer] Undeploying J2EE application, destroy step: file:/C:/proj/ejava-javaee/working/solutions/javaeeEx/partA/javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
-22:20:35,476 INFO  [EARDeployer] Undeployed J2EE application: file:/C:/proj/ejava-javaee/working/solutions/javaeeEx/partA/javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear`
+19:39:23,015 INFO  [SessionSpecContainer] Starting jboss.j2ee:ear=javaeeExEAR-1.0-SNAPSHOT.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3
+19:39:23,015 INFO  [EJBContainer] STARTED EJB: myorg.javaeeex.ejb.RegistrarEJB ejbName: RegistrarEJB
+19:39:23,046 INFO  [JndiSessionRegistrarBase] Binding the following Entries in Global JNDI:
+
+        javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/remote - EJB3.x Default Remote Business Interface
+        javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/remote-myorg.javaeeex.ejb.RegistrarRemote - EJB3.x Remote Business Interface
+        javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/local - EJB3.x Default Local Business Interface
+        javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/local-myorg.javaeeex.ejb.RegistrarLocal - EJB3.x Local Business Interface
+
+19:39:24,421 WARN  [InterceptorsFactory] EJBTHREE-1246: Do not use InterceptorsFactory with a ManagedObjectAdvisor, InterceptorRegistry should be used via the bean container
+19:39:24,421 WARN  [InterceptorsFactory] EJBTHREE-1246: Do not use InterceptorsFactory with a ManagedObjectAdvisor, InterceptorRegistry should be used via the bean container
 ---
 
 

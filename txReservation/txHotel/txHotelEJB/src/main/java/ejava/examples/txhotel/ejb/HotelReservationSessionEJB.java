@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.Remove;
 import javax.ejb.SessionContext;
@@ -54,7 +55,7 @@ import ejava.examples.txhotel.bo.Reservation;
  *
  * @author jcstaff
  */
-@Stateful
+//@Stateless - will be supplied in ejb-jar.xml due to multi deploy
 public class HotelReservationSessionEJB
     implements HotelReservationSessionLocal, HotelReservationSessionRemote,
     SessionSynchronization {
@@ -65,7 +66,7 @@ public class HotelReservationSessionEJB
     @Resource
     private SessionContext ctx;
     
-    //the deployment descriptor will inject this field
+    //injected through deployment descriptor
     private HotelRegistrationLocal reservationist;
     
     /**

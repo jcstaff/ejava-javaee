@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="jmsScheduler" default="run" basedir="..">
+<project name="jmsScheduler" basedir="..">
 
     <property file="test-classes/${ant.project.name}.properties"/>
 
@@ -34,8 +34,8 @@
 
     Each of the targets take the following arguments
     -Djndi.naming.connFactory - connection factory JNDI name
-    -Djndi.name.testQueue      - destination JNDI name
-    -Djndi.name.DLQ            - dead letter queue JNDI name
+    -Djndi.name.requestQueue  - destination JNDI name
+    -Djndi.name.DLQ           - dead letter queue JNDI name
     -Dxxx.name                - connectionID and durable topic name
     -Dxxx.max                 - max messages before existing;0=unlimited
 
@@ -55,7 +55,7 @@
     </target>
 
     <target name="init">
-        <copy todir="${JBOSS_HOME}/server/default/deploy"
+        <copy todir="${JBOSS_HOME}/server/${JBOSS_SERVER}/deploy"
               file="test-classes/${ant.project.name}-jms-service.xml"/>
         <sleep seconds="5"/>
     </target>
@@ -67,8 +67,8 @@
             </classpath>
             <arg value="-jndi.name.connFactory"/>
             <arg value="${jndi.name.connFactory}"/>
-            <arg value="-jndi.name.destination"/>
-            <arg value="${jndi.name.testQueue}"/>
+            <arg value="-jndi.name.requestQueue"/>
+            <arg value="${jndi.name.requestQueue}"/>
             <arg value="-jndi.name.DLQ"/>
             <arg value="${jndi.name.DLQ}"/>
             <arg value="-name"/>
@@ -87,8 +87,8 @@
             </classpath>
             <arg value="-jndi.name.connFactory"/>
             <arg value="${jndi.name.connFactory}"/>
-            <arg value="-jndi.name.destination"/>
-            <arg value="${jndi.name.testQueue}"/>
+            <arg value="-jndi.name.requestQueue"/>
+            <arg value="${jndi.name.requestQueue}"/>
             <arg value="-jndi.name.DLQ"/>
             <arg value="${jndi.name.DLQ}"/>
             <arg value="-name"/>
@@ -107,8 +107,8 @@
             </classpath>
             <arg value="-jndi.name.connFactory"/>
             <arg value="${jndi.name.connFactory}"/>
-            <arg value="-jndi.name.destination"/>
-            <arg value="${jndi.name.testQueue}"/>
+            <arg value="-jndi.name.requestQueue"/>
+            <arg value="${jndi.name.requestQueue}"/>
             <arg value="-jndi.name.DLQ"/>
             <arg value="${jndi.name.DLQ}"/>
             <arg value="-name"/>
@@ -125,8 +125,8 @@
             </classpath>
             <arg value="-jndi.name.connFactory"/>
             <arg value="${jndi.name.connFactory}"/>
-            <arg value="-jndi.name.destination"/>
-            <arg value="${jndi.name.testQueue}"/>
+            <arg value="-jndi.name.requestQueue"/>
+            <arg value="${jndi.name.requestQueue}"/>
             <arg value="-jndi.name.DLQ"/>
             <arg value="${jndi.name.DLQ}"/>
             <arg value="-name"/>
@@ -143,8 +143,8 @@
             </classpath>
             <arg value="-jndi.name.connFactory"/>
             <arg value="${jndi.name.connFactory}"/>
-            <arg value="-jndi.name.destination"/>
-            <arg value="${jndi.name.testQueue}"/>
+            <arg value="-jndi.name.requestQueue"/>
+            <arg value="${jndi.name.requestQueue}"/>
             <arg value="-jndi.name.DLQ"/>
             <arg value="${jndi.name.DLQ}"/>
             <arg value="-name"/>
@@ -161,8 +161,8 @@
             </classpath>
             <arg value="-jndi.name.connFactory"/>
             <arg value="${jndi.name.connFactory}"/>
-            <arg value="-jndi.name.destination"/>
-            <arg value="${jndi.name.testQueue}"/>
+            <arg value="-jndi.name.requestQueue"/>
+            <arg value="${jndi.name.requestQueue}"/>
             <arg value="-jndi.name.DLQ"/>
             <arg value="${jndi.name.DLQ}"/>
             <arg value="-name"/>
@@ -179,8 +179,8 @@
             </classpath>
             <arg value="-jndi.name.connFactory"/>
             <arg value="${jndi.name.connFactory}"/>
-            <arg value="-jndi.name.destination"/>
-            <arg value="${jndi.name.testQueue}"/>
+            <arg value="-jndi.name.requestQueue"/>
+            <arg value="${jndi.name.requestQueue}"/>
             <arg value="-jndi.name.DLQ"/>
             <arg value="${jndi.name.DLQ}"/>
             <arg value="-name"/>

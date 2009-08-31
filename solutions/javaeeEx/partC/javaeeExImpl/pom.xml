@@ -21,27 +21,27 @@
 
     <dependencies>
         <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-          <version>1.0.4</version>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
         </dependency>
     
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-          <version>1.2.13</version>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
             <scope>test</scope>
         </dependency>    
     </dependencies>
@@ -131,18 +131,23 @@
                     <url>http://repository.jboss.org/maven2</url>
                 </repository>
             </repositories>
-
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate</artifactId>
-                    <version>3.2.4.sp1</version>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>3.4.0.GA</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.2.1.GA</version>
+                    <artifactId>hibernate-core</artifactId>
+                    <version>3.3.1.GA</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <version>1.5.2</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

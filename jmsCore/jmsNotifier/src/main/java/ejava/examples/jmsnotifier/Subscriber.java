@@ -200,6 +200,4 @@ public class Subscriber implements Runnable {
             System.exit(-1);            
         }
     }
-
-
 }

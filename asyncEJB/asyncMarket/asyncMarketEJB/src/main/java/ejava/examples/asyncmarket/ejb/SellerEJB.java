@@ -58,12 +58,12 @@ public class SellerEJB
     @Resource
     private SessionContext ctx;
     
-    @PersistenceContext(name="asyncMarket")
+    @PersistenceContext(unitName="asyncMarket")
     private EntityManager em;
     
     private PersonDAO sellerDAO;
     private AuctionItemDAO auctionItemDAO;
-
+    
     @PostConstruct
     public void init() {
         log.info("******************* SellerEJB Created ******************");

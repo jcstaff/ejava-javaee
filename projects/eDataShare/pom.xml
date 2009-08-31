@@ -2,7 +2,7 @@
     <parent>
         <artifactId>projects</artifactId>
         <groupId>ejava.javaee.projects</groupId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2009.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -10,13 +10,17 @@
     <artifactId>eDataShare</artifactId>
     <packaging>pom</packaging>
     <name>eDataShare DMV and Mayberry</name>
-    <version>1.0.2008.1</version>
+    <version>1.0.2009.2-SNAPSHOT</version>
     <description>
         This project provides the problem description and initial artifacts
         for the class project.
     </description>
 
     <modules>
+        <!-- this is only used for test data generation and 
+             should not be part of a submitted class project -->
+        <module>eDmvData</module>
+        <!-- -->
         <module>eDmv</module>
         <module>eMayberry</module>
     </modules>

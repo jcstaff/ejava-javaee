@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -20,12 +21,16 @@ import ejava.examples.asyncmarket.UserMgmt;
 import ejava.examples.asyncmarket.bo.AuctionItem;
 import ejava.examples.asyncmarket.bo.Order;
 import ejava.examples.asyncmarket.bo.Person;
+import ejava.examples.asyncmarket.ejb.BuyerLocal;
+import ejava.examples.asyncmarket.ejb.UserMgmtLocal;
 
 @SuppressWarnings("serial")
 public class BuyerHandlerServlet extends HttpServlet {
     private static Log log = LogFactory.getLog(BuyerHandlerServlet.class);
     private Map<String, Handler> handlers = new HashMap<String, Handler>();
+    @EJB(beanInterface=BuyerLocal.class)
     private Buyer buyer;
+    @EJB(beanInterface=UserMgmtLocal.class)
     private UserMgmt userMgmt;
 
     public static final String COMMAND_PARAM = "command";
@@ -46,7 +51,7 @@ public class BuyerHandlerServlet extends HttpServlet {
         "/WEB-INF/content/UnknownCommand.jsp";
 
     public void init() throws ServletException {
-        log.debug("init() called ");
+        log.debug("init() called, buyer=" + buyer + ", userMgmt=" + userMgmt);
         try {
             ServletContext ctx = getServletContext();
             JNDIHelper jndi = new JNDIHelper();
