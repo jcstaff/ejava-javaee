@@ -19,7 +19,7 @@
     <artifactId>eDmvData</artifactId>
     <packaging>pom</packaging>
     <name>eDmvData</name>
-    <version>1.0.2009.2rc1</version>
+    <version>1.0.2009.2rc2</version>
     <description>
         This project provides the test data and parser 
         for the class project. Students will create a dependency on the
@@ -27,6 +27,12 @@
         provided parser. You can find an example of how to setup and use the
         parser within the eSalesBLImpl sub-project.
     </description>
+
+    <modules>
+        <module>eDmvDTO</module>
+        <module>eDmvTestUtil</module>
+    </modules>
+
     <profiles>
         <profile>
             <id>devel</id>
@@ -43,15 +49,11 @@
             </modules>
         </profile>
         <profile>
-            <id>deploy</id>
-            <activation>
-                <property>
-                    <name>!devel</name>
-                </property>
-            </activation>
+            <id>serverTest</id>
             <modules>
-                <module>eDmvDTO</module>
-                <module>eDmvTestUtil</module>
+                <module>eDmvTestEJB</module>
+                <module>eDmvTestEAR</module>
+                <module>eDmvRMITest</module>
             </modules>
         </profile>
     </profiles>

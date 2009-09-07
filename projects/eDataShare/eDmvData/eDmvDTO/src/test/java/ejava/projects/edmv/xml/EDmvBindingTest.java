@@ -12,11 +12,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,8 +43,42 @@ public class EDmvBindingTest extends TestCase {
         JAXBContext jaxbc = JAXBContext.newInstance(Dmv.class);
         m = jaxbc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        
     }
     
+    public void testCalendar() throws Exception {
+    	log.info("*** testCalendar ***");
+        DatatypeFactory dataFactory = DatatypeFactory.newInstance();
+        log.info("DataTypeFactory=" + dataFactory);
+        XMLGregorianCalendar cal = dataFactory.newXMLGregorianCalendar();
+        log.info("XMLGregorianCalendar=" + cal.getClass());
+        cal.setMonth(GregorianCalendar.MARCH);
+        String xml = cal.toXMLFormat();
+        log.debug("cal=" + xml);
+        dataFactory.newXMLGregorianCalendar(xml);
+        
+        cal.setTimezone(0);
+        
+        Calendar jCal = Calendar.getInstance();
+        jCal.clear();
+        jCal.set(Calendar.MONTH, Calendar.MARCH);
+        DateFormat df = DateFormat.getDateInstance();
+        String dfString = df.format(jCal.getTime()); 
+        log.debug("calendar=" + dfString);
+
+        String format = "--01";
+        try {
+	        XMLGregorianCalendar xCal = dataFactory.newXMLGregorianCalendar(format);
+	        log.info("successfully parsed:" + format + ", xCal=" + xCal.toXMLFormat());
+	        format = "--01--";
+	        xCal = dataFactory.newXMLGregorianCalendar(format);
+	        log.info("successfully parsed:" + format + ", xCal=" + xCal.toXMLFormat());
+        }
+        catch (Exception ex) {
+        	log.error("failed to parse:" + format);
+        	fail("failed to parse:" + format);
+        }
+    }
 
     public void testMarshallDemarshall() throws Exception {
         log.info("*** testMarshallDemarshall ***");
@@ -55,6 +95,7 @@ public class EDmvBindingTest extends TestCase {
         while ((object = 
             parser.getObject(
                     "Person", "VehicleRegistration")) != null) {
+                    //"VehicleRegistration")) != null) {
             log.debug(object);
             if (object instanceof Person) {
                 Person person = (Person) object;
@@ -259,6 +300,25 @@ public class EDmvBindingTest extends TestCase {
                 expected.getVehicle().getPropertyOwnerPerson().size(),
                 actual.getVehicle().getPropertyOwnerPerson().size());
         for (int i=0; i<expected.getVehicle().getPropertyOwnerPerson().size(); i++) {
+        	assertNotNull("expected vehicle owner was null",
+        			expected.getVehicle().getPropertyOwnerPerson().get(0));
+        	assertNotNull("actual vehicle owner was null",
+        			actual.getVehicle().getPropertyOwnerPerson().get(0));
+                log.debug("expected size()=" + 
+                    expected.getVehicle().getPropertyOwnerPerson().size());
+                log.debug("expected get(0)=" + 
+                    expected.getVehicle().getPropertyOwnerPerson().get(0));
+                log.debug("actual size()=" + 
+                    actual.getVehicle().getPropertyOwnerPerson().size());
+                log.debug("actual get(0)=" + 
+                    actual.getVehicle().getPropertyOwnerPerson().get(0));
+                log.debug("actual get(0)=" + 
+                    actual.getVehicle().getPropertyOwnerPerson().get(0).getClass());
+
+        	assertNotNull("expected vehicle owner ref was null",
+        			expected.getVehicle().getPropertyOwnerPerson().get(0).getRef());
+        	assertNotNull("actual vehicle owner ref was null",
+        			actual.getVehicle().getPropertyOwnerPerson().get(0).getRef());
             assertEquals("unexpected owner",
                     ((Person)expected.getVehicle().getPropertyOwnerPerson().get(0).getRef()).getId(),
                     ((Person)actual.getVehicle().getPropertyOwnerPerson().get(0).getRef()).getId()
@@ -271,5 +331,15 @@ public class EDmvBindingTest extends TestCase {
         text.append("id=" + vreg.getId());
         
         log.debug("vreg=" + text);
+        
+	    assertNotNull(vreg.getVehicleRegistrationDecal());
+	    assertNotNull(vreg.getVehicleRegistrationDecal().getDecalMonthDate());
+        assertNotNull(vreg.getVehicleRegistrationDecal().getDecalMonthDate().getValue());
+	    assertNotNull(vreg.getVehicleRegistrationDecal().getDecalYearDate());
+	    assertNotNull(vreg.getVehicleRegistrationDecal().getDecalYearDate().getValue());
+	    
+	    log.debug("month=" + vreg.getVehicleRegistrationDecal().getDecalMonthDate().getValue());
+	    log.debug("year=" + vreg.getVehicleRegistrationDecal().getDecalYearDate().getValue());
+
     }
 }

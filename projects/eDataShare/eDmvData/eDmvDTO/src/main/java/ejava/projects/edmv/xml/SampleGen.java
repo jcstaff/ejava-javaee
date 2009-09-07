@@ -64,7 +64,15 @@ public class SampleGen {
         Person person = new Person();
         person.setId("p" + ++personId);
         person.setSourceIDText("" + personId);
-
+        
+        /*
+        PersonNameTextType firstName = new PersonNameTextType();
+        firstName.setValue(first);
+        PersonNameType nameType = new PersonNameType();
+        nameType.setPersonGivenName(firstName);
+        person.setPersonName(nameType);
+        */
+        
         person.setPersonName(new PersonNameType(new PersonNameTextType(first,
                 null, null), new PersonNameTextType(middle, null, null),
                 new PersonNameTextType(last, null, null), new TextType(suffix,

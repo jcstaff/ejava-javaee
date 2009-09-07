@@ -2,6 +2,9 @@ package ejava.projects.edmv.xml;
 
 import java.io.InputStream;
 
+import java.util.HashMap;
+import java.util.concurrent.Callable;
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -18,6 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
+import com.sun.xml.bind.IDResolver;
+
 /**
  * This class will read in Java objects from a specified XML file. These 
  * objects can be used to create ingest data for projects.
@@ -28,7 +33,7 @@ import org.xml.sax.SAXException;
 public class EDmvParser {
     @SuppressWarnings("unused")
     private Log log = LogFactory.getLog(EDmvParser.class);
-    protected XMLInputFactory xmlif = XMLInputFactory.newInstance();
+    protected XMLInputFactory xmlif;
     protected Unmarshaller um;
     protected XMLStreamReader xmlr;
    
@@ -47,6 +52,30 @@ public class EDmvParser {
         um = jaxbContext.createUnmarshaller();
         xmlif = XMLInputFactory.newInstance();
         xmlr = xmlif.createXMLStreamReader(is);
+
+        //This (anonymous) class is a near replicate of sun's DefaultIDResolver
+        //except that they added a clear() of the idmap within startDocument()
+        //that prevents the unmarshaller from being called multiple times.
+        IDResolver idResolver = new IDResolver() {
+            private HashMap<String,Object> idmap = null;
+
+			@Override
+			public Callable<?> resolve(final String id, Class targetType) throws SAXException {
+                return new Callable() {
+                    public Object call() throws Exception {
+                        if(idmap==null)     return null;
+                        return idmap.get(id);
+                    }
+                };
+			}
+			
+			@Override
+			public void bind(String id, Object obj) throws SAXException {
+                if(idmap==null)     idmap = new HashMap<String,Object>();
+                idmap.put(id,obj);
+			};
+		};
+        um.setProperty(IDResolver.class.getName(), idResolver);
     }
     public EDmvParser(Class rootTypes[], InputStream is) 
         throws JAXBException, XMLStreamException {

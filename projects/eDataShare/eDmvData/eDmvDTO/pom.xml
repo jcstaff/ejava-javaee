@@ -3,7 +3,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eDataShare</groupId>
         <artifactId>eDmvData</artifactId>
-        <version>1.0.2009.2rc1</version>
+        <version>1.0.2009.2rc2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -23,11 +23,11 @@
     </description>
 
     <repositories>
+       <!-- needed to resolve stax dependency -->
         <repository>
-            <id>java.net</id>
-            <name>java.net Maven Repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
-            <layout>legacy</layout>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
         </repository>
     </repositories>
     
@@ -42,13 +42,13 @@
         <!-- StAX API (javax.xml.stream); 
             this is needed by the parser
             this is an API-only, the end user will have to supply a runtime impl
-        -->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jsr173_api</artifactId>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
         </dependency>
+        -->
 
         <!-- JAXB API (javax.xml.bind); 
             this is needed by the classes that are generated
@@ -57,22 +57,22 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.0</version>
+            <version>2.1</version>
             <scope>compile</scope>
         </dependency>
 
-        <!-- StAX Reference Impl (javax.xml.stream.XMLInputFactory) 
+        <!-- StAX Impl (javax.xml.stream.XMLInputFactory) 
             this is an implementation for StAX; it can be defined/used by anyone
             for runtime use.
-        -->
+                -->
         <dependency>
-            <groupId>com.sun.xml.stream</groupId>
-            <artifactId>sjsxp</artifactId>
-            <version>1.0</version>
+            <groupId>stax</groupId>
+            <artifactId>stax</artifactId>
+            <version>1.2.0</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.xml.stream</groupId>
+                    <groupId>stax</groupId>
                     <artifactId>stax-api</artifactId>
                 </exclusion>
             </exclusions>
@@ -81,11 +81,26 @@
         <!-- JAXB Reference Impl (com.sun.xml.bind.v2.ContextFactory)
             this is an implementation for JAXB; it can be defined/used by anyone
             for runtime use.
+
+            2009-09: added compile dependency to create a custom IDResolver
+            that allowed multiple unmarshal calls to resolve other intances.
         -->
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>2.0.2</version>
+            <version>2.1.12</version>
+            <scope>compile</scope>
+        </dependency>
+
+
+        <!-- added a dependency on Xerces to hopefully stablize the
+            lexical representation of gMonth formats when changing
+            JRE versions. 
+            -->
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.9.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -133,86 +148,57 @@
                     <name>!nojaxb</name>
                 </property>
             </activation>
+            <pluginRepositories>
+                <!-- used to get maven-jaxb2-plugin -->
+                <pluginRepository>
+                    <id>download-java-net</id>
+                    <name>Java.net Maven Repository</name>
+                    <url>http://download.java.net/maven/2</url>
+                </pluginRepository>
+            </pluginRepositories>
             <build>
-                <plugins>
+            <plugins>
 
+        <!-- generate Java classes from XML Schema -->
         <plugin>
-        <!-- this plugin is used to generate Java classes from an XML schema.
-            There is also a maven2 version of this plugin, but I haven't been
-            able to get it to use -Xextensions. Using the Ant task will have
-            to do for now.
-            -->
-            <artifactId>maven-antrun-plugin</artifactId>
+            <groupId>org.jvnet.jaxb2.maven2</groupId>
+            <artifactId>maven-jaxb2-plugin</artifactId>
+            <version>0.7.1</version>
             <executions>
                 <execution>
-                    <id>generate-classes-from-xsd</id>
-                    <phase>generate-sources</phase>                    
-                    <configuration>
-                        <tasks>
-                            <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
-                                <classpath refid="maven.plugin.classpath" />
-                            </taskdef>
-                            
-                            <mkdir dir="target/generated-sources/xjc" />
-                            <xjc target="target/generated-sources/xjc" 
-                                 extension="true">
-                                <schema dir="src/main/resources/xsd" includes="dmv.xsd"/>
-                                <binding dir="src/main/resources/xsd" includes="**/*.xjb"/>
-                                <arg value="-Xvalue-constructor" />                      
-                                <depends dir="src/main/resources/xsd" />
-                                <produces dir="target/generated-sources/xjc" />
-                            </xjc>
-                        </tasks>
-                        <sourceRoot>target/generated-sources/xjc</sourceRoot>
-                    </configuration>
                     <goals>
-                        <goal>run</goal>
+                        <goal>generate</goal>
                     </goals>
                 </execution>
             </executions>
+            <configuration>
+                <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+                <schemaIncludes>
+                    <schemaIncludes>dmv.xsd</schemaIncludes>
+                </schemaIncludes>
 
+                <bindingDirectory>src/main/resources/xsd</bindingDirectory>
+                <bindingIncludes>
+                    <bindingInclude>**/*.xjb</bindingInclude>
+                </bindingIncludes>
+                <extension>true</extension>
+                <args>
+                    <arg>-Xvalue-constructor</arg>
+                </args>
+                <plugins>
+                    <!-- this is hosted on webdev -->
+                    <plugin>
+                        <groupId>jaxb2-commons</groupId>
+                        <artifactId>value-constructor</artifactId>
+                        <version>1.5</version>
+                    </plugin>
+                </plugins> 
+            </configuration>
             <dependencies>
-                <!-- this defines the JAXB API that is used by the XJC compiler
-                    and for that classes it produces. The overall project 
-                    should also have a dependency on this artifact 
-                    -->
-                <dependency>                    
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                    <version>2.0</version>
-                    <scope>provided</scope>                    
-                </dependency>
-                <!-- this defines names Sun's JAXB reference implementation 
-                    to be our provider for JAXB functinality. 
-                    -->
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.0.3</version>
-                    <scope>provided</scope>                    
-                </dependency>
-                <!-- this provides the Sun XJC JAXB compiler to take the XML
-                    schema and create Java classes 
-                    -->
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-xjc</artifactId>
-                    <version>2.0.3</version>
-                    <scope>provided</scope>
-                </dependency>
-                <!-- this is an extension for the XJC JAXB compiler. It is used
-                    to add a constructor that accepts a value for each property.
-                    This is convenient for when building nested object trees. i
-                    -->
-                <dependency>
-                    <groupId>jaxb2-commons</groupId>
-                    <artifactId>value-constructor</artifactId>
-                    <version>1.5</version>
-                    <scope>provided</scope>                    
-                </dependency>
             </dependencies>
         </plugin>
-                </plugins>
+
+            </plugins>
             </build>
         </profile>
     </profiles>

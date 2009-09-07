@@ -1,6 +1,7 @@
 package ejava.projects.edmv.xml;
 
 import gov.ojp.it.jxdm._3_0.Person;
+
 import gov.ojp.it.jxdm._3_0.ReferenceType;
 import gov.ojp.it.jxdm._3_0.ResidenceType;
 import gov.ojp.it.jxdm._3_0.VehicleRegistration;
@@ -11,12 +12,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.logging.Log;
@@ -41,6 +41,48 @@ public class EDmvParserTest extends TestCase {
 		assertNotNull("inputDir not supplied", inputDir);
 	}
 	
+	public void testMonthFormat() throws Exception {
+		log.info("*** testMonthFormat ***");
+		XMLGregorianCalendar cal1 = DatatypeFactory.newInstance().newXMLGregorianCalendar();
+		cal1.setMonth(GregorianCalendar.MARCH);
+		String xml = cal1.toXMLFormat();
+		log.debug("MAR=" + xml);
+		
+		XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(xml);
+		assertNotNull("calendar was null", cal);
+		log.info("month=" + cal.getMonth());
+		assertEquals("unexpected month", GregorianCalendar.MARCH, cal.getMonth());
+	}
+	
+    public void testMonthParse() throws Exception {
+    	log.info("*** testCalendar ***");
+        DatatypeFactory dataFactory = DatatypeFactory.newInstance();
+        log.info("DataTypeFactory=" + dataFactory);
+        XMLGregorianCalendar cal = dataFactory.newXMLGregorianCalendar();
+        log.info("XMLGregorianCalendar=" + cal.getClass());
+
+        cal.setMonth(GregorianCalendar.MARCH);
+        String xml = cal.toXMLFormat();
+        log.debug("cal=" + xml);
+        dataFactory.newXMLGregorianCalendar(xml);
+        
+        cal.setTimezone(0);
+        
+        String format = "--01";
+        try {
+	        XMLGregorianCalendar xCal = dataFactory.newXMLGregorianCalendar(format);
+	        log.info("successfully parsed:" + format + ", xCal=" + xCal.toXMLFormat());
+	        format = "--01--";
+	        xCal = dataFactory.newXMLGregorianCalendar(format);
+	        log.info("successfully parsed:" + format + ", xCal=" + xCal.toXMLFormat());
+        }
+        catch (Exception ex) {
+        	log.error("failed to parse:" + format);
+        	fail("failed to parse:" + format);
+        }
+    }
+
+	
 	public void testParser() throws Exception {
 		File inDir = new File(inputDir);
 		File[] files = inDir.listFiles(new FilenameFilter() {
@@ -64,6 +106,9 @@ public class EDmvParserTest extends TestCase {
 	        object = parser.getObject(
 	                    "Person", "VehicleRegistration");
 	        if (object instanceof Person) {
+	        	if (((Person)object).getId().contains("1000")) {
+	        		log.debug("here");
+	        	}
 	            check((Person)object);
 	        }
 	        else if (object instanceof VehicleRegistration) {
@@ -150,7 +195,12 @@ public class EDmvParserTest extends TestCase {
 	    assertNotNull(r.getVehicleLicensePlateID().getID().getValue());
 	    assertNotNull(r.getVehicleRegistrationDecal());
 	    assertNotNull(r.getVehicleRegistrationDecal().getDecalMonthDate());
-	    assertNotNull(r.getVehicleRegistrationDecal().getDecalMonthDate().getValue());
+	    //try {
+	    assertNotNull("decal month date is null",
+	    		r.getVehicleRegistrationDecal().getDecalMonthDate().getValue());
+	    //} catch (Throwable ex) {
+	    //	log.error("monthDate.getValue() == null");
+	    //}
 	    assertNotNull(r.getVehicleRegistrationDecal().getDecalYearDate());
 	    assertNotNull(r.getVehicleRegistrationDecal().getDecalYearDate().getValue());
 	}
