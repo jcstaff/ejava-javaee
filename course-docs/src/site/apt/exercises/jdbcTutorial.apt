@@ -37,7 +37,7 @@ Exercise: JDBC Tutorial
 
 ---
 cd ${JBOSS_HOME}/server/${JBOSS_SERVER}/data/hypersonic
-java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+java -classpath ${JBOSS_HOME}/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     []
@@ -46,7 +46,7 @@ java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.S
     option.
 
 ---
-java -classpath c:/apps/jboss/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+java -classpath ${JBOSS_HOME}/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
 ** {Section B}: Setup project structure
@@ -558,6 +558,19 @@ Total time: 1 second
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+---
+
+    * Add an encoding property specification to avoid the platform
+    dependency warnings.
+
+---
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+</project>
 ---
 
     * Add compilation and test dependencies. We'll add dependency on the 
