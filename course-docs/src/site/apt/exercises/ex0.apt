@@ -183,7 +183,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             SVN repository. You must use https to access the repository.
 
 ---
-$ svn checkout https://ejava.info:8443/repos/class/branches/2009-spring-ejava-javaee ejava-javaee
+$ svn checkout https://ejava.info:8443/repos/class/branches/2009-fall-ejava-javaee ejava-javaee
 A  ejava-javaee/.project
 A  ejava-javaee/jdbcDAO
 A  ejava-javaee/jdbcDAO/.classpath
@@ -509,7 +509,7 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
     one used to persist your EJB application data. This helps avoid issues with
     trying to enlist 2 resources that do not support 2-phase-commit in the same
     transaction. By moving JMS to the ejavaDS data source, we avoid this issue
-    by using only a single resource. In server/standard/deploy/ejb-deployer.xml,
+    by using only a single resource. In server/standard/deploy/ejb2-timer-service.xml,
     change the jboss.jca:service=DataSourceBinding,name from DefaultDS to ejavaDS.
 
 ---
