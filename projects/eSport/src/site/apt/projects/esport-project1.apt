@@ -87,21 +87,6 @@ Project1: eSport Data Access Tier and Initial Business Logic
     A suggested starting point is provided at the end of this project 
     description.
     
-    Since the work is for separate applications, we will need to establish
-    two separate application projects for this work; eLeague and eClub.
-    The development can physically share resources (e.g., same database
-    and application server), but should be easily separated. It is
-    suggested that you form a root for the overall eSport work to
-    coordinate integration testing, and then group the lower-level
-    work under two child projects; eLeague and eClub.  See some
-    suggested project layouts at the bottom of this specification.  A
-    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eSport/}
-    sample set of projects}} that implement a thin eLeague thread has
-    been meade available. Please ignore the TestData sub-project when
-    using the example to craft your source tree. You will depend on
-    projects within that tree -- not reimplement them and not copy
-    them.
-
     The business objects encapsulate the core business data and rules
     of the application. You will design the business objects and then
     map them to the database using JDBC (for eLeague) and JPA (for both
@@ -149,11 +134,18 @@ Project1: eSport Data Access Tier and Initial Business Logic
 
     Since the work is for separate applications, we will need to establish
     two separate application projects for this work; eLeague and eClub.
-    The development can physically share resources (e.g., same database and
-    application server), but should be easily separated. It is suggested
-    that you form a root for the overall eSport work to coordinate
-    integration testing, and then group the lower-level work under two
-    child projects; eLeague and eClub. 
+    The development can physically share resources (e.g., same database
+    and application server), but should be easily separated. It is
+    suggested that you form a root for the overall eSport work to
+    coordinate integration testing, and then group the lower-level
+    work under two child projects; eLeague and eClub.  See some
+    suggested project layouts at the bottom of this specification.  A
+    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eSport/}
+    sample set of projects}} that implement a thin eLeague thread has
+    been made available. Please ignore the TestData sub-project when
+    using the example to craft your source tree. You will depend on
+    projects within that tree -- not reimplement them and not copy
+    them.
     
         [Note:] The root eSport project should be very thin and should
         not have a dependency on the instructor's class examples. Doing

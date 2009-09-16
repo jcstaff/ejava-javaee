@@ -1,6 +1,6 @@
 Project1: eDataShare Data Access Tier and Initial Business Logic
 
-    2009-08-30 Early Draft
+    2009-09-15
 
 * Goals
 
@@ -79,21 +79,9 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     implementations; one based on the JDBC API (for eDmv only) and a
     second based the one the Java Persistence API (JPA; for both eDmv
     and eMayberry). There will only be a single version of the business
-    logic implementations (BLImpl).
-
-    Since the work is for separate applications, we will need to establish
-    two separate application projects for this work; eDmv and eMayberry.
-    How you partition the implementations into separate physical
-    sub-projects beyond that is up to you.  Since the work is for separate
-    applications, we will need to establish two separate application
-    projects for this work; eDmv and eMayberry.  The development can
-    physically share resources (e.g., same database and application
-    server), but should be easily separated. It is suggested that you
-    form a root for the overall eDataShare work to coordinate integration
-    testing, and then group the lower-level work under two child projects;
-    eDmv and eMayberry.  See some suggested project layouts at the bottom
-    of this specification.  A sample set of projects that implement a
-    thin eDmv thread is also supplied in subversion.
+    logic implementations (BLImpl). How you partition the implementations
+    of your projects is up to you. A sugegsted starting point is provided
+    at the end of this project description.
 
     The business objects encapsulate the core business data and rules
     of the application. You will design the business objects and then
@@ -104,9 +92,10 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     Delete) capability with JPA. You will be required to encapsulate
     all object to relational (O/R) mapping within the DAOs, descriptor
     files, and business object annotations.  You will be given a set of
-    test data to initially populate your applications and be the source
-    of data for the ingest requirement. This will be provided through
-    a maven repository and a declared project dependency.
+    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eDataShare/eDmvData/eDmvTestUtil/src/main/resources/xml/}
+    test data}} to initially populate your applications and be the source
+    of data for the ingest requirement.  This will be provided with the
+    sample project thread mentioned above.
 
     [Note:] Its is expected/required that you implement and maintain
     both a set of JDBC and JPA DAOs in order to develop and demonstrate an
@@ -136,6 +125,32 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     a set of functional test that takes the business logic, data access
     tier, and business objects through  a set of specified, end-to-end
     use cases.
+
+* Assembly Overview
+
+    Since the work is for separate applications, we will need to establish
+    two separate application projects for this work; eDmv and eMayberry.
+    The development can physically share resources (e.g., same database
+    and application server), but should be easily separated. It is
+    suggested that you form a root for the overall eDataShare work to
+    coordinate integration testing, and then group the lower-level
+    work under two child projects; eDmv and eMayberry.  See some
+    suggested project layouts at the bottom of this specification.  A
+    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eDataShare/}
+    sample set of projects}} that implement a thin eDmv thread has
+    been made available. Please ignore the TestData sub-project when
+    using the example to craft your source tree. You will depend on
+    projects within that tree -- not reimplement them and not copy
+    them.
+
+
+        [Note:] The root eDataShare project should be very thin and should
+        not have a dependency on the instructor's class examples. Doing
+        so will add unnecessary web site publishing complications to your
+        project that are only needed by posted class examples.
+
+    See the Getting Started section towards the end of this specification
+    for a more detailed sample project layout.
     
     [Note:] Since the class will be producing parallel implementations for
     the applications and submitting them for evaluation, it is asked
