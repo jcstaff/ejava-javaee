@@ -8,15 +8,11 @@
     <enterprise-beans>
         <session>
             <ejb-name>SecurePingEJB</ejb-name>
-            <!-- JBoss 4.2.0 throws a runtime exception (not yet impl)
-                if this is defined in the deployment descriptor at this 
-                time                
             <security-role-ref>
                 <description>role-name checked within EJB</description>
                 <role-name>internalRole</role-name>
                 <role-link>admin</role-link>
             </security-role-ref>
-            -->
         </session>
     </enterprise-beans>    
     <assembly-descriptor>
