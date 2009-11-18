@@ -104,7 +104,7 @@ public class MessageCatcher implements Runnable {
         }
         finally {
             stopped = true;
-            started = false;
+            //started = false;
             if (consumer != null)   { consumer.close(); }
             if (this.sharedSession == null && session!=null){ session.close();}
             if (connection != null) { connection.close(); }
