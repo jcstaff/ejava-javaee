@@ -2,7 +2,7 @@
   <parent>
     <artifactId>ejava-javaee</artifactId>
     <groupId>ejava.javaee</groupId>
-    <version>1.0.2009.2-SNAPSHOT</version>
+    <version>1.0.2010.1-SNAPSHOT</version>
   </parent>
 
     <properties>
@@ -17,7 +17,7 @@
     This module provides an basic example of using JDBC and SQL to map a 
     flat POJO to a database.
   </description>
-  <version>1.0.2009.1</version>
+  <version>1.0.2010.1-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>commons-logging</groupId>
@@ -261,6 +261,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <executions>
                     <execution>
+                        <phase>integration-test</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
@@ -268,6 +269,7 @@
                 </executions>
                 <configuration>
                     <mainClass>ejava.examples.jdbc.ConnectDemo</mainClass>
+                    <classpathScope>test</classpathScope>
                     <systemProperties>
                         <systemProperty>
                             <key>jdbc.driver</key>

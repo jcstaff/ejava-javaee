@@ -1,0 +1,173 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>ejava.javaee.projects.eMarket</groupId>
+        <artifactId>eMarketData</artifactId>
+        <version>1.0.2010.1rc1</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.projects.eMarket.eMarketData</groupId>
+    <artifactId>eSalesTestEJB</artifactId>
+    <packaging>ejb</packaging>
+    <name>eSales TestEJB</name>
+    <description>
+        This project provides a test of the parser within the
+        server-side EJB.
+    </description>
+
+   <!-- this repositories holds many of the javaee5 jar files -->
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- core dependencies -->
+        <dependency>
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.ejb</groupId>
+          <artifactId>ejb-api</artifactId>
+          <version>3.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.0.4</version>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>${pom.groupId}</groupId>
+          <artifactId>eSalesTestUtil</artifactId>
+          <version>${pom.version}</version>
+          <scope>compile</scope>
+            <exclusions>
+            <!-- these won't be needed on server -->
+                <exclusion>
+                    <groupId>stax</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>stax</groupId>
+                    <artifactId>stax</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.6</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- need this excluded API re-added here to allow
+           this component to compile -->
+        <dependency>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+          <version>2.1</version>
+          <scope>provided</scope>
+        </dependency>    
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.13</version>
+          <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+         <!--tell the resource plugin to perform filtering on resources 
+             to fill in dialect, etc. -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>      
+
+              <!-- tell the EJB plugin we are using EJB3  and configure client-jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <ejbVersion>3.0</ejbVersion>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                    <generateClient>true</generateClient>
+                    <clientExcludes>
+                        <clientExclude>**/ejb/*Local.class</clientExclude>
+                        <clientExclude>**/ejb/*EJB.class</clientExclude>
+                    </clientExcludes>
+                </configuration>
+            </plugin>      
+        </plugins>      
+    </build>
+
+    <profiles>
+        <profile> <!-- defines our persistence.xml dialect -->
+            <id>hsql</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
+                </property>
+            </activation>
+            <properties>
+                  <hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
+            </properties>
+        </profile>
+        <profile>
+            <id>mysql</id>
+            <activation>
+                <property> <!-- use this property to name another db -->
+                    <name>jdbcdb</name>
+                    <value>mysql</value>
+                </property>
+            </activation>
+            <properties>
+                  <hibernate.dialect>org.hibernate.dialect.MySQLDialect</hibernate.dialect>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>

@@ -9,30 +9,9 @@
         <mapping-file>META-INF/orm.xml</mapping-file>
         -->
         <properties>
-            <property name="hibernate.dialect" 
-                value="${hibernate.dialect}"/>
-            <property name="hibernate.connection.url"
-                value="${jdbc.url}"/>
-            <property name="hibernate.connection.driver_class" 
-                value="${jdbc.driver}"/>
-            <property name="hibernate.connection.password" 
-                value="${jdbc.password}"/>
-            <property name="hibernate.connection.username" 
-                value="${jdbc.user}"/>
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-
-            <!-- Here's a couple of configuration options that can
-               be used to debug issues with the application
-               * show_sql=true will log each statement issued to the database
-               * format_sql=true will pretty print the SQL output
-               * batch_size=0 will turn off SQL batch statements and 
-               will add clarity to errors occuring within larger 
-               statement batches.
-
-            <property name="hibernate.jdbc.batch_size" value="0"/>
-               -->
-            <property name="hibernate.show_sql" value="true"/>            
-            <property name="hibernate.format_sql" value="true"/>            
+            <!-- hibernate-specific properties can be specified
+                here or in the hibernate.properties file. 
+                -->
         </properties>
     </persistence-unit>        
     

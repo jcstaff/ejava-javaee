@@ -2,7 +2,7 @@
   <parent>
     <artifactId>ejava-javaee</artifactId>
     <groupId>ejava.javaee</groupId>
-    <version>1.0.2009.2-SNAPSHOT</version>
+    <version>1.0.2010.1-SNAPSHOT</version>
   </parent>
 
     <properties>
@@ -51,12 +51,12 @@
   <build>
      <!--tell the resource plugin to perform filtering on resources
          to fill in JDBC URL, etc. -->
-    <resources>
-        <resource>
-            <directory>src/main/resources</directory>
+    <testResources>
+        <testResource>
+            <directory>src/test/resources</directory>
             <filtering>true</filtering>
-        </resource>
-    </resources>
+        </testResource>
+    </testResources>
 
     <plugins>
           <!-- make sure we are building java5 -->
@@ -95,6 +95,9 @@
                   <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password />
+                  <hibernate.dialect>
+                      org.hibernate.dialect.HSQLDialect
+                  </hibernate.dialect>
             </properties>
             <dependencies>
                 <dependency>
@@ -154,7 +157,7 @@
                         <executions>
                             <execution>
                                 <id>generate-drop-ddl</id>
-                                <phase>compile</phase>
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>hbm2ddl</goal>
                                 </goals>
@@ -170,7 +173,7 @@
                             </execution>
                             <execution>
                                 <id>generate-create-ddl</id>
-                                <phase>compile</phase>
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>hbm2ddl</goal>
                                 </goals>

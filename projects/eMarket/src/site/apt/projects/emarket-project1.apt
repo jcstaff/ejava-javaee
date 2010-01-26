@@ -1,6 +1,6 @@
 Project1: eMarket Data Access Tier and Initial Business Logic
 
-    10/19/2008 - fixed link at bottom
+    01/25/2010
 
 * Goals
 
@@ -65,24 +65,42 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     A suggested starting point is provided at the end of this project 
     description.
 
-    The business objects encapsulate the core business data and rules of
-    the applications. You will design the business objects and then map
-    them to the database using JDBC and JPA. You will only be asked to
-    implement a create capability with JDBC to be used with ingest. You
-    will be required to implement full CRUD capability with JPA. You will
-    be required to encapsulate all object to relational (O/R) mapping
-    within the DAOs, descriptor files, and business object annotations.
-    You will be given a set of 
+    The business objects encapsulate the core business data and
+    rules of the applications. You will design the business objects
+    and then map them to the database using JDBC (for eSales) and JPA
+    (for both eSales and eBidbot). You will only be asked to implement
+    a create capability with JDBC to be used with ingest. You will
+    be required to implement full CRUD (Create, Read, Update, and
+    Delete), capability with JPA. You will be required to encapsulate
+    all object to relational (O/R) mapping within the DAOs, descriptor
+    files, and business object annotations.  You will be given a set of
     {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eMarket/eMarketData/eSalesTestUtil/src/main/resources/xml/}
-    test data}} to initially populate your
-    applications as a part of testing.
+    test data}} to initially populate your applications as a part
+    of testing.
 
-    The business logic will handle the initial ingest of test data and
-    runtime business functions of the applications. At this point in time,
-    all actions are localized to the DAOs and any external interfaces we can
-    either host or simulate. We can implement the full business
-    functionality of eSales, but will not have enough of the remote eSales
-    interface in place to test much of the eBidbot business logic.
+    [Note:] Its is expected/required that you implement and maintain
+    both a set of JDBC and JPA DAOs in order to develop and demonstrate an
+    understanding of how database table and Java class designs can
+    impact your JPA implementations.  You will always use the JDBC DAO
+    to implement the eDmv ingest and you will always use the JPA
+    implementation for general CRUD operations in this and follow-on
+    projects.
+
+    []
+
+    The business logic will provide a set of classes with concise methods
+    that map easily to use cases. The business logic will ensure proper
+    use of the overall application, delegating some business logic
+    functionality to the business objects and full O/R responsibility
+    to the DAOs. eSales will have an ingest requirement as well as the
+    requirement to manipulate and add to what was ingested. eBidbot will
+    start fresh and obtain all data from users and coordinate with eSales. 
+    However, for project 1, eBidbot will be unable to fully implement 
+    interactions with eSales because remote interfaces will not be
+    implemented until project2.  Some of that must be stubbed at this point. 
+    You are only required to implement enough business logic methods
+    that it takes to implement the end-to-end scenarios specified later
+    within this specification.
 
     The test acceptance for the first eSales project will be a set of
     unit tests and at least one functional test that takes the business
@@ -99,7 +117,14 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     application server), but should be easily separated. It is suggested
     that you form a root for the overall eMarket work to coordinate
     integration testing, and then group the lower-level work under two
-    child projects; eSales and eBidbot. 
+    child projects; eSales and eBidbot.  See some
+    suggested project layouts at the bottom of this specification.  A
+    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eMarket/}
+    sample set of projects}} that implements a thin eSales thread has
+    been made available. Please ignore the TestData sub-project when
+    using the example to craft your source tree. You will depend on
+    projects within that tree -- not reimplement them and not copy
+    them.
     
         [Note:] The root eMarket project should be very thin and should
         not have a dependency on the instructor's class examples. Doing
@@ -784,8 +809,6 @@ eMarket/
 |   |       |   |   `-- ebidbot
 |   |       |   |       `-- blimpl
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
 |   |       `-- test
 |   |           `-- java
 |   |               `-- ebidbot
@@ -825,8 +848,6 @@ eMarket/
 |   |       |   |   `-- esales
 |   |       |   |       `-- blimpl
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
 |   |       `-- test
 |   |           `-- java
 |   |               `-- esales

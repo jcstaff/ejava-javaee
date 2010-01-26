@@ -26,225 +26,11 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
-          <li>2010-01-18: Posted updated baseline</li>
-          <li>2009-11-17: Posted JMS Materials and Security and JMS TODOs</li>
-          <li>2009-10-20: Posted JNDI and Transaction TODOs</li>
-          <li>2009-10-20: Posted EJB Materials</li>
-          <li>2009-10-13: Posted Inheritance TODOs</li>
-          <li>2009-10-06: Posted EJB-QL TODOs</li>
-          <li>2009-09-29: Posted ORM Relationship TODOs</li>
-          <li>2009-09-22: Posted Core ORM TODOs</li>
-          <li>2009-09-15: Posted JPA Materials</li>
-          <li>2009-09-08: Posted JDBC Materials</li>
-          <li>2009-08-30: Posted initial class site</li>
+          <li>2010-01-25: Posted initial class site</li>
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
-      <li><ul>
-        <li>Have a nice holiday!</li>
-      </ul></li>
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
-      <li><ul>
-          <li>Setup and deploy your JMS publisher code to eDmv session EJB.</li>
-          <li>Setup and implement a JMS MDB in the eMayberry to receive 
-          updates.</li>
-          <li>Implement EJBTimers to perform scheduled work.</li>
-          <li>Test, cleanup, document, and turn in project 3</li> 
-      </ul></li>
-      <li><ul>
-          <li>Finish security configuration, implementation, and testing</li>
-
-          <li>Add JMS configuration file to JBoss server. Be sure
-          to keep a copy in your source tree and refer to file in 
-          project README if you don't auto-deploy the file.</li>
-          <li>Design your JMS message type(s). Write and test a utility
-          class that publishes the messages. This class ideally
-          would be placed in with the BLImpl classes. However, if
-          it publishes DTO classes, the DTOs may have to get moved in
-          with the BO project to satisfy dependency constraints.</li>
-          <li>Implement a Java SE Client to receive and log the JMS
-          messages. This client can be placed in BLImpl, must use a
-          selector, and be launchable by the grader using an Ant script.
-          The Ant script can be part of either the BLImpl or RMI Test
-          project. See class examples on how write the Ant script.</li>
-      </ul></li>
-      <li><ul>
-          <li>Complete your projects, finish testing, and turn in.</li>
-          <li>Start project 3</li>
-          <li>Add user.properties and roles.properties to eDmv project</li>
-          <li>Assign EJB to security-domain "other".
-          The RMI Tests should fail access at this point.</li>
-
-          <li>Specify required roles to access each EJB method</li>
-          <li>Add a java.security.auth.login.config to the RMI Test client</li>
-          <li>Add a LoginContext with a CallbackHandler. The RMI Tests should 
-          be able to access the EJB methods they are authorized to access.
-          You should have at least one test that verifies an unauthorized
-          user is refused access.</li>
-          <li>Assign WAR to security-domain "java:/jaas/other"</li>
-          <li>Add security-constraint elements to the WAR web.xml. The 
-          user should be prompted for a login at this point and be able to
-          access web pages and EJB methods that they are authorized for
-          and be refused access to what they are un-authorized to access</li>
-          <li>Eliminate access to any information or option the user does
-          not have access to see or use</li>
-          <li>Eliminate the passing of userId information when the appropriate
-          means is to obtain through the EJB or WARs security context.</li>
-      </ul></li>
-      <li><ul>
-          <li>Go through Web UI parts of the JavaEE exercise.</li>
-          <li>Look over Web UI parts of the ejbsessionBank.</li>
-          <li>Add a WAR project to eDmv. Add in the controller,
-          handler, and supporting JSP implementations.</li>
-          <li>Add a WAR project to eMayberry. Add in the controller,
-          handler, and supporting JSP implementations.
-          This WAR should get all of its behavior from eMayberryEJB
-          and not interact directly with eDmv.</li>
-      </ul></li>
-      <li><ul>
-          <li>Finish implementing EJB use cases for end-to-end
-          testing.</li>
-          <li>Add @Transaction declarations</li>
-          <li>Implement the transaction test requirement. You may
-          want to place logic for the transaction test within 
-          the TestUtilEJB since you may end up undesirable business
-          logic in order to demonstrate the rollback of a transaction.</li>
-      </ul></li>
-      <li><ul>
-          <li>Look over the specification for project 2.</li>
-          <li>Complete the posted sections of the
-          <a href="http://webdev.apl.jhu.edu/~jcs/ejava-javaee/course-docs/exercises/javaeeEx.html">
-          Java EE exercise</a>.</li>
-          <li>Apply the maven, EJB, EAR, RMI Test, and remote interface
-          concepts from the exercise to your project 2.</li>
-          <li>Begin adding the other session beans, remote interfaces,
-          business logic integration, and RMI tests for project 2.</li>
-      </ul></li>
-      <li><ul>
-          <li>Finish up project 1 and submit to the grader according
-          to the submission criteria.</li>
-          <li>Perform any desired post-submission refactoring of your 
-          project 1 implementation prior to re-use within project 2.</li>
-          <li>Look over the specification for project 2.</li>
-          <li>Begin looking at ejbsessionBank example application; 
-          which forms an EJB, EAR, RMI Test, as well as a WAR Client.
-          These will be key component types within project 2.</li>
-      </ul></li>
-      <li><ul>
-          <li>Refactor or implement any necessary functionality using
-          Queries and EJB-QL.</li>
-          <li>Finish adding required business logic for end-to-end 
-          testing.</li>
-      </ul></li>
-      <li><ul>
-          <li>Enhance your Business Objects to include JPA relationships.
-          Be sure to include proper deletion as a part of your cleanup
-          in your test case. This now must take foreign key constraints
-          into consideration (e.g., can't delete a Person when you
-          still have a Residence)</li>
-          <li>Begin adding required business logic to satisfy the
-          specified end-to-end scenario. Add unit tests to verify
-          the functionality of the individual business logic methods.</li>
-          <li>Implement your ingest capability. Provide some sort of 
-          verification that the ingest worked. You don't have to test
-          for the entire model ingested, but provide a brief set of 
-          sanity checks that comparse pre/post and selected information.
-          </li>
-          <li>Implement your populate() method in terms of the ingest.
-          Encapsulate it an your resetAll() within a TestUtilImpl class.
-          Re-use this class as a part of your unit testing.
-          </li>
-      </ul></li>
-      <li><ul>
-          <li>Create the remainder of your Business Objects for the
-          project.</li>
-          <li>Enhance your testing of the Business Objects to include
-          anticipated use cases for the project.</li>
-          <li>Mature your JDBC DAO implementations to handle persisting
-          the additional classes.</li>
-          <li>Declare the Business Objects as Entities and map the classes
-          to tables and columns in your database. Your JDBC and JPA
-          DAOs should be using the same database tables at this point.
-          You can attempt to use the JPA DAO to help test the JDBC DAO
-          implementation.  Mark relationships and problem fields as
-          @Transient at this point in time.</li>
-          <b>
-          <li>If you have not yet done so, please submit a copy of your
-          project to me for early sanity check. It should be in a known
-          and stable state where it will build from the root with
-          known and documented issues. I want to see your project
-          at least once early in the project and as you run into 
-          any significant issues.</li>
-          </b>
-      </ul></li>
-      <li><ul>
-          <li>Go through the EntityManager Exercise</li>
-          <li>Look over the class project example implementation</li>
-          <li>Add JPA/Hibernate infrastructure to your DAO project
-          DAO. This should at least consist of a successful connection to the DB.
-          You are done with this step when you have a separate JPA JUnit test
-          for the DAO and the setUp() method is able to create an EntityManager.</li>
-          <li>Define a few business objects as being an @Entity and identify the 
-          primary key property with the @Id tag. Make sure you have a default
-          constructor, but leave other things default for now. Annontate all
-          collections with @Transient annotation. We are not ready to cover 
-          relationships just yet.</li>
-
-          <li>Design and implement an initial JPA implementation for your DAO</li>
-
-          <li>Design and implement a set of unit tests for your JPA DAO. Note 
-          how the default schema for the @Entities may not match up with 
-          your DB schema at this point when you run the tests.</li>
-
-          <li>Add JPA @Annotations to your class project business objects to properly 
-          map the @Entities to the database schema design you created last time
-          (primarily a topic for next week)</li>
-
-          <li>Refine your BOs, DB Schema, and DAO based on your understanding 
-          to date.</li>
-
-          <li>Move forward with your DB Schema design, BO classes, and JDBC DAO
-          implementation if there is extra time. You can turn off your JPA 
-          JUnit Test by adding an excludes definition to your surefire 
-          configuration. Perform a google search on "surefire excludes" for
-          details.</li>
-
-          <b>
-          <li>Send me a copy of your
-          project, in a stable, known state, sometime this week;
-          ideally by early Sunday evening. You do not have to be complete
-          with the TODO items, but you should be able to describe what
-          you know you have left to complete and describe any issues
-          that have gotten in your way. This will not be graded, but
-          that should not stop you from turning it in and making an
-          honest effort to have the TODOs completed.</li>
-          </b>
-
-          <li>Continue to consider all BO, DB Schema, and DAO work as
-          draft prototypes at this time to get something end-to-end
-          running. You will refine over next several weeks.</li>
-      </ul></li>
-      <li><ul>
-          <li>Go through the JDBC Exercise</li>
-          <li>Look over the class project and post any questions.</li>
-          <li>Establish your project directory structure and perform a build from the root.</li>
-          <li>Design and implement a few business objects for your class project.</li>
-          <li>Design and implement a set of unit tests for your business objects.</li>
-          <li>Design and implement the test infrastructure for your
-          DAO. This should at least consist of a successful connection to the DB.</li>
-          <li>Design a draft DB schema for your implemented business objects. This should go in 
-          your DAO project.</li>
-          <li>Implement a way to create your schema in the DB as a part of your DAO testing.</li>
-          <li>Design and implement an initial DAO interface and JDBC implementation for your business objects.
-          You only need a create() method for the project.</li>
-          <li>Consider all BO, DB Schema, and DAO work as draft prototypes at this time to get
-          something end-to-end running. You will refine over next several weeks.</li>
-      </ul></li>
       <li><ul>
           <li>register for newsgroup and setup e-mail handling (all
           e-mails will have ejava_class in subject)</li>
@@ -252,8 +38,13 @@
           <li>setup development environment by going through exercises
           0 and 1</li>
       </ul></li>
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
       <li><ul>
-          <li>had a nice summer</li>
+          <li>had a nice holiday</li>
       </ul></li>
       </ul>
       </subsection>

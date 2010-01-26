@@ -6,6 +6,7 @@
     <persistence-unit name="ormRelations">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
+            <!-- moved hibernate properties to hibernate.properties file
             <property name="hibernate.dialect" 
                 value="${hibernate.dialect}"/>
             <property name="hibernate.connection.url"
@@ -18,9 +19,9 @@
                 value="${jdbc.user}"/>
 
             <property name="hibernate.hbm2ddl.auto" value="create"/>
-
             <property name="hibernate.show_sql" value="false"/>            
             <property name="hibernate.format_sql" value="true"/>            
+            -->
         </properties>
     </persistence-unit>        
     

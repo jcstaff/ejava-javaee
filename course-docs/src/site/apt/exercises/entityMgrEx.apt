@@ -113,21 +113,15 @@ DROP TABLE EM_AUTO if EXISTS;
 
         * define provider-specific properties that tell the provider how to 
         obtain a connection to the database as well as some other configuration
-        properties. See the example below. Leave the database-specific properties
-        as variables. We can get the build environment to fill this in during
-        the build process. Set the hibernate.show_sql to true to turn on 
-        logging of SQL commands to the database.
-
-            [Note:] The technique demonstrated here, where we place the driver,
-            URL, and credentials within persistence.xml, causes
-            the information to be located within the component's JAR file.
-            This may not be desirable for operational deployments. The
-            JDBC example showed how we could pass in JDBC properties to
-            our unit tests are runtime. You can do the same here. Just
-            pass a HashMap to Persistence.createEntityManagerFactory()
-            with the property names and values shown below. Delete these
-            variables from persistence.xml if that approach is taken.
-
+        properties. 
+        
+            [Note:] The technique to add the provider-specific properties
+            includes somewhat sensitive information like user credentials.
+            If we place them in the persistence.xml file within the src/main
+            tree, these properties will become part of our deployed 
+            artifact. To avoid this, we will define them in a separate
+            hibernate.properties file placed in the src/test tree.
+        
         []
 
 ---
@@ -139,22 +133,27 @@ DROP TABLE EM_AUTO if EXISTS;
     <persistence-unit name="entityMgrEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
-            <property name="hibernate.dialect"
-                value="${hibernate.dialect}"/>
-            <property name="hibernate.connection.url"
-                value="${jdbc.url}"/>
-            <property name="hibernate.connection.driver_class"
-                value="${jdbc.driver}"/>
-            <property name="hibernate.connection.password"
-                value="${jdbc.password}"/>
-            <property name="hibernate.connection.username"
-                value="${jdbc.user}"/>
-
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.format_sql" value="true"/>
+            <!-- defined in src/test/resources/hibernate.properties -->
         </properties>
     </persistence-unit>
 </persistence>
+---
+
+    * Create a hibernate.properties file in src/test/resources to hold 
+    information we want to suport testing, but may not want to be 
+    part of the deployed artifact. Leave the volatile values as variables
+    so they can be expanded into the target tree during compile time.
+
+---
+hibernate.dialect=${hibernate.dialect}
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.password=${jdbc.password}
+hibernate.connection.username=${jdbc.user}
+#hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
 ---
 
     * Create a JUnit Test case to hold your test code.
@@ -424,6 +423,7 @@ src/
     |       `-- entitymgrex
     |           `-- EntityMgrTest.java
     `-- resources
+        |-- hibernate.properties
         `-- log4j.xml
 ---
 
@@ -493,7 +493,7 @@ src/
         </dependency>
 ---
 
-    * Add a build section and begin by specifying that resource files should be 
+    * Add a build section and begin by specifying that test resource files should be 
     filtered when copied into the target tree. We do this so we have a chance
     to replace the variables in persistence.xml with our specific database profile.
 
@@ -501,12 +501,12 @@ src/
     <build>
         <!--tell the resource plugin to perform filtering on resources
             to fill in JDBC URL, etc. -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
                 <filtering>true</filtering>
-            </resource>
-        </resources>
+            </testResource>
+        </testResources>
     </build>
 ---
 

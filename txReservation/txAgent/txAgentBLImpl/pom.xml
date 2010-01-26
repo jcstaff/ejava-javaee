@@ -3,7 +3,7 @@
     <parent>
         <artifactId>txAgent</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
-        <version>1.0.2009.2-SNAPSHOT</version>
+        <version>1.0.2010.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -69,12 +69,12 @@
     <build>
          <!--tell the resource plugin to perform filtering on resources 
              to fill in JDBC URL, etc. -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
                 <filtering>true</filtering>
-            </resource>
-        </resources>
+            </testResource>
+        </testResources>
 
         <plugins>
               <!-- make sure we are building java5 -->

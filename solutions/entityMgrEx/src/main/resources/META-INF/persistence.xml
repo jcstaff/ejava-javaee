@@ -6,22 +6,7 @@
     <persistence-unit name="entityMgrEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
-            <property name="hibernate.dialect" 
-                value="${hibernate.dialect}"/>
-            <property name="hibernate.connection.url"
-                value="${jdbc.url}"/>
-            <property name="hibernate.connection.driver_class" 
-                value="${jdbc.driver}"/>
-            <property name="hibernate.connection.password" 
-                value="${jdbc.password}"/>
-            <property name="hibernate.connection.username" 
-                value="${jdbc.user}"/>
-            <!-- adding this property causes schema to be generated at runtime
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-            -->
-
-            <property name="hibernate.show_sql" value="true"/>            
-            <property name="hibernate.format_sql" value="true"/>            
+           <!-- defined in src/test/resources/hibernate.properties -->
         </properties>
     </persistence-unit>            
 </persistence>

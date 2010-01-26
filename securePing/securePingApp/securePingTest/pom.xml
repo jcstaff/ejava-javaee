@@ -3,7 +3,7 @@
     <parent>
         <artifactId>securePingApp</artifactId>
         <groupId>ejava.javaee.secureping</groupId>
-        <version>1.0.2009.2-SNAPSHOT</version>
+        <version>1.0.2010.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -64,20 +64,6 @@
         </testResources>
 
         <plugins>
-              <!-- tell it to run, even though we are a pom project -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testResources</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
               <!-- make sure we are building java5 and tell it to compile, 
                     even though we are a pom project -->
             <plugin>
@@ -87,14 +73,6 @@
                     <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>      
 
             <!-- THE PROFILE-SPECIFIC DEPLOY WILL EXECUTE HERE -->

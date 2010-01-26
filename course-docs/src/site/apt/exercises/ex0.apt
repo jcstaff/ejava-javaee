@@ -21,7 +21,7 @@ Exercise 0: Development Environment Setup
     if you are a Unix/bash developer
     and feel helpless when looking at a DOS prompt.
 
-    * {{{Part_B}Download and install J2SE 1.5 JDK}} 
+    * {{{Part_B}Download and install JavaSE 6 JDK}} 
     to compile and run our applications.
 
     * {{{Part_C} Download and install a Subversion Client}} 
@@ -84,21 +84,15 @@ Exercise 0: Development Environment Setup
 
     [[1]] Windows users; welcome to the sane world of the bash shell and vi.
 
-* {Part B}: Download and Install J2SE 5.0 JDK
+* {Part B}: Download and Install JavaSE 6 JDK
 
     [[1]] Go to the
-    {{{http://java.sun.com/javase/downloads/index_jdk5.jsp} Sun Java SE
-    5 Download Page}} and download JDK 5.0. JDK 5.0 is nearing its End
-    of Service Life and requires an e-mail exchange between you and Sun
-    to make sure you really know that. The link sent to me was 
-    {{http://java.sun.com/javase/downloads/5u20/jdk}} and they made it
-    clear that it would not be made available forever. Due to the 
-    inclusion of many of the Java EE 5 additions into Java SE 6, the
-    port between the two versions is non-trivial. 
+    {{{http://java.sun.com/javase/downloads/widget/jdk6.jsp} Sun JavaSE JDK
+    6 Download Page}} and download JDK 6. 
 
     [[1]] Change the installation directory so that it does not have
-    a spaces in its path. I changed mine to C:\apps\java\jdk1.5.0_20 and
-    C:\apps\java\jre1.5.0_20
+    a spaces in its path. I changed mine to C:\apps\java\jdk1.6.0_18 and
+    C:\apps\java\jre1.6.0_18
 
     [[1]] Go through Control Panel -> System -> Advanced -> Environment
     Variables and add ia definition for JAVA_HOME and add %JAVA_HOME%\bin 
@@ -135,7 +129,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             client, but I'll go through some of the steps for
             {{{http://tortoisesvn.tigris.org/}TortoiseSVN}} here.
 
-                [[1]] I chose the latest, TortoiseSVN-1.6.5, version. 
+                [[1]] I chose the latest, TortoiseSVN-1.6.7, version. 
 
                 [[1]] The path for this tool won't be a part of any path we use to build
                 or run projects, so I chose the default installation directory.
@@ -183,7 +177,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             SVN repository. You must use https to access the repository.
 
 ---
-$ svn checkout https://ejava.info:8443/repos/class/branches/2009-fall-ejava-javaee ejava-javaee
+$ svn checkout https://ejava.info:8443/repos/class/branches/2010-spring-ejava-javaee ejava-javaee
 A  ejava-javaee/.project
 A  ejava-javaee/jdbcDAO
 A  ejava-javaee/jdbcDAO/.classpath
@@ -242,8 +236,8 @@ $ which mvn
 
 $ mvn -version
 Apache Maven 2.2.1 (r801777; 2009-08-06 15:16:01-0400)
-Java version: 1.5.0_20
-Java home: c:\apps\java\jdk1.5.0_20\jre
+Java version: 1.6.0_18
+Java home: c:\apps\java\jdk1.6.0_18\jre
 Default locale: en_US, platform encoding: Cp1252
 OS name: "windows xp" version: "5.1" arch: "x86" Family: "windows"
 ---
@@ -355,14 +349,11 @@ l:plexus-compiler-api:jar:1.5.2
     [[1]] Go to the 
     {{{http://jboss.org/jbossas/downloads/}
     Download site for the JBoss Application Server}}.  Download version
-    5.1.0.GA. Burke's EJB3 with JBoss workbook shows an example of using
+    5.1.0.GA for jdk6. Burke's EJB3 with JBoss workbook shows an example of using
     the "Run Installer" that walks you through the right options to get
     JBoss <<AND>> EJB3. However, that was for 4.0.4/5. EJB3 is enabled
-    by default, starting with 4.2. You will notice a jdk6 version. If you 
-    read the release notes, you'll see that the jdk5 version is considered
-    the most stable version and JBoss requires extra setup to get to work
-    under JavaSE 6. Please download the standard/jdk5 version (has no 
-    jdk suffix). 
+    by default, starting with 4.2. Please download the jdk6 version towards the
+    bottom of the list.
 
     [[1]] On Windows, I unzipped mine to c:/apps to avoid having any spaces in the
     path. This produced a directory called c:/apps/jboss-5.1.0.GA.
@@ -406,12 +397,12 @@ $ c:/apps/jboss-5.1.0.GA/bin/run.sh -c standard
 
   JBOSS_HOME: c:\apps\jboss-5.1.0.GA
 
-  JAVA: /cygdrive/c/apps/java/jdk1.5.0_20/bin/java
+  JAVA: /cygdrive/c/apps/java/jdk1.6.0_18/bin/java
 
   JAVA_OPTS: -Dprogram.name=run.sh -server -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsu
 n.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000
 
-  CLASSPATH: c:\apps\jboss-5.1.0.GA\bin\run.jar;c:\apps\java\jdk1.5.0_20\lib\tools.jar
+  CLASSPATH: c:\apps\jboss-5.1.0.GA\bin\run.jar;c:\apps\java\jdk1.6.0_18\lib\tools.jar
 
  =========================================================================
 
@@ -576,7 +567,7 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
 
         * Open Help -> Install New Software
 
-        * Click "Add e..." and enter "http://m2eclipse.sonatype.org/update/"
+        * Click "Add ..." and enter "http://m2eclipse.sonatype.org/update/"
 
         * Check "Maven Integration" and click "Install..."
 
@@ -595,7 +586,7 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
 
         * Preferences -> Java -> Installed JREs -> Add...
 
-        * JRE home: c:\apps\java\jdk1.5.0_20
+        * JRE home: c:\apps\java\jdk1.6.0_18
 
         * Finish
 
@@ -618,7 +609,7 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
     to my shortcut for Eclipse.
 
 ---
-Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.5.0_17\bin
+Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_18\bin
 ---
     
     [[1]] Feel free to experiment whether the embedded or external 
@@ -632,8 +623,10 @@ Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.5.0_17\bin
         [Note:] I use Ant as a portable scripting tool for interactive demos. You will 
         use it to wrap setup commands and Java SE clients for projects you submit.
 
-    [[1]] Download and install {{{http://ant.apache.org/}Ant}}. I
-    downloaded the 1.7.1 version. 
+    [[1]] Download and install {{{http://ant.apache.org/}Ant}}. Please use
+    the older 1.7.1 version. I have not tested yet with the 1.8 version. You can 
+    fine the older releases at {{http://archive.apache.org/dist/ant/binaries/}}.
+    The file is called apache-ant-1.7.1-bin.zip.
 
         * I installed mine in c:/apps, which resulted in c:/apps/apache-ant-1.7.1 
         being created and now being my ANT_HOME.

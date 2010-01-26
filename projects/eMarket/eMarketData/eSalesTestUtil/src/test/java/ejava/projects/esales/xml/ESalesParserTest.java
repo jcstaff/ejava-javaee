@@ -1,5 +1,7 @@
 package ejava.projects.esales.xml;
 
+import info.ejava.esales._1_0_2007.ESales;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,9 +12,6 @@ import java.lang.reflect.Method;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ejava.projects.esales.dto.Account;
-import ejava.projects.esales.dto.Address;
-import ejava.projects.esales.dto.ESales;
 
 import junit.framework.TestCase;
 

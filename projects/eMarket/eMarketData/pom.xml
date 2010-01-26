@@ -7,7 +7,7 @@
     <parent>
         <artifactId>eMarket</artifactId>
         <groupId>ejava.javaee.projects</groupId>
-        <version>1.0.2008.2-SNAPSHOT</version>
+        <version>1.0.2010.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +15,7 @@
     <artifactId>eMarketData</artifactId>
     <packaging>pom</packaging>
     <name>eMarketData</name>
-    <version>1.0.2008.2rc1</version>
+    <version>1.0.2010.1rc1</version>
     <description>
         This project provides the test data and parser 
         for the class project. Students will create a dependency on the
@@ -23,6 +23,12 @@
         provided parser. You can find an example of how to setup and use the
         parser within the eSalesBLImpl sub-project.
     </description>
+
+    <modules>
+        <module>eSalesDTO</module>
+        <module>eSalesTestUtil</module>
+    </modules>
+
     <profiles>
         <profile>
             <id>devel</id>
@@ -39,15 +45,11 @@
             </modules>
         </profile>
         <profile>
-            <id>deploy</id>
-            <activation>
-                <property>
-                    <name>!devel</name>
-                </property>
-            </activation>
+            <id>serverTest</id>
             <modules>
-                <module>eSalesDTO</module>
-                <module>eSalesTestUtil</module>
+                <module>eSalesTestEJB</module>
+                <module>eSalesTestEAR</module>
+                <module>eSalesRMITest</module>
             </modules>
         </profile>
     </profiles>
