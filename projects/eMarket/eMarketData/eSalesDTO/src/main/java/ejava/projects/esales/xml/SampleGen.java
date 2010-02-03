@@ -1,10 +1,10 @@
 package ejava.projects.esales.xml;
 
-import info.ejava.esales._1_0_2007.Account;
-import info.ejava.esales._1_0_2007.Address;
-import info.ejava.esales._1_0_2007.Auction;
-import info.ejava.esales._1_0_2007.Bid;
-import info.ejava.esales._1_0_2007.ESales;
+import ejava.projects.esales.dto.Account;
+import ejava.projects.esales.dto.Address;
+import ejava.projects.esales.dto.Auction;
+import ejava.projects.esales.dto.Bid;
+import ejava.projects.esales.dto.ESales;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

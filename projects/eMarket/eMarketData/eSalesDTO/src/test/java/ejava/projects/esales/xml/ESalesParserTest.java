@@ -1,8 +1,8 @@
 package ejava.projects.esales.xml;
 
-import info.ejava.esales._1_0_2007.Account;
-import info.ejava.esales._1_0_2007.Address;
-import info.ejava.esales._1_0_2007.ESales;
+import ejava.projects.esales.dto.Account;
+import ejava.projects.esales.dto.Address;
+import ejava.projects.esales.dto.ESales;
 
 import java.io.File;
 import java.io.FileInputStream;

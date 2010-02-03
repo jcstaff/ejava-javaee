@@ -1,15 +1,13 @@
 package ejava.projects.esales.ejb;
 
-import info.ejava.esales._1_0_2007.Account;
-import info.ejava.esales._1_0_2007.Address;
-import info.ejava.esales._1_0_2007.Auction;
-import info.ejava.esales._1_0_2007.Bid;
-import info.ejava.esales._1_0_2007.ESales;
+import ejava.projects.esales.dto.Account;
+
+import ejava.projects.esales.dto.Address;
+import ejava.projects.esales.dto.Auction;
+import ejava.projects.esales.dto.Bid;
+import ejava.projects.esales.dto.ESales;
 
 import java.io.InputStream;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static junit.framework.TestCase.*;
 
@@ -55,7 +53,7 @@ public class ParserTestEJB implements ParserTestRemote {
 			Object object=null;
 			do {
 		        object = parser.getObject(
-		                    "address", "account", "auction", "bid");
+		        		"Address", "Account", "Auction", "Bid");
 		        if (object instanceof Address) {
 		            log.debug("found address");
 		        }

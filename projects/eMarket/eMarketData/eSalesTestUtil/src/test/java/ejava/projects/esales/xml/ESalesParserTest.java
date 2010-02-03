@@ -1,6 +1,7 @@
 package ejava.projects.esales.xml;
 
-import info.ejava.esales._1_0_2007.ESales;
+import ejava.projects.esales.dto.Account;
+import ejava.projects.esales.dto.ESales;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -43,10 +44,17 @@ public class ESalesParserTest extends TestCase {
 		ESalesParser parser = new ESalesParser(ESales.class, bis);
 		Object object=null;
 		do {
-			object = parser.getObject("account","address","auction","image");
+			object = parser.getObject("Address", "Account", "Auction", "Bid","Image");
 			if (object != null) { dump(object); };
+			if (object instanceof Account) {
+				checkAccount((Account)object);
+			}
 		} while (object != null);
 		bis.close();
+	}
+
+	private void checkAccount(Account account) {
+		assertNotNull("null login:" + account.getRefid(), account.getLogin());		
 	}
 
 	private void dump(Object object) throws Exception {
