@@ -251,6 +251,7 @@
 
 
                     <!-- generates a DDL file for persistence unit 
+                    -->
                     <plugin>
                         <artifactId>hibernate3-maven-plugin</artifactId>
                         <groupId>org.codehaus.mojo</groupId>
@@ -259,7 +260,7 @@
                         <executions>
                             <execution>
                                 <id>generate-drop-ddl</id>
-                                <phase>compile</phase>
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>hbm2ddl</goal>
                                 </goals>
@@ -275,7 +276,7 @@
                             </execution>
                             <execution>
                                 <id>generate-create-ddl</id>
-                                <phase>compile</phase>
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>hbm2ddl</goal>
                                 </goals>
@@ -311,7 +312,6 @@
                             </componentProperties>
                         </configuration>
                     </plugin>
-                    -->
                 </plugins>          
             </build>          
         </profile>
