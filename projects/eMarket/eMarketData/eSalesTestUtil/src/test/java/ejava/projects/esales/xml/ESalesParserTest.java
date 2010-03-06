@@ -54,7 +54,8 @@ public class ESalesParserTest extends TestCase {
 	}
 
 	private void checkAccount(Account account) {
-		assertNotNull("null login:" + account.getRefid(), account.getLogin());		
+		assertNotNull("null login:" + account.getRefid(), account.getLogin());	
+		assertTrue("account.addresses was empty:" + account.getRefid(), account.getAddress().size() > 0);
 	}
 
 	private void dump(Object object) throws Exception {

@@ -1,6 +1,8 @@
 package ejava.projects.esales.xml;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 
 import javax.xml.XMLConstants;
@@ -18,6 +20,8 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
+
+import com.sun.xml.bind.IDResolver;
 
 /**
  * This class will read in Java objects from a specified XML file. These 
@@ -49,13 +53,30 @@ public class ESalesParser {
         um = jaxbContext.createUnmarshaller();
         xmlif = XMLInputFactory.newInstance();
         xmlr = xmlif.createXMLStreamReader(is);
-    }
-    public ESalesParser(Class rootTypes[], InputStream is) 
-        throws JAXBException, XMLStreamException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(rootTypes);
-        um = jaxbContext.createUnmarshaller();
-        xmlif = XMLInputFactory.newInstance();
-        xmlr = xmlif.createXMLStreamReader(is);
+
+        //This (anonymous) class is a near replicate of sun's DefaultIDResolver
+        //except that they added a clear() of the idmap within startDocument()
+        //that prevents the unmarshaller from being called multiple times.
+        IDResolver idResolver = new IDResolver() {
+            private HashMap<String,Object> idmap = null;
+
+			@Override
+			public Callable<?> resolve(final String id, Class targetType) throws SAXException {
+                return new Callable() {
+                    public Object call() throws Exception {
+                        if(idmap==null)     return null;
+                        return idmap.get(id);
+                    }
+                };
+			}
+			
+			@Override
+			public void bind(String id, Object obj) throws SAXException {
+                if(idmap==null)     idmap = new HashMap<String,Object>();
+                idmap.put(id,obj);
+			};
+		};
+        um.setProperty(IDResolver.class.getName(), idResolver);    
     }
     
     public void setSchema(InputStream schema) throws SAXException {

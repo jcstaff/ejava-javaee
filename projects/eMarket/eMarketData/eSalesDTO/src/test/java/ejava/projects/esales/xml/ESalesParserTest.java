@@ -198,6 +198,8 @@ public class ESalesParserTest extends TestCase {
         		expected.getLogin(), actual.getLogin());
         assertEquals("middleName", 
         		expected.getMiddleName(), actual.getMiddleName());
+        assertEquals("addresses", 
+        		expected.getAddress().size(), actual.getAddress().size());
         /* need to strip out just date
         assertEquals("startDate", 
         		expected.getStartDate().getTime(), actual.getStartDate().getTime());
