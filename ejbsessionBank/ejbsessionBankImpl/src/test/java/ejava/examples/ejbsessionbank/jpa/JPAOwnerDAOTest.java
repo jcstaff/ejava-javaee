@@ -1,6 +1,10 @@
 package ejava.examples.ejbsessionbank.jpa;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -111,6 +115,34 @@ public class JPAOwnerDAOTest extends DemoBase {
         count = accountDAO.findAccounts(
                 AccountDAO.GET_ACCOUNTS_QUERY, null, 0, 1000).size();
         assertEquals("unexpected number of accounts", 0, count);
+    }
+
+    public void testGetAuthor() throws Exception {
+        Owner owner = new Owner();
+        owner.setFirstName("johnx");
+        owner.setLastName("jonesx");
+        owner.setSsn("111x");        
+        ownerDAO.createOwner(owner);
+
+        Account account = new Account();
+        account.setAccountNumber("000111x");
+        owner.getAccounts().add(account);
+        em.getTransaction().commit();
+        
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("account", account);
+        Collection<Owner> owners = 
+        	ownerDAO.findOwners("getAccountOwner", params, 0, 100);
+        assertNotNull("null owners", owners);
+        assertEquals("unexpected number of owners", 1, owners.size());
+        List<Owner> owners2 = ownerDAO.getAccountOwners(account);
+        assertNotNull("null owners", owners2);
+        assertEquals("unexpected number of owners2", 1, owners2.size());
+        
+        em.getTransaction().begin();
+        ownerDAO.removeOwner(owners2.get(0));
+        accountDAO.removeAccount(account);
+        em.getTransaction().commit();
     }
 
 }

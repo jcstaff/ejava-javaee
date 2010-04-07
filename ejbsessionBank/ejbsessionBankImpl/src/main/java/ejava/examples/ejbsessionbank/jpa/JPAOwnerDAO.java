@@ -2,6 +2,7 @@ package ejava.examples.ejbsessionbank.jpa;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,4 +74,12 @@ public class JPAOwnerDAO implements OwnerDAO {
         }
         return owner;
     }
+
+	public List<Owner> getAccountOwners(Account account) throws DAOException {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("account", account);
+        List<Owner> owners = 
+        	findOwners("getAccountOwner", params, 0, 100);
+        return owners;
+	}
 }

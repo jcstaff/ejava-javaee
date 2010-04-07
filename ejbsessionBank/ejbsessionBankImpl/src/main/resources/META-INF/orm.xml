@@ -82,6 +82,13 @@
                 ]]>
             </query>
         </named-query>
+        <named-query name="getAccountOwner">
+            <query><![CDATA[
+                select o from Owner o, IN (o.accounts) acct
+                where acct = :account
+                ]]>
+            </query>
+        </named-query>
         <attributes>
             <id name="id">
                 <generated-value/>

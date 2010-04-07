@@ -1,5 +1,6 @@
 package ejava.examples.ejbsessionbank.blimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -95,6 +96,16 @@ public class TellerImpl implements Teller {
                     "invalid balance:" + account.getBalance());
         }
         else {
+        	//unlink the account from the owner first
+        	for (Owner owner : ownerDAO.getAccountOwners(account)) {
+	        	List<Account> accounts = new ArrayList<Account>(owner.getAccounts());
+	        	for (Account a : accounts) {
+	        		if (a.getId() == account.getId()) {
+	        			owner.getAccounts().remove(a);
+	        		}
+	        	}
+        	}
+        	//now we can remove account
             acctDAO.removeAccount(account);
         }
         
