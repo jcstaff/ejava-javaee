@@ -685,18 +685,27 @@ $mvn clean install
 
 * {Add JNDI InitialContext to Servlet}
 
-    [[1]] Add a dependency on the JBoss client jar library within
-    the Jetty profile dependencies.
+    [[1]] Add the dependences within the Jetty profile dependencies
+    required to be a JBoss client.
 
 ---
 //jetty profile dependencies
 
-<dependency>
-    <groupId>org.jboss.client</groupId>
-    <artifactId>jbossall-client</artifactId>
-    <version>4.2.3.GA</version>
-    <scope>compile</scope>
-</dependency>
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
+...
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>5.1.0.GA</version>            
+            <type>pom</type>
+            <scope>compile</scope>
+        </dependency>
 ---
 
     [[1]] Define the properties required to access the JNDI tree within 
