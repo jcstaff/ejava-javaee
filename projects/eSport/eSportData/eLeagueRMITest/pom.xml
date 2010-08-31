@@ -1,0 +1,178 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>ejava.javaee.projects.eSport</groupId>
+        <artifactId>eSportData</artifactId>
+        <version>1.0.2010.2</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.projects.eSport.eSportData</groupId>
+    <artifactId>eLeagueRMITest</artifactId>
+    <packaging>jar</packaging>
+    <name>eLeague RMITest</name>
+    <description>
+        This project deploys the TestEAR and invokes the 
+        TestEJB to verify proper functionality on the
+        server-side.
+    </description>
+
+    <dependencies>
+        <!-- core dependencies -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- component to test within deployment-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>eLeagueTestEJB</artifactId>
+            <version>${project.version}</version>
+            <type>ejb-client</type>
+            <scope>compile</scope>
+        </dependency>
+        
+        <!-- package being deployed must be a dependency -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>eLeagueTestEAR</artifactId>
+            <version>${project.version}</version>
+            <type>ear</type>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
+        <plugins>
+              <!-- make sure we are building java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>      
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                    <systemProperties>
+                        <property>
+                          <name>jndi.name</name>
+                          <value>
+                              ejava/projects/eLeagueTestEJB/ParserTestEJB/remote
+                          </value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+        </plugins>      
+    </build>
+
+    <profiles>
+<profile>
+    <id>jboss</id>
+    <activation>
+        <property> <!-- activate this unless -Dserver present -->
+            <name>!server</name>
+        </property>
+    </activation>
+    <properties>
+          <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
+          </java.naming.factory.initial>
+          <java.naming.provider.url>jnp://localhost:1099
+          </java.naming.provider.url>
+          <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
+          </java.naming.factory.url.pkgs>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>jboss-repo</id>
+            <name>JBoss Maven Repository</name>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>5.1.0.GA</version>            
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+        <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration>
+                <container>
+                    <containerId>jboss4x</containerId>
+                    <type>remote</type>                
+                </container>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>deploy-component</id>
+                    <!-- jump into a phase before surefire runs tests -->
+                    <phase>test-compile</phase>
+                    <goals>
+                        <goal>undeploy</goal>
+                        <goal>deploy</goal>
+                    </goals>
+                    <configuration>
+                        <configuration>
+                            <type>runtime</type>
+                            <properties>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
+                            </properties>
+                        </configuration>
+                        <deployer>
+                            <type>remote</type>
+                            <deployables>
+                                <deployable>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>eLeagueTestEAR</artifactId>
+                                    <type>ear</type>
+                                </deployable>
+                            </deployables>
+                        </deployer>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>                    
+        </plugins>
+    </build>
+</profile>
+    </profiles>
+</project>

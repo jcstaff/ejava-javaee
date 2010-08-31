@@ -3,7 +3,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eSport</groupId>
         <artifactId>eLeague</artifactId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2010.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -24,9 +24,9 @@
         </dependency>
 
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>eLeagueDAO</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>ejava.javaee.projects.eSport.eSportData</groupId>
             <artifactId>eLeagueTestUtil</artifactId>
-            <version>1.0.2009.1</version>
+            <version>1.0.2010.2</version>
             <scope>provided</scope>
         </dependency>
         
@@ -94,8 +94,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>

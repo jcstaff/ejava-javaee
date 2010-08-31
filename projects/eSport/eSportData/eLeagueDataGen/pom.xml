@@ -7,13 +7,13 @@
     <parent>
         <groupId>ejava.javaee.projects.eSport</groupId>
         <artifactId>eSportData</artifactId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2010.2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ejava.javaee.projects.eSport.eSportData</groupId>
     <artifactId>eLeagueDataGen</artifactId>
-    <version>1.0.2009.1</version>
+    <version>1.0.2010.2</version>
     <name>eLeague DataGen</name>
     <description>
         This project builds the test data sets for the eLeague system. It
@@ -41,9 +41,9 @@
           <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>eLeagueDTO</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -129,8 +129,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                     <!--
                     <excludes>
                         <exclude>**/*.java</exclude>
@@ -231,7 +231,7 @@
                                 <configuration>
                                     <componentProperties>
                                         <outputfilename>
-                                            ${pom.artifactId}-drop.ddl
+                                            ${project.artifactId}-drop.ddl
                                         </outputfilename>
                                         <drop>true</drop>
                                         <create>false</create>
@@ -247,7 +247,7 @@
                                 <configuration>
                                     <componentProperties>
                                         <outputfilename>
-                                            ${pom.artifactId}-create.ddl
+                                            ${project.artifactId}-create.ddl
                                         </outputfilename>
                                         <drop>false</drop>
                                         <create>true</create>

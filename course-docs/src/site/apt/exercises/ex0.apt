@@ -86,13 +86,18 @@ Exercise 0: Development Environment Setup
 
 * {Part B}: Download and Install JavaSE 6 JDK
 
+    [Note:] Choose 32bit or 64bit depending on your operating system and 
+    make sure that both the JDK and Eclipse match. Of note, I have never 
+    personally used 64bit JDK and Eclipse on Windows, but have used 32bit
+    a ton under XP.
+
     [[1]] Go to the
     {{{http://java.sun.com/javase/downloads/widget/jdk6.jsp} Sun JavaSE JDK
     6 Download Page}} and download JDK 6. 
 
     [[1]] Change the installation directory so that it does not have
-    a spaces in its path. I changed mine to C:\apps\java\jdk1.6.0_18 and
-    C:\apps\java\jre1.6.0_18
+    a spaces in its path. I changed mine to C:\apps\java\jdk1.6.0_21 and
+    C:\apps\java\jre1.6.0_21
 
     [[1]] Go through Control Panel -> System -> Advanced -> Environment
     Variables and add ia definition for JAVA_HOME and add %JAVA_HOME%\bin 
@@ -129,7 +134,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             client, but I'll go through some of the steps for
             {{{http://tortoisesvn.tigris.org/}TortoiseSVN}} here.
 
-                [[1]] I chose the latest, TortoiseSVN-1.6.7, version. 
+                [[1]] I chose the latest, TortoiseSVN-1.6.10, version. 
 
                 [[1]] The path for this tool won't be a part of any path we use to build
                 or run projects, so I chose the default installation directory.
@@ -165,7 +170,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             [[1]] Browse the repository to determine the URL for the 
             project you wish to checkout. You can start at the root 
             using the following
-            {{https://ejava.info:8443/repos/class/branches/2009-fall-ejava-javaee}}
+            {{https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee}}
             URL.
 
             [[1]] Check out a level of the SVN repository to your class
@@ -177,7 +182,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             SVN repository. You must use https to access the repository.
 
 ---
-$ svn checkout https://ejava.info:8443/repos/class/branches/2010-spring-ejava-javaee ejava-javaee
+$ svn checkout https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee ejava-javaee
 A  ejava-javaee/.project
 A  ejava-javaee/jdbcDAO
 A  ejava-javaee/jdbcDAO/.classpath
@@ -236,8 +241,8 @@ $ which mvn
 
 $ mvn -version
 Apache Maven 2.2.1 (r801777; 2009-08-06 15:16:01-0400)
-Java version: 1.6.0_18
-Java home: c:\apps\java\jdk1.6.0_18\jre
+Java version: 1.6.0_21
+Java home: c:\apps\java\jdk1.6.0_21\jre
 Default locale: en_US, platform encoding: Cp1252
 OS name: "windows xp" version: "5.1" arch: "x86" Family: "windows"
 ---
@@ -529,13 +534,10 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
 
 * {Part F}: Download and install Eclipse IDE
 
-        [Note:] An IDE, and specifically Eclipse, is <<NOT>> a
-        requirement for class. The memory requirements for an IDE and the
-        application server may have your machine swapping quite a bit.
-        I have included coverage of an IDE only as a productivity tool.
-        You may use vi and command line tools (I do!) or something like
-        NetBeans from Sun. I do find the ability to step through an
-        execution with a graphical debugger priceless.
+        [Note:] An IDE, and specifically Eclipse, is <<NOT>> a requirement
+        for class. However it it quite practical to do so.  The memory
+        requirements for an IDE and the application server will require
+        at least 1GB of memory before doing any size tweeks.
 
         [Note:] Some products, including MyEclipse, provide a full download
         of Eclipse as a part of their installation. Feel free to try those 
@@ -586,7 +588,7 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
 
         * Preferences -> Java -> Installed JREs -> Add...
 
-        * JRE home: c:\apps\java\jdk1.6.0_18
+        * JRE home: c:\apps\java\jdk1.6.0_21
 
         * Finish
 
@@ -609,7 +611,7 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
     to my shortcut for Eclipse.
 
 ---
-Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_18\bin
+Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_21\bin
 ---
     
     [[1]] Feel free to experiment whether the embedded or external 
@@ -623,10 +625,8 @@ Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_18\bin
         [Note:] I use Ant as a portable scripting tool for interactive demos. You will 
         use it to wrap setup commands and Java SE clients for projects you submit.
 
-    [[1]] Download and install {{{http://ant.apache.org/}Ant}}. Please use
-    the older 1.7.1 version. I have not tested yet with the 1.8 version. You can 
-    fine the older releases at {{http://archive.apache.org/dist/ant/binaries/}}.
-    The file is called apache-ant-1.7.1-bin.zip.
+    [[1]] Download and install {{{http://ant.apache.org/}Ant}}. Lets try using
+    the newer 1.8.1 version.
 
         * I installed mine in c:/apps, which resulted in c:/apps/apache-ant-1.7.1 
         being created and now being my ANT_HOME.
@@ -638,7 +638,7 @@ Windows PATH = %JAVA_HOME%\bin;%MAVEN_HOME%\bin;%PATH%;%ANT_HOME%\bin
 ---
 ---
 > ant -version
-Apache Ant version 1.7.1 compiled on June 27 2008
+pache Ant version 1.8.1 compiled on April 30 2010
 ---
 
 * Summary

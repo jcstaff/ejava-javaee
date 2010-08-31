@@ -5,7 +5,7 @@
     <groupId>ejava.javaee</groupId>
     <artifactId>ejava-javaee</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2010.1-SNAPSHOT</version>
+    <version>1.0.2010.2-SNAPSHOT</version>
     <name>Enterprise Java (605.784) Root</name>
     <description>
         This is the course home page for the Enterprise Java Course
@@ -30,8 +30,8 @@
         </mailingList>
     </mailingLists>
     <scm>
-        <url>https://ejava.info:8443/repos/class/branches/2010-spring-ejava-javaee</url>
-        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2010-spring-ejava-javaee</connection>
+        <url>https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee</url>
+        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee</connection>
     </scm>
   <modules>
   <!--
@@ -42,6 +42,7 @@
         <module>utils</module>
         <module>projects</module>
         <module>javase5Enhancements</module>
+        <!-- These will be posted over the course of the semester
         <module>jdbcDAO</module>
         <module>jpaDAO</module>
         <module>ormCore</module>
@@ -56,7 +57,6 @@
         <module>securePing</module>
         <module>jmsCore</module>
         <module>asyncEJB</module>
-        <!-- These will be posted over the course of the semester
         -->
     </modules>
   
@@ -387,7 +387,7 @@
                     <dependency>
                         <groupId>javax.xml</groupId>
                         <artifactId>jaxb-api</artifactId>
-                        <version>2.0</version>
+                        <version>2.1</version>
                         <scope>provided</scope>
                     </dependency>
                 </dependencies>

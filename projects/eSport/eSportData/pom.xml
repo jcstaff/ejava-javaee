@@ -1,13 +1,9 @@
 <?xml version="1.0"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <!-- this parent dependency is only here to pick up site deployment properties
-        when being deployed to the web site, It normally would not be needed to 
-        compile and test the application.
-        -->
     <parent>
         <artifactId>eSport</artifactId>
         <groupId>ejava.javaee.projects</groupId>
-        <version>1.0.2009.1</version>
+        <version>1.0.2010.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +11,7 @@
     <artifactId>eSportData</artifactId>
     <packaging>pom</packaging>
     <name>eSportData</name>
-    <version>1.0.2009.1</version>
+    <version>1.0.2010.2</version>
     <description>
         This project provides the test data and parser 
         for the class project. Students will create a dependency on the
@@ -23,6 +19,12 @@
         provided parser. You can find an example of how to setup and use the
         parser within the eSalesBLImpl sub-project.
     </description>
+
+    <modules>
+        <module>eLeagueDTO</module>
+        <module>eLeagueTestUtil</module>
+    </modules>
+
     <profiles>
         <profile>
             <id>devel</id>
@@ -33,21 +35,15 @@
                 </property>
             </activation>
             <modules>
-                <module>eLeagueDTO</module>
                 <module>eLeagueDataGen</module>
-                <module>eLeagueTestUtil</module>
             </modules>
         </profile>
         <profile>
-            <id>deploy</id>
-            <activation>
-                <property>
-                    <name>!devel</name>
-                </property>
-            </activation>
+            <id>serverTest</id>
             <modules>
-                <module>eLeagueDTO</module>
-                <module>eLeagueTestUtil</module>
+                <module>eLeagueTestEJB</module>
+                <module>eLeagueTestEAR</module>
+                <module>eLeagueRMITest</module>
             </modules>
         </profile>
     </profiles>
