@@ -25,9 +25,9 @@
 
 
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>eDmvBO</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -289,7 +289,7 @@
                         <configuration>
                             <componentProperties>
                                 <outputfilename>
-                                    ${pom.artifactId}-dropJPA.ddl
+                                    ${project.artifactId}-dropJPA.ddl
                                 </outputfilename>
                                 <drop>true</drop>
                                 <create>false</create>
@@ -305,7 +305,7 @@
                         <configuration>
                             <componentProperties>
                                 <outputfilename>
-                                    ${pom.artifactId}-createJPA.ddl
+                                    ${project.artifactId}-createJPA.ddl
                                 </outputfilename>
                                 <drop>false</drop>
                                 <create>true</create>

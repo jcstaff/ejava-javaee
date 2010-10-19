@@ -47,24 +47,18 @@ Exercise: Entity Manager
 
 ---
 cd ${JBOSS_HOME}/server/${JBOSS_SERVER}/data/hypersonic
-java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+java -classpath ${JBOSS_HOME}/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     []
 
     * Start the DB GUI and login using the "HSQL Database Engine Server"
-    option.
+    option.  You can view the contents of your database at any time through the database
+    UI using the following command, configuring it to talk to the server (3rd option
+    on the drop-down list) and entering the proper query SQL.
 
 ---
-java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
----
-
-    * You can view the contents of your database at any time through the database
-    UI using the following command, configuring it to talk to the server (3rd option)
-    and entering the proper query SQL.
-
----
-$ java -classpath ${JBOSS_HOME}/server/${JBOSS_SERVER}/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+java -classpath ${JBOSS_HOME}/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
 ** {Part B}: Setup Project Structure

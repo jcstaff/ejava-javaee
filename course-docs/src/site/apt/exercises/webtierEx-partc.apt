@@ -230,6 +230,7 @@ http://localhost:8080/webtierWAR/
                 <plugin>
                     <groupId>org.codehaus.cargo</groupId>
                     <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>1.0.2</version>
                     <configuration>
                         <container>
                             <containerId>jboss4x</containerId>
@@ -582,9 +583,9 @@ webtierEx> cat webtierWAR/src/main/webapp/WEB-INF/web.xml
 #webtierWAR/pom.xml
 
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>webtierData</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 ---
 

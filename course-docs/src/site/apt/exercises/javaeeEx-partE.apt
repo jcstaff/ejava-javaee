@@ -320,9 +320,9 @@ Hello
 ---
     <dependencies>
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>javaeeExEJB</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <type>ejb</type>
             <exclusions>
                 <!-- jboss doesn't want to see already provided jars -->
@@ -333,9 +333,9 @@ Hello
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>javaeeExWAR</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <type>war</type>
         </dependency>
     </dependencies>
@@ -354,7 +354,7 @@ Hello
                 <configuration>
                     <modules>
                         <webModule>
-                            <groupId>${pom.groupId}</groupId>
+                            <groupId>${project.groupId}</groupId>
                             <artifactId>javaeeExWAR</artifactId>
                             <contextRoot>javaeeEx</contextRoot>
                         </webModule>
@@ -845,9 +845,9 @@ $ mvn clean install
 //root level dependency
 
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>javaeeExEJB</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
 ---
@@ -855,9 +855,9 @@ $ mvn clean install
 //jetty profile dependency
 
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>javaeeExEJB</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <type>ejb-client</type>
             <scope>compile</scope>
         </dependency>

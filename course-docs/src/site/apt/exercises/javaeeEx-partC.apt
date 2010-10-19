@@ -143,9 +143,9 @@ $ mvn clean install
 
 ---
         <dependency>
-          <groupId>${pom.groupId}</groupId>
+          <groupId>${project.groupId}</groupId>
           <artifactId>javaeeExImpl</artifactId>
-          <version>${pom.version}</version>
+          <version>${project.version}</version>
           <scope>compile</scope>
         </dependency>
 ---
@@ -275,7 +275,7 @@ $ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/ma
     <persistence-unit name="javaeeEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/ejavaDS</jta-data-source>
-        <jar-file>javaeeExImpl-${pom.version}.jar</jar-file>
+        <jar-file>javaeeExImpl-${project.version}.jar</jar-file>
         <properties>
         <properties>
             <property name="hibernate.dialect" 

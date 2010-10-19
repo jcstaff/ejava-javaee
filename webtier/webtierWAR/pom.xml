@@ -37,17 +37,17 @@
         
         <!-- this brings in interfaces, BO, and core business logic -->
         <dependency>
-            <groupId>${pom.groupId}</groupId>          
+            <groupId>${project.groupId}</groupId>          
             <artifactId>webtierBL</artifactId>
-            <version>${pom.version}</version>          
+            <version>${project.version}</version>          
             <scope>compile</scope>
         </dependency>
         
         <!-- this brings in a JPA implementation of the DAO -->
         <dependency>
-            <groupId>${pom.groupId}</groupId>          
+            <groupId>${project.groupId}</groupId>          
             <artifactId>webtierJPA</artifactId>
-            <version>${pom.version}</version>          
+            <version>${project.version}</version>          
             <scope>compile</scope>
         </dependency>        
 

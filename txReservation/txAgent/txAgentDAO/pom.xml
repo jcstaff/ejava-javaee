@@ -26,9 +26,9 @@
         </dependency>
 
         <dependency>
-          <groupId>${pom.groupId}</groupId>
+          <groupId>${project.groupId}</groupId>
           <artifactId>txAgentBO</artifactId>
-          <version>${pom.version}</version>
+          <version>${project.version}</version>
           <scope>compile</scope>
         </dependency>
     
@@ -187,7 +187,7 @@
                                 <configuration>
                                     <componentProperties>
                                         <outputfilename>
-                                            ${pom.artifactId}-drop.ddl
+                                            ${project.artifactId}-drop.ddl
                                         </outputfilename>
                                         <drop>true</drop>
                                         <create>false</create>
@@ -203,7 +203,7 @@
                                 <configuration>
                                     <componentProperties>
                                         <outputfilename>
-                                            ${pom.artifactId}-create.ddl
+                                            ${project.artifactId}-create.ddl
                                         </outputfilename>
                                         <drop>false</drop>
                                         <create>true</create>

@@ -170,7 +170,7 @@
                                 <configuration>
                                     <componentProperties>
                                         <outputfilename>
-                                            ${pom.artifactId}-drop.ddl
+                                            ${project.artifactId}-drop.ddl
                                         </outputfilename>
                                         <drop>true</drop>
                                         <create>false</create>
@@ -186,7 +186,7 @@
                                 <configuration>
                                     <componentProperties>
                                         <outputfilename>
-                                            ${pom.artifactId}-create.ddl
+                                            ${project.artifactId}-create.ddl
                                         </outputfilename>
                                         <drop>false</drop>
                                         <create>true</create>

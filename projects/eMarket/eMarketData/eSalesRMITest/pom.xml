@@ -27,18 +27,18 @@
 
         <!-- component to test within deployment-->
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>eSalesTestEJB</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <type>ejb-client</type>
             <scope>compile</scope>
         </dependency>
         
         <!-- package being deployed must be a dependency -->
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>eSalesTestEAR</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <type>ear</type>
         </dependency>
 
@@ -134,6 +134,7 @@
         <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.0.2</version>
             <configuration>
                 <container>
                     <containerId>jboss4x</containerId>
@@ -161,7 +162,7 @@
                             <type>remote</type>
                             <deployables>
                                 <deployable>
-                                    <groupId>${pom.groupId}</groupId>
+                                    <groupId>${project.groupId}</groupId>
                                     <artifactId>eSalesTestEAR</artifactId>
                                     <type>ear</type>
                                 </deployable>

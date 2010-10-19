@@ -49,33 +49,33 @@
         </dependency>
 
         <dependency>
-          <groupId>${pom.groupId}</groupId>
+          <groupId>${project.groupId}</groupId>
           <artifactId>txAgentBLImpl</artifactId>
-          <version>${pom.version}</version>
+          <version>${project.version}</version>
           <scope>compile</scope>
         </dependency>
         <dependency>
-          <groupId>${pom.groupId}</groupId>
+          <groupId>${project.groupId}</groupId>
           <artifactId>txAgentDAO</artifactId>
-          <version>${pom.version}</version>
+          <version>${project.version}</version>
           <scope>compile</scope>
         </dependency>
         <dependency>
-          <groupId>${pom.groupId}</groupId>
+          <groupId>${project.groupId}</groupId>
           <artifactId>txHotelEJB</artifactId>
-          <version>${pom.version}</version>
+          <version>${project.version}</version>
           <type>ejb-client</type>
           <exclusions>
               <exclusion>
-                <groupId>${pom.groupId}</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>txHotelEJB</artifactId>
               </exclusion>
               <exclusion>
-                <groupId>${pom.groupId}</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>txHotelBLImpl</artifactId>
               </exclusion>
               <exclusion>
-                <groupId>${pom.groupId}</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>txHotelDAO</artifactId>
               </exclusion>
           </exclusions>

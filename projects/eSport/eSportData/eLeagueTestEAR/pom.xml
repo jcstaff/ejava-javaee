@@ -18,9 +18,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>eLeagueTestEJB</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <type>ejb</type>
             <exclusions>
                 <exclusion>
@@ -54,6 +54,7 @@
         <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.0.2</version>
             <configuration>
                 <container>
                     <containerId>jboss4x</containerId>

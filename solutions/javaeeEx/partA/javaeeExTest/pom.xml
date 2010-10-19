@@ -23,9 +23,9 @@
             for cargo to be able to deploy it
                 -->
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>javaeeExEAR</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <type>ear</type>
             <scope>compile</scope>
         </dependency>
@@ -33,9 +33,9 @@
         <!-- contains remote interfaces 
         -->
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>javaeeExEJB</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <type>ejb-client</type>
             <scope>test</scope>
         </dependency>
@@ -148,6 +148,7 @@
         <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.0.2</version>
             <configuration>
                 <container>
                     <containerId>jboss5x</containerId>
@@ -175,7 +176,7 @@
                             <type>remote</type>
                             <deployables>
                                 <deployable>
-                                    <groupId>${pom.groupId}</groupId>
+                                    <groupId>${project.groupId}</groupId>
                                     <artifactId>javaeeExEAR</artifactId>
                                     <type>ear</type>
                                 </deployable>
