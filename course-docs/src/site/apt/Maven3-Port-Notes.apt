@@ -1,0 +1,23 @@
+Porting from Maven2 to Maven3
+
+These are the issues encountered and steps taken to port the ejava example
+source tree from Maven 2.2.1 to Maven 3.0.
+
+* Issues
+
+    [[1]] The use of \${pom.xxx} has been deprecated. All references to the current
+    pom now use "project" (e.g., \${project.version}.
+
+    [[1]] maven-ejb-plugin must be specified as version 2.2 or later in order
+    to correctly generate the Class-Path in the MANIFEST.MF. Many of the pom-s
+    were specified as version 2.1 and were updated to 2.3.
+
+    [[1]] maven-ejb-plugin does not use the finalName of the dependency
+    in the MANIFEST.MF Class-Path and the EAR plugin does. That results in 
+    the dependency being unresolved. For ejbsessionBankEJB, its @Local and 
+    @Remote interfaces extend an interface from the dependency. This caused
+    a stack trace during deployment with a NullPointerException and a 
+    an error in Class.forName() in an area that was processing the @Local
+    interface.
+
+

@@ -39,13 +39,6 @@
     </dependencies>
 
     <build>
-
-        <!-- finalName keeps the version information from being carried
-           into the .ear file; allowing the EJB/.../persistence.xml file
-           to use a generic versus version-specific name to refer to this
-           .jar -->
-        <finalName>ejbsessionBankImpl</finalName>
-
         <!--tell the resource plugin to perform filtering on resources 
              to fill in JDBC URL, etc. -->
         <testResources>
