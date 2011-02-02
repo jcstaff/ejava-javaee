@@ -2,7 +2,7 @@ Exercise 1: First Simple Application
 
 * {Part B}: Automate build and testing with Ant (OPTIONAL!)
 
-    [Note:] All course examples and projects submitted will use Maven 2. 
+    [Note:] All course examples and projects submitted will use Maven. 
     Ant will be used to wrap command lines for Java SE clients executed
     outside the normal build environment. However, this exercise shows
     Ant only being used as part of the artifact build and test environment
@@ -112,7 +112,7 @@ Total time: 0 seconds
         * javac - compiles java sources files. See
         {{{http://ant.apache.org/manual/CoreTasks/javac.html}Ant docs}}
         for more information. Note that we are making sure we get J2SE
-        1.5 classes compiled.
+        1.6 classes compiled.
 
         * jar - builds a java archive. See 
         {{{http://ant.apache.org/manual/CoreTasks/jar.html}Ant Docs}}
@@ -126,8 +126,8 @@ Total time: 0 seconds
         <javac srcdir="${src.dir}/main/java"
                destdir="${build.dir}/classes"
                debug="true"
-               source="1.5"
-               target="1.5">
+               source="1.6"
+               target="1.6">
                <classpath>
                </classpath>
         </javac>
@@ -173,8 +173,8 @@ Total time: 1 second
         <javac srcdir="${src.dir}/test/java"
                destdir="${build.dir}/test-classes"
                debug="true"
-               source="1.5"
-               target="1.5">
+               source="1.6"
+               target="1.6">
                <classpath>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>
                    <pathelement path="${junit.classpath}"/>
@@ -409,9 +409,8 @@ Testcase: testApp took 0.016 sec
     In this part, we introduced Ant as a build tool to automate the 
     tasks of building and testing our project. As you can see by looking
     at the list of 
-    {{{http://ant.apache.org/manual/coretasklist.html}core}} and
-    {{{http://ant.apache.org/manual/optionaltasklist.html}optional}} tasks,
-    and performing other web searches for Ant tasks, there is quite a bit
+    {{{http://ant.apache.org/manual/index.html}Ant tasks}}, optional tasks,
+    and externally provided tasks, there is quite a bit
     of support for this approach. 
     
     Ant is an excellent work-horse for doing specific tasks. Tasks are 

@@ -5,7 +5,7 @@ Exercise 1: First Simple Application
 ** Objectives
 
     * Demonstrate the basics of automating the manual steps in part A using
-    the Maven 2 build system. 
+    the Maven build system. 
 
 
     [Note:] Using Maven requires only an initial download and installation.
@@ -13,9 +13,18 @@ Exercise 1: First Simple Application
     as needed.  Connectivity to the internet is required until all
     dependencies have been satisfied.
     
-    [Note:] The people involved with Maven 2 have done a tremendous job at 
+    [Note:] The people involved with Maven have done a tremendous job at 
     documenting the system and how to get started. If you have not done so,
-    you should become familiar with the fact that the following exists:
+    you should become familiar with the fact that the following reference
+    starting points exist. Read thru them as you wish. However, know that 
+    I go out of my way to make sure you spend as much time as possible on 
+    design and JavaEE aspects in class. If you are stuck on Maven -- ask. I know
+    what you are trying to do and can likely point you to an example that
+    is relevant to what you are doing in class. If you are still stuck
+    on Maven issues
+    -- send it to me. I will fix it personally. There is nothing more 
+    irritating than to be fighting with the builds when you want to be 
+    understanding, designing, trying, and mastering what is being built.
 
         * {{{http://maven.apache.org/guides/getting-started/index.html}
         Maven Getting Started}} - This exercise actually mirrors most of
@@ -39,25 +48,22 @@ Exercise 1: First Simple Application
         {{{http://docs.codehaus.org/display/MAVENUSER/FAQs-1}
         Contributed FAQ}} contains a user-maintained FAQ.
 
-        * {{{http://www.nabble.com/Maven---Users-f178.html}
-        Maven User Group}} on Nabble
-
         * {{{http://maven.apache.org/articles.html}Books and Articles}}
         This has a huge collection of information; which is why you won't 
-        find me re-documenting Maven 2 here.
+        find me re-documenting Maven here.
 
     [Note:] Maven will automatically go out and download any
     missing dependencies and recursively download what they depend
     upon. If you are running Maven for the first time, this could
-    result in a significant amount of downloading and commonly
-    subject to connection failures when repositories are remote or
-    busy. Don't worry. As annoying as it is, just execute the build
-    again (and again) until all dependences have been successfully
-    resolved. If you consistently get connection timeouts with
-    no success, these repositories can be down. If you know you already
+    result in a significant amount of downloading and may encounter
+    an occasional connection with repositories. Once a non-SNAPSHOT
+    version is downloaded (e.g., 1.3), Maven will not re-attempt to
+    download it. Maven will, however, go out and check various 
+    resources to stay in sync.  If you know you already
     have everything you need, you can run in off-line mode using the
     "-o" flag on the command line or its equivalent entry within the
-    settings.xml file.
+    settings.xml file. This can save you seconds of build time when
+    disconnected from the Internet.
 
 ** Steps
 
@@ -100,6 +106,10 @@ Exercise 1: First Simple Application
     <name>My First Simple Project</name>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -127,9 +137,10 @@ Exercise 1: First Simple Application
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -164,46 +175,51 @@ Exercise 1: First Simple Application
 ---
 $ mvn package
 [INFO] Scanning for projects...
-[WARNING]
-        Profile with id: 'hsql' has not been activated.
-
+[INFO]
 [INFO] ------------------------------------------------------------------------
-[INFO] Building My First Simple Project
-[INFO]    task-segment: [package]
+[INFO] Building My First Simple Project 1.0-SNAPSHOT
 [INFO] ------------------------------------------------------------------------
-[INFO] [resources:resources {execution: default-resources}]
-[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] skip non existing resourceDirectory C:\cygwin\home\jcstaff\proj\784\exercises\ex1\src\main\resources
-[INFO] [compiler:compile {execution: default-compile}]
-[INFO] Nothing to compile - all classes are up to date
-[INFO] [resources:testResources {execution: default-testResources}]
-[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO]
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ ex1 ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory C:\jhu\784\jboss6\solutions\ex1\src\main\resources
+[INFO]
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ ex1 ---
+[INFO] Compiling 1 source file to C:\jhu\784\jboss6\solutions\ex1\target\classes
+[INFO]
+[INFO] --- maven-resources-plugin:2.4.3:testResources (default-testResources) @ ex1 ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
 [INFO] Copying 1 resource
-[INFO] [compiler:testCompile {execution: default-testCompile}]
-[INFO] Nothing to compile - all classes are up to date
-[INFO] [surefire:test {execution: default-test}]
-[INFO] Surefire report directory: C:\cygwin\home\jcstaff\proj\784\exercises\ex1\target\surefire-reports
+[INFO]
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ ex1 ---
+[INFO] Compiling 1 source file to C:\jhu\784\jboss6\solutions\ex1\target\test-classes
+[INFO]
+[INFO] --- maven-surefire-plugin:2.5:test (default-test) @ ex1 ---
+[INFO] Surefire report directory: C:\jhu\784\jboss6\solutions\ex1\target\surefire-reports
 
  -------------------------------------------------------
  T E S T S
  -------------------------------------------------------
 Running myorg.mypackage.ex1.AppTest
-INFO  30-08 18:31:42,796 (AppTest.java:testApp:28)  -testApp
-DEBUG 30-08 18:31:42,796 (App.java:returnOne:11)  -Here's One!
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.047 sec
+INFO  02-02 11:31:53,487 (AppTest.java:testApp:26)  -testApp
+DEBUG 02-02 11:31:53,487 (App.java:returnOne:11)  -Here's One!
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.234 sec
 
 Results :
 
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] [jar:jar {execution: default-jar}]
+[INFO]
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ ex1 ---
+[INFO] Building jar: C:\jhu\784\jboss6\solutions\ex1\target\ex1-1.0-SNAPSHOT.jar
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2 seconds
-[INFO] Finished at: Sun Aug 30 18:31:43 EDT 2009
-[INFO] Final Memory: 9M/16M
+[INFO] Total time: 3.375s
+[INFO] Finished at: Wed Feb 02 11:31:53 EST 2011
+[INFO] Final Memory: 9M/21M
 [INFO] ------------------------------------------------------------------------
+[WARNING] The requested profile "hsql" could not be activated because it does not exist.
 ---
 
 ---
@@ -229,7 +245,8 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             target/test-classes directory, and src/test/resources
             where copied to the target/test-classes directory by the
             maven-compiler-plugin with no configuration help.  All Maven
-            defaults were take (except for specifying J2SE 5).
+            defaults were take (except for specifying JavaSE 6 and
+            specifyin UTF-8 for resources copied).
 
         [Note:] Test cases were run and their reports were placed in
             target/surefire-reports. Surefire is a Maven plugin that
@@ -242,15 +259,13 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             Maven to Ant using the maven-antrun-plugin if we had legacy
             build.xml scripts that we wanted to leverage.
 
-        [Note:] The [WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent! can be cleaned up by adding the following to the top
+        [Note:] The [WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent! is avoided by using the following to the top
         of the pom.xml
 
 ---
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-...
-    <modelVersion>4.0.0</modelVersion>
 ---
         []
 
@@ -428,11 +443,15 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
         * jboss.server - this is used by class examples to name the
         the JBoss server profile to use within jboss.home. We will be using the
-        (Java EE 5) "standard" profile (which is _not_ the "default" profile).
+        (Java EE 6) "ejava-jboss6" profile that you built in exercise 0
+        (which is _not_ the "default" profile).
 
         * jboss.(remaining) - used by the Maven cargo plugin to set deployment
         variables to their non-default values
 
+        * jboss5/jboss6 profiles - used to trigger backward and forward-based
+        testing of the baseline. Your implementations will only need the 
+        jboss6 profile.
 ---
     <profiles>
         <profile>
@@ -441,18 +460,27 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                  specific configuration -->
             <properties>
                 <m2.repo>c:/jhu/repository</m2.repo>
-                <jboss.home>c:/apps/jboss</jboss.home>
-                <jboss.server>standard</jboss.server>
+
                 <jboss.protocol>http</jboss.protocol>
                 <jboss.host>localhost</jboss.host>
                 <jboss.servlet.port>8080</jboss.servlet.port>
                 <jboss.user>admin</jboss.user>
                 <jboss.password>password</jboss.password>
-            </properties>                                  
+            </properties>                                   
         </profile>        
-    </profiles>
+        <profile>
+            <id>jboss6</id>
+            <properties>
+                <jboss.home>c:/apps/jboss-6.0.0.Final</jboss.home>
+                <jboss.server>ejava-jboss6</jboss.server>
+            </properties>
+        </profile>        
+...
+    </profile>        
     <activeProfiles>
         <activeProfile>ejavaPC</activeProfile>
+        <activeProfile>jboss6</activeProfile>
+        ...
     </activeProfiles>
 ---
 
@@ -527,8 +555,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
         [Note:] At times you will need access to a dependency that is not 
         available in a Maven repository. COTS libraries are generally not
-        available at ibiblio.org and even Sun's Java EE 5 API is not 
-        available from a Maven repository. You must download it 
+        available at ibiblio.org.  You must download it 
         and manually install it locally.
 
     [[1]] This step will go though 
@@ -550,41 +577,38 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ---
 ---
 > mvn package
-...
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building My First Simple Project 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://webdev.apl.jhu.edu/~jcs/maven2/foo/bar/1.1/bar-1.1.pom
+Downloading: http://webdev.apl.jhu.edu/~jcs/maven2-snapshot/foo/bar/1.1/bar-1.1.pom
 Downloading: http://repo1.maven.org/maven2/foo/bar/1.1/bar-1.1.pom
+[WARNING] The POM for foo:bar:jar:1.1 is missing, no dependency information available
+Downloading: http://webdev.apl.jhu.edu/~jcs/maven2/foo/bar/1.1/bar-1.1.jar
+Downloading: http://webdev.apl.jhu.edu/~jcs/maven2-snapshot/foo/bar/1.1/bar-1.1.jar
 Downloading: http://repo1.maven.org/maven2/foo/bar/1.1/bar-1.1.jar
 [INFO] ------------------------------------------------------------------------
-[ERROR] BUILD ERROR
+[INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Failed to resolve artifact.
-
-Missing:
- ----------
-1) foo:bar:jar:1.1
-
-  Try downloading the file manually from the project website.
-
-  Then, install it using the command:
-      mvn install:install-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackaging=jar -Dfile=/path/to/file
-
-  Alternatively, if you host your own repository you can deploy the file there:
-      mvn deploy:deploy-file -DgroupId=foo -DartifactId=bar -Dversion=1.1 -Dpackaging=jar -Dfile=/path/to/file -Durl=[url] -DrepositoryId=[id]
-
-  Path to dependency:
-        1) myorg.myproject:ex1:jar:1.0.2008.2-SNAPSHOT
-        2) foo:bar:jar:1.1
-
- ----------
-1 required artifact is missing.
-
-for artifact:
-  myorg.myproject:ex1:jar:1.0.2008.2-SNAPSHOT
-
-from the specified remote repositories:
-  central (http://repo1.maven.org/maven2)
+[INFO] Total time: 1.437s
+[INFO] Finished at: Wed Feb 02 12:20:51 EST 2011
+[INFO] Final Memory: 2M/15M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal on project ex1: Could not resolve dependencies for project myorg.myproject:ex1:jar:1.0-SNAPSHOT: Could not fi
+nd artifact foo:bar:jar:1.1 in webdev-baseline (http://webdev.apl.jhu.edu/~jcs/maven2) -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException
 ---
 
-    [[1]] Okay; that was a pretty good error message.  Now
+    [[1]] The old error message provided for Maven 2 was much better if 
+    a manual install is what you really needed. The newer (Maven 3) one
+    does not provide instruction.  In this case, 
     manually install a jar file that represents the declaration. Assign it a 
     groupId of foo, an artifactId of bar, and a version of 1.1. Don't forget to 
     add the -DgeneratePom=true or you will get a download warning 
@@ -592,30 +616,41 @@ from the specified remote repositories:
     don't have one laying around, just create one with valid structure.
 
 ---
-> jar cf bar.jar pom.xml
-> mvn install:install-file -DgroupId=foo -DartifactId=bar \
+$ mvn install:install-file -DgroupId=foo -DartifactId=bar \
 > -Dversion=1.1 -Dpackaging=jar -Dfile=bar.jar \
 > -DgeneratePom=true
-...
-
-[INFO] [install:install-file]
-[INFO] Installing /home/jcstaff/proj/ejava-javaee/working/solutions/ex1/bar.jar to /home/jcstaff/.m2/repository/foo/bar/1.1/bar-1.1.jar
+[INFO] Scanning for projects...
+[INFO]
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] Building My First Simple Project 1.0-SNAPSHOT
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2 seconds
-[INFO] Finished at: Sun Aug 24 17:45:42 EDT 2008
-[INFO] Final Memory: 4M/7M
+[INFO]
+[INFO] --- maven-install-plugin:2.3.1:install-file (default-cli) @ ex1 ---
+[INFO] Installing C:\jhu\784\jboss6\solutions\ex1\bar.jar to c:\jhu\repository\foo\bar\1.1\bar-1.1.jar
+[INFO] Installing C:\Documents and Settings\jcstaff\mvninstall2771571397162981253.pom to c:\jhu\repository\foo\bar\1.1\bar-1.1.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1.032s
+[INFO] Finished at: Wed Feb 02 12:25:12 EST 2011
+[INFO] Final Memory: 2M/15M
 [INFO] ------------------------------------------------------------------------
 ---
 ---
-> find /home/jcstaff/.m2/repository/foo/ -type f
-/home/jcstaff/.m2/repository/foo/bar/maven-metadata-local.xml
-/home/jcstaff/.m2/repository/foo/bar/1.1/bar-1.1.jar
-/home/jcstaff/.m2/repository/foo/bar/1.1/bar-1.1.pom
+$ find c:/jhu/repository/foo/ -type f
+c:/jhu/repository/foo/bar/1.1/bar-1.1.jar
+c:/jhu/repository/foo/bar/1.1/bar-1.1.jar.lastUpdated
+c:/jhu/repository/foo/bar/1.1/bar-1.1.pom
+c:/jhu/repository/foo/bar/1.1/bar-1.1.pom.lastUpdated
+c:/jhu/repository/foo/bar/1.1/_maven.repositories
+c:/jhu/repository/foo/bar/maven-metadata-local.xml
 
-> more /home/jcstaff/.m2/repository/foo/bar/1.1/bar-1.1.pom
-<?xml version="1.0" encoding="UTF-8"?><project>
+
+$ more c:/jhu/repository/foo/bar/1.1/bar-1.1.pom
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/P
+OM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>foo</groupId>
   <artifactId>bar</artifactId>
@@ -636,31 +671,33 @@ from the specified remote repositories:
     This is useful to determine what all the delegation summed up to.
 
 ---
-mvn mvn help:effective-pom 
+$ mvn help:effective-pom 
 
 ...
+<!-- ====================================================================== -->
+<!--                                                                        -->
+<!-- Effective POM for project 'myorg.myproject:ex1:jar:1.0-SNAPSHOT'       -->
+<!--                                                                        -->
+<!-- ====================================================================== -->
 
-
-Effective POM for project 'myorg.myproject:ex1:jar:1.0-SNAPSHOT'
-********************************************************************************
-<?xml version="1.0"?><project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://w
+ache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>myorg.myproject</groupId>
   <artifactId>ex1</artifactId>
-  <name>My First Simple Project</name>
   <version>1.0-SNAPSHOT</version>
-  <build>
-    <sourceDirectory>/home/jcstaff/proj/ejava-javaee/solutions/ex1/src/m
-ain/java</sourceDirectory>
-    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
-    <testSourceDirectory>/home/jcstaff/proj/ejava-javaee/solutions/ex1/s
-rc/test/java</testSourceDirectory>
-    <outputDirectory>/home/jcstaff/proj/ejava-javaee/solutions/ex1/targe
-t/classes</outputDirectory>
-    <testOutputDirectory>/home/jcstaff/proj/ejava-javaee/solutions/ex1/t
-arget/test-classes</testOutputDirectory>
-    <resources>
-...
+  <name>My First Simple Project</name>
+  <properties>
+    <jboss.home>c:/apps/jboss-6.0.0.Final</jboss.home>
+    <jboss.host>localhost</jboss.host>
+    <jboss.password>password</jboss.password>
+    <jboss.protocol>http</jboss.protocol>
+    <jboss.server>ejava-jboss6</jboss.server>
+    <jboss.servlet.port>8080</jboss.servlet.port>
+    <jboss.user>admin</jboss.user>
+    <m2.repo>c:/jhu/repository</m2.repo>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 ---
 
     * Getting the "Effective Settings"
@@ -673,29 +710,20 @@ mvn help:effective-settings
 
 ...
 
-Effective settings:
-
-<?xml version="1.0"?><settings>
-  <localRepository>/home/jcstaff/.m2/repository</localRepository>
-  <servers>
-...
-  </servers>
-  <mirrors>
-    <mirror>
-      <mirrorOf>central</mirrorOf>
-      <url>http://ibiblio.lsu.edu/main/pub/packages/maven2</url>
-      <id>isu.edu</id>
-    </mirror>
-    <mirror>
-      <mirrorOf>central</mirrorOf>
-      <url>http://www.ibiblio.org/maven2</url>
-      <id>ibiblio.org</id>
-    </mirror>
-  </mirrors>
-  <profiles>
-    <profile>
-      <repositories>
-
+<settings xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.a
+pache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+  <localRepository xmlns="http://maven.apache.org/SETTINGS/1.1.0">c:\jhu\repository</localRepository>
+  <activeProfiles xmlns="http://maven.apache.org/SETTINGS/1.1.0">
+    <activeProfile>ejavaPC</activeProfile>
+    <activeProfile>jboss6</activeProfile>
+    <activeProfile>hsql</activeProfile>
+    <activeProfile>webdev-repositories</activeProfile>
+  </activeProfiles>
+  <pluginGroups xmlns="http://maven.apache.org/SETTINGS/1.1.0">
+    <pluginGroup>org.apache.maven.plugins</pluginGroup>
+    <pluginGroup>org.codehaus.mojo</pluginGroup>
+  </pluginGroups>
+</settings>
 ...
 ---
 

@@ -164,8 +164,8 @@ log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar
         <javac srcdir="${src.dir}/main/java"
                destdir="${build.dir}/classes"
                debug="true"
-               source="1.5"
-               target="1.5">
+               source="1.6"
+               target="1.6">
                <classpath>
                    <pathelement path="${commons.logging.classpath}"/>
                </classpath>
@@ -175,8 +175,8 @@ log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar
         <javac srcdir="${src.dir}/test/java"
                destdir="${build.dir}/test-classes"
                debug="true"
-               source="1.5"
-               target="1.5">
+               source="1.6"
+               target="1.6">
                <classpath>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>
                    <pathelement path="${junit.classpath}"/>
