@@ -1,0 +1,248 @@
+<project name="ci-build" default="build">
+    <property file="${user.home}/ci-build.properties"/>
+
+    <property name="MAVEN_HOME" value="/opt/apache-maven-3.0.2/"/>
+    <property name="JBOSS5_HOME" value="/opt/jboss-5.1.0.GA"/>
+    <property name="JBOSS6_HOME" value="/opt/jboss-6.0.0.Final"/>
+
+    <property name="jboss.server" value="standard"/>
+    <property name="jboss.servlet.port" value="8080"/>
+    <property name="start.timeout" value="100"/>
+
+    <target name="jboss5.configure" if="jboss5">
+        <property name="jboss.home" value="${JBOSS5_HOME}"/>
+        <property name="cargo.containerId" value="jboss51x"/>
+        <property name="jboss.project" location="servers/ejava-jboss5"/>
+        <property name="jboss.bind.address" value="127.0.0.3"/>
+        <property name="jboss.host" value="${jboss.bind.address}"/>
+        <!--
+        <property name="jboss.server.home" 
+                  value="${jboss.project}/target/ejava-${jboss.profile}"/>
+                  -->
+        <property name="jboss.server.home" 
+                  value="${jboss.home}/server/ejava-${jboss.profile}"/>
+        <property name="jboss.console" 
+                  value="${jboss.server.home}/log/console.log"/>
+        <property name="jboss.url" 
+                  value="http://${jboss.host}:${jboss.servlet.port}/index.html"/>
+        <property name="jboss.shutdown.address.option" value="-s"/>
+        <echo message="using JBoss 5"/>
+    </target>
+    <target name="jboss6.configure" if="jboss6">
+        <property name="jboss.home" value="${JBOSS6_HOME}"/>
+        <property name="cargo.containerId" value="jboss6x"/>
+        <property name="jboss.project" location="servers/ejava-jboss6"/>
+        <property name="jboss.bind.address" value="127.0.0.4"/>
+        <property name="jboss.host" value="${jboss.bind.address}"/>
+        <!--
+        <property name="jboss.server.home" 
+                  value="${jboss.project}/target/ejava-${jboss.profile}"/>
+                  -->
+        <property name="jboss.server.home" 
+                  value="${jboss.home}/server/ejava-${jboss.profile}"/>
+        <property name="jboss.console" 
+                  value="${jboss.server.home}/log/console.log"/>
+        <property name="jboss.url" 
+                  value="http://${jboss.host}:${jboss.servlet.port}/index.html"/>
+        <property name="jboss.shutdown.address.option" value="-o"/>
+        <echo message="using JBoss 6"/>
+    </target>
+    <target name="setup">
+        <condition property="jboss5" value="true">
+            <matches string="${jboss.profile}" pattern="jboss5"/>
+        </condition>
+        <condition property="jboss6" value="true">
+            <matches string="${jboss.profile}" pattern="jboss6"/>
+        </condition>
+    </target>
+
+    <target name="echo" depends="setup, jboss5.configure, jboss6.configure">
+       <echo message="jboss.profile=${jboss.profile}"/>
+       <echo message="jboss.home=${jboss.home}"/> 
+       <echo message="db.profile=${db.profile}"/>
+       <echo message="jboss.server=${jboss.server}"/>
+       <echo message="jboss.project=${jboss.project}"/>
+    </target>
+
+    <target name="sleep5">
+        <sleep seconds="5"/>
+    </target>
+
+    <target name="coldstart"
+        depends="setup, jboss5.configure, jboss6.configure">
+        <delete verbose="true">
+            <fileset dir="${jboss.server.home}">
+                <include name="deploy/*.ear"/>
+                <include name="deploy/*.war"/>
+                <type type="file"/>
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${jboss.server.home}">
+                <!--
+                <include name="data/hypersonic/ejava.*"/>
+                <include name="data/hornetq/**/*"/>
+                <include name="data/tx-object-store/**/*"/>
+                <include name="data/xmbean-attrs/**/*"/>
+                <include name="data/jnp-service.url"/>
+                -->
+                <include name="data/**/*"/>
+                <include name="tmp/**/*"/>
+                <include name="work/**/*"/>
+                <include name="log/*"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <!-- execute JBoss using a blocked call within this task -->
+    <target name="jboss-run"
+        depends="setup, jboss5.configure, jboss6.configure">
+       <echo message="running JBoss..."/>
+       <!--
+        <exec executable="${MAVEN_HOME}/bin/mvn" 
+            dir="${jboss.project}"
+            spawn="false">
+            <arg value="cargo:start"/>
+            <arg value="-P${jboss.profile}"/>
+        </exec>
+        -->
+        <mkdir dir="${jboss.server.home}/log"/>
+        <exec executable="${jboss.home}/bin/run.sh"
+              dir="${jboss.home}"
+              spawn="false"
+              output="${jboss.console}">
+            <arg value="-c"/>
+            <arg value="ejava-${jboss.profile}"/>
+            <arg value="-b"/>
+            <arg value="${jboss.bind.address}"/>
+        </exec>
+    </target>
+
+    <target name="jboss-build" 
+        depends="setup,jboss5.configure, jboss6.configure"
+        if="build.server">
+        <echo message="preparing JBoss server, this can take some time"/>
+        <exec executable="${MAVEN_HOME}/bin/mvn" 
+            dir="${jboss.project}">
+            <arg value="clean"/>
+            <arg value="verify"/>
+        </exec>
+        <echo message="JBoss server created"/>
+    </target>
+
+    <target name="doStart" 
+        depends="setup,jboss5.configure, jboss6.configure"
+        if="start.server">
+
+       <echo message="forking Ant to start JBoss..."/>
+       <exec executable="ant" dir="." spawn="true">
+           <arg value="-f"/>
+           <arg value="ci-build.xml"/>
+           <arg value="-Djboss.profile=${jboss.profile}"/>
+           <arg value="jboss-run"/>
+       </exec>
+
+        <echo message="waiting for JBoss..."/>
+        <waitfor maxwait="${start.timeout}"
+            maxwaitunit="second" 
+            checkevery="3"
+            checkeveryunit="second"
+            timeoutproperty="timeout">
+            <http url="${jboss.url}"/>
+        </waitfor>
+        <fail if="timeout" message="timed out waiting for server"/>
+        <echo message="JBoss is now running"/>
+    </target>
+
+    <!-- fork off a new Ant process to start JBoss -->
+    <target name="jboss-start"
+        depends="setup, jboss5.configure, jboss6.configure">
+
+        <condition property="server.home.available" else="false">
+            <available file="${jboss.server.home}"/>
+        </condition>
+        <echo message="server home available:${server.home.available}"/>
+
+        <condition property="server.running" else="false">
+            <not><http url="${jboss.url}"/></not>
+        </condition>
+        <echo message="server running on:${jboss.url}=${server.running}"/>
+
+        <condition property="build.server">
+            <and>
+                <isfalse value="${server.running}"/>
+                <isfalse value="${server.home.available}"/>
+            </and>
+        </condition>
+        <echo message="build.server=${build.server}"/>
+
+        <condition property="start.server">
+            <isfalse value="${jboss.url}"/>
+        </condition>
+        <echo message="start.server=${start.server}"/>
+
+        <antcall target="jboss-build"/>
+        <antcall target="doStart"/>
+    </target>
+
+    <!-- shutdown the running JBoss instance -->
+    <target name="doStop"
+        depends="setup, jboss5.configure, jboss6.configure"
+        if="stop.server">
+        <echo message="shutting down JBoss..."/>
+        <!--
+        <exec executable="${MAVEN_HOME}/bin/mvn" 
+            dir="${jboss.project}">
+            <arg value="cargo:stop"/>
+        </exec>
+        -->
+
+        <exec executable="${jboss.home}/bin/shutdown.sh"
+              dir="${jboss.home}"
+              spawn="false">
+            <arg value="${jboss.shutdown.address.option}"/>
+            <arg value="${jboss.bind.address}"/>
+        </exec>
+
+        <echo message="waiting for shutdown to complete..."/>
+        <waitfor maxwait="10" maxwaitunit="second">
+            <not><http url="${jboss.url}"/></not>
+        </waitfor>
+        <sleep seconds="5"/>
+        <echo message="JBoss shutdown complete"/>
+    </target>
+
+    <target name="jboss-stop"
+        depends="setup, jboss5.configure, jboss6.configure">
+
+        <condition property="stop.server">
+            <http url="${jboss.url}"/>
+        </condition>
+
+        <antcall target="doStop"/>
+        <echo message="JBoss shutdown complete"/>
+    </target>
+
+    <!-- build and test just the code -->
+    <target name="build-modules">
+        <exec executable="${MAVEN_HOME}/bin/mvn">
+            <arg value="clean"/>
+            <arg value="install"/>
+            <arg value="-P${jboss.profile}"/>
+            <arg value="-P${db.profile}"/>
+        </exec>
+    </target>
+
+    <!-- setup the environment and run the build -->
+    <target name="build"
+        depends="setup, jboss5.configure, jboss6.configure">
+        <condition property="jboss.running">
+            <http url="http://localhost:8080/index.html"/>
+        </condition>
+       <antcall target="jboss-start"/>
+
+        <antcall target="build-modules"/>
+
+        <antcall target="jboss-stop"/>
+    </target>
+</project>

@@ -4,12 +4,9 @@
     <property file="test-classes/${ant.project.name}.properties"/>
 
     <path id="demo.classpath">
-        <pathelement path="${commons.logging.classpath}"/>
-        <pathelement path="${log4j.classpath}"/>
-        <pathelement path="${javaee.classpath}"/>
-        <pathelement path="${jbossall-client.classpath}"/>
         <pathelement path="test-classes"/>
         <pathelement path="classes"/>
+        <fileset dir="dependency" includes="*.jar"/>
     </path>
 
     <description>

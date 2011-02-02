@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.annotation.Resource;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
@@ -154,7 +153,6 @@ public class TellerHandlerServlet extends HttpServlet {
      * development environment may need to establish a remote connection.
      * @throws NamingException
      */
-    @SuppressWarnings("unchecked")
     protected void initTeller() throws NamingException {
         ServletConfig config = getServletConfig();
         try {
@@ -167,7 +165,8 @@ public class TellerHandlerServlet extends HttpServlet {
         else if (teller == null) { //get the interface manually
             log.info("teller was null, getting teller manually");
             Properties jndiProperties = new Properties();
-            for(Enumeration e=config.getInitParameterNames();
+            for(@SuppressWarnings("rawtypes")
+			Enumeration e=config.getInitParameterNames();
                 e.hasMoreElements(); ) {
                 String key = (String)e.nextElement();
                 String value=(String)config.getInitParameter(key);

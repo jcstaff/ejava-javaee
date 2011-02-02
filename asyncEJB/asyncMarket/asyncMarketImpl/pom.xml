@@ -2,35 +2,26 @@
     <parent>
         <artifactId>asyncMarket</artifactId>
         <groupId>ejava.javaee.asyncejb</groupId>
-        <version>1.0.2010.2-SNAPSHOT</version>
+        <version>2.0.2011.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ejava.javaee.asyncejb</groupId>
-    <artifactId>asyncMarketDA</artifactId>
+    <artifactId>asyncMarketImpl</artifactId>
     <packaging>jar</packaging>
-    <name>Async Market JAR</name>
+    <name>Async Market Impl</name>
     <description>
         This project provides the data access tier used by the Async
         Market JMS example.
     </description>
 
-    <!-- this repositories holds many of the javaee5 jar files -->
     <repositories>
         <repository>
-            <id>jboss-repo</id>
-            <name>JBoss Maven Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
+            <id>java.net-repo</id>
+            <name>Java.net Maven Repository</name>
+            <url>http://download.java.net/maven/2</url>
         </repository>
     </repositories>
-
     <dependencies>
-        <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
         <dependency>
           <groupId>javax.transaction</groupId>
           <artifactId>jta</artifactId>
@@ -59,11 +50,6 @@
     </dependencies>
 
     <build>
-        <!-- keep the version# from appearing in the name within the EAR.
-           This simplifies reference from the EJB's persistence.xml  
-        <finalName>asyncMarketDA</finalName>
-           -->
-                
          <!--tell the resource plugin to perform filtering on resources 
              to fill in JDBC URL, etc. -->
         <testResources>
@@ -78,9 +64,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>      
       
@@ -88,6 +75,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                 </configuration>
@@ -106,7 +94,7 @@
             </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password />
                   <hibernate.dialect>
@@ -132,7 +120,7 @@
             </activation>
             <properties>
                   <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                  <jdbc.url>jdbc:mysql://localhost:3306/test</jdbc.url>
+                  <jdbc.url>jdbc:mysql://${db.host}:3306/test</jdbc.url>
                   <jdbc.user>jboss</jdbc.user>
                   <jdbc.password>password</jdbc.password>
                   <hibernate.dialect>
@@ -158,28 +146,23 @@
             </activation>
             <repositories>
                 <repository>
-                    <id>jboss-repo</id>
-                    <name>JBoss Maven Repository</name>
-                    <url>http://repository.jboss.org/maven2</url>
+                    <id>jboss-nexus</id>
+                    <name>JBoss Nexus Repository</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
                 </repository>
             </repositories>
+
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.4.0.GA</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-core</artifactId>
-                    <version>3.3.1.GA</version>
+                    <version>${hibernate-entitymanager.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>1.5.2</version>
+                    <version>${slf4j.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -202,7 +185,7 @@
                                 <configuration>
                                     <componentProperties>
                                         <outputfilename>
-                                            ${pom.artifactId}-drop.ddl
+                                            ${project.artifactId}-drop.ddl
                                         </outputfilename>
                                         <drop>true</drop>
                                         <create>false</create>
@@ -218,7 +201,7 @@
                                 <configuration>
                                     <componentProperties>
                                         <outputfilename>
-                                            ${pom.artifactId}-create.ddl
+                                            ${project.artifactId}-create.ddl
                                         </outputfilename>
                                         <drop>false</drop>
                                         <create>true</create>
@@ -249,6 +232,29 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>jboss5</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.persistence</groupId>
+                    <artifactId>persistence-api</artifactId>
+                    <version>1.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jboss6</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

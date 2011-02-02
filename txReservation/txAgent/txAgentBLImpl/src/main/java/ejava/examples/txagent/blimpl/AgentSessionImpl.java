@@ -16,7 +16,6 @@ import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 
 public class AgentSessionImpl implements AgentReservationSession {
-    @SuppressWarnings("unused")
     private static final Log log = 
         LogFactory.getLog(AgentSessionImpl.class);
     private Booking booking = new Booking();

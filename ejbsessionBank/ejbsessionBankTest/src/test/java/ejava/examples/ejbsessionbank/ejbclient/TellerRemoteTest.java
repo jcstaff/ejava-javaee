@@ -108,7 +108,7 @@ public class TellerRemoteTest extends TestCase {
             teller.createAccount(account.getAccountNumber());
             fail("created account with duplicate number");
         }
-        catch (BankException expected) {
+        catch (Exception expected) {
             log.info("got expected exception trying to create " +
                     "duplicate account:" + expected);
         }

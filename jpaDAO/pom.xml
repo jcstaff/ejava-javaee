@@ -2,7 +2,7 @@
   <parent>
     <artifactId>ejava-javaee</artifactId>
     <groupId>ejava.javaee</groupId>
-    <version>1.0.2010.2-SNAPSHOT</version>
+    <version>2.0.2011.1-SNAPSHOT</version>
   </parent>
 
     <properties>
@@ -17,15 +17,9 @@
     This module provides an basic example of using the Java Persistence API
     to map a flat POJO to a database.
   </description>
-  <version>1.0.2010.2-SNAPSHOT</version>
+  <version>2.0.2011.1-SNAPSHOT</version>
   <dependencies>
     <!-- core dependencies -->
-    <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
@@ -62,9 +56,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>      
 
@@ -73,14 +68,9 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
             <configuration>
                 <argLine>${surefire.argLine}</argLine>
-                <systemProperties>
-                    <property>
-                        <name>java.class.path</name>
-                        <value>target/classes</value>
-                    </property>
-                </systemProperties>
             </configuration>
         </plugin>
 
@@ -98,7 +88,7 @@
             </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password />
                   <hibernate.dialect>
@@ -124,7 +114,7 @@
             </activation>
             <properties>
                   <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                  <jdbc.url>jdbc:mysql://localhost:3306/test</jdbc.url>
+                  <jdbc.url>jdbc:mysql://${db.host}:3306/test</jdbc.url>
                   <jdbc.user>jboss</jdbc.user>
                   <jdbc.password>password</jdbc.password>
                   <hibernate.dialect>
@@ -153,9 +143,9 @@
            <!-- needed to resolve some hibernate dependencies -->
             <repositories>
                 <repository>
-                    <id>jboss-repo</id>
-                    <name>JBoss Maven Repository</name>
-                    <url>http://repository.jboss.org/maven2</url>
+                    <id>jboss-nexus</id>
+                    <name>JBoss Nexus Repository</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
                 </repository>
             </repositories>
 
@@ -163,14 +153,36 @@
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.4.0.GA</version>
+                    <version>${hibernate-entitymanager.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>1.5.2</version>
+                    <version>${slf4j.version}</version>
                     <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jboss5</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.persistence</groupId>
+                    <artifactId>persistence-api</artifactId>
+                    <version>1.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jboss6</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
         </profile>

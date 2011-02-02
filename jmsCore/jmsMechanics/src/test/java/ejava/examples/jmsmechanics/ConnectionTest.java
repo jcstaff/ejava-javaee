@@ -2,11 +2,6 @@ package ejava.examples.jmsmechanics;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.Topic;
 import javax.naming.InitialContext;
 
 import junit.framework.TestCase;
@@ -17,8 +12,10 @@ import org.apache.commons.logging.LogFactory;
 public class ConnectionTest extends TestCase {
     static Log log = LogFactory.getLog(ConnectionTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testTopic");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String destinationJNDI = System.getProperty("jndi.name.testTopic",
+        "topic/ejava/examples/jmsMechanics/topic1");
     
     ConnectionFactory connFactory;
         

@@ -1,9 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
         
     <parent>
         <groupId>ejava.javaee.projects.eDataShare.eDmv</groupId>
         <artifactId>eDmv</artifactId>
-        <version>1.0.2009.2-SNAPSHOT</version>
+        <version>2.0.2011.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,13 +15,6 @@
     </description>
 
     <dependencies>
-        <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eDmvDAO</artifactId>
@@ -93,14 +86,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <systemProperties>                                
@@ -123,6 +118,40 @@
                     </systemProperties>                                
                 </configuration>
             </plugin>
+
+            <!-- create a classpath for our JSE clients to run -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-jars</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>unpack-ddl</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>eDmvDAO</artifactId>
+                                    <version>${project.version}</version>
+                                    <includes>ddl/*</includes>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>      
         </plugins>
     </build>
 
@@ -131,13 +160,12 @@
             <id>hsql</id>
             <activation>
                 <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
+                    <name>!jdbcdb</name>
                 </property>
             </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password />
                   <hibernate.dialect>
@@ -161,31 +189,41 @@
                     <name>!jpa</name>
                 </property>
             </activation>
-            <repositories>
-                <repository>
-                    <id>jboss-repo</id>
-                    <name>JBoss Maven Repository</name>
-                    <url>http://repository.jboss.org/maven2</url>
-                </repository>
-            </repositories>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.4.0.GA</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-core</artifactId>
-                    <version>3.3.1.GA</version>
+                    <version>${hibernate-entitymanager.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>1.5.2</version>
+                    <version>${slf4j.version}</version>
                     <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>jboss5</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.persistence</groupId>
+                    <artifactId>persistence-api</artifactId>
+                    <version>1.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jboss6</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
         </profile>

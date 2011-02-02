@@ -135,16 +135,16 @@
     <properties>
           <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
           </java.naming.factory.initial>
-          <java.naming.provider.url>jnp://localhost:1099
+          <java.naming.provider.url>jnp://${jboss.host}:1099
           </java.naming.provider.url>
           <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
           </java.naming.factory.url.pkgs>
     </properties>
     <repositories>
         <repository>
-            <id>jboss-repo</id>
-            <name>JBoss Maven Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
     <dependencies>

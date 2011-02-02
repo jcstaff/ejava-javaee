@@ -27,9 +27,11 @@ import org.apache.commons.logging.LogFactory;
 public class QueueBrowserTest extends TestCase {
     static Log log = LogFactory.getLog(QueueBrowserTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue");
-    String msgCountStr = System.getProperty("multi.message.count");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String destinationJNDI = System.getProperty("jndi.name.testQueue",
+        "queue/ejava/examples/jmsMechanics/queue1");
+    String msgCountStr = System.getProperty("multi.message.count", "20");
     
     protected ConnectionFactory connFactory;
     protected Destination destination;        

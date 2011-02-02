@@ -7,7 +7,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ejava.javaee.jmscore</groupId>
     <artifactId>jmsSecurity</artifactId>
     <packaging>jar</packaging>
     <name>JMS Security</name>
@@ -19,9 +18,9 @@
    <!-- this repositories holds many of the javaee5 jar files -->
    <repositories>
        <repository>
-           <id>jboss-repo</id>
-           <name>JBoss Maven Repository</name>
-           <url>http://repository.jboss.org/maven2</url>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
        </repository>
     </repositories>
 
@@ -87,15 +86,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>      
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <includes>
@@ -119,7 +120,7 @@
                       org.jnp.interfaces.NamingContextFactory
                   </java.naming.factory.initial>
                   <java.naming.provider.url>
-                      jnp://localhost:1099
+                      jnp://${jboss.host}:1099
                   </java.naming.provider.url>
                   <java.naming.factory.url.pkgs>
                       org.jboss.naming:org.jnp.interfaces
@@ -136,14 +137,14 @@
                 <dependency>
                     <groupId>org.jboss.jbossas</groupId>
                     <artifactId>jboss-as-client</artifactId>
-                    <version>5.1.0.GA</version>            
+                    <version>${jboss-as-client.version}</version>            
                     <type>pom</type>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.jboss.jbossas</groupId>
                     <artifactId>jboss-as-server</artifactId>
-                    <version>5.1.0.GA</version>            
+                    <version>${jboss-as-server.version}</version>            
                     <classifier>jmx-invoker-adaptor-client</classifier>
                     <scope>compile</scope>
                 </dependency>

@@ -7,12 +7,10 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.Remove;
 import javax.ejb.SessionContext;
 import javax.ejb.SessionSynchronization;
-import javax.ejb.Stateful;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

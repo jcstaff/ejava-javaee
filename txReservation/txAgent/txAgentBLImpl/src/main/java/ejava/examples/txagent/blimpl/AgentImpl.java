@@ -14,7 +14,6 @@ import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.bo.Reservation;
 
 public class AgentImpl implements BookingAgent {
-    @SuppressWarnings("unused")
     private static Log log = LogFactory.getLog(AgentImpl.class);
     private BookingDAO bookingDAO;
     private HotelReservationist reservationist;

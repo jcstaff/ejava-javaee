@@ -2,15 +2,15 @@
     <parent>
         <artifactId>jmsCore</artifactId>
         <groupId>ejava.javaee.jmscore</groupId>
-        <version>1.0.2010.2-SNAPSHOT</version>
+        <version>2.0.2011.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ejava.javaee.jmscore</groupId>
     <artifactId>jmsMechanics</artifactId>
     <packaging>jar</packaging>
     <name>JMS Mechanics</name>
-    <version>1.0.2010.2-SNAPSHOT</version>
+    <version>2.0.2011.1-SNAPSHOT</version>
     <description>
         This project provides examples for performing core JMS mechanics
         of establishing connections, creating, sending, and receiving
@@ -20,9 +20,9 @@
    <!-- this repositories holds many of the javaee5 jar files -->
     <repositories>
        <repository>
-           <id>jboss-repo</id>
-           <name>JBoss Maven Repository</name>
-           <url>http://repository.jboss.org/maven2</url>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
        </repository>
     </repositories>
 
@@ -81,15 +81,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>      
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <includes>
@@ -101,24 +103,8 @@
                           <value>${testx}</value>
                         </property>
                         <property>
-                          <name>jndi.name.connFactory</name>
-                          <value>ConnectionFactory</value>
-                        </property>
-                        <property>
                           <name>multi.message.count</name>
                           <value>${jmsmechanics.multi.message.count}</value>
-                        </property>
-                        <property>
-                          <name>jndi.name.testTopic</name>
-                          <value>
-                              topic/ejava/examples/jmsMechanics/topic1
-                          </value>
-                        </property>
-                        <property>
-                          <name>jndi.name.testQueue</name>
-                          <value>
-                              queue/ejava/examples/jmsMechanics/queue1
-                          </value>
                         </property>
                     </systemProperties>
                 </configuration>
@@ -130,14 +116,16 @@
         <profile>
             <id>jboss</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property> 
+                    <name>!server</name>
+                </property>
             </activation>
             <properties>
                   <java.naming.factory.initial>
                       org.jnp.interfaces.NamingContextFactory
                   </java.naming.factory.initial>
                   <java.naming.provider.url>
-                      jnp://localhost:1099
+                      jnp://${jboss.host}:1099
                   </java.naming.provider.url>
                   <java.naming.factory.url.pkgs>
                       org.jboss.naming:org.jnp.interfaces
@@ -156,16 +144,59 @@
                 <dependency>
                     <groupId>org.jboss.jbossas</groupId>
                     <artifactId>jboss-as-client</artifactId>
-                    <version>5.1.0.GA</version>            
+                    <version>${jboss-as-client.version}</version>            
                     <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jboss6</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <version>${slf4j.jboss.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hornetq</groupId>
+                    <artifactId>hornetq-jms-client</artifactId>
+                    <version>${hornetq.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hornetq</groupId>
+                    <artifactId>hornetq-core</artifactId>
+                    <version>${hornetq.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.netty</groupId>
+                    <artifactId>netty</artifactId>
+                    <version>${netty.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.jboss.jbossas</groupId>
                     <artifactId>jboss-as-server</artifactId>
-                    <version>5.1.0.GA</version>            
+                    <version>${jboss-as-server.version}</version>            
                     <classifier>jmx-invoker-adaptor-client</classifier>
-                    <scope>compile</scope>
+                    <scope>test</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.jboss.microcontainer</groupId>
+                            <artifactId>jboss-dependency</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging-spi</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging-log4j</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>

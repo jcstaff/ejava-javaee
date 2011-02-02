@@ -29,9 +29,11 @@ import org.apache.commons.logging.LogFactory;
 public class DurableSubscriberTest extends TestCase {
     static Log log = LogFactory.getLog(DurableSubscriberTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testTopic");
-    String msgCountStr = System.getProperty("multi.message.count");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String destinationJNDI = System.getProperty("jndi.name.testTopic",
+        "topic/ejava/examples/jmsMechanics/topic1");
+    String msgCountStr = System.getProperty("multi.message.count", "20");
     
     ConnectionFactory connFactory;
     Destination destination;        
@@ -295,6 +297,10 @@ public class DurableSubscriberTest extends TestCase {
             }
             assertEquals(1, asyncClient.getCount());
             assertEquals(1, syncClient.getCount());
+        }
+        catch (Exception ex) {
+        	log.error("error testing durable subscription", ex);
+        	fail(ex.toString());
         }
         finally {
             if (connection != null) { connection.stop(); }

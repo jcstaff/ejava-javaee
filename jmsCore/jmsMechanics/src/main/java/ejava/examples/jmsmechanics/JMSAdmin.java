@@ -2,38 +2,51 @@ package ejava.examples.jmsmechanics;
 
 import java.util.Arrays;
 
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.jmx.adaptor.rmi.RMIAdaptor;
 
 /**
- * This administers the JMS Destinations on JBoss 5. Thus, this class
- * is specific to JBoss 5. 
+ * This class is used to provide runtime administration of JMS resources
+ * versus more static approaches using deployment descriptors. The 
+ * implementation of this class is specific to JBoss5/JBoss Messaging and 
+ * JBoss6/HornetQ.
  *
  * @author jcstaff
  */
-public class JMSAdmin {
+public class JMSAdmin {	
+    public static final String JBM_MSG_SERVICE = 
+        "jboss.messaging:service=ServerPeer";
+    public static final String HQ_MSG_SERVICE = 
+        "org.hornetq:module=JMS,type=Server";
+    public static enum JMSProvider { 
+    	HORNETQ("createTopic", "createQueue"), 
+    	JBM("deployTopic", "deployQueue");
+    	
+    	public final String deployTopic;
+    	public final String deployQueue;
+    	public final String destroyTopic = "destroyTopic";
+    	public final String destroyQueue = "destroyQueue";
+    	JMSProvider(String deployTopic, String deployQueue) {
+    		this.deployTopic = deployTopic;
+    		this.deployQueue = deployQueue;
+    	}
+    }
+
     private static final Log log = 
         LogFactory.getLog(JMSAdmin.class); 
-    protected String MSG_SERVICE = 
-        "jboss.messaging:service=ServerPeer";
-    private static final String DEPLOY_TOPIC_OPERATION = 
-        "deployTopic";
-    private static final String DEPLOY_QUEUE_OPERATION = 
-        "deployQueue";
-    private static final String DESTROY_TOPIC_OPERATION = 
-        "destroyTopic";
-    private static final String DESTROY_QUEUE_OPERATION = 
-        "destroyQueue";
     private static final String jndiName = 
         System.getProperty("jmx.invoker","jmx/invoker/RMIAdaptor");
 
-    RMIAdaptor remote;
+    MBeanServerConnection remote;
     ObjectName jmxName;
+    JMSProvider jmsProvider;
     
     protected JMSAdmin init() throws Exception {
     	if (remote == null) {
@@ -42,9 +55,25 @@ public class JMSAdmin {
 	        log.debug("jndi=" + jndi.getEnvironment());
 	        log.debug("looking up:" + jndiName);
 	        Object object = jndi.lookup(jndiName);
+	        log.debug("object=" + object);
 	        
-	        remote = (RMIAdaptor) object;
-	        jmxName = new ObjectName(MSG_SERVICE);
+	        remote = (MBeanServerConnection)object;
+	        jmxName = new ObjectName(HQ_MSG_SERVICE);
+        	jmsProvider=JMSProvider.HORNETQ;
+	        
+	        try {
+	        	//verify we have JBoss6/HornetQ first
+	        	remote.invoke(jmxName, "listConnectionIDs", 
+	        			new Object[]{}, new String[]{});
+	        }
+	        catch (InstanceNotFoundException ex) {
+	        	log.info("not JBoss6/HornetQ, trying JBoss5/JBM");
+	        	jmxName = new ObjectName(JBM_MSG_SERVICE);
+	        	jmsProvider=JMSProvider.JBM;
+	        	remote.invoke(jmxName, "listMessageCountersAsHTML", 
+	        			new Object[]{}, new String[]{});
+	        }
+        	log.info("using " + jmsProvider.name());
     	}
         return this;
     }
@@ -53,9 +82,9 @@ public class JMSAdmin {
     	init();
         Object[] params = { name, jndiName };
         String[] signature = { "java.lang.String", "java.lang.String" };
-        log.debug(jmxName + "." + DEPLOY_TOPIC_OPERATION + "(" +
+        log.debug(jmxName + "." + jmsProvider.deployTopic + "(" +
                 Arrays.toString(params) + ")");
-        remote.invoke(jmxName,DEPLOY_TOPIC_OPERATION, params, signature);
+        remote.invoke(jmxName,jmsProvider.deployTopic, params, signature);
         return this;
     }
 
@@ -63,9 +92,9 @@ public class JMSAdmin {
     	init();
         Object[] params = { name, jndiName };
         String[] signature = { "java.lang.String", "java.lang.String" };
-        log.debug(jmxName + "." + DEPLOY_QUEUE_OPERATION + "(" +
+        log.debug(jmxName + "." + jmsProvider.deployQueue + "(" +
                 Arrays.toString(params) + ")");
-        remote.invoke(jmxName,DEPLOY_QUEUE_OPERATION, params, signature);
+        remote.invoke(jmxName,jmsProvider.deployQueue, params, signature);
         return this;
     }
 
@@ -73,9 +102,13 @@ public class JMSAdmin {
     	init();
         Object[] params = { name };
         String[] signature = { "java.lang.String" };
-        log.debug(jmxName + "." + DESTROY_TOPIC_OPERATION + "(" +
+        log.debug(jmxName + "." + jmsProvider.destroyTopic + "(" +
                 Arrays.toString(params) + ")");        
-        remote.invoke(jmxName,DESTROY_TOPIC_OPERATION, params, signature);
+        try { //JBoss6/HonetQ throws exception when deleting non-existent dest
+        	remote.invoke(jmxName,jmsProvider.destroyTopic, params, signature);
+        } catch (Exception ex) {
+        	log.warn(ex);
+        }
         return this;
     }
 
@@ -83,9 +116,13 @@ public class JMSAdmin {
     	init();
         Object[] params = { name };
         String[] signature = { "java.lang.String"};
-        log.debug(jmxName + "." + DESTROY_QUEUE_OPERATION + "(" +
+        log.debug(jmxName + "." + jmsProvider.destroyQueue + "(" +
                 Arrays.toString(params) + ")");
-        remote.invoke(jmxName,DESTROY_QUEUE_OPERATION, params, signature);
+        try {//JBoss6/HonetQ throws exception when deleting non-existent dest
+        	remote.invoke(jmxName,jmsProvider.destroyQueue, params, signature);
+	    } catch (Exception ex) {
+	    	log.warn(ex);
+	    }
         return this;
     }
 }

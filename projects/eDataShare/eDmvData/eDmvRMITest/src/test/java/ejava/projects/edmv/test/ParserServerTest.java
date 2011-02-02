@@ -19,6 +19,9 @@ public class ParserServerTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+            //try to avoid a race condition we have with cargo not finishing
+            //deployment before allowing the tests to start
+            Thread.sleep(3000);
 		InitialContext jndi = new InitialContext();
 		
 		log.trace("looking up name:" + jndiName);

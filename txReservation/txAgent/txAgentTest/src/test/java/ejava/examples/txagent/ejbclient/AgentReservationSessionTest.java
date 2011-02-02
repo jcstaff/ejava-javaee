@@ -31,25 +31,54 @@ public class AgentReservationSessionTest extends TestCase {
     String hotelJNDI = System.getProperty("jndi.name.hotel");
     HotelReservationist hotel;
     
-    public void setUp() throws Exception {
+    public void setUp() {
+    	boolean fail=false;
+    	
         log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        log.info("looking up:" + agentJNDI);
-        agent = (BookingAgentRemote)jndi.lookup(agentJNDI);
-        log.info("found:" + agent);
-        
-        log.info("looking up:" + agentsessionJNDI);
-        agentSession = (AgentReservationSessionRemote)
-            jndi.lookup(agentsessionJNDI);
-        log.info("found:" + agentSession);
+        try {
+            jndi = new InitialContext();
+            log.debug("jndi=" + jndi.getEnvironment());
+        } catch (Exception ex) {
+                fail("Error getting InitialContext:" + ex);
+        }    
 
-        log.info("looking up:" + hotelJNDI);
-        hotel = (HotelRegistrationRemote)jndi.lookup(hotelJNDI);
-        log.info("found:" + hotel);
+        try {
+            log.info("looking up:" + agentJNDI);
+            agent = (BookingAgentRemote)jndi.lookup(agentJNDI);
+            log.info("found:" + agent);
+        } catch (Exception ex) {
+                log.error("Error looking up:" + agentJNDI, ex);
+                fail=true; //but lets keep going
+        }    
+
+        try {
+            log.info("looking up:" + agentsessionJNDI);
+            agentSession = (AgentReservationSessionRemote)
+                jndi.lookup(agentsessionJNDI);
+            log.info("found:" + agentSession);
+        } catch (Exception ex) {
+                log.error("Error looking up:" + agentsessionJNDI, ex);
+                fail=true; //but lets keep going
+        }    
+
+        try {
+            log.info("looking up:" + hotelJNDI);
+            hotel = (HotelRegistrationRemote)jndi.lookup(hotelJNDI);
+            log.info("found:" + hotel);
+        } catch (Exception ex) {
+                log.error("Error looking up:" + hotelJNDI, ex);
+                fail=true; //but lets keep going
+        }    
         
-        cleanup();
+        //okay - now we can either fail or get on with the test setup
+        if (fail) { fail("jndi errors -- look at previous output for specific errors"); }
+        else {
+            try {
+                    cleanup();
+            } catch (Exception ex) {
+                    fail(ex.toString());
+            }
+        }
     }
     
     private void cleanup() throws Exception {

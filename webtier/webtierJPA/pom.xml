@@ -2,7 +2,7 @@
   <parent>
     <artifactId>webTier</artifactId>
     <groupId>ejava.javaee.webtier</groupId>
-    <version>1.0.2010.2-SNAPSHOT</version>
+    <version>2.0.2011.1-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -104,7 +104,7 @@
             </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password />
                   <hibernate.dialect>
@@ -130,7 +130,7 @@
             </activation>
             <properties>
                   <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                  <jdbc.url>jdbc:mysql://localhost:3306/test</jdbc.url>
+                  <jdbc.url>jdbc:mysql://${db.host}:3306/test</jdbc.url>
                   <jdbc.user>jboss</jdbc.user>
                   <jdbc.password>password</jdbc.password>
                   <hibernate.dialect>
@@ -158,9 +158,9 @@
            <!-- needed to resolve some hibernate dependencies -->
             <repositories>
                 <repository>
-                    <id>jboss-repo</id>
-                    <name>JBoss Maven Repository</name>
-                    <url>http://repository.jboss.org/maven2</url>
+                    <id>jboss-nexus</id>
+                    <name>JBoss Nexus Repository</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
                 </repository>
             </repositories>
             <dependencies>

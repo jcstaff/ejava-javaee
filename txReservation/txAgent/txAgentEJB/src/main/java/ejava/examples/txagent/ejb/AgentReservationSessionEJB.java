@@ -11,7 +11,6 @@ import javax.ejb.EJBException;
 import javax.ejb.Remove;
 import javax.ejb.SessionContext;
 import javax.ejb.SessionSynchronization;
-import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;

@@ -3,25 +3,10 @@
 
     <property file="test-classes/${ant.project.name}.properties"/>
 
-    <path id="ingest.classpath">
-        <pathelement path="${commons.logging.classpath}"/>
-        <pathelement path="${log4j.classpath}"/>
-        <pathelement path="${JDBC_CLASSPATH}"/>
-        <pathelement path="${parser.classpath}"/>
-        <pathelement path="${sibling.classpath}"/>
+    <path id="run.classpath">
         <pathelement path="test-classes"/>
         <pathelement path="classes"/>
-    </path>
-
-    <path id="dmvmgmt.classpath">
-        <pathelement path="${commons.logging.classpath}"/>
-        <pathelement path="${log4j.classpath}"/>
-        <pathelement path="${JDBC_CLASSPATH}"/>
-        <pathelement path="${jpa.classpath}"/>
-        <pathelement path="${parser.classpath}"/>
-        <pathelement path="${sibling.classpath}"/>
-        <pathelement path="test-classes"/>
-        <pathelement path="classes"/>
+        <fileset dir="dependency" includes="*.jar"/>
     </path>
 
     <description>
@@ -29,37 +14,31 @@
     </description>
 
     <target name="echo">
-        <property name="ingest-classpath" refid="ingest.classpath"/>
-        <property name="dmvmgmt-classpath" refid="dmvmgmt.classpath"/>
+        <property name="run-classpath" refid="run.classpath"/>
         <echo>basedir=${basedir}</echo>
-        <echo>ingest.classpath=${ingest-classpath}</echo>
-        <echo>dmvmgmt.classpath=${dmvmgmt-classpath}</echo>
-        <echo>edmvDAO=${edmvDAO}</echo>
-        <echo>parser.classpath=${parser.classpath}</echo>
+        <echo>run.classpath=${run-classpath}</echo>
     </target>
 
     <target name="coldstart">
-        <mkdir dir="target"/>
-        <unzip src="${edmvDAO}" dest="target">
-            <patternset>
-                <include name="ddl/*"/>
-            </patternset>
-        </unzip>
         <sql driver="${JDBC_DRIVER}"
              url="${JDBC_URL}"
              userid="${JDBC_USER}"
-             password="${JDBC_PASSWORD}"
-             classpath="${JDBC_CLASSPATH}">
-             <fileset dir="target">
+             password="${JDBC_PASSWORD}">
+            <classpath>
+                <path refid="run.classpath"/>
+            </classpath>
+             <fileset dir=".">
                 <include name="ddl/*drop.ddl"/>
              </fileset>
          </sql>
         <sql driver="${JDBC_DRIVER}"
              url="${JDBC_URL}"
              userid="${JDBC_USER}"
-             password="${JDBC_PASSWORD}"
-             classpath="${JDBC_CLASSPATH}">
-             <fileset dir="target">
+             password="${JDBC_PASSWORD}">
+            <classpath>
+                <path refid="run.classpath"/>
+            </classpath>
+             <fileset dir=".">
                 <include name="ddl/*create.ddl"/>
              </fileset>
          </sql>
@@ -70,7 +49,7 @@
         <java classname="ejava.projects.edmv.blimpl.EDmvIngestCommand" 
               fork="true">
             <classpath>
-                <path refid="ingest.classpath"/>
+                <path refid="run.classpath"/>
             </classpath>
             <sysproperty key="inputFile"
                          value="${inputFile}"/>
@@ -99,7 +78,7 @@
         <property name="count" value="10"/>
         <java classname="ejava.projects.edmv.blimpl.EDmvMgmtCommand" fork="true">
             <classpath>
-                <path refid="dmvmgmt.classpath"/>
+                <path refid="run.classpath"/>
             </classpath>
             <sysproperty key="command" value="${command}"/>
             <sysproperty key="index" value="${index}"/>

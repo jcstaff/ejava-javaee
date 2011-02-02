@@ -5,7 +5,7 @@
     <groupId>ejava.javaee</groupId>
     <artifactId>ejava-javaee</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2010.2-SNAPSHOT</version>
+    <version>2.0.2011.1-SNAPSHOT</version>
     <name>Enterprise Java (605.784) Root</name>
     <description>
         This is the course home page for the Enterprise Java Course
@@ -34,8 +34,6 @@
         <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee</connection>
     </scm>
   <modules>
-  <!--
-        -->
         <module>site-skin</module>
         <module>course-docs</module>
         <module>solutions</module>
@@ -48,7 +46,9 @@
         <module>ormRelations</module>
         <module>ormEJBQL</module>
         <module>ormInheritance</module>
+  <!--
         <module>ormListeners</module>
+        -->
         <module>ejbsessionBank</module>
         <module>jndiDemo</module>
         <module>txReservation</module>
@@ -59,7 +59,19 @@
         <!-- These will be posted over the course of the semester
         -->
     </modules>
-  
+
+    <properties>
+        <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+        <maven-ear-plugin.version>2.4.2</maven-ear-plugin.version>
+        <maven-surefire-plugin.version>2.5</maven-surefire-plugin.version>
+        <maven-site-plugin.version>2.0.1</maven-site-plugin.version>
+        <maven-dependency-plugin.version>2.1</maven-dependency-plugin.version>
+
+        <jboss.protocol>http</jboss.protocol>
+        <jboss.servlet.port>8080</jboss.servlet.port>
+        <db.host>${jboss.host}</db.host>
+    </properties>
+
     <developers>
         <developer>
             <id>jcstaff</id>
@@ -125,19 +137,17 @@
     <build>
         <plugins>
             <plugin> <!-- generates site documentation -->
-                <artifactId>maven-site-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <!--
-                <version>2.0-beta-7</version>
-                -->
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven-site-plugin.version}</version>
                 <configuration>
                     <locales>en</locales>
                 </configuration>
             </plugin>
 
             <plugin> <!-- deploys artifacts to repository -->
-                <artifactId>maven-deploy-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.2.1</version>
                 <configuration>
                     <locales>en</locales>
@@ -221,6 +231,42 @@
     </reporting>
 
     <profiles>
+        <profile>
+            <id>jboss5</id>
+            <properties>
+                <jboss.host>localhost</jboss.host>
+                <jboss.server>ejava-jboss5</jboss.server>
+                <jboss-as-server.version>5.1.0.GA</jboss-as-server.version>
+                <jboss-as-client.version>5.1.0.GA</jboss-as-client.version>
+                <hibernate-entitymanager.version>3.4.0.GA</hibernate-entitymanager.version>
+                <slf4j.version>1.5.2</slf4j.version>
+
+                <!-- TODO: update all to depend on just slf4j.version since
+                    we want the API and implementation versions matching -->
+                <slf4j-log4j12.version>1.5.2</slf4j-log4j12.version>
+            </properties>                                  
+        </profile>        
+        <profile>
+            <id>jboss6</id>
+            <properties>
+                <jboss.host>localhost</jboss.host>
+                <jboss.server>ejava-jboss6</jboss.server>
+                <jboss-as-server.version>6.0.0.Final</jboss-as-server.version>
+                <jboss-as-client.version>6.0.0.Final</jboss-as-client.version>
+                <hibernate-entitymanager.version>3.6.0.Final</hibernate-entitymanager.version>
+                <hornetq.version>2.1.2.Final</hornetq.version>
+                <netty.version>3.2.1.Final</netty.version>
+                <slf4j.hibernate.version>1.6.1</slf4j.hibernate.version>
+                <slf4j.jboss.version>1.5.6</slf4j.jboss.version>
+
+                <!-- TODO: update all to depend on just slf4j.version since
+                    we want the API and implementation versions matching -->
+                <slf4j-log4j12.version>1.6.1</slf4j-log4j12.version>
+                <slf4j.version>1.6.1</slf4j.version>
+            </properties>                                  
+        </profile>        
+
+
         <profile> <!-- tells surefire to run JUnit tests with remote debug -->
             <id>debugger</id>
             <activation>
@@ -258,9 +304,9 @@
                <!-- this repositories holds many of the javaee5 jar files -->
                 <repositories>
                     <repository>
-                        <id>jboss-repo</id>
-                        <name>JBoss Maven Repository</name>
-                        <url>http://repository.jboss.org/maven2</url>
+                        <id>jboss-nexus</id>
+                        <name>JBoss Nexus Repository</name>
+                        <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
                     </repository>
                     <repository>
                         <id>javanet-repo</id>
@@ -334,9 +380,9 @@
                <!-- this repositories holds many of the javaee5 jar files -->
                 <repositories>
                     <repository>
-                        <id>jboss-repo</id>
-                        <name>JBoss Maven Repository</name>
-                        <url>http://repository.jboss.org/maven2</url>
+                        <id>jboss-nexus</id>
+                        <name>JBoss Nexus Repository</name>
+                        <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
                     </repository>
                     <repository>
                         <id>javanet-repo</id>
@@ -410,9 +456,9 @@
                <!-- this repositories holds many of the javaee5 jar files -->
                 <repositories>
                     <repository>
-                        <id>jboss-repo</id>
-                        <name>JBoss Maven Repository</name>
-                        <url>http://repository.jboss.org/maven2</url>
+                        <id>jboss-nexus</id>
+                        <name>JBoss Nexus Repository</name>
+                        <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
                     </repository>
                     <repository>
                         <id>javanet-repo</id>

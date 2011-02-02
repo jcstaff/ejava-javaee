@@ -30,9 +30,11 @@ import org.apache.commons.logging.LogFactory;
 public class MessagePriorityTest extends TestCase {
     static Log log = LogFactory.getLog(MessagePriorityTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue");
-    String msgCountStr = System.getProperty("multi.message.count");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String destinationJNDI = System.getProperty("jndi.name.testQueue",
+        "queue/ejava/examples/jmsMechanics/queue1");
+    String msgCountStr = System.getProperty("multi.message.count", "20");
     
     ConnectionFactory connFactory;
     Destination destination;        
@@ -73,14 +75,18 @@ public class MessagePriorityTest extends TestCase {
                 log.debug("onMessage received (" + ++count + 
                         "):" + message.getJMSMessageID() +
                         ", priority=" + message.getJMSPriority());
-                messages.add(message);
+                synchronized (messages) {
+                    messages.add(message);
+				}
             } catch (JMSException ex) {
                 log.fatal("error handling message", ex);
             }
         }        
         public int getCount() { return count; }
         public Message getMessage() {
-            return (messages.isEmpty() ? null : messages.remove());
+        	synchronized (messages) {
+                return (messages.isEmpty() ? null : messages.remove());
+			}
         }
     }
     

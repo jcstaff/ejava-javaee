@@ -2,7 +2,6 @@ package ejava.examples.jmsmechanics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +32,11 @@ import org.apache.commons.logging.LogFactory;
 public class MessageReplyToTest extends TestCase {
     static Log log = LogFactory.getLog(MessageReplyToTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue");
-    String msgCountStr = System.getProperty("multi.message.count");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String destinationJNDI = System.getProperty("jndi.name.testQueue",
+        "queue/ejava/examples/jmsMechanics/queue1");
+    String msgCountStr = System.getProperty("multi.message.count", "20");
     
     ConnectionFactory connFactory;
     Destination destination;        

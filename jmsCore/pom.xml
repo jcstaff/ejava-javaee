@@ -1,27 +1,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>ejava-javaee</artifactId>
-    <groupId>ejava.javaee</groupId>
-    <version>1.0.2010.2-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <artifactId>ejava-javaee</artifactId>
+        <groupId>ejava.javaee</groupId>
+        <version>2.0.2011.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>ejava.javaee.jmscore</groupId>
-  <artifactId>jmsCore</artifactId>
-  <packaging>pom</packaging>
-  <name>Java Messaging Service</name>
-  <version>1.0.2010.2-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.jmscore</groupId>
+    <artifactId>jmsCore</artifactId>
+    <packaging>pom</packaging>
+    <name>Java Messaging Service</name>
 
-  <modules>
-    <module>jmsMechanics</module>
-    <module>jmsNotifier</module>
-    <module>jmsScheduler</module>
-    <!-- this must be run separately with JBM 2.0
-    <module>jmsSecurity</module>
-    -->
-  </modules>
+    <modules>
+        <module>jmsMechanics</module>
+        <module>jmsNotifier</module>
+        <module>jmsScheduler</module>
+        <!-- this must be run separately with JBM 2.0
+        <module>jmsSecurity</module>
+        -->
+    </modules>
 </project>

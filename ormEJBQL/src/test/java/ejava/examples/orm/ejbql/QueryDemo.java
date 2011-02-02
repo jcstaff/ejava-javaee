@@ -98,7 +98,7 @@ public class QueryDemo extends DemoBase {
         Query query = em.createQuery(
                 "select c from Clerk c " +
                 "where c.hireDate > :date");
-        query.setParameter("date", hireDate, TemporalType.DATE);
+        query.setParameter("date", hireDate.getTime(), TemporalType.DATE);
         
         Clerk clerk = (Clerk)query.getSingleResult();
         log.info("found clerk by date(" + hireDate.getTime() + "):" + clerk);

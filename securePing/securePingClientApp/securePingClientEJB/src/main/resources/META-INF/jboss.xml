@@ -13,7 +13,7 @@
             <local-jndi-name>ejava/examples/secureping/SecurePingClientEJB/local</local-jndi-name>
             <ejb-ref>
                 <ejb-ref-name>ejb/SecurePingEJB</ejb-ref-name>
-                <jndi-name>jnp://localhost:1099/ejava/examples/secureping/SecurePingEJB/remote</jndi-name>
+                <jndi-name>jnp://${jboss.bind.address}:1099/ejava/examples/secureping/SecurePingEJB/remote</jndi-name>
             </ejb-ref>
             <security-identity>
                 <run-as-principal>admin1</run-as-principal>

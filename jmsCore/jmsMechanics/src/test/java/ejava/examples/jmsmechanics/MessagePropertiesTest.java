@@ -26,8 +26,10 @@ import org.apache.commons.logging.LogFactory;
 public class MessagePropertiesTest extends TestCase {
     static Log log = LogFactory.getLog(MessagePropertiesTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testTopic");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String destinationJNDI = System.getProperty("jndi.name.testTopic",
+        "topic/ejava/examples/jmsMechanics/topic1");
     
     ConnectionFactory connFactory;
     Destination destination;        
@@ -106,7 +108,8 @@ public class MessagePropertiesTest extends TestCase {
             log.debug("message2.JMSPriority=" + message2.getJMSPriority());
 
             
-            for(Enumeration e=message2.getPropertyNames();e.hasMoreElements();){
+            for(@SuppressWarnings("rawtypes")
+			Enumeration e=message2.getPropertyNames();e.hasMoreElements();){
                 String name = (String)e.nextElement();
                 Object property = message2.getObjectProperty(name);
                 log.debug("message2." + name +

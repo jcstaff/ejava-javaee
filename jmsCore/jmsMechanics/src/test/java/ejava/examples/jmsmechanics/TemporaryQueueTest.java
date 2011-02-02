@@ -22,8 +22,9 @@ import org.apache.commons.logging.LogFactory;
 public class TemporaryQueueTest extends TestCase {
     static Log log = LogFactory.getLog(TemporaryQueueTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String msgCountStr = System.getProperty("multi.message.count");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String msgCountStr = System.getProperty("multi.message.count", "20");
     
     protected ConnectionFactory connFactory;
     protected Connection connection = null;

@@ -7,7 +7,6 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
@@ -55,7 +54,6 @@ public class BookingAgentEJB implements BookingAgentRemote,
      * This method creates the business logic, assigns a DAO, and registers
      * the EntityManager for the DAO(s) to use.
      */
-    @SuppressWarnings("unchecked")
     @PostConstruct
     public void init() {
         log.info("*** BookingAgentEJB initializing ***");
@@ -72,7 +70,8 @@ public class BookingAgentEJB implements BookingAgentRemote,
 	            Object object = ctx.lookup("ejb/HotelReservation");
 	            text.append("ctx.lookup(ejb/HotelReservation)=" + object);
 	            text.append(", class=" + object.getClass().getName());
-	            Class clazz = object.getClass();
+	            @SuppressWarnings("rawtypes")
+				Class clazz = object.getClass();
 	            for (Object iface : clazz.getInterfaces()) {
 	            	text.append(", iface=" + iface);
 	            }
@@ -85,7 +84,8 @@ public class BookingAgentEJB implements BookingAgentRemote,
 		            		"ejava/examples/txhotel/HotelRegistrationEJB/remote");
 		            text.append(", jndi.lookup(HotelRegistrationEJB)=" + object);
 		            text.append(", class=" + object.getClass().getName());
-		            Class clazz = object.getClass();
+		            @SuppressWarnings("rawtypes")
+					Class clazz = object.getClass();
 		            for (Object iface : clazz.getInterfaces()) {
 		            	text.append(", iface=" + iface);
 		            }

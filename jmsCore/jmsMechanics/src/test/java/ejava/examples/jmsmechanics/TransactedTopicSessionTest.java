@@ -24,9 +24,11 @@ import org.apache.commons.logging.LogFactory;
 public class TransactedTopicSessionTest extends TestCase {
     static Log log = LogFactory.getLog(TransactedTopicSessionTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testTopic");
-    String msgCountStr = System.getProperty("multi.message.count");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String destinationJNDI = System.getProperty("jndi.name.testTopic",
+        "topic/ejava/examples/jmsMechanics/topic1");
+    String msgCountStr = System.getProperty("multi.message.count", "20");
     
     ConnectionFactory connFactory;
     Destination destination;        

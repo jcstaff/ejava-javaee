@@ -87,9 +87,8 @@ Exercise 0: Development Environment Setup
 * {Part B}: Download and Install JavaSE 6 JDK
 
     [Note:] Choose 32bit or 64bit depending on your operating system and 
-    make sure that both the JDK and Eclipse match. Of note, I have never 
-    personally used 64bit JDK and Eclipse on Windows, but have used 32bit
-    a ton under XP.
+    make sure that both the JDK and Eclipse matchi (i.e., either both 32
+    or both 64bit). 
 
     [[1]] Go to the
     {{{http://java.sun.com/javase/downloads/widget/jdk6.jsp} Sun JavaSE JDK
@@ -111,7 +110,7 @@ Exercise 0: Development Environment Setup
     /usr/bin
 
 ---
-PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
+export PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
 ---
 
 * {Part C}: Download and install a Subversion Client
@@ -129,12 +128,9 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             the windows-based tool or go back to the cygwin setup to download
             and install the subversion client.
 
-            * Windows Users: I tried out the TortoiseSVN client
-            and was really impressed. Feel free to use another
-            client, but I'll go through some of the steps for
+            * Windows Users: I personally like TortoiseSVN. 
+            Feel free to use another client, but I'll go through some of the steps for
             {{{http://tortoisesvn.tigris.org/}TortoiseSVN}} here.
-
-                [[1]] I chose the latest, TortoiseSVN-1.6.10, version. 
 
                 [[1]] The path for this tool won't be a part of any path we use to build
                 or run projects, so I chose the default installation directory.
@@ -142,10 +138,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
                 [[2]] The install, of course, wants you to reboot your system.
 
                 [[3]] TortoiseSVN launchers have been added to your right click
-                menus and available from the explorer window as well. There was an issue
-                reported by a student last semester that the ToroiseSVN processing
-                took over their CPU and had to remove it. I have not encountered that
-                issue. Your mileage may vary.
+                menus and available from the explorer window as well. 
 
             * Eclipse Users: There is an subversion plugin for Eclipse available
             called {{{http://subclipse.tigris.org/}Subclipse}}. You can install it
@@ -159,8 +152,9 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             [Note:] You can checkout the class examples using any of the SVN clients
             above. However, if you use multiple subversion clients (e.g., mix the
             usage of ToortuiseSVN with Subclipse), you need to make sure the 
-            products implement the same client version. I have found that TortoiseSVN
-            tends to have a baseline release ahead of many of the other clients.
+            products implement the same client version. There is no need to worry
+            about the specific version of the subversion server used in class --
+            just the clients you use on the same file system.
 
         [[1]] Test out your subversion installation by performing a checkout
         of the ejava-javaee course files. 
@@ -170,7 +164,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             [[1]] Browse the repository to determine the URL for the 
             project you wish to checkout. You can start at the root 
             using the following
-            {{https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee}}
+            {{http://ejava.info/repos/class/branches/2011-spring-ejava-javaee}}
             URL.
 
             [[1]] Check out a level of the SVN repository to your class
@@ -182,7 +176,7 @@ PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
             SVN repository. You must use https to access the repository.
 
 ---
-$ svn checkout https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee ejava-javaee
+$ svn checkout http://ejava.info/repos/class/branches/2011-spring-ejava-javaee ejava-javaee
 A  ejava-javaee/.project
 A  ejava-javaee/jdbcDAO
 A  ejava-javaee/jdbcDAO/.classpath
@@ -214,15 +208,13 @@ At revision 24.
     [[1]] Go to the 
     {{{http://maven.apache.org/}Maven Site}}  and download the latest
     version for your platform. You don't need the Tasks for Ant. Those
-    are for when you want to call Maven from within Ant.
+    are for when you want to reference Maven repositories within Ant.
 
     [[1]] Unzip the archive. I put mine in c:/apps/, which resulted in a
-    c:/apps/apache-maven-2.2.1-bin directory. I then moved the single sub-directory
-    up to the c:/apps level and removed the empty parent. That left me with
-    c:/apps/apache-maven-2.2.1
+    c:/apps/apache-maven-3.0.2 directory. 
 
 ---
-$ ls c:/apps/apache-maven-2.2.1
+$ ls c:/apps/apache-maven-3.0.2
 LICENSE.txt  NOTICE.txt  README.txt  bin  boot  conf  lib
 ---
 
@@ -237,14 +229,14 @@ LICENSE.txt  NOTICE.txt  README.txt  bin  boot  conf  lib
 
 ---
 $ which mvn
-/cygdrive/c/apps/apache-maven-2.2.1/bin/mvn
+/cygdrive/c/apps/apache-maven-3.0.2/bin/mvn
 
 $ mvn -version
-Apache Maven 2.2.1 (r801777; 2009-08-06 15:16:01-0400)
-Java version: 1.6.0_21
-Java home: c:\apps\java\jdk1.6.0_21\jre
+Apache Maven 3.0.2 (r1056850; 2011-01-08 19:58:10-0500)
+Java version: 1.6.0_21, vendor: Sun Microsystems Inc.
+Java home: C:\apps\java\jdk1.6.0_21\jre
 Default locale: en_US, platform encoding: Cp1252
-OS name: "windows xp" version: "5.1" arch: "x86" Family: "windows"
+OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
 ---
 
     [Cywin Users:] You must express all PATHs in unix form. Unix PATHs use ":" as a 
@@ -257,10 +249,10 @@ $ cygpath --unix c:/
 /cygdrive/c
 
 $ cygpath --unix $MAVEN_HOME
-/cygdrive/c/apps/apache-maven-2.2.1
+/cygdrive/c/apps/apache-maven-3.0.2
 
 $ cygpath --windows $MAVEN_HOME
-c:\apps\apache-maven-2.2.1
+c:\apps\apache-maven-3.0.2
 
 $ cygpath --windows /cygdrive/c
 c:\
@@ -303,47 +295,7 @@ $ cd c:/jhu/784/ejava-javaee/javase5Enhancements/
 $ mvn install -Dmaven.test.skip=true
 ---
 
-    [[1]] Maven will begin downloading dependencies, but will
-    unfortunately run into several "Error transferring file" problems
-    before we get all dependencies. Just grit your teeth and re-issue
-    the command until it completes or you hit a real error. The transfer
-    errors have to do with the fact you are downloading files from a set
-    of mirror sites that is shared with the rest of the internet. Once
-    these files are downloaded once, the local copies will be used
-    instead.
-
----
-[ERROR] BUILD ERROR
-[INFO] ------------------------------------------------------------------------
-[INFO] Error building POM (may not be this project's POM).
-
-
-Project ID: org.apache.maven:maven-model
-
-Reason: Error getting POM for 'org.apache.maven:maven-model' from the repository
-: Error transferring file
-  org.apache.maven:maven-model:pom:2.0
-
-from the specified remote repositories:
-  central (http://repo1.maven.org/maven2),
-  apache.snapshots (http://svn.apache.org/maven-snapshot-repository),
-  snapshots (http://snapshots.maven.codehaus.org/maven2)
----
----
-[ERROR] BUILD ERROR
-[INFO] ------------------------------------------------------------------------
-[INFO] Error building POM (may not be this project's POM).
-
-
-Project ID: null:plexus-compiler-api:jar:1.5.2
-
-Reason: Cannot find parent: org.codehaus.plexus:plexus-compiler for project: nul
-l:plexus-compiler-api:jar:1.5.2
----
-
-    [[1]] If you get an error looking for JBoss artifacts,
-    don't worry. You may have attempted to build from the root or build a sub-project
-    that requires further setup.
+    [[1]] Maven will begin downloading dependencies.
 
     [[1]] We'll look at and configure Maven a bit more in Exercise 1. 
     You'll be responsible for basic tasks of building and 
@@ -354,36 +306,47 @@ l:plexus-compiler-api:jar:1.5.2
     [[1]] Go to the 
     {{{http://jboss.org/jbossas/downloads/}
     Download site for the JBoss Application Server}}.  Download version
-    5.1.0.GA for jdk6. Burke's EJB3 with JBoss workbook shows an example of using
-    the "Run Installer" that walks you through the right options to get
-    JBoss <<AND>> EJB3. However, that was for 4.0.4/5. EJB3 is enabled
-    by default, starting with 4.2. Please download the jdk6 version towards the
-    bottom of the list.
+    6.0.0.Final. 
 
     [[1]] On Windows, I unzipped mine to c:/apps to avoid having any spaces in the
-    path. This produced a directory called c:/apps/jboss-5.1.0.GA.
+    path. This produced a directory called c:/apps/jboss-6.0.0.Final.
 
-    [Note:] If you choose a directory other than c:/apps/jboss-5.1.0.GA, make sure to 
+    [Note:] If you choose a directory other than c:/apps/jboss-6.0.0.Final, make sure to 
     update the value for jboss.home in the MAVEN %HOME%/.m2/settings.xml file.
 
     []
 
-    [[1]] We'll be using the "standard" server. This configuration is Java EE 5
-    compliant, but not the JBoss default. You will need to add "-c standard"
+    [[1]] We'll be using a modification of the "standard" server. This configuration is 
+    Java EE 6 compliant, but not the JBoss default. You will need to add "-c standard"
     to the start command.
 
----
-$ ls c:/apps/jboss-5.1.0.GA/server/standard/
-conf  deploy  deployers  lib
----
+    * Copy the jboss-6.0.0.Final/server/standard directory to ejava-jboss6.
 
-    [[1]] Add a configuration file that will define a database
-    we'll be using for class. Although we can start/stop the database
-    without using JBoss and won't need the server for a while, it is 
-    very easy to have the all servers managed under a single set of
-    run/shutdown scripts. Paste the 
-    <<{{{../files/jboss/deploy/ejava-jdbc-ds.xml}
-    following file}}>> into the JBOSS_HOME/servers/standard/deploy directory
+    * Overwrite several of the files in the new directory with the following
+
+    []
+
+---
+$ pwd
+/cygdrive/c/apps/jboss-6.0.0.Final/server
+
+$ cp -r standard ejava-jboss6
+
+$ ls
+all  default  ejava-jboss6  jbossweb-standalone  minimal  standard
+
+$ svn export --force http://ejava.info/repos/class/branches/jboss6/servers/ejava-jboss6/src/main/re
+sources/ejava-jboss6
+A    ejava-jboss6
+A    ejava-jboss6/deploy
+A    ejava-jboss6/deploy/hornetq
+A    ejava-jboss6/deploy/hornetq/hornetq-configuration.xml
+A    ejava-jboss6/deploy/hornetq/hornetq-jms.xml
+A    ejava-jboss6/deploy/jboss-logging.xml
+A    ejava-jboss6/deploy/ejava-jdbc-ds.xml
+A    ejava-jboss6/deploy/ejb2-timer-service.xml
+Exported revision 1149.
+---
 
     [[1]] Start the server and look for the following lines towards the end
     of its output. This means that our Hypersonic "ejava" database has 
@@ -395,72 +358,60 @@ conf  deploy  deployers  lib
         []
 
 ---
-$ c:/apps/jboss-5.1.0.GA/bin/run.sh -c standard
+$ c:/apps/jboss-6.0.0.Final/bin/run.sh -c ejava-jboss6
+
  =========================================================================
 
   JBoss Bootstrap Environment
 
-  JBOSS_HOME: c:\apps\jboss-5.1.0.GA
+  JBOSS_HOME: C:\apps\jboss-6.0.0.Final
 
-  JAVA: /cygdrive/c/apps/java/jdk1.6.0_18/bin/java
+  JAVA: /cygdrive/c/apps/java/jdk1.6.0_21/bin/java
 
-  JAVA_OPTS: -Dprogram.name=run.sh -server -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsu
-n.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000
+  JAVA_OPTS: -server -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.
+rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Dprogram.name=run.sh -Dja
+va.library.path=C:\apps\jboss-6.0.0.Final\bin\native\bin
 
-  CLASSPATH: c:\apps\jboss-5.1.0.GA\bin\run.jar;c:\apps\java\jdk1.6.0_18\lib\tools.jar
+  CLASSPATH: C:\apps\jboss-6.0.0.Final\bin\run.jar;C:\apps\java\jdk1.6.0_21\lib\tools.jar
 
  =========================================================================
 
-15:48:25,484 INFO  [ServerImpl] Starting JBoss (Microcontainer)...
-15:48:25,499 INFO  [ServerImpl] Release ID: JBoss [The Oracle] 5.1.0.GA (build: SVNTag=JBoss_5_1_0_GA date=200905221053)
+02:32:19,138 INFO  [AbstractJBossASServerBase] Server Configuration:
 
-15:48:25,499 INFO  [ServerImpl] Bootstrap URL: null
-15:48:25,499 INFO  [ServerImpl] Home Dir: C:\apps\jboss-5.1.0.GA
-15:48:25,499 INFO  [ServerImpl] Home URL: file:/C:/apps/jboss-5.1.0.GA/
-15:48:25,499 INFO  [ServerImpl] Library URL: file:/C:/apps/jboss-5.1.0.GA/lib/
-15:48:25,530 INFO  [ServerImpl] Patch URL: null
-15:48:25,530 INFO  [ServerImpl] Common Base URL: file:/C:/apps/jboss-5.1.0.GA/common/
-15:48:25,530 INFO  [ServerImpl] Common Library URL: file:/C:/apps/jboss-5.1.0.GA/common/lib/
-15:48:25,530 INFO  [ServerImpl] Server Name: standard
-15:48:25,530 INFO  [ServerImpl] Server Base Dir: C:\apps\jboss-5.1.0.GA\server
-15:48:25,530 INFO  [ServerImpl] Server Base URL: file:/C:/apps/jboss-5.1.0.GA/server/
-15:48:25,530 INFO  [ServerImpl] Server Config URL: file:/C:/apps/jboss-5.1.0.GA/server/standard/conf/
-15:48:25,530 INFO  [ServerImpl] Server Home Dir: C:\apps\jboss-5.1.0.GA\server\standard
-15:48:25,530 INFO  [ServerImpl] Server Home URL: file:/C:/apps/jboss-5.1.0.GA/server/standard/
-15:48:25,530 INFO  [ServerImpl] Server Data Dir: C:\apps\jboss-5.1.0.GA\server\standard\data
-15:48:25,530 INFO  [ServerImpl] Server Library URL: file:/C:/apps/jboss-5.1.0.GA/server/standard/lib/
-15:48:25,530 INFO  [ServerImpl] Server Log Dir: C:\apps\jboss-5.1.0.GA\server\standard\log
-15:48:25,530 INFO  [ServerImpl] Server Native Dir: C:\apps\jboss-5.1.0.GA\server\standard\tmp\native
-15:48:25,530 INFO  [ServerImpl] Server Temp Dir: C:\apps\jboss-5.1.0.GA\server\standard\tmp
-15:48:25,530 INFO  [ServerImpl] Server Temp Deploy Dir: C:\apps\jboss-5.1.0.GA\server\standard\tmp\deploy
+        JBOSS_HOME URL: file:/C:/apps/jboss-6.0.0.Final/
+        Bootstrap: $JBOSS_HOME\server/ejava-jboss6/conf/bootstrap.xml
+        Common Base: $JBOSS_HOME\common/
+        Common Library: $JBOSS_HOME\common/lib/
+        Server Name: ejava-jboss6
+        Server Base: $JBOSS_HOME\server/
+        Server Library: $JBOSS_HOME\server/ejava-jboss6/lib/
+        Server Config: $JBOSS_HOME\server/ejava-jboss6/conf/
+        Server Home: $JBOSS_HOME\server/ejava-jboss6/
+        Server Data: $JBOSS_HOME\server/ejava-jboss6/data
+        Server Log: $JBOSS_HOME\server/ejava-jboss6/log/
+        Server Temp: $JBOSS_HOME\server/ejava-jboss6/tmp
 
+02:32:19,153 INFO  [AbstractServer] Starting: JBossAS [6.0.0.Final "Neo"]
 ...
+02:33:23,231 INFO  [org.apache.coyote.http11.Http11Protocol] Starting Coyote HTTP/1.1 on http-127.0.
+0.1-8080
+02:33:23,231 INFO  [org.apache.coyote.ajp.AjpProtocol] Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
 
-15:49:42,734 INFO  [STDOUT] [Server@1f25d83]: Initiating startup sequence...
-15:49:42,734 INFO  [STDOUT] [Server@1f25d83]: Server socket opened successfully in 0 ms.
-15:49:43,109 INFO  [STDOUT] [Server@1f25d83]: Database [index=0, id=0, db=file:C:\apps\jboss-5.1.0.GA\server\standard\da
-ta\hypersonic\ejava, alias=] opened sucessfully in 375 ms.
-15:49:43,140 INFO  [STDOUT] [Server@1f25d83]: Startup sequence completed in 406 ms.
-
-...
-
-15:49:52,280 INFO  [Http11Protocol] Starting Coyote HTTP/1.1 on http-127.0.0.1-8080
-15:49:52,296 INFO  [AjpProtocol] Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
-15:49:52,296 INFO  [ServerImpl] JBoss (Microcontainer) [5.1.0.GA (build: SVNTag=JBoss_5_1_0_GA date=200905221053)] Start
-ed in 1m:7s:62ms
+02:33:23,231 INFO  [org.jboss.bootstrap.impl.base.server.AbstractServer] JBossAS [6.0.0.Final "Neo"]
+ Started in 1m:4s:62ms
 ---
 
     [[1]] Start the database UI to verify that the database is up.
 
 ---
-$ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+$ java -classpath c:/apps/jboss-6.0.0.Final/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
     [Note:] I created a startdbui.bat script that looks something like the following
 
 ---
 echo off
-set JBOSS_HOME=c:\apps\jboss-5.1.0.GA
+set JBOSS_HOME=c:\apps\jboss-6.0.0.Final
 java -classpath %JBOSS_HOME%/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
@@ -481,18 +432,18 @@ Server shutdown may take a while - check logfiles for completion
     [Note:] You can run just the database application by executing the following.
 
 ---
-> cd c:/apps/jboss-5.1.0.GA/server/standard/data/hypersonic
-> java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+> cd c:/apps/jboss-6.0.0.Final/server/ejava-jboss6/data/hypersonic
+> java -classpath c:/apps/jboss-6.0.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     [Note:] I created a startdb.bat script that looks something like the following.
 
 ---
 echo off
-set JBOSS_HOME=c:\apps\jboss-5.1.0.GA
-set JBOSS_SERVER=standard
+set JBOSS_HOME=c:\apps\jboss-6.0.0.Final
+set JBOSS_SERVER=ejava-jboss6
 cd %JBOSS_HOME%\server\%JBOSS_SERVER%\data\hypersonic
-java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+java -classpath c:/apps/jboss-6.0.0.Final/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     []    
@@ -501,36 +452,6 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
     desktop launch icons since you'll be starting and stopping this server
     quite a bit over the semester.
 
-    [[1]] Change the data source used to persist EJB Timers to be the same as the
-    one used to persist your EJB application data. This helps avoid issues with
-    trying to enlist 2 resources that do not support 2-phase-commit in the same
-    transaction. By moving JMS to the ejavaDS data source, we avoid this issue
-    by using only a single resource. In server/standard/deploy/ejb2-timer-service.xml,
-    change the jboss.jca:service=DataSourceBinding,name from DefaultDS to ejavaDS.
-
----
-//FROM
-    <!-- DataSourceBinding ObjectName -->
-    <depends optional-attribute-name="DataSource">jboss.jca:service=DataSourceBinding,name=DefaultDS</depends>
-
-    <!-- The timers table name -->
-    <attribute name="TimersTable">TIMERS</attribute>
-    <depends>jboss.jdbc:datasource=DefaultDS,service=metadata</depends>
-  </mbean>
----
----
-//CHANGE TO
-    <!-- DataSourceBinding ObjectName -->
-    <depends optional-attribute-name="DataSource">jboss.jca:service=DataSourceBinding,name=ejavaDS</depends>
-
-    <!-- The timers table name -->
-    <attribute name="TimersTable">TIMERS</attribute>
-    <depends>jboss.jdbc:datasource=ejavaDS,service=metadata</depends>
-  </mbean>
----
-
-    [[1]] Add support for https protocol by following the instructions in the
-    {{{./jboss-https.html} Enable JBoss HTTPS Exercise}}
 
 * {Part F}: Download and install Eclipse IDE
 
@@ -540,12 +461,9 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
         at least 1GB of memory before doing any size tweeks.
 
         [Note:] Some products, including MyEclipse, provide a full download
-        of Eclipse as a part of their installation. Feel free to try those 
-        installations and fall back to a bare install if you encounter 
-        problems that cannot be worked around. For example, one student 
-        experienced issues integrating the Maven m2eclipse into their
-        MyEclipse environment and dropped back to a pure Eclipse instance
-        to get that optional piece running.
+        of Eclipse as a part of their installation. Try to avoid these
+        platform specific packaging as a first choice and go with the 
+        stock Eclipse for JavaEE developers from Eclipse.
 
     [[1]] Download and install
     {{{http://www.eclipse.org/}Eclipse}}. They now have a separate download
@@ -575,12 +493,9 @@ java -classpath c:/apps/jboss-5.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -
 
         * Follow instructions to complete installation.
 
-    [Note:] You will notice other packages that are available for update.
-    I had a lot of issues with the Eclipse Web Dev Tools and m2eclipse
-    integrating with one another when these were selected. Leaving only
-    the Maven Integration selected seemed to improve the situation.
-    Remember...if something goes wrong, its pretty easy to get back to a 
-    clean slate.
+    [Note:] Ignore any optional packages if present and only install the
+    Maven Integration for Eclipse.  Remember...if something goes wrong, 
+    its pretty easy to get back to a clean slate.
 
     []
 
@@ -625,10 +540,10 @@ Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_21\bin
         [Note:] I use Ant as a portable scripting tool for interactive demos. You will 
         use it to wrap setup commands and Java SE clients for projects you submit.
 
-    [[1]] Download and install {{{http://ant.apache.org/}Ant}}. Lets try using
-    the newer 1.8.1 version.
+    [[1]] Download and install {{{http://ant.apache.org/}Ant}}. Use the 
+    newer 1.8.2 version.
 
-        * I installed mine in c:/apps, which resulted in c:/apps/apache-ant-1.7.1 
+        * I installed mine in c:/apps, which resulted in c:/apps/apache-ant-1.8.2 
         being created and now being my ANT_HOME.
 
     [[1]] Add ANT_HOME/bin to your PATH.
@@ -637,8 +552,8 @@ Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_21\bin
 Windows PATH = %JAVA_HOME%\bin;%MAVEN_HOME%\bin;%PATH%;%ANT_HOME%\bin
 ---
 ---
-> ant -version
-pache Ant version 1.8.1 compiled on April 30 2010
+$ ant -version
+Apache Ant(TM) version 1.8.2 compiled on December 20 2010
 ---
 
 * Summary

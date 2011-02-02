@@ -1,5 +1,6 @@
 package ejava.examples.txhotel.ejbclient;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -23,6 +24,12 @@ import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
 import junit.framework.TestCase;
 
+/**
+ * This test case provides an example of conducting a failed usecase 
+ * across a set of EJBs that have a mixture of transaction scope.
+ * @author jcstaff
+ *
+ */
 public class HotelReservationSessionTest extends TestCase {
     Log log = LogFactory.getLog(HotelReservationSessionTest.class);
     InitialContext jndi;
@@ -31,7 +38,7 @@ public class HotelReservationSessionTest extends TestCase {
     Map<String, HotelReservationSession> reservationSessions =
         new HashMap<String, HotelReservationSession>();
     HotelReservationist reservationist;
-    
+    List<String> jndiNames = new ArrayList<String>();
     
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
@@ -39,6 +46,12 @@ public class HotelReservationSessionTest extends TestCase {
         log.debug("jndi=" + jndi.getEnvironment());
         log.debug("jndi name:" + sessionJNDI);        
         
+        /**
+         * Instead of looking up a specific EJB, we are pointed to the 
+         * root context of a JNDI tree that contains the same EJB
+         * deployed multiple times and run the purposely failed use
+         * cases against each of them to test and note their differences.
+         */
         for(NamingEnumeration<Binding> e = jndi.listBindings(sessionJNDI);
             e.hasMore(); ) {
             Binding b = e.nextElement();
@@ -53,6 +66,7 @@ public class HotelReservationSessionTest extends TestCase {
                     reservationSessions.put(b.getName(), 
                             (HotelReservationSession)object);
                     log.info("found:" + name);
+                    jndiNames.add(name.toString());
                 }
             }
             catch (NameNotFoundException ex) {}
@@ -69,9 +83,12 @@ public class HotelReservationSessionTest extends TestCase {
                 log.debug("looking for reservationist:" + name);
                 Object object = jndi.lookup(name.toString());
                 if (object instanceof HotelRegistrationRemote) {
-                    reservationist = (HotelReservationist)object;
-                    log.info("using reservationist:" + name);
-                    break;
+                    log.info("found:" + name);
+                    jndiNames.add(name.toString());
+                	if (reservationist == null) {
+                		reservationist = (HotelReservationist)object;
+                        log.info("using reservationist:" + name);
+                	}
                 }
             }
             catch (NameNotFoundException ex) {}
@@ -80,7 +97,16 @@ public class HotelReservationSessionTest extends TestCase {
         cleanup();
     }
     
-    private void cleanup() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
+    	StringBuilder text = new StringBuilder("JNDI names found/used:\n");
+    	for (String name : jndiNames) {
+    		text.append(name).append("\n");
+    	}
+    	log.info(text.toString());
+	}
+
+	private void cleanup() throws Exception {
         List<Reservation> reservations = reservationist.getReservations(0, 100);
         while (reservations.size() > 0) {
             for(Reservation r: reservations) {

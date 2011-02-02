@@ -2,7 +2,7 @@
     <parent>
         <artifactId>projects</artifactId>
         <groupId>ejava.javaee.projects</groupId>
-        <version>1.0.2009.2-SNAPSHOT</version>
+        <version>2.0.2011.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -10,18 +10,27 @@
     <artifactId>eDataShare</artifactId>
     <packaging>pom</packaging>
     <name>eDataShare DMV and Mayberry</name>
-    <version>1.0.2009.2-SNAPSHOT</version>
+    <version>2.0.2011.1-SNAPSHOT</version>
     <description>
         This project provides the problem description and initial artifacts
         for the class project.
     </description>
 
+    <repositories>
+        <repository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+    </repositories>
+
     <modules>
         <!-- this is only used for test data generation and 
              should not be part of a submitted class project -->
+        <!-- these will be uncommented after the first week of class
         <module>eDmvData</module>
-        <!-- -->
         <module>eDmv</module>
         <module>eMayberry</module>
+        -->
     </modules>
 </project>

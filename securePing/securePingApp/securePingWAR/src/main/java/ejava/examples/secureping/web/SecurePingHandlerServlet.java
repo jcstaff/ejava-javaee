@@ -52,6 +52,7 @@ public class SecurePingHandlerServlet extends HttpServlet {
             
             //build a list of handlers for individual commands
             String handler = config.getInitParameter(HANDLER_TYPE_KEY);
+            
             handlers.put(MAINMENU_COMMAND, new MainMenu());
             handlers.put(IS_CALLER_IN_ROLE_COMMAND, new IsCallerInRole());
             handlers.put(PING_ALL_COMMAND, new PingAll());
@@ -71,7 +72,8 @@ public class SecurePingHandlerServlet extends HttpServlet {
         if (securePingServer == null) {
             //build an InitialContext from Servlet.init properties in web.xml
             Properties jndiProperties = new Properties();
-            for(Enumeration e=config.getInitParameterNames();
+            for(@SuppressWarnings("rawtypes")
+			Enumeration e=config.getInitParameterNames();
                 e.hasMoreElements(); ) {
                 String key = (String)e.nextElement();
                 String value=(String)config.getInitParameter(key);

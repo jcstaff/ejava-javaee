@@ -2,7 +2,6 @@ package ejava.examples.jndidemo.ejb;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;

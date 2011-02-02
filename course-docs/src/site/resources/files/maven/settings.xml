@@ -5,7 +5,15 @@
 
     <!-- this overrides the default $HOME/.m2/repository location. -->
     <localRepository>c:/jhu/repository</localRepository>
-  
+
+    <mirrors>
+        <mirror>
+          <id>nexus</id>
+          <mirrorOf>*</mirrorOf>
+          <url>http://ejava.info/nexus/content/groups/public</url>
+        </mirror>
+    </mirrors>
+
     <profiles>
         <profile>
             <id>ejavaPC</id>
@@ -13,13 +21,19 @@
                  specific configuration -->
             <properties>
                 <m2.repo>c:/jhu/repository</m2.repo>
-                <jboss.home>c:/apps/jboss-5.1.0.GA</jboss.home>
-                <jboss.server>standard</jboss.server>
-                <jboss.protocol>http</jboss.protocol>
                 <jboss.host>localhost</jboss.host>
-                <jboss.servlet.port>8080</jboss.servlet.port>
-                <jboss.user>admin</jboss.user>
-                <jboss.password>password</jboss.password>
+            </properties>                                  
+        </profile>        
+        <profile>
+            <id>jboss5</id>
+            <properties>
+                <jboss.home>c:/apps/jboss-5.1.0.GA</jboss.home>
+            </properties>                                  
+        </profile>        
+        <profile>
+            <id>jboss6</id>
+            <properties>
+                <jboss.home>c:/apps/jboss-6.0.0.Final</jboss.home>
             </properties>                                  
         </profile>        
 
@@ -65,9 +79,11 @@
         </profile>        
     
     </profiles>
+
     <activeProfiles>
+        <activeProfile>ejavaPC</activeProfile>
+        <activeProfile>jboss6</activeProfile>
         <activeProfile>hsql</activeProfile>
         <activeProfile>webdev-repositories</activeProfile>
-        <activeProfile>ejavaPC</activeProfile>
     </activeProfiles>
 </settings>

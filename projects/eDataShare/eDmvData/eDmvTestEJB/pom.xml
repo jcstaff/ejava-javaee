@@ -2,7 +2,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eDataShare</groupId>
         <artifactId>eDmvData</artifactId>
-        <version>1.0.2009.2rc2</version>
+        <version>2.0.2011.1rc1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -17,32 +17,14 @@
    <!-- this repositories holds many of the javaee5 jar files -->
     <repositories>
         <repository>
-            <id>jboss-repo</id>
-            <name>JBoss Maven Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
 
     <dependencies>
         <!-- core dependencies -->
-        <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>jsr250-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.ejb</groupId>
-          <artifactId>ejb-api</artifactId>
-          <version>3.0</version>
-          <scope>provided</scope>
-        </dependency>
         <dependency>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
@@ -114,9 +96,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>      
 
@@ -166,6 +149,58 @@
             <properties>
                   <hibernate.dialect>org.hibernate.dialect.MySQLDialect</hibernate.dialect>
             </properties>
+        </profile>
+
+        <profile>
+            <id>jboss5</id>
+           <!-- this repositories holds many of the javaee5 jar files -->
+            <repositories>
+                <repository>
+                    <id>jboss-nexus</id>
+                    <name>JBoss Nexus Repository</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+                </repository>
+            </repositories>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>jsr250-api</artifactId>
+                    <version>1.0</version>
+                  <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.persistence</groupId>
+                    <artifactId>persistence-api</artifactId>
+                    <version>1.0</version>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.ejb</groupId>
+                    <artifactId>ejb-api</artifactId>
+                    <version>3.0</version>
+                  <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>jboss6</id>
+            <repositories>
+                <repository>
+                    <id>java.net-repo</id>
+                    <name>Java.net Maven Repository</name>
+                    <url>http://download.java.net/maven/2</url>
+                </repository>
+            </repositories>
+            <dependencies>
+                <!-- this is fine to compile with -->
+                <dependency>
+                    <groupId>javax</groupId>
+                    <artifactId>javaee-api</artifactId>
+                    <version>6.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava.javaee.servers</groupId>
+    <artifactId>ejava-jboss5</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.2010.2-SNAPSHOT</version>
+    <name>Ejava JBoss 5 Server</name>
+    <description>
+        This project builds the JBoss 5 server directory for use with 
+        the ejava baseline.
+    </description>
+
+    <properties>
+        <jboss.config.template>standard</jboss.config.template>
+        <jboss5.download.url>
+           http://downloads.sourceforge.net/project/jboss/JBoss/JBoss-5.1.0.GA/jboss-5.1.0.GA-jdk6.zip
+        </jboss5.download.url>
+        <install.dir>/tmp/downloads</install.dir>
+        <jboss.bind.address>127.0.0.3</jboss.bind.address>
+        <jvm.debug>-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n</jvm.debug>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin> 
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>1.0.4</version>
+                <configuration>
+                    <container>
+                        <containerId>jboss51x</containerId>
+                        <home>${install.dir}/jboss-5.1.0.GA-jdk6/jboss-5.1.0.GA</home>
+                        <log>${project.build.directory}/cargo.log</log>
+                        <output>${project.build.directory}/console.log</output>
+                    </container>
+                    <configuration>
+                        <type>existing</type>
+                        <home>${project.build.directory}/${project.artifactId}</home>
+                        <properties>
+                            <cargo.hostname>${jboss.bind.address}</cargo.hostname>
+                            <!--
+                            <cargo.jvmargs>"${jvm.debug}"</cargo.jvmargs>
+                            -->
+                        </properties>
+                    </configuration>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>build-container</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>configure</goal>
+                        </goals>
+                        <configuration>
+                            <container>
+                                <zipUrlInstaller>
+                                    <url>${jboss5.download.url}</url>
+                                    <installDir>${install.dir}</installDir>
+                                </zipUrlInstaller>
+                            </container>
+                            <configuration>
+                                <type>standalone</type>
+                                <home>${project.build.directory}/${project.artifactId}</home>
+                                <properties>
+                                    <cargo.jboss.configuration>${jboss.config.template}</cargo.jboss.configuration>
+                                </properties>
+                            </configuration>
+                            <dependencies>
+                                
+                            </dependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <!-- now copy in the files we meant to change -->
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>          
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>              
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin> 
+
+            <!-- remove some files we don't want -->
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete verbose="true">
+                                    <fileset dir="${project.build.directory}">
+                                        <include name="**/deploy/iiop*.xml"/>
+                                    </fileset>
+                                </delete>
+                            </target>
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin> 
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/compile/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

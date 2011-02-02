@@ -2,16 +2,10 @@ package ejava.examples.jmsmechanics;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -45,9 +39,11 @@ import org.apache.commons.logging.LogFactory;
 public class MessageTest extends TestCase {
     static Log log = LogFactory.getLog(MessageTest.class);
     InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue");
-    String msgCountStr = System.getProperty("multi.message.count");
+    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
+        "ConnectionFactory");
+    String destinationJNDI = System.getProperty("jndi.name.testQueue",
+        "queue/ejava/examples/jmsMechanics/queue1");
+    String msgCountStr = System.getProperty("multi.message.count", "20");
     
     protected ConnectionFactory connFactory;
     protected Destination destination;        
@@ -214,7 +210,8 @@ public class MessageTest extends TestCase {
         
         protected Message getReply(ObjectMessage request) throws Exception {
             log.debug("object request body=" + request.getObject());
-            Map<String, Object> body = (Map<String, Object>)request.getObject();
+            @SuppressWarnings("unchecked")
+			Map<String, Object> body = (Map<String, Object>)request.getObject();
             String operator =  (String)body.get("operator");
             int operand1 = ((MyInteger)body.get("operand1")).getValue();
             int operand2 = ((MyInteger)body.get("operand2")).getValue();

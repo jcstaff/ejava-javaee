@@ -3,11 +3,10 @@
     <parent>
         <artifactId>txAgent</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
-        <version>1.0.2010.2-SNAPSHOT</version>
+        <version>2.0.2011.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ejava.javaee.txreservation</groupId>
     <artifactId>txAgentTest</artifactId>
     <packaging>jar</packaging>
     <name>Tx Agent Business Remote Test</name>
@@ -88,9 +87,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>      
 
@@ -100,26 +100,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <systemProperties>
                         <property>
                           <name>jndi.name.hotel</name>
-                          <value>
-                              ejava/examples/txhotel/RequiredEJB/remote
-                          </value>
+                          <value>ejava/examples/txhotel/RequiredEJB/remote</value>
                         </property>
                         <property>
                           <name>jndi.name.agent</name>
-                          <value>
-                              ejava/examples/txagent/BookingAgentEJB/remote
-                          </value>
+                          <value>ejava/examples/txagent/BookingAgentEJB/remote</value>
                         </property>
                         <property>
                           <name>jndi.name.agentsession</name>
-                          <value>
-                              txAgentEAR/AgentReservationSessionEJB/remote
-                          </value>
+                          <value>${agentsession.jndi}</value>
                         </property>
                     </systemProperties>
                 </configuration>
@@ -141,28 +136,30 @@
 <profile>
     <id>jboss</id>
     <activation>
-        <activeByDefault>true</activeByDefault>
+        <property> <!-- activate this unless -Dserver present -->
+            <name>!server</name>
+        </property>
     </activation>
     <properties>
           <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
           </java.naming.factory.initial>
-          <java.naming.provider.url>jnp://localhost:1099
+          <java.naming.provider.url>jnp://${jboss.host}:1099
           </java.naming.provider.url>
           <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
           </java.naming.factory.url.pkgs>
     </properties>
     <repositories>
         <repository>
-            <id>jboss-repo</id>
-            <name>JBoss Maven Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-client</artifactId>
-            <version>5.1.0.GA</version>            
+            <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
         </dependency>
@@ -170,76 +167,123 @@
 
     <build>
         <plugins>
-        <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.0.2</version>
-            <configuration>
-                <container>
-                    <containerId>jboss4x</containerId>
-                    <type>remote</type>                
-                </container>
-            </configuration>
-            <executions>
-            <!-- this requires the app server to be running
-                <execution>
-                    <id>undeploy-component</id>
-                    <phase>clean</phase>
-                    <goals>
-                        <goal>undeploy</goal>
-                    </goals>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>1.0.4</version>
+                <configuration>
+                    <container>
+                        <containerId>${cargo.containerId}</containerId>
+                        <type>remote</type>                
+                    </container>
                     <configuration>
-                        <configuration>
-                            <type>runtime</type>
-                            <properties>
+                        <type>runtime</type>
+                        <properties>
+                            <cargo.hostname>${jboss.host}</cargo.hostname>
                             <cargo.remote.username>${jboss.user}</cargo.remote.username>
                             <cargo.remote.password>${jboss.password}</cargo.remote.password>
-                            </properties>
-                        </configuration>
-                        <deployer>
-                            <type>remote</type>
-                            <deployables>
-                                <deployable>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>txAgentEAR</artifactId>
-                                    <type>ear</type>
-                                </deployable>
-                            </deployables>
-                        </deployer>
+                        </properties>
                     </configuration>
-                </execution>
-                -->
+                    <deployer>
+                        <type>remote</type>
+                        <deployables>
+                            <deployable>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>txAgentEAR</artifactId>
+                                <type>ear</type>
+                            </deployable>
+                        </deployables>
+                    </deployer>
+                </configuration>
+                <dependencies>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>deploy-component</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>                    
+        </plugins>
+    </build>
+</profile>
 
-                <execution>
-                    <id>deploy-component</id>
-                    <!-- jump into a phase before surefire runs tests -->
-                    <phase>test-compile</phase>
-                    <goals>
-                        <goal>undeploy</goal>
-                        <goal>deploy</goal>
-                    </goals>
-                    <configuration>
-                        <configuration>
-                            <type>runtime</type>
-                            <properties>
-                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
-                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
-                            </properties>
-                        </configuration>
-                        <deployer>
-                            <type>remote</type>
-                            <deployables>
-                                <deployable>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>txAgentEAR</artifactId>
-                                    <type>ear</type>
-                                </deployable>
-                            </deployables>
-                        </deployer>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>                    
+<profile>
+    <id>jboss5</id>
+    <properties>
+        <cargo.containerId>jboss51x</cargo.containerId>
+        <agentsession.jndi>txAgentEAR-${project.version}/AgentReservationSessionEJB/remote</agentsession.jndi>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
+                        <version>1.0.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-client</artifactId>
+                        <version>${jboss-as-client.version}</version>
+                        <type>pom</type>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.jboss.integration</groupId>
+                        <artifactId>jboss-profileservice-spi</artifactId>
+                        <version>${jboss-as-client.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>                    
+        </plugins>
+    </build>
+</profile>
+
+<profile>
+    <id>jboss6</id>
+    <properties>
+        <cargo.containerId>jboss6x</cargo.containerId>
+        <agentsession.jndi>txAgentEAR-${project.version}/txAgentEJB-${project.version}.jar/AgentReservationSessionEJB!remote</agentsession.jndi>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.jboss.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
+                        <version>1.0.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-client</artifactId>
+                        <version>${jboss-as-client.version}</version>
+                        <type>pom</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-profileservice-client</artifactId>
+                        <version>${jboss-as-client.version}</version>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
+            </plugin>                    
         </plugins>
     </build>
 </profile>

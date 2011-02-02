@@ -32,7 +32,7 @@ public class HotelReservationImpl implements HotelReservationist {
         if (reservation == null) {
             throw new ReservationNotFoundException(
                     "unable to locate reservation for conf#" + 
-                    reservation.getConfirmation());
+                    confirmation);
         }
         return reservation;
     }

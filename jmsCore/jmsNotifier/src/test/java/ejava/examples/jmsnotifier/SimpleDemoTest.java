@@ -2,6 +2,7 @@ package ejava.examples.jmsnotifier;
 
 
 import java.io.InputStream;
+
 import java.util.Properties;
 
 import javax.jms.ConnectionFactory;
@@ -10,7 +11,6 @@ import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;

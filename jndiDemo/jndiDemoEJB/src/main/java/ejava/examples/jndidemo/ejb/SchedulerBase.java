@@ -7,7 +7,6 @@ import javax.naming.NamingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ejava.examples.jndidemo.JNDIHelper;
 import ejava.examples.jndidemo.Scheduler;
 
 public abstract class SchedulerBase implements Scheduler {

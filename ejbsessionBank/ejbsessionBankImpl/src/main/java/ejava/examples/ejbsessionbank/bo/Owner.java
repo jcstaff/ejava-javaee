@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Owner implements Serializable {
-    private long id;
+	private static final long serialVersionUID = 1L;
+	private long id;
     private String firstName;
     private String lastName;
     private String ssn;

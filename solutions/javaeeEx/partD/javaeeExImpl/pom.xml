@@ -101,7 +101,7 @@
             </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
+                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password/>
                   <hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
@@ -127,9 +127,9 @@
            <!-- needed to resolve some hibernate dependencies -->
             <repositories>
                 <repository>
-                    <id>jboss-repo</id>
-                    <name>JBoss Maven Repository</name>
-                    <url>http://repository.jboss.org/maven2</url>
+                    <id>jboss-nexus</id>
+                    <name>JBoss Nexus Repository</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
                 </repository>
             </repositories>
             <dependencies>
@@ -233,7 +233,7 @@
               <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>sql-maven-plugin</artifactId>        
-                <version>1.0</version>
+                <version>1.4</version>
                 
                 <dependencies>
                   <dependency>

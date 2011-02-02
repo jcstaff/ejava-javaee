@@ -1,13 +1,11 @@
 package ejava.examples.secureping.ejbclient;
 
 
-import java.security.AccessControlContext;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.naming.InitialContext;
-import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 
