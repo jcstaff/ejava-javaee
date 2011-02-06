@@ -19,9 +19,9 @@
     <url>http://webdev.apl.jhu.edu/~jcs/ejava-javaee</url>
     <organization>
         <name>
-            John's Hopkins University, Engineering Programs for Professional 
+            John's Hopkins University, Engineering Programs for Professionals 
         </name>
-        <url>http://ptesrv.apl.jhu.edu</url>
+        <url>http://ep.jhu.edu</url>
     </organization>
     <mailingLists>
         <mailingList>
@@ -29,11 +29,10 @@
             <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
         </mailingList>
     </mailingLists>
-    <scm>
-        <url>https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee</url>
-        <connection>scm:svn:https://ejava.info:8443/repos/class/branches/2010-fall-ejava-javaee</connection>
-    </scm>
+
   <modules>
+  <!--
+        -->
         <module>site-skin</module>
         <module>course-docs</module>
         <module>solutions</module>
@@ -46,17 +45,19 @@
         <module>ormRelations</module>
         <module>ormEJBQL</module>
         <module>ormInheritance</module>
-  <!--
+        <!--
         <module>ormListeners</module>
         -->
         <module>ejbsessionBank</module>
         <module>jndiDemo</module>
         <module>txReservation</module>
         <module>webtier</module>
+        <!--
         <module>securePing</module>
+        -->
         <module>jmsCore</module>
-        <module>asyncEJB</module>
         <!-- These will be posted over the course of the semester
+        <module>asyncEJB</module>
         -->
     </modules>
 
@@ -66,13 +67,45 @@
         <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
         <maven-ear-plugin.version>2.4.2</maven-ear-plugin.version>
         <maven-surefire-plugin.version>2.5</maven-surefire-plugin.version>
-        <maven-site-plugin.version>2.0.1</maven-site-plugin.version>
         <maven-dependency-plugin.version>2.1</maven-dependency-plugin.version>
+        <maven-deploy-plugin.version>2.2.1</maven-deploy-plugin.version>
+        <maven-javadoc-plugin.version>2.7</maven-javadoc-plugin.version>
+        <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
 
         <jboss.protocol>http</jboss.protocol>
         <jboss.servlet.port>8080</jboss.servlet.port>
         <db.host>${jboss.host}</db.host>
     </properties>
+
+    <scm>
+        <url>http://ejava.info/repos/class/branches/2011-spring-ejava-javaee</url>
+        <connection>scm:svn:http://ejava.info/repos/class/branches/2011-spring-ejava-javaee</connection>
+        <developerConnection>scm:svn:https://ejava.info/repos/class/branches/2011-spring-ejava-javaee</developerConnection>
+    </scm>
+
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://ejava.info/hudson/job/2011-spring-ejava-javaee/</url>
+    </ciManagement>
+
+    <distributionManagement>
+        <site>
+            <id>webdev.website</id>
+            <name>ejava JHU webdev website</name>
+            <url>${webdev.scp.root}/ejava-javaee</url>
+        </site>
+        <repository>
+            <id>webdev.repository</id>
+            <name>ejava JHU repository</name>
+            <url>${webdev.scp.root}/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>webdev.snapshot.repo</id>
+            <name>ejava JHU snapshot repository</name>
+            <url>${webdev.scp.root}/maven2-snapshot</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 
     <developers>
         <developer>
@@ -137,8 +170,9 @@
     </contributors>
 
     <build>
-        <plugins>
-            <plugin> <!-- generates site documentation -->
+        <pluginManagement>
+          <plugins>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>${maven-site-plugin.version}</version>
@@ -146,50 +180,38 @@
                     <locales>en</locales>
                 </configuration>
             </plugin>
-
-            <plugin> <!-- deploys artifacts to repository -->
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>${maven-deploy-plugin.version}</version>
                 <configuration>
                     <locales>en</locales>
                 </configuration>
             </plugin>
-
-            <!-- used to build source.zip files
-            <plugin> 
-                <artifactId>maven-assembly-plugin</artifactId>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <version>2.1</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>${basedir}/assembly.xml</descriptor>
-                    </descriptors>                    
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin> 
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+
+        <plugins>
+        <!-- generates site documentation 
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+            </plugin>
             -->
 
-            <!--
-            <plugin>
-                <artifactId>jxr-maven-plugin</artifactId>
-                <groupId>org.codehaus.mojo</groupId>
-                <version>2.0-beta-1</version>
-                <executions>
-                    <execution>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>jxr</goal>
-                        </goals>
-                    </execution>
-                </executions>
+            <plugin> <!-- deploys artifacts to repository -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+            </plugin>
+            <!-- creates Javadoc data for report 
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
             -->
         </plugins>
@@ -199,7 +221,7 @@
             <extension> 
                 <artifactId>wagon-ssh-external</artifactId>
                 <groupId>org.apache.maven.wagon</groupId>
-                <version>1.0-beta-1</version>
+                <version>1.0-beta-7</version>
             </extension>
             -->
         </extensions>
@@ -207,32 +229,68 @@
 
     <reporting>
         <plugins>
-            <plugin> <!-- generates aggergated javadoc for root project -->
+            <!-- generates aggregated javadoc for root project -->
+            <plugin> 
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <version>2.0</version>
+                <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
-                    <aggregate>true</aggregate>
+                    <detectLinks/>
+                    <show>private</show>
+                    <source>1.6</source>
                     <links>
-                        <link>http://java.sun.com/javaee/5/docs/api</link>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                        <link>http://download.oracle.com/javaee/6/api/</link>
+                        <link>http://download.oracle.com/javase/6/docs/api/</link>
                     </links>
                 </configuration>
             </plugin>
-
-            <plugin> <!-- generates HTML pages for java code -->
-                <artifactId>jxr-maven-plugin</artifactId>
-                <groupId>org.codehaus.mojo</groupId>
-                <version>2.0-beta-1</version>
+            <!-- generates HTML pages for java code -->
+            <plugin> 
+                <artifactId>maven-jxr-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>${maven-jxr-plugin.version}</version>
                 <configuration>
-                    <aggregate>true</aggregate>
+                    <aggregate>false</aggregate>
                 </configuration>
             </plugin>
-
         </plugins>
     </reporting>
 
     <profiles>
+        <profile>
+            <id>maven2</id>
+            <activation> <!-- only maven3 knows what basedir is -->
+                <file>
+                    <missing>${basedir}</missing>
+                </file>
+            </activation>
+            <properties>
+                <maven-site-plugin.version>2.0.1</maven-site-plugin.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>maven3</id>
+            <activation> <!-- only maven3 knows what basedir is -->
+                <file>
+                    <exists>${basedir}</exists>
+                </file>
+            </activation>
+            <properties>
+                <maven-site-plugin.version>3.0-beta-3</maven-site-plugin.version>
+                <maven-project-info-reports-plugin.version>2.2</maven-project-info-reports-plugin.version>
+            </properties>
+            <reporting>
+                <plugins>
+                    <plugin> 
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>${maven-project-info-reports-plugin.version}</version>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+
         <profile>
             <id>jboss5</id>
             <properties>
@@ -242,10 +300,6 @@
                 <jboss-as-client.version>5.1.0.GA</jboss-as-client.version>
                 <hibernate-entitymanager.version>3.4.0.GA</hibernate-entitymanager.version>
                 <slf4j.version>1.5.2</slf4j.version>
-
-                <!-- TODO: update all to depend on just slf4j.version since
-                    we want the API and implementation versions matching -->
-                <slf4j-log4j12.version>1.5.2</slf4j-log4j12.version>
             </properties>                                  
         </profile>        
         <profile>
@@ -258,16 +312,10 @@
                 <hibernate-entitymanager.version>3.6.0.Final</hibernate-entitymanager.version>
                 <hornetq.version>2.1.2.Final</hornetq.version>
                 <netty.version>3.2.1.Final</netty.version>
-                <slf4j.hibernate.version>1.6.1</slf4j.hibernate.version>
-                <slf4j.jboss.version>1.5.6</slf4j.jboss.version>
-
-                <!-- TODO: update all to depend on just slf4j.version since
-                    we want the API and implementation versions matching -->
-                <slf4j-log4j12.version>1.6.1</slf4j-log4j12.version>
                 <slf4j.version>1.6.1</slf4j.version>
+                <slf4j.jboss.version>1.5.6</slf4j.jboss.version>
             </properties>                                  
         </profile>        
-
 
         <profile> <!-- tells surefire to run JUnit tests with remote debug -->
             <id>debugger</id>
@@ -280,248 +328,5 @@
                 <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
             </properties>                                  
         </profile>        
-
-        <!-- distribution info for site and repository artifacts -->
-        <profile>
-            <id>webdev</id> <!-- this is official class web site -->
-                <distributionManagement>
-                    <site>
-                        <id>webdev.website</id>
-                        <name>ejava JHU webdev website</name>
-                        <url>${webdev.scp.root}/ejava-javaee</url>
-                    </site>
-                    <repository>
-                        <id>webdev.repository</id>
-                        <name>ejava JHU repository</name>
-                        <url>${webdev.scp.root}/maven2</url>
-                    </repository>
-                    <snapshotRepository>
-                        <id>webdev.snapshot.repo</id>
-                        <name>ejava JHU snapshot repository</name>
-                        <url>${webdev.scp.root}/maven2-snapshot</url>
-                        <uniqueVersion>false</uniqueVersion>
-                    </snapshotRepository>
-                </distributionManagement>
-
-               <!-- this repositories holds many of the javaee5 jar files -->
-                <repositories>
-                    <repository>
-                        <id>jboss-nexus</id>
-                        <name>JBoss Nexus Repository</name>
-                        <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                    </repository>
-                    <repository>
-                        <id>javanet-repo</id>
-                        <name>java.net Maven Repository</name>
-                        <url>http://download.java.net/maven/2/</url>
-                    </repository>
-                </repositories>
-
-                <dependencies>
-                    <!-- needed to resolve JavaEE annotations within Javadoc
-                  -->
-                    <dependency>
-                        <groupId>javax.annotation</groupId>
-                        <artifactId>jsr250-api</artifactId>
-                        <version>1.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.persistence</groupId>
-                        <artifactId>persistence-api</artifactId>
-                        <version>1.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.ejb</groupId>
-                        <artifactId>ejb-api</artifactId>
-                        <version>3.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.jms</groupId>
-                        <artifactId>jms</artifactId>
-                        <version>1.1</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                        <version>2.5</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.xml</groupId>
-                        <artifactId>jaxb-api</artifactId>
-                        <version>2.1</version>
-                        <scope>provided</scope>
-                    </dependency>
-                </dependencies>
-        </profile>
-        <profile>
-            <id>ejavainfo</id>
-                <distributionManagement>
-                    <site>
-                        <id>ejava.website</id>
-                        <name>ejava local website</name>
-                        <url>${ejavainfo.scp.root}/ejava-javaee</url>
-                    </site>
-                    <repository>
-                        <id>ejava.repository</id>
-                        <name>ejava repository</name>
-                        <url>${ejavainfo.scp.root}/maven2</url>
-                    </repository>
-                    <snapshotRepository>
-                        <id>ejava.snapshot.repo</id>
-                        <name>ejava snapshot repository</name>
-                        <url>${ejavainfo.scp.root}/maven2-snapshot</url>
-                        <uniqueVersion>false</uniqueVersion>
-                    </snapshotRepository>
-                </distributionManagement>
-
-               <!-- this repositories holds many of the javaee5 jar files -->
-                <repositories>
-                    <repository>
-                        <id>jboss-nexus</id>
-                        <name>JBoss Nexus Repository</name>
-                        <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                    </repository>
-                    <repository>
-                        <id>javanet-repo</id>
-                        <name>java.net Maven Repository</name>
-                        <url>http://download.java.net/maven/2/</url>
-                    </repository>
-                </repositories>
-
-                <dependencies>
-                    <!-- needed to resolve JavaEE annotations within Javadoc
-                  -->
-                    <dependency>
-                        <groupId>javax.annotation</groupId>
-                        <artifactId>jsr250-api</artifactId>
-                        <version>1.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.persistence</groupId>
-                        <artifactId>persistence-api</artifactId>
-                        <version>1.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.ejb</groupId>
-                        <artifactId>ejb-api</artifactId>
-                        <version>3.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.jms</groupId>
-                        <artifactId>jms</artifactId>
-                        <version>1.1</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                        <version>2.5</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.xml.bind</groupId>
-                        <artifactId>jaxb-api</artifactId>
-                        <version>2.1</version>
-                        <scope>provided</scope>
-                    </dependency>
-                </dependencies>
-        </profile>
-        <profile>
-            <id>localhost</id>
-                <distributionManagement>
-                    <site>
-                        <id>localhost.website</id>
-                        <name>localhost website</name>
-                        <url>${localhost.scp.root}/ejava-javaee</url>
-                    </site>
-                    <repository>
-                        <id>localhost.repository</id>
-                        <name>ejava local repository</name>
-                        <url>${localhost.scp.root}/maven2</url>
-                    </repository>
-                    <snapshotRepository>
-                        <id>localhost.snapshot.repo</id>
-                        <name>ejava local snapshot repository</name>
-                        <url>${localhost.scp.root}/maven2-snapshot</url>
-                        <uniqueVersion>false</uniqueVersion>
-                    </snapshotRepository>
-                </distributionManagement>
-
-               <!-- this repositories holds many of the javaee5 jar files -->
-                <repositories>
-                    <repository>
-                        <id>jboss-nexus</id>
-                        <name>JBoss Nexus Repository</name>
-                        <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                    </repository>
-                    <repository>
-                        <id>javanet-repo</id>
-                        <name>java.net Maven Repository</name>
-                        <url>http://download.java.net/maven/2/</url>
-                    </repository>
-                </repositories>
-
-                <dependencies>
-                    <!-- needed to resolve JavaEE annotations within Javadoc
-                  -->
-                    <dependency>
-                        <groupId>javax.annotation</groupId>
-                        <artifactId>jsr250-api</artifactId>
-                        <version>1.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.persistence</groupId>
-                        <artifactId>persistence-api</artifactId>
-                        <version>1.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.ejb</groupId>
-                        <artifactId>ejb-api</artifactId>
-                        <version>3.0</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.jms</groupId>
-                        <artifactId>jms</artifactId>
-                        <version>1.1</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                        <version>2.5</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.xml.bind</groupId>
-                        <artifactId>jaxb-api</artifactId>
-                        <version>2.1</version>
-                        <scope>provided</scope>
-                    </dependency>
-                </dependencies>
-        </profile>
     </profiles>
-
-    <!-- don't enable this unless you are desparate to use latest, semi-tested 
-        versions of plugins
-    <pluginRepositories>
-        <pluginRepository>
-           <id>apache.snapshots</id>
-           <url>http://cvs.apache.org/maven-snapshot-repository</url>
-           <snapshots>
-               <enabled>true</enabled>
-           </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-    -->
 </project>

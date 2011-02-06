@@ -106,7 +106,7 @@ public class EDmvParser {
      * is being used. That won't work to great when two namespaces declare 
      * a common local-name. Should be easily fixable when needed.
      * 
-     * @param element
+     * @param elements
      * @return
      * @throws XMLStreamException
      * @throws JAXBException

@@ -79,14 +79,18 @@ public class MessageDeliveryModeTest extends TestCase {
                 //            "):" + message.getJMSMessageID() +
                 //            ", mode=" + message.getJMSDeliveryMode());
                 //}
-                messages.add(message);
+                synchronized(messages) {
+                    messages.add(message);
+                }
             } catch (Exception ex) {
                 log.fatal("error handling message", ex);
             }
         }        
         public int getCount() { return count; }
         public Message getMessage() {
-            return (messages.isEmpty() ? null : messages.remove());
+            synchronized(messages) {
+                return (messages.isEmpty() ? null : messages.remove());
+            }
         }
     }
     

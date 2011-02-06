@@ -29,6 +29,7 @@ public class HotelReservationTest extends TestCase {
         new HashMap<String, HotelReservationist>();
     
     public void setUp() throws Exception {
+        Thread.sleep(3000); //hak - give extra time to deploy
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
