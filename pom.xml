@@ -36,7 +36,6 @@
         <module>site-skin</module>
         <module>course-docs</module>
         <module>solutions</module>
-        <module>utils</module>
         <module>projects</module>
         <module>javase5Enhancements</module>
         <module>jdbcDAO</module>
@@ -71,6 +70,8 @@
         <maven-deploy-plugin.version>2.2.1</maven-deploy-plugin.version>
         <maven-javadoc-plugin.version>2.7</maven-javadoc-plugin.version>
         <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
+        <maven-surefire-report-plugin>2.7.2</maven-surefire-report-plugin>
+        <maven-project-info-reports-plugin.version>2.3</maven-project-info-reports-plugin.version>
 
         <jboss.protocol>http</jboss.protocol>
         <jboss.servlet.port>8080</jboss.servlet.port>
@@ -196,26 +197,6 @@
           </plugins>
         </pluginManagement>
 
-        <plugins>
-        <!-- generates site documentation 
-            <plugin> 
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-            </plugin>
-            -->
-
-            <plugin> <!-- deploys artifacts to repository -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-            </plugin>
-            <!-- creates Javadoc data for report 
-            <plugin> 
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            -->
-        </plugins>
-        
         <extensions><!-- used for scpexe for some platforms -->
         <!--
             <extension> 
@@ -227,35 +208,6 @@
         </extensions>
     </build>
 
-    <reporting>
-        <plugins>
-            <!-- generates aggregated javadoc for root project -->
-            <plugin> 
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <groupId>org.apache.maven.plugins</groupId>
-                <version>${maven-javadoc-plugin.version}</version>
-                <configuration>
-                    <detectLinks/>
-                    <show>private</show>
-                    <source>1.6</source>
-                    <links>
-                        <link>http://download.oracle.com/javaee/6/api/</link>
-                        <link>http://download.oracle.com/javase/6/docs/api/</link>
-                    </links>
-                </configuration>
-            </plugin>
-            <!-- generates HTML pages for java code -->
-            <plugin> 
-                <artifactId>maven-jxr-plugin</artifactId>
-                <groupId>org.apache.maven.plugins</groupId>
-                <version>${maven-jxr-plugin.version}</version>
-                <configuration>
-                    <aggregate>false</aggregate>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-
     <profiles>
         <profile>
             <id>maven2</id>
@@ -265,8 +217,54 @@
                 </file>
             </activation>
             <properties>
-                <maven-site-plugin.version>2.0.1</maven-site-plugin.version>
+                <maven-site-plugin.version>2.2</maven-site-plugin.version>
             </properties>
+            <reporting>
+                <plugins>
+                    <!-- creates standard reports -->
+                    <plugin> 
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>${maven-project-info-reports-plugin.version}</version>
+                    </plugin>
+
+                    <!-- generates test reports -->
+                    <plugin> 
+                        <artifactId>maven-surefire-report-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>${maven-surefire-report-plugin}</version>
+                        <configuration>
+                            <aggregate>false</aggregate>
+                        </configuration>
+                    </plugin>
+
+                    <!-- generates aggregated javadoc for root project -->
+                    <plugin> 
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <detectLinks/>
+                            <show>private</show>
+                            <source>1.6</source>
+                            <links>
+                                <link>http://download.oracle.com/javaee/6/api/</link>
+                                <link>http://download.oracle.com/javase/6/docs/api/</link>
+                            </links>
+                        </configuration>
+                    </plugin>
+
+                    <!-- generates HTML pages for java code -->
+                    <plugin> 
+                        <artifactId>maven-jxr-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>${maven-jxr-plugin.version}</version>
+                        <configuration>
+                            <aggregate>false</aggregate>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
         </profile>
 
         <profile>
@@ -278,17 +276,70 @@
             </activation>
             <properties>
                 <maven-site-plugin.version>3.0-beta-3</maven-site-plugin.version>
-                <maven-project-info-reports-plugin.version>2.2</maven-project-info-reports-plugin.version>
             </properties>
-            <reporting>
+            <build>
                 <plugins>
                     <plugin> 
-                        <artifactId>maven-project-info-reports-plugin</artifactId>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <version>${maven-project-info-reports-plugin.version}</version>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-descriptor</id>
+                                <phase>pre-site</phase>
+                                <goals>
+                                    <goal>attach-descriptor</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <reportPlugins>
+                                <!-- creates standard reports -->
+                                <plugin> 
+                                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <version>${maven-project-info-reports-plugin.version}</version>
+                                </plugin>
+
+                                <!-- generates test reports -->
+                                <plugin> 
+                                    <artifactId>maven-surefire-report-plugin</artifactId>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <version>${maven-surefire-report-plugin}</version>
+                                    <configuration>
+                                        <aggregate>false</aggregate>
+                                    </configuration>
+                                </plugin>
+
+                                <!-- generates aggregated javadoc for root project -->
+                                <plugin> 
+                                    <artifactId>maven-javadoc-plugin</artifactId>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <version>${maven-javadoc-plugin.version}</version>
+                                    <configuration>
+                                        <detectLinks/>
+                                        <show>private</show>
+                                        <source>1.6</source>
+                                        <links>
+                                            <link>http://download.oracle.com/javaee/6/api/</link>
+                                            <link>http://download.oracle.com/javase/6/docs/api/</link>
+                                        </links>
+                                    </configuration>
+                                </plugin>
+
+                                <!-- generates HTML pages for java code -->
+                                <plugin> 
+                                    <artifactId>maven-jxr-plugin</artifactId>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <version>${maven-jxr-plugin.version}</version>
+                                    <configuration>
+                                        <aggregate>false</aggregate>
+                                    </configuration>
+                                </plugin>
+                            </reportPlugins>
+                        </configuration>
                     </plugin>
                 </plugins>
-            </reporting>
+            </build>
         </profile>
 
         <profile>

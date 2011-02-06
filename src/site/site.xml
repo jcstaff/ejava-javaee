@@ -8,28 +8,27 @@
     </bannerLeft>
     <bannerRight>
         <name></name>
-        <src>http://ep.jhu.edu/images/ep-logo-2.png</src>
         <href>http://ep.jhu.edu/</href>
     </bannerRight>
   <body>
     <links>
         <item name="Newsgroup" href="http://groups.yahoo.com/group/ejava_class/" />
-        <item name="FAQ" href="course-docs/ejava-faq.html" />
-        <item name="JavaEE" href="http://java.sun.com/javaee/5/docs/api/" />
-        <item name="JavaSE" href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-        <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
+        <item name="JavaEE" href="http://download.oracle.com/javase/6/docs/api/"/>
+        <item name="JavaSE" href="http://download.oracle.com/javaee/6/api/"/>
+        <item name="JBoss" href="http://www.jboss.org/"/>
+        <item name="Maven" href="http://maven.apache.org/maven2/"/>
     </links>
 
-    <menu ref="parent"/>
-    <menu name="Quick Links">
-        <item name="Course Description" href="course-docs/ejava-course-description.html"/>
-        <item name="Syllabus" href="course-docs/syllabus.html"/>
-        <item name="Reference Links" href="course-docs/links.html"/>
-        <item name="Exercises" href="course-docs/exercises/exercises.html"/>
-        <item name="Course Javadoc" href="apidocs/index.html"/>
+    <menu ref="parent" inherit="top"/>
+    <menu name="Quick Links" inhert="top">
+        <item name="Course Description" href="${project.url}/course-docs/ejava-course-description.html"/>
+        <item name="Syllabus" href="${project.url}/course-docs/syllabus.html"/>
+        <item name="Reference Links" href="${project.url}/course-docs/links.html"/>
+        <item name="Exercises" href="${project.url}/course-docs/exercises/exercises.html"/>
+        <item name="Course Javadoc" href="${project.url}/apidocs/index.html"/>
     </menu>
-    <menu ref="modules"/>
-    <menu ref="reports"/>
+    <menu ref="modules" inherit="top"/>
+    <menu ref="reports" inherit="bottom"/>
 
   </body>
 
