@@ -12,21 +12,6 @@
         <class>ejava.projects.edmv.bo.VehicleRegistration</class>
         
         <properties>
-            <property name="hibernate.dialect" 
-                value="${hibernate.dialect}"/>
-            <property name="hibernate.connection.url"
-                value="${jdbc.url}"/>
-            <property name="hibernate.connection.driver_class" 
-                value="${jdbc.driver}"/>
-            <property name="hibernate.connection.password" 
-                value="${jdbc.password}"/>
-            <property name="hibernate.connection.username" 
-                value="${jdbc.user}"/>
-            <property name="hibernate.show_sql" value="false"/>            
-            <!-- uncomment this to permit Hibernate to create the schema
-                 this is a great Java-first technique for creating schema
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-            -->
         </properties>
     </persistence-unit>        
     

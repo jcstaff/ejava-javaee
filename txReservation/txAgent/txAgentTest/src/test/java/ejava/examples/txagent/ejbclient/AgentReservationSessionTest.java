@@ -31,8 +31,9 @@ public class AgentReservationSessionTest extends TestCase {
     String hotelJNDI = System.getProperty("jndi.name.hotel");
     HotelReservationist hotel;
     
-    public void setUp() {
+    public void setUp() throws Exception {
     	boolean fail=false;
+        Thread.sleep(3000); //hack - give jboss extra time to deploy
     	
         log.debug("getting jndi initial context");
         try {
