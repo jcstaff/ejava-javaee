@@ -2,6 +2,7 @@ package ejava.examples.secureping;
 
 import java.util.Arrays;
 
+import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -40,7 +41,9 @@ public class ResetAuthenticationCache {
         log.debug("jndi=" + jndi.getEnvironment());
         log.debug("looking up:" + jndiName);
         Object object = jndi.lookup(jndiName);
-        RMIAdaptor remote = (RMIAdaptor) object;
+        //RMIAdaptor remote = (RMIAdaptor) object;
+        MBeanServerConnection remote = (MBeanServerConnection) object;
+        
         
         //invoke the bean to flush the authentication cache for the domain
         ObjectName name = new ObjectName(SECURITY_MANAGER_SERVICE);

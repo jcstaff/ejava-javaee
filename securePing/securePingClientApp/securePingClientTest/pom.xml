@@ -11,6 +11,11 @@
     <packaging>jar</packaging>
     <name>Secure Ping Remote Client Test</name>
 
+    <properties>
+        <admin.username>admin1</admin.username>
+        <user.username>user1</user.username>
+    </properties>
+
     <dependencies>
         <!-- core dependencies -->
         <dependency>
@@ -84,28 +89,17 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                          <name>jndi.name.secureping</name>
-                            <value>ejava/examples/secureping/SecurePingClientEJB/remote</value>
-                        </property>
-                        <property>
-                            <name>java.security.auth.login.config</name>
-                            <value>file://${basedir}/target/test-classes/securePingClientTest-auth.conf</value>
-                        </property>
-                        <property>
-                            <name>skip.flush</name>
-                            <value>${skip.flush}</value>
-                        </property>
-                        <property>
-                            <name>admin.username</name>
-                            <value>${admin.username}</value>
-                        </property>
-                        <property>
-                            <name>user.username</name>
-                            <value>${user.username}</value>
-                        </property>                        
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <jndi.name.secureping>
+                            ejava/examples/secureping/SecurePingClientEJB/remote
+                        </jndi.name.secureping>
+                        <java.security.auth.login.config>
+                            file://${basedir}/target/test-classes/securePingClientTest-auth.conf
+                        </java.security.auth.login.config>
+                        <skip.flush>${skip.flush}</skip.flush>
+                        <admin.username>${admin.username}</admin.username>
+                        <user.username>${user.username}</user.username>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -136,6 +130,13 @@
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
@@ -143,6 +144,12 @@
             <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
+            <exclusions>
+            	<exclusion>
+            	    <groupId>org.jboss.security</groupId>
+                    <artifactId>jbosssx-client</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>

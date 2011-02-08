@@ -22,6 +22,7 @@ public class TellerRemoteTest extends TestCase {
     String jndiName = System.getProperty("jndi.name", "TellerEJB/remote");
     
     public void setUp() throws Exception {
+        Thread.sleep(1000); //hack -- give JBoss extra time to finish deploy
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());

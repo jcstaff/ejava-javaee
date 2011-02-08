@@ -89,14 +89,9 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                          <name>jndi.name</name>
-                          <value>
-                              ejava/examples/ejbsessionbank/TellerEJB/remote
-                          </value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <jndi.name>ejava/examples/ejbsessionbank/TellerEJB/remote</jndi.name>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -127,6 +122,13 @@
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
@@ -134,6 +136,12 @@
             <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                    <groupId>org.jboss.security</groupId>
+                    <artifactId>jbosssx-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
@@ -204,7 +212,6 @@
                         <version>${jboss-as-client.version}</version>
                         <type>pom</type>
                     </dependency>
-
                     <dependency>
                         <groupId>org.jboss.integration</groupId>
                         <artifactId>jboss-profileservice-spi</artifactId>

@@ -87,9 +87,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                          <name>jndi.name.aid</name>
+                    <systemPropertyVariables>
                           <!-- The JNDI name may reflect the version name
                                when deploying the EAR within a debugging
                                environment. If so, look for the actual name 
@@ -101,19 +99,13 @@
                           jndiDemoEAR-1.0.20XX.X-SNAPSHOT/BakeScheduler/remote
                           jndiDemoEAR-1.0.20XX.X-SNAPSHOT/AidScheduler/remote
                           -->
-                          <value>
-                          ejava/examples/jndidemo/AidScheduler/remote 
-                          </value>
-                        </property>
+                          <jndi.name.aid>ejava/examples/jndidemo/AidScheduler/remote</jndi.name.aid>
 
                         <!-- This name is provided in the JBoss-specific profiles
                             and is necessary to do it that way since this is an 
                             example of an EJB that took all defaults -->
-                        <property>
-                            <name>jndi.name.bake</name>
-                            <value>${jndi.name.bake}</value>
-                        </property>
-                    </systemProperties>
+                            <jndi.name.bake>${jndi.name.bake}</jndi.name.bake>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -144,6 +136,13 @@
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
@@ -151,6 +150,12 @@
             <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                    <groupId>org.jboss.security</groupId>
+                    <artifactId>jbosssx-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>

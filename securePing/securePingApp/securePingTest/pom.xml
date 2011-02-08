@@ -12,6 +12,13 @@
     <packaging>jar</packaging>
     <name>Secure Ping Remote Test</name>
 
+    <properties>
+        <admin.username>admin1</admin.username>
+        <admin.password>password</admin.password>
+        <user.username>user1</user.username>
+        <user.password>password</user.password>
+    </properties>
+
     <dependencies>
         <!-- core dependencies -->
         <dependency>
@@ -85,59 +92,22 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                          <name>jndi.name.secureping</name>
-                            <value>
+                    <systemPropertyVariables>
+                        <jndi.name.secureping>
                             ejava/examples/secureping/SecurePingEJB/remote
-                          </value>
-                        </property>
-                        <property>
-                            <name>java.security.auth.login.config</name>
-                            <value>
+                        </jndi.name.secureping>
+                        <java.security.auth.login.config>
                 file://${basedir}/target/test-classes/securePingTest-auth.conf
-                            </value>
-                        </property>
-                        <property>
-                            <name>skip.flush</name>
-                            <value>${skip.flush}</value>
-                        </property>
-                        <property>
-                            <name>admin.username</name>
-                            <value>${admin.username}</value>
-                        </property>
-                        <property>
-                            <name>admin.password</name>
-                            <value>${admin.password}</value>
-                        </property>
-                        <property>
-                            <name>user.username</name>
-                            <value>${user.username}</value>
-                        </property>                        
-                        <property>
-                            <name>user.password</name>
-                            <value>${user.password}</value>
-                        </property>                        
-                        <property>
-                            <name>jmx.username</name>
-                            <value>${jboss.user}</value>
-                        </property>                        
-                        <property>
-                            <name>jmx.password</name>
-                            <value>${jboss.password}</value>
-                        </property>                        
-                    </systemProperties>
+                        </java.security.auth.login.config>
+                        <skip.flush>${skip.flush}</skip.flush>
+                        <admin.username>${admin.username}</admin.username>
+                        <admin.password>${admin.password}</admin.password>
+                        <user.username>${user.username}</user.username>
+                        <user.password>${user.password}</user.password>
+                        <jmx.username>${jboss.user}</jmx.username>
+                        <jmx.password>${jboss.password}</jmx.password>
+                    </systemPropertyVariables>
                 </configuration>
-                <executions>
-                        <!-- ignored:( running during test phase 
-                    <execution>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                         </goals>
-                    </execution>
-                        -->
-                </executions>
             </plugin>
 
         </plugins>      
@@ -147,15 +117,11 @@
 <profile>
     <id>jboss</id>
     <activation>
-        <property> <!-- activate this unless -Dserver present -->
+        <property>
             <name>!server</name>
         </property>
     </activation>
     <properties>
-          <admin.username>admin1</admin.username>
-          <admin.password>password</admin.password>
-          <user.username>user1</user.username>
-          <user.password>password</user.password>
           <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
           </java.naming.factory.initial>
           <java.naming.provider.url>jnp://${jboss.host}:1099
@@ -175,13 +141,35 @@
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
+            <!-- needed to make JMX calls -->
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-server</artifactId>
             <version>${jboss-as-server.version}</version>            
             <classifier>jmx-invoker-adaptor-client</classifier>
             <scope>compile</scope>
+        </dependency>
+            <!-- needed to make RMI calls -->
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>${jboss-as-client.version}</version>            
+            <type>pom</type>
+            <scope>test</scope>
+            <exclusions>
+            	<exclusion>
+            	    <groupId>org.jboss.security</groupId>
+                    <artifactId>jbosssx-client</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -313,15 +301,6 @@
     <properties>
         <cargo.containerId>jboss51x</cargo.containerId>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-client</artifactId>
-            <version>${jboss-as-client.version}</version>            
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -357,19 +336,6 @@
         <cargo.containerId>jboss6x</cargo.containerId>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-client</artifactId>
-            <version>${jboss-as-client.version}</version>            
-            <type>pom</type>
-            <scope>test</scope>
-            <exclusions>
-            	<exclusion>
-            	    <groupId>org.jboss.security</groupId>
-  				    <artifactId>jbosssx</artifactId>
-            	</exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>

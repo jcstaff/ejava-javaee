@@ -38,6 +38,7 @@ public class SecurePingRemoteTest extends TestCase {
     String skipFlush = System.getProperty("skip.flush");
     
     public void setUp() throws Exception {
+        Thread.sleep(1000); //hack -- give JBoss more time to finish deploy
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());

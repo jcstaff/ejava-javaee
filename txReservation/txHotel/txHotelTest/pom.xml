@@ -91,18 +91,12 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
+                    <systemPropertyVariables>
                         <!-- The test case will locate one or more 
                            deployments below these contexts -->
-                        <property>
-                          <name>jndi.name.hotel</name>
-                          <value>ejava/examples/txhotel</value>
-                        </property>
-                        <property>
-                          <name>jndi.name.hotelsession</name>
-                          <value>ejava/examples/txhotelsession</value>
-                        </property>
-                    </systemProperties>
+                          <jndi.name.hotel>ejava/examples/txhotel</jndi.name.hotel>
+                          <jndi.name.hotelsession>ejava/examples/txhotelsession</jndi.name.hotelsession>
+                    </systemPropertyVariables>
                 </configuration>
                 <executions>
                     <execution>
@@ -140,6 +134,13 @@
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
@@ -147,9 +148,14 @@
             <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                    <groupId>org.jboss.security</groupId>
+                    <artifactId>jbosssx-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
