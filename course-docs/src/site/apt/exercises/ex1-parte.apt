@@ -17,24 +17,35 @@ Exercise 1: First Simple Application
 
     [Note:] Maven/Eclipse integration is probably the most volatile 
     aspects of the environment. 
-    The Maven side is handled by the
-    {{{http://maven.apache.org/plugins/maven-eclipse-plugin/}
-    Apache Maven Eclipse Plugin}}.
-    The Eclipse side is handled by a set of competing plug-ins that
-    get installed into Eclipse; m2eclipse/M2E and q4e/IAM.  The 
-    {{{http://m2eclipse.codehaus.org/} m2eclipse plugin}}
-    is going through
-    considerable changes and is in the process of becoming an 
-    {{{http://www.eclipse.org/m2e/} Eclipse project (M2E)}}
-    There is an alternative offered by
-    {{{http://code.google.com/p/q4e/} Google's q4e}}
-    , which is soon to be
-    {{{http://www.eclipse.org/iam/} Eclipse IAM}}. A comparison of 
-    the various options is located on the 
-    {{{http://docs.codehaus.org/display/MAVENUSER/Eclipse+Integration}
-    Codehaus Wiki}}. We will be using m2eclipse. m2eclipse is
-    smart enough about Maven that we do not need the Maven-side
-    of the integration. You must import your projects as Maven 
+    
+    * The Maven side has the
+    {{{http://maven.apache.org/plugins/maven-eclipse-plugin/} Apache
+    Maven Eclipse Plugin}}. This plugin is used to generate Eclipse
+    configuration files from a maven pom.xml. This is done manually and
+    should be considered "old school". You can forget using this plugin
+    for class.
+
+    * The Eclipse side is handled by a set of competing plug-ins that
+    get installed into Eclipse; m2eclipse/M2E and q4e/IAM.  Out of the
+    two, m2eclipse seems to be the most popular and is supported by 
+    the main developers of Maven.
+
+        ** The {{{http://m2eclipse.codehaus.org/} m2eclipse plugin}} has gone
+        through considerable changes over the years and has evolved into a
+        really solid product. It is based on Maven 3 and is in the process
+        of becoming an {{{http://www.eclipse.org/m2e/} Eclipse project (M2E)}}
+
+        ** There is an alternative offered by
+        {{{http://code.google.com/p/q4e/} Google's q4e}}
+        , which is soon to be
+        {{{http://www.eclipse.org/iam/} Eclipse IAM}}. A comparison of 
+        the various options is located on the 
+        {{{http://docs.codehaus.org/display/MAVENUSER/Eclipse+Integration,+Eclipse+Integration}
+        Codehaus Wiki}}. 
+
+        []
+
+    We will be using m2eclipse and you will import your projects as Maven 
     Projects and access goals through the "Run..." button.
 
     []
@@ -52,10 +63,9 @@ Exercise 1: First Simple Application
         * Select "Add.." for a Standard VM
 
         * Select your JDK instance for the JRE Home. This was 
-        c:/apps/jdk1.5.0_20 on my system.
+        c:/apps/java/jdk1.6.0_21 on my system.
 
-        * You may optionally set this as the default. However, we
-        will specifically point to this later.
+        * You may optionally set this as the default.
 
 *** {Section B}: Importing a Maven project into Eclipse
 
@@ -66,7 +76,13 @@ Exercise 1: First Simple Application
         [Note:] Any changes to the project dependencies you make within
         Eclipse are not updated in the pom.xml. Use the pom.xml file
         to specify all project dependencies and refresh your Eclipse
-        project to see the changes.
+        project to see the changes. You may also edit the pom.xml
+        through various helpers provided by the m2eclipse plugin. 
+        Just remember that you are setting up a Maven project that
+        will be processed by m2eclipse and not an Eclipse project
+        to be processed by anything within Maven. If you tweak your
+        project within Eclipse, be sure those changes are documented
+        through a change to the Maven pom.xml.
 
     [[1]] Inside Eclipse, import the project using
 
@@ -165,11 +181,22 @@ Exercise 1: First Simple Application
 
 *** {Section D}: Setup environment to enable interactive debugging
 
-        [Note:] Although it is possible to run JUnit directly from within
-        Eclipse and have test-level granularity, doing so will leave many
-        of the test configuration properties defined within Maven left 
-        behind. For that reason, I will show you how to run the debugger
-        running under a normal Maven configuration. When doing this, you 
+        [Note:] There are two primary ways to run your JUnit tests with
+        Eclipse; run-as a JUnit and run-as a Maven build. They both
+        execute your test class within JUnit. However, the run-as JUnit
+        runs JUnit without the maven wrapper and any configuration.
+        Any system properties passed in through the pom.xml will not 
+        be present and any maven handling of resource files is not
+        performed. The run-as a Maven build runs a Maven phase as 
+        a separate entity and JUnit is opaque to Eclipse. The later
+        approach is basically the same as running "mvn (phase)" on the
+        command line and will use all the configuration and processing
+        defined in the pom.xml. There will be times when one approach
+        is better than the other and you need to design your tests
+        or environment with the limits and advantages of each in mind.
+
+        I will show you how to run the debugger
+        running under a normal Maven build. When doing this, you 
         need to realize that there will be 2 processes; the "remote"
         application being launched/tested and the "local" debugger that is
         commanding the remote JVM through its actions.

@@ -91,24 +91,12 @@
                 <version>2.5</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>                                
-                        <property>
-                          <name>jdbc.driver</name>
-                          <value>${jdbc.driver}</value>
-                        </property>
-                        <property>
-                          <name>jdbc.url</name>
-                          <value>${jdbc.url}</value>          
-                        </property>
-                        <property>
-                          <name>jdbc.user</name>
-                          <value>${jdbc.user}</value>          
-                        </property>
-                        <property>
-                          <name>jdbc.password</name>
-                          <value>${jdbc.password}</value>          
-                        </property>
-                    </systemProperties>                                
+                    <systemPropertyVariables>
+                        <jdbc.driver>${jdbc.driver}</jdbc.driver>
+                        <jdbc.url>${jdbc.url}</jdbc.url>
+                        <jdbc.user>${jdbc.user}</jdbc.user>
+                        <jdbc.password>${jdbc.password}</jdbc.password>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -160,7 +148,7 @@
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
+                  <jdbc.password/>
                   <hibernate.dialect>
                       org.hibernate.dialect.HSQLDialect
                   </hibernate.dialect>

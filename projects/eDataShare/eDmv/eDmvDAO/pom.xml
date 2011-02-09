@@ -59,8 +59,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -69,24 +69,12 @@
                 <version>2.5</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>                                
-                        <property>
-                          <name>jdbc.driver</name>
-                          <value>${jdbc.driver}</value>
-                        </property>
-                        <property>
-                          <name>jdbc.url</name>
-                          <value>${jdbc.url}</value>          
-                        </property>
-                        <property>
-                          <name>jdbc.user</name>
-                          <value>${jdbc.user}</value>          
-                        </property>
-                        <property>
-                          <name>jdbc.password</name>
-                          <value>${jdbc.password}</value>          
-                        </property>
-                    </systemProperties>                                
+                    <systemPropertyVariables>
+                        <jdbc.driver>${jdbc.driver}</jdbc.driver>
+                        <jdbc.url>${jdbc.url}</jdbc.url>
+                        <jdbc.user>${jdbc.user}</jdbc.user>
+                        <jdbc.password>${jdbc.password}</jdbc.password>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>

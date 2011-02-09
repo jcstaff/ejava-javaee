@@ -8,12 +8,12 @@
     <groupId>myorg.jdbctutorial</groupId>
     <artifactId>jdbcTutorial</artifactId>
     <name>JDBC Tutorial</name>
-    <version>1.0.2006.3</version>
-<!--
+    <version>2.0.2011.1</version>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <db.host>${jboss.host}</db.host>
     </properties>
-    -->
 
     <dependencies>
         <dependency>
@@ -66,38 +66,20 @@
                 <version>2.5</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                            <name>jdbc.driver</name>
-                            <value>${jdbc.driver}</value>
-                        </property>
-                        <property>
-                            <name>jdbc.url</name>
-                            <value>${jdbc.url}</value>          
-                        </property>
-                        <property>
-                            <name>jdbc.user</name>
-                            <value>${jdbc.user}</value>          
-                        </property>
-                        <property>
-                            <name>jdbc.password</name>
-                            <value>${jdbc.password}</value>          
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <jdbc.driver>${jdbc.driver}</jdbc.driver>
+                        <jdbc.url>${jdbc.url}</jdbc.url>
+                        <jdbc.user>${jdbc.user}</jdbc.user>
+                        <jdbc.password>${jdbc.password}</jdbc.password>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>            
         </plugins>    
     </build>
 
     <profiles>
-        <profile> <!-- defines our default database -->
+        <profile> <!-- defines database for hsql -->
             <id>hsql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
-                </property>
-            </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>

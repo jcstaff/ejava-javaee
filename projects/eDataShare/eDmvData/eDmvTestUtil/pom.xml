@@ -125,12 +125,9 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>                                
-                        <property>
-                            <name>inputDir</name>
-                            <value>target/classes/xml</value>
-                        </property>
-                    </systemProperties>                                
+                    <systemPropertyVariables>                                
+                        <inputDir>target/classes/xml</inputDir>
+                    </systemPropertyVariables>                                
                 </configuration>
             </plugin>
         </plugins>

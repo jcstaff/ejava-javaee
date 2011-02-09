@@ -52,30 +52,33 @@ Exercise 1: First Simple Application
         This has a huge collection of information; which is why you won't 
         find me re-documenting Maven here.
 
-    [Note:] Maven will automatically go out and download any
-    missing dependencies and recursively download what they depend
-    upon. If you are running Maven for the first time, this could
-    result in a significant amount of downloading and may encounter
-    an occasional connection with repositories. Once a non-SNAPSHOT
-    version is downloaded (e.g., 1.3), Maven will not re-attempt to
-    download it. Maven will, however, go out and check various 
-    resources to stay in sync.  If you know you already
-    have everything you need, you can run in off-line mode using the
-    "-o" flag on the command line or its equivalent entry within the
-    settings.xml file. This can save you seconds of build time when
-    disconnected from the Internet.
+    [Note:] Maven will automatically go out and download any missing
+    dependencies and recursively download what they depend upon. If
+    you are running Maven for the first time, this could result in a
+    significant amount of downloading and may encounter an occasional
+    connection failure with repositories. Once a non-SNAPSHOT version
+    is downloaded (e.g., 1.3), Maven will not re-attempt to download
+    it. Maven will, however, go out and check various resources to stay
+    in sync.  If you know you already have everything you need, you can
+    run in off-line mode using the "-o" flag on the command line or its
+    equivalent entry within the settings.xml file. This can save you
+    seconds of build time when disconnected from the Internet.
 
 ** Steps
 
     [[1]] Create a pom.xml file in PROJECT_BASEDIR. This will be used to 
     define your entire project. Refer to the
-    {{http://maven.apache.org/ref/current/maven-model/maven.html}}
-    Maven POM Reference} for details about each element. 
+    {{{http://maven.apache.org/ref/current/maven-model/maven.html}
+    Maven POM Reference}} for details about each element. 
 
         * modelVersion - yes; its required
 
-        * groupId - earlier in the exercise, we found junit.jar in a junit
-        directory on ibiblio. That is one area where the groupId comes in.
+        * groupId - just as it sounds, this value is used to group 
+        related artifacts. groupId is a hierarchical value and the
+        individual names are used to form a directory structure in the 
+        Maven repository (e.g., artifacts in the myorg.myproject.foo 
+        groupId will be located below the 
+        HOME/.m2/repository/myorg/myproject/foo directory).
 
         * version - Maven has a strong versioning system and versions 
         appended with the word SNAPSHOT are handled differently. Projects
@@ -84,14 +87,42 @@ Exercise 1: First Simple Application
         version lacking the -SNAPSHOT ending are meant to be an official
         release, with no other variants available with the same tag.
 
-        * dependency.scope - note that we only need junit and log4j during
-        testing; not compilation or deployment. The default scope (if missing)
-        is "compile"; which means your core code depends on this library and
-        it must be deployed with the primary artifact from this project.
+        * dependency.scope - this is used to define the scope the 
+        dependency gets applied. scope=compile is the default and is
+        used to describe artifacts that the src/main directory depends 
+        upon. These artifacts will be brought along with the module
+        when transitive dependencies are evaluated. If scope is missing,
+        the value is assumed to be scope=compile. scope=test is used to
+        define artifacts which src/test depends upon. These will be 
+        made available during testing, but will not be considered a 
+        dependency for downstream users of the module. Consult the 
+        maven documentation for other scopes, but one other that is
+        commonly used in class is scope=provided. This is similar to 
+        scope=compile in that the src/main tree needs it, however like
+        scope=test, it is not carried forward. The downstream module is
+        required to know about the dependency and provide a replacement.
+        This is common for APIs like JavaEE where we may want to provide
+        the API using a downstream provider's artifact rather than the
+        upstream dependency's selection.
+
+        [Note:] Although m2eclipse reads the pom dependency and creates
+        a classpath within Eclipse, it does not honor the differences
+        between the different scope values. All dependencies are blended 
+        together. The result is that something may compile and run
+        fine within Eclipse and report a missing class when built at
+        the command line. If that happens, check for classes using 
+        artifacts that have been brought in as scope=test.
+
+        []
 
         * maven-compiler-plugin - this declaration is not necessary
         for this exercise, but like our Ant script, specify the Java
         version to make sure we get what we need.
+
+        * properties.project.build.sourceEncoding - this defines the
+        default handling of file content for all plugins within a 
+        module. The default is platform-specific if left unspecified.
+        UTF-8 is a reasonable default without going as far as UTF-16.
 
         []
 
@@ -246,21 +277,25 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             where copied to the target/test-classes directory by the
             maven-compiler-plugin with no configuration help.  All Maven
             defaults were take (except for specifying JavaSE 6 and
-            specifyin UTF-8 for resources copied).
+            specifying UTF-8 for files processed).
 
         [Note:] Test cases were run and their reports were placed in
             target/surefire-reports. Surefire is a Maven plugin that
             supports multiple test frameworks, but defaults to JUnit. We
             didn't have to configure it because we structured our project
-            using Maven directory structure.
+            using Maven directory structure and used the default 
+            packaging=jar module type (since packaging=jar is the default, it
+            could be left unspecified). Many of the standard features
+            are enacted when for modules with packaging=jar type.
 
         [Note:] The build.xml and build.properties file from our work with
             Ant is still allowed to exist. We could even delegate from
             Maven to Ant using the maven-antrun-plugin if we had legacy
             build.xml scripts that we wanted to leverage.
 
-        [Note:] The [WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent! is avoided by using the following to the top
-        of the pom.xml
+        [Note:] The [WARNING] Using platform encoding (Cp1252 actually)
+            to copy filtered resources, i.e. build is platform dependent! is
+            avoided by using the following to the top of the pom.xml
 
 ---
     <properties>
@@ -270,10 +305,13 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
         []
 
     [[1]]  For fun, lets add a README that could be used to describe
-    your project when it is turned in. Maven supports a couple of 
-    documentation generation languages, but lets just use HTML
-    to keep this simple. Place the following content to
-    src/site/resources/README.html
+    something about your project and have it be processed as part of the
+    documentation for the module. You do not need to do this for class
+    projects, but walking through this may be helpful in understanding how
+    the class website is created from the source you have on your disk.
+    Maven supports a couple of documentation generation languages, but
+    lets just use HTML to keep this simple. Place the following content
+    to src/site/resources/README.html
 
 ---
 <?xml version="1.0"?>
@@ -352,6 +390,29 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ./target/site/README.html
 ---
 
+    [Warning:] Maven site reporting has been redesigned for Maven 3
+        and the above does not generate the desired content as described
+        without specifying a new site plugin version (which requires Maven
+        3). Add the following to the build area of your pom.xml to restore
+        full site generation.
+
+---
+    <build>
+        ...
+        <pluginManagement>
+          <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.0-beta-3</version>
+            </plugin>
+        </pluginManagement>
+        ...
+    </build>
+---
+
+    []
+
     [[1]] Okay, that was a lot of work to just copy an html file. Now lets
     add javadoc to our project and create a link to it. Add the following 
     contents to the bottom of the pom.xml file.
@@ -359,13 +420,17 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ---
     <reporting>
         <plugins>
-            <plugin>
+            <plugin> 
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
+                <version>2.7</version>
                 <configuration>
+                    <detectLinks/>
+                    <show>private</show>
+                    <source>1.6</source>
                     <links>
-                        <link>http://java.sun.com/javaee/5/docs/api</link>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                        <link>http://download.oracle.com/javaee/6/api/</link>
+                        <link>http://download.oracle.com/javase/6/docs/api/</link>
                     </links>
                 </configuration>
             </plugin>
@@ -385,7 +450,9 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
     <menu name="Content">
         <item name="README" href="README.html"/>
     </menu>
+
     <menu ref="reports"/>
+
   </body>
 </project>
 ---
@@ -396,15 +463,20 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
     the Javadoc.
 
         [Note:] The pom.xml file is the main configuration source
-        form 99% of what you develop with Maven. There is an
+        for 99% of what you develop with Maven. There is an
         additional $HOME/.m2/settings.xml file where you can
         specify build site-specific properties.  These will be
         available to all pom.xml files. You want to be careful
-        not to over-populate this file (taking advantage of its
+        not to over-populate the settings.xml file (taking advantage of its
         re-usable specification) since it will make you pom.xml
         files too dependent on a particulate build site. Refer to
         the {{{http://maven.apache.org/maven-settings/settings.html}
         Settings Descriptor}} for detailed information on settings.xml.
+
+        [Note:] The following provides a step-wise generation of the
+        settings.xml file you put in place during ex0. Read thru this
+        for reference since you likely already have everything in place
+        you need.
 
     [[1]] Let's start a settings.xml file to store properties that 
     are specific to out build site. You can find details about each setting
@@ -452,6 +524,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
         * jboss5/jboss6 profiles - used to trigger backward and forward-based
         testing of the baseline. Your implementations will only need the 
         jboss6 profile.
+
 ---
     <profiles>
         <profile>
@@ -531,6 +604,21 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
         <activeProfile>webdev-repositories</activeProfile>
 ---    
 
+    [[1]] Activate a standard profile that is located in all class example
+    modules that interact with the database. This value is used by many of
+    the modules to decide which database they will work with at compile time
+    and allow for portability and comparison tests to be easily performed.
+
+---    
+        <activeProfile>hsql</activeProfile>
+---    
+
+    [Note:] Maven will report a warning about not being able to activate 
+    the hsql profile for modules that do not define one. These warnings
+    can be ignored since those modules do not use the database.
+
+    []
+
     [[1]] While you are in this file, add an optional profile that changes the 
     command line to the maven/junit invocation to allow remote debugging. More will
     be covered on this later. However, it should be noted that this profile
@@ -553,10 +641,11 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
         </profile>        
 ---
 
-        [Note:] At times you will need access to a dependency that is not 
-        available in a Maven repository. COTS libraries are generally not
-        available at ibiblio.org.  You must download it 
-        and manually install it locally.
+        [Note:] Although not needed for this class -- at times you will
+        need access to a dependency that is not available in a Maven
+        repository. COTS libraries are generally not available at
+        ibiblio.org.  You must download it and manually install it
+        locally.
 
     [[1]] This step will go though 
     importing a stand-alone archive into the repository to resolve

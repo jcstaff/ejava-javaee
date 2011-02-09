@@ -23,13 +23,13 @@ Exercise: JDBC Tutorial
 
     * If you haven't done so already, perform the setup instructions
     for JBoss and the database as defined in 
-    {{{./ex0.html#Part_F}Exercise 0}}. Refer back to those instructions for 
+    {{{./ex0.html#Part_E}Exercise 0}}. Refer back to those instructions for 
     basic commands.
 
-    * Start the database (using the JBoss run.sh command). Note that the 
-    application server is not necessary for this exercise. We are just 
-    taking advantage of the fact it will start and stop the database 
-    process.
+    * Start the database (and the application server using the JBoss
+    run.sh command). Note that the application server is not necessary
+    for this exercise. We are just taking advantage of the fact it will
+    start and stop the database process. 
 
     [Note:] You can also start the database manually to save some room 
     on your system for now. You should try both commands at first and
@@ -343,8 +343,8 @@ echo:
         <javac srcdir="${src.dir}/main/java"
                destdir="${build.dir}/classes"
                debug="true"
-               source="1.5"
-               target="1.5">
+               source="1.6"
+               target="1.6">
                <classpath>
                    <pathelement path="${commons.logging.classpath}"/>
                </classpath>
@@ -397,8 +397,8 @@ myorg/jdbctutorial/Coffee.class
         <javac srcdir="${src.dir}/test/java"
                destdir="${build.dir}/test-classes"
                debug="true"
-               source="1.5"
-               target="1.5">
+               source="1.6"
+               target="1.6">
                <classpath>
                    <pathelement location="${build.dir}/${artifactId}.jar"/>
                    <pathelement path="${junit.classpath}"/>
@@ -570,8 +570,25 @@ Total time: 1 second
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-</project>
 ---
+
+    * Add a definition of where to locate the database host. We will default
+    the host to the jboss.server. We did not do this in the Ant approach, but
+    we could have.
+
+---
+    <properties>
+        ...
+        <db.host>${jboss.host}</db.host>
+    </properties>
+---
+
+    [Note:] The above approach allows for running multiple JBoss servers
+    on the same host or simply on a different IP address from localhost.
+    The class setup has you define the jboss.host in your 
+    {{{../files/maven/settings.xml}settings.xml}}.
+
+    []
 
     * Add compilation and test dependencies. We'll add dependency on the 
     HSQL driver later using a profile to try to remain DB-agnostic.
@@ -601,7 +618,7 @@ Total time: 1 second
 ---
 
     * Add plugin definitions for the maven-compiler-plugin to give us
-    Java 1.5 classes and for maven-surefire-plugin to be passed
+    Java 1.6 classes and for maven-surefire-plugin to be passed
     system properties with the database driver values.
 
 ---
@@ -612,8 +629,8 @@ Total time: 1 second
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
 
@@ -621,28 +638,17 @@ Total time: 1 second
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                            <name>jdbc.driver</name>
-                            <value>${jdbc.driver}</value>
-                        </property>
-                        <property>
-                            <name>jdbc.url</name>
-                            <value>${jdbc.url}</value>
-                        </property>
-                        <property>
-                            <name>jdbc.user</name>
-                            <value>${jdbc.user}</value>
-                        </property>
-                        <property>
-                            <name>jdbc.password</name>
-                            <value>${jdbc.password}</value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <jdbc.driver>${jdbc.driver}</jdbc.driver>
+                        <jdbc.url>${jdbc.url}</jdbc.url>
+                        <jdbc.user>${jdbc.user}</jdbc.user>
+                        <jdbc.password>${jdbc.password}</jdbc.password>
+                    </systemPropertyVariables>
                 </configuration>
-            </plugin>
+            </plugin>            
         </plugins>
     </build>
 ---
@@ -663,14 +669,8 @@ Total time: 1 second
 
 ---
     <profiles>
-        <profile> <!-- defines our default database -->
+        <profile> <!-- defines database for hsql -->
             <id>hsql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
-                </property>
-            </activation>
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://localhost:9001</jdbc.url>
@@ -823,53 +823,65 @@ Total time: 1 second
 
 ---
 [INFO] Scanning for projects...
-[INFO] ----------------------------------------------------------------------------
-[INFO] Building JDBC Tutorial
-[INFO]    task-segment: [test]
-[INFO] ----------------------------------------------------------------------------
-[INFO] [resources:resources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [compiler:compile]
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JDBC Tutorial 2.0.2011.1
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ jdbcTutorial ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 3 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jdbcTutorial ---
 [INFO] Nothing to compile - all classes are up to date
-[INFO] [resources:testResources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [sql:execute {execution: drop-db-before-test}]
-[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:testResources (default-testResources) @ jdbcTutorial ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- sql-maven-plugin:1.4:execute (drop-db-before-test) @ jdbcTutorial ---
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/jboss6/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
 [INFO] 1 of 1 SQL statements executed successfully
-[INFO] [sql:execute {execution: create-db-before-test}]
-[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_create.ddl
+[INFO] 
+[INFO] --- sql-maven-plugin:1.4:execute (create-db-before-test) @ jdbcTutorial ---
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/jboss6/solutions/jdbcTutorial/src/main/resources/ddl/coffee_create.ddl
 [INFO] 1 of 1 SQL statements executed successfully
-[INFO] [sql:execute {execution: populate-db-before-test}]
-[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/test/resources/ddl/coffee_populate.ddl
+[INFO] 
+[INFO] --- sql-maven-plugin:1.4:execute (populate-db-before-test) @ jdbcTutorial ---
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/jboss6/solutions/jdbcTutorial/src/test/resources/ddl/coffee_populate.ddl
 [INFO] 1 of 1 SQL statements executed successfully
-[INFO] [compiler:testCompile]
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jdbcTutorial ---
 [INFO] Nothing to compile - all classes are up to date
-[INFO] [surefire:test]
-[INFO] Surefire report directory: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/target/surefire-reports
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.5:test (default-test) @ jdbcTutorial ---
+[INFO] Surefire report directory: /home/jcstaff/proj/ejava-javaee/jboss6/solutions/jdbcTutorial/target/surefire-reports
 
  -------------------------------------------------------
  T E S T S
  -------------------------------------------------------
 Running myorg.jdbctutorial.CoffeeTest
-(CoffeeTest.java:setUp:26)  -loading driver:org.hsqldb.jdbcDriver
-(CoffeeTest.java:setUp:28)  -getting connection: url=jdbc:hsqldb:hsql://localhost:9001, user=sa, password=
-(CoffeeTest.java:testDemoSelect:39)  -testDemoSelect
-(Coffee.java:demoSelect:31)  -COF_NAME=juan, SUP_ID=3, PRICE=10.0, SALES10.0, TOTAL=100
-(CoffeeTest.java:tearDown:34)  -closing connection
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.182 sec
+(CoffeeTest.java:setUp:24)  -loading driver:org.hsqldb.jdbcDriver
+(CoffeeTest.java:setUp:26)  -getting connection: url=jdbc:hsqldb:hsql://127.0.0.4:9001, user=sa, password=null
+(CoffeeTest.java:testDemoSelect:37)  -testDemoSelect
+(Coffee.java:demoSelect:31)  -COF_NAME=juan, SUP_ID=3, PRICE=10.0, SALES=40, TOTAL=100
+(CoffeeTest.java:tearDown:32)  -closing connection
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.36 sec
 
 Results :
+
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] [sql:execute {execution: drop-db-after-test}]
-[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/working/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
+[INFO] 
+[INFO] --- sql-maven-plugin:1.4:execute (drop-db-after-test) @ jdbcTutorial ---
+[INFO] Executing file: /home/jcstaff/proj/ejava-javaee/jboss6/solutions/jdbcTutorial/src/main/resources/ddl/coffee_drop.ddl
 [INFO] 1 of 1 SQL statements executed successfully
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2 seconds
-[INFO] Finished at: Tue Jan 30 00:40:21 EST 2007
-[INFO] Final Memory: 3M/7M
+[INFO] Total time: 3.889s
+[INFO] Finished at: Tue Feb 08 22:52:27 EST 2011
+[INFO] Final Memory: 5M/81M
 [INFO] ------------------------------------------------------------------------
 ---
 

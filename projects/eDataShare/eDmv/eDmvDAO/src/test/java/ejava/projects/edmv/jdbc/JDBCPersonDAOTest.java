@@ -37,7 +37,7 @@ public class JDBCPersonDAOTest extends TestCase {
 		assertNotNull("jdbc.driver not supplied", jdbcDriver);
 		assertNotNull("jdbc.url not supplied", jdbcURL);
 		assertNotNull("jdbc.user not supplied", jdbcUser);
-		assertNotNull("jdbc.password not supplied", jdbcPassword);
+		//assertNotNull("jdbc.password not supplied", jdbcPassword);
 		
 		log.debug("loading JDBC driver:" + jdbcDriver);
 		Thread.currentThread()

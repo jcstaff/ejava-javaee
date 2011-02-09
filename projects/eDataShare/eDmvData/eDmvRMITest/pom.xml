@@ -83,14 +83,11 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                          <name>jndi.name</name>
-                          <value>
-                              ejava/projects/eDmvTestEJB/ParserTestEJB/remote
-                          </value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                      <jndi.name>
+                          ejava/projects/eDmvTestEJB/ParserTestEJB/remote
+                      </jndi.name>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -128,6 +125,12 @@
             <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                    <groupId>org.jboss.security</groupId>
+                    <artifactId>jbosssx-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
