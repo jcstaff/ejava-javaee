@@ -1,6 +1,9 @@
 package myorg.entitymgrex;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -12,16 +15,19 @@ import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 
-public class EntityMgrTest extends TestCase {
+public class EntityMgrTest {
     private static Log log = LogFactory.getLog(EntityMgrTest.class);
     private static final String PERSISTENCE_UNIT = "entityMgrEx";
     EntityManagerFactory emf;
     private EntityManager em;    
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         log.debug("creating entity manager");
         emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
         em = emf.createEntityManager();
@@ -29,7 +35,8 @@ public class EntityMgrTest extends TestCase {
         cleanup();
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         try {
             log.debug("tearDown() started, em=" + em);
             em.getTransaction().begin();
@@ -59,11 +66,13 @@ public class EntityMgrTest extends TestCase {
         em.getTransaction().commit();
         log.info("removed " + rows + " rows");
     }
-    
+
+    @Test
     public void testTemplate() {
         log.info("testTemplate");
     }
     
+    @Test
     public void testCreate() {
         log.info("testCreate");
         
@@ -77,6 +86,7 @@ public class EntityMgrTest extends TestCase {
         em.persist(car);        
     }
     
+    @Test
     public void testMultiCreate() {
         log.info("testMultiCreate");
         for(int i=0; i<5; i++) {
@@ -90,6 +100,7 @@ public class EntityMgrTest extends TestCase {
         }
     }
     
+    @Test
     public void testFind() {
         log.info("testFind");
         
@@ -111,6 +122,7 @@ public class EntityMgrTest extends TestCase {
         log.info("found car:" + car2);
     }
     
+    @Test
     public void testGetReference() {
         log.info("testGetReference");
         
@@ -132,6 +144,7 @@ public class EntityMgrTest extends TestCase {
         log.info("found car:" + car2);        
     }
     
+    @Test
     public void testUpdate() {
         log.info("testUpdate");
         
@@ -171,6 +184,7 @@ public class EntityMgrTest extends TestCase {
         return (Integer)query.getSingleResult();        
     }
 
+    @Test
     public void testMerge() throws Exception {
         log.info("testMerge");
         
@@ -231,6 +245,7 @@ public class EntityMgrTest extends TestCase {
         return car2;
     }
         
+    @Test
     public void testRemove() {
         log.info("testRemove");
         
@@ -262,5 +277,4 @@ public class EntityMgrTest extends TestCase {
         Auto car3 = em.find(Auto.class, car.getId());
         assertNull("car found", car3);
     }    
-
 }

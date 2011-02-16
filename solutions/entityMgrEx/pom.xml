@@ -4,19 +4,21 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+    <!-- Be sure to activate -Pjboss6 or -Pjboss5 to build -->
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>myorg.jpa</groupId>
     <artifactId>entityMgrEx</artifactId>
     <name>Entity Manager Exercise</name>
-    <version>1.0.2010.2-SNAPSHOT</version>
+    <version>2.0.2011.1-SNAPSHOT</version>
+
+    <properties>
+        <jboss.host>localhost</jboss.host>
+        <db.host>${jboss.host}</db.host>
+        <server>jboss6</server>
+    </properties>
 
     <dependencies>
-        <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
         <dependency>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
@@ -66,14 +68,11 @@
                 <version>2.5</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
+                    <systemPropertyVariables>
                     <!--
-                        <property>
-                            <name>name</name>
-                            <value>value</value>
-                        </property>
+                        <name>value</name>
                         -->
-                    </systemProperties>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>            
         </plugins>    
@@ -129,19 +128,13 @@
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.4.0.GA</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-core</artifactId>
-                    <version>3.3.1.GA</version>
+                    <version>${hibernate-entitymanager.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>1.5.2</version>
+                    <version>${slf4j.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -316,6 +309,38 @@
                     </plugin>
                 </plugins>          
             </build>          
+        </profile>
+
+
+        <profile>
+            <id>jboss5</id>
+            <properties>
+                <hibernate-entitymanager.version>3.4.0.GA</hibernate-entitymanager.version>
+                <slf4j.version>1.5.2</slf4j.version>
+            </properties>                                  
+            <dependencies>
+                <dependency>
+                    <groupId>javax.persistence</groupId>
+                    <artifactId>persistence-api</artifactId>
+                    <version>1.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jboss6</id>
+            <properties>
+                <hibernate-entitymanager.version>3.6.0.Final</hibernate-entitymanager.version>
+                <slf4j.version>1.6.1</slf4j.version>
+            </properties>                                  
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

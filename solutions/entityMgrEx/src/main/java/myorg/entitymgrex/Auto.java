@@ -2,6 +2,8 @@ package myorg.entitymgrex;
 
 import java.io.Serializable;
 
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,7 +18,7 @@ public class Auto implements Serializable {
     private String color;
     private int mileage;
         
-    @Id @GeneratedValue
+    @Id @GeneratedValue //@Column(nullable=false)
     public long getId() {
         return id;
     }
@@ -47,14 +49,17 @@ public class Auto implements Serializable {
     }
     public void setColor(String color) {
         this.color = color;
-    }    
-    
-    public String toString() {
-        return super.toString() +
-            ", id=" + id +
-            ", make=" + make +
-            ", model=" + model +
-            ", color=" + color +
-            ", mileage=" + mileage;            
     }
+    
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder
+		    .append("id=").append(id)
+			.append(", make=").append(make)
+			.append(", model=").append(model)
+			.append(", color=").append(color)
+			.append(", mileage=").append(mileage);
+		return builder.toString();
+	}    
 }
