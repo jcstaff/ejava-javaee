@@ -25,7 +25,10 @@
         </init-param>
         <init-param>      
             <param-name>java.naming.provider.url</param-name>
-            <param-value>jnp://localhost:1099</param-value>
+            <param-value>jnp://127.0.0.4:1099</param-value>
+            <!--
+            <param-value>jnp://${jboss.host}:1099</param-value>
+            -->
         </init-param>
         <init-param>
             <param-name>java.naming.factory.url.pkgs</param-name> 
@@ -48,6 +51,6 @@
          -->
     <ejb-ref>
         <ejb-ref-name>ejb/tellerRemote</ejb-ref-name>
-        <mapped-name>jnp://localhost:1099/ejava/examples/ejbsessionbank/TellerEJB/remote</mapped-name>
+        <mapped-name>jnp://${jboss.host}:1099/ejava/examples/ejbsessionbank/TellerEJB/remote</mapped-name>
     </ejb-ref>
 </web-app>

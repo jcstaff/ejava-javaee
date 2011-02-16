@@ -40,7 +40,7 @@ public class JPAVehicleDAOTest extends TestCase {
 	private PersonDAO personDAO;
 	
 	public void setUp() throws Exception {
-		emf = Persistence.createEntityManagerFactory("eDmvBO");
+		emf = Persistence.createEntityManagerFactory("eDmvBO-test");
 		em = emf.createEntityManager();
 		
 	    vehicleDAO = new JPAVehicleDAO();

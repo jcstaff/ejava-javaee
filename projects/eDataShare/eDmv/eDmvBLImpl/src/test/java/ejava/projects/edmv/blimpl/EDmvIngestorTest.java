@@ -66,7 +66,7 @@ public class EDmvIngestorTest extends TestCase {
 		
 		connection.setAutoCommit(false);
 		
-		emf = Persistence.createEntityManagerFactory("eDmvBO");
+		emf = Persistence.createEntityManagerFactory("eDmvBO-test");
 		em = emf.createEntityManager();
 		//we could easily switch this to the JPA version here
 		//personDAO = new JPAPersonDAO();

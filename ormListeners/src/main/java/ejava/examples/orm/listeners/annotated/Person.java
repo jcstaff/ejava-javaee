@@ -17,9 +17,10 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 @Entity @Table(name="ORMLISTEN_PERSON")
-@EntityListeners(Listener.class)
+//@EntityListeners(Listener.class) - enabled in deployment descriptor
 public class Person {
     private static final Log log = LogFactory.getLog(Person.class);
+    private static final Log cbLog = LogFactory.getLog("callback.Person");
     
     private long id;
     private String name;
@@ -34,19 +35,21 @@ public class Person {
         this.name = name;
     }
     
+    public long peekId() { return id; } //peek at ID without logging
+    
     @Id 
-    //@GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
     //@GeneratedValue(strategy=GenerationType.TABLE) 
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    //@GeneratedValue(strategy=GenerationType.IDENTITY)
     public long getId() {
         return id;
     }
     protected void setId(long id) {
         log.debug("Person.setId() called with:" + id);
         this.id = id;
-        if (residence != null && residence.getId() == 0) { 
-            residence.setId(id); 
-        }
+        //if (residence != null && residence.peekId() == 0) { 
+        //    residence.putId(id, "Person"); 
+        //}
     }
     public String getName() {
         return name;
@@ -55,35 +58,46 @@ public class Person {
         this.name = name;
     }
     
-    @OneToOne(optional=true, cascade=CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy="person", optional=true, cascade=CascadeType.ALL)
     public Residence getResidence() {
         return residence;
     }
     public void setResidence(Residence residence) {        
         this.residence = residence;
+        if (residence != null) {
+        	residence.setPerson(this);
+        }
     }
     
     @PrePersist public void prePersist() {
-        log.debug("prePersist event:" + this.toString());
+        cbLog.debug("Callback.prePersist event:" + this.toString());
     }
     @PostPersist public void postPersist() {
-        log.debug("postPersist event:" + this.toString());
+    	cbLog.debug("Callback.postPersist event:" + this.toString());
+        if (residence.peekId() != 0) {
+        	cbLog.debug("Person Callback.postPersist too late");
+        }
+        else if (residence != null && residence.peekId() == 0) { 
+            residence.putId(id, "Listener"); 
+        } 
+        else {
+        	cbLog.debug("Person Callback.postPersist too late");
+        }
     }
     @PostLoad public void postLoad() {
-        log.debug("postLoad event:" + this.toString());
+    	cbLog.debug("Callback.postLoad event:" + this.toString());
     }
     @PreUpdate public void preUpdate() {
-        log.debug("preUpdate event:" + this.toString());
+    	cbLog.debug("Callback.preUpdate event:" + this.toString());
     }
     @PostUpdate public void postUpdate() {
-        log.debug("postUpdate event:" + this.toString());
+    	cbLog.debug("Callback.postUpdate event:" + this.toString());
     }
     @PreRemove public void preRemove() {
-        log.debug("preRemove event:" + this.toString());
+    	cbLog.debug("Callback.preRemove event:" + this.toString());
     }
     @PostRemove public void postRemove() {
-        log.debug("postRemove event:" + this.toString());
+    	cbLog.debug("Callback.postRemove event:" + this.toString());
     }
     
     public String toString() {

@@ -5,7 +5,11 @@
 
     <persistence-unit name="ejbsessionbank">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    	<!-- we can't use ejavaDS because the new EJB3.l1 Timers are 
+    	   hard-coded to use DefaultDS and HSQL does not support XA.
         <jta-data-source>java:/ejavaDS</jta-data-source>
+    	 -->
+        <jta-data-source>java:/DefaultDS</jta-data-source>
         <jar-file>ejbsessionBankImpl-${project.version}.jar</jar-file>
         <properties>
             <property name="hibernate.dialect" 

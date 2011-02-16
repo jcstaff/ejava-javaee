@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
@@ -79,7 +80,7 @@ public class SellerEJB
         auctionItemDAO = new JPAAuctionItemDAO();
         ((JPAAuctionItemDAO)auctionItemDAO).setEntityManager(em);        
     }
-
+    
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public long sellProduct(String sellerId, AuctionItem item) 
         throws MarketException {

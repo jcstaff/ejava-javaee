@@ -15,6 +15,15 @@
         test/demo of the ingest data.
     </description>
 
+   <!-- needed to resolve some hibernate dependencies -->
+    <repositories>
+        <repository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -76,6 +85,27 @@
                         <jdbc.password>${jdbc.password}</jdbc.password>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+
+            <!-- this is an example of creating a reusable test archive -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <!-- include or exclude as appropriate -->
+                            <includes>
+                                <include>META-INF/persistence.xml</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -297,7 +327,7 @@
                     </components>
                     <componentProperties>
                         <persistenceunit>
-                            eDmvBO
+                            eDmvBO-test
                         </persistenceunit>
                         <export>false</export>
                         <format>true</format>

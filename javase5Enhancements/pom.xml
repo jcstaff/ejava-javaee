@@ -13,7 +13,6 @@
     <groupId>ejava.javaee.intro</groupId>
     <artifactId>javase5Enhancements</artifactId>
     <name>Java SE 5 Enhancements</name>
-    <version>2.0.2011.1-SNAPSHOT</version>
     <description>
         This project contains examples that demonstrate language
         enhancements added in Java SE 5 (a.k.a J2SE 5, J2SE 1.5).
@@ -47,17 +46,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
              <!-- surefire.argLine is set in debugger profile -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.2</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                 </configuration>

@@ -36,7 +36,7 @@ public class JPAPersonDAOTest extends TestCase {
 	private PersonDAO dao;
 	
 	public void setUp() throws Exception {
-		emf = Persistence.createEntityManagerFactory("eDmvBO");
+		emf = Persistence.createEntityManagerFactory("eDmvBO-test");
 		em = emf.createEntityManager();
 		
 	    dao = new JPAPersonDAO();

@@ -18,16 +18,25 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 @Entity @Table(name="ORMLISTEN_RESIDENCE")
-@EntityListeners(Listener.class)
+//@EntityListeners(Listener.class) -specified in deployment descriptor
 public class Residence {
     private static final Log log = LogFactory.getLog(Residence.class);
+    private static final Log cbLog = LogFactory.getLog("callback.Residence");
+
     private long id;
     private String street;
     private String city;
     private String state;
     private String zip;
+    private Person person;
     
     public Residence() {}
+    
+    public long peekId() { return id; } //peek at ID without logging
+	public void putId(long id, String source) { 
+		this.id = id; 
+        log.debug("Residence.setId() called from " + source + " with:" + id);
+	}
 
     @Id
     public long getId() {
@@ -38,11 +47,22 @@ public class Residence {
         log.debug("Residence.setId() called with:" + id);
         this.id = id;
     }
+    
+    @OneToOne(optional=false)
+    @PrimaryKeyJoinColumn
+    public Person getPerson() {
+		return person;
+	}
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+    
 
     public String getCity() {
         return city;
     }
-    public void setCity(String city) {
+
+	public void setCity(String city) {
         this.city = city;
     }
     public String getState() {
@@ -65,26 +85,35 @@ public class Residence {
     }
     
     @PrePersist public void prePersist() {
-        log.debug("prePersist event:" + this.toString());
+        cbLog.debug("Callback.prePersist event:" + this.toString());
         //id = person.getId();
+        if (id != 0) {
+            cbLog.debug("Residence Callback.prePersist too late");
+        }
+        else if (person != null && person.peekId() != 0) {
+        	putId(person.peekId(), "Resident.Callback");
+        }
+        else {
+        	cbLog.debug("Residence Callback.prePersist too early");
+        }
     }
     @PostPersist public void postPersist() {
-        log.debug("postPersist event:" + this.toString());
+    	cbLog.debug("Callback.postPersist event:" + this.toString());
     }
     @PostLoad public void postLoad() {
-        log.debug("postLoad event:" + this.toString());
+    	cbLog.debug("Callback.postLoad event:" + this.toString());
     }
     @PreUpdate public void preUpdate() {
-        log.debug("preUpdate event:" + this.toString());
+    	cbLog.debug("Callback.preUpdate event:" + this.toString());
     }
     @PostUpdate public void postUpdate() {
-        log.debug("postUpdate event:" + this.toString());
+    	cbLog.debug("Callback.postUpdate event:" + this.toString());
     }
     @PreRemove public void preRemove() {
-        log.debug("preRemove event:" + this.toString());
+    	cbLog.debug("Callback.preRemove event:" + this.toString());
     }
     @PostRemove public void postRemove() {
-        log.debug("postRemove event:" + this.toString());
+    	cbLog.debug("Callback.postRemove event:" + this.toString());
     }    
     
     public String toString() {
@@ -95,5 +124,5 @@ public class Residence {
         text.append(", " + state);
         text.append(" " + zip);        
         return text.toString();
-    }    
+    }
 }

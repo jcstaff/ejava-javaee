@@ -42,17 +42,15 @@
         <module>ormRelations</module>
         <module>ormEJBQL</module>
         <module>ormInheritance</module>
-        <!--
         <module>ormListeners</module>
-        -->
         <module>ejbsessionBank</module>
         <module>jndiDemo</module>
         <module>txReservation</module>
         <module>webtier</module>
         <module>securePing</module>
         <module>jmsCore</module>
-        <!-- These will be posted over the course of the semester
         <module>asyncEJB</module>
+        <!-- These will be posted over the course of the semester
         -->
     </modules>
 
@@ -349,6 +347,7 @@
                 <jboss-as-client.version>5.1.0.GA</jboss-as-client.version>
                 <hibernate-entitymanager.version>3.4.0.GA</hibernate-entitymanager.version>
                 <slf4j.version>1.5.2</slf4j.version>
+                <slf4j-jboss.version>${slf4j.version}</slf4j-jboss.version>
             </properties>                                  
         </profile>        
         <profile>
@@ -361,7 +360,7 @@
                 <hornetq.version>2.1.2.Final</hornetq.version>
                 <netty.version>3.2.1.Final</netty.version>
                 <slf4j.version>1.6.1</slf4j.version>
-                <slf4j.jboss.version>1.5.6</slf4j.jboss.version>
+                <slf4j-jboss.version>1.5.6</slf4j-jboss.version>
             </properties>                                  
         </profile>        
 
