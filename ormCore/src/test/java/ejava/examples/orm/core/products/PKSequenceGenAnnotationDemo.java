@@ -3,6 +3,7 @@ package ejava.examples.orm.core.products;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.logging.Log;
@@ -23,11 +24,11 @@ import junit.framework.TestCase;
 public class PKSequenceGenAnnotationDemo extends TestCase {
     private static Log log = LogFactory.getLog(BasicAnnotationDemo.class);
     private static final String PERSISTENCE_UNIT = "ormCore";
+    private EntityManagerFactory emf;
     private EntityManager em = null;
 
     protected void setUp() throws Exception {        
-        EntityManagerFactory emf = 
-            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);   
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
         em = emf.createEntityManager();
         em.getTransaction().begin();
     }
@@ -66,6 +67,13 @@ public class PKSequenceGenAnnotationDemo extends TestCase {
             log.info("created fan (after flush):" + fan);
             
             assertFalse(fan.getId() == 0L);
+            
+            for (int i=2; i<20; i++) {
+            	Fan f = new Fan();
+            	f.setMake("cool runner " + i);
+            	em.persist(f);
+            	em.flush();
+            }
         } catch (PersistenceException ex) {
             String text = getText(ex);
             log.error("error in testSEQUENCE:" + text, ex);

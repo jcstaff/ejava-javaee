@@ -1,6 +1,5 @@
 package ejava.projects.edmv.bo;
 
-import java.util.Date;
 
 /**
  * This class is used to represent a location from the test database.

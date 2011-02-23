@@ -1,9 +1,11 @@
 package ejava.projects.edmv.bo;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 /**
  * This test case provides a _sparse_ example of testing of business
@@ -12,9 +14,10 @@ import junit.framework.TestCase;
  * @author jcstaff
  *
  */
-public class EDmvBOTest extends TestCase {
+public class EDmvBOTest {
     private static Log log = LogFactory.getLog(EDmvBOTest.class);
-    
+
+    @Test
     public void testPerson() {
         log.info("*** testPerson() ***");
         long id = 23;
@@ -27,6 +30,7 @@ public class EDmvBOTest extends TestCase {
         assertEquals("unexpected lastname", lastName, p.getLastName());
     }
     
+    @Test
     public void testVehicleRegistration() {
         log.info("*** testVehicleRegistration() ***");
         

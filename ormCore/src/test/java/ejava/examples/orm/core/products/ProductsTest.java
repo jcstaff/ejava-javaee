@@ -55,7 +55,6 @@ public class ProductsTest extends TestCase {
             public void setUp() throws Exception {
             }
             public void tearDown() throws Exception {
-                JPAUtil.close();
             }
         };
         

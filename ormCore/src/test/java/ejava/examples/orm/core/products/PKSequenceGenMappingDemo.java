@@ -3,6 +3,7 @@ package ejava.examples.orm.core.products;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,11 +23,11 @@ import junit.framework.TestCase;
 public class PKSequenceGenMappingDemo extends TestCase {
     private static Log log = LogFactory.getLog(BasicAnnotationDemo.class);
     private static final String PERSISTENCE_UNIT = "ormCore";
+    private EntityManagerFactory emf;
     private EntityManager em = null;
 
     protected void setUp() throws Exception {        
-        EntityManagerFactory emf = 
-            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);   
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
         em = emf.createEntityManager();
         em.getTransaction().begin();
     }

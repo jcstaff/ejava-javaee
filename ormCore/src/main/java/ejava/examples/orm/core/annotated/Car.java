@@ -74,13 +74,17 @@ public class Car implements Serializable {
     public void setCost(double cost) {
         this.cost = cost;
     }
+
+    @Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString())
+	           .append(", id=").append(id)
+		       .append(", make=").append(make)
+			   .append(", model=").append(model)
+			   .append(", year=").append(year)
+			   .append(", cost=$").append(cost);
+		return builder.toString();
+	}
     
-    public String toString() {
-        return super.toString()
-            + ", id=" + id
-            + ", make=" + make
-            + ", model=" + model
-            + ", year=" + year
-            + "$" + cost;        
-    }
 }

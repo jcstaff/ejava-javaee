@@ -45,8 +45,10 @@ public class Pen implements Serializable {
     }
     
     public String toString() {
-        return super.toString() +
-           ", pk=" + pk +
-           ", size=" + size;
+        return new StringBuilder()
+           .append(super.toString())	       
+           .append("pk=").append(pk)
+           .append(", size=").append(size)
+           .toString();
     }
 }

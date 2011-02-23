@@ -42,9 +42,12 @@ public class Fan implements Serializable {
         this.make = make;
     }
 
-    public String toString() {
-        return super.toString()
-            + ", id=" + id
-            + ", make=" + make;        
-    }
+	@Override
+	public String toString() {
+		return new StringBuilder()
+		          .append(super.toString())
+	              .append(", id=").append(id)
+		          .append(", make=").append(make)
+		          .toString();
+	}    
 }

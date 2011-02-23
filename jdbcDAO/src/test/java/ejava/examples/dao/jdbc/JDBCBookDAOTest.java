@@ -1,19 +1,21 @@
 package ejava.examples.dao.jdbc;
 
+import static org.junit.Assert.*;
+
 import java.sql.Connection;
+
 import java.sql.DriverManager;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.examples.dao.BookDAO;
 import ejava.examples.dao.DAOException;
 import ejava.examples.dao.domain.Book;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * This class provides a demonstration of using a DAO implemented with JDBC. 
@@ -25,15 +27,19 @@ import junit.framework.TestSuite;
  * @author jcstaff
  * $Id:$
  */
-public class JDBCBookDAOTest extends TestCase {
+public class JDBCBookDAOTest {
     public static final boolean USE_GENERATED_ID = false;
     static Log log_ = org.apache.commons.logging.LogFactory
             .getLog(JDBCBookDAOTest.class);
 
-    private static String dbDriver_ = System.getProperty("jdbc.driver");
-    private static String dbUrl_ = System.getProperty("jdbc.url");
-    private static String dbUser_ = System.getProperty("jdbc.user");
-    private static String dbPassword_ = System.getProperty("jdbc.password");
+	private static String dbDriver = 
+		System.getProperty("jdbc.driver", "org.hsqldb.jdbcDriver");
+	private static String dbUrl = 
+		System.getProperty("jdbc.url", "jdbc:hsqldb:hsql://localhost:9001");
+	private static String dbUser = 
+		System.getProperty("jdbc.user", "sa");
+	private static String dbPassword = 
+		System.getProperty("jdbc.password", "");
     private static long id=2001;    
     private static long nextId() { 
         return (USE_GENERATED_ID) ? 0 : id++; 
@@ -42,37 +48,16 @@ public class JDBCBookDAOTest extends TestCase {
     private BookDAO dao = null;
 
     /**
-     * The use of a suite here is overkill at the moment. However, we can 
-     * place any one-time setUp and tearDown tasks within the anonymous 
-     * TestSetup wrapper class returned to the JUnit framework.
-     */
-    public static Test suite() {
-        log_.info("suite()");
-        TestSuite tests = new TestSuite(JDBCBookDAOTest.class);
-
-        TestSetup wrapper = new TestSetup(tests) {
-            public void setUp() throws Exception {                
-            }
-            public void tearDown() throws Exception {
-            }
-        };
-
-        return wrapper;
-    }
-
-    /**
      * This method uses the DriverManager and provided system properties
      * to obtain a new connection to the database.
      */
     private static Connection getConnection() throws Exception {
-        log_.info("getConnection(" + dbUrl_ + ", " + dbUser_ + ", "
-                + dbPassword_ + ")");
-        assertTrue("db.url not specified", dbUrl_ != null);
-        assertTrue("db.driver not specified", dbDriver_ != null);
+        log_.info("getConnection(" + dbUrl + ", " + dbUser + ", "
+                + dbPassword + ")");
         Thread.currentThread().getContextClassLoader().loadClass(
-                        dbDriver_).newInstance();
-        return DriverManager.getConnection(dbUrl_, dbUser_,
-                        dbPassword_);
+                        dbDriver).newInstance();
+        return DriverManager.getConnection(dbUrl, dbUser,
+                        dbPassword);
     }
 
     /**
@@ -92,7 +77,8 @@ public class JDBCBookDAOTest extends TestCase {
      * to the database and the DAOs within this thread have a reference 
      * to it.
      */
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         connection = getConnection();
         connection.setAutoCommit(false);
         JDBCBookDAO.setConnection(connection);
@@ -103,13 +89,15 @@ public class JDBCBookDAOTest extends TestCase {
      * Close (or return to cache) connections between each test so we 
      * don't leak valuable resources.
      */
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         closeConnection();
     }    
 
     /**
      * This test verifies the ability of the DAO to create an object.
      */
+    @Test
     public void testCreate() throws Exception {
         log_.info("testCreate()");
 
@@ -136,6 +124,7 @@ public class JDBCBookDAOTest extends TestCase {
     /**
      * This test verifies the ability of the DAO to update the database.
      */
+    @Test
     public void testUpdate() throws Exception {
         log_.info("testUpdate()");
 
@@ -178,6 +167,7 @@ public class JDBCBookDAOTest extends TestCase {
      * This test verifies the ability of the DAO to get an object from the
      * database.
      */
+    @Test
     public void testGet() throws Exception {
         log_.info("testGet()");
 
@@ -208,6 +198,7 @@ public class JDBCBookDAOTest extends TestCase {
      * This test verifies the ability of the DAO to remove an object from
      * the database.
      */
+    @Test
     public void testRemove() throws Exception {
         log_.info("testRemove()");
         Book book = new Book(nextId());
@@ -234,6 +225,7 @@ public class JDBCBookDAOTest extends TestCase {
         assertTrue("get error not reported", errorReported);
     }
     
+    @Test
     public void testFind() throws Exception {
         log_.info("testFind()");
         try {
@@ -260,6 +252,7 @@ public class JDBCBookDAOTest extends TestCase {
      * make it available to the DAO. A test class is used to inspect the 
      * non-public access to that connection.
      */
+    @Test
     public void testGetConnection() throws Exception {
         log_.info("testGetConnection()");
         Connection connection = JDBCBookDAOTest.getConnection();

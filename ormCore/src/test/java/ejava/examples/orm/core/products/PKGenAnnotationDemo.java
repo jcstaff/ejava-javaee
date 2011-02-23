@@ -1,8 +1,11 @@
 package ejava.examples.orm.core.products;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.logging.Log;
@@ -24,11 +27,11 @@ import junit.framework.TestCase;
 public class PKGenAnnotationDemo extends TestCase {
     private static Log log = LogFactory.getLog(BasicAnnotationDemo.class);
     private static final String PERSISTENCE_UNIT = "ormCore";
+    private EntityManagerFactory emf;
     private EntityManager em = null;
 
     protected void setUp() throws Exception {        
-        EntityManagerFactory emf = 
-            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);   
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
         em = emf.createEntityManager();
         em.getTransaction().begin();
     }
@@ -98,6 +101,7 @@ public class PKGenAnnotationDemo extends TestCase {
 
     public void testTABLE() {
         log.info("testTABLE");
+        log.debug("table id before=" + getTableId());
         //note that since PKs are generated, we must pass in an object that
         //has not yet been assigned a PK value.
         ejava.examples.orm.core.annotated.EggBeater eggbeater = new EggBeater(0);
@@ -109,7 +113,21 @@ public class PKGenAnnotationDemo extends TestCase {
         em.flush(); 
         log.info("created eggbeater (after flush):" + eggbeater);
         
-        assertFalse(eggbeater.getId() == 0L);        
+        assertFalse(eggbeater.getId() == 0L);   
+        log.debug("table id after=" + getTableId());
+        for (int i=2; i<20; i++) {
+        	em.persist(new EggBeater());
+        	em.flush();
+            log.debug("table id after[" + i + "]=" + getTableId());        	
+        }
+    }
+    
+    protected Integer getTableId() {
+        List<?> results = em.createNativeQuery(
+        		"select UID_VAL from ORMCORE_EB_UID " +
+		        "where UID_ID='ORMCORE_EGGBEATER'")
+		        .getResultList();
+        return results.size() == 0 ? null : (Integer)results.get(0);
     }
 
     public void testSEQUENCE() {
@@ -129,6 +147,13 @@ public class PKGenAnnotationDemo extends TestCase {
             log.info("created gadget (after flush):" + gadget);
             
             assertFalse(gadget.getId() == 0L);                
+            
+            for (int i=2; i<20; i++) {
+            	Gadget g = new Gadget();
+            	g.setMake("gizmo " + i);
+            	em.persist(g);
+            	em.flush();
+            }
         } catch (PersistenceException ex) {
             String text = getText(ex);
             log.error("error in testIDENTITY:" + text, ex);

@@ -130,6 +130,9 @@
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
+                        <configuration>
+                            <includeScope>test</includeScope>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>unpack-ddl</id>

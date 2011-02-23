@@ -29,7 +29,7 @@ public class EDmvMgmtCommand extends EDmvIngestCommand {
 	private static PrintStream out = System.out;
 	
 	private static EntityManagerFactory getEMF() {
-		return Persistence.createEntityManagerFactory("eDmvBO");
+		return Persistence.createEntityManagerFactory("eDmvBO-test");
 	}
 	
 	private static void invoke(

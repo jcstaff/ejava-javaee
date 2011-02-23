@@ -57,9 +57,11 @@ public class Mower implements Serializable {
     }
     
     public String toString() {
-        return super.toString() +
-           ", make=" + make +
-           ", model=" + model +
-           ", size=" + size;
+        return new StringBuilder()
+           .append(super.toString())
+           .append(", make=").append(make)
+           .append(", model=").append(model)
+           .append(", size=").append(size)
+           .toString();
     }
 }

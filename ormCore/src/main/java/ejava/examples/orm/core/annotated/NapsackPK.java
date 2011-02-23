@@ -58,9 +58,11 @@ public class NapsackPK implements Serializable {
     }
     
     public String toString() {
-        return super.toString() +
-            ", make=" + make +
-            ", model=" + model;
+        return new StringBuilder()
+            .append(super.toString())	       
+            .append(", make=").append(make)
+            .append(", model=").append(model)
+            .toString();
     }
 
 }

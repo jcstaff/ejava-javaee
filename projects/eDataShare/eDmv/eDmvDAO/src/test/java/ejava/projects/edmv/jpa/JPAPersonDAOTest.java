@@ -1,5 +1,8 @@
 package ejava.projects.edmv.jpa;
 
+import static org.junit.Assert.*;
+
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,12 +13,13 @@ import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.projects.edmv.bo.Person;
 import ejava.projects.edmv.dao.PersonDAO;
 import ejava.projects.edmv.jpa.JPAPersonDAO;
-
-import junit.framework.TestCase;
 
 /**
  * This test case provides an example of one might test the JPA DAO. It 
@@ -25,7 +29,7 @@ import junit.framework.TestCase;
  * @author jcstaff
  *
  */
-public class JPAPersonDAOTest extends TestCase {
+public class JPAPersonDAOTest {
 	private static Log log = LogFactory.getLog(JPAPersonDAOTest.class);
 	//this code assumes all the JDBC properties were placed in 
 	//META-INF/persistence.xml when the file was copied from src to the 
@@ -35,6 +39,7 @@ public class JPAPersonDAOTest extends TestCase {
 	private EntityManager em;
 	private PersonDAO dao;
 	
+	@Before
 	public void setUp() throws Exception {
 		emf = Persistence.createEntityManagerFactory("eDmvBO-test");
 		em = emf.createEntityManager();
@@ -47,7 +52,8 @@ public class JPAPersonDAOTest extends TestCase {
 		em.getTransaction().begin();
 	}
 
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (em != null) {
 			EntityTransaction tx = em.getTransaction();
 			if (tx.isActive()) {
@@ -77,6 +83,7 @@ public class JPAPersonDAOTest extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testJPACreate() throws Exception {
 		log.info("*** testJPACreate ***");
 		

@@ -1,13 +1,20 @@
 package ejava.examples.dao.jpa;
 
+import static org.junit.Assert.*;
+
+
 import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import ejava.examples.dao.domain.Author;
-import junit.framework.TestCase;
 
 /**
  * This class provides a scalled down version of JPAAuthorDAOTest, in that
@@ -16,22 +23,23 @@ import junit.framework.TestCase;
  * 
  * @author jcstaff
  */
-public class JPAExtendedOnlyDemo extends TestCase {
+public class JPAExtendedOnlyDemo {
     private static Log log_ = LogFactory.getLog(JPAExtendedOnlyDemo.class);
+    private EntityManagerFactory emf;
     private EntityManager em;    
         
+    @Before
     public void setUp() throws Exception {
         log_.debug("setUp() started, em=" + em);
-        EntityManagerFactory emf = JPAUtil.getEntityManagerFactory("jpaDemo");
+        emf = Persistence.createEntityManagerFactory("jpaDemo");
         em = emf.createEntityManager();
     }
     
+    @After
     public void tearDown() throws Exception {
         try {
-            log_.debug("tearDown() started, em=" + em);
+            log_.debug("tearDown() started, em=" + em);            
             em.getTransaction().begin();
-            em.flush();
-            em.close();
             em.getTransaction().commit();
             log_.debug("tearDown() complete, em=" + em);
         }
@@ -39,12 +47,17 @@ public class JPAExtendedOnlyDemo extends TestCase {
             log_.fatal("tearDown failed", ex);
             throw ex;
         }
+        finally {
+            em.close();
+            emf.close();
+        }
     }
     
     
     /**
      * This test verifies we can persist an entity.
      */
+    @Test
     public void testCreate() throws Exception {
         log_.info("testCreate()");
         Author author = new Author();
@@ -66,6 +79,7 @@ public class JPAExtendedOnlyDemo extends TestCase {
      * database.
      * @throws Exception
      */
+    @Test
     public void testGet() throws Exception {
         log_.info("testGet()");
         Author author = new Author();
@@ -92,6 +106,7 @@ public class JPAExtendedOnlyDemo extends TestCase {
      * This test verifies the functionality of a query method that simply 
      * queries by the primary key value.
      */
+    @Test
     public void testQuery() throws Exception {
         log_.info("testQuery()");
         
@@ -140,6 +155,7 @@ public class JPAExtendedOnlyDemo extends TestCase {
     /**
      * This tests the ability to update on object.
      */
+    @Test
     public void testUpdate() throws Exception {
         log_.info("testUpdate");
         
@@ -201,6 +217,7 @@ public class JPAExtendedOnlyDemo extends TestCase {
     /**
      * This tests the ability to merge an object.
      */
+    @Test
     public void testMerge() throws Exception {
         log_.info("testMerge");
         
@@ -263,6 +280,7 @@ public class JPAExtendedOnlyDemo extends TestCase {
         assertEquals(new Date(published.getTime()+1000), author3.getPublishDate());
     }
     
+    @Test
     public void testRemove() throws Exception {
         log_.info("testRemove()");
 
@@ -308,5 +326,4 @@ public class JPAExtendedOnlyDemo extends TestCase {
             fail("object not deleted");
         }        
     }
-
 }

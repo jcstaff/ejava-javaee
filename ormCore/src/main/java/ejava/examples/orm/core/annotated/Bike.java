@@ -50,10 +50,14 @@ public class Bike implements Serializable {
     public void setSize(int size) {
         this.size = size;
     }
-    public String toString() {
-        return super.toString() + " id=" + id + 
-            ", make=" + make + 
-            ", model=" + model + 
-            ", " + size + "in";
-    }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString())
+		       .append(", id=").append(id)
+		       .append(", make=").append(make)
+			   .append(", model=").append(model)
+			   .append(", size=").append(size).append("in");
+		return builder.toString();
+	}    
 }

@@ -1,5 +1,8 @@
 package ejava.projects.edmv.jdbc;
 
+import static org.junit.Assert.*;
+
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -7,6 +10,9 @@ import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.projects.edmv.bo.Person;
 import ejava.projects.edmv.bo.VehicleRegistration;
@@ -14,8 +20,6 @@ import ejava.projects.edmv.dao.PersonDAO;
 import ejava.projects.edmv.dao.VehicleDAO;
 import ejava.projects.edmv.jdbc.JDBCPersonDAO;
 import ejava.projects.edmv.jdbc.JDBCVehicleDAO;
-
-import junit.framework.TestCase;
 
 /**
  * This test case provides an example of one might test the JDBC DAO. It 
@@ -26,23 +30,23 @@ import junit.framework.TestCase;
  * @author jcstaff
  *
  */
-public class JDBCVehicleDAOTest extends TestCase {
+public class JDBCVehicleDAOTest {
 	private static Log log = LogFactory.getLog(JDBCVehicleDAOTest.class);
-	private static String jdbcDriver = System.getProperty("jdbc.driver");
-	private static String jdbcURL = System.getProperty("jdbc.url");
-	private static String jdbcUser = System.getProperty("jdbc.user");
-	private static String jdbcPassword = System.getProperty("jdbc.password");
+	private static String jdbcDriver = 
+		System.getProperty("jdbc.driver", "org.hsqldb.jdbcDriver");
+	private static String jdbcURL = 
+		System.getProperty("jdbc.url", "jdbc:hsqldb:hsql://localhost:9001");
+	private static String jdbcUser = 
+		System.getProperty("jdbc.user", "sa");
+	private static String jdbcPassword = 
+		System.getProperty("jdbc.password", "");
 	
 	private Connection connection;
 	private VehicleDAO vehicleDAO;
 	private PersonDAO personDAO;
 	
+	@Before
 	public void setUp() throws Exception {
-		assertNotNull("jdbc.driver not supplied", jdbcDriver);
-		assertNotNull("jdbc.url not supplied", jdbcURL);
-		assertNotNull("jdbc.user not supplied", jdbcUser);
-		//assertNotNull("jdbc.password not supplied", jdbcPassword);
-		
 		log.debug("loading JDBC driver:" + jdbcDriver);
 		Thread.currentThread()
 		      .getContextClassLoader()
@@ -63,7 +67,8 @@ public class JDBCVehicleDAOTest extends TestCase {
 		cleanup();
 	}
 
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (connection != null) {
 			connection.commit();
 		    ((JDBCVehicleDAO)vehicleDAO).setConnection(null);
@@ -92,6 +97,7 @@ public class JDBCVehicleDAOTest extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testJDBCCreate() throws Exception {
 		log.info("*** testJDBCCreate ***");
 

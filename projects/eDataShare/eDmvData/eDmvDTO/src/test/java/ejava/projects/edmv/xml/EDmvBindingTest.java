@@ -1,9 +1,7 @@
 package ejava.projects.edmv.xml;
 
-import gov.ojp.it.jxdm._3_0.LocationType;
 import gov.ojp.it.jxdm._3_0.Person;
 import gov.ojp.it.jxdm._3_0.PersonPhysicalDetailsType;
-import gov.ojp.it.jxdm._3_0.ReferenceType;
 import gov.ojp.it.jxdm._3_0.ResidenceType;
 import gov.ojp.it.jxdm._3_0.VehicleRegistration;
 import info.ejava.projects.edmv._1.Dmv;
@@ -15,7 +13,6 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -121,7 +118,8 @@ public class EDmvBindingTest extends TestCase {
         }        
     }
     
-    private Object getById(String id, List objects) {        
+    private Object getById(String id, 
+    		@SuppressWarnings("rawtypes") List objects) {        
         Object theObject=null;
         for (Object object : objects) {
             Method getId;
@@ -140,7 +138,8 @@ public class EDmvBindingTest extends TestCase {
         return theObject;
     }
     
-    private Object getBySourceIDText(String id, List objects) {        
+	private Object getBySourceIDText(String id, 
+			@SuppressWarnings("rawtypes")List objects) {        
         Object theObject=null;
         for (Object object : objects) {
             Method getId;

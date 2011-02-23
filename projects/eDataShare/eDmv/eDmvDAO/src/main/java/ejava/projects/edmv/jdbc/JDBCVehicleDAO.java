@@ -36,7 +36,6 @@ public class JDBCVehicleDAO implements VehicleDAO {
 		PreparedStatement statement1 = null;
 		Statement statement2 = null;
 		PreparedStatement statement3 = null;
-		Statement statement4 = null;
 		ResultSet rs = null;
 				
 		try {
@@ -87,7 +86,6 @@ public class JDBCVehicleDAO implements VehicleDAO {
 			try { statement1.close(); } catch (Exception ignored) {}
 			try { statement2.close(); } catch (Exception ignored) {}
 			try { statement3.close(); } catch (Exception ignored) {}
-			try { statement4.close(); } catch (Exception ignored) {}
 		}
 	}
 

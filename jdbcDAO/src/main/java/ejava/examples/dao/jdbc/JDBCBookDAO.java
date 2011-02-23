@@ -23,7 +23,8 @@ import ejava.examples.dao.domain.Book;
  * $Id:$
  */
 public class JDBCBookDAO extends JDBCDAOBase implements BookDAO {
-    private static final Log log = LogFactory.getLog(JDBCDAOBase.class);
+    @SuppressWarnings("unused")
+	private static final Log log = LogFactory.getLog(JDBCDAOBase.class);
     public String SEQ_NAME = "DAO_BOOK_SEQ";
     public String SEQ_VALUE = "DAO_BOOK_UID";
     public String TABLE_NAME = "DAO_BOOK";

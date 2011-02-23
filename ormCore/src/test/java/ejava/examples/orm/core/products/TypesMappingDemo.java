@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,11 +25,11 @@ import junit.framework.TestCase;
 public class TypesMappingDemo extends TestCase {
     private static Log log = LogFactory.getLog(TypesMappingDemo.class);
     private static final String PERSISTENCE_UNIT = "ormCore";
+    private EntityManagerFactory emf;
     private EntityManager em = null;
 
     protected void setUp() throws Exception {        
-        EntityManagerFactory emf = 
-            JPAUtil.getEntityManagerFactory(PERSISTENCE_UNIT);   
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
         em = emf.createEntityManager();
         em.getTransaction().begin();
     }
@@ -61,7 +62,7 @@ public class TypesMappingDemo extends TestCase {
         //find the inserted object
         em.flush();
         em.clear();
-        Vase vase2 = em.find(Vase.class, 1L); 
+        Vase vase2 = em.find(Vase.class, 2L); 
 
         log.info("found vase:" + vase2);
         assertNotNull(vase2);

@@ -76,15 +76,17 @@ public class Vase implements Serializable {
     private void setId(long id) {
         this.id = id;
     }
-    
-    public String toString() {
-        return super.toString() +
-            ", id=" + id +
-            ", aDate=" + aDate +
-            ", aTime=" + aTime +
-            ", aTimestamp=" + aTimestamp +            
-            ", colorId=" + colorId +
-            ", colorName=" + colorName;        
-    }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString())
+		       .append(", id=").append(id)
+		       .append(", aDate=").append(aDate)
+			   .append(", aTime=").append(aTime)
+			   .append(", aTimestamp=").append(aTimestamp)
+			   .append(", colorId=").append(colorId)
+			   .append(", colorName=").append(colorName);
+		return builder.toString();
+	}
 }
 

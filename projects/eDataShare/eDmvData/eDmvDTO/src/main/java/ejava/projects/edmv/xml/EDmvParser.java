@@ -46,7 +46,7 @@ public class EDmvParser {
      * @throws JAXBException
      * @throws XMLStreamException
      */
-    public EDmvParser(Class rootType, InputStream is) 
+    public EDmvParser(Class<?> rootType, InputStream is) 
         throws JAXBException, XMLStreamException {
         JAXBContext jaxbContext = JAXBContext.newInstance(rootType);
         um = jaxbContext.createUnmarshaller();
@@ -60,8 +60,10 @@ public class EDmvParser {
             private HashMap<String,Object> idmap = null;
 
 			@Override
-			public Callable<?> resolve(final String id, Class targetType) throws SAXException {
-                return new Callable() {
+			public Callable<?> resolve(final String id, 
+					@SuppressWarnings("rawtypes") Class targetType) 
+					throws SAXException {
+                return new Callable<Object>() {
                     public Object call() throws Exception {
                         if(idmap==null)     return null;
                         return idmap.get(id);
@@ -77,7 +79,7 @@ public class EDmvParser {
 		};
         um.setProperty(IDResolver.class.getName(), idResolver);
     }
-    public EDmvParser(Class rootTypes[], InputStream is) 
+    public EDmvParser(Class<?> rootTypes[], InputStream is) 
         throws JAXBException, XMLStreamException {
         JAXBContext jaxbContext = JAXBContext.newInstance(rootTypes);
         um = jaxbContext.createUnmarshaller();
@@ -111,7 +113,8 @@ public class EDmvParser {
      * @throws XMLStreamException
      * @throws JAXBException
      */
-    public Object getObject(String...elements) 
+    @SuppressWarnings("rawtypes")
+	public Object getObject(String...elements) 
         throws XMLStreamException, JAXBException {
         xmlr.next();
         while (xmlr.hasNext()) {

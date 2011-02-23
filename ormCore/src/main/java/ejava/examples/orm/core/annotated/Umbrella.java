@@ -64,9 +64,11 @@ public class Umbrella implements Serializable {
     }
 
     public String toString() {
-        return super.toString() +
-           "make=" + make +
-           ", model=" + model;
+        return new StringBuilder()
+           .append(super.toString())	       
+           .append("make=").append(make)
+           .append(", model=").append(model)
+           .toString();
     }
     private void trace(String message) {
         log.debug(super.toString() + ":" + message);

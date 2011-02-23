@@ -58,10 +58,13 @@ public class MakeModelPK implements Serializable {
         }
     }
     
-    public String toString() {
-        return super.toString() +
-            ", make=" + make +
-            ", model=" + model;
-    }
+	@Override
+	public String toString() {
+		return new StringBuilder()
+		          .append(super.toString())	       
+		          .append(", make=").append(make)
+		          .append(", model=").append(model)
+		          .toString();
+	}    
 
 }

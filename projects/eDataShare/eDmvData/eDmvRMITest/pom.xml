@@ -118,6 +118,13 @@
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
@@ -171,6 +178,13 @@
                         <phase>test-compile</phase>
                         <goals>
                             <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>undeploy-component</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>undeploy</goal>
                         </goals>
                     </execution>
                 </executions>

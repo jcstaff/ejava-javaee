@@ -44,10 +44,13 @@ public class Manufacturer implements Serializable {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+    
     public String toString() {
-        return super.getClass().getName() +
-            ", name=" + name +
-            ", address=" + address +
-            ", phone=" + phone;        
+        return new StringBuilder()
+           .append(super.getClass().getName())
+           .append(", name=").append(name)
+           .append(", address=").append(address)
+           .append(", phone=").append(phone)
+           .toString();        
     }
 }

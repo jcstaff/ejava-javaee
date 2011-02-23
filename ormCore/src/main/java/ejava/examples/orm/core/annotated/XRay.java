@@ -55,9 +55,11 @@ public class XRay implements Serializable {
     
     
     public String toString() {
-        return super.getClass().getName() +
-            ", id=" + id +
-            ", model=" + model +
-            ", maker=" + maker;
+        return new StringBuilder()
+           .append(super.getClass().getName())
+           .append(", id=").append(id)
+           .append(", model=").append(model)
+           .append(", maker=").append(maker)
+           .toString();
     }
 }

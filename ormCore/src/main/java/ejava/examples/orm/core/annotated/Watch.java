@@ -94,16 +94,18 @@ public class Watch implements Serializable {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-
-    public String toString() {
-        return super.toString() +
-            ", id=" + id +
-            ", make=" + make + 
-            ", model=" + model +
-            ", owner=" + owner +
-            ", cardnum=" + cardnum +
-            ", manufacturer=" + manufacturer +
-            ", address=" + address +
-            ", phone=" + phone;
-    }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString())
+		       .append(", id=").append(id)
+		       .append(", make=").append(make)
+			   .append(", model=").append(model)
+			   .append(", owner=").append(owner)
+			   .append(", cardnum=").append(cardnum)
+			   .append(", manufacturer=").append(manufacturer)
+			   .append(", address=").append(address)
+			   .append(", phone=").append(phone);
+		return builder.toString();
+	}
 }
