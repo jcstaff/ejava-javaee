@@ -1,7 +1,12 @@
 package ejava.examples.orm.rel;
 
+import static org.junit.Assert.*;
+
+
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.junit.Test;
 
 import ejava.examples.orm.rel.annotated.Author;
 import ejava.examples.orm.rel.annotated.Media;
@@ -16,6 +21,7 @@ import ejava.examples.orm.rel.annotated.WantList;
  */
 public class ManyToManyDemo extends DemoBase {
     
+	@Test
     public void testManyToManyUniCreate() {
         log.info("testManyToManyUniCreate");
         Collection<WantList> wantLists = new ArrayList<WantList>(); 
@@ -69,6 +75,7 @@ public class ManyToManyDemo extends DemoBase {
     }
 
     
+	@Test
     public void testManyToManyBiCreate() {
         log.info("testManyToManyBiCreate");
         Collection<Author> authors = new ArrayList<Author>(); 

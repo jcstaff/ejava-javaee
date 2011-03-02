@@ -1,5 +1,7 @@
 package ejava.examples.orm.rel;
 
+import org.junit.Test;
+
 import ejava.examples.orm.rel.annotated.Borrower;
 import ejava.examples.orm.rel.annotated.Library;
 import ejava.examples.orm.rel.annotated.Person;
@@ -14,6 +16,7 @@ import ejava.examples.orm.rel.annotated.Person;
  */
 public class OneToManyMapDemo extends DemoBase {
     
+	@Test
     public void testMapCreate() {
         log.info("testMapCreate");
         ejava.examples.orm.rel.annotated.Library library

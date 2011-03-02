@@ -53,8 +53,8 @@ Part A: Create Project Shell
     flat structure under a common parent project. This parent project
     will be used to coordinate goals involved of the entire application.
     The order in which it builds things can be influenced by the 
-    configuration you supply, however, it will analyze dependencies
-    at build time are either honor the dependency ordering or fail
+    configuration you supply, however, maven will analyze dependencies
+    at build time and either honor the actual dependency ordering or fail
     if you have expressed a circular dependency.
 
     [[1]] Create a root directory for the exercise. This will host
@@ -109,39 +109,41 @@ $ mkdir javaeeEx
 ---
 $ mvn clean install
 [INFO] Scanning for projects...
+[INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise
-[INFO]    task-segment: [clean, install]
+[INFO] Building Java EE Exercise 1.0-SNAPSHOT
 [INFO] ------------------------------------------------------------------------
-[INFO] [clean:clean]
-[INFO] [site:attach-descriptor]
-[INFO] [install:install]
-[INFO] Installing c:\proj\javaeeEx\pom.xml to c:\proj\repository.test\myorg\javaee\
-javaeeEx\1.0-SNAPSHOT\javaeeEx-1.0-SNAPSHOT.pom
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ javaeeEx ---
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeEx ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/pom.xml to /home/jcstaff/.m2/repository3/myorg/javaee/javaeeEx/1.0-SNAPSHOT/javaeeEx-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2 seconds
-[INFO] Finished at: Sun Mar 15 21:36:08 EDT 2009
-[INFO] Final Memory: 7M/14M
+[INFO] Total time: 1.807s
+[INFO] Finished at: Mon Feb 28 20:43:32 EST 2011
+[INFO] Final Memory: 2M/57M
 [INFO] ------------------------------------------------------------------------
+
 ---
 
 * {Create the EJB Maven project}
 
     The EJB project will be used to develop one of the EJB components. The
-    term "EJB" gets a little overloaded at times.  There are EJB classes,
-    EJB components, and EJB tiers.  EJB classes break out into the
-    @Remote and @Local interfaces, the EJB implementation class (either
-    @Stateless, @Stateful, or @MessageDriven), and support classes. It
-    is common to think of each cohesive pairing of @Remote, @Local,
-    and implementation class as "an EJB".  You can have many EJBs
-    (the sets of classes) within an EJB component. An EJB component is
-    a materialized as a .jar and there can be many EJB components within
-    your EJB tier. For this exercise we will have only one EJB component
-    and start out with only one EJB.  A second EJB will be added to the
-    single EJB component in a later excercise to help support testing.
-    A single Maven project can build a single EJB component.
+    term "EJB" gets a little overloaded at times.  There are EJB
+    classes, EJB components, and EJB tiers.  EJB classes break out
+    into the business-remote (aka @Remote) and business-local (aka
+    @Local) interfaces, the EJB implementation class (either @Stateless,
+    @Stateful, or @MessageDriven), and support classes. It is common to
+    think of each cohesive pairing of @Remote, @Local, and implementation
+    class as "an EJB".  You can have many EJBs (the sets of classes)
+    within an EJB component. An EJB component is a materialized as a .jar
+    and there can be many EJB components within your EJB tier. For this
+    exercise we will have only one EJB component and start out with only
+    one EJB.  A second EJB will be added to the single EJB component in
+    a later excercise to help support testing.  A single Maven project
+    can build a single EJB component.
 
 
     [[1]] Add an EJB project directory to your project tree.
@@ -193,31 +195,36 @@ $ mkdir javaeeExEJB
 </project>
 ---
 
-    [[1]] Add in the Java SE 1.5 plugin specification to make sure JDK
-    1.5 is used.
+    [[1]] Add in the maven-compiler-plugin specification to make sure JDK
+    1.5 or 1.6 is used.
 
 ---
     <build>
         <plugins>
-              <!-- make sure we are building java5 -->
+              <!-- make sure we are building jdk5 or jdk6 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
     ...
 ---
 
     [[1]] Add in the maven-ejb-plugin specification to configure it
-    for EJB Version 3.0. Otherwise, it will default to a pre-3.0
-    version that does not handle JPA. We will also add a few more 
-    details.
+    for EJB Version 3.0.  We will also add a few more details.
+
+        * tell is explicitly to use EJB 3.0 versus the legacy EJB 2.1
+        approach. There are many changes between the two approaches
+        so we need to make sure we are set correctly. 
     
         * tell it to add all dependencies with scope=compile 
-        to the Class-Path in the META-INF/MANIFEST.MF
+        to the Class-Path in the META-INF/MANIFEST.MF. This is a 
+        pure Java construct that JavaEE takes advantage of in 
+        order to resolve dependencies on the server. 
 
         * tell it to create a ejb-client.jar file for remote clients.
         This will be populated using a set of include and exclude 
@@ -250,33 +257,35 @@ $ mkdir javaeeExEJB
 ---
 
     [[1]] Add several dependencies to account for use of logging, 
-    annotations, and EJB constructs. Use the artifacts out of the
-    JBoss-maintained maven repository since javaee.jar is not as
-    easy to locate.
+    annotations, and EJB constructs. Since we will be instantiating
+    this code only on the server and not in a 2-tier approach, we
+    the pure JavaEE API from Sun/Oracle will do fine. Otherwise we
+    should use the dependencies from Hibernate/JBoss.
+
+    [Note:] You should always declare a scope=provided dependency
+    on the JavaEE API artifacts so that downstream clients of the
+    module are free to supply their own version/provider of the 
+    API.
+
+    []
 
 ---
-    <!-- this repositories holds many of the javaee5 jar files -->
+    <!-- this repository holds many of the javaee jar files -->
     <repositories>
         <repository>
-            <id>jboss-repo</id>
-            <name>JBoss Maven Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
+            <id>java.net-repo</id>
+            <name>Java.net Maven Repository</name>
+            <url>http://download.java.net/maven/2</url>
         </repository>
     </repositories>
 
     <dependencies>
         <!-- core dependencies -->
         <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>jsr250-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.ejb</groupId>
-          <artifactId>ejb-api</artifactId>
-          <version>3.0</version>
-          <scope>provided</scope>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>6.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
           <groupId>commons-logging</groupId>
@@ -358,10 +367,11 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     public void ping() {
         log.debug("ping called");
     }
+}
 ---
 
 
-    [[1]] The EJB should build at this time. You will notice the following
+    [[1]] The EJB can be built at this time. You will notice the following
     in the output.
 
         * Our 3 Java files (@Remote, @Local, and @Stateless) were compiled
@@ -374,37 +384,34 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
 ---
 $ (cd javaeeExEJB/; mvn clean install)
 [INFO] Scanning for projects...
+[INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise EJB
-[INFO]    task-segment: [clean, install]
+[INFO] Building Java EE Exercise EJB 1.0-SNAPSHOT
 [INFO] ------------------------------------------------------------------------
-[INFO] [clean:clean]
-[INFO] [resources:resources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [compiler:compile]
-[INFO] Compiling 3 source files to c:\proj\javaeeEx\javaeeExEJB\target\classes
-[INFO] [resources:testResources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [compiler:testCompile]
-[INFO] No sources to compile
-[INFO] [surefire:test]
-[INFO] No tests to run.
-[INFO] [ejb:ejb]
-[INFO] Building ejb javaeeExEJB-1.0-SNAPSHOT with ejbVersion 3.0
-[INFO] Building jar: c:\proj\javaeeEx\javaeeExEJB\target\javaeeExEJB-1.0-SNAPSHOT.jar
-[INFO] Building ejb client javaeeExEJB-1.0-SNAPSHOT-client
-[INFO] Building jar: c:\proj\javaeeEx\javaeeExEJB\target\javaeeExEJB-1.0-SNAPSHOT-client.jar
-[INFO] [install:install]
-[INFO] Installing c:\proj\javaeeEx\javaeeExEJB\target\javaeeExEJB-1.0-SNAPSHOT.jar to c:\proj\repository.test\myorg\java
-ee\javaeeExEJB\1.0-SNAPSHOT\javaeeExEJB-1.0-SNAPSHOT.jar
-[INFO] Installing c:\proj\javaeeEx\javaeeExEJB\target\javaeeExEJB-1.0-SNAPSHOT-client.jar to c:\proj\repository.test\myo
-rg\javaee\javaeeExEJB\1.0-SNAPSHOT\javaeeExEJB-1.0-SNAPSHOT-client.jar
+...
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] --- maven-ejb-plugin:2.3:ejb (default-ejb) @ javaeeExEJB ---
+[INFO] Building EJB javaeeExEJB-1.0-SNAPSHOT with EJB version 3.0
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT.jar
+[INFO] Building EJB client javaeeExEJB-1.0-SNAPSHOT-client
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT-client.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExEJB ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEJB/1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEJB/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEJB/1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT.pom
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT-client.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEJB/1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT-client.jar
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2 seconds
-[INFO] Finished at: Sun Mar 15 22:34:52 EDT 2009
-[INFO] Final Memory: 7M/14M
+[INFO] Total time: 10.853s
+[INFO] Finished at: Mon Feb 28 21:30:35 EST 2011
+[INFO] Final Memory: 8M/128M
 [INFO] ------------------------------------------------------------------------
 ---
 
@@ -421,27 +428,22 @@ rg\javaee\javaeeExEJB\1.0-SNAPSHOT\javaeeExEJB-1.0-SNAPSHOT-client.jar
 ---
 $ mvn clean install
 [INFO] Scanning for projects...
-[INFO] Reactor build order:
-[INFO]   Java EE Exercise
-[INFO]   Java EE Exercise EJB
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise
-
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise
+[INFO] Java EE Exercise EJB
 ...
-
-[INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [1.405s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [9.130s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.469s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [1.531s]
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 4 seconds
-[INFO] Finished at: Sun Mar 15 22:42:29 EDT 2009
-[INFO] Final Memory: 11M/19M
-[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 10.898s
+[INFO] Finished at: Mon Feb 28 21:34:41 EST 2011
+[INFO] Final Memory: 8M/128M
 ---
 
     [[1]] Verify this is what you have so far.
@@ -541,31 +543,37 @@ $ cat javaeeExEAR/pom.xml
 
 ---
 $ (cd javaeeExEAR/; mvn clean install)
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise EAR
-[INFO]    task-segment: [clean, install]
-[INFO] ------------------------------------------------------------------------
-[INFO] [clean:clean]
-[INFO] Deleting directory c:\proj\javaeeEx\javaeeExEAR\target
-[INFO] [ear:generate-application-xml]
-[INFO] Generating application.xml
-[INFO] [resources:resources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [ear:ear]
+[INFO] Scanning for projects...                                                                                                  
+[INFO]                                                                                                                           
+[INFO] ------------------------------------------------------------------------                                                  
+[INFO] Building Java EE Exercise EAR 1.0-SNAPSHOT                                                                                
+[INFO] ------------------------------------------------------------------------                                                  
+Downloading: http://download.java.net/maven/2/myorg/javaee/javaeeEx/1.0-SNAPSHOT/maven-metadata.xml                              
+[INFO]                                                                                                                           
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ javaeeExEAR ---                                                      
+[INFO] Deleting /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target                                                              
+[INFO]                                                                                                                           
+[INFO] --- maven-ear-plugin:2.4.2:generate-application-xml (default-generate-application-xml) @ javaeeExEAR ---                  
+[INFO] Generating application.xml                                                                                                
+[INFO]                                                                                                                           
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ javaeeExEAR ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/jcstaff/solutions/javaeeEx/javaeeExEAR/src/main/resources
+[INFO] 
+[INFO] --- maven-ear-plugin:2.4.2:ear (default-ear) @ javaeeExEAR ---
 [INFO] Copying artifact[ejb:myorg.javaee:javaeeExEJB:1.0-SNAPSHOT] to[javaeeExEJB-1.0-SNAPSHOT.jar]
-[INFO] Could not find manifest file: c:\proj\javaeeEx\javaeeExEAR\src\main\application\META-INF\MANIFEST.MF - Generating
- one
-[INFO] Building jar: c:\proj\javaeeEx\javaeeExEAR\target\javaeeExEAR-1.0-SNAPSHOT.ear
-[INFO] [install:install]
-[INFO] Installing c:\proj\javaeeEx\javaeeExEAR\target\javaeeExEAR-1.0-SNAPSHOT.ear to c:\proj\repository.test\myorg\java
-ee\javaeeExEAR\1.0-SNAPSHOT\javaeeExEAR-1.0-SNAPSHOT.ear
+[INFO] Could not find manifest file: /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT/META-INF/MANIFEST.MF - Generating one
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExEAR ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEAR/1.0-SNAPSHOT/javaeeExEAR-1.0-SNAPSHOT.ear
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEAR/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEAR/1.0-SNAPSHOT/javaeeExEAR-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 1 second
-[INFO] Finished at: Sun Mar 15 22:54:48 EDT 2009
-[INFO] Final Memory: 5M/10M
+[INFO] Total time: 2.413s
+[INFO] Finished at: Tue Mar 01 22:33:15 EST 2011
+[INFO] Final Memory: 4M/82M
 [INFO] ------------------------------------------------------------------------
 ---
 
@@ -575,15 +583,14 @@ ee\javaeeExEAR\1.0-SNAPSHOT\javaeeExEAR-1.0-SNAPSHOT.ear
     for you.
 
 ---
-$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
-META-INF/
-META-INF/MANIFEST.MF
-javaeeExEJB-1.0-SNAPSHOT.jar
+$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear 
+...
 META-INF/application.xml
+javaeeExEJB-1.0-SNAPSHOT.jar
 ...
 ---
 ---
-$ cat javaeeExEAR/target/application.xml
+$ cat javaeeExEAR/target/application.xml 
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE application PUBLIC
         "-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN"
@@ -595,7 +602,6 @@ $ cat javaeeExEAR/target/application.xml
   <module>
     <ejb>javaeeExEJB-1.0-SNAPSHOT.jar</ejb>
   </module>
-</application>
 ---
 
     [[1]] Add the EAR to the root level project and verify everything builds 
@@ -610,28 +616,29 @@ $ cat javaeeExEAR/target/application.xml
 ---
 $ mvn clean install
 [INFO] Scanning for projects...
-[INFO] Reactor build order:
-[INFO]   Java EE Exercise
-[INFO]   Java EE Exercise EJB
-[INFO]   Java EE Exercise EAR
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise
+[INFO] Java EE Exercise EJB
+[INFO] Java EE Exercise EAR
+[INFO]                                                                         
 
+...
 ...
 
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.644s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.099s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.661s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.391s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [1.328s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [0.406s]
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 4 seconds
-[INFO] Finished at: Sun Mar 15 22:58:37 EDT 2009
-[INFO] Final Memory: 12M/21M
+[INFO] Total time: 5.597s
+[INFO] Finished at: Tue Mar 01 22:37:59 EST 2011
+[INFO] Final Memory: 8M/128M
 [INFO] ------------------------------------------------------------------------
 ---
 
@@ -657,13 +664,16 @@ javaeeEx/
 
 * {Create the RMI Test Maven project}
 
-    Any test we would have created within the EJB would have needed to
-    test the EJB locally as if it were POJO business logic because it 
-    is not until the EJB is deployed to the application server that
-    it can be accessed and tested in its intended runtime environment.
-    Therefore, we add an additional Maven project with a JUnit test and
-    configurations to deploy and test the EJB from its RMI interface.
-    The project will have no target artifact that we care about. One 
+    Any tests we implement within the EJB module itself would likely
+    be a POJO-level unit test. EJB 3.1 does provide a means to create
+    a lightweight EJB container to be used as a test hardness, but 
+    that does not substitue for honest end-to-end testing using a 
+    server deployment of the EJB/EAR and external test clients.
+    We will create an additional module to deploy the EAR, locate
+    the server and EJB remote interface, and test the EJB through
+    that interface. We can reuse tests from lower levels, but
+    that will not be shown as a part of this exercise.
+    This module will have no target artifact that we care about. One 
     could do some tweeking of the pom.xml to keep that from being 
     generated, but I have found that to only confuse Eclipse so we'll
     just live with and empty, unused RMI Test.jar.
@@ -702,15 +712,17 @@ $ cat javaeeExTest/pom.xml
     </description>
 
     <dependencies>
-...
+
     </dependencies>
 
     <build>
-...
+        <plugins>
+
+        </plugins>
     </build>
 
     <profiles>
-...
+
     </profiles>
 </project>
 ---
@@ -738,7 +750,7 @@ $ cat javaeeExTest/pom.xml
         </dependency>
 ---
 
-    [[1]] Configure the compiler plugin to use Java5.
+    [[1]] Configure the compiler plugin to use JDK 5 or 6.
 
 ---
     <build>
@@ -747,9 +759,10 @@ $ cat javaeeExTest/pom.xml
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
 ---
@@ -759,33 +772,60 @@ $ cat javaeeExTest/pom.xml
     all required client dependencies in a single declaration.  We are
     using a profile in this case to cleary isolate the JBoss-specific
     aspects of this pom.xml file. You could also roll these dependencies
-    up to the root level.
+    up to the root level. 
+
+    [Note:] One negative I have noticed in using the jboss-as-client.pom
+    dependency is that it is a catch-all and will add +100 jar files
+    to your classpath. That does not present a functional proble, but it
+    will cause your dependency classpath to be 10s of MB in size for 
+    even the simplest clients.
+
+    []
 
 ---
 <profile>
     <id>jboss</id>
     <activation>
-        <property>
-            <name>!appserver</name>
+        <property> <!-- activate this unless -Dserver present -->
+            <name>!server</name>
         </property>
     </activation>
     <properties>
       <!-- more here later -->
     </properties>
+
     <repositories>
         <repository>
-            <id>jboss-repo</id>
-            <name>JBoss Maven Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-client</artifactId>
-            <version>5.1.0.GA</version>            
+            <version>6.0.0.Final</version>            
             <type>pom</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                    <groupId>org.jboss.security</groupId>
+                    <artifactId>jbosssx-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.6</version>
         </dependency>
     </dependencies>
     <build>
@@ -834,7 +874,7 @@ java.naming.factory.url.pkgs=${java.naming.factory.url.pkgs}
     <properties>
           <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
           </java.naming.factory.initial>
-          <java.naming.provider.url>jnp://localhost:1099
+          <java.naming.provider.url>jnp://${jboss.host}:1099
           </java.naming.provider.url>
           <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
           </java.naming.factory.url.pkgs>
@@ -849,16 +889,32 @@ java.naming.factory.url.pkgs=${java.naming.factory.url.pkgs}
 ---
 $ (cd javaeeExTest/; mvn clean install)
 [INFO] Scanning for projects...
+[INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise Remote Test
+[INFO] Building Java EE Exercise Remote Test 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[WARNING] The POM for woodstox:wstx-asl:jar:3.2.1 is missing, no dependency information available
+[WARNING] The POM for ws-commons:policy:jar:1.0 is missing, no dependency information available
 
 ...
 
-[INFO] BUILD SUCCESSFUL
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+...
+
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 3 seconds
-[INFO] Finished at: Sun Mar 15 23:27:07 EDT 2009
-[INFO] Final Memory: 8M/16M
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 12.913s
+[INFO] Finished at: Tue Mar 01 23:08:33 EST 2011
+[INFO] Final Memory: 25M/269M
 [INFO] ------------------------------------------------------------------------
 ---
 ---
@@ -879,19 +935,23 @@ java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces
     them to be the same, but that ends up biting you in the end.
 
 ---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
 package myorg.javaeeex.ejbclient;
 
 import javax.naming.InitialContext;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class RegistrarTest extends TestCase {
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
+public class RegistrarTest {
     Log log = LogFactory.getLog(RegistrarTest.class);
     InitialContext jndi;
 
+    @Before
     public void setUp() throws Exception {
 
         log.debug("getting jndi initial context");
@@ -900,8 +960,10 @@ public class RegistrarTest extends TestCase {
         jndi.lookup("/"); //do a quick comms check of JNDI
     }
 
+    @Test
     public void testPing() {
     }
+}
 ---
 
     [[1]] Put a log4j.xml configuration in place.
@@ -926,7 +988,7 @@ $ cat javaeeExTest/src/test/resources/log4j.xml
    </appender>
 
    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
-      <param name="File" value="/tmp/log4j-out.txt"/>
+      <param name="File" value="target/log4j-out.txt"/>
       <param name="Append" value="false"/>
       <param name="MaxFileSize" value="100KB"/>
       <param name="MaxBackupIndex" value="1"/>
@@ -967,14 +1029,68 @@ is java.net.ConnectException: Connection refused: connect]]]
         at org.jnp.interfaces.NamingContext.lookup(NamingContext.java:634)
         at org.jnp.interfaces.NamingContext.lookup(NamingContext.java:627)
         at javax.naming.InitialContext.lookup(InitialContext.java:351)
+
+
+$ (cd javaeeExTest/; mvn clean install -Pjboss6)
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise Remote Test 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+...
+
+Running myorg.javaeeex.ejbclient.RegistrarTest
+ -getting jndi initial context
+ -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=127.0.0.4:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 5.433 sec <<< FAILURE!
+
+Results :
+
+Tests in error: 
+  testPing(myorg.javaeeex.ejbclient.RegistrarTest)
+
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 19.910s
+[INFO] Finished at: Tue Mar 01 23:23:19 EST 2011
+[INFO] Final Memory: 36M/270M
+[INFO] ------------------------------------------------------------------------
+[WARNING] The requested profile "hsql" could not be activated because it does not exist.
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:2.7.1:test (default-test) on project javaeeExTest: There are test failures.
+[ERROR] 
+[ERROR] Please refer to /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/surefire-reports for the individual test results.
+---
+---
+$ more javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt 
+ -------------------------------------------------------------------------------
+Test set: myorg.javaeeex.ejbclient.RegistrarTest
+ -------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 5.432 sec <<< FAILURE!
+testPing(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 5.388 sec  <<< ERROR!
+javax.naming.CommunicationException: Could not obtain connection to any of these urls: 127.0.0.4:1099 and discovery failed with e
+rror: javax.naming.CommunicationException: Receive timed out [Root exception is java.net.SocketTimeoutException: Receive timed ou
+t]
+        at org.jnp.interfaces.NamingContext.discoverServer(NamingContext.java:1690)
+        at org.jnp.interfaces.NamingContext.checkRef(NamingContext.java:1761)
+        at org.jnp.interfaces.NamingContext.lookup(NamingContext.java:695)
+        at org.jnp.interfaces.NamingContext.lookup(NamingContext.java:688)
+        at javax.naming.InitialContext.lookup(InitialContext.java:409)
+        at myorg.javaeeex.ejbclient.RegistrarTest.setUp(RegistrarTest.java:22)
+...
 ---
 
 * {Start JBoss Application Server}
 
-    [Note:] JBoss provides several profiles for its application server. It's
-    default profile is an optimized starting point. However, it is not 
-    fully Java EE-compliant. They provide a standard configuration that is
-    suppose to be fully Java EE-compliant. To use the non-default profiles, 
+    [Note:] JBoss provides several profiles for its application
+    server. It's default profile is an optimized starting point. However,
+    it is not fully Java EE-compliant. They provide a standard
+    configuration that is is meant to be fully Java EE-compliant. The
+    profile you created the first week of class is a copy of the standard
+    profile with minor resource edits.  To use a non-default profile,
     we need to add a -c (profile-name) switch to the command line.
 
     []
@@ -987,41 +1103,37 @@ is java.net.ConnectException: Connection refused: connect]]]
     we start the server. These edits will allow debug from our 
     EJB to be logged in the server output.
 
-        * change the Theshold value for the CONSOLE from INFO to
-        DEBUG
+        * verify the CONSOLE logger does not have a Threshold set 
+        to restrict DEBUG
 
         * add a logger for org and com, with a level=INFO so that the 
         change to CONSOLE does not cause org.* class output to
         overwhelm the console.
 
         * add logger entries for myorg and the ejava class examples.
+        Search the file before adding. They may already be defined.
 
 ---
-$ cat server/standard/conf/jboss-log4j.xml
+$ cat $JBOSS_HOME/server/ejava-jboss6/deploy/jboss-logging.xml
+---
+---
+   <console-handler name="CONSOLE" autoflush="true" target="System.out">
+      <error-manager>
+         <only-once/>
+      </error-manager>
 
+<!--
+      <level name="INFO"/>
+      -->
 ...
-   <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
-      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
-      <param name="Target" value="System.out"/>
-      <param name="Threshold" value="DEBUG"/>
-
-      <layout class="org.apache.log4j.PatternLayout">
-         <!-- The default pattern: Date Priority [Category] Message\n -->
-         <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
-      </layout>
-   </appender>
-
-   <logger name="myorg">
-       <level value="debug"/>
+---
+---
+...
+   <logger category="myorg">
+      <level name="DEBUG"/>
    </logger>
-   <logger name="ejava">
-       <level value="debug"/>
-   </logger>
-   <logger name="org">
-       <level value="info"/>
-   </logger>
-   <logger name="com">
-       <level value="info"/>
+   <logger category="ejava">
+      <level name="DEBUG"/>
    </logger>
 ---
 
@@ -1029,77 +1141,99 @@ $ cat server/standard/conf/jboss-log4j.xml
     [[1]] Start the JBoss server.
 
 ---
-$ pwd
-/cygdrive/c/apps/jboss-5.1.0.GA
-
-$ ./bin/run.sh -c standard
-Calling C:\apps\jboss-5.1.0.GA\bin\run.conf.bat
-===============================================================================
+$ /opt/jboss-6.0.0.Final/bin/run.sh -c ejava-jboss6 
+=========================================================================
 
   JBoss Bootstrap Environment
 
-  JBOSS_HOME: C:\apps\jboss-5.1.0.GA
+  JBOSS_HOME: /opt/jboss-6.0.0.Final
 
-  JAVA: c:\apps\java\jdk1.5.0_17\bin\java
+  JAVA: /usr/lib/jvm/java-6-openjdk/bin/java
 
-  JAVA_OPTS: -Dprogram.name=run.bat -Xms128M -Xmx512M -XX:MaxPermSize=256M -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Dorg.jboss.resolver.warning=true -server
+  JAVA_OPTS: -server -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n -Djava.net.preferIPv4Stack=true -Dprogram.name=run.sh -Djava.library.path=/opt/jboss-6.0.0.Final/bin/native/lib
 
-  CLASSPATH: C:\apps\jboss-5.1.0.GA\bin\run.jar
+  CLASSPATH: /opt/jboss-6.0.0.Final/bin/run.jar:/usr/lib/jvm/java-6-openjdk/lib/tools.jar
 
-===============================================================================
+=========================================================================
 
-18:10:34,218 INFO  [ServerImpl] Starting JBoss (Microcontainer)...
+23:36:43,714 INFO  [AbstractJBossASServerBase] Server Configuration:
+
+        JBOSS_HOME URL: file:/opt/jboss-6.0.0.Final/
+        Bootstrap: $JBOSS_HOME/server/ejava-jboss6/conf/bootstrap.xml
+        Common Base: $JBOSS_HOME/common/
+        Common Library: $JBOSS_HOME/common/lib/
+        Server Name: ejava-jboss6
+        Server Base: $JBOSS_HOME/server/
+        Server Library: $JBOSS_HOME/server/ejava-jboss6/lib/
+        Server Config: $JBOSS_HOME/server/ejava-jboss6/conf/
+        Server Home: $JBOSS_HOME/server/ejava-jboss6/
+        Server Data: $JBOSS_HOME/server/ejava-jboss6/data/
+        Server Log: $JBOSS_HOME/server/ejava-jboss6/log/
+        Server Temp: $JBOSS_HOME/server/ejava-jboss6/tmp/
+
+23:36:43,720 INFO  [AbstractServer] Starting: JBossAS [6.0.0.Final "Neo"]
+23:36:46,025 INFO  [ServerInfo] Java version: 1.6.0_20,Sun Microsystems Inc.
+23:36:46,025 INFO  [ServerInfo] Java Runtime: OpenJDK Runtime Environment (build 1.6.0_20-b20)
+23:36:46,025 INFO  [ServerInfo] Java VM: OpenJDK Server VM 19.0-b09,Sun Microsystems Inc.
+23:36:46,025 INFO  [ServerInfo] OS-System: Linux 2.6.32-28-generic,i386
+23:36:46,026 INFO  [ServerInfo] VM arguments: -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n -Djava.net.preferIPv4Stack=true -Dprogram.name=run.sh -Djava.library.path=/opt/jboss-6.0.0.Final/bin/native/lib -Djava.endorsed.dirs=/opt/jboss-6.0.0.Final/lib/endorsed 
 
 ...
+23:37:10,044 INFO  [STDOUT] [Server@1d2c810]: Initiating startup sequence...
+23:37:10,049 INFO  [STDOUT] [Server@1d2c810]: Server socket opened successfully in 2 ms.
+23:37:10,075 INFO  [ConnectionFactoryBindingService] Bound ConnectionManager 'jboss.jca:service=DataSourceBinding,name=ejavaDS' to JNDI name 'java:ejavaDS'
+23:37:10,377 INFO  [STDOUT] [Server@1d2c810]: Database [index=0, id=0, db=file:/opt/jboss-6.0.0.Final/server/ejava-jboss6/data/hypersonic/ejava, alias=] opened sucessfully in 325 ms.
+23:37:10,377 INFO  [STDOUT] [Server@1d2c810]: Startup sequence completed in 330 ms.
+23:37:10,382 INFO  [STDOUT] [Server@1d2c810]: 2011-03-01 23:37:10.382 HSQLDB server 1.8.0 is online
+23:37:10,383 INFO  [STDOUT] [Server@1d2c810]: To close normally, connect and execute SHUTDOWN SQL
+23:37:10,383 INFO  [STDOUT] [Server@1d2c810]: From command line, use [Ctrl]+[C] to abort abruptly
+...
 
-19:29:53,703 INFO  [Http11Protocol] Starting Coyote HTTP/1.1 on http-127.0.0.1-8080
-19:29:53,734 INFO  [AjpProtocol] Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
-19:29:53,750 INFO  [ServerImpl] JBoss (Microcontainer) [5.1.0.GA (build: SVNTag=JBoss_5_1_0_GA date=200905221053)] Started in 53s:141ms
+23:37:12,201 INFO  [org.apache.coyote.http11.Http11Protocol] Starting Coyote HTTP/1.1 on http-127.0.0.1-8080
+23:37:12,206 INFO  [org.apache.coyote.ajp.AjpProtocol] Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
+23:37:12,206 INFO  [org.jboss.bootstrap.impl.base.server.AbstractServer] JBossAS [6.0.0.Final "Neo"] Started in 28s:479ms
 ---
 
     [[1]] Re-run the RMI Test again.
 
 ---
 $ (cd javaeeExTest/; mvn clean install)
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise Remote Test
-
 ...
 
+ -------------------------------------------------------
  T E S T S
  -------------------------------------------------------
 Running myorg.javaeeex.ejbclient.RegistrarTest
  -getting jndi initial context
- -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=l
-ocalhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.313 sec
+ -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=localhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.641 sec
 
 Results :
 
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] [jar:jar]
-[WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: c:\proj\javaeeEx\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] [install:install]
-[INFO] Installing c:\proj\javaeeEx\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.jar to c:\proj\repository.test\myorg\ja
-vaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
 ...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 14.668s
+[INFO] Finished at: Tue Mar 01 23:45:35 EST 2011
+[INFO] Final Memory: 36M/270M
+[INFO] ------------------------------------------------------------------------
 ---
 
 * {Deploy the Application}
 
-    We want tests to run as automated as possible. This allows us to 
+    We want tests to run as automated as possible. This allows us to
     simplify testing as well as leverage continous integration techniques
-    (e.g., CruiseControl; i.e., nightly builds/tests). To help automate this
-    we are going to leverage the Maven cargo plugin. Cargo, itself, is a
-    Java library that is used to manage Java EE containers. The maven
-    cargo plugin just makes it callable from within Maven. We will add the
-    cargo plugin to the RMI Test project (to deploy the application) since
-    the application isn't ready to be deployed until after the EAR is built.
+    (e.g., CruiseControl, Hudson; i.e., nightly builds/tests). To
+    help automate this we are going to leverage the Maven cargo
+    plugin. Cargo, itself, is a Java library that is used to manage Java
+    EE containers. The maven cargo plugin just makes it callable from
+    within Maven. We will add the cargo plugin to the RMI Test project
+    (to deploy the application) since the application isn't ready to be
+    deployed until after the EAR is built.
 
     [[1]] Add the cargo plugin to the RMI Test to deploy the EAR
     to JBoss. This configuration goes in the jboss area of the RMI
@@ -1109,47 +1243,57 @@ vaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
     <build>
         <plugins>
 
-        <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.0.2</version>
-            <configuration>
-                <container>
-                    <containerId>jboss5x</containerId>
-                    <type>remote</type>
-                </container>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>deploy-component</id>
-                    <!-- jump into a phase before surefire runs tests -->
-                    <phase>test-compile</phase>
-                    <goals>
-                        <goal>undeploy</goal>
-                        <goal>deploy</goal>
-                    </goals>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>1.0.4</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
+                        <version>1.0.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-profileservice-client</artifactId>
+                        <version>6.0.0.Final</version>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <container>
+                        <containerId>jboss6x</containerId>
+                        <type>remote</type>
+                    </container>
                     <configuration>
-                        <configuration>
-                            <type>runtime</type>
-                            <properties>
+                        <type>runtime</type>
+                        <properties>
+                            <cargo.hostname>${jboss.host}</cargo.hostname>
                             <cargo.remote.username>${jboss.user}</cargo.remote.username>
                             <cargo.remote.password>${jboss.password}</cargo.remote.password>
-                            </properties>
-                        </configuration>
-                        <deployer>
-                            <type>remote</type>
-                            <deployables>
-                                <deployable>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>javaeeExEAR</artifactId>
-                                    <type>ear</type>
-                                </deployable>
-                            </deployables>
-                        </deployer>
+                        </properties>
                     </configuration>
-                </execution>
-            </executions>
-        </plugin>
+                    <deployer>
+                        <type>remote</type>
+                        <deployables>
+                            <deployable>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>javaeeExEAR</artifactId>
+                                <type>ear</type>
+                            </deployable>
+                        </deployables>
+                    </deployer>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>deploy-component</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 ---
 
     [[1]] You will also need to add a dependency on the EAR from the RMI Test
@@ -1176,23 +1320,35 @@ vaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
 
 ---
 $ (cd javaeeExTest/; mvn clean install)
-[INFO] Scanning for projects...
+...
+
+ -------------------------------------------------------
+ T E S T S
+ -------------------------------------------------------
+Running myorg.javaeeex.ejbclient.RegistrarTest
+ -getting jndi initial context
+ -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=localhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.845 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
+[WARNING] JAR will be empty - no content was marked for inclusion!
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise Remote Test
-
-...
-
-[INFO] [cargo:undeploy {execution: deploy-component}]
-[INFO] [cargo:deploy {execution: deploy-component}]
-...
----
----
-//SERVER LOG
-00:00:06,906 INFO  [EJBContainer] STARTED EJB: myorg.javaeeex.ejb.RegistrarEJB ejbName: RegistrarEJB
-00:00:06,953 INFO  [EJB3Deployer] Deployed: file:/C:/apps/jboss-4.2.3.GA/server/default/tmp/deploy/tmp767856868280374431
-3javaeeExEAR-1.0-SNAPSHOT.ear-contents/javaeeExEJB-1.0-SNAPSHOT.jar
-00:00:06,984 INFO  [EARDeployer] Started J2EE application: file:/C:/proj/repository.test/myorg/javaee/javaeeExEAR/1.0-SN
-APSHOT/javaeeExEAR-1.0-SNAPSHOT.ear
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 24.223s
+[INFO] Finished at: Tue Mar 01 23:56:58 EST 2011
+[INFO] Final Memory: 38M/269M
+[INFO] ------------------------------------------------------------------------
 ---
 
 * {Setup JNDI access to Remote interface}
@@ -1209,16 +1365,24 @@ APSHOT/javaeeExEAR-1.0-SNAPSHOT.ear
 
         * Click on Invoke under list()
 
-        * Note the JNDI names for the RegistrarEJB under the Global
+        [Note:] the JNDI names for the RegistrarEJB under the Global
         JNDI Namespace. 
+
+        [Note:] selecting "True" for parameter 1 before clicking
+        Invoke will result in a cleaner JNDI output, absent of
+        class information. 
+
+        []
 
 ---
 Global JNDI Namespace
 
-  +- javaeeExEAR-1.0-SNAPSHOT (class: org.jnp.interfaces.NamingContext)
-  |   +- RegistrarEJB (class: org.jnp.interfaces.NamingContext)
-  |   |   +- local (proxy: $Proxy69 implements interface myorg.javaeeex.ejb.RegistrarLocal,interface org.jboss.ejb3.JBossProxy)
-  |   |   +- remote (proxy: $Proxy67 implements interface myorg.javaeeex.ejb.RegistrarRemote,interface org.jboss.ejb3.JBossProxy)
+  +- javaeeExEAR-1.0-SNAPSHOT
+  |   +- javaeeExEJB-1.0-SNAPSHOT.jar
+  |   |   +- RegistrarEJB!myorg.javaeeex.ejb.RegistrarLocal
+  |   |   +- RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+  |   |   +- RegistrarEJB!local
+  |   |   +- RegistrarEJB!remote
 ---
 
     [[1]] Add the above JNDI name for the @Remote interface in the 
@@ -1228,16 +1392,12 @@ Global JNDI Namespace
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                          <name>jndi.name.registrar</name>
-                          <value>
-                              javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/remote
-                          </value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <jndi.name.registrar>javaeeExEAR-${project.version}/javaeeExEJB-${project.version}.jar/RegistrarEJB!remote</jndi.name.registrar>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 ---
@@ -1261,19 +1421,25 @@ Global JNDI Namespace
     of the lookup to the JUnit test.
 
 ---
+cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
 ...
 import myorg.javaeeex.ejb.RegistrarRemote;
 ...
 
-public class RegistrarTest extends TestCase {
+public class RegistrarTest {
 ...
     String registrarJNDI = System.getProperty("jndi.name.registrar");
     RegistrarRemote registrar;
 
+    @Before
     public void setUp() throws Exception {
         assertNotNull("jndi.name.registrar not supplied", registrarJNDI);
 
-        ...
+        log.debug("getting jndi initial context");
+        jndi = new InitialContext();
+        log.debug("jndi=" + jndi.getEnvironment());
+        jndi.lookup("/"); //do a quick comms check of JNDI
 
         log.debug("jndi name:" + registrarJNDI);
         registrar = (RegistrarRemote)jndi.lookup(registrarJNDI);
@@ -1285,22 +1451,34 @@ public class RegistrarTest extends TestCase {
 
 ---
 $ (cd javaeeExTest/; mvn clean install)
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise Remote Test
-
 ...
-
+-------------------------------------------------------
  T E S T S
- -------------------------------------------------------
+-------------------------------------------------------
 Running myorg.javaeeex.ejbclient.RegistrarTest
  -getting jndi initial context
- -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=l
-ocalhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
- -jndi name:javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/remote
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.297 sec
+ -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=localhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
+ -jndi name:javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT.jar/RegistrarEJB!remote
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.607 sec
 
-...
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
+[WARNING] JAR will be empty - no content was marked for inclusion!
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 20.490s
+[INFO] Finished at: Wed Mar 02 00:18:14 EST 2011
+[INFO] Final Memory: 37M/270M
 ---
 
 * {Invoke EJB method through Remote interface}
@@ -1309,6 +1487,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.297 sec
     of the EJB.
 
 ---
+    @Test
     public void testPing() {
         log.info("*** testPing ***");
         registrar.ping();
@@ -1327,13 +1506,13 @@ $ (cd javaeeExTest/; mvn clean install)
 ...
 
  -*** testPing ***
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.468 sec
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.876 sec
 ...
 ---
 ---
 //SERVER LOG
-00:17:52,750 DEBUG [RegistrarEJB] **** init ****
-00:17:52,765 DEBUG [RegistrarEJB] ping called
+00:20:27,883 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] **** init ****
+00:20:27,927 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] ping called
 ---
 
 * {Add a few finishing touches}
@@ -1386,36 +1565,40 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.468 sec
     3rd time fully clears and works. This error only occurs when you switch 
     directories. If you always build from the root, it will remain constant.
 
-    [Note:] I have noticed that JBoss 5 is not as forgiving as earlier versions
-    and the 3-time rule may not apply. Run "mvn clean -Pundeploy" before changing
-    directories.
-
-    []
-
 ---
 $ mvn clean install
 [INFO] Scanning for projects...
-[INFO] Reactor build order:
-[INFO]   Java EE Exercise
-[INFO]   Java EE Exercise EJB
-[INFO]   Java EE Exercise EAR
-[INFO]   Java EE Exercise Remote Test
 [INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise
+[INFO] Java EE Exercise EJB
+[INFO] Java EE Exercise EAR
+[INFO] Java EE Exercise Remote Test
 
 ...
 
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.733s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [3.595s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.781s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [19.215s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.516s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [1.437s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [0.422s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [4.031s]
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
+[INFO] Total time: 24.543s
+[INFO] Finished at: Wed Mar 02 00:23:25 EST 2011
+[INFO] Final Memory: 42M/272M
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 8 seconds
 ---
+
+    [Note:] If you run into issues where the server will not accept the same
+    EAR built from a different level of the hierarchy, you will need to manually
+    delete the copy that exists in the JBOSS_HOME/server/ejava-jboss6 directory
+    and possibly restart the server.
+
+    []
 
 ---
 [INFO] Trace
@@ -1430,9 +1613,8 @@ javax.management.InstanceAlreadyExistsException: jboss.j2ee:service=EARDeploymen
 eady registered.
 ---
 
-    [[1]] Lets make one more enhancement to the project shell to allow the option to undeploy an EAR from
-    the application server as a part of the clean goal. This is useful when you have multiple
-    EARs and want all uninstalled during the clean and then have them rebuilt and re-installed
+[[1]] Lets make one more enhancement to the project shell to allow the option to undeploy an EAR from
+the application server as a part of the clean goal. This is useful when you have multiple EARs and want all uninstalled during the clean and then have them rebuilt and re-installed
     as a part of a later install. If we left it the way we have it, we would get a series
     of clean+install (for EAR 1), clean+install (from EAR 2), etc. instead of clean (for EAR 1), clean
     (from EAR 2), install (for EAR 1), and install (for EAR 2). To allow for this, add the following 
@@ -1442,30 +1624,72 @@ eady registered.
     </dependencies>
 
     <profiles>
-        <!-- this profiles allow the EAR to be undeployed before it is deleted
-            during the clean target. This behavior requires the EAR to be
-            present, so it cannot be part of the default behavior. It is
-            only activated when -Dundeploy or -Pundeploy is present so that
-            normal cleans do not fail.  -->
-    <profile>
-        <id>undeploy</id>
-        <activation>
-            <property>
-                <name>undeploy</name>
-                <value>true</value>
-            </property>
-        </activation>
-        <build>
-            <plugins>
+    <!-- this profiles allow the EAR to be undeployed before it is deleted
+        during the clean target. This behavior requires the EAR to be
+        present, so it cannot be part of the default behavior. It is
+        only activated when -Dundeploy or -Pundeploy is present so that
+        normal cleans do not fail.  -->
+<profile>
+    <id>undeploy</id>
+    <activation>
+        <property>
+            <name>undeploy</name>
+            <value>true</value>
+        </property>
+    </activation>
+    <build>
+        <plugins>
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.4</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
+                        <version>1.0.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-client</artifactId>
+                        <version>6.0.0.Final</version>
+                        <type>pom</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-profileservice-client</artifactId>
+                        <version>6.0.0.Final</version>
+                        <type>pom</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                        <version>1.5.6</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <container>
-                        <containerId>jboss5x</containerId>
+                        <containerId>jboss6x</containerId>
                         <type>remote</type>
                     </container>
+                    <configuration>
+                        <type>runtime</type>
+                        <properties>
+                            <cargo.hostname>${jboss.host}</cargo.hostname>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
+                        </properties>
+                    </configuration>
+                    <deployer>
+                        <type>remote</type>
+                        <deployables>
+                            <deployable>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <type>ear</type>
+                            </deployable>
+                        </deployables>
+                    </deployer>
                 </configuration>
                 <executions>
                     <execution>
@@ -1474,90 +1698,63 @@ eady registered.
                         <goals>
                             <goal>undeploy</goal>
                         </goals>
-                        <configuration>
-                            <configuration>
-                                <type>runtime</type>
-                                <properties>
-                                <cargo.remote.username>${jboss.user}</cargo.remote.username>
-                                <cargo.remote.password>${jboss.password}</cargo.remote.password>
-                                </properties>
-                            </configuration>
-                            <deployer>
-                                <type>remote</type>
-                                <deployables>
-                                    <deployable>
-                                        <groupId>${project.groupId}</groupId>
-                                        <artifactId>${project.artifactId}</artifactId>
-                                        <type>ear</type>
-                                    </deployable>
-                                </deployables>
-                            </deployer>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-            </plugins>
-        </build>
-    </profile>
-        </profiles>
+        </plugins>
+    </build>
+    </profiles>
 </project>
 ---
 
     [[1]] Run the clean target and activate the new plugin configuration.
 
 ---
-StaffordJ@takedown /cygdrive/c/proj/ejava-javaee/working/solutions/javaeeEx/partA
 $ mvn clean -Pundeploy
 [INFO] Scanning for projects...
-[INFO] Reactor build order:
-[INFO]   Java EE Exercise
-[INFO]   Java EE Exercise EJB
-[INFO]   Java EE Exercise EAR
-[INFO]   Java EE Exercise Remote Test
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise
+[INFO] Java EE Exercise EJB
+[INFO] Java EE Exercise EAR
+[INFO] Java EE Exercise Remote Test
 
 ...
 
+[INFO] Building Java EE Exercise EAR 1.0-SNAPSHOT
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise EAR
-[INFO]    task-segment: [clean]
-[INFO] ------------------------------------------------------------------------
-[INFO] [cargo:undeploy {execution: undeploy-ear}]
-[INFO] [clean:clean]
+[INFO] 
+[INFO] --- cargo-maven2-plugin:1.0.4:undeploy (undeploy-ear) @ javaeeExEAR ---
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ javaeeExEAR ---
+[INFO] Deleting /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target
 [INFO] ------------------------------------------------------------------------
 
 ...
 
-[INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.370s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [0.065s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [12.077s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [0.130s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [0.547s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [0.157s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [1.953s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [0.093s]
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 3 seconds
-[INFO] Finished at: Tue Mar 17 22:26:35 EDT 2009
-[INFO] Final Memory: 6M/12M
+[INFO] Total time: 12.942s
+[INFO] Finished at: Wed Mar 02 00:37:49 EST 2011
+[INFO] Final Memory: 27M/269M
 [INFO] ------------------------------------------------------------------------
 ---
 
 ---
 //SERVER LOG
 
-19:39:23,015 INFO  [SessionSpecContainer] Starting jboss.j2ee:ear=javaeeExEAR-1.0-SNAPSHOT.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3
-19:39:23,015 INFO  [EJBContainer] STARTED EJB: myorg.javaeeex.ejb.RegistrarEJB ejbName: RegistrarEJB
-19:39:23,046 INFO  [JndiSessionRegistrarBase] Binding the following Entries in Global JNDI:
+00:37:48,305 INFO  [org.jboss.ejb3.session.SessionSpecContainer] Stopping jboss.j2ee:ear=javaeeExEAR-1.0-SNAPSHOT.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3
+00:37:48,310 INFO  [org.jboss.ejb3.EJBContainer] STOPPED EJB: myorg.javaeeex.ejb.RegistrarEJB ejbName: RegistrarEJB
+00:37:48,324 INFO  [org.jboss.ejb3.instantiator.deployer.BeanInstantiatorDeployerBase] Uninstalled org.jboss.ejb3.instantiator.impl.Ejb31SpecBeanInstantiator@23bd85 from MC at org.jboss.ejb.bean.instantiator/javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB
 
-        javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/remote - EJB3.x Default Remote Business Interface
-        javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/remote-myorg.javaeeex.ejb.RegistrarRemote - EJB3.x Remote Business Interface
-        javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/local - EJB3.x Default Local Business Interface
-        javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/local-myorg.javaeeex.ejb.RegistrarLocal - EJB3.x Local Business Interface
-
-19:39:24,421 WARN  [InterceptorsFactory] EJBTHREE-1246: Do not use InterceptorsFactory with a ManagedObjectAdvisor, InterceptorRegistry should be used via the bean container
-19:39:24,421 WARN  [InterceptorsFactory] EJBTHREE-1246: Do not use InterceptorsFactory with a ManagedObjectAdvisor, InterceptorRegistry should be used via the bean container
 ---
 
 

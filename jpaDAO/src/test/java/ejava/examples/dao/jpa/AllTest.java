@@ -1,10 +1,9 @@
 package ejava.examples.dao.jpa;
 
 import org.junit.runner.RunWith;
+
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-import junit.framework.TestCase;
 
 /**
  * This *optional* JUnit construct can be used to group tests. 
@@ -17,5 +16,5 @@ import junit.framework.TestCase;
 	JPANoDAODemo.class,
 	JPAExtendedOnlyDemo.class
 })
-public class AllTest extends TestCase {
+public class AllTest {
 }

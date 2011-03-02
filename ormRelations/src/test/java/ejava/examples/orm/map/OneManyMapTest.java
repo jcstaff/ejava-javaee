@@ -2,6 +2,8 @@ package ejava.examples.orm.map;
 
 import java.util.List;
 
+import org.junit.Test;
+
 import ejava.examples.orm.map.annotated.OneManyChild;
 import ejava.examples.orm.map.annotated.OneManyInverseParent;
 import ejava.examples.orm.map.annotated.OneManyOwningChild;
@@ -157,6 +159,7 @@ public class OneManyMapTest extends DemoBase {
     );
      </pre><p/>
 	 */
+	@Test
 	public void testOneToManyInverseParentMap() {
 		log.info("*** testOneToManyInverseParentMap ***");
 		
@@ -278,6 +281,7 @@ fred                        ernie
     );
      </pre><p/>
      */
+	@Test
 	public void testOneToManyOwningParentMap() {
 		log.info("*** testOneToManyOwningParentMap ***");
 		

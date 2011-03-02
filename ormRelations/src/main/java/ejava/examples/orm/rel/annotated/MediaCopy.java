@@ -84,14 +84,12 @@ public class MediaCopy implements Serializable {
     }    
 
     public int getCopyNo()                { return copyNo; }    
-    @SuppressWarnings("unused")
     private void setCopyNo(int copyNo)    { this.copyNo = copyNo; }
     
     //this property is used for the composite primary key and is mapped to
     //the same column as the media @ManyToOne property FK
     @Id @Column(name="MEDIACOPY_MID")
     public long getMediaId()              { return mediaId; }
-    @SuppressWarnings("unused")
     private void setMediaId(long mediaId) { this.mediaId = mediaId; }
     
     @ManyToOne //use m2o to have media automatically associated
@@ -102,7 +100,6 @@ public class MediaCopy implements Serializable {
             insertable=false,
             updatable=false)
     public Media getMedia()               { return media; }    
-    @SuppressWarnings("unused")
     private void setMedia(Media media)    { this.media = media; }
 
     public String toString() {

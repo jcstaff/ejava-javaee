@@ -2,6 +2,8 @@ package ejava.examples.orm.map;
 
 import java.util.List;
 
+import org.junit.Test;
+
 import ejava.examples.orm.map.annotated.ManyManyEntity;
 import ejava.examples.orm.map.annotated.ManyManyInverseEntity;
 import ejava.examples.orm.map.annotated.ManyManyOwningEntity;
@@ -175,6 +177,7 @@ public class ManyManyMapTest extends DemoBase {
     </pre><p/>
 
 	 */
+	@Test
 	public void testManyToManyInverseMap() {
 		log.info("*** testManyToManyInverseMap ***");
 		
@@ -264,7 +267,8 @@ public class ManyManyMapTest extends DemoBase {
     );
      </pre><p/>
      */
-    public void XtestManyToManyMap() {
+	@Test
+	public void XtestManyToManyMap() {
         log.info("*** testManyToManyMap ***");
         
         ManyManyEntity manyManyEntity1 = 

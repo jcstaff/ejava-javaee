@@ -1,5 +1,9 @@
 package ejava.examples.orm.rel;
 
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 import ejava.examples.orm.rel.annotated.Media;
 import ejava.examples.orm.rel.annotated.MediaCopy;
 
@@ -18,6 +22,7 @@ public class ManyToOneUnidirectionalDemo extends DemoBase {
 
     /**
      */
+	@Test
     public void testCreateManyToOne() {
         log.info("testCreateManyToOne");
         ejava.examples.orm.rel.annotated.Media media = new Media();

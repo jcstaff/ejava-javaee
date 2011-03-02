@@ -2,6 +2,8 @@ package ejava.examples.orm.onetomany;
 
 import java.util.List;
 
+import org.junit.Test;
+
 import ejava.examples.orm.onetomany.annotated.OneManyChild;
 import ejava.examples.orm.onetomany.annotated.OneManyOwningParent;
 import ejava.examples.orm.rel.DemoBase;
@@ -67,6 +69,7 @@ public class OneManyUnidirectionalTest extends DemoBase {
      * know nothing of the parent. In this case, there is only an owning 
      * side. 
      */
+	@Test
 	public void testOneToManyOwningParent() {
 		log.info("*** testOneToManyOwningParent ***");
 		

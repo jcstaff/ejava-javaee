@@ -1,7 +1,11 @@
 package ejava.examples.orm.rel;
 
+import static org.junit.Assert.*;
+
 import java.util.Date;
 import java.util.Iterator;
+
+import org.junit.Test;
 
 import ejava.examples.orm.rel.annotated.Borrower;
 import ejava.examples.orm.rel.annotated.Checkout;
@@ -49,6 +53,7 @@ public class OneToManyDemo extends DemoBase {
      * foreign key relationships.
      *
      */
+	@Test
     public void testManyOneBiDirectional() {
         log.info("testManyOneBiDirectional");
         //get a borrower
@@ -91,6 +96,7 @@ public class OneToManyDemo extends DemoBase {
      * relationship. Note that we have to update the java fields on both sides
      * of the bi-directional relationship.
      */
+	@Test
     public void testRemove() {
         log.info("testRemove");
         //get a borrower

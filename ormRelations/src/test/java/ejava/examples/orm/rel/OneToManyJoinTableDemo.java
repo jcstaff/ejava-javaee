@@ -1,6 +1,10 @@
 package ejava.examples.orm.rel;
 
+import static org.junit.Assert.*;
+
 import java.util.Collection;
+
+import org.junit.Test;
 
 import ejava.examples.orm.rel.annotated.Inventory;
 import ejava.examples.orm.rel.annotated.Media;
@@ -15,6 +19,7 @@ import ejava.examples.orm.rel.annotated.Media;
  */
 public class OneToManyJoinTableDemo extends DemoBase {
     
+	@Test
     public void testOneToManyJoinCreate() {
         log.info("testLinkCreate");
         ejava.examples.orm.rel.annotated.Inventory inventory
@@ -32,6 +37,7 @@ public class OneToManyJoinTableDemo extends DemoBase {
         log.info("creating inventory:" + inventory);
     }
     
+	@Test
     public void testOneToManyJoinFind() {
         log.info("testOneToManyJoinFind()");
         
@@ -69,6 +75,7 @@ public class OneToManyJoinTableDemo extends DemoBase {
         findMedia(inventory2.getMedia(), true);
     }
 
+	@Test
     public void testOneToManyJoinRemove() {
         log.info("testOneToManyJoinRemove");
         ejava.examples.orm.rel.annotated.Inventory inventory1

@@ -1,8 +1,12 @@
 package ejava.examples.orm.rel;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Date;
+
+import org.junit.Test;
 
 import ejava.examples.orm.rel.annotated.Applicant;
 import ejava.examples.orm.rel.annotated.Borrower;
@@ -45,6 +49,7 @@ public class OneToOneDemo extends DemoBase {
      * initially created with a FK=null and then its setter is later called
      * to setup the relationship between Person and Photo.
      */
+	@Test
     public void testRelateOrphans() {
         log.info("testRelateOrphans");
         
@@ -86,6 +91,7 @@ public class OneToOneDemo extends DemoBase {
      * owning side. The tree is very small, consisting of only the Person
      * and Photo, but demonstrates the Cascade.PERSIST capability.
      */
+	@Test
     public void testCacadePersist() {
         log.info("testCascadePersist");
         
@@ -128,6 +134,7 @@ public class OneToOneDemo extends DemoBase {
      * set of objects are created using the find. 
      *
      */
+	@Test
     public void testPersistOnSetter() {
         log.info("testSetPersistedWithNew");
         
@@ -172,6 +179,7 @@ public class OneToOneDemo extends DemoBase {
      * instead of a separate column in the borrower table. 
      *
      */
+	@Test
     public void testPrimaryKeyJoin() {
         log.info("testPrimaryKeyJoin");
         
@@ -213,6 +221,7 @@ public class OneToOneDemo extends DemoBase {
      * that they can both independently exist and that the Applicant physically
      * owns the relationship by hosting the foreign key field.
      */
+	@Test
     public void testOneToOneBiDirectional() {
         log.info("testOneToOneBiDirectional");
         

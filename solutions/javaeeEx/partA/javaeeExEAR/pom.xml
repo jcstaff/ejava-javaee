@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<?xmlversion="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    
+
     <parent>
         <artifactId>javaeeEx</artifactId>
         <groupId>myorg.javaee</groupId>
@@ -36,30 +36,72 @@
     </dependencies>
 
     <profiles>
-        <!-- this profiles allow the EAR to be undeployed before it is deleted
-            during the clean target. This behavior requires the EAR to be
-            present, so it cannot be part of the default behavior. It is
-            only activated when -Dundeploy or -Pundeploy is present so that
-            normal cleans do not fail.  -->
-    <profile>
-        <id>undeploy</id>
-        <activation>
-            <property>
-                <name>undeploy</name>
-                <value>true</value>
-            </property>
-        </activation>    
-        <build>
-            <plugins>
+    <!-- this profiles allow the EAR to be undeployed before it is deleted
+        during the clean target. This behavior requires the EAR to be
+        present, so it cannot be part of the default behavior. It is
+        only activated when -Dundeploy or -Pundeploy is present so that
+        normal cleans do not fail.  -->
+<profile>
+    <id>undeploy</id>
+    <activation>
+        <property>
+            <name>undeploy</name>
+            <value>true</value>
+        </property>
+    </activation>    
+    <build>
+        <plugins>
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.4</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
+                        <version>1.0.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-client</artifactId>
+                        <version>6.0.0.Final</version>
+                        <type>pom</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-profileservice-client</artifactId>
+                        <version>6.0.0.Final</version>
+                        <type>pom</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                        <version>1.5.6</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <container>
-                        <containerId>jboss5x</containerId>
+                        <containerId>jboss6x</containerId>
                         <type>remote</type>                
                     </container>
+                    <configuration>
+                        <type>runtime</type>
+                        <properties>
+                            <cargo.hostname>${jboss.host}</cargo.hostname>
+                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
+                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
+                        </properties>
+                    </configuration>
+                    <deployer>
+                        <type>remote</type>
+                        <deployables>
+                            <deployable>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <type>ear</type>
+                            </deployable>
+                        </deployables>
+                    </deployer>
                 </configuration>
                 <executions>
                     <execution>
@@ -68,30 +110,12 @@
                         <goals>
                             <goal>undeploy</goal>
                         </goals>
-                        <configuration>
-                            <configuration>
-                                <type>runtime</type>
-                                <properties>
-                                <cargo.remote.username>${jboss.user}</cargo.remote.username>
-                                <cargo.remote.password>${jboss.password}</cargo.remote.password>
-                                </properties>
-                            </configuration>
-                            <deployer>
-                                <type>remote</type>
-                                <deployables>
-                                    <deployable>
-                                        <groupId>${project.groupId}</groupId>
-                                        <artifactId>${project.artifactId}</artifactId>
-                                        <type>ear</type>
-                                    </deployable>
-                                </deployables>
-                            </deployer>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>                    
-            </plugins>
-        </build>
-    </profile>
-        </profiles>
+        </plugins>
+    </build>
+</profile>
+</profiles>
 </project>
+

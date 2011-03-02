@@ -1,5 +1,9 @@
 package ejava.examples.orm.rel;
 
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 import ejava.examples.orm.rel.annotated.Applicant;
 import ejava.examples.orm.rel.annotated.Borrower;
 import ejava.examples.orm.rel.annotated.Person;
@@ -19,7 +23,7 @@ public class RelationshipOwnershipDemo extends DemoBase {
      * This setUp method creates a few objects that we'll use to test a few
      * relations.
      */
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         
         ejava.examples.orm.rel.annotated.Person person = new Person();
@@ -46,7 +50,7 @@ public class RelationshipOwnershipDemo extends DemoBase {
     /**
      * This method makes sure there are no relationships left over after test
      */
-    protected void tearDown() throws Exception {        
+    public void tearDown() throws Exception {        
         
         Borrower borrower = em.find(Borrower.class, borrowerId);
         Applicant applicant = em.find(Applicant.class, applicantId);
@@ -69,6 +73,7 @@ public class RelationshipOwnershipDemo extends DemoBase {
      * reflected in the DB when the transaction commits.
      *
      */
+	@Test
     public void testOnetoOneInverse() {
         log.info("testOneToOneInverse");
         
@@ -179,6 +184,7 @@ public class RelationshipOwnershipDemo extends DemoBase {
      * the Borrower. A change to Applicant gets written to DB, but not 
      * automatically reflected in Borrower until manually set of refreshed.
      */
+	@Test
     public void testOnetoOneOwnership() {
         log.info("testOneToOneOwnership");
         
