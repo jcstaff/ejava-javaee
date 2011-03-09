@@ -1,5 +1,7 @@
 package ejava.examples.orm.ejbql;
 
+import static org.junit.Assert.*;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -8,14 +10,17 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
+import org.junit.Test;
+
 import ejava.examples.orm.ejbql.annotated.Clerk;
 import ejava.examples.orm.ejbql.annotated.Customer;
 import ejava.examples.orm.ejbql.annotated.Sale;
 import ejava.examples.orm.ejbql.annotated.Store;
 
 public class QueryDemo extends DemoBase {
+	@Test
     public void testSingleResult() {
-        log.info("testSingleResult");
+        log.info("*** testSingleResult() ***");
         
         Query query = em.createQuery(
                 "select s from Store s where s.name='Big Al''s'");
@@ -50,8 +55,9 @@ public class QueryDemo extends DemoBase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testResultList() {
-        log.info("testResultList");
+        log.info("*** testResultList() ***");
         
         Query query = em.createQuery(
             "select c from Clerk c where lastName='Pep'");
@@ -64,8 +70,9 @@ public class QueryDemo extends DemoBase {
     }
     
     @SuppressWarnings("unchecked")
+    @Test
     public void testParameters() {
-        log.info("testParameters");
+        log.info("*** testParameters() ***");
         
         Query query = em.createQuery(
                 "select c from Customer c " +
@@ -90,8 +97,9 @@ public class QueryDemo extends DemoBase {
         }
     }
     
+    @Test
     public void testDateParameter() {
-        log.info("testDateParameter");
+        log.info("*** testDateParameter() ***");
         
         Calendar hireDate = Calendar.getInstance();
         hireDate.set(Calendar.YEAR, 1972);
@@ -105,8 +113,9 @@ public class QueryDemo extends DemoBase {
     }
     
     @SuppressWarnings("unchecked")
+    @Test
     public void testPaging() {
-        log.info("testPaging");
+        log.info("*** testPaging() ***");
         
         Query query = em.createQuery(
                 "select s from Sale s");

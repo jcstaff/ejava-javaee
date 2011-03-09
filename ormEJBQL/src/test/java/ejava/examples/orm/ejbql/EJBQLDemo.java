@@ -1,6 +1,9 @@
 package ejava.examples.orm.ejbql;
 
+import static org.junit.Assert.*;
+
 import java.math.BigDecimal;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,10 +12,10 @@ import java.util.Map;
 
 import javax.persistence.Query;
 
+import org.junit.Test;
+
 import ejava.examples.orm.ejbql.annotated.Clerk;
-import ejava.examples.orm.ejbql.annotated.Customer;
 import ejava.examples.orm.ejbql.annotated.Sale;
-import ejava.examples.orm.ejbql.annotated.Store;
 
 public class EJBQLDemo extends DemoBase {
 
@@ -41,16 +44,18 @@ public class EJBQLDemo extends DemoBase {
         return objects;
     }
     
+    @Test
     public void testSimpleSelect() {
-        log.info("testSimpleSelect");
+        log.info("*** testSimpleSelect() ***");
         
         int rows = executeQuery("select object(c) from Customer as c").size();
         assertTrue("unexpected number of customers:" + rows, rows > 0);
     }
     
     @SuppressWarnings("unchecked")
+    @Test
     public void testEntityProperties() {
-        log.info("testEntityProperties");
+        log.info("*** testEntityProperties() ***");
         
         Query query = em.createQuery(
                 "select c.firstName, c.hireDate from Clerk c");
@@ -68,8 +73,9 @@ public class EJBQLDemo extends DemoBase {
     }
     
     @SuppressWarnings("unchecked")
+    @Test
     public void testEntityRelationships() {
-        log.info("testEntityRelationships");
+        log.info("*** testEntityRelationships() ***");
         
         Query query = em.createQuery(
                 "select s.id, s.store.name from Sale s");
@@ -87,8 +93,9 @@ public class EJBQLDemo extends DemoBase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testConstructorExpressions() {
-        log.info("testConstructorExpressions");
+        log.info("*** testConstructorExpressions() ***");
         
         Query query = em.createQuery(
                 "select new ejava.examples.orm.ejbql.Receipt(" +
@@ -103,8 +110,9 @@ public class EJBQLDemo extends DemoBase {
         }        
     }
     
+    @Test
     public void testIN() {
-        log.info("testIN");
+        log.info("*** testIN() ***");
         
         int rows = executeQuery(
                 "select sale from Store s, IN(s.sales) sale").size();
@@ -115,8 +123,9 @@ public class EJBQLDemo extends DemoBase {
         assertTrue("unexpected number of sales:" + rows, rows > 0);
     }
     
+    @Test
     public void testInnerJoin() {
-        log.info("testInnerJoin");
+        log.info("*** testInnerJoin() ***");
         
         int rows = executeQuery(
                 "select sale from Store s INNER JOIN s.sales sale").size();
@@ -128,8 +137,9 @@ public class EJBQLDemo extends DemoBase {
     }
     
     @SuppressWarnings("unchecked")
+    @Test
     public void testOuterJoin() {
-        log.info("testOuterJoin");
+        log.info("*** testOuterJoin() ***");
         
         Query query = em.createQuery(
             "select c.id, c.firstName, sale.amount " +
@@ -150,14 +160,16 @@ public class EJBQLDemo extends DemoBase {
         }
     }
     
+    @Test
     public void testFetchJoin() {        
-        log.info("testFetchJoin");
+        log.info("** testFetchJoin() ***");
         executeQuery(
                 "select s from Store s LEFT JOIN s.sales sale");
     }
     
+    @Test
     public void testDISTINCT() {
-        log.info("testDISTINCT");
+        log.info("*** testDISTINCT() ***");
         
         int rows = executeQuery(
                 "select DISTINCT c.lastName from Customer c").size();
@@ -167,8 +179,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows for DISTINCT:" + rows, 2, rows);
     }
     
+    @Test
     public void testLiteral() {
-        log.info("testLiteral");
+        log.info("*** testLiteral() ***");
         int rows = executeQuery(
                 "select c from Customer c " +
                 "where c.firstName='cat'"
@@ -176,8 +189,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:" + rows, 1, rows);
     }
     
+    @Test
     public void testSpecialCharacter() {
-        log.info("testSpecialCharacter");
+        log.info("*** testSpecialCharacter() ***");
         int rows = executeQuery(
                 "select s from Store s " +
                 "where s.name='Big Al''s'"
@@ -185,8 +199,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:" + rows, 1, rows);
     }
     
+    @Test
     public void testLike() {
-        log.info("testLike");
+        log.info("*** testLike() ***");
         
         int rows = executeQuery(
                   "select c from Clerk c " +
@@ -214,8 +229,9 @@ public class EJBQLDemo extends DemoBase {
         
     }
     
+    @Test
     public void testArithmetic() {
-        log.info("testArithmetic");
+        log.info("*** testArithmetic() ***");
         
         String query = "select s from Sale s " +
             "where (s.amount * :tax) > :amount";
@@ -232,11 +248,13 @@ public class EJBQLDemo extends DemoBase {
         }
         log.info("raise taxes to:" + tax);
         
-        assertEquals("unexpected level for tax:" + tax, 0.07, tax);
+        assertEquals("unexpected level for tax:" + tax, 
+        		(int)(0.07 * 100), (int)(tax * 100));
     }
     
+    @Test
     public void testLogical() {
-        log.info("testLogical");
+        log.info("*** testLogical() ***");
         int rows = executeQuery(
                 "select c from Customer c " +
                 "where (c.firstName='cat' AND" +
@@ -254,8 +272,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:" + rows, 2, rows);        
     }
     
+    @Test
     public void testEquality() {
-        log.info("testEquality");
+        log.info("*** testEquality() ***");
         
         //get a clerk entity
         Clerk clerk = (Clerk)
@@ -274,8 +293,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows", 2, rows);
     }
     
+    @Test
     public void testBetween() {
-        log.info("testBetween");
+        log.info("*** testBetween() ***");
         
         String query = "select s from Sale s " +
             "where s.amount BETWEEN :low AND :high";
@@ -287,8 +307,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:", 1, rows);
     }
     
+    @Test
     public void testIsNull() {
-        log.info("testIsNull");
+        log.info("*** testIsNull() ***");
         
         String query = "select s from Sale s " +
             "where s.store IS NULL";
@@ -303,8 +324,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:", 2, rows);
     }
 
+    @Test
     public void testIsEmpty() {
-        log.info("testIsEmpty");
+        log.info("*** testIsEmpty() ***");
         
         String query = "select c from Clerk c " +
             "where c.sales IS EMPTY";
@@ -319,8 +341,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:", 2, rows);
     }
 
+    @Test
     public void testMemberOf() {
-        log.info("testMemberOf");
+        log.info("*** testMemberOf() ***");
         
         //get a clerk entity
         Clerk clerk = (Clerk)
@@ -339,8 +362,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows", 2, rows);
     }
     
+    @Test
     public void testStringFunctions() {
-        log.info("testStringFunctions");
+        log.info("*** testStringFunctions() ***");
 
         int rows = executeQuery(
                 "select c from Customer c " +
@@ -403,8 +427,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:" + rows, 1, rows);        
     }
 
+    @Test
     public void testDates() {        
-        log.info("testDates");
+        log.info("*** testDates() ***");
 
         int rows = executeQuery(
                 "select s from Sale s " +
@@ -435,8 +460,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected number of rows:" + rows, 2, rows);
     }
     
+    @Test
     public void testCount() {        
-        log.info("testCount");
+        log.info("*** testCount() ***");
 
         List<Object> results= executeQuery(
                 "select COUNT(s) from Sale s");
@@ -444,8 +470,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected result", 2, ((Long)results.get(0)).intValue());
     }
     
+    @Test
     public void testMaxMin() {        
-        log.info("testMaxMin");
+        log.info("*** testMaxMin() ***");
 
         List<Object> results= executeQuery(
                 "select max(s.amount) from Sale s");
@@ -458,8 +485,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected result", 100, ((BigDecimal)results.get(0)).intValue());
     }
 
+    @Test
     public void testSumAve() {        
-        log.info("testSumAve");
+        log.info("*** testSumAve() ***");
 
         List<Object> results= executeQuery(
             "select sum(s.amount) from Sale s");
@@ -472,8 +500,9 @@ public class EJBQLDemo extends DemoBase {
         assertEquals("unexpected result", 125, ((Double)results.get(0)).intValue());
     }
     
+    @Test
     public void testOrderBy() {
-        log.info("testOrderBy");
+        log.info("*** testOrderBy() ***");
 
         List<Object> results = executeQuery(
             "select s from Sale s ORDER BY s.amount ASC"); 
@@ -497,8 +526,9 @@ public class EJBQLDemo extends DemoBase {
                 ((Sale)results.get(1)).getAmount().intValue());
     }
     
+    @Test
     public void testSubqueries() {
-       log.info("testHaving");   
+       log.info("*** testSubqueries() ***");   
        
        List<Object> results = executeQuery(
                "select c from Customer c " +
@@ -509,12 +539,14 @@ public class EJBQLDemo extends DemoBase {
        assertEquals("unexpected number of rows", 1, results.size());
     }
     
+    @Test
     public void testAll() {
-        log.info("testHaving");  
+        log.info("*** testAll() ***");  
         
         executeQuery("select s from Sale s");
         
-        List<Object> results = executeQuery(
+        @SuppressWarnings("unused")
+		List<Object> results = executeQuery(
                 "select c from Clerk c " +
                 "where 125 < ALL " +
                 "   (select s.amount from c.sales s)"

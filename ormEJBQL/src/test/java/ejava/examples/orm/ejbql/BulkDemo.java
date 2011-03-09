@@ -1,16 +1,21 @@
 package ejava.examples.orm.ejbql;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import javax.persistence.Query;
+
+import org.junit.Test;
 
 import ejava.examples.orm.ejbql.annotated.Clerk;
 
 public class BulkDemo extends DemoBase {
     
     @SuppressWarnings("unchecked")
+    @Test
     public void testBulkUpdate() {
-        log.info("testBulkUpdate");
+        log.info("*** testBulkUpdate() ***");
         
         Query query = em.createQuery(
                 "select c from Clerk c where c.lastName=:last");
@@ -38,8 +43,9 @@ public class BulkDemo extends DemoBase {
         }
     }
     
+    @Test
     public void testBulkDelete() {
-        log.info("testBulkDelete");
+        log.info("*** testBulkDelete() ***");
         
         Query query = em.createQuery(
                 "select count(c) from Customer c " +

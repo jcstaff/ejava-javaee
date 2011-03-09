@@ -1,8 +1,12 @@
 package ejava.examples.orm.ejbql;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import javax.persistence.Query;
+
+import org.junit.Test;
 
 import ejava.examples.orm.ejbql.annotated.Customer;
 import ejava.examples.orm.ejbql.annotated.Sale;
@@ -10,8 +14,9 @@ import ejava.examples.orm.ejbql.annotated.Sale;
 public class NamedQueryDemo extends DemoBase {
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testNamedQuery() {
-        log.info("testNamedQuery");
+        log.info("*** testNamedQuery() ***");
         
         Customer customer = (Customer)
             em.createNamedQuery("getCustomersByName")

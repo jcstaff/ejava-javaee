@@ -1,16 +1,21 @@
 package ejava.examples.orm.ejbql;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import javax.persistence.Query;
+
+import org.junit.Test;
 
 import ejava.examples.orm.ejbql.annotated.Customer;
 
 public class NativeQueryDemo extends DemoBase {
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testScalarNativeQuery() {
-        log.info("testSimpleNativeQuery");
+        log.info("*** testSimpleNativeQuery() ***");
         
         Query query = em.createNativeQuery(
                 "select * from ORMQL_CUSTOMER " +
@@ -33,8 +38,9 @@ public class NativeQueryDemo extends DemoBase {
     }
     
     @SuppressWarnings("unchecked")
+    @Test
     public void testEntityNativeQuery() {
-        log.info("testEntityNativeQuery");
+        log.info("*** testEntityNativeQuery() ***");
         
         Query query = em.createNativeQuery(
                 "select * from ORMQL_CUSTOMER " +

@@ -4,169 +4,18 @@ Java EE Exercise
 
 * Objectives
 
-    * Take control of the JNDI name used for our deployed EJBs
-    by specifying deployment descriptor values.
+    * {{{Control the JNDI name used for an EJBs}
+        Control the JNDI name used for an EJB}}
+        by specifying deployment descriptor values.
 
-        * {{{Control_the_default_root_JNDI_name_used}
-            Control the default root JNDI name used
-        }}
+* {Control the JNDI name used for an EJB}
 
-        * {{{Control_the_complete_JNDI_name_used}
-            Control the complete JNDI name used
-        }} 
+    The default JNDI name used for the EJB is vendor-dependent in JavaEE 5
+    and will be take a standard form in JavaEE 6. However, we can control
+    the JNDI name and make it be what we want by specifying it within the 
+    application's deployment descriptor.
 
-
-* {Control the default root JNDI name used}
-
-    As you witnessed in part A of the exercise, the default JNDI name
-    was derived from the EAR and EJB names. The EAR name was a function
-    of its artifactId and version number. To take a first step in customizing
-    the JNDI name, we might just want version number to not be part of
-    the JNDI name. Lets do that here.
-
-    [[1]] Build and deploy you application from partA and note the 
-    JNDI name for the application. Use the jmx-console to view 
-    the actual name.
-
-        * Navigate to http://localhost:8080/jmx-console/ in your browser
-
-        * Click on service=JNDIView
-
-        * Click on Invoke under list()
-
-        * Note the JNDI names for the RegistrarEJB under the Global
-        JNDI Namespace. 
-
----
-Global JNDI Namespace
-
-  +- javaeeExEAR-1.0-SNAPSHOT (class: org.jnp.interfaces.NamingContext)
-  |   +- RegistrarEJB (class: org.jnp.interfaces.NamingContext)
-  |   |   +- local (proxy: $Proxy69 implements interface myorg.javaeeex.ejb.RegistrarLocal,interface org.jboss.ejb3.JBossProxy)
-  |   |   +- remote (proxy: $Proxy67 implements interface myorg.javaeeex.ejb.RegistrarRemote,interface org.jboss.ejb3.JBossProxy)
----
-
-    [[[1]] As an intermediate step, assign a finalName to the EAR so
-    that it does not use the version in the EAR and JNDI name.
-
----
-    </dependencies>
-
-    <build>
-        <finalName>javaeeEx</finalName>
-    </build>
-
-    <profiles>
----
-
-    [[1]] Build and install the application from the root. 
-
-    [Note:] Although the objects will be de-registered from the JNDI tree when you
-    change the JNDI name, the naming contexts (aka directories) will remain
-    (empty) until you reboot the application server.
-
-    []
-
----
-Global JNDI Namespace
-
-  +- javaeeExEAR-1.0-SNAPSHOT (class: org.jnp.interfaces.NamingContext)
-  |   +- RegistrarEJB (class: org.jnp.interfaces.NamingContext)
-
-...
-
- +- javaeeEx (class: org.jnp.interfaces.NamingContext)
-  |   +- RegistrarEJB (class: org.jnp.interfaces.NamingContext)
-  |   |   +- local (proxy: $Proxy76 implements interface myorg.javaeeex.ejb.RegistrarLocal,interface org.jboss.ejb3.JBossProxy)
-  |   |   +- remote (proxy: $Proxy75 implements interface myorg.javaeeex.ejb.RegistrarRemote,interface org.jboss.ejb3.JBossProxy)
----
-
----
-Tests in error:
-  testPing(myorg.javaeeex.ejbclient.RegistrarTest)
-
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
-
-[INFO] ------------------------------------------------------------------------
-[ERROR] BUILD FAILURE
----
-
----
-$ more `find . -name "*.txt" | grep surefire`
- -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
- -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.297 sec  FAILURE!
-testPing(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.172 sec  ERROR!
-javax.naming.NameNotFoundException: remote not bound
----
-
-    [[1]] Now update the Test/pom.xml surefire configuration to this new
-    JNDI name and rebuild.
-
----
-                    <systemProperties>
-                        <property>
-                          <name>jndi.name.registrar</name>
-                          <!--
-                          <value>
-                              javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/remote
-                          </value>
-                          -->
-                          <value>
-                              javaeeEx/RegistrarEJB/remote
-                          </value>
----
----
- T E S T S
- -------------------------------------------------------
-$mvn clean install
-
-...
-
-
-Running myorg.javaeeex.ejbclient.RegistrarTest
- -getting jndi initial context
- -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=l
-ocalhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
- -jndi name:javaeeEx/RegistrarEJB/remote
- -*** testPing ***
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.375 sec
-
-Results :
-
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-
-[INFO] [jar:jar]
-[WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: C:\proj\ejava-javaee\working\solutions\javaeeEx\partB\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT
-.jar
-[INFO] [install:install]
-[INFO] Installing C:\proj\ejava-javaee\working\solutions\javaeeEx\partB\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.ja
-r to c:\proj\repository.test\myorg\javaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO]
-[INFO]
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.375s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [1.375s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [0.406s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [3.859s]
-[INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
----
-
-* {Control the complete JNDI name used}
-
-    Although the above approach was a decent step at making the JNDI name
-    not so version-specific, there are many times when we'll want to 
-    manually control the entire JNDI name used. We can do this by adding
-    a deployment descriptor.
-
-
-    [[1]] Now lets add a vender-specific, META-INF/jboss.xml deployment
+    [[1]] Lets add a vender-specific, META-INF/jboss.xml deployment
     descriptor file to specify a custom JNDI name.
 
     [Note:] Your server will throw an obscure NullPointerException if
@@ -206,32 +55,19 @@ $ cat javaeeExEJB/src/main/resources/META-INF/jboss.xml
     totally custom name.
 
 ---
-+- myorg (class: org.jnp.interfaces.NamingContext)
+ +- myorg (class: org.jnp.interfaces.NamingContext)
   |   +- javaeeEx (class: org.jnp.interfaces.NamingContext)
   |   |   +- RegistrarEJB (class: org.jnp.interfaces.NamingContext)
-  |   |   |   +- local (proxy: $Proxy108 implements interface myorg.javaeeex.ejb.RegistrarLocal,interface org.jboss.ejb3.JBossProxy)
-  |   |   |   +- remote (proxy: $Proxy107 implements interface myorg.javaeeex.ejb.RegistrarRemote,interface org.jboss.ejb3.JBossProxy)
+  |   |   |   +- local (class: Proxy for: myorg.javaeeex.ejb.RegistrarLocal)
+  |   |   |   +- remote (class: Proxy for: myorg.javaeeex.ejb.RegistrarRemote)
 ---
 
     [[1]] Update the surefire configuration for the JNDI name.
 
 ---
-                    <systemProperties>
-                        <property>
-                          <name>jndi.name.registrar</name>
-                          <!--
-                          <value>
-                              javaeeExEAR-1.0-SNAPSHOT/RegistrarEJB/remote
-                          </value>
-                          <value>
-                              javaeeEx/RegistrarEJB/remote
-                          </value>
-                          -->
-                          <value>
-                              myorg/javaeeEx/RegistrarEJB/remote
-                          </value>
-                        </property>
-                    </systemProperties>
+        <systemPropertyVariables>
+            <jndi.name.registrar>myorg/javaeeEx/RegistrarEJB/remote</jndi.name.registrar>
+        </systemPropertyVariables>
 ---
 
     [[1]] Rebuild the application and things should now work again with the 
@@ -242,37 +78,37 @@ $ mvn clean install
 
 ...
 
+ T E S T S
+ -------------------------------------------------------
 Running myorg.javaeeex.ejbclient.RegistrarTest
  -getting jndi initial context
- -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=l
-ocalhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
+ -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=127.0.0.4:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
  -jndi name:myorg/javaeeEx/RegistrarEJB/remote
  -*** testPing ***
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.375 sec
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.123 sec
 
 Results :
 
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] [jar:jar]
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
 [WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: C:\proj\ejava-javaee\working\solutions\javaeeEx\partB\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT
-.jar
-[INFO] [install:install]
-[INFO] Installing C:\proj\ejava-javaee\working\solutions\javaeeEx\partB\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.ja
-r to c:\proj\repository.test\myorg\javaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO]
-[INFO]
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [1.490s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [7.798s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.772s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [36.721s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.390s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [1.391s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [2.234s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [1.907s]
-[INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
+
 ---
 
     [[1]] We have the same structure that we ended with in partA. However, we have added
@@ -317,13 +153,8 @@ partB/
 
 ** Summary
 
-    * In this exercise, we leveraged two ways to gain control of the 
-    JNDI name.
-
-        * we used the finalName to remove the version number from the
-        EAR name within Maven that was being used by the provider as 
-        a basis for an automatically generated JNDI name.
-
-        * we used a META-INF/jboss.xml file to manually specifiy a 
-        fully customized JNDI name.
+    * In this exercise, we manually specified the EJB JNDI names so
+    that we were not dependent on the provider-specific name selected
+    by the vendor. More specifically, we used a META-INF/jboss.xml file
+    to manually specifiy a fully customized JNDI name.
 
