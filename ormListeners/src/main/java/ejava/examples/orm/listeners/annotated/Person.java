@@ -38,15 +38,18 @@ public class Person {
     public long peekId() { return id; } //peek at ID without logging
     
     @Id 
-    @GeneratedValue(strategy=GenerationType.SEQUENCE)
-    //@GeneratedValue(strategy=GenerationType.TABLE) 
+    //@GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @GeneratedValue(strategy=GenerationType.TABLE) 
     //@GeneratedValue(strategy=GenerationType.IDENTITY)
     public long getId() {
+        log.debug("Person.getId() returning:" + id);
         return id;
     }
     protected void setId(long id) {
         log.debug("Person.setId() called with:" + id);
         this.id = id;
+        //ideally we want the entity class ignorant of the PK scheme
+        //so having this code here would work -- but not ideal
         //if (residence != null && residence.peekId() == 0) { 
         //    residence.putId(id, "Person"); 
         //}
@@ -78,7 +81,7 @@ public class Person {
         	cbLog.debug("Person Callback.postPersist too late");
         }
         else if (residence != null && residence.peekId() == 0) { 
-            residence.putId(id, "Listener"); 
+            residence.putId(id, "Callback"); 
         } 
         else {
         	cbLog.debug("Person Callback.postPersist too late");

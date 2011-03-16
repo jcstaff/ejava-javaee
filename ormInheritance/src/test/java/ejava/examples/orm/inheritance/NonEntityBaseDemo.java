@@ -1,6 +1,11 @@
 package ejava.examples.orm.inheritance;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
+
+import org.junit.Test;
+
 import ejava.examples.orm.inheritance.annotated.Album;
 import ejava.examples.orm.inheritance.annotated.BaseObject;
 import ejava.examples.orm.inheritance.annotated.ToothPaste;
@@ -13,8 +18,9 @@ import ejava.examples.orm.inheritance.annotated.ToothPaste;
  */
 public class NonEntityBaseDemo extends DemoBase {
 
-    @SuppressWarnings("unchecked")
-    public void testNonEntityBaseCreate() {
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testNonEntityBaseCreate() {
         log.info("testNonEntityBaseCreate");
         
         ejava.examples.orm.inheritance.annotated.Album album = 

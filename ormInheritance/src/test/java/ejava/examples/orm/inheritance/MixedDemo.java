@@ -1,6 +1,11 @@
 package ejava.examples.orm.inheritance;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
+
+import org.junit.Test;
+
 import ejava.examples.orm.inheritance.annotated.BaseObject;
 import ejava.examples.orm.inheritance.annotated.Circle;
 import ejava.examples.orm.inheritance.annotated.Cube;
@@ -15,10 +20,10 @@ import ejava.examples.orm.inheritance.annotated.Shape;
  */
 public class MixedDemo extends DemoBase {
     
-    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
         super.setUp();
         
+        @SuppressWarnings("unchecked")
         List<Shape> shapes = 
             em.createQuery("select s from Shape s").getResultList();
         for(Shape s : shapes) {
@@ -29,7 +34,7 @@ public class MixedDemo extends DemoBase {
         em.getTransaction().begin();
     }
 
-    @SuppressWarnings("unchecked")
+    @Test
     public void testNonEntityBaseAndJoinCreate() {
         log.info("testNonEntityBaseAndJoinCreate");
         
@@ -53,6 +58,7 @@ public class MixedDemo extends DemoBase {
         assertFalse("rectangle still managed", em.contains(rectangle));
         assertFalse("circle still managed", em.contains(circle));
         
+        @SuppressWarnings("unchecked")
         List<BaseObject> objects = 
             em.createQuery("select s from Shape s").getResultList();
         
@@ -80,7 +86,7 @@ public class MixedDemo extends DemoBase {
         assertEquals("unexpected number of circle rows:" + rows, 1, rows);
     }
     
-    @SuppressWarnings("unchecked")
+    @Test
     public void testNonEntityBaseAndTablePerClassCreate() {
         log.info("testNonEntityBaseAndTablePerClassCreate");
         
@@ -96,7 +102,8 @@ public class MixedDemo extends DemoBase {
         em.clear();
         assertFalse("cube still managed", em.contains(cube));
         
-        List<BaseObject> objects = 
+        @SuppressWarnings("unchecked")
+		List<BaseObject> objects = 
             em.createQuery("select c from Cube c").getResultList();
         assertTrue("unexpected number of objects:" + objects.size(),
                 objects.size() == 1);

@@ -86,7 +86,6 @@ public class Residence {
     
     @PrePersist public void prePersist() {
         cbLog.debug("Callback.prePersist event:" + this.toString());
-        //id = person.getId();
         if (id != 0) {
             cbLog.debug("Residence Callback.prePersist too late");
         }

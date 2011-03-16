@@ -1,7 +1,12 @@
 package ejava.examples.orm.inheritance;
 
+import static org.junit.Assert.*;
+
 import java.util.Date;
 import java.util.List;
+
+import org.junit.Test;
+
 import ejava.examples.orm.inheritance.annotated.Customer;
 import ejava.examples.orm.inheritance.annotated.Employee;
 import ejava.examples.orm.inheritance.annotated.Person;
@@ -14,9 +19,9 @@ import ejava.examples.orm.inheritance.annotated.Person;
  */
 public class TablePerClassDemo extends DemoBase {
     
-    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
         super.setUp();
+        @SuppressWarnings("unchecked")
         List<Person> people = 
             em.createQuery("select p from Person p").getResultList();
         for(Person p: people) {
@@ -27,7 +32,7 @@ public class TablePerClassDemo extends DemoBase {
         em.getTransaction().begin();
     }
 
-    @SuppressWarnings("unchecked")
+    @Test
     public void testTablePerClassCreate() {
         log.info("testTablePerClassCreate");
         
@@ -51,6 +56,7 @@ public class TablePerClassDemo extends DemoBase {
         assertFalse("employee still managed", em.contains(employee));
         assertFalse("customer still managed", em.contains(customer));
         
+        @SuppressWarnings("unchecked")
         List<Person> people = 
             em.createQuery("select p from Person p").getResultList();
         assertTrue("unexpected number of people:" + people.size(),

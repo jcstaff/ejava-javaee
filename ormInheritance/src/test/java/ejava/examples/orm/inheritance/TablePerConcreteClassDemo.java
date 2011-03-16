@@ -1,6 +1,11 @@
 package ejava.examples.orm.inheritance;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
+
+import org.junit.Test;
+
 import ejava.examples.orm.inheritance.annotated.Account;
 import ejava.examples.orm.inheritance.annotated.CheckingAccount;
 import ejava.examples.orm.inheritance.annotated.InterestAccount;
@@ -13,7 +18,6 @@ import ejava.examples.orm.inheritance.annotated.InterestAccount;
  */
 public class TablePerConcreteClassDemo extends DemoBase {
 
-    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
         super.setUp();
         em.createQuery("delete from CheckingAccount c").executeUpdate();
@@ -24,6 +28,7 @@ public class TablePerConcreteClassDemo extends DemoBase {
     }
 
     @SuppressWarnings("unchecked")
+	@Test
     public void testTablePerConcreteClassCreate() {
         log.info("testTablePerConcreteClassCreate");
         

@@ -1,7 +1,11 @@
 package ejava.examples.orm.inheritance;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 import java.util.Date;
+
+import org.junit.Test;
 
 import ejava.examples.orm.inheritance.annotated.Bread;
 import ejava.examples.orm.inheritance.annotated.Product;
@@ -15,9 +19,9 @@ import ejava.examples.orm.inheritance.annotated.Soup;
  */
 public class SingleTablePerHierarchyDemo extends DemoBase {
 
-    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
         super.setUp();
+        @SuppressWarnings("unchecked")
         List<Product> products = 
             em.createQuery("select p from Product p").getResultList();
         for(Product p: products) {
@@ -28,7 +32,7 @@ public class SingleTablePerHierarchyDemo extends DemoBase {
         em.getTransaction().begin();
     }
 
-    @SuppressWarnings("unchecked")
+    @Test
     public void testSingleTablePerHierarchyCreate() {
         log.info("testSingleTablePerHierarchyCreate");
         
@@ -50,6 +54,7 @@ public class SingleTablePerHierarchyDemo extends DemoBase {
         assertFalse("bread still managed", em.contains(bread));
         assertFalse("soup still managed", em.contains(soup));
         
+        @SuppressWarnings("unchecked")
         List<Product> products = 
             em.createQuery("select p from Product p").getResultList();
         assertTrue("unexpected number of products:" + products.size(),

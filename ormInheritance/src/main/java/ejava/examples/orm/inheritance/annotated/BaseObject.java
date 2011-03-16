@@ -17,7 +17,6 @@ public abstract class BaseObject {
     public long getId() {
         return id;
     }
-    @SuppressWarnings("unused")
     protected void setId(long id) {
         this.id = id;
     }

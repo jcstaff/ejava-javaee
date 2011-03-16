@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -40,6 +41,7 @@ public class AnnotatedCallbacksTest {
      * started until after the persist() is called. 
      *
      */
+    //@Ignore 
     @Test
     public void testActiveTransaction() {
         log.info("*** testActiveTransaction() ***");
@@ -54,7 +56,8 @@ public class AnnotatedCallbacksTest {
         residence.setZip("20500");
         person.setResidence(residence);
 
-        assertEquals(0, person.getId());        
+        assertEquals(0, person.peekId());        
+        assertEquals(0, residence.peekId());        
         log.debug("beginning transaction:" + person + ": " + residence);
         em.getTransaction().begin();
         log.debug("calling persist()");
@@ -64,7 +67,7 @@ public class AnnotatedCallbacksTest {
         log.debug("committing transaction:" + person + ": " + residence);
         em.getTransaction().commit();
         log.debug("committed transaction:" + person + ": " + residence);
-        assertTrue(person.getId() != 0);
+        assertTrue(person.peekId() != 0);
         assertEquals(person.peekId(), residence.peekId());
         
         em.remove(person);
@@ -79,6 +82,7 @@ public class AnnotatedCallbacksTest {
      * started until after the persist() is called. 
      *
      */
+    //@Ignore
     @Test
     public void testDelayedTransaction() {
         log.info("*** testDelayedTransaction() ***");
@@ -93,7 +97,8 @@ public class AnnotatedCallbacksTest {
         residence.setZip("20500");
         person.setResidence(residence);
 
-        assertEquals(0, person.getId());        
+        assertEquals(0, person.peekId());        
+        assertEquals(0, residence.peekId());        
         log.debug("calling persist()");
         em.persist(person);
         log.debug("persisted person:" + person);
@@ -103,11 +108,7 @@ public class AnnotatedCallbacksTest {
         log.debug("committing transaction:" + person + ": " + residence);
         em.getTransaction().commit();
         log.debug("committed transaction:" + person + ": " + residence);
-        assertTrue(person.getId() != 0);
+        assertTrue(person.peekId() != 0);
         assertEquals(person.peekId(), residence.peekId());
-        
-        em.remove(person);
-        em.getTransaction().begin();
-        em.getTransaction().commit();
     }
 }
