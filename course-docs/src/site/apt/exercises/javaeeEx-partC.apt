@@ -37,9 +37,18 @@ Persistence Unit within the EJB
     We are only concerned with resolving artifacts and classes
     at this point. 
 
-    [[1]] Copy/paste the javaeeExImpl solution from the SVN repository.
-    You will find a copy within solutions/javaeeEx/partC. Your directory
-    will look like the following when you are complete.
+    [[1]] Export the javaeeExImpl solution from the SVN repository.
+    You will find a copy within solutions/javaeeEx/partC. 
+    
+---
+$ cd javaeeEx
+$ svn export https://ejava.info/repos/class/trunk/ejava-javaee/solutions/javaeeEx/partC/javaeeExImpl
+A    javaeeExImpl
+A    javaeeExImpl/src
+...
+---
+    
+    Your directory will look like the following when you are complete.
 
 ---
 javaeeEx                                   
@@ -114,29 +123,44 @@ javaeeEx
 ---
 $ mvn clean install
 [INFO] Scanning for projects...
-[INFO] Reactor build order:
-[INFO]   Java EE Exercise
-[INFO]   Java EE Exercise Impl
-[INFO]   Java EE Exercise EJB
-[INFO]   Java EE Exercise EAR
-[INFO]   Java EE Exercise Remote Test
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise
+[INFO] Java EE Exercise Impl
+[INFO] Java EE Exercise EJB
+[INFO] Java EE Exercise EAR
+[INFO] Java EE Exercise Remote Test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
 
 ...
 
-[INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.395s]
+[INFO] Java EE Exercise Impl ............................. SUCCESS [11.150s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [3.877s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.057s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [25.080s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.360s]
-[INFO] Java EE Exercise Impl ................................. SUCCESS [7.281s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [0.594s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [0.453s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [2.937s]
-[INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 ---
+
+    [Note:] You can avoid unecessary builds of the javaExImpl
+    project by adding an extra set of parameters to the build that
+    names the module you wish to resume the build from.
+
+---
+$ mvn clean install -rf :javaeeExEJB
+---
+
+    The above command will begin execution of the build at the EJB
+    and skip the Impl project.
+
+    []
 
     [[1]] Add a dependency from the EJB to the Impl project. This edit is done
     within the EJB/pom.xml. 
@@ -159,8 +183,8 @@ $ mvn clean install
 ...
 ---
 
-    [[1]] Add the business logic and DAO classes for the Impl we are
-    integrating into our stateless session bean.
+    [[1]] Integerate the business logic and DAO classes for the Impl 
+    partially into our stateless session bean.
 
 ---
 ...
@@ -210,10 +234,15 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
 ---
 //SERVER LOG
 
-00:07:20,632 INFO  [EARDeployer] Started J2EE application: file:/C:/proj/ejava-javaee/working/solutions/javaeeEx/partC/javaeeExEAR/target/javaeeEx.ear
-00:07:21,273 DEBUG [RegistrarEJB] **** init ****
-00:07:21,273 DEBUG [RegistrarEJB] init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1b7a531
-00:07:21,273 DEBUG [RegistrarEJB] ping called
+        /myorg/javaeeEx/RegistrarEJB/remote - EJB3.x Default Remote Business Interface
+        javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT.jar/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote - EJB3.x Remote Business Interface
+        /myorg/javaeeEx/RegistrarEJB/local - EJB3.x Default Local Business Interface
+        javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT.jar/RegistrarEJB!myorg.javaeeex.ejb.RegistrarLocal - EJB3.x Local Business Interface
+
+22:59:52,150 WARN  [org.jboss.ejb3.TimerServiceContainer] EJBTHREE-2193: using deprecated TimerServiceFactory for restoring timers
+22:59:56,809 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] **** init ****
+22:59:56,810 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@4286a3
+22:59:56,811 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] ping called
 ---
 
 * {Integrate EntityManager into EJB}
@@ -231,12 +260,23 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     [[1]] Update your EJB implementation to add the PersistenceUnit.
 
 ---
+    <repositories>
+        ...
+        <repository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
         <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.0.Final</version>
+            <scope>provided</scope>
         </dependency>
+        ...
 ---
 ---
 import javax.persistence.EntityManager;
@@ -263,27 +303,25 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     project.
 
 ---
-$ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/main/resources/META-INF/
+$ cp javaeeExImpl/src/test/resources/META-INF/persistence.xml javaeeExEJB/src/main/resources/META-INF/
 ---
 
     [[1]] Update the definition of the persistence.xml file to provide a jta-data-source
     and a reference to the entity jar-file. Since we are now using a DataSource from the
     JNDI tree, we no longer need the connection information. It can be deleted from the
-    EJB's copy.
+    EJB's copy. The "-test" suffix can be removed at thsi time since this will be what
+    we plan to use in operaton (except for the auto schema create).
 
 ---
     <persistence-unit name="javaeeEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/ejavaDS</jta-data-source>
+        <mapping-file>META-INF/orm.xml</mapping-file>
         <jar-file>javaeeExImpl-${project.version}.jar</jar-file>
         <properties>
-        <properties>
-            <property name="hibernate.dialect" 
-                value="${hibernate.dialect}"/>
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
             <property name="hibernate.show_sql" value="false"/>
-            <property name="hibernate.formal_sql" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
         </properties>
     </persistence-unit>
 ---
@@ -298,7 +336,7 @@ $ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/ma
 
     []
 
-    [[1]] Update your pom.xml to expand the variables defined within the persistence.xml
+    [[1]] Update your EJB/pom.xml to expand the variables defined within the persistence.xml
     file.
 
 ---
@@ -335,10 +373,58 @@ $ cp javaeeExImpl/src/main/resources/META-INF/persistence.xml javaeeExEJB/src/ma
     [[1]] Rebuild your application and note that the EntityManager was resolved.
 
 ---
-00:19:34,694 INFO  [EARDeployer] Started J2EE application: file:/C:/proj/ejava-javaee/working/solutions/javaeeEx/partC/javaeeExEAR/target/javaeeEx.ear
-00:19:35,288 DEBUG [RegistrarEJB] **** init ****
-00:19:35,288 DEBUG [RegistrarEJB] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@182eca8
-00:19:35,288 DEBUG [RegistrarEJB] ping called
+23:34:05,877 INFO  [org.jboss.jpa.deployment.PersistenceUnitDeployment] Starting persistence unit persistence.unit:unitName=javaeeExEAR-1.0-SNAPSHOT.ear/javaeeExEJB-1.0-SNAPSHOT.jar#javaeeEx
+23:34:05,879 INFO  [org.hibernate.ejb.Ejb3Configuration] Processing PersistenceUnitInfo [
+        name: javaeeEx
+        ...]
+...
+23:34:07,499 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] **** init ****
+23:34:07,500 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] em=org.jboss.jpa.tx.TransactionScopedEntityManager@1423a74
+23:34:07,500 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@117f2d6
+23:34:07,501 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] ping called
+---
+
+    If the server-side looks fine and you are now encountering a name not found
+    problem locating the interface from the previous exercise, place a Thread.sleep()
+    in the setUp() to allow the EJB a little extra time to deploy. The cargo plugin
+    seems to get a handshake from JBoss and then turn things over to surefire/JUnit
+    before the application has fully deployed.
+
+---
+myorg was not found
+---
+
+    Add the following
+---
+$ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+...
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        Thread.sleep(3000);
+    }
+...
+---
+
+    [[1]] Note too that the persistence.xml file gets expanded to the following. If you see
+    unexpanded variables in your target copy, check that the variable is declared, that
+    filtering of that directory and file type are enabled, and everything is spelled 
+    correctly.
+
+---
+$ cat javaeeExEJB/target/classes/META-INF/persistence.xml 
+...
+    <persistence-unit name="javaeeEx">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:/ejavaDS</jta-data-source>
+        <mapping-file>META-INF/orm.xml</mapping-file>
+        <jar-file>javaeeExImpl-1.0-SNAPSHOT.jar</jar-file>
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
+            <property name="hibernate.show_sql" value="false"/>            
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+        </properties>
+    </persistence-unit>            
+    ...
 ---
 
 * {End to End Test EJB}
@@ -413,6 +499,7 @@ import myorg.javaeeex.bo.Person;
         return person;
     }
 
+    @Test
     public void testCreatePerson() throws Exception {
         log.info("*** testCreatePerson ***");
 
@@ -430,21 +517,23 @@ import myorg.javaeeex.bo.Person;
     }
 ---
 
-    [[1]] Rebuild the application.
+    [[1]] Rebuild the application. It will fail because of a validation rule in the
+    business logic.
 
 ---
 $ mvn clean install
 
 ...
-
-Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.407 sec FAILURE!
+ -*** testCreatePerson ***
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.319 sec <<< FAILURE!
 
 Results :
 
-Tests in error:
+Tests in error: 
   testCreatePerson(myorg.javaeeex.ejbclient.RegistrarTest)
 
 Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
+
 ---
 ---
 ./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
@@ -452,10 +541,10 @@ Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
  -------------------------------------------------------------------------------
 Test set: myorg.javaeeex.ejbclient.RegistrarTest
  -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.407 sec FAILURE!
-testCreatePerson(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.016 sec  ERROR!
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.324 sec <<< FAILURE!
+testCreatePerson(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.076 sec  <<< ERROR!
 myorg.javaeeex.bl.RegistrarException: myorg.javaeeex.bl.RegistrarException: Person must have 1 address
-        at myorg.javaeeex.ejb.RegistrarEJB.createPerson(RegistrarEJB.java:70)
+        at myorg.javaeeex.ejb.RegistrarEJB.createPerson(RegistrarEJB.java:66)
 ---
 
     [[1]] Add an Address to the makePerson() in the RMI Test.
@@ -483,32 +572,30 @@ $ mvn clean install
 ...
 
  -*** testCreatePerson ***
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.5 sec
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.633 sec
 
 Results :
 
 Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] [jar:jar]
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
 [WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: C:\proj\ejava-javaee\working\solutions\javaeeEx\partC\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT
-.jar
-[INFO] [install:install]
-[INFO] Installing C:\proj\ejava-javaee\working\solutions\javaeeEx\partC\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.ja
-r to c:\proj\repository.test\myorg\javaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO]
-[INFO]
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.337s]
+[INFO] Java EE Exercise Impl ............................. SUCCESS [11.316s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.135s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.291s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [21.046s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.375s]
-[INFO] Java EE Exercise Impl ................................. SUCCESS [7.203s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [0.766s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [2.078s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [1.609s]
-[INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 ---
 
 
@@ -517,14 +604,15 @@ r to c:\proj\repository.test\myorg\javaee\javaeeExTest\1.0-SNAPSHOT\javaeeExTest
 ---
 //SERVER LOG
 
-00:49:16,476 DEBUG [RegistrarEJB] **** init ****
-00:49:16,476 DEBUG [RegistrarEJB] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@e6f8d7
-00:49:16,491 DEBUG [RegistrarEJB] ping called
-00:49:16,507 DEBUG [RegistrarEJB] *** createPerson() ***
-00:49:16,507 DEBUG [JPAPersonDAO] creating person:id=0:joe smith 123, addresses={{street1 city1, state1 zip1},}
-00:49:16,507 DEBUG [JPAPersonDAO] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@e6f8d7
-00:49:16,507 DEBUG [JPAPersonDAO] person created:id=1:joe smith 123, addresses={{street1 city1, state1 zip1},}
-00:49:16,523 DEBUG [RegistrarEJB] *** getPersonById(1) ***
+00:08:06,245 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] **** init ****
+00:08:06,246 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] em=org.jboss.jpa.tx.TransactionScopedEntityManager@1929486
+00:08:06,246 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@129460
+00:08:06,247 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] ping called
+00:08:06,316 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] *** createPerson() ***
+00:08:06,317 DEBUG [myorg.javaeeex.jpa.JPAPersonDAO] creating person:id=0:joe smith 123, addresses={{street1 city1, state1 zip1},}
+00:08:06,321 DEBUG [myorg.javaeeex.jpa.JPAPersonDAO] em=org.jboss.jpa.tx.TransactionScopedEntityManager@1929486
+00:08:06,573 DEBUG [myorg.javaeeex.jpa.JPAPersonDAO] person created:id=1:joe smith 123, addresses={{street1 city1, state1 zip1},}
+00:08:06,700 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] *** getPersonById(1) ***
 ---
 
     []

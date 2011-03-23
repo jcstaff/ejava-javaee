@@ -1,5 +1,9 @@
 package myorg.javaeeex.blimpl;
 
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 import myorg.javaeeex.bl.TestUtil;
 import myorg.javaeeex.bo.Address;
 import myorg.javaeeex.bo.Person;
@@ -8,13 +12,15 @@ import myorg.javaeeex.jpa.DemoBase;
 public class TestUtilTest extends DemoBase {
     private TestUtil testUtil;
 
-    protected void setUp() throws Exception {
+    @Override
+    public void setUp() throws Exception {
         super.setUp();
         
         testUtil = new TestUtilImpl();
         ((TestUtilImpl)testUtil).setEntityManager(em);
     }
 
+    @Test
     public void testResetAll() throws Exception {
         log.info("*** testResetAll");
 

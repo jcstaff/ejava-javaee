@@ -1,7 +1,10 @@
 package myorg.javaeeex.blimpl;
 
+import static org.junit.Assert.*;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import myorg.javaeeex.bl.Registrar;
 import myorg.javaeeex.bl.RegistrarException;
@@ -14,13 +17,11 @@ public class RegistrarImplTest extends DemoBase {
     private static final Log log = LogFactory.getLog(RegistrarImplTest.class);
     private Registrar registrar;
     
-    protected void setUp() throws Exception {
+    @Override
+    public void setUp() throws Exception {
         super.setUp();
         registrar = new RegistrarImpl();
         ((RegistrarImpl)registrar).setDAO(personDAO);
-    }
-    protected void tearDown() throws Exception {
-        super.tearDown();
     }
     
     protected Person makePerson() {
@@ -32,7 +33,8 @@ public class RegistrarImplTest extends DemoBase {
                 new Address(0,"city1", "street1", "state1", "zip1"));
         return person;
     }
-    
+
+    @Test
     public void testCreatePerson() throws Exception {
         log.info("*** testCreatePerson() ***");
         
@@ -85,6 +87,7 @@ public class RegistrarImplTest extends DemoBase {
         log.info("registrar returned expected person:" + person);
     }
     
+    @Test
     public void testChangeAddress() throws Exception {
         log.info("*** testChangeAddress() ***");
         Person person = makePerson();

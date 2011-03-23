@@ -1,5 +1,7 @@
 package myorg.javaeeex.jpa;
 
+import static org.junit.Assert.*;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +13,7 @@ import myorg.javaeeex.dao.PersonDAO;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 
 public class JPAPersonDAOTest extends DemoBase {
@@ -28,6 +31,7 @@ public class JPAPersonDAOTest extends DemoBase {
         return person;
     }
     
+    @Test
     public void testCreatePerson() {
         log.info("*** testCreatePerson ***");
         Person person = makePerson();
@@ -39,7 +43,7 @@ public class JPAPersonDAOTest extends DemoBase {
         assertTrue("unexpected id:" + person.getId(), person.getId() != 0);        
     }    
     
-    
+    @Test
     public void testRemovePerson() {
         log.info("*** testRemovePerson ***");
 
@@ -68,6 +72,7 @@ public class JPAPersonDAOTest extends DemoBase {
         assertEquals("unexpected number of people",startCount, removeCount);        
     }
     
+    @Test
     public void testGetPerson() {
         log.info("*** testGetPerson ***");
         
@@ -88,6 +93,7 @@ public class JPAPersonDAOTest extends DemoBase {
                 person2.getAddresses().size());
     }
     
+    @Test
     public void testFindPeopleLikeName() {
         log.info("*** testFindPeopleLikeName ***");
         
@@ -113,6 +119,7 @@ public class JPAPersonDAOTest extends DemoBase {
         log.debug("found people with first name like joe123%:" + matches);
     }
 
+    @Test
     public void testFindAllPeople() {
         log.info("*** testFindAllPeople ***");
 
