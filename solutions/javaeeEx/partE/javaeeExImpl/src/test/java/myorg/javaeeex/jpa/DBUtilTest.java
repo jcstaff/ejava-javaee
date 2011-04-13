@@ -1,11 +1,18 @@
 package myorg.javaeeex.jpa;
 
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 public class DBUtilTest extends DemoBase {
-    private String dropPath = System.getProperty("dropPath");
-    private String createPath = System.getProperty("createPath");
+    private String dropPath = 
+    	System.getProperty("dropPath", "ddl/javaeeExImpl-drop.ddl");
+    private String createPath = 
+    	System.getProperty("createPath", "ddl/javaeeExImpl-create.ddl");
     private DBUtil dbUtil;
     
-    protected void setUp() throws Exception {
+    @Override
+    public void setUp() throws Exception {
         super.setUp();
         
         assertNotNull("dropPath not supplied", dropPath);
@@ -15,6 +22,7 @@ public class DBUtilTest extends DemoBase {
     }
 
     /* this is a basic sanity check of the ability to drop and create schema */
+    @Test
     public void testDropCreate() throws Exception {
         log.info("*** testDropCreate ***");
         

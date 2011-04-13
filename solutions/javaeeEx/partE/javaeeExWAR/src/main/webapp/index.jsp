@@ -5,8 +5,7 @@
     <title>JavaEE Exercise Main Page</title>
 </head>
 <body>
-    <h2>Hello JavaEE Controller</h2>
-
+    <h2>Hello</h2>
     <ul>
         <li><a href="model/admin/handler">invoke servlet</a></li>
         <li><a href="model/admin/handler?command=Ping">invoke admin EJB.ping()</a></li>
@@ -14,4 +13,4 @@
     </ul>
 </body>
 </html>
-            
+

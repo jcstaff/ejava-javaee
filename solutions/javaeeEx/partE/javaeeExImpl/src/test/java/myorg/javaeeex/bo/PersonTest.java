@@ -1,19 +1,21 @@
 package myorg.javaeeex.bo;
 
+import static org.junit.Assert.*;
+
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import junit.framework.TestCase;
-
+import org.junit.Test;
 
 /**
  * This class provides a test case for a very trivial business object.
  * @author jcstaff
  *
  */
-public class PersonTest extends TestCase {
+public class PersonTest {
     private static Log log = LogFactory.getLog(PersonTest.class);
     
+    @Test
     public void testPerson() {
         log.info("*** testPerson ***");
         String firstName = "joe";
