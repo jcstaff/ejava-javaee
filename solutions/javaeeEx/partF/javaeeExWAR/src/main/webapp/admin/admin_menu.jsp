@@ -4,15 +4,11 @@
 <head>
     <title>JavaEE Exercise Admin Menu</title>
 </head>
-<jsp:scriptlet>
-     String ctx = request.getContextPath() + "/";
-</jsp:scriptlet>
 <body>
     <h2>Hello JavaEE Admin User</h2>
 
     <ul>
-        <li><a href=<%=ctx + "model/admin/handler?command=Get+All+People&index=0&count=10"%>>Get All People</a></li>
+        <li><a href="../model/admin/handler?command=Get+All+People&index=0&count=10">Get All People</a></li>
     </ul>
 </body>
 </html>
-            

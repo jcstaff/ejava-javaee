@@ -47,6 +47,8 @@ Part F: Handling WAR/EJB Interface Issues
     [[1]] Add the getAllPeople() method to the @Remote interface.
 
 ---
+$ cat ./javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarRemote.java
+
 @Remote
 public interface RegistrarRemote {
 ...
@@ -58,6 +60,9 @@ public interface RegistrarRemote {
     implementation.
 
 ---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
+
+...
     public Collection<Person> getAllPeople(int index, int count)
             throws RegistrarException {
         log.debug("*** getAllPeople(index=" + index + 
@@ -77,6 +82,10 @@ public interface RegistrarRemote {
     we attempt to make use of it within the WAR.
 
 ---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+...
+    @Test
     public void testWebUseCase() throws Exception {
         log.info("*** testWebUserCase ***");
         final int PAGE_SIZE=24;
@@ -110,52 +119,51 @@ public interface RegistrarRemote {
     [[1]] Build, deploy, and test the new method from the RMI Test.
 
 ---
-$ mvn clean install
+$ mvn clean install -rf :javaeeExEJB
 [INFO] Scanning for projects...
-[INFO] Reactor build order:
-[INFO]   Java EE Exercise
-[INFO]   Java EE Exercise Impl
-[INFO]   Java EE Exercise EJB
-[INFO]   Java EE Exercise WAR
-[INFO]   Java EE Exercise EAR
-[INFO]   Java EE Exercise Remote Test
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise EJB
+[INFO] Java EE Exercise WAR
+[INFO] Java EE Exercise EAR
+[INFO] Java EE Exercise Remote Test
 
 ...
 
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.406 sec
+ -*** testWebUserCase ***
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.466 sec
 
 Results :
 
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] [jar:jar]
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
 [WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: C:\proj\javaeeEx\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] [install:install]
-[INFO] Installing C:\proj\javaeeEx\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.jar to c:\proj\repository\myorg\javaee\
-javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO]
-[INFO]
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.481s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.841s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.530s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [25.191s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.469s]
-[INFO] Java EE Exercise Impl ................................. SUCCESS [9.938s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [0.906s]
-[INFO] Java EE Exercise WAR .................................. SUCCESS [1.344s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [0.406s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [4.281s]
-[INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 ---
 
     [[1]] Now add some extra getters of the person information within
     the existing test method.
 
 ---
+$cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+
             loops += 1;
             for (Person person : people) {
                 log.debug("person: (" + person.getId() +
@@ -168,7 +176,7 @@ javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
     [[1]] Build and run the new form of the test.
 
 ---
-$mvn clean install
+$ mvn clean install -rf :javaeeExEJB
 
 ...
 
@@ -190,6 +198,9 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.421 sec
     [[1]] Attempt a deeper processing of the people returned.
 
 ---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+...
             log.debug("people=" + people);
         } while (!people.isEmpty() && loops <= PAGES + 1);   
 ---
@@ -221,6 +232,9 @@ PersistentCollection.java:350)
     [[1]] Add a hydrated form of the getAllPeople.
 
 ---
+$ cat ./javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarRemote.java
+
+...
 @Remote
 public interface RegistrarRemote {
    ...
@@ -231,6 +245,9 @@ public interface RegistrarRemote {
         throws RegistrarException;
 ---
 ---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
+
+...
 @Stateless
 public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
    ...
@@ -257,17 +274,19 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     [[1]] Update the RMI Test to use the hydrated form.
 
 ---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+...
         do {
             people = registrar.getAllPeopleHydrated(index, PAGE_SIZE);
 ---
 ---
-$ mvn clean install
+$ mvn clean install -rf :javaeeExEJB
+
 
 ...
-
  -person: (96) first95 last95
  -people=[id=73:first72 last72 123, addresses={{street1 city1, state1 zip1},}, id=74:first73 last73 123, addresses={{str
-
 ...
 
 1, state1 zip1},}, id=94:first93 last93 123, addresses={{street1 city1, state1 zip1},}, id=95:first94 last94 123, addres
@@ -277,32 +296,29 @@ ses={{street1 city1, state1 zip1},}, id=96:first95 last95 123, addresses={{stree
  -address: (1) street1 city1, state1 zip1
  -person: (1) first0 last0
  -address: (97) street12 city12, state12 zip12
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.5 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.504 sec
 
 Results :
 
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] [jar:jar]
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
 [WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: C:\proj\javaeeEx\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] [install:install]
-[INFO] Installing C:\proj\javaeeEx\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.jar to c:\proj\repository\myorg\javaee\
-javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO]
-[INFO]
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.259s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.834s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.138s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [24.765s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.359s]
-[INFO] Java EE Exercise Impl ................................. SUCCESS [7.438s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [0.875s]
-[INFO] Java EE Exercise WAR .................................. SUCCESS [1.328s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [0.328s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [4.500s]
-[INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 ---
 
 ---
@@ -311,6 +327,9 @@ javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
     Web UI use case. Do this after the paging tests.
 
 ---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+
         ...
         assertEquals("unexpected number of people", TOTAL, count);
         
@@ -372,6 +391,8 @@ PersistentCollection.java:350)
     two forms.
 
 ---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarRemote.java
+
 @Remote
 public interface RegistrarRemote {
     ...
@@ -382,6 +403,9 @@ public interface RegistrarRemote {
         throws RegistrarException;
 ---
 ---
+$cat ./javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
+
+...
     public Person getPersonByIdHydrated(long id) throws RegistrarException {
         log.debug("*** getPersonByIdHydrated() ***");
 
@@ -400,6 +424,9 @@ public interface RegistrarRemote {
     [[1]] Update the RMI Test RMI Test to use the new hydrated form.
 
 ---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+...
         //view a specific user
         long id = registrar.getAllPeople(0, PAGE_SIZE).iterator().next().getId();
         Person person = registrar.getPersonByIdHydrated(id);
@@ -407,68 +434,44 @@ public interface RegistrarRemote {
 
     [[1]] Build and run the new implementation.
 
-    [Note:] I needed to restart by JBoss server at this point to fully
-    resolve all the changes that were made in the last step. I initially
-    got the following error before I restarted.
-
 ---
-./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
-::::::::::::::
- -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
- -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.36 sec <<< FAILURE!
-testWebUseCase(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.594 sec  <<< ERROR!
-java.lang.RuntimeException: Could not resolve beanClass method from proxy call
-        at org.jboss.ejb3.stateless.StatelessContainer.dynamicInvoke(StatelessContainer.java:274)
-        at org.jboss.aop.Dispatcher.invoke(Dispatcher.java:106)
-
-...
-
-        at org.jboss.ejb3.stateless.StatelessRemoteProxy.invoke(StatelessRemoteProxy.java:107)
-        at $Proxy1.getPersonByIdHydrated(Unknown Source)
----
-
-    []
-
----
-$mvn clean install
+$ mvn clean install -rf :javaeeExEJB
 
 ...
 
  -person: (1) first0 last0
  -address: (1) street1 city1, state1 zip1
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.985 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.501 sec
 
 Results :
 
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] [jar:jar]
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
 [WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: C:\proj\javaeeEx\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] [install:install]
-[INFO] Installing C:\proj\javaeeEx\javaeeExTest\target\javaeeExTest-1.0-SNAPSHOT.jar to c:\proj\repository\myorg\javaee\
-javaeeExTest\1.0-SNAPSHOT\javaeeExTest-1.0-SNAPSHOT.jar
-[INFO]
-[INFO]
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.890s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.655s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.114s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [24.296s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.422s]
-[INFO] Java EE Exercise Impl ................................. SUCCESS [7.750s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [0.875s]
-[INFO] Java EE Exercise WAR .................................. SUCCESS [1.359s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [0.359s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [6.657s]
-[INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 ---
 
     [[1]] Add a method to changeAddress for a person.
 
 ---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarRemote.java
+
+...
 import myorg.javaeeex.bo.Address;
 
 @Remote
@@ -484,6 +487,9 @@ public interface RegistrarRemote {
         throws RegistrarException;
 ---
 ---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
+
+...
 @Stateless
 public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
 ...
@@ -505,6 +511,9 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     person.
 
 ---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+...
         //update the address of a specific user
         Address address2 = new Address();
         address2.setStreet(address.getStreet() + 2);
@@ -522,6 +531,9 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     [[1]] Update the RMI Test method to report the changes of the person.
 
 ---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+...
         //view user again
         person = registrar.getPersonByIdHydrated(id);
         log.debug("person: (" + person.getId() +
@@ -556,6 +568,9 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.313 sec
     functionality.
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
     private abstract class Handler {
         ...
         protected static final String INDEX_PARAM = "index";
@@ -566,6 +581,8 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.313 sec
                 throws Exception;
 ---
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
 ...
 import java.util.Collection;
 ...
@@ -590,11 +607,15 @@ import myorg.javaeeex.bo.Person;
               getServletContext().getRequestDispatcher(DISPLAY_RESULT_URL);
             rd.forward(request, response);                
         }
+    }
 ---
 
     [[1]] Add this option to the ADMIN handlers.
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
 public class RegistrarHandlerServlet extends HttpServlet {
 
 ...
@@ -613,6 +634,7 @@ public class RegistrarHandlerServlet extends HttpServlet {
     Please this request in an admin-specific sub-menu.
 
 ---
+$ mkdir mkdir -p javaeeExWAR/src/main/webapp/admin
 $ cat javaeeExWAR/src/main/webapp/admin/admin_menu.jsp
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -625,16 +647,21 @@ $ cat javaeeExWAR/src/main/webapp/admin/admin_menu.jsp
     <h2>Hello JavaEE Admin User</h2>
 
     <ul>
-        <li><a href="model/admin/handler?command=Get+All+People?index=0&count=10">Get All People</a></li>
+        <li><a href="../model/admin/handler?command=Get+All+People&index=0&count=10">Get All People</a></li>
     </ul>
 </body>
 </html>
 ---
 
-    [[1]] Add navigation to the admin-menu from the root menu.
+    [[1]] Add navigation to the admin_menu from the root menu.
+
+    [Note:] admin_menu.jsp is mis-typed as admin-menu.jsp on purpose.
+
+    []
 
 ---
 $ cat javaeeExWAR/src/main/webapp/index.jsp
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
             "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -703,7 +730,8 @@ Go to Main Page
     in page increments.
 
 ---
-$ cat src/main/webapp/WEB-INF/content/DisplayPeople.jsp
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPeople.jsp
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
             "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -730,9 +758,7 @@ $ cat src/main/webapp/WEB-INF/content/DisplayPeople.jsp
                     String firstName = p.getFirstName();
                     String lastName = p.getLastName();
             </jsp:scriptlet>
-                <li><%= firstName %> <%= lastName %>
-                </li>
-
+                <li><%= firstName %> <%= lastName %></li>
             <jsp:scriptlet>
                 }
             </jsp:scriptlet>
@@ -769,14 +795,18 @@ $ cat src/main/webapp/WEB-INF/content/DisplayPeople.jsp
 
             int nextIndex = (people.size()==0) ?
                 index : index + people.size();
-            
+
+            //request.setAttribute(RESULT_PARAM, people);
             request.setAttribute(RESULT_PARAM, people);
             request.setAttribute(INDEX_PARAM, index);
             request.setAttribute(COUNT_PARAM, count);
             request.setAttribute(NEXT_INDEX_PARAM, nextIndex);
-            
-            RequestDispatcher rd = 
+
+            //RequestDispatcher rd =
+            //  getServletContext().getRequestDispatcher(DISPLAY_RESULT_URL);
+            RequestDispatcher rd =
               getServletContext().getRequestDispatcher(DISPLAY_PEOPLE_URL);
+            rd.forward(request, response);
 ---
 ---
 People Display
@@ -819,10 +849,17 @@ Go to Main Page
     the detailed display of a specific person in the list.
 
 ---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPeople.jsp
+
+...
+            <jsp:scriptlet>
+                for(Object o: people) {
+                    Person p = (Person)o;
+                    String firstName = p.getFirstName();
+                    String lastName = p.getLastName();
                     String url = "?id=" + p.getId() + "&command=Get+Person";
             </jsp:scriptlet>
-                <li><a href="<%= url %>"><%= firstName %> <%= lastName %> </a>                
-                </li>
+                <li><a href="<%= url %>"><%= firstName %> <%= lastName %> </a></li>
 ---
 
     [[1]] Hit refresh and you should see the new HREFS, but clicking on
@@ -838,11 +875,17 @@ Go to Main Page
     [[1]] Add a handler for "Get Person".
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
     private abstract class Handler {
         protected static final String ID_PARAM = "id";
 ...
 ---
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
     private class GetPerson extends Handler {
         public void doHandle(HttpServletRequest request, 
                 HttpServletResponse response) 
@@ -863,6 +906,9 @@ Go to Main Page
     }
 ---
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
 public class RegistrarHandlerServlet extends HttpServlet {
 
 ...
@@ -877,11 +923,11 @@ public class RegistrarHandlerServlet extends HttpServlet {
             } 
 ---
 
-    [[1]] Wait for the Servlet class to be automatically redeployed.
-    This will happen when you cause the class to be recompiled to the
-    target/classes directory either through a maven build or saving
-    within Eclipse. Hit refresh on the browser to see the new
-    functionality.
+    [[1]] Wait for the Servlet class to be automatically redeployed
+    within Jetty This will happen when you cause the class to be
+    recompiled to the target/classes directory either through a maven
+    build or saving within Eclipse. Hit refresh on the browser to see
+    the new functionality.
 
         * http://localhost:9080/javaeeExWAR/model/admin/handler?id=91&command=Get+Person
 
@@ -900,7 +946,8 @@ Go to Main Page
     Incorporate the ability to display and request a change of address.
 
 ---
-$ cat src/main/webapp/WEB-INF/content/DisplayPerson.jsp
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPerson.jsp
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
             "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -941,20 +988,28 @@ $ cat src/main/webapp/WEB-INF/content/DisplayPerson.jsp
     [[1]] Update the handler to use the new JSP
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
     private abstract class Handler {
 ...
         protected static final String DISPLAY_PERSON_URL = 
             "/WEB-INF/content/DisplayPerson.jsp";
 ---
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
     private class GetPerson extends Handler {
         public void doHandle(HttpServletRequest request, 
                 HttpServletResponse response) 
                 throws Exception {
 ...
             RequestDispatcher rd =
+             //getServletContext().getRequestDispatcher(DISPLAY_RESULT_URL);
              getServletContext().getRequestDispatcher(DISPLAY_PERSON_URL);
             rd.forward(request, response);
+
         }
     }
 ---
@@ -967,22 +1022,22 @@ $ cat src/main/webapp/WEB-INF/content/DisplayPerson.jsp
 
 ---
 Id: 91
+First Name: first14
 
-First Name: first90
-
-Last Name: last90
+Last Name: last14
 
 SSN: 123
-Street:
 
-City:
+Street: street1
+City: city1
 
-State:
+State: state1
 
-Zip:
+Zip: zip1
 
-    [Change Address]
-Go to Main Page 
+ [Change Address]
+
+Go to Main Page
 ---
 
     [[1]] Issue a "Change Address" Request. Note the error for now.
@@ -999,6 +1054,9 @@ Go to Main Page
     [[1]] Create the handler to implement the change of address.
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
     private abstract class Handler {
 ...
         protected static final String STREET_PARAM = "street";
@@ -1007,6 +1065,9 @@ Go to Main Page
         protected static final String ZIP_PARAM = "zip";
 ---
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
 import myorg.javaeeex.bo.Address;
 ...
 
@@ -1047,6 +1108,9 @@ import myorg.javaeeex.bo.Address;
     [[1]] Add the new ChangeAddress handler to the Controller Servlet
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
 public class RegistrarHandlerServlet extends HttpServlet {
 ...
     public static final String CHANGE_ADDRESS_COMMAND = "Change Address";
@@ -1100,17 +1164,15 @@ erServlet$GetPerson@f36e59}
         * verify the change for the modified Person
 
 ---
-$ mvn clean install
-[INFO] Scanning for projects...
-[INFO] Reactor build order:
-[INFO]   Java EE Exercise
-[INFO]   Java EE Exercise Impl
-[INFO]   Java EE Exercise EJB
-[INFO]   Java EE Exercise WAR
-[INFO]   Java EE Exercise EAR
-[INFO]   Java EE Exercise Remote Test
+$ mvn clean install -rf :javaeeExEJB
 
 ...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.753s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [3.233s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.359s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [26.487s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
 ---
 
 * {Migrate WAR to EJB Local Interface}
@@ -1129,6 +1191,7 @@ $ mvn clean install
 
 ---
 $ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarLocal.java
+
 package myorg.javaeeex.ejb;
 
 import java.util.Collection;
@@ -1164,6 +1227,9 @@ public interface RegistrarLocal {
     Registrar reference in the Web UI.
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
 import myorg.javaeeex.ejb.RegistrarLocal;
 import myorg.javaeeex.ejb.RegistrarRemote;
 ...
@@ -1208,19 +1274,22 @@ public class RegistrarHandlerServlet extends HttpServlet {
     and revert to Remote.
 
 ---
-            String jndiName = config.getServletConfig().getInitParameter("registrar.local");
-            try {
-                registrar = (RegistrarLocal)jndi.lookup(jndiName);
-                ((RegistrarLocal)registrar).ping(); //check capability
-            }
-            catch (Throwable ex) {
-                log.debug("local failed, trying remote:" + ex);
-                jndiName = config.getServletConfig().getInitParameter("registrar.remote");
-                registrar = (RegistrarRemote)jndi.lookup(jndiName);
-                ((RegistrarRemote)registrar).ping(); //check capability
-            }
-            log.debug("registrar initialized:" + registrar);
-            log.debug("jndiName used:" + jndiName);
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
+        String jndiName = config.getServletContext().getInitParameter("registrar.local");
+        try {
+            registrar = (RegistrarLocal)jndi.lookup(jndiName);
+            ((RegistrarLocal)registrar).ping(); //check capability
+        }
+        catch (Throwable ex) {
+            log.debug("local failed, trying remote:" + ex);
+            jndiName = config.getServletContext().getInitParameter("registrar.remote");
+            registrar = (RegistrarRemote)jndi.lookup(jndiName);
+            ((RegistrarRemote)registrar).ping(); //check capability
+        }
+        log.debug("registrar initialized:" + registrar);
+        log.debug("jndiName used:" + jndiName);
 ---
 
     [[1]] Test within the Jetty container. Note the use of the Remote
@@ -1266,17 +1335,22 @@ r)
     relaxing the hydration in one of the methods.
 
 ---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarLocal.java
+
+...
 @Local
 public interface RegistrarLocal { 
     void ping();
 
     Person getPersonById(long id)
         throws RegistrarException;
-    Person getPersonByIdHydrated(long id)
-        throws RegistrarException;
+    Collection<Person> getAllPeople(int index, int count)
+                throws RegistrarException;
+---
+---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
 
----
----
+...
     private class GetPerson extends Handler {
         public void doHandle(HttpServletRequest request, 
                 HttpServletResponse response) 
@@ -1284,6 +1358,7 @@ public interface RegistrarLocal {
 ...
             Person person = (registrar instanceof RegistrarRemote) ?
                 ((RegistrarRemote)registrar).getPersonByIdHydrated(id) :
+                //((RegistrarLocal)registrar).getPersonByIdHydrated(id);
                 ((RegistrarLocal)registrar).getPersonById(id);
 ---
 
@@ -1312,7 +1387,8 @@ myorg.webtier.web.RegistrarHandlerServlet$GetPerson.doHandle(RegistrarHandlerSer
     [[1]] Add a the shell of a Servlet Filter class.
 
 ---
-$ cat src/main/java/myorg/javaeeex/web/JPAFilter.java
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/JPAFilter.java
+
 package myorg.javaeeex.web;
 
 import java.io.IOException;
@@ -1396,6 +1472,13 @@ dlerServlet$GetPerson@125d92c}
     only work within the application server the way it is designed here.
 
 ---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+
+...
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+...
     private InitialContext jndi;
     public void init(FilterConfig config) throws ServletException {
         log.debug("*** JPAFilter.init() ***");
@@ -1409,20 +1492,27 @@ dlerServlet$GetPerson@125d92c}
     }    
 ---
 
-    [[1]] Add the transaction API to the WAR dependencies.
+    [[1]] Add the transaction and naming APIs to the WAR dependencies.
 
 ---
+$ cat javaeeExWAR/pom.xml 
+
+...
         <dependency>
-          <groupId>javax.transaction</groupId>
-          <artifactId>jta</artifactId>
-          <version>1.1</version>
-          <scope>provided</scope>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>6.0</version>
+            <scope>provided</scope>
         </dependency>
+
 ---
 
     [[1]] Add the JNDI lookup and management of the UserTransaction object
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/JPAFilter.java
+
+...
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
@@ -1469,9 +1559,9 @@ import javax.transaction.UserTransaction;
     }
 ---
 
-    [[1]] Verify the Jetty configuration still works. Note that we
-    have no transaction active in the Web UI and must use the 
-    hydrated form of the calls.
+    [[1]] Verify the Jetty configuration still works. Note that we have
+    no transaction active in the Web UI hosted by Jetty and must use
+    the hydrated form of the calls.
 
 ---
 [INFO] Restart completed at Mon Apr 06 00:10:05 EDT 2009
@@ -1492,21 +1582,33 @@ import javax.transaction.UserTransaction;
     methods.
 
 ---
-00:13:03,515 DEBUG [JPAFilter] *** JPAFilter.doFilter() ENTER ***
-00:13:03,515 DEBUG [RegistrarHandlerServlet] doGet() called
-00:13:03,515 DEBUG [RegistrarHandlerServlet] command=Get Person
-00:13:03,515 DEBUG [RegistrarEJB] *** getPersonById(1) ***
-00:13:03,531 DEBUG [JPAFilter] *** JPAFilter.doFilter() EXIT ***
+22:21:36,782 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] init() called 
+22:21:36,783 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] jndiProperties={java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=jnp://127.0.0.4:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
+22:21:36,794 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] **** init ****
+22:21:36,795 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] em=org.jboss.jpa.tx.TransactionScopedEntityManager@2399a1
+22:21:36,795 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1d6fc09
+22:21:36,795 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] ping called
+22:21:36,795 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] registrar initialized:Proxy to jboss.j2ee:ear=javaeeEx.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3 implementing [interface myorg.javaeeex.ejb.RegistrarLocal]
+22:21:36,795 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] jndiName used:/myorg/javaeeEx/RegistrarEJB/local
+22:21:36,796 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] configured handler type:admin with {Get Person=myorg.javaeeex.web.RegistrarHandlerServlet$GetPerson@13cdfec, Get All People=myorg.javaeeex.web.RegistrarHandlerServlet$GetAllPeople@19131da, Change Address=myorg.javaeeex.web.RegistrarHandlerServlet$ChangeAddress@15ff8a2}
+22:21:36,796 DEBUG [myorg.javaeeex.web.JPAFilter] *** JPAFilter.doFilter() ENTER ***
+22:21:36,801 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] doGet() called
+22:21:36,801 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] command=Get Person
+22:21:36,802 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] *** getPersonById(89) ***
+22:21:36,969 DEBUG [myorg.javaeeex.web.JPAFilter] *** JPAFilter.doFilter() EXIT ***
 ---
 
     [[1]] Update the remaining Local calls to use the non-hydrated form.
 
 ---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
     private class GetAllPeople extends Handler {
 ...
-            
             Collection<Person> people = (registrar instanceof RegistrarRemote) ?
                 ((RegistrarRemote)registrar).getAllPeopleHydrated(index, count) :
+                //((RegistrarLocal)registrar).getAllPeopleHydrated(index, count);
                 ((RegistrarLocal)registrar).getAllPeople(index, count);
 ---
 ---
@@ -1514,12 +1616,11 @@ import javax.transaction.UserTransaction;
 ... 
             Person person = (registrar instanceof RegistrarRemote) ?
                 ((RegistrarRemote)registrar).getPersonByIdHydrated(id) :
+                //((RegistrarLocal)registrar).getPersonByIdHydrated(id);
                 ((RegistrarLocal)registrar).getPersonById(id);
 ---
 
     [[1]] Redeploy and retest functionality within the application server.
-
-
 
 
     []

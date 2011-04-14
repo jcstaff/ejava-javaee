@@ -9,7 +9,7 @@ public class AddressDTO implements Serializable {
     private String city;
     private String state;
     private String zip;
-    
+
     public AddressDTO() {}
     public AddressDTO(
             long id, String street, String city, String state, String zip) {
@@ -19,7 +19,7 @@ public class AddressDTO implements Serializable {
         this.street = street;
         this.zip = zip;
     }
-    
+
     public long getId() {
         return id;
     }
@@ -27,7 +27,7 @@ public class AddressDTO implements Serializable {
     private void setId(long id) {
         this.id = id;
     }
-    
+
     public String getStreet() {
         return street;
     }
@@ -52,10 +52,9 @@ public class AddressDTO implements Serializable {
     public void setZip(String zip) {
         this.zip = zip;
     }
-    
     public String toString() {
         StringBuilder text = new StringBuilder();
-        
+
         text.append(street + " ");
         text.append(city + ", ");
         text.append(state + " ");
@@ -63,3 +62,4 @@ public class AddressDTO implements Serializable {
         return text.toString();
     }
 }
+

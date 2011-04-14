@@ -14,12 +14,12 @@ import myorg.javaeeex.blimpl.TestUtilImpl;
 @Stateless
 public class TestUtilEJB implements TestUtilRemote {
     private static Log log = LogFactory.getLog(TestUtilEJB.class);
-    
+
     @PersistenceContext(unitName="javaeeEx")
     private EntityManager em;
-    
+
     private TestUtil testUtil;
-    
+
     @PostConstruct
     public void init() {
         log.info(" *** TestUtilEJB:init() ***");
@@ -36,5 +36,5 @@ public class TestUtilEJB implements TestUtilRemote {
             throw ex;
         }
     }
-
 }
+

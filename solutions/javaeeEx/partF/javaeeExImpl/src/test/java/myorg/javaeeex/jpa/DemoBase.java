@@ -2,6 +2,7 @@ package myorg.javaeeex.jpa;
 
 import java.util.List;
 
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -13,19 +14,25 @@ import myorg.javaeeex.jpa.JPAPersonDAO;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
-
-import junit.framework.TestCase;
-
-public abstract class DemoBase extends TestCase {
+public abstract class DemoBase {
     protected Log log = LogFactory.getLog(getClass());
-    private static final String PERSISTENCE_UNIT = "javaeeEx";
+    private static final String PERSISTENCE_UNIT = "javaeeEx-test";
     protected PersonDAO personDAO = null;
-    protected EntityManagerFactory emf;
+    protected static EntityManagerFactory emf;
     protected EntityManager em;
 
-    protected void setUp() throws Exception {
+    @BeforeClass
+    public static void setUpClass() {
         emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+    }
+    
+    @Before
+    public void setUp() throws Exception {
         em = emf.createEntityManager();
         personDAO = new JPAPersonDAO();
         ((JPAPersonDAO)personDAO).setEntityManager(em);
@@ -33,7 +40,8 @@ public abstract class DemoBase extends TestCase {
         em.getTransaction().begin();
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         EntityTransaction tx = em.getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
@@ -43,11 +51,19 @@ public abstract class DemoBase extends TestCase {
         emf.close();
     }
     
-    @SuppressWarnings("unchecked")
+    @AfterClass
+    public static void tearDownClass() {
+    	if (emf != null) {
+    		emf.close();
+    		emf = null;
+    	}
+    }
+    
     protected void cleanup() {
         log.info("cleaning up database");
         em.getTransaction().begin();
-        List<Person> people = 
+        @SuppressWarnings("unchecked")
+		List<Person> people = 
             em.createQuery("select p from Person p").getResultList();
         for(Person p: people) {
             em.remove(p);

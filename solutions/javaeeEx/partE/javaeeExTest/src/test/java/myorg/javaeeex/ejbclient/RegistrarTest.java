@@ -31,6 +31,7 @@ public class RegistrarTest {
     RegistrarRemote registrar;
     TestUtil testUtil;
 
+    @BeforeClass
     public static void setUpClass() throws Exception {
     	Thread.sleep(3000);
     }

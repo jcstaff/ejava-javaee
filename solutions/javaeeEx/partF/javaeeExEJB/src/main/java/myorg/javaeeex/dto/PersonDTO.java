@@ -10,10 +10,10 @@ public class PersonDTO implements Serializable {
     private String firstName;
     private String lastName;
     private Collection<AddressDTO> addresses = new ArrayList<AddressDTO>();
-    
+
     public PersonDTO() {}
     public PersonDTO(long id) { setId(id); }
-    
+
     public long getId() {
         return id;
     }
@@ -31,7 +31,7 @@ public class PersonDTO implements Serializable {
     }
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }    
+    }
     public Collection<AddressDTO> getAddresses() {
         return addresses;
     }
@@ -40,7 +40,7 @@ public class PersonDTO implements Serializable {
     }
     public String toString() {
         StringBuffer text = new StringBuffer();
-        text.append("id=" + id); 
+        text.append("id=" + id);
         text.append(":" + firstName);
         text.append(" " + lastName);
         text.append(", addresses={");
