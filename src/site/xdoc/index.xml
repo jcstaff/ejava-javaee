@@ -26,6 +26,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2010-04-19: Posted Security Updates and javaeeEx(G) EJB Security Exercise</li>
           <li>2010-04-13: Posted javaeeEx Part F Updates</li>
           <li>2010-04-12: Posted Web Tier TODOs</li>
           <li>2011-04-06: Posted More EJB TODOs</li>
@@ -43,6 +44,35 @@
       <subsection name="Class To Do" id="todo">
       <ul>
       <li><ul>
+          <li>Complete your project 2, finish testing, and turn in.</li>
+
+          <li>Start project 3</li>
+          <li>Add user.properties and roles.properties to eDmv project</li>
+          <li>Assign EJB to security-domain "other".
+          The RMI Tests should fail access at this point.</li>
+
+          <li>Specify required roles to access each EJB method</li>
+          <li>Add a java.security.auth.login.config to the RMI Test client</li>
+          <li>Add a LoginContext with a CallbackHandler. The RMI Tests should 
+          be able to access the EJB methods they are authorized to access.
+          You should have at least one test that verifies an unauthorized
+          user is refused access.</li>
+          <li>Assign WAR to security-domain "java:/jaas/other"</li>
+          <li>Add security-constraint elements to the WAR web.xml. The 
+          user should be prompted for a login at this point and be able to
+          access web pages and EJB methods that they are authorized for
+          and be refused access to what they are un-authorized to access</li>
+          <li>Eliminate access to any information or option the user does
+          not have access to see or use</li>
+          <li>Eliminate the passing of userId information when the appropriate
+          means is to obtain through the EJB or WARs security context.</li>
+      </ul></li>
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
+      <li><ul>
           <li>Go through Web UI parts of the JavaEE exercise. PartE has 
           been ported. PartF has not as of Apr12.</li>
           <li>Look over Web UI parts of the ejbsessionBank.</li>
@@ -55,11 +85,6 @@
           with eDmvEJB. eMayberryEJB should act as a facade for 
           all behavior performed on behalf of eMayberry WAR</li>
       </ul></li>
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
       <li><ul>
           <li>Finish implementing EJB use cases for end-to-end
           testing.</li>

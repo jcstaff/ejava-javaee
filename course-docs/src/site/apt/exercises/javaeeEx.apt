@@ -4,7 +4,7 @@ JavaEE EJB, EAR, and RMI Client Exercise
     a single JavaEE application; root project, Impl (BOs,DAOs, and BL) 
     project, EJB project, WAR project, EAR project, and RMI Test project.
 
-    The root project is the parent to each of the other project and can
+    The root project is the parent to each of the other projects and can
     be used to invoke targets that apply to all children. This project
     is known as a reactor or "pom" project since it has not artifacts
     other than a pom.xml (and children).
@@ -20,7 +20,7 @@ JavaEE EJB, EAR, and RMI Client Exercise
     the application server. The EJB container running within the 
     application server will provide a runtime environment, thread
     management, resource management, transaction management and security 
-    (transactions and security not a part of this exercise).
+    (transactions are not currently part of this exercise).
 
     The WAR project will provide an HTML-based web interface for the 
     clients to access the application. It will interface to the application
@@ -41,8 +41,8 @@ JavaEE EJB, EAR, and RMI Client Exercise
         * Implementation logic with business rules and data access tier
 
         * EJB tier with local and remote interfaces, implementation
-        hosting, thread management, resource management, and future 
-        transaction management and security.
+        hosting, thread management, resource management, security, 
+        and transaction management (future).
 
         * Web tier with static and dynamic HTML using Servlets and JSPs
         integrated as part of a WAR.
@@ -70,6 +70,8 @@ JavaEE EJB, EAR, and RMI Client Exercise
 
     * {{{./javaeeEx-partF.html}Part F}}: Handling WAR/EJB Interface Issues
 
+    * {{{./javaeeEx-partG.html}Part G}}: Securing the EJB Tier and RMI Interface
+
     Your final source tree will look like the following.
 
 ---
@@ -92,10 +94,12 @@ javaeeEx
 |           |               |-- RegistrarRemote.java
 |           |               |-- TestUtilEJB.java    
 |           |               `-- TestUtilRemote.java 
-|           `-- resources                           
-|               `-- META-INF                        
-|                   |-- jboss.xml                   
-|                   `-- persistence.xml             
+|           `-- resources
+|               |-- META-INF
+|               |   |-- jboss.xml
+|               |   `-- persistence.xml
+|               |-- roles.properties
+|               `-- users.properties
 |-- javaeeExImpl                                    
 |   |-- pom.xml                                     
 |   `-- src                                         
@@ -149,7 +153,8 @@ javaeeEx
 |           |               `-- RegistrarTest.java
 |           `-- resources
 |               |-- jndi.properties
-|               `-- log4j.xml
+|               |-- log4j.xml
+|               `-- security-config.conf
 |-- javaeeExWAR
 |   |-- pom.xml
 |   `-- src
