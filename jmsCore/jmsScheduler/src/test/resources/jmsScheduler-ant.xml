@@ -58,7 +58,8 @@
     </target>
 
     <target name="requestor">
-        <java classname="ejava.examples.jmsscheduler.Requestor">
+        <java classname="ejava.examples.jmsscheduler.Requestor"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -78,7 +79,8 @@
     </target>
 
     <target name="requestor1" depends="init">
-        <java classname="ejava.examples.jmsscheduler.Requestor">
+        <java classname="ejava.examples.jmsscheduler.Requestor"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -98,7 +100,8 @@
     </target>
 
     <target name="worker">
-        <java classname="ejava.examples.jmsscheduler.Worker">
+        <java classname="ejava.examples.jmsscheduler.Worker"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -116,7 +119,8 @@
     </target>
 
     <target name="worker1">
-        <java classname="ejava.examples.jmsscheduler.Worker">
+        <java classname="ejava.examples.jmsscheduler.Worker"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -134,7 +138,8 @@
     </target>
 
     <target name="worker2">
-        <java classname="ejava.examples.jmsscheduler.Worker">
+        <java classname="ejava.examples.jmsscheduler.Worker"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -152,7 +157,8 @@
     </target>
 
     <target name="worker3">
-        <java classname="ejava.examples.jmsscheduler.Worker">
+        <java classname="ejava.examples.jmsscheduler.Worker"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -170,7 +176,8 @@
     </target>
 
     <target name="worker4">
-        <java classname="ejava.examples.jmsscheduler.Worker">
+        <java classname="ejava.examples.jmsscheduler.Worker"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>

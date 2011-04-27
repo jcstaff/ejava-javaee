@@ -26,6 +26,7 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
+          <li>2010-04-27: Posted JMS materials</li>
           <li>2010-04-19: Posted Security Updates and javaeeEx(G) EJB Security Exercise</li>
           <li>2010-04-13: Posted javaeeEx Part F Updates</li>
           <li>2010-04-12: Posted Web Tier TODOs</li>
@@ -42,6 +43,28 @@
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
+      <ul>
+      <li><ul>
+          <li>Finish security configuration, implementation, and testing</li>
+
+          <li>Edit the deploy/hornetq/hornetq-jms.xml file on your JBoss
+          server to add your project destinations. Include a copy and reference
+          to this file in your project README.</li>
+          <li>Design your JMS message type(s). Write and test a utility
+          class that publishes the messages. This class ideally
+          would be placed in with the BLImpl classes. However, if
+          it publishes DTO classes, the DTOs may have to get moved in
+          with the BO project to satisfy dependency constraints.</li>
+          <li>Implement a Java SE Client to receive and log the JMS
+          messages. This client can be placed in BLImpl, must use a
+          selector, and be launchable by the grader using an Ant script.
+          The Ant script can be part of either the BLImpl or RMI Test
+          project. See class examples on how write the Ant script.</li>
+      </ul></li>
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
       <ul>
       <li><ul>
           <li>Complete your project 2, finish testing, and turn in.</li>
@@ -67,11 +90,6 @@
           <li>Eliminate the passing of userId information when the appropriate
           means is to obtain through the EJB or WARs security context.</li>
       </ul></li>
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
       <li><ul>
           <li>Go through Web UI parts of the JavaEE exercise. PartE has 
           been ported. PartF has not as of Apr12.</li>

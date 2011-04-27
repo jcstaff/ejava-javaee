@@ -44,7 +44,8 @@
     </target>
 
     <target name="publisher">
-        <java classname="ejava.examples.jmsnotifier.Publisher">
+        <java classname="ejava.examples.jmsnotifier.Publisher"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -62,7 +63,8 @@
     </target>
 
     <target name="subscriber">
-        <java classname="ejava.examples.jmsnotifier.Subscriber">
+        <java classname="ejava.examples.jmsnotifier.Subscriber"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -84,7 +86,8 @@
     </target>
 
     <target name="subscriberd">
-        <java classname="ejava.examples.jmsnotifier.Subscriber">
+        <java classname="ejava.examples.jmsnotifier.Subscriber"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -106,7 +109,8 @@
     </target>
 
     <target name="subscriber1">
-        <java classname="ejava.examples.jmsnotifier.Subscriber">
+        <java classname="ejava.examples.jmsnotifier.Subscriber"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -128,7 +132,8 @@
     </target>
 
     <target name="subscriber2">
-        <java classname="ejava.examples.jmsnotifier.Subscriber">
+        <java classname="ejava.examples.jmsnotifier.Subscriber"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -150,7 +155,8 @@
     </target>
 
     <target name="subscriber2d">
-        <java classname="ejava.examples.jmsnotifier.Subscriber">
+        <java classname="ejava.examples.jmsnotifier.Subscriber"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -172,7 +178,8 @@
     </target>
 
     <target name="subscriber3">
-        <java classname="ejava.examples.jmsnotifier.Subscriber">
+        <java classname="ejava.examples.jmsnotifier.Subscriber"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
@@ -194,7 +201,8 @@
     </target>
 
     <target name="subscriber4">
-        <java classname="ejava.examples.jmsnotifier.Subscriber">
+        <java classname="ejava.examples.jmsnotifier.Subscriber"
+            fork="true">
             <classpath>
                 <path refid="demo.classpath"/>
             </classpath>
