@@ -22,6 +22,8 @@ Exercise: Enable JBoss HTTPS
         []
 
 ---
+$ cd $JBOSS_HOME/server/(server)
+
 default/conf> keytool -genkey -alias serverkeys -keyalg RSA -keystore ejava.keystore -storepass password -keypass password -dname "CN=jboss, OU=ejava, O=jhu, L=laurel, ST=md, C=usa"
 
 default/conf> keytool -export -alias serverkeys -keystore ejava.keystore -storepass password -file ejava.cer
@@ -32,16 +34,17 @@ Certificate stored in file <ejava.cer>
     standard/deploy/jbossweb.sar/server.xml
 
 ---
-      <!-- SSL/TLS Connector configuration using the admin devl guide keystore-->
-      <Connector port="8443" address="${jboss.bind.address}"
-           maxThreads="100" strategy="ms" maxHttpHeaderSize="8192"
-           emptySessionPath="true"
-           scheme="https" secure="true" clientAuth="false"
-           sslProtocol = "TLS"
+$ cat deploy/jbossweb.sar/server.xml
+
+...
+      <!-- SSL/TLS Connector configuration using the admin devl guide keystore
+      -->
+      <Connector protocol="HTTP/1.1" SSLEnabled="true" 
+           port="${jboss.web.https.port}" address="${jboss.bind.address}"
+           scheme="https" secure="true" clientAuth="false" 
            keystoreFile="${jboss.server.home.dir}/conf/ejava.keystore"
-           keystorePass="password"
-           SSLEnabled="true"
-       />
+           keystorePass="password" sslProtocol = "TLS" />
+...
 ---
 
     [[1]] Start/Restart JBoss.

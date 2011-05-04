@@ -168,7 +168,7 @@ public class RegistrarHandlerServlet extends HttpServlet {
         protected static final String STATE_PARAM = "state";
         protected static final String ZIP_PARAM = "zip";
         protected static final String DISPLAY_EXCEPTION_URL =
-            "/WEB-INF/content/ErrorPage.jsp";
+            "/WEB-INF/content/DisplayException.jsp";
         protected static final String DISPLAY_RESULT_URL =
             "/WEB-INF/content/DisplayResult.jsp";
         protected static final String DISPLAY_PEOPLE_URL =

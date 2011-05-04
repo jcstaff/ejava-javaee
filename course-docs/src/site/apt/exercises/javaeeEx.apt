@@ -72,6 +72,8 @@ JavaEE EJB, EAR, and RMI Client Exercise
 
     * {{{./javaeeEx-partG.html}Part G}}: Securing the EJB Tier and RMI Interface
 
+    * {{{./javaeeEx-partH.html}Part H}}: Securing the Web Tier
+
     Your final source tree will look like the following.
 
 ---
@@ -166,18 +168,21 @@ javaeeEx
 |       |   |               |-- JPAFilter.java
 |       |   |               `-- RegistrarHandlerServlet.java
 |       |   `-- webapp
-|       |       |-- WEB-INF
-|       |       |   |-- content
-|       |       |   |   |-- DisplayException.jsp
-|       |       |   |   |-- DisplayPeople.jsp
-|       |       |   |   |-- DisplayPerson.jsp
-|       |       |   |   |-- DisplayResult.jsp
-|       |       |   |   |-- ErrorPage.jsp
-|       |       |   |   `-- UnknownCommand.jsp
-|       |       |   `-- web.xml
 |       |       |-- admin
 |       |       |   `-- admin_menu.jsp
-|       |       `-- index.jsp
+|       |       |-- index.jsp
+|       |       `-- WEB-INF
+|       |           |-- content
+|       |           |   |-- DisplayException.jsp
+|       |           |   |-- DisplayPeople.jsp
+|       |           |   |-- DisplayPerson.jsp
+|       |           |   |-- DisplayResult.jsp
+|       |           |   |-- ErrorPage.jsp
+|       |           |   |-- LoginFailure.jsp
+|       |           |   |-- Login.jsp
+|       |           |   `-- UnknownCommand.jsp
+|       |           |-- jboss-web.xml
+|       |           `-- web.xml
 |       `-- test
 |           `-- resources
 |               `-- log4j.xml

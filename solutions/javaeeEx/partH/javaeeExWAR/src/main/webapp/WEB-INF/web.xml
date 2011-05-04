@@ -1,0 +1,110 @@
+<web-app
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
+
+  <display-name>Web Tier Exercise Web Application</display-name>
+
+    <context-param>
+        <param-name>java.naming.factory.initial</param-name>
+        <param-value>org.jnp.interfaces.NamingContextFactory</param-value>
+    </context-param>
+    <context-param>
+        <param-name>java.naming.provider.url</param-name>
+        <param-value>jnp://127.0.0.4:1099</param-value>
+    </context-param>
+    <context-param>
+        <param-name>java.naming.factory.url.pkgs</param-name>
+        <param-value>org.jboss.naming:org.jnp.interfaces</param-value>
+    </context-param>
+    <context-param>
+        <param-name>registrar.local</param-name> 
+        <param-value>/myorg/javaeeEx/RegistrarEJB/local</param-value>
+    </context-param>
+    <context-param>
+        <param-name>registrar.remote</param-name> 
+        <param-value>/myorg/javaeeEx/RegistrarEJB/remote</param-value>
+    </context-param>
+
+    <servlet>
+        <servlet-name>AdminHandler</servlet-name>
+        <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
+        <init-param>
+            <param-name>type</param-name>
+            <param-value>admin</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminHandler</servlet-name>
+        <url-pattern>/model/admin/handler</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Handler</servlet-name>
+        <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
+        <init-param>
+            <param-name>type</param-name>
+            <param-value>anonymous</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Handler</servlet-name>
+        <url-pattern>/model/handler</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>JPAFilter</filter-name>
+        <filter-class>myorg.javaeeex.web.JPAFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>JPAFilter</filter-name>
+        <url-pattern>/model/admin/handler</url-pattern>
+        <url-pattern>/model/handler</url-pattern>
+    </filter-mapping>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>admin-access</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+            <url-pattern>/model/admin/handler</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+            <!-- enable this if HTTPS not configured on server
+            <transport-guarantee>NONE</transport-guarantee>
+            -->
+        </user-data-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>open-access</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>NONE</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+
+    <login-config>
+        <!--
+            <auth-method>BASIC</auth-method>
+            <realm-name>javaeeEx</realm-name>
+        -->
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/WEB-INF/content/Login.jsp</form-login-page>
+            <form-error-page>/WEB-INF/content/LoginFailure.jsp</form-error-page>
+        </form-login-config>
+    </login-config>    
+    
+    <security-role>
+        <role-name>admin</role-name>
+    </security-role>
+</web-app>
+

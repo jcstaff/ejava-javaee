@@ -133,7 +133,7 @@ public class RegistrarHandlerServlet extends HttpServlet {
         protected static final String RESULT_PARAM = "result";
         protected static final String EXCEPTION_PARAM = "exception";
         protected static final String DISPLAY_EXCEPTION_URL =
-            "/WEB-INF/content/ErrorPage.jsp";
+            "/WEB-INF/content/DisplayException.jsp";
         protected static final String DISPLAY_RESULT_URL =
             "/WEB-INF/content/DisplayResult.jsp";
         protected String action;
