@@ -201,9 +201,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/src/main/resources/ddl</basedir>
+                    <basedir>${basedir}/target/classes</basedir>
                     <includes>
-                      <include>**/*drop*.ddl</include>                  
+                      <include>ddl/*drop*.ddl</include>                  
                     </includes>
                   </fileset>
                   <!-- the tables may not exist when tests are run -->
@@ -220,9 +220,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/src/main/resources/ddl</basedir>
+                    <basedir>${basedir}/target/classes</basedir>
                     <includes>
-                      <include>**/*create*.ddl</include>                  
+                      <include>ddl/*create*.ddl</include>                  
                     </includes>
                   </fileset>
                   <print>true</print>
@@ -238,9 +238,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/src/test/resources/ddl</basedir>
+                    <basedir>${basedir}/target/test-classes</basedir>
                     <includes>
-                      <include>**/*populate*.ddl</include>                  
+                      <include>ddl/*populate*.ddl</include>                  
                     </includes>
                   </fileset>
                 </configuration>        
@@ -256,9 +256,9 @@
                 <configuration>              
                     <autocommit>true</autocommit>
                     <fileset>
-                        <basedir>${basedir}/src/main/resources/ddl</basedir>
+                        <basedir>${basedir}/src/main/resources</basedir>
                         <includes>
-                            <include>**/*drop*.ddl</include>                  
+                            <include>ddl/*drop*.ddl</include>                  
                         </includes>
                     </fileset>
                 </configuration>        
