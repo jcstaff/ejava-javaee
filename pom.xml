@@ -57,15 +57,37 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <maven-clean-plugin.version>2.4.1</maven-clean-plugin.version>
         <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
-        <maven-ear-plugin.version>2.4.2</maven-ear-plugin.version>
-        <maven-surefire-plugin.version>2.5</maven-surefire-plugin.version>
-        <maven-dependency-plugin.version>2.1</maven-dependency-plugin.version>
-        <maven-deploy-plugin.version>2.2.1</maven-deploy-plugin.version>
-        <maven-javadoc-plugin.version>2.7</maven-javadoc-plugin.version>
+        <maven-deploy-plugin.version>2.6</maven-deploy-plugin.version>
+        <maven-failsafe-plugin.version>2.9</maven-failsafe-plugin.version>
+        <maven-install-plugin.version>2.3.1</maven-install-plugin.version>
+        <maven-resources-plugin.version>2.5</maven-resources-plugin.version>
+        <maven-site-plugin.version>3.0</maven-site-plugin.version>
+        <maven-surefire-plugin.version>2.9</maven-surefire-plugin.version>
+        <maven-verifier-plugin.version>1.0</maven-verifier-plugin.version>
+
+        <maven-ear-plugin.version>2.6</maven-ear-plugin.version>
+        <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
+        <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
+        <maven-rar-plugin.version>2.2</maven-rar-plugin.version>
+        <maven-war-plugin.version>2.1.1</maven-war-plugin.version>
+
         <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
-        <maven-surefire-report-plugin>2.7.2</maven-surefire-report-plugin>
-        <maven-project-info-reports-plugin.version>2.3</maven-project-info-reports-plugin.version>
+        <maven-javadoc-plugin.version>2.8</maven-javadoc-plugin.version>
+        <maven-surefire-report-plugin>2.9</maven-surefire-report-plugin>
+        <maven-project-info-reports-plugin.version>2.4</maven-project-info-reports-plugin.version>
+
+        <maven-ant-plugin.version>2.3</maven-ant-plugin.version>
+        <maven-antrun-plugin.version>1.6</maven-antrun-plugin.version>
+        <maven-archetype-plugin.version>2.0</maven-archetype-plugin.version>
+        <maven-assembly-plugin.version>2.2.1</maven-assembly-plugin.version>
+        <maven-dependency-plugin.version>2.2</maven-dependency-plugin.version>
+        <maven-enforcer-plugin.version>1.0.1</maven-enforcer-plugin.version>
+        <maven-help-plugin.version>2.2.1</maven-help-plugin.version>
+        <maven-plugin-plugin.version>2.8</maven-plugin-plugin.version>
+        <maven-release-plugin.version>2.2.1</maven-release-plugin.version>
+        <maven-scm-plugin.version>1.4</maven-scm-plugin.version>
 
         <jboss.host>localhost</jboss.host>
         <jboss.protocol>http</jboss.protocol>
@@ -76,14 +98,14 @@
     </properties>
 
     <scm>
-        <url>http://ejava.info/repos/class/branches/2011-spring-ejava-javaee</url>
-        <connection>scm:svn:http://ejava.info/repos/class/branches/2011-spring-ejava-javaee</connection>
-        <developerConnection>scm:svn:https://ejava.info/repos/class/branches/2011-spring-ejava-javaee</developerConnection>
+        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/branch/master</url>
+        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
+        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
     </scm>
 
     <ciManagement>
         <system>hudson</system>
-        <url>http://ejava.info/hudson/job/2011-spring-ejava-javaee/</url>
+        <url>http://ejava.info/hudson/job/2011-fall-ejava-javaee/</url>
     </ciManagement>
 
     <distributionManagement>
@@ -172,11 +194,13 @@
           <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>${maven-site-plugin.version}</version>
-                <configuration>
-                    <locales>en</locales>
-                </configuration>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven-clean-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -188,81 +212,217 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>${maven-install-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven-site-plugin.version}</version>
+                <configuration>
+                    <locales>en</locales>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-verifier-plugin</artifactId>
+                <version>${maven-verifier-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <version>${maven-ear-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <version>${maven-ejb-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-rar-plugin</artifactId>
+                <version>${maven-rar-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-rar-plugin</artifactId>
+                <version>${maven-war-plugin.version}</version>
+            </plugin>
+
+
+            <plugin> 
+                <artifactId>maven-jxr-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>${maven-jxr-plugin.version}</version>
+                <configuration>
+                    <aggregate>false</aggregate>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven-javadoc-plugin.version}</version>
             </plugin>
+            <plugin> 
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>${maven-surefire-report-plugin}</version>
+                <configuration>
+                    <aggregate>false</aggregate>
+                </configuration>
+            </plugin>
+            <plugin> 
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>${maven-project-info-reports-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ant-plugin</artifactId>
+                <version>${maven-ant-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven-antrun-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-archetype-plugin</artifactId>
+                <version>${maven-archetype-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>${maven-help-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>${maven-plugin-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>${maven-scm-plugin.version}</version>
+            </plugin>
           </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-descriptor</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>attach-descriptor</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <reportPlugins>
+                        <!-- creates standard reports -->
+                        <plugin> 
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <version>${maven-project-info-reports-plugin.version}</version>
+                        </plugin>
 
-        <extensions><!-- used for scpexe for some platforms -->
-        <!--
-            <extension> 
-                <artifactId>wagon-ssh-external</artifactId>
-                <groupId>org.apache.maven.wagon</groupId>
-                <version>1.0-beta-7</version>
-            </extension>
-            -->
-        </extensions>
+                        <!-- generates test reports -->
+                        <plugin> 
+                            <artifactId>maven-surefire-report-plugin</artifactId>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <version>${maven-surefire-report-plugin}</version>
+                            <configuration>
+                                <aggregate>false</aggregate>
+                            </configuration>
+                        </plugin>
+
+                        <!-- generates aggregated javadoc for root project -->
+                        <plugin> 
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <version>${maven-javadoc-plugin.version}</version>
+                            <configuration>
+                                <detectLinks/>
+                                <show>private</show>
+                                <source>1.6</source>
+                                <links>
+                                    <link>http://download.oracle.com/javaee/6/api/</link>
+                                    <link>http://download.oracle.com/javase/6/docs/api/</link>
+                                </links>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>findbugs-maven-plugin</artifactId>
+                            <version>2.3.1</version>
+                            <configuration>
+                                <xmlOutput>true</xmlOutput>
+                                <effort>Max</effort>
+                            </configuration>
+                        </plugin>
+
+                        <!-- generates HTML pages for java code -->
+                        <plugin> 
+                            <artifactId>maven-jxr-plugin</artifactId>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <version>${maven-jxr-plugin.version}</version>
+                            <configuration>
+                                <aggregate>false</aggregate>
+                            </configuration>
+                        </plugin>
+                    </reportPlugins>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
-        <profile>
-            <id>maven2</id>
-            <activation> <!-- only maven3 knows what basedir is -->
-                <file>
-                    <missing>${basedir}</missing>
-                </file>
-            </activation>
-            <properties>
-                <maven-site-plugin.version>2.2</maven-site-plugin.version>
-            </properties>
-            <reporting>
-                <plugins>
-                    <!-- creates standard reports -->
-                    <plugin> 
-                        <artifactId>maven-project-info-reports-plugin</artifactId>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <version>${maven-project-info-reports-plugin.version}</version>
-                    </plugin>
-
-                    <!-- generates test reports -->
-                    <plugin> 
-                        <artifactId>maven-surefire-report-plugin</artifactId>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <version>${maven-surefire-report-plugin}</version>
-                        <configuration>
-                            <aggregate>false</aggregate>
-                        </configuration>
-                    </plugin>
-
-                    <!-- generates aggregated javadoc for root project -->
-                    <plugin> 
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <version>${maven-javadoc-plugin.version}</version>
-                        <configuration>
-                            <detectLinks/>
-                            <show>private</show>
-                            <source>1.6</source>
-                            <links>
-                                <link>http://download.oracle.com/javaee/6/api/</link>
-                                <link>http://download.oracle.com/javase/6/docs/api/</link>
-                            </links>
-                        </configuration>
-                    </plugin>
-
-                    <!-- generates HTML pages for java code -->
-                    <plugin> 
-                        <artifactId>maven-jxr-plugin</artifactId>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <version>${maven-jxr-plugin.version}</version>
-                        <configuration>
-                            <aggregate>false</aggregate>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </reporting>
-        </profile>
 
         <profile>
             <id>maven3</id>
@@ -274,78 +434,6 @@
             <properties>
                 <maven-site-plugin.version>3.0-beta-3</maven-site-plugin.version>
             </properties>
-            <build>
-                <plugins>
-                    <plugin> 
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-site-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-descriptor</id>
-                                <phase>pre-site</phase>
-                                <goals>
-                                    <goal>attach-descriptor</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <reportPlugins>
-                                <!-- creates standard reports -->
-                                <plugin> 
-                                    <artifactId>maven-project-info-reports-plugin</artifactId>
-                                    <groupId>org.apache.maven.plugins</groupId>
-                                    <version>${maven-project-info-reports-plugin.version}</version>
-                                </plugin>
-
-                                <!-- generates test reports -->
-                                <plugin> 
-                                    <artifactId>maven-surefire-report-plugin</artifactId>
-                                    <groupId>org.apache.maven.plugins</groupId>
-                                    <version>${maven-surefire-report-plugin}</version>
-                                    <configuration>
-                                        <aggregate>false</aggregate>
-                                    </configuration>
-                                </plugin>
-
-                                <!-- generates aggregated javadoc for root project -->
-                                <plugin> 
-                                    <artifactId>maven-javadoc-plugin</artifactId>
-                                    <groupId>org.apache.maven.plugins</groupId>
-                                    <version>${maven-javadoc-plugin.version}</version>
-                                    <configuration>
-                                        <detectLinks/>
-                                        <show>private</show>
-                                        <source>1.6</source>
-                                        <links>
-                                            <link>http://download.oracle.com/javaee/6/api/</link>
-                                            <link>http://download.oracle.com/javase/6/docs/api/</link>
-                                        </links>
-                                    </configuration>
-                                </plugin>
-                                <plugin>
-                                    <groupId>org.codehaus.mojo</groupId>
-                                    <artifactId>findbugs-maven-plugin</artifactId>
-                                    <version>2.3.1</version>
-                                    <configuration>
-                                        <xmlOutput>true</xmlOutput>
-                                        <effort>Max</effort>
-                                    </configuration>
-                                </plugin>
-
-                                <!-- generates HTML pages for java code -->
-                                <plugin> 
-                                    <artifactId>maven-jxr-plugin</artifactId>
-                                    <groupId>org.apache.maven.plugins</groupId>
-                                    <version>${maven-jxr-plugin.version}</version>
-                                    <configuration>
-                                        <aggregate>false</aggregate>
-                                    </configuration>
-                                </plugin>
-                            </reportPlugins>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
         <profile>
@@ -385,4 +473,5 @@
             </properties>                                  
         </profile>        
     </profiles>
+
 </project>
