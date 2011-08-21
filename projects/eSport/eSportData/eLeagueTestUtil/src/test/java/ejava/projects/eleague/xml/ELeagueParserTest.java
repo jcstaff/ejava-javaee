@@ -70,7 +70,8 @@ public class ELeagueParserTest extends TestCase {
 		}
 		else if (object instanceof Collection && level <= MAX_LEVELS) {
 		    text.append("{");
-		    for(Iterator<Object> itr=((Collection)object).iterator();
+		    for(@SuppressWarnings({ "rawtypes", "unchecked" })
+			Iterator<Object> itr=((Collection)object).iterator();
 		        itr.hasNext();) {
 		        dump(itr.next());
 		        if (itr.hasNext()) {

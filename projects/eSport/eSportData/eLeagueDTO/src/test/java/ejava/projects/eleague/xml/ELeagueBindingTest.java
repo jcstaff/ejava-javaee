@@ -127,7 +127,7 @@ public class ELeagueBindingTest extends TestCase {
         }        
     }
     
-    private Object getById(long id, List objects) {        
+    private Object getById(long id, List<?> objects) {        
         Object theObject=null;
         for (Object object : objects) {
             Method getId;
@@ -146,7 +146,8 @@ public class ELeagueBindingTest extends TestCase {
         return theObject;
     }
     
-    private void compare(ELeague expected, ELeague actual) throws Exception {
+    @SuppressWarnings("unused")
+	private void compare(ELeague expected, ELeague actual) throws Exception {
         compare(expected.getLeagueMetadata(), actual.getLeagueMetadata());
         assertEquals("unexpected number of clubs",
                 expected.getClub().size(), actual.getClub().size());

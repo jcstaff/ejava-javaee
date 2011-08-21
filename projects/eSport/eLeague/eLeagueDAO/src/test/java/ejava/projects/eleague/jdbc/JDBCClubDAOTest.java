@@ -89,8 +89,10 @@ public class JDBCClubDAOTest extends TestCase {
 	public void testJDBCCreate() throws Exception {
 		log.info("*** testJDBCCreate ***");
 		
-    	String userId = "foo";
-    	String firstName = "bar";
+    	@SuppressWarnings("unused")
+		String userId = "foo";
+    	@SuppressWarnings("unused")
+		String firstName = "bar";
     	
     	Venue venue = new Venue();
     	venue.setName("myVenue");

@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,7 +63,8 @@ public class JPALeagueDAO implements ELeagueDAO {
               //      + ", venues=" + club.getVenue().size());
             while (club.getVenue().size() > MAX_VENUES_PER_CLUB) {
                 int index = club.getVenue().size() - 1;
-                Venue venue = club.getVenue().remove(index);
+                @SuppressWarnings("unused")
+				Venue venue = club.getVenue().remove(index);
             }
             if (club.getVenue().size() == 0) {
                 throw new Exception("no Venues for Club:" + club.getName());
@@ -186,7 +184,8 @@ public class JPALeagueDAO implements ELeagueDAO {
     }
     
     public List<Club> getClubs() {
-        List<Club> clubs = (List<Club>)em.createQuery(
+        @SuppressWarnings("unchecked")
+		List<Club> clubs = (List<Club>)em.createQuery(
                 "select c from Club c")
                 .getResultList();
         for (Club club : clubs) {

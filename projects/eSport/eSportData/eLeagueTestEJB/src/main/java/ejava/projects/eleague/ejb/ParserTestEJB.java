@@ -1,7 +1,6 @@
 package ejava.projects.eleague.ejb;
 
 import java.io.InputStream;
-import java.security.acl.Group;
 
 import static junit.framework.TestCase.*;
 
@@ -13,11 +12,9 @@ import javax.ejb.Stateless;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ejava.projects.eleague.dto.AddressType;
 import ejava.projects.eleague.dto.Club;
 import ejava.projects.eleague.dto.Contact;
 import ejava.projects.eleague.dto.ContactRoleType;
-import ejava.projects.eleague.dto.Contest;
 import ejava.projects.eleague.dto.Division;
 import ejava.projects.eleague.dto.ELeague;
 import ejava.projects.eleague.dto.LeagueMetadata;

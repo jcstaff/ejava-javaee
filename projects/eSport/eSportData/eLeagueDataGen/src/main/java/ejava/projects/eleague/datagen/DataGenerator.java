@@ -28,7 +28,6 @@ import ejava.projects.eleague.dto.Season;
 import ejava.projects.eleague.dto.Team;
 import ejava.projects.eleague.dto.TeamSeason;
 import ejava.projects.eleague.dto.Venue;
-import ejava.projects.eleague.xml.SampleGen;
 
 public class DataGenerator {
 	Log log = LogFactory.getLog(DataGenerator.class);
@@ -109,7 +108,8 @@ public class DataGenerator {
 	                    team.getRefid().length() == 0) {
 	                team.setRefid("Team-" + nextRefId());
 	            }
-	            for (ContactRoleType contact : team.getContactRole()) {
+	            for (@SuppressWarnings("unused") ContactRoleType contact : 
+	            	team.getContactRole()) {
 	            }	        
 	        }
 	        for (Venue venue : club.getVenue()) {
@@ -154,7 +154,7 @@ public class DataGenerator {
 	public static Map<String, String> getProps(String prefix) {
 		Map<String, String> props = new HashMap<String, String>();
 		Properties sysProps = System.getProperties();
-		for(Iterator itr=sysProps.keySet().iterator(); itr.hasNext();) {
+		for(Iterator<Object> itr=sysProps.keySet().iterator(); itr.hasNext();) {
 			String key = (String)itr.next();
 			if (key.startsWith(prefix + ".")) {
 				String name = key.substring(prefix.length()+1);

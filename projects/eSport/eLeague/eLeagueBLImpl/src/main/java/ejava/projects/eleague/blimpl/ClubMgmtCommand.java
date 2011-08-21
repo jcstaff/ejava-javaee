@@ -15,6 +15,7 @@ import ejava.projects.eleague.bo.Venue;
 import ejava.projects.eleague.jpa.JPAClubDAO;
 
 public class ClubMgmtCommand extends ELeagueIngestCommand {
+	@SuppressWarnings("unused")
 	private static final Log log = 
 		LogFactory.getLog(ClubMgmtCommand.class);
 	private static String command = System.getProperty("command");
