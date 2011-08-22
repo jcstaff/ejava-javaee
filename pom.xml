@@ -88,6 +88,7 @@
         <maven-plugin-plugin.version>2.8</maven-plugin-plugin.version>
         <maven-release-plugin.version>2.2.1</maven-release-plugin.version>
         <maven-scm-plugin.version>1.4</maven-scm-plugin.version>
+        <cargo-maven2-plugin.version>1.0.6</cargo-maven2-plugin.version>
 
         <jboss.host>localhost</jboss.host>
         <jboss.protocol>http</jboss.protocol>
@@ -270,7 +271,7 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-rar-plugin</artifactId>
+                <artifactId>maven-war-plugin</artifactId>
                 <version>${maven-war-plugin.version}</version>
             </plugin>
 
@@ -351,6 +352,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-scm-plugin</artifactId>
                 <version>${maven-scm-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>${cargo-maven2-plugin.version}</version>
             </plugin>
           </plugins>
         </pluginManagement>

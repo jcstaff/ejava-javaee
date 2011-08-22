@@ -45,7 +45,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -99,20 +99,6 @@
           </java.naming.factory.url.pkgs>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
@@ -133,7 +119,6 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.0.4</version>
                 <configuration>
                     <container>
                         <containerId>${cargo.containerId}</containerId>

@@ -27,7 +27,19 @@
             <name>JBoss Nexus Repository</name>
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
+        <repository>
+            <id>java.net-repo</id>
+            <name>Java.net Maven Repository</name>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,6 +52,7 @@
         <maven-war-plugin.version>2.1.1</maven-war-plugin.version>
         <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.9</maven-surefire-plugin.version>
+        <cargo-maven2-plugin.version>1.1.2</cargo-maven2-plugin.version>
     </properties>
 
     <build>
@@ -74,98 +87,99 @@
 	                <artifactId>maven-surefire-plugin</artifactId>
 	                <version>${maven-surefire-plugin.version}</version>
 	            </plugin>
-			    <plugin>
-			      <groupId>org.eclipse.m2e</groupId>
-			      <artifactId>lifecycle-mapping</artifactId>
-			      <version>1.0.0</version>
-			      <configuration>
-			        <lifecycleMappingMetadata>
-			          <pluginExecutions>
-			            <pluginExecution>
-			              <pluginExecutionFilter>
-			                <groupId>org.apache.maven.plugins</groupId>
-			                <artifactId>maven-ear-plugin</artifactId>
-			                <versionRange>[1.0.0,)</versionRange>
-			                <goals>
-			                  <goal>generate-application-xml</goal>
-			                </goals>
-			              </pluginExecutionFilter>
-			              <action>
-			                <ignore/>
-			              </action>
-			            </pluginExecution>
-			            <pluginExecution>
-			              <pluginExecutionFilter>
-			                <groupId>org.apache.maven.plugins</groupId>
-			                <artifactId>maven-dependency-plugin</artifactId>
-			                <versionRange>[1.0.0,)</versionRange>
-			                <goals>
-			                  <goal>copy-dependencies</goal>
-			                  <goal>unpack</goal>
-			                </goals>
-			              </pluginExecutionFilter>
-			              <action>
-			                <ignore/>
-			              </action>
-			            </pluginExecution>
-			            <pluginExecution>
-			              <pluginExecutionFilter>
-			                <groupId>org.codehaus.cargo</groupId>
-			                <artifactId>cargo-maven2-plugin</artifactId>
-			                <versionRange>[1.0.0,)</versionRange>
-			                <goals>
-			                  <goal>deploy</goal>
-			                  <goal>undeploy</goal>
-			                </goals>
-			              </pluginExecutionFilter>
-			              <action>
-			                <ignore/>
-			              </action>
-			            </pluginExecution>
-			            <pluginExecution>
-			              <pluginExecutionFilter>
-			                <groupId>org.codehaus.mojo</groupId>
-			                <artifactId>hibernate3-maven-plugin</artifactId>
-			                <versionRange>[1.0.0,)</versionRange>
-			                <goals>
-			                  <goal>hbm2ddl</goal>
-			                </goals>
-			              </pluginExecutionFilter>
-			              <action>
-			                <ignore/>
-			              </action>
-			            </pluginExecution>
-			            <pluginExecution>
-			              <pluginExecutionFilter>
-			                <groupId>org.codehaus.mojo</groupId>
-			                <artifactId>sql-maven-plugin</artifactId>
-			                <versionRange>[1.0.0,)</versionRange>
-			                <goals>
-			                  <goal>execute</goal>
-			                </goals>
-			              </pluginExecutionFilter>
-			              <action>
-			                <ignore/>
-			              </action>
-			            </pluginExecution>
 
-			            <pluginExecution>
-			              <pluginExecutionFilter>
-			                <groupId>org.jvnet.jaxb2.maven2</groupId>
-			                <artifactId>maven-jaxb2-plugin</artifactId>
-			                <versionRange>[0.7.1,)</versionRange>
-			                <goals>
-			                  <goal>generate</goal>
-			                </goals>
-			              </pluginExecutionFilter>
-			              <action>
-			                <execute/>
-			              </action>
-			            </pluginExecution>
-			          </pluginExecutions>
-			        </lifecycleMappingMetadata>
-			      </configuration>
-			    </plugin>
+                    <plugin>
+                      <groupId>org.eclipse.m2e</groupId>
+                      <artifactId>lifecycle-mapping</artifactId>
+                      <version>1.0.0</version>
+                      <configuration>
+                        <lifecycleMappingMetadata>
+                          <pluginExecutions>
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-ear-plugin</artifactId>
+                                <versionRange>[1.0.0,)</versionRange>
+                                <goals>
+                                  <goal>generate-application-xml</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-dependency-plugin</artifactId>
+                                <versionRange>[1.0.0,)</versionRange>
+                                <goals>
+                                  <goal>copy-dependencies</goal>
+                                  <goal>unpack</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.cargo</groupId>
+                                <artifactId>cargo-maven2-plugin</artifactId>
+                                <versionRange>[1.0.0,)</versionRange>
+                                <goals>
+                                  <goal>deploy</goal>
+                                  <goal>undeploy</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>hibernate3-maven-plugin</artifactId>
+                                <versionRange>[1.0.0,)</versionRange>
+                                <goals>
+                                  <goal>hbm2ddl</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>sql-maven-plugin</artifactId>
+                                <versionRange>[1.0.0,)</versionRange>
+                                <goals>
+                                  <goal>execute</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                                <artifactId>maven-jaxb2-plugin</artifactId>
+                                <versionRange>[0.7.1,)</versionRange>
+                                <goals>
+                                  <goal>generate</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <execute/>
+                              </action>
+                            </pluginExecution>
+                          </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                      </configuration>
+                    </plugin>
     		</plugins>
     	</pluginManagement>
     </build>

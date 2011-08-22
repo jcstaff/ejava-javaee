@@ -10,19 +10,31 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.LazyInitializationException;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.dto.OwnerDTO;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
-public class TellerOwnerRemoteTest extends TestCase {
+public class TellerOwnerRemoteTest {
     private static Log log = LogFactory.getLog(TellerOwnerRemoteTest.class);
     protected InitialContext jndi;
     protected String jndiName = 
         System.getProperty("jndi.name", "TellerEJB/remote");
     protected TellerRemote teller;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        //try to avoid a race condition we have with cargo not finishing
+        //deployment before allowing the tests to start
+        Thread.sleep(3000);
+    }
     
+    @Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
@@ -71,6 +83,7 @@ public class TellerOwnerRemoteTest extends TestCase {
         }
     }
     
+    @Test
     public void testLazy() throws Exception {
         log.info("*** testLazy ***");
         
@@ -104,6 +117,7 @@ public class TellerOwnerRemoteTest extends TestCase {
         }
     }
     
+    @Test
     public void testPOJO() throws Exception {
         log.info("*** testPOJO ***");
         
@@ -136,6 +150,7 @@ public class TellerOwnerRemoteTest extends TestCase {
         }
     }
     
+    @Test
     public void testDTO() throws Exception {
         log.info("*** testDTO ***");
         
@@ -155,6 +170,4 @@ public class TellerOwnerRemoteTest extends TestCase {
         assertEquals("unexpected number of owners", startCount + 2,
                 owners.size());
     }
-
-
 }

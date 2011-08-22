@@ -12,29 +12,29 @@ import org.junit.Test;
 import ejava.projects.edmv.ejb.ParserTestRemote;
 
 public class ParserServerTest {
-	private static final Log log = LogFactory.getLog(ParserServerTest.class);
-	private static final String jndiName = System.getProperty("jndi.name");
-	
-	private static ParserTestRemote parser;
+    private static final Log log = LogFactory.getLog(ParserServerTest.class);
+    private static final String jndiName = System.getProperty("jndi.name");
+    
+    private static ParserTestRemote parser;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-            //try to avoid a race condition we have with cargo not finishing
-            //deployment before allowing the tests to start
-            Thread.sleep(3000);
-		InitialContext jndi = new InitialContext();
-		
-		log.trace("looking up name:" + jndiName);
-		parser = (ParserTestRemote)jndi.lookup(jndiName);
-	}
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        //try to avoid a race condition we have with cargo not finishing
+        //deployment before allowing the tests to start
+        Thread.sleep(3000);
+            InitialContext jndi = new InitialContext();
+            
+            log.trace("looking up name:" + jndiName);
+            parser = (ParserTestRemote)jndi.lookup(jndiName);
+    }
 
-	@Before
-	public void setUp() throws Exception {
-	}
+    @Before
+    public void setUp() throws Exception {
+    }
 
-	@Test
-	public void testIngest() throws Exception {
-		log.info("*** testIngest ***");
-		parser.ingest();
-	}
+    @Test
+    public void testIngest() throws Exception {
+            log.info("*** testIngest ***");
+            parser.ingest();
+    }
 }

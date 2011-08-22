@@ -19,14 +19,6 @@
         classes, and the XML parsing libraries.
     </description>
 
-    <repositories>
-       <!-- needed to resolve stax dependency -->
-        <repository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -97,7 +89,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
