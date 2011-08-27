@@ -29,6 +29,17 @@
             <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
         </mailingList>
     </mailingLists>
+    <scm>
+        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/branch/master</url>
+        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
+        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
+    </scm>
+
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://ejava.info/hudson/job/2011-fall-ejava-javaee/</url>
+    </ciManagement>
+
 
   <modules>
         <module>site-skin</module>
@@ -89,6 +100,7 @@
         <maven-release-plugin.version>2.2.1</maven-release-plugin.version>
         <maven-scm-plugin.version>1.4</maven-scm-plugin.version>
         <cargo-maven2-plugin.version>1.0.6</cargo-maven2-plugin.version>
+        <hibernate3-maven-plugin.version>2.2</hibernate3-maven-plugin.version>
 
         <jboss.host>localhost</jboss.host>
         <jboss.protocol>http</jboss.protocol>
@@ -96,18 +108,116 @@
         <db.host>${jboss.host}</db.host>
         <jboss.user>admin</jboss.user>
         <jboss.password>admin</jboss.password>
+
+        <cargo-core-tools-jboss-deployer-5.1-and-onwards.version>1.0.4</cargo-core-tools-jboss-deployer-5.1-and-onwards.version>
+        <commons-logging.version>1.0.4</commons-logging.version>
+        <jaxb-api.version>2.1</jaxb-api.version>
+        <jaxb-impl.version>2.1.9-brew</jaxb-impl.version>
+        <jsr250-api.version>1.0</jsr250-api.version>
+        <junit.version>4.7</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+        <maven-jaxb2-plugin.version>0.7.1</maven-jaxb2-plugin.version>
+        <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
+        <xercesImpl.version>2.9.1</xercesImpl.version>
+
+        <mysql-connector-java.version>5.0.5</mysql-connector-java.version>
+        <hsqldb.version>1.8.0.4</hsqldb.version>
+        <servlet-api.version>2.5</servlet-api.version>
+        <maven-jetty-plugin.version>6.1.26</maven-jetty-plugin.version>
     </properties>
 
-    <scm>
-        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/branch/master</url>
-        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
-        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
-    </scm>
+    <repositories>
+        <repository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+        <repository>
+            <id>java.net-repo</id>
+            <name>Java.net Maven Repository</name>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
-    <ciManagement>
-        <system>hudson</system>
-        <url>http://ejava.info/hudson/job/2011-fall-ejava-javaee/</url>
-    </ciManagement>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>    
+
+            <dependency>
+                <groupId>sun-jaxb</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb-impl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xercesImpl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb-api.version}</version>
+            </dependency>    
+            <dependency>
+              <groupId>javax.annotation</groupId>
+              <artifactId>jsr250-api</artifactId>
+              <version>${jsr250-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.jbossas</groupId>
+                <artifactId>jboss-as-client</artifactId>
+                <version>${jboss-as-client.version}</version>            
+                <type>pom</type>
+                <exclusions>
+                    <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                        <groupId>org.jboss.security</groupId>
+                        <artifactId>jbosssx-client</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector-java.version}</version>
+            </dependency>       
+            <dependency>
+                <groupId>hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>${hsqldb.version}</version>
+            </dependency>       
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j-jboss.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${servlet-api.version}</version>
+            </dependency>        
+        </dependencies>
+    </dependencyManagement>
 
     <distributionManagement>
         <site>
@@ -358,6 +468,17 @@
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <version>${cargo-maven2-plugin.version}</version>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>${maven-jetty-plugin.version}</version>
+            </plugin>          
           </plugins>
         </pluginManagement>
         <plugins>
@@ -455,7 +576,23 @@
                 <hibernate-entitymanager.version>3.4.0.GA</hibernate-entitymanager.version>
                 <slf4j.version>1.5.2</slf4j.version>
                 <slf4j-jboss.version>${slf4j.version}</slf4j-jboss.version>
+                <persistence-api.version>1.0</persistence-api.version>
+                <ejb-api.verson>3.0</ejb-api.verson>
             </properties>                                  
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.persistence</groupId>
+                        <artifactId>persistence-api</artifactId>
+                        <version>${persistence-api.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.ejb</groupId>
+                        <artifactId>ejb-api</artifactId>
+                        <version>${ejb-api.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>        
         <profile>
             <id>jboss6</id>
@@ -468,7 +605,23 @@
                 <netty.version>3.2.1.Final</netty.version>
                 <slf4j.version>1.6.1</slf4j.version>
                 <slf4j-jboss.version>1.5.6</slf4j-jboss.version>
+                <hibernate-jpa-2.0-api.version>1.0.0.Final</hibernate-jpa-2.0-api.version>
+                <javaee-api.version>6.0</javaee-api.version>
             </properties>                                  
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate.javax.persistence</groupId>
+                        <artifactId>hibernate-jpa-2.0-api</artifactId>
+                        <version>${hibernate-jpa-2.0-api.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax</groupId>
+                        <artifactId>javaee-api</artifactId>
+                        <version>${javaee-api.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>        
 
         <profile> <!-- tells surefire to run JUnit tests with remote debug -->
@@ -482,6 +635,57 @@
                 <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
             </properties>                                  
         </profile>        
+
+    	<!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+            <id>m2e</id>
+            <activation>
+                <property>
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                <plugin>
+                  <groupId>org.eclipse.m2e</groupId>
+                  <artifactId>lifecycle-mapping</artifactId>
+                  <version>1.0.0</version>
+                  <configuration>
+                    <lifecycleMappingMetadata>
+                      <pluginExecutions>
+                        <pluginExecution>
+                          <pluginExecutionFilter>
+                            <groupId>org.codehaus.cargo</groupId>
+                            <artifactId>cargo-maven2-plugin</artifactId>
+                            <versionRange>[1.0.0,)</versionRange>
+                            <goals>
+                              <goal>deploy</goal>
+                              <goal>undeploy</goal>
+                            </goals>
+                          </pluginExecutionFilter>
+                          <action>
+                            <ignore/>
+                          </action>
+                        </pluginExecution>
+                        <pluginExecution>
+                          <pluginExecutionFilter>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>hibernate3-maven-plugin</artifactId>
+                            <versionRange>[1.0.0,)</versionRange>
+                            <goals>
+                              <goal>hbm2ddl</goal>
+                            </goals>
+                          </pluginExecutionFilter>
+                          <action>
+                            <ignore/>
+                          </action>
+                        </pluginExecution>
+                    </lifecycleMappingMetadata>
+                  </configuration>
+                </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 </project>

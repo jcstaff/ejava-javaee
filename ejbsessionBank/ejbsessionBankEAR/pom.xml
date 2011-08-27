@@ -43,7 +43,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ear-plugin</artifactId>
-                <version>${maven-ear-plugin.version}</version>
                 <configuration>
                     <description>
                         Example Session Bean Bank Application
@@ -79,7 +78,6 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.0.4</version>
                 <configuration>
                     <container>
                         <containerId>${cargo.containerId}</containerId>
@@ -132,7 +130,7 @@
                     <dependency>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>1.0.4</version>
+                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
@@ -140,7 +138,6 @@
                         <version>${jboss-as-client.version}</version>
                         <type>pom</type>
                     </dependency>
-
                     <dependency>
                         <groupId>org.jboss.integration</groupId>
                         <artifactId>jboss-profileservice-spi</artifactId>
@@ -161,7 +158,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-jboss.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -173,7 +169,7 @@
                     <dependency>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>1.0.4</version>
+                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>

@@ -21,11 +21,12 @@ public class ParserServerTest {
     public static void setUpBeforeClass() throws Exception {
         //try to avoid a race condition we have with cargo not finishing
         //deployment before allowing the tests to start
-        Thread.sleep(3000);
-            InitialContext jndi = new InitialContext();
-            
-            log.trace("looking up name:" + jndiName);
-            parser = (ParserTestRemote)jndi.lookup(jndiName);
+        Thread.sleep(5000);
+        InitialContext jndi = new InitialContext();
+        
+        log.trace("looking up name:" + jndiName);
+        try {parser = (ParserTestRemote)jndi.lookup(jndiName);}
+        finally {jndi.close();}
     }
 
     @Before
@@ -34,7 +35,7 @@ public class ParserServerTest {
 
     @Test
     public void testIngest() throws Exception {
-            log.info("*** testIngest ***");
-            parser.ingest();
+        log.info("*** testIngest ***");
+        parser.ingest();
     }
 }
