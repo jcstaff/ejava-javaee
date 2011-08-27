@@ -1,13 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/maven-v4_0_0.xsd">
-        
     <parent>
         <groupId>ejava.javaee.projects.eMarket</groupId>
         <artifactId>eMarketData</artifactId>
-        <version>2.0.2011.1-SNAPSHOT</version>
+        <version>2.0.2011.2-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
+
     <artifactId>eSalesDTO</artifactId>
+    <version>2.0.2011.2</version>
+
     <name>eSales DTO</name>
     <description>
         This project provides the data transfer objects and XML parser used to 
@@ -25,14 +26,19 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
             <scope>compile</scope>
+        </dependency>
+        
+        <!--  this is what JBoss AS 5.1.0.GA is using  -->
+        <dependency>
+            <groupId>sun-jaxb</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <scope>provided</scope>
         </dependency>
         
         <!-- StAX Impl (javax.xml.stream.XMLInputFactory) 
             this is an implementation for StAX; it can be defined/used by anyone
             for runtime use.
-        -->
         <dependency>
             <groupId>stax</groupId>
             <artifactId>stax</artifactId>
@@ -45,6 +51,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        -->
 
         <!-- JAXB Reference Impl (com.sun.xml.bind.v2.ContextFactory)
             this is an implementation for JAXB; it can be defined/used by anyone
@@ -52,13 +59,13 @@
 
             2010-10: added compile dependency to create a custom IDResolver
             that allowed multiple unmarshal calls to resolve other intances.
-        -->
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
             <version>2.1.12</version>
             <scope>compile</scope>
         </dependency>
+        -->
 
         <!-- added a dependency on Xerces to hopefully stablize the
             lexical representation of gMonth formats when changing
@@ -75,13 +82,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
             <scope>test</scope>
         </dependency>        
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
             <scope>test</scope>
         </dependency>    
     </dependencies>
@@ -106,14 +111,6 @@
                     <name>!nojaxb</name>
                 </property>
             </activation>
-            <pluginRepositories>
-                <!-- used to get maven-jaxb2-plugin -->
-                <pluginRepository>
-                    <id>download-java-net</id>
-                    <name>Java.net Maven Repository</name>
-                    <url>http://download.java.net/maven/2</url>
-                </pluginRepository>
-            </pluginRepositories>
             <build>
                 <plugins>
 
@@ -121,7 +118,6 @@
         <plugin>
             <groupId>org.jvnet.jaxb2.maven2</groupId>
             <artifactId>maven-jaxb2-plugin</artifactId>
-            <version>0.7.1</version>
             <executions>
                 <execution>
                     <phase>process-resources</phase>

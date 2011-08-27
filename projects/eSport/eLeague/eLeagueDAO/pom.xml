@@ -3,12 +3,13 @@
     <parent>
         <groupId>ejava.javaee.projects.eSport</groupId>
         <artifactId>eLeague</artifactId>
-        <version>1.0.2010.2-SNAPSHOT</version>
+        <version>2.0.2011.1-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>ejava.javaee.projects.eSport.eLeague</groupId>
     <artifactId>eLeagueDAO</artifactId>
+
     <name>eLeague DAO</name>
     <description>
         This project provides a sparse example of how to setup a JDBC and JPA
@@ -26,20 +27,17 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
             <scope>compile</scope>
         </dependency>
         
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
             <scope>test</scope>
         </dependency>        
     </dependencies>
@@ -55,14 +53,6 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -126,15 +116,6 @@
                 </property>
             </activation>
 
-           <!-- needed to resolve some hibernate dependencies -->
-            <repositories>
-                <repository>
-                    <id>jboss-nexus</id>
-                    <name>JBoss Nexus Repository</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                </repository>
-            </repositories>
-
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
@@ -186,7 +167,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>        
-            <version>1.4</version>
             
             <dependencies>
               <dependency>

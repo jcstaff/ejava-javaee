@@ -1,20 +1,15 @@
 <?xml version="1.0"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <!-- this parent dependency is only here to pick up site deployment properties
-        when being deployed to the web site, It normally would not be needed to 
-        compile and test the application.
-        -->
     <parent>
         <artifactId>eDataShare</artifactId>
         <groupId>ejava.javaee.projects.eDataShare</groupId>
         <version>2.0.2011.1-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
+
     <artifactId>eDmvData</artifactId>
     <packaging>pom</packaging>
     <name>eDmvData</name>
-    <version>2.0.2011.1rc1</version>
+
     <description>
         This project provides the test data and parser 
         for the class project. Students will create a dependency on the

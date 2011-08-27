@@ -1,14 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/maven-v4_0_0.xsd">
-        
     <parent>
-        <groupId>ejava.javaee.projects.eMarket</groupId>
+        <groupId>ejava.javaee.projects.eMarket.eSales</groupId>
         <artifactId>eSales</artifactId>
-        <version>1.0.2010.1-SNAPSHOT</version>
+        <version>2.0.2011.2-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ejava.javaee.projects.eMarket.eSales</groupId>
+
     <artifactId>eSalesBLImpl</artifactId>
+
     <name>eSales BLImpl</name>
     <description>
         This project provides a sparse example of how to setup an ingest and 
@@ -16,13 +15,6 @@
     </description>
 
     <dependencies>
-        <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eSalesDAO</artifactId>
@@ -32,7 +24,6 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
             <scope>compile</scope>
         </dependency>
 
@@ -44,20 +35,18 @@
         <dependency>
             <groupId>ejava.javaee.projects.eMarket.eMarketData</groupId>
             <artifactId>eSalesTestUtil</artifactId>
-            <version>1.0.2010.1rc2</version>
+            <version>2.0.2011.2</version>
             <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
             <scope>test</scope>
         </dependency>        
     </dependencies>
@@ -90,14 +79,6 @@
         </testResources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -150,6 +131,7 @@
             </dependencies>
         </profile>
 
+
         <profile> <!-- defines our default persistence provider -->
             <id>hibernate</id>
             <activation>
@@ -158,27 +140,41 @@
                 </property>
             </activation>
 
-           <!-- needed to resolve some hibernate dependencies -->
-            <repositories>
-                <repository>
-                    <id>jboss-nexus</id>
-                    <name>JBoss Nexus Repository</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                </repository>
-            </repositories>
-
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.4.0.GA</version>
+                    <version>${hibernate-entitymanager.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>1.5.2</version>
+                    <version>${slf4j.version}</version>
                     <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>jboss5</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.persistence</groupId>
+                    <artifactId>persistence-api</artifactId>
+                    <version>1.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jboss6</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
         </profile>
