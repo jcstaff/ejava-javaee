@@ -51,18 +51,28 @@
         <maven-jaxb2-plugin.version>0.7.1</maven-jaxb2-plugin.version>
         <maven-jetty-plugin.version>6.1.26</maven-jetty-plugin.version>
 
-        <junit.version>4.7</junit.version>
-        <log4j.version>1.2.13</log4j.version>
         <commons-logging.version>1.0.4</commons-logging.version>
         <cargo-core-tools-jboss-deployer-5.1-and-onwards.version>1.0.4</cargo-core-tools-jboss-deployer-5.1-and-onwards.version>
         <hsqldb.version>1.8.0.4</hsqldb.version>
-        <jaxb-impl.version>2.1.9-brew</jaxb-impl.version>
-        <xercesImpl.version>2.9.1</xercesImpl.version>
-        <mysql-connector-java.version>5.0.5</mysql-connector-java.version>
-        <jsr250-api.version>1.0</jsr250-api.version>
+        <log4j.version>1.2.13</log4j.version>
         <jaxb-api.version>2.1</jaxb-api.version>
+        <jaxb-impl.version>2.1.9-brew</jaxb-impl.version>
+        <jsr250-api.version>1.0</jsr250-api.version>
+        <junit.version>4.7</junit.version>
+        <maven-jaxb2-plugin.version>0.7.1</maven-jaxb2-plugin.version>
+        <mysql-connector-java.version>5.0.5</mysql-connector-java.version>
         <servlet-api.version>2.5</servlet-api.version>
+        <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
+        <xercesImpl.version>2.9.1</xercesImpl.version>
 
+        <cargo-core-tools-jboss-deployer-5.1-and-onwards.version>1.0.4</cargo-core-tools-jboss-deployer-5.1-and-onwards.version>
+        <commons-logging.version>1.0.4</commons-logging.version>
+        <jaxb-api.version>2.1</jaxb-api.version>
+        <jaxb-impl.version>2.1.9-brew</jaxb-impl.version>
+        <jsr250-api.version>1.0</jsr250-api.version>
+        <junit.version>4.7</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+        <jms.version>1.1</jms.version>
 
         <jboss.host>localhost</jboss.host>
         <jboss.protocol>http</jboss.protocol>
@@ -71,16 +81,6 @@
         <jboss.user>admin</jboss.user>
         <jboss.password>admin</jboss.password>
 
-        <cargo-core-tools-jboss-deployer-5.1-and-onwards.version>1.0.4</cargo-core-tools-jboss-deployer-5.1-and-onwards.version>
-        <commons-logging.version>1.0.4</commons-logging.version>
-        <jaxb-api.version>2.1</jaxb-api.version>
-        <jaxb-impl.version>2.1.9-brew</jaxb-impl.version>
-        <jsr250-api.version>1.0</jsr250-api.version>
-        <junit.version>4.7</junit.version>
-        <log4j.version>1.2.13</log4j.version>
-        <maven-jaxb2-plugin.version>0.7.1</maven-jaxb2-plugin.version>
-        <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
-        <xercesImpl.version>2.9.1</xercesImpl.version>
     </properties>
 
     <distributionManagement>
@@ -155,6 +155,11 @@
                 <version>${log4j.version}</version>
             </dependency>    
 
+            <dependency>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms</artifactId>
+                <version>${jms.version}</version>
+            </dependency>
             <dependency>
                 <groupId>sun-jaxb</groupId>
                 <artifactId>jaxb-impl</artifactId>
@@ -326,42 +331,42 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-ant-plugin</artifactId>
-                    <version>${maven-ant-plugin.version</version>
+                    <version>${maven-ant-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>${maven-antrun-plugin.version</version>
+                    <version>${maven-antrun-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-archetype-plugin</artifactId>
-                    <version>${maven-archetype-plugin.version</version>
+                    <version>${maven-archetype-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>${maven-assembly-plugin.version</version>
+                    <version>${maven-assembly-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>${maven-enforcer-plugin.version</version>
+                    <version>${maven-enforcer-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-help-plugin</artifactId>
-                    <version>${maven-help-plugin.version</version>
+                    <version>${maven-help-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>${maven-plugin-plugin.version</version>
+                    <version>${maven-plugin-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-scm-plugin</artifactId>
-                    <version>${maven-scm-plugin.version</version>
+                    <version>${maven-scm-plugin.version}</version>
                 </plugin>
 
                 <plugin>
@@ -582,6 +587,21 @@
                         <groupId>javax</groupId>
                         <artifactId>javaee-api</artifactId>
                         <version>${javaee-api.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.hornetq</groupId>
+                        <artifactId>hornetq-jms-client</artifactId>
+                        <version>${hornetq.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.hornetq</groupId>
+                        <artifactId>hornetq-core</artifactId>
+                        <version>${hornetq.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.netty</groupId>
+                        <artifactId>netty</artifactId>
+                        <version>${netty.version}</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>

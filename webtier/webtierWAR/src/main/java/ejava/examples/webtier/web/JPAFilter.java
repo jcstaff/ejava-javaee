@@ -33,14 +33,13 @@ public class JPAFilter implements Filter {
     private EntityManager pc;
 
     
-    @SuppressWarnings("unchecked")
     public void init(FilterConfig config) throws ServletException {
         log.debug("filter initializing JPA DAOs"); 
         new JPADAOTypeFactory();
         DAOTypeFactory daoType = DAOFactory.getDAOTypeFactory();
         log.debug("filter got typeFactory:" + daoType.getName());
         
-        for(Enumeration e=config.getInitParameterNames();
+        for(Enumeration<?> e=config.getInitParameterNames();
             e.hasMoreElements(); ) {
             String key = (String)e.nextElement();
             String value=(String)config.getInitParameter(key);
@@ -123,14 +122,13 @@ public class JPAFilter implements Filter {
         log.debug(text.toString());
     }
 
-    @SuppressWarnings("unchecked")
     private void doDump(int level, StringBuilder text, Context context, String name) 
         throws NamingException {
-        for (NamingEnumeration ne = context.list(name); ne.hasMore();) {
+        for (NamingEnumeration<NameClassPair> ne = context.list(name); ne.hasMore();) {
             NameClassPair ncp = (NameClassPair) ne.next();
             String objectName = ncp.getName();
             String className = ncp.getClassName();
-            String classText = (true) ? " :" + className : "";
+            String classText = " :" + className;
             if (isContext(className)) {
                 text.append(getPad(level) + "+" + objectName + classText +"\n");
                 doDump(level + 1, text, context, name + "/" + objectName);
@@ -140,10 +138,9 @@ public class JPAFilter implements Filter {
         }
     }
     
-    @SuppressWarnings("unchecked")
     protected boolean isContext(String className) {
         try {
-            Class objectClass = Thread.currentThread().getContextClassLoader()
+            Class<?> objectClass = Thread.currentThread().getContextClassLoader()
                     .loadClass(className);
             return Context.class.isAssignableFrom(objectClass);
         }

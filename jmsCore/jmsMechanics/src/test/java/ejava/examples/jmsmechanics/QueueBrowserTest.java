@@ -111,7 +111,7 @@ public class QueueBrowserTest extends TestCase {
             
             QueueBrowser qbrowser = session.createBrowser((Queue)destination);
             int msgs=0;
-            for (Enumeration e = qbrowser.getEnumeration(); 
+            for (Enumeration<?> e = qbrowser.getEnumeration(); 
                  e.hasMoreElements(); ) {
                 Message m = (Message) e.nextElement();
                 msgs += 1;

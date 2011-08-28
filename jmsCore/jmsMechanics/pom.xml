@@ -2,42 +2,31 @@
     <parent>
         <artifactId>jmsCore</artifactId>
         <groupId>ejava.javaee.jmscore</groupId>
-        <version>2.0.2011.1-SNAPSHOT</version>
+        <version>2.0.2011.2-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
+
     <artifactId>jmsMechanics</artifactId>
     <packaging>jar</packaging>
+
     <name>JMS Mechanics</name>
-    <version>2.0.2011.1-SNAPSHOT</version>
     <description>
         This project provides examples for performing core JMS mechanics
         of establishing connections, creating, sending, and receiving
         messages.
     </description>
 
-   <!-- this repositories holds many of the javaee5 jar files -->
-    <repositories>
-       <repository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-       </repository>
-    </repositories>
-
     <dependencies>
         <!-- core dependencies -->
         <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>jms</artifactId>
-            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
             <scope>provided</scope>
         </dependency>
 
@@ -45,13 +34,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
             <scope>test</scope>
         </dependency>    
     </dependencies>
@@ -76,22 +63,9 @@
         </testResources>
 
         <plugins>
-              <!-- make sure we are building java5 and tell it to compile, 
-                    even though we are a pom project -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>      
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <includes>
@@ -133,19 +107,16 @@
                   <jmsmechanics.multi.message.count>20
                   </jmsmechanics.multi.message.count>
             </properties>
-            <repositories>
-                <repository>
-                    <id>jboss-repo</id>
-                    <name>JBoss Maven Repository</name>
-                    <url>http://repository.jboss.org/maven2</url>
-                </repository>
-            </repositories>
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.jbossas</groupId>
                     <artifactId>jboss-as-client</artifactId>
-                    <version>${jboss-as-client.version}</version>            
                     <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -154,33 +125,23 @@
             <id>jboss6</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <version>${slf4j-jboss.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
                     <groupId>org.hornetq</groupId>
                     <artifactId>hornetq-jms-client</artifactId>
-                    <version>${hornetq.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.hornetq</groupId>
                     <artifactId>hornetq-core</artifactId>
-                    <version>${hornetq.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.jboss.netty</groupId>
                     <artifactId>netty</artifactId>
-                    <version>${netty.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.jboss.jbossas</groupId>
                     <artifactId>jboss-as-server</artifactId>
-                    <version>${jboss-as-server.version}</version>            
                     <classifier>jmx-invoker-adaptor-client</classifier>
                     <scope>test</scope>
                     <exclusions>

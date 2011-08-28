@@ -25,14 +25,13 @@ public class JNDIHelper {
         log.debug(text.toString());
     }
 
-    @SuppressWarnings("unchecked")
     private void doDump(int level, StringBuilder text, Context context, String name) 
         throws NamingException {
-        for (NamingEnumeration ne = context.list(name); ne.hasMore();) {
+        for (NamingEnumeration<NameClassPair> ne = context.list(name); ne.hasMore();) {
             NameClassPair ncp = (NameClassPair) ne.next();
             String objectName = ncp.getName();
             String className = ncp.getClassName();
-            String classText = (true) ? " :" + className : "";
+            String classText = " :" + className;
             if (isContext(className)) {
                 text.append(getPad(level) + "+" + objectName + classText +"\n");
                 doDump(level + 1, text, context, name + "/" + objectName);
@@ -42,10 +41,9 @@ public class JNDIHelper {
         }
     }
     
-    @SuppressWarnings("unchecked")
     protected boolean isContext(String className) {
         try {
-            Class objectClass = Thread.currentThread().getContextClassLoader()
+            Class<?> objectClass = Thread.currentThread().getContextClassLoader()
                     .loadClass(className);
             return Context.class.isAssignableFrom(objectClass);
         }

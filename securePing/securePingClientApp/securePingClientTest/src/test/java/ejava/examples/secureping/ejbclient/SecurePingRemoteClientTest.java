@@ -3,16 +3,17 @@ package ejava.examples.secureping.ejbclient;
 
 import static org.junit.Assert.*;
 
+
 import java.security.Principal;
 
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ejava.examples.secureping.ejb.SecurePingClient;
@@ -51,12 +52,6 @@ public class SecurePingRemoteClientTest {
     CallbackHandler adminLogin;
     String skipFlush = System.getProperty("skip.flush");
     
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    	//wait for cargo to deploy
-    	Thread.sleep(3000);
-    }
-    
     @Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
@@ -64,7 +59,17 @@ public class SecurePingRemoteClientTest {
         log.debug("jndi=" + jndi.getEnvironment());
         log.debug("jndi name:" + jndiName);
         
-        securePing = (SecurePingClientRemote)jndi.lookup(jndiName);
+        for (int i=0; i<5; i++) {
+        	try { securePing = (SecurePingClientRemote)jndi.lookup(jndiName); }
+        	catch (NamingException ignored){}
+        	if (securePing != null){ break; }
+        	Thread.sleep(1000);
+        }
+        //if the above wait did not work -- do it again and throw the reported exception
+        if (securePing == null) {
+        	securePing = (SecurePingClientRemote)jndi.lookup(jndiName);
+        }
+        
         
         //create different types of logins
         knownLogin = new BasicCallbackHandler();
