@@ -46,7 +46,8 @@ public class TellerRemoteTest extends TestCase {
                     }
                 }
                 
-                for (int index=0; ; index+= 100) {
+                for (@SuppressWarnings("unused")
+				int index=0; ; index+= 100) {
                     List<Account> accounts = teller.getAccounts(0, 100);
                     if (accounts.size() == 0) { break; }
                     for (Account a: accounts) {
