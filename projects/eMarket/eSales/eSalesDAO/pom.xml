@@ -184,9 +184,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/src/main/resources/ddl</basedir>
+                    <basedir>${basedir}/target</basedir>
                     <includes>
-                      <include>target/classes/ddl/*drop*.ddl</include>                  
+                      <include>classes/ddl/*drop*.ddl</include>                  
                     </includes>
                   </fileset>
                   <!-- the tables may not exist when tests are run -->
@@ -205,7 +205,7 @@
                   <fileset>
                     <basedir>${basedir}/target</basedir>
                     <includes>
-                      <include>classes/ddl*create*.ddl</include>                  
+                      <include>classes/ddl/*create*.ddl</include>                  
                     </includes>
                   </fileset>
                   <print>true</print>
