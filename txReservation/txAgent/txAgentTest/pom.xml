@@ -136,6 +136,11 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -144,18 +149,6 @@
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <configuration>
-                    <container>
-                        <containerId>${cargo.containerId}</containerId>
-                        <type>remote</type>                
-                    </container>
-                    <configuration>
-                        <type>runtime</type>
-                        <properties>
-                            <cargo.hostname>${jboss.host}</cargo.hostname>
-                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
-                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
-                        </properties>
-                    </configuration>
                     <deployer>
                         <type>remote</type>
                         <deployables>
@@ -167,8 +160,6 @@
                         </deployables>
                     </deployer>
                 </configuration>
-                <dependencies>
-                </dependencies>
                 <executions>
                     <execution>
                         <id>deploy-component</id>
@@ -189,33 +180,6 @@
         <cargo.containerId>jboss51x</cargo.containerId>
         <agentsession.jndi>txAgentEAR-${project.version}/AgentReservationSessionEJB/remote</agentsession.jndi>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.jboss.integration</groupId>
-                        <artifactId>jboss-profileservice-spi</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>                    
-        </plugins>
-    </build>
 </profile>
 
 <profile>
@@ -224,39 +188,6 @@
         <cargo.containerId>jboss6x</cargo.containerId>
         <agentsession.jndi>txAgentEAR-${project.version}/txAgentEJB-${project.version}.jar/AgentReservationSessionEJB!remote</agentsession.jndi>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-profileservice-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-                </dependencies>
-            </plugin>                    
-        </plugins>
-    </build>
 </profile>
     </profiles>
 </project>
