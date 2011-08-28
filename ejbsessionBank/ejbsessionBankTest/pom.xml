@@ -144,6 +144,17 @@
                     </deployer>
                 </configuration>
                 <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
+                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.jbossas</groupId>
+                        <artifactId>jboss-as-client</artifactId>
+                        <version>${jboss-as-client.version}</version>
+                        <type>pom</type>
+                    </dependency>
                 </dependencies>
                 <executions>
                     <execution>
@@ -171,17 +182,6 @@
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <dependencies>
                     <dependency>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-                    <dependency>
                         <groupId>org.jboss.integration</groupId>
                         <artifactId>jboss-profileservice-spi</artifactId>
                         <version>${jboss-as-client.version}</version>
@@ -197,29 +197,12 @@
     <properties>
         <cargo.containerId>jboss6x</cargo.containerId>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-    </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
                         <artifactId>jboss-as-profileservice-client</artifactId>
@@ -231,6 +214,5 @@
         </plugins>
     </build>
 </profile>
-
     </profiles>
 </project>
