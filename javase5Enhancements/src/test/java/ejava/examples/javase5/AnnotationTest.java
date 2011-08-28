@@ -19,7 +19,7 @@ public class AnnotationTest extends TestCase {
     }
     
     private void invoke(Object obj) throws Exception {
-        Class clazz = obj.getClass();
+        Class<? extends Object> clazz = obj.getClass();
         log("class annotations", clazz.getAnnotations());
 
         for(Method m : clazz.getDeclaredMethods()) {

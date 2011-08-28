@@ -23,13 +23,14 @@ public class GenericsTest extends TestCase {
      * Raw exceptions expose runtime to ClassCastExceptions 
      *
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void testRawCollection() {
         log.info("testRawCollection");
         
         TestType anObject = new TestType();
         anObject.name = "test object";
         
-        List rawCollection = new ArrayList();
+		List rawCollection = new ArrayList();
         rawCollection.add(anObject);
         
         //the cast to (TestType) is required here
@@ -60,7 +61,8 @@ public class GenericsTest extends TestCase {
      * Checked collections check at runtime.
      *
      */
-    public void testCheckedCollection() {
+    @SuppressWarnings("unchecked")
+	public void testCheckedCollection() {
         log.info("testCheckedCollection");
         
         TestType anObject = new TestType();
@@ -72,7 +74,8 @@ public class GenericsTest extends TestCase {
         typedCollection.add(anObject);
         
         //but things can still happen that bypass compiler
-        List rawCollection = typedCollection;
+        @SuppressWarnings("rawtypes")
+		List rawCollection = typedCollection;
         try {
             rawCollection.add(new String("slipped by 2"));
         }
