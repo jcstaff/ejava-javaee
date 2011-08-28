@@ -8,12 +8,12 @@
     <enterprise-beans>
         <session>
             <ejb-name>AidScheduler</ejb-name>
-            <jndi-name>ejava/examples/jndidemo/AidScheduler/remote</jndi-name>
-            <local-jndi-name>ejava/examples/jndidemo/AidScheduler/local</local-jndi-name>
             <resource-ref>
                 <res-ref-name>jdbc/myds</res-ref-name>
             	<jndi-name>java:/ejavaDS</jndi-name>
             </resource-ref>
+            <jndi-name>ejava/examples/jndidemo/AidScheduler/remote</jndi-name>
+            <local-jndi-name>ejava/examples/jndidemo/AidScheduler/local</local-jndi-name>
         </session>
         
     </enterprise-beans>

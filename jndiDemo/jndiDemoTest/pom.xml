@@ -20,7 +20,6 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
             <scope>test</scope>
         </dependency>
 
@@ -45,13 +44,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
             <scope>test</scope>
         </dependency>    
     </dependencies>
@@ -66,25 +63,12 @@
         </testResources>
 
         <plugins>
-              <!-- make sure we are building java5 and tell it to compile, 
-                    even though we are a pom project -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>      
-
             <!-- THE PROFILE-SPECIFIC DEPLOY WILL EXECUTE HERE -->
 
               <!-- tell it to run, even though we are a pom project -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <systemPropertyVariables>
@@ -129,33 +113,12 @@
           </java.naming.factory.url.pkgs>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-client</artifactId>
-            <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
-            <exclusions>
-                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
-                    <groupId>org.jboss.security</groupId>
-                    <artifactId>jbosssx-client</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
     <build>
@@ -163,7 +126,6 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.0.4</version>
                 <configuration>
                     <container>
                         <containerId>${cargo.containerId}</containerId>
@@ -219,7 +181,7 @@
                     <dependency>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>1.0.4</version>
+                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
@@ -249,7 +211,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-jboss.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -261,7 +222,7 @@
                     <dependency>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>1.0.4</version>
+                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
