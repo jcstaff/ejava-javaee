@@ -85,7 +85,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <systemPropertyVariables>
@@ -134,7 +133,6 @@
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-client</artifactId>
-            <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
         </dependency>
@@ -230,7 +228,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-jboss.version}</version>
         </dependency>
     </dependencies>
     <build>
