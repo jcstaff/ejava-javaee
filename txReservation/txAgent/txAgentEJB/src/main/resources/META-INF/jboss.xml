@@ -16,12 +16,6 @@
     <enterprise-beans>
         <session>
             <ejb-name>BookingAgentEJB</ejb-name>
-            <!-- this supplies a custom JNDI name for the EJB remote and
-                 local interfaces to be located by remote/RMI clients
-                 --> 
-            <jndi-name>ejava/examples/txagent/BookingAgentEJB/remote</jndi-name>
-            <local-jndi-name>ejava/examples/txagent/BookingAgentEJB/local</local-jndi-name>
-            
             <!-- this supplies the JNDI name of the EJB that implements
                 this remote interface for the ejb-ref. It is done this way
                 by the "deployer" (a person) since the hotel is a separate
@@ -31,6 +25,11 @@
                 <ejb-ref-name>ejb/HotelReservation</ejb-ref-name>                                                      
                 <jndi-name>jnp://${txHotel.host}:1099/ejava/examples/txhotel/RequiredEJB/remote</jndi-name>
             </ejb-ref>
+            <!-- this supplies a custom JNDI name for the EJB remote and
+                 local interfaces to be located by remote/RMI clients
+                 --> 
+            <jndi-name>ejava/examples/txagent/BookingAgentEJB/remote</jndi-name>
+            <local-jndi-name>ejava/examples/txagent/BookingAgentEJB/local</local-jndi-name>
         </session>
         
         <session>
