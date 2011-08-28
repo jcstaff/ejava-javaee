@@ -9,7 +9,6 @@ import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.jmx.adaptor.rmi.RMIAdaptor;
 
 /**
  * This class flushes the JBoss JaasSecurityManager authentication cache. 

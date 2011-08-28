@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.ejb.EJB;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -25,6 +26,8 @@ import ejava.examples.secureping.ejb.SecurePingRemote;
 public class SecurePingHandlerServlet extends HttpServlet {
     private static Log log = LogFactory.getLog(SecurePingHandlerServlet.class);
     private Map<String, Handler> handlers = new HashMap<String, Handler>();
+    
+    @EJB(beanName="SecurePingEJB", beanInterface=SecurePingLocal.class)
     private SecurePing securePingServer;
 
     public static final String COMMAND_PARAM = "command";
@@ -51,7 +54,7 @@ public class SecurePingHandlerServlet extends HttpServlet {
             initServerRef(config);
             
             //build a list of handlers for individual commands
-            String handler = config.getInitParameter(HANDLER_TYPE_KEY);
+            //String handler = config.getInitParameter(HANDLER_TYPE_KEY);
             
             handlers.put(MAINMENU_COMMAND, new MainMenu());
             handlers.put(IS_CALLER_IN_ROLE_COMMAND, new IsCallerInRole());

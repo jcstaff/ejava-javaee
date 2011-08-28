@@ -9,8 +9,6 @@
     <enterprise-beans>
         <session>
             <ejb-name>SecurePingClientEJB</ejb-name>
-            <jndi-name>ejava/examples/secureping/SecurePingClientEJB/remote</jndi-name>
-            <local-jndi-name>ejava/examples/secureping/SecurePingClientEJB/local</local-jndi-name>
             <ejb-ref>
                 <ejb-ref-name>ejb/SecurePingEJB</ejb-ref-name>
                 <jndi-name>jnp://${jboss.bind.address}:1099/ejava/examples/secureping/SecurePingEJB/remote</jndi-name>
@@ -18,6 +16,8 @@
             <security-identity>
                 <run-as-principal>admin1</run-as-principal>
             </security-identity>
+            <jndi-name>ejava/examples/secureping/SecurePingClientEJB/remote</jndi-name>
+            <local-jndi-name>ejava/examples/secureping/SecurePingClientEJB/local</local-jndi-name>
         </session>
     </enterprise-beans>
 </jboss>

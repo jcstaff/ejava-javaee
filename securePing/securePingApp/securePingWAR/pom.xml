@@ -6,7 +6,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ejava.javaee.secureping</groupId>
     <artifactId>securePingWAR</artifactId>
     <packaging>war</packaging>
 
@@ -33,6 +32,33 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>jboss5</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>jsr250-api</artifactId>
+                  <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.ejb</groupId>
+                    <artifactId>ejb-api</artifactId>
+                  <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jboss6</id>
+            <dependencies>
+                <!-- this is fine to compile with -->
+                <dependency>
+                    <groupId>javax</groupId>
+                    <artifactId>javaee-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        
 <profile>
     <id>jetty</id>
     <build>

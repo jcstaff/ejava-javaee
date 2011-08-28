@@ -1,13 +1,16 @@
 package ejava.examples.ejbsessionbank.ejbclient;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
+
 
 import javax.naming.InitialContext;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bl.Teller;
@@ -16,11 +19,12 @@ import ejava.examples.ejbsessionbank.bo.Ledger;
 import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
-public class TellerRemoteTest extends TestCase {
+public class TellerRemoteTest {
     Log log = LogFactory.getLog(TellerRemoteTest.class);
     InitialContext jndi;
     String jndiName = System.getProperty("jndi.name", "TellerEJB/remote");
     
+    @Before
     public void setUp() throws Exception {
         Thread.sleep(1000); //hack -- give JBoss extra time to finish deploy
         log.debug("getting jndi initial context");
@@ -73,7 +77,7 @@ public class TellerRemoteTest extends TestCase {
         }
     }
 
-    
+    @Test
     public void testLookupTellerRemote() throws Exception {
         log.info("*** testLookupTellerRemote ***");
         @SuppressWarnings("unused")
@@ -91,6 +95,7 @@ public class TellerRemoteTest extends TestCase {
         }        
     }    
 
+    @Test
     public void testCreateAccount() throws Exception {
         log.info("*** testCreateAccount ***");
         Account account=null;
@@ -116,6 +121,7 @@ public class TellerRemoteTest extends TestCase {
         }
     }
     
+    @Test
     public void testGetAccount() throws Exception {
         log.info("*** testGetAccount ***");
         Account account = null;
@@ -131,7 +137,8 @@ public class TellerRemoteTest extends TestCase {
             assertEquals("unexpected account num:"+account2.getAccountNumber(),
                     account.getAccountNumber(), account2.getAccountNumber());
             assertEquals("unexpected account bal:"+account2.getBalance(),
-                    account.getBalance(), account2.getBalance());
+                    (int)(100*account.getBalance()), 
+                    (int)(100*account2.getBalance()));
         }
         catch (Exception ex) {
             log.fatal("error getting account:" + ex, ex);
@@ -139,6 +146,7 @@ public class TellerRemoteTest extends TestCase {
         }        
     }    
 
+    @Test
     public void testUpdateAccount() throws Exception {
         log.info("*** testUpdateAccount ***");
         Account account = null;
@@ -151,7 +159,8 @@ public class TellerRemoteTest extends TestCase {
             
             account.deposit(5.00);
             assertEquals("unexpected balance:" + account.getBalance(),
-                    5.00, account.getBalance());
+                    (int)(100*5.00), 
+                    (int)(100*account.getBalance()));
             teller.updateAccount(account);
             log.debug("updated account:" + account);
             
@@ -159,11 +168,13 @@ public class TellerRemoteTest extends TestCase {
             log.debug("retrieved updated account:" + account2);
                         
             assertEquals("unexpected account bal:"+account2.getBalance(),
-                    account.getBalance(), account2.getBalance());
+                    (int)(100*account.getBalance()), 
+                    (int)(100*account2.getBalance()));
             
             account.withdraw(10.00);
             assertEquals("unexpected balance:" + account.getBalance(),
-                    -5.00, account.getBalance());
+		            (int)(100*-5.00), 
+		            (int)(100*account.getBalance()));
             teller.updateAccount(account);
             log.debug("updated account:" + account);
             
@@ -171,7 +182,8 @@ public class TellerRemoteTest extends TestCase {
             log.debug("retrieved updated account:" + account2);
                         
             assertEquals("unexpected account bal:"+account2.getBalance(),
-                    account.getBalance(), account2.getBalance());
+                    (int)(100*account.getBalance()), 
+                    (int)(100*account2.getBalance()));
         }
         catch (Exception ex) {
             log.fatal("error updating account:" + ex, ex);
@@ -179,6 +191,7 @@ public class TellerRemoteTest extends TestCase {
         }        
     }    
     
+    @Test
     public void testCloseAccount() throws Exception {
         log.info("*** testCloseAccount ***");
         TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
@@ -214,6 +227,7 @@ public class TellerRemoteTest extends TestCase {
         }
     }
 
+    @Test
     public void testFindOverdrawnAccounts() throws Exception {
         log.info("*** testFindOverdrawnAccounts ***");
         TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
@@ -243,6 +257,7 @@ public class TellerRemoteTest extends TestCase {
         }
     }
 
+    @Test
     public void testFindAllAccounts() throws Exception {
         log.info("*** testFindAllAccounts ***");
         TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
@@ -262,7 +277,8 @@ public class TellerRemoteTest extends TestCase {
                 log.debug("got " + accounts.size() + " accounts");
                 for(Account a: accounts) {
                     assertEquals("unexpected balance",
-                            (double)index++, a.getBalance());
+	                    (int)(100*index++), 
+	                    (int)(100*a.getBalance()));
                 }
             }            
             assertEquals("unexpected number of accounts:"+index, TOTAL, index);
@@ -273,6 +289,7 @@ public class TellerRemoteTest extends TestCase {
         }
     }
     
+    @Test
     public void testGetLedger() throws Exception {
         log.info("*** testGetLedger ***");
         TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
@@ -299,6 +316,7 @@ public class TellerRemoteTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetLedger2() throws Exception {
         log.info("*** testGetLedger2 ***");
         TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
@@ -324,5 +342,4 @@ public class TellerRemoteTest extends TestCase {
             fail("error getting ledger2:" + ex);
         }
     }
-
 }

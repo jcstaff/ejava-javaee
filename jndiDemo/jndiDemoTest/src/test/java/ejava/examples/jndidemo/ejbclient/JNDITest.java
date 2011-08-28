@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import ejava.examples.jndidemo.Scheduler;
 
@@ -29,6 +30,7 @@ public class JNDITest  {
         log.debug("jndi=" + jndi.getEnvironment());
     }
 
+    @Test
     public void testXMLPopulation() throws Exception {
         log.info("*** testXMLPopulation ***");
         
@@ -54,6 +56,7 @@ public class JNDITest  {
         log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
     }
     
+    @Test
     public void testAnnotationPopulation() throws Exception {
         log.info("*** testAnnotationPopulation ***");
         

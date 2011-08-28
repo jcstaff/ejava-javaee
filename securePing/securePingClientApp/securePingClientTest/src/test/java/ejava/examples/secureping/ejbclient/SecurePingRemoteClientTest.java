@@ -1,16 +1,19 @@
 package ejava.examples.secureping.ejbclient;
 
 
+import static org.junit.Assert.*;
+
 import java.security.Principal;
 
 import javax.naming.InitialContext;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import ejava.examples.secureping.ejb.SecurePingClient;
 import ejava.examples.secureping.ejb.SecurePingClientRemote;
@@ -22,7 +25,7 @@ import ejava.examples.secureping.ejb.SecurePingClientRemote;
  *
  * @author jcstaff
  */
-public class SecurePingRemoteClientTest extends TestCase {
+public class SecurePingRemoteClientTest {
     static Log log = LogFactory.getLog(SecurePingRemoteClientTest.class);
     InitialContext jndi;
     
@@ -48,6 +51,13 @@ public class SecurePingRemoteClientTest extends TestCase {
     CallbackHandler adminLogin;
     String skipFlush = System.getProperty("skip.flush");
     
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    	//wait for cargo to deploy
+    	Thread.sleep(3000);
+    }
+    
+    @Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
@@ -77,6 +87,7 @@ public class SecurePingRemoteClientTest extends TestCase {
      * LoginContext object following a login. The values are printed to the
      * log. 
      */
+    @Test
     public void testLoginContext() throws Exception {
         log.info("*** testLoginContext ***");
         
@@ -105,6 +116,7 @@ public class SecurePingRemoteClientTest extends TestCase {
      * thinks we are in and then what SecurePingEJB things after doing a
      * run-as.
      */
+    @Test
     public void testIsCallerInRole() throws Exception {
         log.info("*** testIsCallerInRole ***");
         
@@ -157,6 +169,7 @@ public class SecurePingRemoteClientTest extends TestCase {
      * SecurePingEJB. Both will report security information to the log as 
      * to what the container thought of the caller.
      */
+    @Test
     public void testPingAll() throws Exception {
         log.info("*** testPingAll ***");
         try {
@@ -253,6 +266,7 @@ public class SecurePingRemoteClientTest extends TestCase {
      * SecurePingEJB. Both will report security information to the log as 
      * to what the container thought of the caller.
      */
+    @Test
     public void testPingAdmin() throws Exception {
         log.info("*** testPingAdmin ***");
         try {
@@ -304,6 +318,7 @@ public class SecurePingRemoteClientTest extends TestCase {
      * SecurePingEJB. Both will report security information to the log as 
      * to what the container thought of the caller.
      */
+    @Test
     public void testPingExcluded() throws Exception {
         log.info("*** testPingExcluded ***");
         try {
