@@ -1,23 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    
     <parent>
         <artifactId>securePingApp</artifactId>
         <groupId>ejava.javaee.secureping</groupId>
-        <version>2.0.2011.1-SNAPSHOT</version>
+        <version>2.0.2011.2-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>ejava.javaee.secureping</groupId>
     <artifactId>securePingEJB</artifactId>
     <packaging>ejb</packaging>
-    <name>Secure Ping EJB</name>
 
+    <name>Secure Ping EJB</name>
     <dependencies>
         <!-- core dependencies -->
         <dependency>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
-          <version>1.0.4</version>
           <scope>compile</scope>
         </dependency>
 
@@ -25,35 +23,21 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
-          <version>1.2.13</version>
           <scope>test</scope>
         </dependency>    
     </dependencies>
 
     <build>
         <plugins>
-              <!-- make sure we are building java5 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>      
-
               <!-- tell the EJB plugin we are using EJB3  and configure client-jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ejb-plugin</artifactId>
-                <version>2.3</version>
                 <configuration>
                     <ejbVersion>3.0</ejbVersion>
                     <archive>
@@ -77,31 +61,20 @@
     <profiles>
         <profile>
             <id>jboss5</id>
-           <!-- this repositories holds many of the javaee5 jar files -->
-            <repositories>
-                <repository>
-                    <id>jboss-nexus</id>
-                    <name>JBoss Nexus Repository</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                </repository>
-            </repositories>
             <dependencies>
                 <dependency>
                     <groupId>javax.annotation</groupId>
                     <artifactId>jsr250-api</artifactId>
-                    <version>1.0</version>
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>javax.persistence</groupId>
                     <artifactId>persistence-api</artifactId>
-                    <version>1.0</version>
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>javax.ejb</groupId>
                     <artifactId>ejb-api</artifactId>
-                    <version>3.0</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
@@ -109,19 +82,11 @@
 
         <profile>
             <id>jboss6</id>
-            <repositories>
-                <repository>
-                    <id>java.net-repo</id>
-                    <name>Java.net Maven Repository</name>
-                    <url>http://download.java.net/maven/2</url>
-                </repository>
-            </repositories>
             <dependencies>
                 <!-- this is fine to compile with -->
                 <dependency>
                     <groupId>javax</groupId>
                     <artifactId>javaee-api</artifactId>
-                    <version>6.0</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>

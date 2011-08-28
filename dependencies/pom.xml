@@ -177,6 +177,22 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.jbossas</groupId>
+                <artifactId>jboss-as-server</artifactId>
+                <version>${jboss-as-server.version}</version>
+                <classifier>jmx-invoker-adaptor-client</classifier>
+                <exclusions>
+                    <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                        <groupId>org.jboss.security</groupId>
+                        <artifactId>jbosssx-client</artifactId>
+                    </exclusion>
+                    <exclusion> <!-- gets in the way with newer versions -->
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.jbossas</groupId>
                 <artifactId>jboss-as-client</artifactId>
                 <version>${jboss-as-client.version}</version>            
                 <type>pom</type>

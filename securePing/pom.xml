@@ -1,22 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>ejava-javaee</artifactId>
-    <groupId>ejava.javaee</groupId>
-    <version>2.0.2011.1-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <artifactId>ejava-javaee</artifactId>
+        <groupId>ejava.javaee</groupId>
+        <version>2.0.2011.2-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <groupId>ejava.javaee.secureping</groupId>
+    <artifactId>securePing</artifactId>
+    <packaging>pom</packaging>
+    <name>Java EE Security</name>
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>ejava.javaee.secureping</groupId>
-  <artifactId>securePing</artifactId>
-  <packaging>pom</packaging>
-  <name>Java EE Security</name>
-
-  <modules>
-    <module>securePingApp</module>
-    <module>securePingClientApp</module>
-  </modules>
+    <modules>
+        <module>securePingApp</module>
+        <module>securePingClientApp</module>
+    </modules>
 </project>
