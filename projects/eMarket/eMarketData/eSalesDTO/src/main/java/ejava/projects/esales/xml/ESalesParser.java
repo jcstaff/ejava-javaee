@@ -47,7 +47,8 @@ public class ESalesParser {
      * @throws JAXBException
      * @throws XMLStreamException
      */
-    public ESalesParser(Class rootType, InputStream is) 
+    public ESalesParser(Class<?> rootType, InputStream is) 
+    
         throws JAXBException, XMLStreamException {
         JAXBContext jaxbContext = JAXBContext.newInstance(rootType);
         um = jaxbContext.createUnmarshaller();
@@ -60,6 +61,7 @@ public class ESalesParser {
         IDResolver idResolver = new IDResolver() {
             private HashMap<String,Object> idmap = null;
 
+			@SuppressWarnings("rawtypes")
 			@Override
 			public Callable<?> resolve(final String id, Class targetType) throws SAXException {
                 return new Callable() {
@@ -113,7 +115,7 @@ public class ESalesParser {
                     contains(elements, xmlr.getName().getLocalPart())) {
                 Object object = um.unmarshal(xmlr);
                 return (object instanceof JAXBElement) ?
-                    ((JAXBElement)object).getValue() : object;
+                    ((JAXBElement<?>)object).getValue() : object;
             }
             xmlr.next();
         }

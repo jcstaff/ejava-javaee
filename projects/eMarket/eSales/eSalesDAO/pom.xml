@@ -17,13 +17,6 @@
 
     <dependencies>
         <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eSalesBO</artifactId>
             <version>${project.version}</version>
@@ -58,14 +51,6 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -112,7 +97,6 @@
                 <dependency>
                     <groupId>hsqldb</groupId>
                     <artifactId>hsqldb</artifactId>
-                    <version>1.8.0.4</version>
                     <scope>test</scope>
                 </dependency>       
             </dependencies>
@@ -126,26 +110,15 @@
                 </property>
             </activation>
 
-           <!-- needed to resolve some hibernate dependencies -->
-            <repositories>
-                <repository>
-                    <id>jboss-nexus</id>
-                    <name>JBoss Nexus Repository</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                </repository>
-            </repositories>
-
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.3.1.ga</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate</artifactId>
-                    <version>3.2.4.sp1</version>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -156,7 +129,6 @@
                 <dependency>
                     <groupId>javax.persistence</groupId>
                     <artifactId>persistence-api</artifactId>
-                    <version>1.0</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
@@ -167,7 +139,6 @@
                 <dependency>
                     <groupId>org.hibernate.javax.persistence</groupId>
                     <artifactId>hibernate-jpa-2.0-api</artifactId>
-                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
@@ -215,7 +186,7 @@
                   <fileset>
                     <basedir>${basedir}/src/main/resources/ddl</basedir>
                     <includes>
-                      <include>**/*drop*.ddl</include>                  
+                      <include>target/classes/ddl/*drop*.ddl</include>                  
                     </includes>
                   </fileset>
                   <!-- the tables may not exist when tests are run -->
@@ -232,9 +203,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/src/main/resources/ddl</basedir>
+                    <basedir>${basedir}/target</basedir>
                     <includes>
-                      <include>**/*create*.ddl</include>                  
+                      <include>classes/ddl*create*.ddl</include>                  
                     </includes>
                   </fileset>
                   <print>true</print>
@@ -250,9 +221,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/src/test/resources/ddl</basedir>
+                    <basedir>${basedir}/target</basedir>
                     <includes>
-                      <include>**/*populate*.ddl</include>                  
+                      <include>test-classes/ddl/*populate*.ddl</include>                  
                     </includes>
                   </fileset>
                 </configuration>        
@@ -268,9 +239,9 @@
                 <configuration>              
                     <autocommit>true</autocommit>
                     <fileset>
-                        <basedir>${basedir}/src/main/resources/ddl</basedir>
+                        <basedir>${basedir}/target</basedir>
                         <includes>
-                            <include>**/*drop*.ddl</include>                  
+                            <include>classes/ddl/*drop*.ddl</include>                  
                         </includes>
                     </fileset>
                 </configuration>        

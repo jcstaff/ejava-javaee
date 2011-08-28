@@ -1,6 +1,7 @@
 package ejava.projects.esales.dao;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -9,7 +10,6 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ejava.projects.esales.dto.Account;
 import ejava.projects.esales.dto.Auction;
 import ejava.projects.esales.dto.Image;
 
@@ -69,7 +69,7 @@ public class JPAESalesDAO implements ESalesDAO {
 	@SuppressWarnings("unchecked")
 	public List<Image> getImagesForAuctions(List<Auction> auctions) {
 		
-		List<Image> images = new ArrayList();
+		List<Image> images = new ArrayList<Image>();
     	for (int pos=0; pos < auctions.size(); pos += 100) {
     		int max = (auctions.size() - pos > 100) ?
     				100 : auctions.size() - pos;

@@ -113,7 +113,7 @@ public class ESalesParserTest extends TestCase {
         }        
     }
     
-	private Object getById(int id, List objects) {        
+	private Object getById(int id, List<?> objects) {        
         Object theObject=null;
         for (Object object : objects) {
             Method getId;
@@ -132,7 +132,7 @@ public class ESalesParserTest extends TestCase {
         return theObject;
     }
     
-    private Object getByRefId(String id, List objects) {        
+    private Object getByRefId(String id, List<?> objects) {        
         Object theObject=null;
         for (Object object : objects) {
             Method getId;
@@ -151,7 +151,8 @@ public class ESalesParserTest extends TestCase {
         return theObject;
     }
     
-    private Account getByLogin(String login, List<Account> accounts) {
+    @SuppressWarnings("unused")
+	private Account getByLogin(String login, List<Account> accounts) {
     	for (Account account : accounts) {
     		if (account.getLogin().equals(login)) {
     			return account;

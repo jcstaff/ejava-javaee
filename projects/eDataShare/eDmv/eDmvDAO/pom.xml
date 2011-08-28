@@ -109,7 +109,6 @@
                 <dependency>
                     <groupId>hsqldb</groupId>
                     <artifactId>hsqldb</artifactId>
-                    <version>1.8.0.4</version>
                     <scope>test</scope>
                 </dependency>       
             </dependencies>
@@ -127,13 +126,11 @@
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>${hibernate-entitymanager.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>${slf4j.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -255,7 +252,6 @@
             <plugin>
                 <artifactId>hibernate3-maven-plugin</artifactId>
                 <groupId>org.codehaus.mojo</groupId>
-                <version>2.2</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>
@@ -334,7 +330,6 @@
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.0-api</artifactId>
-                <version>1.0.0.Final</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>

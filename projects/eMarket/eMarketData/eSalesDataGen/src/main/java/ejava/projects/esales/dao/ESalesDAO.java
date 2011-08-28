@@ -2,7 +2,7 @@ package ejava.projects.esales.dao;
 
 import java.util.List;
 
-import ejava.projects.esales.dto.Account;
+
 import ejava.projects.esales.dto.Auction;
 import ejava.projects.esales.dto.Image;
 

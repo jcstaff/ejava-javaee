@@ -1,21 +1,13 @@
 package ejava.projects.esales.xml;
 
 import ejava.projects.esales.dto.Account;
+
 import ejava.projects.esales.dto.Address;
 import ejava.projects.esales.dto.Auction;
 import ejava.projects.esales.dto.Bid;
 import ejava.projects.esales.dto.ESales;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 public class SampleGen {
 	static int addressId = 0;
