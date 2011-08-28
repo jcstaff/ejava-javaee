@@ -143,19 +143,6 @@
                         </deployables>
                     </deployer>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-                </dependencies>
                 <executions>
                     <execution>
                         <id>deploy-component</id>

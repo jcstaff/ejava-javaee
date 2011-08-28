@@ -279,6 +279,19 @@
                     <groupId>org.codehaus.cargo</groupId>
                     <artifactId>cargo-maven2-plugin</artifactId>
                     <version>${cargo-maven2-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.cargo</groupId>
+                            <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
+                            <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.jboss.jbossas</groupId>
+                            <artifactId>jboss-as-client</artifactId>
+                            <version>${jboss-as-client.version}</version>
+                            <type>pom</type>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>
