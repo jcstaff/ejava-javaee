@@ -194,6 +194,10 @@
                         <groupId>org.jboss.security</groupId>
                         <artifactId>jbosssx-client</artifactId>
                     </exclusion>
+                    <exclusion> <!-- gets in the way with newer versions -->
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -208,8 +212,13 @@
             </dependency>       
             <dependency>
                 <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j-jboss.version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -603,7 +612,7 @@
                 <hibernate-entitymanager.version>3.6.0.Final</hibernate-entitymanager.version>
                 <hornetq.version>2.1.2.Final</hornetq.version>
                 <netty.version>3.2.1.Final</netty.version>
-                <slf4j.version>1.6.1</slf4j.version>
+                <slf4j.version>1.5.8</slf4j.version>
                 <slf4j-jboss.version>1.5.6</slf4j-jboss.version>
                 <hibernate-jpa-2.0-api.version>1.0.0.Final</hibernate-jpa-2.0-api.version>
                 <javaee-api.version>6.0</javaee-api.version>
@@ -680,6 +689,7 @@
                             <ignore/>
                           </action>
                         </pluginExecution>
+                      </pluginExecutions>
                     </lifecycleMappingMetadata>
                   </configuration>
                 </plugin>

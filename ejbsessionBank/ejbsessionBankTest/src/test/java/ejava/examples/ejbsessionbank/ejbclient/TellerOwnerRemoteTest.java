@@ -2,9 +2,8 @@ package ejava.examples.ejbsessionbank.ejbclient;
 
 import java.util.List;
 
-import javax.naming.InitialContext;
 
-import junit.framework.TestCase;
+import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,6 +12,7 @@ import org.hibernate.LazyInitializationException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bo.Account;
@@ -59,7 +59,8 @@ public class TellerOwnerRemoteTest {
                 }
             }
             
-            for (int index=0; ; index+= 100) {
+            for (@SuppressWarnings("unused")
+			int index=0; ; index+= 100) {
                 List<Account> accounts = teller.getAccounts(0, 100);
                 if (accounts.size() == 0) { break; }
                 for (Account a: accounts) {

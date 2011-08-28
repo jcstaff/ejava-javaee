@@ -3,6 +3,7 @@
         <artifactId>ejbsessionBank</artifactId>
         <groupId>ejava.javaee.ejb</groupId>
         <version>2.0.2011.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -107,12 +108,6 @@
             <artifactId>jboss-as-client</artifactId>
             <type>pom</type>
             <scope>test</scope>
-            <exclusions>
-                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
-                    <groupId>org.jboss.security</groupId>
-                    <artifactId>jbosssx-client</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
     <build>
