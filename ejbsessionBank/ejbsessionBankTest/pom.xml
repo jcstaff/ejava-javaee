@@ -156,50 +156,5 @@
         </plugins>
     </build>
 </profile>
-
-<profile>
-    <id>jboss5</id>
-    <properties>
-        <cargo.containerId>jboss51x</cargo.containerId>
-    </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jboss.integration</groupId>
-                        <artifactId>jboss-profileservice-spi</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>                    
-        </plugins>
-    </build>
-</profile>
-
-<profile>
-    <id>jboss6</id>
-    <properties>
-        <cargo.containerId>jboss6x</cargo.containerId>
-    </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-profileservice-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-                </dependencies>
-            </plugin>                    
-        </plugins>
-    </build>
-</profile>
     </profiles>
 </project>
