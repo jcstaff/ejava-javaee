@@ -2,19 +2,27 @@ package ejava.examples.jndidemo.ejbclient;
 
 import javax.naming.InitialContext;
 
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 import ejava.examples.jndidemo.Scheduler;
 
-public class JNDITest extends TestCase {
+public class JNDITest  {
     Log log = LogFactory.getLog(JNDITest.class);
     InitialContext jndi;
     static String aidName = System.getProperty("jndi.name.aid");
     static String bakeName = System.getProperty("jndi.name.bake");
     
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    	//wait initial to avoid loosing a race condition with cargo
+    	Thread.sleep(3000);
+    }
+    
+    @Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
@@ -26,6 +34,7 @@ public class JNDITest extends TestCase {
         
         Object object = jndi.lookup(aidName);
         log.debug(aidName + "=" + object);
+        jndi.close();
         
         Scheduler s = (Scheduler)object;        
         log.debug("got scheduler:" + s.getName());
@@ -50,6 +59,7 @@ public class JNDITest extends TestCase {
         
         Object object = jndi.lookup(bakeName);
         log.debug(bakeName + "=" + object);
+        jndi.close();
         
         Scheduler s = (Scheduler)object;        
         log.debug("got scheduler:" + s.getName());
