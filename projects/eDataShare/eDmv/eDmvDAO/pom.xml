@@ -176,9 +176,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/target/classes</basedir>
+                    <basedir>${basedir}/target</basedir>
                     <includes>
-                      <include>ddl/*drop*.ddl</include>                  
+                      <include>classes/ddl/*drop.ddl</include>                  
                     </includes>
                   </fileset>
                   <!-- the tables may not exist when tests are run -->
@@ -195,9 +195,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/target/classes</basedir>
+                    <basedir>${basedir}/target</basedir>
                     <includes>
-                      <include>ddl/*create*.ddl</include>                  
+                      <include>classes/ddl/*create.ddl</include>                  
                     </includes>
                   </fileset>
                   <print>true</print>
@@ -213,9 +213,9 @@
                 <configuration>              
                   <autocommit>true</autocommit>
                   <fileset>
-                    <basedir>${basedir}/target/test-classes</basedir>
+                    <basedir>${basedir}/target</basedir>
                     <includes>
-                      <include>ddl/*populate*.ddl</include>                  
+                      <include>test-classes/ddl/*populate*.ddl</include>                  
                     </includes>
                   </fileset>
                 </configuration>        
@@ -231,9 +231,9 @@
                 <configuration>              
                     <autocommit>true</autocommit>
                     <fileset>
-                        <basedir>${basedir}/src/main/resources</basedir>
+                        <basedir>${basedir}/target</basedir>
                         <includes>
-                            <include>ddl/*drop*.ddl</include>                  
+                            <include>classes/ddl/*drop.ddl</include>                  
                         </includes>
                     </fileset>
                 </configuration>        
