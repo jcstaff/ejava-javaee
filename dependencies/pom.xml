@@ -73,6 +73,7 @@
         <junit.version>4.7</junit.version>
         <log4j.version>1.2.13</log4j.version>
         <jms.version>1.1</jms.version>
+        <jta.version>1.0.1B</jta.version>
 
         <jboss.host>localhost</jboss.host>
         <jboss.protocol>http</jboss.protocol>
@@ -159,6 +160,11 @@
                 <groupId>javax.jms</groupId>
                 <artifactId>jms</artifactId>
                 <version>${jms.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.transaction</groupId>
+                <artifactId>jta</artifactId>
+                <version>${jta.version}</version>
             </dependency>
             <dependency>
                 <groupId>sun-jaxb</groupId>

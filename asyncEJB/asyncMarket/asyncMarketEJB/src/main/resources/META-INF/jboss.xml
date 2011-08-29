@@ -18,30 +18,30 @@
 
         <session>
             <ejb-name>AuctionMgmtEJB</ejb-name>
+            <resource-ref>
+                <res-ref-name>jms/ConnectionFactory</res-ref-name>
+                <jndi-name>ConnectionFactory</jndi-name>
+            </resource-ref>
             <jndi-name>
                 ejava/examples/asyncMarket/AuctionMgmtEJB/remote
             </jndi-name>
             <local-jndi-name>
                 ejava/examples/asyncMarket/AuctionMgmtEJB/local
             </local-jndi-name>
-            <resource-ref>
-                <res-ref-name>jms/ConnectionFactory</res-ref-name>
-                <jndi-name>ConnectionFactory</jndi-name>
-            </resource-ref>
         </session>
         
         <session>
             <ejb-name>SellerEJB</ejb-name>
+            <resource-ref>
+                <res-ref-name>jms/ConnectionFactory</res-ref-name>
+                <jndi-name>ConnectionFactory</jndi-name>
+            </resource-ref>
             <jndi-name>
                 ejava/examples/asyncMarket/SellerEJB/remote
             </jndi-name>
             <local-jndi-name>
                 ejava/examples/asyncMarket/SellerEJB/local
             </local-jndi-name>
-            <resource-ref>
-                <res-ref-name>jms/ConnectionFactory</res-ref-name>
-                <jndi-name>ConnectionFactory</jndi-name>
-            </resource-ref>
         </session>
 
         <session>

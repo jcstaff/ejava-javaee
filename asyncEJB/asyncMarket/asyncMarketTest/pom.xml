@@ -2,12 +2,13 @@
     <parent>
         <artifactId>asyncMarket</artifactId>
         <groupId>ejava.javaee.asyncejb</groupId>
-        <version>2.0.2011.1-SNAPSHOT</version>
+        <version>2.0.2011.2-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
+
     <artifactId>asyncMarketTest</artifactId>
     <packaging>jar</packaging>
+
     <name>Async Market Test</name>
     <description>
         This project is used to deploy and test the server-side components
@@ -19,7 +20,6 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
             <scope>test</scope>
         </dependency>
 
@@ -51,13 +51,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
             <scope>test</scope>
         </dependency>    
     </dependencies>
@@ -82,55 +80,27 @@
         </testResources>
 
         <plugins>
-              <!-- make sure we are building java5 and tell it to compile, 
-                    even though we are a pom project -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>      
-
               <!-- tell it to run, even though we are a pom project -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>
-                        <property>
-                          <name>test</name>
-                          <value>${test}</value>
-                        </property>
-                        <property>
-                          <name>jndi.name.auctionmgmt</name>
-                          <value>
-                             /ejava/examples/asyncMarket/AuctionMgmtEJB/remote
-                          </value>
-                        </property>
-                        <property>
-                          <name>jndi.name.usermgmt</name>
-                          <value>
-                             /ejava/examples/asyncMarket/UserMgmtEJB/remote
-                          </value>
-                        </property>
-                        <property>
-                          <name>jndi.name.seller</name>
-                          <value>
-                             /ejava/examples/asyncMarket/SellerEJB/remote
-                          </value>
-                        </property>
-                        <property>
-                          <name>jndi.name.buyer</name>
-                          <value>
-                             /ejava/examples/asyncMarket/BuyerEJB/remote
-                          </value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                      <test>${test}</test>
+                      <jndi.name.auctionmgmt>
+                         /ejava/examples/asyncMarket/AuctionMgmtEJB/remote
+                      </jndi.name.auctionmgmt>
+                      <jndi.name.usermgmt>
+                         /ejava/examples/asyncMarket/UserMgmtEJB/remote
+                      </jndi.name.usermgmt>
+                      <jndi.name.seller>
+                         /ejava/examples/asyncMarket/SellerEJB/remote
+                      </jndi.name.seller>
+                      <jndi.name.buyer>
+                         /ejava/examples/asyncMarket/BuyerEJB/remote
+                      </jndi.name.buyer>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -154,33 +124,17 @@
           </java.naming.factory.url.pkgs>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-client</artifactId>
-            <version>${jboss-as-client.version}</version>            
             <type>pom</type>
             <scope>test</scope>
-            <exclusions>
-                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
-                    <groupId>org.jboss.security</groupId>
-                    <artifactId>jbosssx-client</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -188,20 +142,7 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.0.4</version>
                 <configuration>
-                    <container>
-                        <containerId>${cargo.containerId}</containerId>
-                        <type>remote</type>                
-                    </container>
-                    <configuration>
-                        <type>runtime</type>
-                        <properties>
-                            <cargo.hostname>${jboss.host}</cargo.hostname>
-                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
-                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
-                        </properties>
-                    </configuration>
                     <deployer>
                         <type>remote</type>
                         <deployables>
@@ -231,35 +172,8 @@
 
 <profile>
     <id>jboss5</id>
-    <properties>
-        <cargo.containerId>jboss51x</cargo.containerId>
-    </properties>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>1.0.4</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.jboss.integration</groupId>
-                        <artifactId>jboss-profileservice-spi</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>                    
-
             <!-- copy the jms-services.xml file to the server -->
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -267,61 +181,20 @@
                 <executions>
                  <execution>
                    <phase>process-test-resources</phase>
+                   <goals>
+                       <goal>run</goal>
+                   </goals>
                    <configuration>
-                     <tasks>
+                     <target>
                        <copy todir="${jboss.home}/server/${jboss.server}/deploy">
                           <fileset dir="${basedir}/target/test-classes" includes="*jms-service.xml" />
                        </copy>
                        <sleep seconds="5" />
-                     </tasks>
+                     </target>
                    </configuration>
-                   <goals>
-                     <goal>run</goal>
-                   </goals>
                  </execution>
                 </executions>
             </plugin> 
-        </plugins>
-    </build>
-</profile>
-
-<profile>
-    <id>jboss6</id>
-    <properties>
-        <cargo.containerId>jboss6x</cargo.containerId>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-jboss.version}</version>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                        <version>1.0.4</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jboss.jbossas</groupId>
-                        <artifactId>jboss-as-profileservice-client</artifactId>
-                        <version>${jboss-as-client.version}</version>
-                        <type>pom</type>
-                    </dependency>
-                </dependencies>
-            </plugin>                    
         </plugins>
     </build>
 </profile>

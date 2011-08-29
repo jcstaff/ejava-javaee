@@ -11,7 +11,6 @@ import javax.ejb.MessageDrivenContext;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 

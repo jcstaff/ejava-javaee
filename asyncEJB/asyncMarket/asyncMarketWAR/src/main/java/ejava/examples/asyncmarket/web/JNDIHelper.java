@@ -41,7 +41,7 @@ public class JNDIHelper {
         
         //build an InitialContext from Servlet.init properties in web.xml
         Properties jndiProperties = new Properties();
-        for(Enumeration e=context.getInitParameterNames();
+        for(Enumeration<?> e=context.getInitParameterNames();
             e.hasMoreElements(); ) {
             String key = (String)e.nextElement();
             String value=(String)context.getInitParameter(key);

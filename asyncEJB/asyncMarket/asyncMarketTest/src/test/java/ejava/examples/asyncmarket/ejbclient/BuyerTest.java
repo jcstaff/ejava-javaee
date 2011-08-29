@@ -11,7 +11,6 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xml.security.keys.content.MgmtData;
 
 import ejava.examples.asyncmarket.AuctionMgmt;
 import ejava.examples.asyncmarket.Buyer;

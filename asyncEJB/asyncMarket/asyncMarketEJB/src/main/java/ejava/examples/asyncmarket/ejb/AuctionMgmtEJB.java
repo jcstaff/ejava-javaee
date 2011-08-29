@@ -69,7 +69,6 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
         ((JPAPersonDAO)userDAO).setEntityManager(em);
     }
     
-    @SuppressWarnings("unchecked")
     public void cancelTimers() {
         log.debug("canceling timers");
         for (Timer timer : (Collection<Timer>)timerService.getTimers()) {
