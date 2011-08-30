@@ -6,11 +6,35 @@
     <version>2.0.2011.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Parent POM</name>
+    <name>Enterprise Java Parent POM</name>
     <description>
         This project defines dependencies used across the ejava-javaee examples,
         solutions, and projects.
     </description>
+    <url>http://webdev.apl.jhu.edu/~jcs/ejava-javaee</url>
+
+    <organization>
+        <name>
+            John's Hopkins University, Engineering Programs for Professionals 
+        </name>
+        <url>http://ep.jhu.edu</url>
+    </organization>
+    <mailingLists>
+        <mailingList>
+            <name>class newsgroup (for class use)</name>
+            <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
+        </mailingList>
+    </mailingLists>
+    <scm>
+        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/master</url>
+        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
+        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
+    </scm>
+
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://ejava.info/hudson/job/2011-fall-ejava-javaee/</url>
+    </ciManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,6 +57,7 @@
         <maven-war-plugin.version>2.1.1</maven-war-plugin.version>
         <cargo-maven2-plugin.version>1.0.6</cargo-maven2-plugin.version>
 
+        <findbugs-maven-plugin.version>2.3.1</findbugs-maven-plugin.version>
         <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
         <maven-javadoc-plugin.version>2.8</maven-javadoc-plugin.version>
         <maven-project-info-reports-plugin.version>2.4</maven-project-info-reports-plugin.version>
@@ -292,6 +317,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
                     <version>${maven-site-plugin.version}</version>
+                </plugin>
+                <plugin> 
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>${maven-project-info-reports-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

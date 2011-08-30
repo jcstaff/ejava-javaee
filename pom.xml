@@ -21,30 +21,6 @@
         for ejava-javaee, refer to 
         http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee.
     </description>
-    <url>http://webdev.apl.jhu.edu/~jcs/ejava-javaee</url>
-    <organization>
-        <name>
-            John's Hopkins University, Engineering Programs for Professionals 
-        </name>
-        <url>http://ep.jhu.edu</url>
-    </organization>
-    <mailingLists>
-        <mailingList>
-            <name>class newsgroup (for class use)</name>
-            <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
-        </mailingList>
-    </mailingLists>
-    <scm>
-        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/branch/master</url>
-        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
-        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
-    </scm>
-
-    <ciManagement>
-        <system>hudson</system>
-        <url>http://ejava.info/hudson/job/2011-fall-ejava-javaee/</url>
-    </ciManagement>
-
 
   <modules>
         <module>dependencies</module>
@@ -53,6 +29,7 @@
         <module>solutions</module>
         <module>projects</module>
         <module>javase5Enhancements</module>
+        <!-- These will be posted over the course of the semester
         <module>jdbcDAO</module>
         <module>jpaDAO</module>
         <module>ormCore</module>
@@ -67,7 +44,6 @@
         <module>securePing</module>
         <module>jmsCore</module>
         <module>asyncEJB</module>
-        <!-- These will be posted over the course of the semester
         -->
     </modules>
 
@@ -148,6 +124,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <siteDirectory>${basedir}/src/site</siteDirectory>
                     <reportPlugins>
                         <!-- creates standard reports -->
                         <plugin> 
@@ -181,10 +158,11 @@
                                 </links>
                             </configuration>
                         </plugin>
+                        <!-- -->
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>findbugs-maven-plugin</artifactId>
-                            <version>2.3.1</version>
+                            <version>${findbugs-maven-plugin.version}</version>
                             <configuration>
                                 <xmlOutput>true</xmlOutput>
                                 <effort>Max</effort>
@@ -194,8 +172,8 @@
                         <!-- generates HTML pages for java code -->
                         <plugin> 
                             <artifactId>maven-jxr-plugin</artifactId>
-                            <groupId>org.apache.maven.plugins</groupId>
                             <version>${maven-jxr-plugin.version}</version>
+                            <groupId>org.apache.maven.plugins</groupId>
                             <configuration>
                                 <aggregate>false</aggregate>
                             </configuration>

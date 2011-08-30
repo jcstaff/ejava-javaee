@@ -4,7 +4,7 @@
     <bannerLeft>
         <name>Enterprise Java (605.784.31)</name>
         <src>${project.url}/images/ejava-javaee.png</src>
-        <href>${project.url}</href>
+        <href>${project.url}/index.html</href>
     </bannerLeft>
     <bannerRight>
         <name></name>
@@ -19,17 +19,14 @@
         <item name="Maven" href="http://maven.apache.org/maven2/"/>
     </links>
 
-    <menu ref="parent" inherit="top"/>
-    <menu name="Quick Links" inhert="top">
-        <item name="Course Description" href="${project.url}/course-docs/ejava-course-description.html"/>
-        <item name="Syllabus" href="${project.url}/course-docs/syllabus.html"/>
-        <item name="Reference Links" href="${project.url}/course-docs/links.html"/>
-        <item name="Exercises" href="${project.url}/course-docs/exercises/exercises.html"/>
-        <item name="Course Javadoc" href="${project.url}/apidocs/index.html"/>
+    <menu name="Quick Links">
+        <item name="Course Description" href="${project.url}/ejava-javaee/course-docs/ejava-course-description.html"/>
+        <item name="Syllabus" href="${project.url}/ejava-javaee/course-docs/syllabus.html"/>
+        <item name="Reference Links" href="${project.url}/ejava-javaee/course-docs/links.html"/>
+        <item name="Exercises" href="${project.url}/ejava-javaee/course-docs/exercises/exercises.html"/>
+        <item name="Course Javadoc" href="${project.url}/ejava-javaee/apidocs/index.html"/>
     </menu>
-    <menu ref="modules" inherit="top"/>
     <menu ref="reports" inherit="bottom"/>
-
   </body>
 
     <skin>
@@ -37,7 +34,7 @@
         <artifactId>maven-default-skin</artifactId>
         <version>1.0</version>
     </skin>    
-  <!--
+    <!--
     <skin>
         <groupId>ejava.javaee.site</groupId>
         <artifactId>site-skin</artifactId>
