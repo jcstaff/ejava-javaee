@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ejava.projects.edmv.bo.Person;
+import ejava.projects.edmv.bo.VehicleRegistration;
 import ejava.projects.edmv.dao.PersonDAO;
 import ejava.projects.edmv.jpa.JPAPersonDAO;
 
@@ -69,7 +70,13 @@ public class JPAPersonDAOTest {
 	
 	@SuppressWarnings("unchecked")
 	private void cleanup() throws Exception {
-		Query query = em.createQuery("select p from Person p");
+		Query query = em.createQuery("select vr from VehicleRegistration vr");
+		for (VehicleRegistration reg : 
+		    (List<VehicleRegistration>)query.getResultList()) {
+		    reg.getOwners().clear(); //remove entries from m-m link table
+			em.remove(reg);          //remove row from vehicle table
+		}
+		query = em.createQuery("select p from Person p");
 		for (Person person : (List<Person>)query.getResultList()) {
 			em.remove(person);
 		}
