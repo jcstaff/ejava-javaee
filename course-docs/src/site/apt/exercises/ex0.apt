@@ -24,7 +24,7 @@ Exercise 0: Development Environment Setup
     * {{{Part_B}Download and install JavaSE 6 JDK}} 
     to compile and run our applications.
 
-    * {{{Part_C} Download and install a Subversion Client}} 
+    * {{{Part_C} Download and install a Git Client}}
     to obtain source code for this course.
 
     * {{{Part_D}Download and install the Maven 2 Build System}} 
@@ -66,10 +66,13 @@ Exercise 0: Development Environment Setup
 
         * Archive -> zip & unizip
 
+        * Development -> git, git-completion, git-gui, git-svn, and gitk - a
+        set of tools that can be used to interact with a git CM repository.
+
         * Development -> subversion  - 
         a command-line interface to the class code repository. 
 
-        * Editors -> vim - a standard unix text editor
+        * Editors -> vim and gvim - a standard unix text editor
     
         * Net -> openssh - a command line interface to remotely login and 
         transfer files over the network
@@ -87,16 +90,18 @@ Exercise 0: Development Environment Setup
 * {Part B}: Download and Install JavaSE 6 JDK
 
     [Note:] Choose 32bit or 64bit depending on your operating system and 
-    make sure that both the JDK and Eclipse matchi (i.e., either both 32
+    make sure that both the JDK and Eclipse match (i.e., either both 32
     or both 64bit). 
+
+    []
 
     [[1]] Go to the
     {{{http://java.sun.com/javase/downloads/widget/jdk6.jsp} Sun JavaSE JDK
     6 Download Page}} and download JDK 6. 
 
     [[1]] Change the installation directory so that it does not have
-    a spaces in its path. I changed mine to C:\apps\java\jdk1.6.0_21 and
-    C:\apps\java\jre1.6.0_21
+    a spaces in its path. On Windows XP, I changed mine to 
+    C:\apps\java\jdk1.6.0_26 and C:\apps\java\jre1.6.0_26
 
     [[1]] Go through Control Panel -> System -> Advanced -> Environment
     Variables and add ia definition for JAVA_HOME and add %JAVA_HOME%\bin 
@@ -112,96 +117,123 @@ Exercise 0: Development Environment Setup
 ---
 export PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
 ---
+---
+$ java -version
+java version "1.6.0_26"
+Java(TM) SE Runtime Environment (build 1.6.0_26-b03)
+Java HotSpot(TM) Client VM (build 20.1-b02, mixed mode, sharing)
+---
 
-* {Part C}: Download and install a Subversion Client
+* {Part C}: Download and install a Git Client
 
-        [[1]] Install the subversion client. You will only be performing checkouts
-        and updates from the repository. This is pretty simple once you have access
-        to a client and the repository URL.
+        [[1]] Install a Git client. You will only be performing clones
+        and pulls from the repository. This is pretty simple once you
+        have access to a client and the repository URL. You can browse the 
+        repository using the following URL: {{https://github.com/jcstaff/ejava-javaee/}}.
 
             * Linux Users: Either go to your package installer and
             select subversion or use google to find a suitable rpm for
             your system.
 
-            * Cygwin Users: You may have already installed a subversion
-            command line client (try "svn --version"). If not, you can use
+            * Cygwin Users: You may have already installed a git tools in
+            the optional previous step (try "git --version"). If not, you can use
             the windows-based tool or go back to the cygwin setup to download
             and install the subversion client.
 
-            * Windows Users: I personally like TortoiseSVN. 
-            Feel free to use another client, but I'll go through some of the steps for
-            {{{http://tortoisesvn.tigris.org/}TortoiseSVN}} here.
+            * Windows Users: I personally have liked TortoiseSVN in the past
+            and feel {{{http://code.google.com/p/tortoisegit/}TortoiseGIT}}
+            may be just as good. TortoiseGIT appears to
+            be a windows integration above a command line capability called
+            msygit or Git for Windows. You won't be doing anything overly complex
+            with GIT this semester, so the command line tool may be all you need.
 
-                [[1]] The path for this tool won't be a part of any path we use to build
-                or run projects, so I chose the default installation directory.
+                [[1]] Install {{{http://code.google.com/p/msysgit/}msygit, Git for Windows}}
+                before installing TortoiseGIT. I used the
+                {{{http://msysgit.googlecode.com/files/msysGit-fullinstall-1.7.6-preview20110708.exe}
+                msysGit-fullinstall-1.7.6-preview20110708.exe}} link for my 32bit
+                Windows XP system.  The path for this tool won't be a part of any path
+                we use to build or run projects. I placed it in c:\apps\msysgit.
 
-                [[2]] The install, of course, wants you to reboot your system.
+                [[1]] Run "/share/msysGit/add-shortcut.tcl" in the shell window when it
+                finishes building. This will give you a list of links you can create.
+                I used "/share/msysGit/add-shortcut.tcl Desktop".
 
-                [[3]] TortoiseSVN launchers have been added to your right click
+                [[1]] Optionally install {{http://code.google.com/p/tortoisegit/downloads/list}
+                TourtoiseGIT}} layer. I used 1.7.3, the default putty option, and the
+                default installation directory.
+
+                [[1]] Launch TortoiseGIT settings from the start menu. There will be an error
+                about not finding the msygit web site. Select edit settings and tell it where
+                to find the git binaries, I entered "C:\apps\msysgit\msysgit\bin".
+
+                [[3]] TortoiseGIT launchers have been added to your right click
                 menus and available from the explorer window as well. 
 
-            * Eclipse Users: There is an subversion plugin for Eclipse available
-            called {{{http://subclipse.tigris.org/}Subclipse}}. You can install it
-            by following the instructions located at
-            {{http://subclipse.tigris.org/servlets/ProjectProcess?pageID=p4wYuA}} 
+            * Eclipse Users: There is an git plugin for Eclipse available
+            called {{{http://eclipse.org/egit/}EGit}}. You can install it
+            by following the instructions located at {{http://eclipse.org/egit/download/}} 
             once you have Eclipse installed. I added the following site to my 
-            Eclipse configuration {{http://subclipse.tigris.org/update_1.6.x/}}.
+            Eclipse sites configuration {http://download.eclipse.org/releases/indigo}}.
             Use of this plugin is of best use when you are
-            commiting changes to the baseline. You will not be doing this during class.
+            commiting changes to the baseline. You will *not* be doing this during class.
 
-            [Note:] You can checkout the class examples using any of the SVN clients
-            above. However, if you use multiple subversion clients (e.g., mix the
-            usage of ToortuiseSVN with Subclipse), you need to make sure the 
-            products implement the same client version. There is no need to worry
-            about the specific version of the subversion server used in class --
-            just the clients you use on the same file system.
+            [Note:] You can checkout the class examples using any of the git clients
+            above. 
 
-        [[1]] Test out your subversion installation by performing a checkout
+            []
+
+        [[1]] Test out your git  installation by performing a checkout
         of the ejava-javaee course files. 
 
             [[1]] Create a directory for class work; e.g., c:/jhu/784
 
-            [[1]] Browse the repository to determine the URL for the 
-            project you wish to checkout. You can start at the root 
-            using the following
-            {{http://ejava.info/repos/class/branches/2011-spring-ejava-javaee}}
-            URL.
-
-            [[1]] Check out a level of the SVN repository to your class
-            work directory. You can check it out to a directory called ejava-javaee
-            (c:/jhu/784/ejava-javaee) or anything you choose.
-            If you mess up, you can delete it and retry.
-
-            [[1]] You will be asked to verify the self-signed certificate for the 
-            SVN repository. You must use https to access the repository.
+            [[1]] Clone the class repository using
+            {{git://github.com/jcstaff/ejava-javaee.git}}. This is located on
+            {{{github}https://github.com/}}.
 
 ---
-$ svn checkout http://ejava.info/repos/class/branches/2011-spring-ejava-javaee ejava-javaee
-A  ejava-javaee/.project
-A  ejava-javaee/jdbcDAO
-A  ejava-javaee/jdbcDAO/.classpath
-A  ejava-javaee/jdbcDAO/.project
-A  ejava-javaee/jdbcDAO/src
-A  ejava-javaee/jdbcDAO/src/test
-A  ejava-javaee/jdbcDAO/src/test/java
-A  ejava-javaee/jdbcDAO/src/test/java/ejava
-A  ejava-javaee/jdbcDAO/src/test/java/ejava/examples
-A  ejava-javaee/jdbcDAO/src/test/java/ejava/examples/dao
-A  ejava-javaee/jdbcDAO/src/test/java/ejava/examples/dao/jdbc
-A ejava-javaee/jdbcDAO/src/test/java/ejava/examples/dao/jdbc/JDBCBookDAOTest.java
+Url: git://github.com/jcstaff/ejava-javaee.git
+Directory: C:\jhu\784\ejava-javaee
 ---
 
-                [Note:] It was not required that you check all files out from
-                the root, but it didn't hurt either.
+---
+git.exe clone   --progress -v  "git://github.com/jcstaff/ejava-javaee.git" "C:\jhu\784\ejava-javaee"
+
+Receiving objects: 100% (13680/13680), 14.91 MiB | 2.00 MiB/s
+Resolving deltas: 100% (6227/6227)
+Checking out files: 100% (1504/1504)
+Checking out files: 100% (1504/1504), done.
+---
+
+            [Note:] The master and several working branches will have a lot
+            of information in them. The semester branch will start out
+            small and reach that size over time. It is intended that you 
+            limit your work to the semester branch to not get confused with
+            material that we won't be covering for weeks.
+
+            []
+
+            [[1]] Switch to the development/2011fall branch by dowing a git
+            checkout in the directory you just created. Don't worry, you can
+            always get back to the previous content or you can clone a separate
+            copy.
+
+---
+Branch: remotes/origin/2011fall-class
+Create New Branch: 2011fall-class
+Track
+---
+---
+git.exe checkout  --track -b 2011fall-class remotes/origin/2011fall-class
+
+Branch 2011fall-class set up to track remote branch 2011fall-class from origin.
+Switched to a new branch '2011fall-class'
+---
 
             [[1]] Repeat after me, "Cool!". This beats managing a bunch of 
             zip files any day. As the content is updated during the
             semester, just do an update to see changes
 
----
-$ svn update
-At revision 24.
----
 
 * {Part D}: Download and install Maven Build System
 
@@ -211,10 +243,10 @@ At revision 24.
     are for when you want to reference Maven repositories within Ant.
 
     [[1]] Unzip the archive. I put mine in c:/apps/, which resulted in a
-    c:/apps/apache-maven-3.0.2 directory. 
+    c:/apps/apache-maven-3.0.3 directory. 
 
 ---
-$ ls c:/apps/apache-maven-3.0.2
+$ ls c:/apps/apache-maven-3.0.3
 LICENSE.txt  NOTICE.txt  README.txt  bin  boot  conf  lib
 ---
 
@@ -232,9 +264,10 @@ $ which mvn
 /cygdrive/c/apps/apache-maven-3.0.2/bin/mvn
 
 $ mvn -version
-Apache Maven 3.0.2 (r1056850; 2011-01-08 19:58:10-0500)
-Java version: 1.6.0_21, vendor: Sun Microsystems Inc.
-Java home: C:\apps\java\jdk1.6.0_21\jre
+Apache Maven 3.0.3 (r1075438; 2011-02-28 12:31:09-0500)
+Maven home: C:\apps\apache-maven-3.0.3\bin\..
+Java version: 1.6.0_26, vendor: Sun Microsystems Inc.
+Java home: C:\apps\java\jdk1.6.0_26\jre
 Default locale: en_US, platform encoding: Cp1252
 OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
 ---
@@ -249,10 +282,10 @@ $ cygpath --unix c:/
 /cygdrive/c
 
 $ cygpath --unix $MAVEN_HOME
-/cygdrive/c/apps/apache-maven-3.0.2
+/cygdrive/c/apps/apache-maven-3.0.3
 
 $ cygpath --windows $MAVEN_HOME
-c:\apps\apache-maven-3.0.2
+c:\apps\apache-maven-3.0.3
 
 $ cygpath --windows /cygdrive/c
 c:\
@@ -264,13 +297,15 @@ $ export PATH=$PATH:`cygpath --unix $MAVEN_HOME/bin`
 
     [[1]] Add a personal maven configuration file, called settings.xml,
     to your $HOME/.m2 directory (windows and Cygwin users will put this in
-    %HOME%/.m2). This file will be used to point to a custom repository
-    location (i.e., one that does have spaces in the path) and reference
-    the class repositories. Use the <<{{{../files/maven/settings.xml}
-    following file}}>> as a starting point.
+    %HOME%/.m2). If your operating system home directory has spaces in the
+    path this settings.xml file can be used to relocate it to a different
+    location. If your home directory does not have a space in it (e.g.,
+    Windows 7, MacOS, Linux), you can turn off this option.
+    Use the <<{{{../files/maven/settings.xml} following file}}>> as a starting point.
 
 ---
-$ mkdir %HOME%/.m2
+$ cd %HOME%
+$ mkdir .m2
 
 jcstaff@bullet /cygdrive/c/Documents and Settings/jcstaff/.m2
 $ ls
@@ -292,7 +327,7 @@ settings.xml
 ---
 $ cd c:/jhu/784/ejava-javaee/javase5Enhancements/
 
-$ mvn install -Dmaven.test.skip=true
+$ mvn clean install
 ---
 
     [[1]] Maven will begin downloading dependencies.
@@ -306,12 +341,19 @@ $ mvn install -Dmaven.test.skip=true
     [[1]] Go to the 
     {{{http://jboss.org/jbossas/downloads/}
     Download site for the JBoss Application Server}}.  Download version
-    6.0.0.Final. 
+    6.1.0.Final. 
+
+    [Note:] JBoss 7.x was relased within the last month but was too significant of
+    a change to integrate with class for this semester. The grader and I will be
+    installing and supporting JBoss 6 this semester and all work must be submitted
+    such that it works with the environment described in this exercise.
+
+    []
 
     [[1]] On Windows, I unzipped mine to c:/apps to avoid having any spaces in the
-    path. This produced a directory called c:/apps/jboss-6.0.0.Final.
+    path. This produced a directory called c:/apps/jboss-6.1.0.Final.
 
-    [Note:] If you choose a directory other than c:/apps/jboss-6.0.0.Final, make sure to 
+    [Note:] If you choose a directory other than c:/apps/jboss-6.1.0.Final, make sure to 
     update the value for jboss.home in the MAVEN %HOME%/.m2/settings.xml file.
 
     []
@@ -320,7 +362,7 @@ $ mvn install -Dmaven.test.skip=true
     Java EE 6 compliant, but not the JBoss default. You will need to add "-c ejava-jboss6"
     to the start command to use the specific configuration for class.
 
-    * Copy the jboss-6.0.0.Final/server/standard directory to ejava-jboss6.
+    * Copy the jboss-6.1.0.Final/server/standard directory to ejava-jboss6.
 
     * Overwrite several of the files in the new directory with the following
 
@@ -328,28 +370,19 @@ $ mvn install -Dmaven.test.skip=true
 
 ---
 $ pwd
-/cygdrive/c/apps/jboss-6.0.0.Final/server
+/cygdrive/c/apps/jboss-6.1.0.Final/server
 
 $ cp -r standard ejava-jboss6
 
 $ ls
 all  default  ejava-jboss6  jbossweb-standalone  minimal  standard
-
-$ svn export --force http://ejava.info/repos/class/branches/2011-spring-ejava-javaee/servers/ejava-jboss6/src/main/resources/ejava-jboss6
-A    ejava-jboss6
-A    ejava-jboss6/deploy
-A    ejava-jboss6/deploy/hornetq
-A    ejava-jboss6/deploy/hornetq/hornetq-configuration.xml
-A    ejava-jboss6/deploy/hornetq/hornetq-jms.xml
-A    ejava-jboss6/deploy/jboss-logging.xml
-A    ejava-jboss6/deploy/ejava-jdbc-ds.xml
-A    ejava-jboss6/deploy/ejb2-timer-service.xml
-Exported revision 1149.
 ---
 
-    [[1]] Start the server and look for the following lines towards the end
-    of its output. This means that our Hypersonic "ejava" database has 
-    started.
+        [Note:] There will be an additional configuration step added here next week.
+
+        []
+
+    [[1]] Start the server
 
         [Note:] JBoss will open a listen port that may trigger a firewall alert. You
         will need to permit JBoss to open the listen port(s) in order to operate.
@@ -357,27 +390,27 @@ Exported revision 1149.
         []
 
 ---
-$ c:/apps/jboss-6.0.0.Final/bin/run.sh -c ejava-jboss6
+$ c:/apps/jboss-6.1.0.Final/bin/run.sh -c ejava-jboss6
 
  =========================================================================
 
   JBoss Bootstrap Environment
 
-  JBOSS_HOME: C:\apps\jboss-6.0.0.Final
+  JBOSS_HOME: C:\apps\jboss-6.1.0.Final
 
   JAVA: /cygdrive/c/apps/java/jdk1.6.0_21/bin/java
 
   JAVA_OPTS: -server -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.
 rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Dprogram.name=run.sh -Dja
-va.library.path=C:\apps\jboss-6.0.0.Final\bin\native\bin
+va.library.path=C:\apps\jboss-6.1.0.Final\bin\native\bin
 
-  CLASSPATH: C:\apps\jboss-6.0.0.Final\bin\run.jar;C:\apps\java\jdk1.6.0_21\lib\tools.jar
+  CLASSPATH: C:\apps\jboss-6.1.0.Final\bin\run.jar;C:\apps\java\jdk1.6.0_21\lib\tools.jar
 
  =========================================================================
 
 02:32:19,138 INFO  [AbstractJBossASServerBase] Server Configuration:
 
-        JBOSS_HOME URL: file:/C:/apps/jboss-6.0.0.Final/
+        JBOSS_HOME URL: file:/C:/apps/jboss-6.1.0.Final/
         Bootstrap: $JBOSS_HOME\server/ejava-jboss6/conf/bootstrap.xml
         Common Base: $JBOSS_HOME\common/
         Common Library: $JBOSS_HOME\common/lib/
@@ -390,27 +423,21 @@ va.library.path=C:\apps\jboss-6.0.0.Final\bin\native\bin
         Server Log: $JBOSS_HOME\server/ejava-jboss6/log/
         Server Temp: $JBOSS_HOME\server/ejava-jboss6/tmp
 
-02:32:19,153 INFO  [AbstractServer] Starting: JBossAS [6.0.0.Final "Neo"]
 ...
-02:33:23,231 INFO  [org.apache.coyote.http11.Http11Protocol] Starting Coyote HTTP/1.1 on http-127.0.
-0.1-8080
-02:33:23,231 INFO  [org.apache.coyote.ajp.AjpProtocol] Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
-
-02:33:23,231 INFO  [org.jboss.bootstrap.impl.base.server.AbstractServer] JBossAS [6.0.0.Final "Neo"]
- Started in 1m:4s:62ms
+23:10:06,276 INFO  [org.jboss.bootstrap.impl.base.server.AbstractServer] JBossAS [6.1.0.Final "Neo"] Started in 43s:282ms
 ---
 
-    [[1]] Start the database UI to verify that the database is up.
+    [[1]] Start the database UI
 
 ---
-$ java -classpath c:/apps/jboss-6.0.0.Final/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
+$ java -classpath c:/apps/jboss-6.1.0.Final/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
     [Note:] I created a startdbui.bat script that looks something like the following
 
 ---
 echo off
-set JBOSS_HOME=c:\apps\jboss-6.0.0.Final
+set JBOSS_HOME=c:\apps\jboss-6.1.0.Final
 java -classpath %JBOSS_HOME%/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
 ---
 
@@ -419,6 +446,9 @@ java -classpath %JBOSS_HOME%/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManag
     [[1]] Select HSQL Database Engine Server from the "Type" pulldown. 
     Everything else can stay defaulted. After you hit OK, the GUI should
     connect to the database using port 9001.
+
+        [Note:] This step will not work until we add the missing configuration 
+        steps next week.
 
     [[1]] Shutdown your server using the shutdown.sh script.
 
@@ -431,18 +461,18 @@ Server shutdown may take a while - check logfiles for completion
     [Note:] You can run just the database application by executing the following.
 
 ---
-> cd c:/apps/jboss-6.0.0.Final/server/ejava-jboss6/data/hypersonic
-> java -classpath c:/apps/jboss-6.0.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+> cd c:/apps/jboss-6.1.0.Final/server/ejava-jboss6/data/hypersonic
+> java -classpath c:/apps/jboss-6.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     [Note:] I created a startdb.bat script that looks something like the following.
 
 ---
 echo off
-set JBOSS_HOME=c:\apps\jboss-6.0.0.Final
+set JBOSS_HOME=c:\apps\jboss-6.1.0.Final
 set JBOSS_SERVER=ejava-jboss6
 cd %JBOSS_HOME%\server\%JBOSS_SERVER%\data\hypersonic
-java -classpath c:/apps/jboss-6.0.0.Final/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+java -classpath c:/apps/jboss-6.1.0.Final/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     []    
@@ -459,17 +489,14 @@ java -classpath c:/apps/jboss-6.0.0.Final/common/lib/hsqldb.jar org.hsqldb.Serve
         requirements for an IDE and the application server will require
         at least 1GB of memory before doing any size tweeks.
 
-        [Note:] Some products, including MyEclipse, provide a full download
-        of Eclipse as a part of their installation. Try to avoid these
-        platform specific packaging as a first choice and go with the 
-        stock Eclipse for JavaEE developers from Eclipse.
+        [Note:] To stay consistent with class, try to stay clear of 
+        too many vendor add-ons and aids. This will be confusing when
+        you start out and we will not be covering GUI-based wizards in
+        class.  Use just the stock Eclipse IDE for Java EE developers.
 
     [[1]] Download and install
-    {{{http://www.eclipse.org/}Eclipse}}. They now have a separate download
-    for Java Developers and another for Java EE Developers. Most of the 
-    features for Java EE Developers is centered around DB and web tier 
-    development. It also contains support for working with XML.  Choose 
-    the "Java EE" version.
+    {{{http://www.eclipse.org/}Eclipse}}. Download the Indigo version
+    for Java EE Developers.
 
         * I extracted the files to c:/apps, which resulted in a c:/apps/eclipse 
         directory.
@@ -478,23 +505,30 @@ java -classpath c:/apps/jboss-6.0.0.Final/common/lib/hsqldb.jar org.hsqldb.Serve
         was just an unzip, there was nothing automatically added to your
         start menu.
 
-    [[1]] Install the Maven Integration for Eclipse Plug-in to allow maven
+    [[1]] Install the Maven2  Integration for Eclipse (m2e) Plug-in to allow maven
     builds to be kicked off within Eclipse. Core documentation is located 
-    at {{{http://m2eclipse.codehaus.org/} the Codehaus site}}. You don't
+    at {{{http://eclipse.org/m2e/} the m2eclipse site}}. You don't
     manually download any artifacts. All downloads and installation are
     handled within the Eclipse software updates mechanism.
 
         * Open Help -> Install New Software
 
-        * Click "Add ..." and enter "http://m2eclipse.sonatype.org/sites/m2e"
+        * Click "Add ..." and enter "http://download.eclipse.org/technology/m2e/releases"
 
-        * Check "Maven Integration" and click "Install..."
+        * Check "m2e" - Maven Integration for Eclipse and m2e - slf4j over logback 
+        logging and click "Install...". Mine came up as version 1.0.0.20110607-2117.
 
         * Follow instructions to complete installation.
 
-    [Note:] Ignore any optional packages if present and only install the
-    Maven Integration for Eclipse.  Remember...if something goes wrong, 
-    its pretty easy to get back to a clean slate.
+    [Note:] The m2e initiative to get Maven and Eclipse working seemlessly 
+    together has taken great strides in the last year and has taken off even more
+    with Eclipse Indigo version. So much so -- that the behavior for an environment
+    is hard to predict because of the rate of change and dynamic availability of
+    various plugin extensions. There will be some risk here during the semester
+    for people to be on different versions.
+
+    [Note:] If something goes wrong, its pretty easy to get back to a clean slate --
+    just unzip the original file to a new location.
 
     []
 
@@ -502,7 +536,7 @@ java -classpath c:/apps/jboss-6.0.0.Final/common/lib/hsqldb.jar org.hsqldb.Serve
 
         * Preferences -> Java -> Installed JREs -> Add...
 
-        * JRE home: c:\apps\java\jdk1.6.0_21
+        * JRE home: c:\apps\java\jdk1.6.0_26
 
         * Finish
 
@@ -525,7 +559,7 @@ java -classpath c:/apps/jboss-6.0.0.Final/common/lib/hsqldb.jar org.hsqldb.Serve
     to my shortcut for Eclipse.
 
 ---
-Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_21\bin
+Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_26\bin
 ---
     
     [[1]] Feel free to experiment whether the embedded or external 
