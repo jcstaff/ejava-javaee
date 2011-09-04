@@ -1,5 +1,7 @@
 package ejava.projects.esales.bl;
 
 public class AccountMgmtException extends Exception {
-    public AccountMgmtException(String message) { super(message); }
+	private static final long serialVersionUID = 1L;
+
+	public AccountMgmtException(String message) { super(message); }
 }

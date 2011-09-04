@@ -29,7 +29,7 @@ public class Account implements Serializable {
 	private List<Address> addresses = new ArrayList<Address>();
 	
 
-	private Account() {}   //JPA requites a no-arg ctor
+	protected Account() {}   //JPA requires a no-arg ctor
 	public Account(String userId) {
 		setUserId(userId);
 	}

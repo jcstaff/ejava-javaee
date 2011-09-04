@@ -15,6 +15,7 @@ import ejava.projects.esales.bo.Account;
 import ejava.projects.esales.jpa.JPAAccountDAO;
 
 public class AccountMgmtCommand extends ESalesIngestCommand {
+	@SuppressWarnings("unused")
 	private static final Log log = 
 		LogFactory.getLog(AccountMgmtCommand.class);
 	private static String command = System.getProperty("command");
