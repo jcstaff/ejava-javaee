@@ -3,22 +3,22 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ejava.javaee.servers</groupId>
-    <artifactId>ejava-jboss5</artifactId>
+    <artifactId>ejava-jboss61</artifactId>
     <packaging>pom</packaging>
     <version>2.0.2011.2-SNAPSHOT</version>
-    <name>Ejava JBoss 5 Server</name>
+    <name>Ejava JBoss 6.1 Server</name>
     <description>
-        This project builds the JBoss 5 server directory for use with 
+        This project builds the JBoss 6.1 server directory for use with 
         the ejava baseline.
     </description>
 
     <properties>
+        <jboss6.download.url>
+        http://download.jboss.org/jbossas/6.1/jboss-as-distribution-6.1.0.Final.zip
+        </jboss6.download.url>
         <jboss.config.template>standard</jboss.config.template>
-        <jboss5.download.url>
-           http://downloads.sourceforge.net/project/jboss/JBoss/JBoss-5.1.0.GA/jboss-5.1.0.GA-jdk6.zip
-        </jboss5.download.url>
         <install.dir>/tmp/downloads</install.dir>
-        <jboss.bind.address>127.0.0.3</jboss.bind.address>
+        <jboss.bind.address>127.0.0.4</jboss.bind.address>
         <jvm.debug>-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n</jvm.debug>
     </properties>
 
@@ -30,8 +30,8 @@
                 <version>1.0.4</version>
                 <configuration>
                     <container>
-                        <containerId>jboss51x</containerId>
-                        <home>${install.dir}/jboss-5.1.0.GA-jdk6/jboss-5.1.0.GA</home>
+                        <containerId>jboss6x</containerId>
+                        <home>${install.dir}/jboss-as-distribution-6.1.0.Final/jboss-6.1.0.Final</home>
                         <log>${project.build.directory}/cargo.log</log>
                         <output>${project.build.directory}/console.log</output>
                     </container>
@@ -48,6 +48,7 @@
                 </configuration>
 
                 <executions>
+                    <!-- start with a baseline from the .zip -->
                     <execution>
                         <id>build-container</id>
                         <phase>generate-resources</phase>
@@ -57,7 +58,7 @@
                         <configuration>
                             <container>
                                 <zipUrlInstaller>
-                                    <url>${jboss5.download.url}</url>
+                                    <url>${jboss6.download.url}</url>
                                     <installDir>${install.dir}</installDir>
                                 </zipUrlInstaller>
                             </container>
@@ -68,13 +69,12 @@
                                     <cargo.jboss.configuration>${jboss.config.template}</cargo.jboss.configuration>
                                 </properties>
                             </configuration>
-                            <dependencies>
-                                
-                            </dependencies>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- copy over the ejava-specific files -->
             <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -100,7 +100,7 @@
                     </execution>
                 </executions>
             </plugin> 
-
+            
             <!-- remove some files we don't want -->
             <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
@@ -116,7 +116,7 @@
                             <target>
                                 <delete verbose="true">
                                     <fileset dir="${project.build.directory}">
-                                        <include name="**/deploy/iiop*.xml"/>
+                                        <include name="**/deploy/iiop-jboss-beans.xml"/>
                                     </fileset>
                                 </delete>
                             </target>
@@ -124,6 +124,7 @@
                     </execution>
                 </executions>
             </plugin> 
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

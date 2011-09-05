@@ -378,7 +378,30 @@ $ ls
 all  default  ejava-jboss6  jbossweb-standalone  minimal  standard
 ---
 
-        [Note:] There will be an additional configuration step added here next week.
+    * Copy in class configuration files for the server. Be sure to use ejava-jboss61 as the source of the copy and ejava-jboss6 as the destination of the copy. This will be the only time you will need to reference the 61 directory. From here on out we will just refer to the server as ejava-jboss6.
+
+---
+$ tree /home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/
+/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/
+|-- conf
+|   `-- login-config.xml
+`-- deploy
+    |-- ejava-jdbc-ds.xml
+    |-- hornetq
+    |   |-- hornetq-configuration.xml
+    |   `-- hornetq-jms.xml
+    |-- hsqldb-ds.xml
+    `-- jboss-logging.xml
+
+$ cp -rv /home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/* ejava-jboss6/
+
+`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/conf/login-config.xml' -> `ejava-jboss6/conf/login-config.xml'
+`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hsqldb-ds.xml' -> `ejava-jboss6/deploy/hsqldb-ds.xml'
+`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/ejava-jdbc-ds.xml' -> `ejava-jboss6/deploy/ejava-jdbc-ds.xml'
+`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hornetq/hornetq-jms.xml' -> `ejava-jboss6/deploy/hornetq/hornetq-jms.xml'
+`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hornetq/hornetq-configuration.xml' -> `ejava-jboss6/deploy/hornetq/hornetq-configuration.xml'
+`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/jboss-logging.xml' -> `ejava-jboss6/deploy/jboss-logging.xml'
+---
 
         []
 
@@ -427,6 +450,21 @@ va.library.path=C:\apps\jboss-6.1.0.Final\bin\native\bin
 23:10:06,276 INFO  [org.jboss.bootstrap.impl.base.server.AbstractServer] JBossAS [6.1.0.Final "Neo"] Started in 43s:282ms
 ---
 
+    [[1]] Look for the DB server information in the middle of the startup
+    log. This and a lack of error stack traces is an indication that
+    the class files were correctly put in place.
+
+---
+22:21:20,929 INFO  [STDOUT] [Server@1434108e]: Initiating startup sequence...
+22:21:20,933 INFO  [STDOUT] [Server@1434108e]: Server socket opened successfully in 2 ms.
+22:21:20,960 INFO  [ConnectionFactoryBindingService] Bound ConnectionManager 'jboss.jca:service=DataSourceBinding,name=DefaultDS' to JNDI name 'java:DefaultDS'
+22:21:21,190 INFO  [STDOUT] [Server@1434108e]: Database [index=0, id=0, db=file:/opt/jboss-6.1.0.Final/server/ejava-jboss6/data/hypersonic/default, alias=] opened sucessfully in 254 ms.
+22:21:21,190 INFO  [STDOUT] [Server@1434108e]: Startup sequence completed in 259 ms.
+22:21:21,193 INFO  [STDOUT] [Server@1434108e]: 2011-09-04 22:21:21.193 HSQLDB server 1.8.0 is online
+22:21:21,194 INFO  [STDOUT] [Server@1434108e]: To close normally, connect and execute SHUTDOWN SQL
+22:21:21,194 INFO  [STDOUT] [Server@1434108e]: From command line, use [Ctrl]+[C] to abort abruptly
+---
+
     [[1]] Start the database UI
 
 ---
@@ -465,7 +503,9 @@ Server shutdown may take a while - check logfiles for completion
 > java -classpath c:/apps/jboss-6.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
-    [Note:] I created a startdb.bat script that looks something like the following.
+    [Note:] I created a startdb.bat script that looks something like the following. -address 
+    can be added to set the bind address. -port can be added to override the default listen
+    port#.
 
 ---
 echo off

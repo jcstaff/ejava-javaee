@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- The Hypersonic embedded database JCA connection factory config -->
+
+<!-- See http://www.jboss.org/community/wiki/Multiple1PC for information about local-tx-datasource -->
+<!-- $Id: hsqldb-ds.xml 88948 2009-05-15 14:09:08Z jesper.pedersen $ -->
+
+<datasources>
+   <local-tx-datasource>
+      <jndi-name>ejavaDS</jndi-name>
+      <connection-url>jdbc:hsqldb:hsql://${jboss.bind.address}:9001</connection-url>
+      <driver-class>org.hsqldb.jdbcDriver</driver-class>
+      <user-name>sa</user-name>
+      <password></password>
+
+      <min-pool-size>5</min-pool-size>
+      <max-pool-size>20</max-pool-size>
+      <idle-timeout-minutes>0</idle-timeout-minutes>
+      <track-statements/>
+      <prepared-statement-cache-size>32</prepared-statement-cache-size>
+      <metadata>
+         <type-mapping>Hypersonic SQL</type-mapping>
+      </metadata>
+
+      <depends>jboss:service=Hypersonic</depends>
+   </local-tx-datasource>
+
+<!--
+   <mbean code="org.jboss.jdbc.HypersonicDatabase" 
+     name="jboss:service=Hypersonic">
+     <attribute name="Port">9001</attribute>
+     <attribute name="BindAddress">${jboss.bind.address}</attribute>     
+     <attribute name="Silent">true</attribute>
+     <attribute name="Database">ejava</attribute>
+     <attribute name="Trace">false</attribute>
+     <attribute name="No_system_exit">true</attribute>
+   </mbean>
+   -->
+</datasources>
