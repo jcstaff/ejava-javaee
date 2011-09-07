@@ -35,7 +35,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -73,7 +73,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>${maven-site-plugin.version}</version>
+                <version>3.0</version>
             </plugin>
             <plugin> 
                 <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -105,30 +105,6 @@
     </reporting>
 
     <profiles>
-        <profile>
-            <id>maven2</id>
-            <activation> <!-- only maven3 knows what basedir is -->
-                <file>
-                    <missing>${basedir}</missing>
-                </file>
-            </activation>
-            <properties>
-                <maven-site-plugin.version>2.0.1</maven-site-plugin.version>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>maven3</id>
-            <activation> <!-- only maven3 knows what basedir is -->
-                <file>
-                    <exists>${basedir}</exists>
-                </file>
-            </activation>
-            <properties>
-                <maven-site-plugin.version>3.0-beta-3</maven-site-plugin.version>
-            </properties>
-        </profile>
-
         <!-- the ex1 instructions say to place this in settings.xml.
         However, it works here as a local declaration -->
         <profile> <!-- tells surefire to run JUnit tests with remote debug -->

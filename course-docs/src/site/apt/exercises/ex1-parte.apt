@@ -4,14 +4,12 @@ Exercise 1: First Simple Application
 
 ** Objectives
 
-    * {{{Section_A}Register JDK as a valid JRE instance}}
-
-    * {{{Section_B}Import a project into Eclipse}}
+    * {{{Section_A}Import a project into Eclipse}}
     using maven-eclipse-plugin goals
 
-    * {{{Section_C}Setup Eclipse to be able to execute Maven project goals}}
+    * {{{Section_B}Setup Eclipse to be able to execute Maven project goals}}
 
-    * {{{Section_D}Setup environment to enable interactive debugging}} 
+    * {{{Section_C}Setup environment to enable interactive debugging}} 
 
 ** Steps
 
@@ -40,38 +38,19 @@ Exercise 1: First Simple Application
         , which is soon to be
         {{{http://www.eclipse.org/iam/} Eclipse IAM}}. A comparison of 
         the various options is located on the 
-        {{{http://docs.codehaus.org/display/MAVENUSER/Eclipse+Integration,+Eclipse+Integration}
+        {{{http://docs.codehaus.org/display/MAVENUSER/Eclipse+Integration}
         Codehaus Wiki}}. 
 
         []
 
     We will be using m2eclipse and you will import your projects as Maven 
-    Projects and access goals through the "Run..." button.
+    Projects and access goals through the "Run..." button. You should
+    have already installed this in exercise 0.
 
     []
 
 
-*** {Section A}: Register your JDK as a JRE option for running maven 
-    plugin commands.
-
-    [[1]] Register your JDK with Eclipse as a valid JRE option. Eclipse
-    will, by default, launch external commands using the default JRE.
-    Maven wants this to be a JDK, since it invokes the compiler.
-
-        * Window -> Preferences -> Java -> Installed JREs 
-
-        * Select "Add.." for a Standard VM
-
-        * Select your JDK instance for the JRE Home. This was 
-        c:/apps/java/jdk1.6.0_21 on my system.
-
-        * You may optionally set this as the default.
-
 *** {Section B}: Importing a Maven project into Eclipse
-
-        [Note:] If you haven't already done so, download and install
-        {{{http://www.eclipse.org/}Eclipse}} as described in
-        {{{./ex0.html#Part_F}Exercise 0}}. 
 
         [Note:] Any changes to the project dependencies you make within
         Eclipse are not updated in the pom.xml. Use the pom.xml file
@@ -84,17 +63,43 @@ Exercise 1: First Simple Application
         project within Eclipse, be sure those changes are documented
         through a change to the Maven pom.xml.
 
-    [[1]] Inside Eclipse, import the project using
+    [[1]] Inside Eclipse, turn on Working Set foldering (a personal preference
+    of mine).
 
-        * File->Import
+        * Click on the downward facing triangle in the top right of 
+        the Project Explorer.
 
-        * Select General->Maven Projects into Workspace
+        * Select: Top Level Elements -> Working Sets
+
+    [[1]] Create a Working Set for Exercises
+
+        * Click on the downward facing triangle in the top right of 
+        the Project Explorer (again).
+
+        * Select: Select Working Set -> New ...
+
+        * Select: Java and click Next
+
+        * Type: "Exercises" and click Finished
+
+        * Select: Exercises as one of the working sets and press OK
+
+    [[1]] Import a project into the Working Set by
+
+        * Select the "Exercises" working set
+
+        * Select File->Import
+
+        * Select Maven->Existing Maven Projects
 
         * Browse to the project directory. The next panel should show 
         a list of projects that include "ex1".
 
         * There may be a noticeable delay while it rebuilds the 
         workspace.
+
+        * Select Finish, taking the defaults of the root pom.xml for 
+        ex1 and "Add project(s) to working set".
         
         * Once imported, you should be able to open a suitable Perspective 
         and browse the files of the project.
@@ -110,15 +115,20 @@ Exercise 1: First Simple Application
             Repository under Window->Preferences-> Maven->Installations.
 
 
-*** {Section C}: Setup Eclipse to be able to execute Maven project goals
+*** {Section B}: Setup Eclipse to be able to execute Maven project goals
 
 
-    [[1]] Right-click on the pom.xml file and execute Run As->"Maven install".
-    You can also get back to this window through the Run As option on the 
-    toolbar once you have the project selective. 
+    [[1]] Right-click on the pom.xml file or ex1 project folder and
+    execute Run As->"Maven install".  You can also get back to this
+    window through the Run As option on the toolbar once you have the
+    project selective. This mode runs the JUnit test you wrote within 
+    the context of the full maven project. All pre-test and post-test 
+    setup and teardown you wired into the maven command line build will
+    be executed.
 
-    [[1]] Refresh the project directory to be able to see any new target 
-    artifacts, including the surefire-reports. 
+    [[1]] Look for the results of the testing in a *.txt file written to 
+    target/test-reports/. Eclipse will not show you this directory by default,
+    but you can open it manually and have it refresh as you run each test.
 
         [Note:] You can full screen any display by double clicking its tab.
 
@@ -132,6 +142,19 @@ Exercise 1: First Simple Application
         []
 
 [images/ex1_separate_eclipse_windows.png] Separate Eclipse Windows
+
+    [[1]] Rerun the tests as a JUnit test. This mode runs the JUnit test
+    raw within Eclipse. This is very efficient for making and testing
+    Java code changes but will not run any maven setup or teardown 
+    plugins (which is not always required or can be avoided).
+
+    * Right click the pom.xml or ex1 project folder (again) and select 
+    Run As->JUnit Test.
+
+    * You may get a firewall warning at this point and will want to 
+    unblock if that occurs.
+
+[images/run_as_junit.png] Run As JUnit Test
 
     [[1]] Make a small edit to the pom.xml and notice the change in the 
     Maven Dependencies within Eclipse. Switch back and forth between these
@@ -149,7 +172,7 @@ Exercise 1: First Simple Application
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
 ---
@@ -179,7 +202,7 @@ Exercise 1: First Simple Application
         * press Apply and Close
 
 
-*** {Section D}: Setup environment to enable interactive debugging
+*** {Section C}: Setup environment to enable interactive debugging
 
         [Note:] There are two primary ways to run your JUnit tests with
         Eclipse; run-as a JUnit and run-as a Maven build. They both
@@ -195,7 +218,7 @@ Exercise 1: First Simple Application
         is better than the other and you need to design your tests
         or environment with the limits and advantages of each in mind.
 
-        I will show you how to run the debugger
+        I will first show you how to run the debugger
         running under a normal Maven build. When doing this, you 
         need to realize that there will be 2 processes; the "remote"
         application being launched/tested and the "local" debugger that is
@@ -326,6 +349,12 @@ Listening for transport dt_socket at address: 8000
         []
 
 [images/ex1_eclipse_debugger.png] Eclipse Debugger
+
+    [[1]] Rerun the debug session using Run As->JUnit. This is much 
+    simpler than the above, but functions outside of the Maven 
+    environment. You should target your project designs to be able
+    to be debugged in this manner if possible and use the first 
+    option as a fallback.
 
 * Summary    
 

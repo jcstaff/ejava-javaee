@@ -152,7 +152,7 @@ Exercise 1: First Simple Application
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -304,7 +304,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 ---
         []
 
-    [[1]]  For fun, lets add a README that could be used to describe
+    [[1]]  For *fun*, lets add a README that could be used to describe
     something about your project and have it be processed as part of the
     documentation for the module. You do not need to do this for class
     projects, but walking through this may be helpful in understanding how
@@ -404,7 +404,12 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.0-beta-3</version>
+                <version>3.0</version>
+            </plugin>
+            <plugin> 
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>2.2</version>
             </plugin>
         </pluginManagement>
         ...
@@ -492,6 +497,12 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 </settings>
 ---
 
+    [Note:] The following discussion on settings.xml covers much of the work 
+    you have already done in exercise 0. It is included here just to provide 
+    additional discussion of the topic.
+
+    []
+
     [[1]] The first thing Windows users will want to do is provide an override
     for the localRepository. Provide a custom path that does not contain spaces.
     This value will default to a "$HOME/.m2/repository" directory. 
@@ -544,7 +555,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
         <profile>
             <id>jboss6</id>
             <properties>
-                <jboss.home>c:/apps/jboss-6.0.0.Final</jboss.home>
+                <jboss.home>c:/apps/jboss-6.1.0.Final</jboss.home>
                 <jboss.server>ejava-jboss6</jboss.server>
             </properties>
         </profile>        
@@ -777,7 +788,7 @@ ache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <version>1.0-SNAPSHOT</version>
   <name>My First Simple Project</name>
   <properties>
-    <jboss.home>c:/apps/jboss-6.0.0.Final</jboss.home>
+    <jboss.home>c:/apps/jboss-6.1.0.Final</jboss.home>
     <jboss.host>localhost</jboss.host>
     <jboss.password>password</jboss.password>
     <jboss.protocol>http</jboss.protocol>
