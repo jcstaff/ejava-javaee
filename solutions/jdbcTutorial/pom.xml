@@ -8,7 +8,7 @@
     <groupId>myorg.jdbctutorial</groupId>
     <artifactId>jdbcTutorial</artifactId>
     <name>JDBC Tutorial</name>
-    <version>2.0.2011.1</version>
+    <version>2.0.2011.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,7 +26,7 @@
         <dependency>
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
-          <version>4.6</version>
+          <version>4.7</version>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -36,15 +36,6 @@
           <scope>test</scope>
         </dependency>    
     </dependencies>
-
-    <pluginRepositories>
-        <!-- will contain any patched plugins for class -->
-        <pluginRepository>
-            <id>webdev.repository</id>
-            <name>ejava webdev repository</name>
-            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <plugins>
@@ -73,7 +64,7 @@
                         <jdbc.password>${jdbc.password}</jdbc.password>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>            
+			</plugin>            
         </plugins>    
     </build>
 
@@ -201,5 +192,47 @@
                 </plugins>          
             </build>          
         </profile>
+        
+    	<!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+	      <id>m2e</id>
+	      <activation>
+	        <property>
+	          <name>m2e.version</name>
+	        </property>
+	      </activation>
+	      <build>
+    <pluginManagement>
+        <plugins>
+	        <plugin>
+	          <groupId>org.eclipse.m2e</groupId>
+	          <artifactId>lifecycle-mapping</artifactId>
+	          <version>1.0.0</version>
+	          <configuration>
+	            <lifecycleMappingMetadata>
+	              <pluginExecutions>
+	                <pluginExecution>
+	                  <pluginExecutionFilter>
+	                    <groupId>org.codehaus.mojo</groupId>
+	                    <artifactId>sql-maven-plugin</artifactId>
+	                    <versionRange>[1.4.0,)</versionRange>
+	                    <goals>
+	                      <goal>execute</goal>
+	                    </goals>
+	                  </pluginExecutionFilter>
+	                  <action>
+	                    <ignore/>
+	                  </action>
+	                </pluginExecution>
+	              </pluginExecutions>
+	            </lifecycleMappingMetadata>
+	          </configuration>
+	        </plugin>
+        </plugins>
+	</pluginManagement>
+		   </build>
+	    </profile>
+        
     </profiles>
+    
 </project>
