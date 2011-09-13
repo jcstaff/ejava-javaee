@@ -539,6 +539,63 @@ Total time: 1 second
 
     * Create an initial pom.xml with basic project information.
 
+    [Note:] Eclipse Indigo users may get a warning/error for
+    sql-maven-plugin plugin. The error is related to Eclipse trying to
+    have a tighter integration with Maven by trying to perform comparable
+    tasks inside of Eclipse for what would happen in a normal Maven
+    command line build. For some of the plugins -- Maven does not know yet
+    what to do with them and will be asking you for assistance on how to
+    treat the plugin. In most cases you will just tell Eclipse to ignore
+    the plugin.  These can be ignored but but adding the following profile
+    will eliminate the error shown by Eclipse for the project pom.xml.
+
+---
+        <!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+          <id>m2e</id>
+          <activation>
+            <property>
+              <name>m2e.version</name>
+            </property>
+          </activation>
+          <build>
+            <pluginManagement>
+                <plugins>
+                    <plugin>
+                      <groupId>org.eclipse.m2e</groupId>
+                      <artifactId>lifecycle-mapping</artifactId>
+                      <version>1.0.0</version>
+                      <configuration>
+                        <lifecycleMappingMetadata>
+                          <pluginExecutions>
+
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>sql-maven-plugin</artifactId>
+                                <versionRange>[1.4,)</versionRange>
+                                <goals>
+                                  <goal>execute</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+    
+                          </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                      </configuration>
+                    </plugin>
+
+                </plugins>
+            </pluginManagement>
+           </build>
+        </profile>
+---
+
+    []
+
 ---
 <?xml version="1.0"?>
 <project>
