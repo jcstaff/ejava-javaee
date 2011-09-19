@@ -1,5 +1,8 @@
 package ejava.projects.esales.blimpl;
 
+import static org.junit.Assert.*;
+
+
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,25 +15,32 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.projects.esales.dao.AccountDAO;
+import ejava.projects.esales.bl.AccountMgmt;
 import ejava.projects.esales.bo.Account;
 import ejava.projects.esales.jdbc.JDBCAccountDAO;
+import ejava.projects.esales.jpa.JPAAccountDAO;
 
-import junit.framework.TestCase;
-
-public class ESalesIngestorTest extends TestCase {
+public class ESalesIngestorTest {
 	private static Log log = LogFactory.getLog(ESalesIngestorTest.class);
-	private static String jdbcDriver = System.getProperty("jdbc.driver");
-	private static String jdbcURL = System.getProperty("jdbc.url");
-	private static String jdbcUser = System.getProperty("jdbc.user");
-	private static String jdbcPassword = System.getProperty("jdbc.password");
+	private static String jdbcURL = 
+			System.getProperty("jdbc.url", "jdbc:hsqldb:hsql://localhost:9001");	
+	private static String jdbcDriver = System.getProperty("jdbc.driver", "org.hsqldb.jdbcDriver");
+	private static String jdbcUser = System.getProperty("jdbc.user", "sa");
+	private static String jdbcPassword = System.getProperty("jdbc.password","");
 	
 	private EntityManagerFactory emf;
 	private EntityManager em;
 	private AccountDAO accountDAO;
 	private Connection connection;
+	private JPAAccountDAO jpaDAO;
+	private AccountMgmt mgmt;
 	
+	@Before
 	public void setUp() throws Exception {
 		assertNotNull("jdbc.driver not supplied", jdbcDriver);
 		assertNotNull("jdbc.url not supplied", jdbcURL);
@@ -59,11 +69,18 @@ public class ESalesIngestorTest extends TestCase {
 		//accountDAO = new JPAAccountDAO();
 		//((JPAAccountDAO)accountDAO).setEntityManager(em);
 		
+		//lets verify we have something using the JPA DAO
+		jpaDAO = new JPAAccountDAO();
+		jpaDAO.setEntityManager(em);
+		mgmt = new AccountMgmtImpl();
+		((AccountMgmtImpl)mgmt).setAccountDAO(jpaDAO);
+
 		cleanup();
 		em.getTransaction().begin();
 	}
 	
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (connection != null) {
 			connection.commit();
 			connection.close();
@@ -93,7 +110,7 @@ public class ESalesIngestorTest extends TestCase {
 		em.getTransaction().commit();
 	}
 
-
+	@Test
 	public void testIngest1() throws Exception {
 		log.info("*** testIngest1 ***");
 		
@@ -107,8 +124,13 @@ public class ESalesIngestorTest extends TestCase {
 		ingestor.setAccountDAO(accountDAO);
 		ingestor.setInputStream(is);
 		ingestor.ingest();
+		
+		//verify we have the expected number of accounts		
+		assertEquals("unexpected number of accounts",2,
+				mgmt.getAccounts(0, 1000).size());
 	}
 	
+	@Test
 	public void testIngest10() throws Exception {
 		log.info("*** testIngest10 ***");
 		
@@ -122,8 +144,13 @@ public class ESalesIngestorTest extends TestCase {
 		ingestor.setAccountDAO(accountDAO);
 		ingestor.setInputStream(is);
 		ingestor.ingest();
+		
+		//verify we have the expected number of accounts		
+		assertEquals("unexpected number of accounts",19,
+				mgmt.getAccounts(0, 1000).size());
 	}
 
+	@Test
 	public void testIngest100() throws Exception {
 		log.info("*** testIngest10 ***");
 		
@@ -137,8 +164,13 @@ public class ESalesIngestorTest extends TestCase {
 		ingestor.setAccountDAO(accountDAO);
 		ingestor.setInputStream(is);
 		ingestor.ingest();
+		
+		//verify we have the expected number of accounts		
+		assertEquals("unexpected number of accounts",209,
+				mgmt.getAccounts(0, 1000).size());
 	}
 
+	@Test
 	public void testIngestAll() throws Exception {
 		log.info("*** testIngestAll ***");
 		
@@ -152,6 +184,11 @@ public class ESalesIngestorTest extends TestCase {
 		ingestor.setAccountDAO(accountDAO);
 		ingestor.setInputStream(is);
 		ingestor.ingest();
+		
+		
+		//verify we have the expected number of accounts		
+		assertEquals("unexpected number of accounts",841,
+				mgmt.getAccounts(0, 1000).size());
 	}
 
 }
