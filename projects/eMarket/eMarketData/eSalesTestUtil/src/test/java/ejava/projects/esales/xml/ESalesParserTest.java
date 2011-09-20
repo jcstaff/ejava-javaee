@@ -1,6 +1,7 @@
 package ejava.projects.esales.xml;
 
 import ejava.projects.esales.dto.Account;
+
 import ejava.projects.esales.dto.ESales;
 
 import java.io.BufferedInputStream;
@@ -12,18 +13,20 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-
-import junit.framework.TestCase;
-
-public class ESalesParserTest extends TestCase {
+public class ESalesParserTest {
 	private static final Log log = LogFactory.getLog(ESalesParser.class);
 	private String inputDir = System.getProperty("inputDir");
 	
+	@Before
 	public void setUp() {
 		assertNotNull("inputDir not supplied", inputDir);
 	}
 	
+	@Test
 	public void testParser() throws Exception {
 		File inDir = new File(inputDir);
 		File[] files = inDir.listFiles(new FilenameFilter() {
@@ -36,6 +39,7 @@ public class ESalesParserTest extends TestCase {
 			testParser(file.getCanonicalPath());
 		}
 	}
+	
 	public void testParser(String inputFile) throws Exception {
 		log.info("*** testParser:" + inputFile + " ***");
 		
@@ -71,5 +75,4 @@ public class ESalesParserTest extends TestCase {
 		}
 		log.debug(text);
 	}
-
 }

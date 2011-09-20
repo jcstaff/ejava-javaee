@@ -1,22 +1,25 @@
 package ejava.projects.esales.bo;
 
+import static org.junit.Assert.*;
+
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * This test case provides an example framework for how business objects 
- * could be tested. The functionality of the business objects shoudl be
+ * could be tested. The functionality of the business objects should be
  * tested at this level prior to adding more complex scenarios, like 
  * persistence and server-side logic.
  * 
  * @author jcstaff
  *
  */
-public class ESalesBOTest extends TestCase {
+public class ESalesBOTest {
 	Log log = LogFactory.getLog(ESalesBOTest.class);
 	
+	@Test
     public void testAccount() {
     	log.info("*** testAccount ***");
     	

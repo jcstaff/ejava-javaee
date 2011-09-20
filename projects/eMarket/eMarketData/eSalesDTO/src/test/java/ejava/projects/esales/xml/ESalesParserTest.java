@@ -1,6 +1,7 @@
 package ejava.projects.esales.xml;
 
 import ejava.projects.esales.dto.Account;
+
 import ejava.projects.esales.dto.Address;
 import ejava.projects.esales.dto.ESales;
 
@@ -20,8 +21,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
 
 /**
  * This provides a basic test of a constructed DMV DTO graph to be 
@@ -29,10 +32,11 @@ import junit.framework.TestCase;
  * @author jcstaff
  *
  */
-public class ESalesParserTest extends TestCase {
+public class ESalesParserTest {
     private Log log = LogFactory.getLog(ESalesParserTest.class);
     private Marshaller m;
     
+    @Before
     public void setUp() throws Exception {
         JAXBContext jaxbc = JAXBContext.newInstance(ESales.class);
         m = jaxbc.createMarshaller();
@@ -40,6 +44,7 @@ public class ESalesParserTest extends TestCase {
         
     }
     
+    @Test
     public void testCalendar() throws Exception {
     	log.info("*** testCalendar ***");
         DatatypeFactory dataFactory = DatatypeFactory.newInstance();
@@ -74,6 +79,7 @@ public class ESalesParserTest extends TestCase {
         }
     }
 
+    @Test
     public void testMarshallDemarshall() throws Exception {
         log.info("*** testMarshallDemarshall ***");
         ESales sales = new SampleGen().createSales();

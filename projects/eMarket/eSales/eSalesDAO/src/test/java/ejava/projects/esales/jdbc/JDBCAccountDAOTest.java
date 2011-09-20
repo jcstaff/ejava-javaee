@@ -1,5 +1,8 @@
 package ejava.projects.esales.jdbc;
 
+import static org.junit.Assert.*;
+
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -7,12 +10,13 @@ import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.projects.esales.bo.Account;
 import ejava.projects.esales.bo.Address;
 import ejava.projects.esales.dao.AccountDAO;
-
-import junit.framework.TestCase;
 
 /**
  * This test case provides an example of one might test the JDBC DAO. It 
@@ -23,16 +27,18 @@ import junit.framework.TestCase;
  * @author jcstaff
  *
  */
-public class JDBCAccountDAOTest extends TestCase {
+public class JDBCAccountDAOTest {
 	private static Log log = LogFactory.getLog(JDBCAccountDAO.class);
-	private static String jdbcDriver = System.getProperty("jdbc.driver");
-	private static String jdbcURL = System.getProperty("jdbc.url");
-	private static String jdbcUser = System.getProperty("jdbc.user");
-	private static String jdbcPassword = System.getProperty("jdbc.password");
+	private static String jdbcURL = 
+			System.getProperty("jdbc.url", "jdbc:hsqldb:hsql://localhost:9001");	
+	private static String jdbcDriver = System.getProperty("jdbc.driver", "org.hsqldb.jdbcDriver");
+	private static String jdbcUser = System.getProperty("jdbc.user", "sa");
+	private static String jdbcPassword = System.getProperty("jdbc.password","");
 	
 	private Connection connection;
 	private AccountDAO dao;
 	
+	@Before
 	public void setUp() throws Exception {
 		assertNotNull("jdbc.driver not supplied", jdbcDriver);
 		assertNotNull("jdbc.url not supplied", jdbcURL);
@@ -57,7 +63,8 @@ public class JDBCAccountDAOTest extends TestCase {
 		cleanup();
 	}
 
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (connection != null) {
 			connection.commit();
 		    ((JDBCAccountDAO)dao).setConnection(null);
@@ -86,6 +93,7 @@ public class JDBCAccountDAOTest extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testJDBCCreate() throws Exception {
 		log.info("*** testJDBCCreate ***");
 		
