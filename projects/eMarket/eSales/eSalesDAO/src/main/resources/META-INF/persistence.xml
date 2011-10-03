@@ -10,23 +10,9 @@
 
         <class>ejava.projects.esales.bo.Account</class>
         <class>ejava.projects.esales.bo.Address</class>
-        
         <properties>
-            <property name="hibernate.dialect" 
-                value="org.hibernate.dialect.HSQLDialect"/>
-            <property name="hibernate.connection.url"
-                value="${jdbc.url}"/>
-            <property name="hibernate.connection.driver_class" 
-                value="${jdbc.driver}"/>
-            <property name="hibernate.connection.password" 
-                value="${jdbc.password}"/>
-            <property name="hibernate.connection.username" 
-                value="${jdbc.user}"/>
-            <property name="hibernate.show_sql" value="true"/>            
-            <!-- uncomment this to permit Hibernate to create the schema
-                 this is a great Java-first technique for creating schema
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-            -->
+           <!-- properties have been moved to hibernate.properties 
+               resource file in test tree -->
         </properties>
     </persistence-unit>        
     
