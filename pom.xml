@@ -13,16 +13,11 @@
 
     <name>Enterprise Java (605.784) Root</name>
     <description>
-        This is the course home page for the Enterprise Java Course
-        (605.784), taught at John's Hopkins University, Engineering Programs 
-        for Professionals. 
-        This site will be populated as the semester progresses and topics 
-        are addressed. If you are looking for a version of the full content
-        for ejava-javaee, refer to 
-        http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee.
+        This is the parent project for the content modules. Content gets
+        added to this project as the semester moves forward.
     </description>
 
-  <modules>
+    <modules>
         <module>dependencies</module>
         <module>site-skin</module>
         <module>course-docs</module>
@@ -111,6 +106,31 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>clean</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>instrument</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>instrument</goal>
+                            <goal>cobertura</goal>
+                        </goals>
+                        <configuration>
+                            <aggregate>true</aggregate>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -177,6 +197,13 @@
                             <configuration>
                                 <aggregate>false</aggregate>
                             </configuration>
+                        </plugin>
+
+                        <!-- generates code coverage report -->
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>cobertura-maven-plugin</artifactId>
+                            <version>${cobertura-maven-plugin.version}</version>
                         </plugin>
                     </reportPlugins>
                 </configuration>
