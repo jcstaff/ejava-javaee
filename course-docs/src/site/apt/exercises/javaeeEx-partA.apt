@@ -132,7 +132,7 @@ $ mvn clean install
 
     The EJB project will be used to develop one of the EJB components. The
     term "EJB" gets a little overloaded at times.  There are EJB
-    classes, EJB components, and EJB tiers.  EJB classes break out
+    classes, EJB components, and an EJB tier.  EJB classes break out
     into the business-remote (aka @Remote) and business-local (aka
     @Local) interfaces, the EJB implementation class (either @Stateless,
     @Stateful, or @MessageDriven), and support classes. It is common to
@@ -258,7 +258,7 @@ $ mkdir javaeeExEJB
 
     [[1]] Add several dependencies to account for use of logging, 
     annotations, and EJB constructs. Since we will be instantiating
-    this code only on the server and not in a 2-tier approach, we
+    this code only on the server and not in a 2-tier approach,
     the pure JavaEE API from Sun/Oracle will do fine. Otherwise we
     should use the dependencies from Hibernate/JBoss.
 
@@ -739,7 +739,7 @@ $ cat javaeeExTest/pom.xml
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -775,7 +775,7 @@ $ cat javaeeExTest/pom.xml
     up to the root level. 
 
     [Note:] One negative I have noticed in using the jboss-as-client.pom
-    dependency is that it is a catch-all and will add +100 jar files
+    dependency is that it is a catch-all and will add 100+ jar files
     to your classpath. That does not present a functional proble, but it
     will cause your dependency classpath to be 10s of MB in size for 
     even the simplest clients.
@@ -812,7 +812,7 @@ $ cat javaeeExTest/pom.xml
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-client</artifactId>
-            <version>6.0.0.Final</version>            
+            <version>6.1.0.Final</version>            
             <type>pom</type>
             <scope>test</scope>
             <exclusions>
@@ -898,9 +898,9 @@ $ (cd javaeeExTest/; mvn clean install)
 
 ...
 
--------------------------------------------------------
+ -------------------------------------------------------
  T E S T S
--------------------------------------------------------
+ -------------------------------------------------------
 There are no tests to run.
 
 Results :
@@ -1141,24 +1141,24 @@ $ cat $JBOSS_HOME/server/ejava-jboss6/deploy/jboss-logging.xml
     [[1]] Start the JBoss server.
 
 ---
-$ /opt/jboss-6.0.0.Final/bin/run.sh -c ejava-jboss6 
+$ /opt/jboss-6.x.x.Final/bin/run.sh -c ejava-jboss6 
 =========================================================================
 
   JBoss Bootstrap Environment
 
-  JBOSS_HOME: /opt/jboss-6.0.0.Final
+  JBOSS_HOME: /opt/jboss-6.x.x.Final
 
   JAVA: /usr/lib/jvm/java-6-openjdk/bin/java
 
-  JAVA_OPTS: -server -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n -Djava.net.preferIPv4Stack=true -Dprogram.name=run.sh -Djava.library.path=/opt/jboss-6.0.0.Final/bin/native/lib
+  JAVA_OPTS: -server -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n -Djava.net.preferIPv4Stack=true -Dprogram.name=run.sh -Djava.library.path=/opt/jboss-6.x.x.Final/bin/native/lib
 
-  CLASSPATH: /opt/jboss-6.0.0.Final/bin/run.jar:/usr/lib/jvm/java-6-openjdk/lib/tools.jar
+  CLASSPATH: /opt/jboss-6.x.x.Final/bin/run.jar:/usr/lib/jvm/java-6-openjdk/lib/tools.jar
 
 =========================================================================
 
 23:36:43,714 INFO  [AbstractJBossASServerBase] Server Configuration:
 
-        JBOSS_HOME URL: file:/opt/jboss-6.0.0.Final/
+        JBOSS_HOME URL: file:/opt/jboss-6.x.x.Final/
         Bootstrap: $JBOSS_HOME/server/ejava-jboss6/conf/bootstrap.xml
         Common Base: $JBOSS_HOME/common/
         Common Library: $JBOSS_HOME/common/lib/
@@ -1171,18 +1171,18 @@ $ /opt/jboss-6.0.0.Final/bin/run.sh -c ejava-jboss6
         Server Log: $JBOSS_HOME/server/ejava-jboss6/log/
         Server Temp: $JBOSS_HOME/server/ejava-jboss6/tmp/
 
-23:36:43,720 INFO  [AbstractServer] Starting: JBossAS [6.0.0.Final "Neo"]
+23:36:43,720 INFO  [AbstractServer] Starting: JBossAS [6.x.x.Final "Neo"]
 23:36:46,025 INFO  [ServerInfo] Java version: 1.6.0_20,Sun Microsystems Inc.
 23:36:46,025 INFO  [ServerInfo] Java Runtime: OpenJDK Runtime Environment (build 1.6.0_20-b20)
 23:36:46,025 INFO  [ServerInfo] Java VM: OpenJDK Server VM 19.0-b09,Sun Microsystems Inc.
 23:36:46,025 INFO  [ServerInfo] OS-System: Linux 2.6.32-28-generic,i386
-23:36:46,026 INFO  [ServerInfo] VM arguments: -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n -Djava.net.preferIPv4Stack=true -Dprogram.name=run.sh -Djava.library.path=/opt/jboss-6.0.0.Final/bin/native/lib -Djava.endorsed.dirs=/opt/jboss-6.0.0.Final/lib/endorsed 
+23:36:46,026 INFO  [ServerInfo] VM arguments: -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n -Djava.net.preferIPv4Stack=true -Dprogram.name=run.sh -Djava.library.path=/opt/jboss-6.x.x.Final/bin/native/lib -Djava.endorsed.dirs=/opt/jboss-6.x.x.Final/lib/endorsed 
 
 ...
 23:37:10,044 INFO  [STDOUT] [Server@1d2c810]: Initiating startup sequence...
 23:37:10,049 INFO  [STDOUT] [Server@1d2c810]: Server socket opened successfully in 2 ms.
 23:37:10,075 INFO  [ConnectionFactoryBindingService] Bound ConnectionManager 'jboss.jca:service=DataSourceBinding,name=ejavaDS' to JNDI name 'java:ejavaDS'
-23:37:10,377 INFO  [STDOUT] [Server@1d2c810]: Database [index=0, id=0, db=file:/opt/jboss-6.0.0.Final/server/ejava-jboss6/data/hypersonic/ejava, alias=] opened sucessfully in 325 ms.
+23:37:10,377 INFO  [STDOUT] [Server@1d2c810]: Database [index=0, id=0, db=file:/opt/jboss-6.x.x.Final/server/ejava-jboss6/data/hypersonic/ejava, alias=] opened sucessfully in 325 ms.
 23:37:10,377 INFO  [STDOUT] [Server@1d2c810]: Startup sequence completed in 330 ms.
 23:37:10,382 INFO  [STDOUT] [Server@1d2c810]: 2011-03-01 23:37:10.382 HSQLDB server 1.8.0 is online
 23:37:10,383 INFO  [STDOUT] [Server@1d2c810]: To close normally, connect and execute SHUTDOWN SQL
@@ -1191,7 +1191,7 @@ $ /opt/jboss-6.0.0.Final/bin/run.sh -c ejava-jboss6
 
 23:37:12,201 INFO  [org.apache.coyote.http11.Http11Protocol] Starting Coyote HTTP/1.1 on http-127.0.0.1-8080
 23:37:12,206 INFO  [org.apache.coyote.ajp.AjpProtocol] Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
-23:37:12,206 INFO  [org.jboss.bootstrap.impl.base.server.AbstractServer] JBossAS [6.0.0.Final "Neo"] Started in 28s:479ms
+23:37:12,206 INFO  [org.jboss.bootstrap.impl.base.server.AbstractServer] JBossAS [6.x.x.Final "Neo"] Started in 28s:479ms
 ---
 
     [[1]] Re-run the RMI Test again.
@@ -1256,7 +1256,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
                         <artifactId>jboss-as-profileservice-client</artifactId>
-                        <version>6.0.0.Final</version>
+                        <version>6.1.0.Final</version>
                         <type>pom</type>
                     </dependency>
                 </dependencies>
@@ -1652,13 +1652,13 @@ the application server as a part of the clean goal. This is useful when you have
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
                         <artifactId>jboss-as-client</artifactId>
-                        <version>6.0.0.Final</version>
+                        <version>6.1.0.Final</version>
                         <type>pom</type>
                     </dependency>
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
                         <artifactId>jboss-as-profileservice-client</artifactId>
-                        <version>6.0.0.Final</version>
+                        <version>6.1.0.Final</version>
                         <type>pom</type>
                     </dependency>
                     <dependency>

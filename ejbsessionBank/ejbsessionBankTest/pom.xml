@@ -21,7 +21,7 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
 
         <!-- component to test within deployment-->
@@ -30,13 +30,13 @@
             <artifactId>ejbsessionBankEJB</artifactId>
             <version>${project.version}</version>
             <type>ejb-client</type>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ejbsessionBankImpl</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
         
         <!-- package being deployed must be a dependency -->
@@ -45,6 +45,7 @@
             <artifactId>ejbsessionBankEAR</artifactId>
             <version>${project.version}</version>
             <type>ear</type>
+            <scope>compile</scope>
         </dependency>
 
         <!-- test dependencies -->

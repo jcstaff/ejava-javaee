@@ -6,14 +6,14 @@ JavaEE EJB, EAR, and RMI Client Exercise
 
     The root project is the parent to each of the other projects and can
     be used to invoke targets that apply to all children. This project
-    is known as a reactor or "pom" project since it has not artifacts
+    is known as a reactor or "pom" project since it has no artifacts
     other than a pom.xml (and children).
 
     The Impl project contains implementation code for the business rules
     (business logic and business objects) and data access tier. This 
     has been the focus of other exercises and could have been broken out
     into separate projects, however, they were condensed into a single
-    project for this exercise since they are not the focus of the exercise.
+    project for this exercise for simplicity.
 
     The EJB project will host the session beans, define the remote and 
     local interfaces for the application, and host the application within
@@ -42,7 +42,7 @@ JavaEE EJB, EAR, and RMI Client Exercise
 
         * EJB tier with local and remote interfaces, implementation
         hosting, thread management, resource management, security, 
-        and transaction management (future).
+        and transaction management.
 
         * Web tier with static and dynamic HTML using Servlets and JSPs
         integrated as part of a WAR.
