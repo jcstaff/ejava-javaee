@@ -242,6 +242,10 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
                     </exclusion>
+                    <exclusion> <!-- causes reference to defunct repo -->
+						  <groupId>trove</groupId>
+						  <artifactId>trove</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -280,6 +284,11 @@
     <build>
     	<pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>        
+                    <version>${sql-maven-plugin.version}</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
