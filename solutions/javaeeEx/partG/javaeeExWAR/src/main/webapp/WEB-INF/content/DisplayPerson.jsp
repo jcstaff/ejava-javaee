@@ -17,7 +17,7 @@
         Id: <%= person.getId() %><p/>
         First Name: <%=person.getFirstName()%><p/>
         Last Name: <%=person.getLastName()%><p/>
-        SSN: <%=person.getSsn()%></p>
+        SSN: <%=person.getSsn()%><p/>
 
         <form method="GET"
             action="<%=request.getContextPath()%>/model/admin/handler">

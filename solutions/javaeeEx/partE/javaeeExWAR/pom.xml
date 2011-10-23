@@ -8,13 +8,12 @@
         <groupId>myorg.javaee</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <groupId>myorg.javaee</groupId>
+
     <artifactId>javaeeExWAR</artifactId>
     <packaging>war</packaging>
-    <name>Java EE Exercise WAR</name>
 
+    <name>Java EE Exercise WAR</name>
     <repositories>
         <repository>
             <id>jboss-nexus</id>
@@ -66,6 +65,9 @@
     </build>
 
     <profiles>
+        <!--
+$ (cd javaeeExWAR; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
+-->
         <profile>
             <id>jetty</id>
             <build>
@@ -94,6 +96,12 @@
                     <version>6.1.0.Final</version>            
                     <type>pom</type>
                     <scope>compile</scope>
+                    <exclusions>
+                        <exclusion> <!-- troubles finding this artifact -->
+                            <groupId>com.sun.istack</groupId>
+                            <artifactId>istack-commons-runtime</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>commons-logging</groupId>

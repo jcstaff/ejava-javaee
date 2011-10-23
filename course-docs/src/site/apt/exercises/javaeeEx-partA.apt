@@ -820,6 +820,10 @@ $ cat javaeeExTest/pom.xml
                     <groupId>org.jboss.security</groupId>
                     <artifactId>jbosssx-client</artifactId>
                 </exclusion>
+                <exclusion> <!-- troubles finding this artifact -->
+                    <groupId>com.sun.istack</groupId>
+                    <artifactId>istack-commons-runtime</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -1296,6 +1300,60 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             </plugin>
 ---
 
+    [Note] When adding the cargo plugin and importing the project
+    within Eclipse, you may need to inform Eclipse to ignore this
+    plugin to avoid a meaningless error to be shown against the RMI Test
+    pom.xml. Optionally add the following to a profiles section of your
+    root pom.xml.
+
+---
+        <!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+          <id>m2e</id>
+          <activation>
+            <property>
+              <name>m2e.version</name>
+            </property>
+          </activation>
+          <build>
+            <pluginManagement>
+                <plugins>
+                    <plugin>
+                      <groupId>org.eclipse.m2e</groupId>
+                      <artifactId>lifecycle-mapping</artifactId>
+                      <version>1.0.0</version>
+                      <configuration>
+                        <lifecycleMappingMetadata>
+                          <pluginExecutions>
+
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.cargo</groupId>
+                                <artifactId>cargo-maven2-plugin</artifactId>
+                                <versionRange>[1.0.4,)</versionRange>
+                                <goals>
+                                  <goal>deploy</goal>
+                                  <goal>undeploy</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+
+                          </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                      </configuration>
+                    </plugin>
+                
+                </plugins>
+            </pluginManagement>
+           </build>
+        </profile>
+---
+
+    []
+
     [[1]] You will also need to add a dependency on the EAR from the RMI Test
     to satisfy the above plugin. This goes in the root dependency section.
 
@@ -1349,6 +1407,48 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Finished at: Tue Mar 01 23:56:58 EST 2011
 [INFO] Final Memory: 38M/269M
 [INFO] ------------------------------------------------------------------------
+---
+
+    [Note] If you receive an error trying to Access denied to:
+    http://repository.jboss.org/maven2, try adding the following
+    repository and plugin repository defintions to the root pom.xml in
+    an attempt to avoid that deprecated repository.
+
+---
+    <repositories>
+        <repository> <!--  this is needed to keep the build from trying to 
+                resolve artifacts from the deprecated repository.jboss.org repo -->
+            <id>maven-nuxeo</id>
+            <name>Maven Nuxeo Repository</name>
+            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository> <!--  this is needed to keep the build from trying to 
+                resolve artifacts from the deprecated repository.jboss.org repo -->
+            <id>maven-nuxeo</id>
+            <name>Maven Nuxeo Repository</name>
+            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 ---
 
 * {Setup JNDI access to Remote interface}

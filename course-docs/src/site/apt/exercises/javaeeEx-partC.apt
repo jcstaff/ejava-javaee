@@ -42,7 +42,7 @@ Persistence Unit within the EJB
     
 ---
 $ cd javaeeEx
-$ svn export https://ejava.info/repos/class/trunk/ejava-javaee/solutions/javaeeEx/partC/javaeeExImpl
+$ cp -r (class root)/solutions/javaeeEx/partC/javaeeExImpl .
 A    javaeeExImpl
 A    javaeeExImpl/src
 ...
@@ -102,6 +102,82 @@ javaeeEx
 |-- javaeeExTest
 |   |-- ...
 `-- pom.xml
+---
+
+    [Note] The new Impl module will add two plugins that may
+    trigger an error within Eclipse. If that is the case, extend your
+    pluginManagement definition in the root pom.xml to include coverage
+    for the hibernate3-maven-plugin and sql-maven-plugin plugins.
+
+---
+        <!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+              <id>m2e</id>
+              <activation>
+                <property>
+                  <name>m2e.version</name>
+                </property>
+              </activation>
+              <build>
+                <pluginManagement>
+                    <plugins>
+
+                       <plugin>
+                          <groupId>org.eclipse.m2e</groupId>
+                          <artifactId>lifecycle-mapping</artifactId>
+                          <version>1.0.0</version>
+                          <configuration>
+                            <lifecycleMappingMetadata>
+                              <pluginExecutions>
+
+                                <pluginExecution>
+                                  <pluginExecutionFilter>
+                                    <groupId>org.codehaus.cargo</groupId>
+                                    <artifactId>cargo-maven2-plugin</artifactId>
+                                    <versionRange>[1.0.4,)</versionRange>
+                                    <goals>
+                                      <goal>deploy</goal>
+                                      <goal>undeploy</goal>
+                                    </goals>
+                                  </pluginExecutionFilter>
+                                  <action>
+                                    <ignore/>
+                                  </action>
+                                </pluginExecution>
+
+                                <pluginExecution>
+                                  <pluginExecutionFilter>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>hibernate3-maven-plugin</artifactId>
+                                    <versionRange>[2.2,)</versionRange>
+                                    <goals>
+                                      <goal>hbm2ddl</goal>
+                                    </goals>
+                                  </pluginExecutionFilter>
+                                  <action>
+                                    <ignore/>
+                                  </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                  <pluginExecutionFilter>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>sql-maven-plugin</artifactId>
+                                    <versionRange>[1.0.0,)</versionRange>
+                                    <goals>
+                                      <goal>execute</goal>
+                                    </goals>
+                                  </pluginExecutionFilter>
+                                  <action>
+                                    <ignore/>
+                                  </action>
+                                </pluginExecution>
+                              </pluginExecutions>
+                            </lifecycleMappingMetadata>
+                          </configuration>
+                        </plugin>
+
+                    </plugins>
+                </pluginManagement>
 ---
 
     [[1]] Add the Impl sub-project to your root pom.xml file.

@@ -8,11 +8,11 @@
         <groupId>myorg.javaee</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <groupId>myorg.javaee</groupId>
+
     <artifactId>javaeeExTest</artifactId>
     <packaging>jar</packaging>
+
     <name>Java EE Exercise Remote Test</name>
     <description>
         This project provides an example RMI Test project.
@@ -147,6 +147,10 @@
                 <exclusion> <!-- gets in the way with JBoss6 and M2 -->
                     <groupId>org.jboss.security</groupId>
                     <artifactId>jbosssx-client</artifactId>
+                </exclusion>
+                <exclusion> <!-- troubles finding this artifact -->
+                    <groupId>com.sun.istack</groupId>
+                    <artifactId>istack-commons-runtime</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

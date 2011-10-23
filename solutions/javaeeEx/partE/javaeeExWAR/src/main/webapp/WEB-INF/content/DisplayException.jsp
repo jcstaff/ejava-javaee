@@ -2,9 +2,9 @@
             "http://www.w3.org/TR/html4/strict.dtd">
 
 <html>
-<header>
+<head>
    <title>General Exception Page</title>
-</header>
+</head>
 <body>
    <center><h1>General Exception Page</h1></center>
    <p>An error was reported by the application. More detailed information

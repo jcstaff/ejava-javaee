@@ -767,7 +767,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPeople.jsp
         <form method="GET"
             action="<%=request.getContextPath()%>/model/admin/handler">
             Index: <%= index %><p/>
-            Count: <%= count %></p>
+            Count: <%= count %><p/>
             <input type="hidden" name="index" value="<%= nextIndex %>"/>
             <input type="hidden" name="count" value="<%= count %>"/>
             <input type="submit" name="command" value="Get All People"/>
@@ -967,7 +967,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPerson.jsp
         Id: <%= person.getId() %><p/>
         First Name: <%=person.getFirstName()%><p/>
         Last Name: <%=person.getLastName()%><p/>
-        SSN: <%=person.getSsn()%></p>
+        SSN: <%=person.getSsn()%><p/>
 
         <form method="GET"
             action="<%=request.getContextPath()%>/model/admin/handler">
