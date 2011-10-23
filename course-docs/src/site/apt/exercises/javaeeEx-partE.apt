@@ -386,7 +386,7 @@ $ cat javaeeExEAR/pom.xml
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ear-plugin</artifactId>
-                <version>2.4.2</version>
+                <version>2.6</version>
                 <configuration>
                     <modules>
                         <webModule>
@@ -682,6 +682,13 @@ $ cat javaeeExWAR/src/test/resources/log4j.xml
 $ (cd javaeeExWAR; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
 ---
 
+    [Note] I have found it helpful to write the above command within
+    a commented out section within the pom.xml, use grep mvn, copy,
+    and paste to be able to quickly find and execute the commend in 
+    the future.
+
+    []
+
     [[1]] Access your servlet hosted within Jetty
 
         * http://localhost:9080/javaeeExWAR/
@@ -752,6 +759,12 @@ $ cat javaeeExWAR/pom.xml
                     <version>6.1.0.Final</version>            
                     <type>pom</type>
                     <scope>compile</scope>
+                    <exclusions>
+                        <exclusion> <!-- troubles finding this artifact -->
+                            <groupId>com.sun.istack</groupId>
+                            <artifactId>istack-commons-runtime</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
@@ -1129,9 +1142,9 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayException.jsp
             "http://www.w3.org/TR/html4/strict.dtd">
 
 <html>
-<header>
+<head>
    <title>General Exception Page</title>
-</header>
+</head>
 <body>
    <center><h1>General Exception Page</h1></center>
    <p>An error was reported by the application. More detailed information
@@ -1190,9 +1203,9 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/ErrorPage.jsp
      --%>
 <%@ page isErrorPage="true" %>
 <html>
-<header>
+<head>
    <title>General Exception Page</title>
-</header>
+</head>
 <body>
    <center><h1>General Exception Page</h1></center>
    <p>An error was reported by the application. More detailed information
@@ -1330,12 +1343,12 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/UnknownCommand.jsp
             "http://www.w3.org/TR/html4/strict.dtd">
 <jsp:directive.page errorPage="/WEB-INF/content/ErrorPage.jsp"/>
 <html>
-   <header>
+   <head>
       <title>Unknown Command</title>
-   </header>
+   </head>
 <body>
    <center><h1>Command Error</h1></center>
-   A request was made, but the command was not recognized</p>.
+   A request was made, but the command was not recognized<p/>.
    command=<%=request.getParameter("command")%>
    <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
 </body>

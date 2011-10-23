@@ -131,36 +131,110 @@
 
     <repositories>
         <repository>
+            <id>maven-nuxeo</id>
+            <name>Maven Nuxeo Repository</name>
+            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>    
+        <repository>
             <id>jboss-nexus</id>
             <name>JBoss Nexus Repository</name>
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>java.net-repo</id>
             <name>Java.net Maven Repository</name>
             <url>http://download.java.net/maven/2</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>webdev-plugins</id>
             <name>ejava webdev repository</name>
             <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
         </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
+            <id>maven-nuxeo</id>
+            <name>Maven Nuxeo Repository</name>
+            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
             <id>jboss-nexus</id>
             <name>JBoss Nexus Repository</name>
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>download-java-net</id>
             <name>Java.net Maven Repository</name>
             <url>http://download.java.net/maven/2</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>webdev-plugins</id>
             <name>ejava webdev repository</name>
             <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
         </pluginRepository>
     </pluginRepositories>
 
@@ -243,8 +317,12 @@
                         <artifactId>slf4j-api</artifactId>
                     </exclusion>
                     <exclusion> <!-- causes reference to defunct repo -->
-						  <groupId>trove</groupId>
-						  <artifactId>trove</artifactId>
+                        <groupId>trove</groupId>
+                        <artifactId>trove</artifactId>
+                    </exclusion>
+                    <exclusion> <!-- troubles finding this artifact -->
+                        <groupId>com.sun.istack</groupId>
+                        <artifactId>istack-commons-runtime</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -460,6 +538,12 @@
                             <artifactId>jboss-as-client</artifactId>
                             <version>${jboss-as-client.version}</version>
                             <type>pom</type>
+                            <exclusions>
+                                <exclusion> <!-- troubles finding this artifact -->
+                                    <groupId>com.sun.istack</groupId>
+                                    <artifactId>istack-commons-runtime</artifactId>
+                                </exclusion>
+                            </exclusions>
                         </dependency>
                     </dependencies>
                 </plugin>

@@ -12,8 +12,6 @@ import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

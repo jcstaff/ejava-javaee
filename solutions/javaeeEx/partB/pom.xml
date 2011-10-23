@@ -18,6 +18,41 @@
         <module>javaeeExEAR</module>
     </modules>
 
+    <repositories>
+        <repository> <!--  this is needed to keep the build from trying to 
+                resolve artifacts from the deprecated repository.jboss.org repo -->
+            <id>maven-nuxeo</id>
+            <name>Maven Nuxeo Repository</name>
+            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>    
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository> <!--  this is needed to keep the build from trying to 
+                resolve artifacts from the deprecated repository.jboss.org repo -->
+            <id>maven-nuxeo</id>
+            <name>Maven Nuxeo Repository</name>
+            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>    
+    </pluginRepositories>
+
     <profiles>
         <profile>
             <id>functional-tests</id>
@@ -29,6 +64,51 @@
             <modules>
                 <module>javaeeExTest</module>
             </modules>
+        </profile>
+
+    	<!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+	      <id>m2e</id>
+	      <activation>
+	        <property>
+	          <name>m2e.version</name>
+	        </property>
+	      </activation>
+	      <build>
+	      	<pluginManagement>
+                    <plugins>
+
+	               <plugin>
+	                  <groupId>org.eclipse.m2e</groupId>
+	                  <artifactId>lifecycle-mapping</artifactId>
+	                  <version>1.0.0</version>
+	                  <configuration>
+	                    <lifecycleMappingMetadata>
+	                      <pluginExecutions>
+
+	                        <pluginExecution>
+	                          <pluginExecutionFilter>
+	                            <groupId>org.codehaus.cargo</groupId>
+	                            <artifactId>cargo-maven2-plugin</artifactId>
+	                            <versionRange>[1.0.4,)</versionRange>
+	                            <goals>
+	                              <goal>deploy</goal>
+	                              <goal>undeploy</goal>
+	                            </goals>
+	                          </pluginExecutionFilter>
+	                          <action>
+	                            <ignore/>
+	                          </action>
+	                        </pluginExecution>
+
+	                      </pluginExecutions>
+	                    </lifecycleMappingMetadata>
+	                  </configuration>
+	                </plugin>
+
+                    </plugins>
+	      	</pluginManagement>
+           </build>
         </profile>
     </profiles>
 </project>

@@ -34,7 +34,7 @@
         <form method="GET"
             action="<%=request.getContextPath()%>/model/admin/handler">
             Index: <%= index %><p/>
-            Count: <%= count %></p>
+            Count: <%= count %><p/>
             <input type="hidden" name="index" value="<%= nextIndex %>"/>
             <input type="hidden" name="count" value="<%= count %>"/>
             <input type="submit" name="command" value="Get All People"/>
