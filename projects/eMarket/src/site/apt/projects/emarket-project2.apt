@@ -292,8 +292,22 @@ Project2: eMarket N-Tier Application
 
         [[A]] Create a demonstration of 
         transactions and the capability of rollback by implementing a 
-        scenario that adds something to the database and then a follow-on
+        scenario that adds something to the database and then a *follow-on*
         rollback causes the changes to be undone.
+
+        [Note] To satisfy the transaction demonstration requirement, you
+        must actually store something in the database and then later in 
+        the transaction roll it back based on some decision. If you make
+        the decision before you store the information -- you are not
+        satisfying the requirement. It is common for students to 
+        implement a wrapper around an existing method that takes a 
+        collection and populate the collection with good data up front
+        and bad data at the end. The good data that got successfully
+        processed should get rolled back once the bad data is 
+        processed. Create remote methods that can tell your RMI client
+        that this actually occured.
+
+        []
 
 * Testing
 
