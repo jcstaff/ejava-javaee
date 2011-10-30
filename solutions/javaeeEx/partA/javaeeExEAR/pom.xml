@@ -66,6 +66,16 @@
                         <artifactId>jboss-as-client</artifactId>
                         <version>6.1.0.Final</version>
                         <type>pom</type>
+                        <exclusions>
+                            <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                                <groupId>org.jboss.security</groupId>
+                                <artifactId>jbosssx-client</artifactId>
+                            </exclusion>
+                            <exclusion> <!-- troubles finding this artifact -->
+                                <groupId>com.sun.istack</groupId>
+                                <artifactId>istack-commons-runtime</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
