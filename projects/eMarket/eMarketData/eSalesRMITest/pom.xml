@@ -110,6 +110,12 @@
             <artifactId>jboss-as-client</artifactId>
             <type>pom</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion> <!-- troubles finding this artifact -->
+                    <groupId>com.sun.istack</groupId>
+                    <artifactId>istack-commons-runtime</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
@@ -185,6 +191,12 @@
                         <artifactId>jboss-as-client</artifactId>
                         <version>${jboss-as-client.version}</version>
                         <type>pom</type>
+                        <exclusions>
+                            <exclusion> <!-- troubles finding this artifact -->
+                                <groupId>com.sun.istack</groupId>
+                                <artifactId>istack-commons-runtime</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
 
                     <dependency>
@@ -225,6 +237,12 @@
                         <artifactId>jboss-as-client</artifactId>
                         <version>${jboss-as-client.version}</version>
                         <type>pom</type>
+                        <exclusions>
+                            <exclusion> <!-- troubles finding this artifact -->
+                                <groupId>com.sun.istack</groupId>
+                                <artifactId>istack-commons-runtime</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
                     <dependency>
                         <groupId>org.jboss.jbossas</groupId>
