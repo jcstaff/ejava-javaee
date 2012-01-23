@@ -26,42 +26,37 @@
       </p>
       <subsection name="What's New" id="whatsnew">
       <ul>
-          <li>2011-11-30: Posted Async TODOs</li>
-          <li>2011-11-15: Posted JMS materials</li>
-          <li>2011-11-09: Posted Security Updates</li>
-          <li>2011-11-01: Posted Web Tier TODOs</li>
-          <li>2011-10-30: Posted corrections for -Pundeploy profile</li>
-          <li>2011-10-26: Posted More EJB TODOs</li>
-          <li>2011-10-22: Posted build changes to address deprecated jboss-repo</li>
-          <li>2011-10-17: Posted EJB/Server-side Materials</li>
-          <li>2011-10-10: Posted Final Project 1 TODOs</li>
-          <li>2011-10-04: Posted EJB-QL TODOs</li>
-          <li>2011-09-26: Posted ORM Relationship updates</li>
-          <li>2011-09-20: Posted Core JPA TODOs</li>
-          <li>2011-09-13: Posted EntityManager TODOs</li>
-          <li>2011-09-07: Corrected link to eMarket project</li>
-          <li>2011-09-06: Posted Data Tier Topics</li>
-          <li>2011-08-31: Posted initial class site</li>
+      <!--
+          <li>2012-xx-xx: Posted Async TODOs</li>
+          <li>2012-xx-xx: Posted JMS materials</li>
+          <li>2012-xx-xx: Posted Security Updates</li>
+          <li>2012-xx-xx: Posted Web Tier TODOs</li>
+          <li>2012-xx-xx: Posted More EJB TODOs</li>
+          <li>2012-xx-xx: Posted EJB/Server-side Materials</li>
+          <li>2012-xx-xx: Posted Final Project 1 TODOs</li>
+          <li>2012-xx-xx: Posted EJB-QL TODOs</li>
+          <li>2012-xx-xx: Posted ORM Relationship updates</li>
+          <li>2012-xx-xx: Posted Core JPA TODOs</li>
+          <li>2012-xx-xx: Posted EntityManager TODOs</li>
+          <li>2012-xx-xx: Posted Data Tier Topics</li>
+          -->
+          <li>2012-01-xx: Posted initial class site</li>
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
+      <!--
       <li><ul>
-          <li>Setup and deploy your JMS publisher code to eSales
+          <li>Setup and deploy your JMS publisher code to eLeague
           session EJB</li>
-          <li>Verify that the eSales JMS JSE Subscriber from last
-          week receives published messages from eSales EJB.</li>
-          <li>Setup and implement a JMS MDB in the eBidbot to receive 
-          updates published by eSales.</li>
-          <li>Implement EJBTimers to perform scheduled work within
-          eSales and eBidbot.</li>
+          <li>Verify that the eLeague JMS JSE Subscriber from last
+          week receives published messages from eLeague EJB.</li>
+          <li>Setup and implement a JMS MDB in the eClub to receive 
+          updates published by eLeague.</li>
+          <li>Implement an EJBTimer to perform scheduled work within
+          eLeague.</li>
           <li>Test, cleanup, document, and turn in project 3</li> 
       </ul></li>
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
       <li><ul>
           <li>Finish security configuration, implementation, and testing</li>
 
@@ -84,7 +79,7 @@
           <li>Complete your project 2, finish testing, and turn in.</li>
 
           <li>Start project 3</li>
-          <li>Add user.properties and roles.properties to eSales project</li>
+          <li>Add user.properties and roles.properties to eLeague project</li>
           <li>Assign EJB to security-domain "other".
           The RMI Tests should fail access at this point.</li>
 
@@ -107,18 +102,17 @@
       <li><ul>
           <li>Go through Web UI parts of the JavaEE exercise.</li>
           <li>Look over Web UI parts of the ejbsessionBank.</li>
-          <li>Add a WAR project to eSales. Add in the controller,
+          <li>Add a WAR project to eLeague. Add in the controller,
           handler, and supporting JSP implementations.</li>
-          <li>Add a WAR project to eBidbot. Add in the controller,
+          <li>Add a WAR project to eClub. Add in the controller,
           handler, and supporting JSP implementations.
           This WAR may obtain functionality implemented by 
-          eSalesEJB. However, it should not directly communicate
-          with eSalesEJB. eBidbotEJB should act as a facade for 
-          all behavior performed on behalf of eBidbot WAR</li>
+          eLeagueEJB. However, it should not directly communicate
+          with eLeagueEJB. eClubEJB should act as a facade for 
+          all behavior performed on behalf of eClubWAR</li>
       </ul></li>
       <li><ul>
-          <li>Finish implementing EJB use cases for end-to-end
-          testing.</li>
+          <li>Finish implementing EJB use cases for end-to-end testing.</li>
           <li>Add @Transaction declarations</li>
           <li>Implement the transaction test requirement. You may
           want to place logic for the transaction test within 
@@ -133,7 +127,7 @@
           <li>Apply the maven, EJB, EAR, RMI Test, and remote interface
           concepts from the exercise to your project 2.</li>
           <li>Design your remote interfaces and DTO classes</li>
-          <li>Have an end-to-end thread through eSalesTest, EJB, and project 1
+          <li>Have an end-to-end thread through eLeagueTest, EJB, and project 1
           operational</li>
           <li>Begin adding the other session beans, remote interfaces,
           business logic integration, and RMI tests for project 2.</li>
@@ -201,19 +195,24 @@
           problem fields as @Transient at this point in time.</li>
           <b>
           <li>If you have not yet done so, please submit a copy of
-          your project to me for early sanity check. If you did so last
-          week and I pointed out significant issues -- please resubmit.
-          The project should be in a known and stable state where it
-          will build from the root with known and documented issues.</li>
+          your project to me for early submission feedback. If you did so last
+          week and I pointed out significant issues - please resubmit.
+          In addition to the requirements from last week, this week's
+          submission project should have BO classed defined that 
+          correspond to the entire project. They should be mapped to
+          the database in a way that is consistent with your JDBC design.
+          Relationships are not part of this submission. This is your
+          last chance to complete the early submission feeback assignment
+          for credit.</li>
           </b>
       </ul></li>
       <li><ul>
           <li>Go through the EntityManager Exercise</li>
           <li>Look over the class project example implementation under the 
-          projects/eMarket/eSales directory</li>
+          projects/eSport/eLeague directory</li>
           <li>Add JPA/Hibernate infrastructure to your project DAO module.
           This should at least consist of a successful connection to
-          the DB.  You are done with this step when you have a separate
+          the DB.  You are done with this goal when you have a separate
           JPA JUnit test for the DAO and the setUp() method is able to
           create an EntityManager.</li>
           <li>Define a few business object (BO) classes as being an
@@ -223,10 +222,10 @@
           @Transient annotation. We are not ready to cover relationships
           just yet.</li>
 
-          <li>Design and implement an initial JPA implementation for your DAO</li>
+          <li>Design and implement an initial JPA implementation for your DAO(s).</li>
 
           <li>Design and implement a set of unit tests for your JPA
-          DAO. Note how the default schema for the @Entities may not
+          DAO(s). Note how the default schema for the @Entities may not
           match up with your DB schema at this point when you run
           the tests.</li>
 
@@ -245,14 +244,17 @@
           details.</li>
 
           <b>
-          <li>Send me a copy of your
-          project, in a stable, known state, sometime this week;
-          ideally by early Sunday evening. You do not have to be complete
-          with the TODO items, but you should be able to describe what
-          you know you have left to complete and describe any issues
-          that have gotten in your way. This will not be graded, but
-          that should not stop you from turning it in and making an
-          honest effort to have the TODOs completed.</li>
+          <li>If you have not yet done so, please submit a copy of your
+          project to me for early submission feedback. If you did so last
+          week and I pointed out significant issues - please resubmit.
+          You should have a project structure in place, at least one
+          JDBC-based and one JPA-based JUnit DAO test case implemented
+          with connectivity thru to the DB.  Concentrate of very few
+          BO classes, tables, and DAOs at this point and focus more on
+          the end-to-end assembly of the data tier project. This will be
+          graded and used as feedback to the class. You will have another
+          chance next week to turn in a project for early submission
+          feedback if you cannot turn something in this week.</li>
           </b>
 
           <li>Continue to consider all BO, DB Schema, and DAO work as
@@ -282,16 +284,33 @@
           You only need a create() method for the project.</li>
           <li>Consider all BO, DB Schema, and DAO work as draft prototypes at this time to get
           something end-to-end running. You will refine over next several weeks.</li>
+          <b>
+          <li>Send me a copy of your project, in a stable, known state,
+          sometime this week; ideally by early Monday evening. You should have
+          a project structure in place, at least one JDBC-based 
+          JUnit DAO test case implemented with connectivity thru to the DB. 
+          Concentrate of very few BO classes, tables, and DAOs at this point and 
+          focus more on the end-to-end assembly of the data tier project. This
+          will be graded and used as feedback to the class. You will have 
+          another chance next week to turn in a project for early submission
+          feedback if you cannot turn something in this week.</li>
+          </b>
       </ul></li>
+      -->
       <li><ul>
           <li>register for newsgroup and setup e-mail handling (all
           e-mails will have ejava_class in subject)</li>
           <li>post at least 1 test message to newsgroup</li>
-          <li>setup development environment by going through exercises
-          0 and 1</li>
+          <li>setup development environment by going through exercises 0 and 1</li>
+          <li>post your weekly newsgroup contribution based on development environment setup</li>
       </ul></li>
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
       <li><ul>
-          <li>had a nice summer!</li>
+          <li>had a nice break!</li>
       </ul></li>
       </ul>
       </subsection>
