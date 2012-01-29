@@ -3,8 +3,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-    <!-- this overrides the default $HOME/.m2/repository location. -->
+    <offline>false</offline>
+    <!-- this overrides the default $HOME/.m2/repository location. 
     <localRepository>c:/jhu/repository</localRepository>
+    -->
 
     <!--
     <mirrors>
@@ -22,13 +24,12 @@
             <!-- some of these paths will need to be updated to match your
                  specific configuration -->
             <properties>
-                <m2.repo>c:/jhu/repository</m2.repo>
-
                 <jboss.protocol>http</jboss.protocol>
                 <jboss.host>localhost</jboss.host>
                 <jboss.servlet.port>8080</jboss.servlet.port>
                 <jboss.user>admin</jboss.user>
                 <jboss.password>password</jboss.password>
+                <db.host>${jboss.host}</db.host>
             </properties>                                  
         </profile>        
         <profile>
@@ -41,7 +42,7 @@
         <profile>
             <id>jboss6</id>
             <properties>
-                <jboss.home>c:/apps/jboss-6.0.0.Final</jboss.home>
+                <jboss.home>c:/apps/jboss-6.1.0.Final</jboss.home>
                 <jboss.server>ejava-jboss6</jboss.server>
             </properties>                                  
         </profile>        

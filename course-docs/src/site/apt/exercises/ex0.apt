@@ -27,7 +27,7 @@ Exercise 0: Development Environment Setup
     * {{{Part_C} Download and install a Git Client}}
     to obtain source code for this course.
 
-    * {{{Part_D}Download and install the Maven 2 Build System}} 
+    * {{{Part_D}Download and install the Maven 3 Build System}} 
     to manage our portable build environment.
 
     * {{{Part_E}Download and install the JBoss Application Server}}
@@ -96,12 +96,18 @@ Exercise 0: Development Environment Setup
     []
 
     [[1]] Go to the
-    {{{http://java.sun.com/javase/downloads/widget/jdk6.jsp} Sun JavaSE JDK
-    6 Download Page}} and download JDK 6. 
+    {{{http://www.oracle.com/technetwork/java/javase/downloads/index.html}
+    JavaSE Download Page}} and download JDK 6 (not 7). They have alternate
+    packaging of the JDK to include JavaEE and NetBeans. The JavaEE includes
+    the Glassfish Application Server. We will not be using Glassfish or
+    Netbeans as a part of class -- so please just take the JavaSE 6 JDK.
 
     [[1]] Change the installation directory so that it does not have
     a spaces in its path. On Windows XP, I changed mine to 
-    C:\apps\java\jdk1.6.0_26 and C:\apps\java\jre1.6.0_26
+    C:\apps\java\jdk1.6.0_30 and C:\apps\java\jre1.6.0_30. Windows 7
+    seems to have eliminated spaces in many of the default paths 
+    (e.g., "Documents and Settings") so changing the path is much less
+    an issue on the later operating system.
 
     [[1]] Go through Control Panel -> System -> Advanced -> Environment
     Variables and add ia definition for JAVA_HOME and add %JAVA_HOME%\bin 
@@ -119,9 +125,10 @@ export PATH=`cygpath --unix $JAVA_HOME/bin`:$PATH
 ---
 ---
 $ java -version
-java version "1.6.0_26"
-Java(TM) SE Runtime Environment (build 1.6.0_26-b03)
-Java HotSpot(TM) Client VM (build 20.1-b02, mixed mode, sharing)
+C:\Documents and Settings\jcstaff>java -version
+java version "1.6.0_30"
+Java(TM) SE Runtime Environment (build 1.6.0_30-b12)
+Java HotSpot(TM) Client VM (build 20.5-b03, mixed mode, sharing)
 ---
 
 * {Part C}: Download and install a Git Client
@@ -140,37 +147,35 @@ Java HotSpot(TM) Client VM (build 20.1-b02, mixed mode, sharing)
             the windows-based tool or go back to the cygwin setup to download
             and install the subversion client.
 
-            * Windows Users: I personally have liked TortoiseSVN in the past
-            and feel {{{http://code.google.com/p/tortoisegit/}TortoiseGIT}}
-            may be just as good. TortoiseGIT appears to
-            be a windows integration above a command line capability called
-            msygit or Git for Windows. You won't be doing anything overly complex
-            with GIT this semester, so the command line tool may be all you need.
+            * Non-Cygwin Windows Users: Git comes in a core layer and then
+            OS-layer add-ons. The core layer is sufficient for class.
 
-                [[1]] Install {{{http://code.google.com/p/msysgit/}msygit, Git for Windows}}
-                before installing TortoiseGIT. I used the
-                {{{http://msysgit.googlecode.com/files/msysGit-fullinstall-1.7.6-preview20110708.exe}
-                msysGit-fullinstall-1.7.6-preview20110708.exe}} link for my 32bit
-                Windows XP system.  The path for this tool won't be a part of any path
-                we use to build or run projects. I placed it in c:\apps\msysgit.
+                [[1]] Install {{{http://code.google.com/p/msysgit/downloads/detail?name=Git-1.7.8-preview20111206.exe&can=3&q=official+Git}
+                Full installer for official Git for Windows 1.7.8}}. 
+                
+                [[1]] You can select the default installation path since
+                it will not be used for any of the build classpaths.
 
-                [[1]] Run "/share/msysGit/add-shortcut.tcl" in the shell window when it
-                finishes building. This will give you a list of links you can create.
-                I used "/share/msysGit/add-shortcut.tcl Desktop".
+                [[1]] Accept the default installation option of "Use Git Bash bash 
+                only". As the prompt states, it has the least risk and will
+                be suitable for the minor amount of use required in class.
 
-                [[1]] Optionally install {{http://code.google.com/p/tortoisegit/downloads/list}
-                TourtoiseGIT}} layer. I used 1.7.3, the default putty option, and the
-                default installation directory.
+                [[1]] Chose your checkout style. Don't worry about commit style
+                you will only be performing read-only checkouts. I chose 
+                "Checkout as-is, commit Unix-style line endings" since I used
+                all linux-style editors on Windows. You may want the Window
+                checkout format.
 
-                [[1]] Launch TortoiseGIT settings from the start menu. There will be an error
-                about not finding the msygit web site. Select edit settings and tell it where
-                to find the git binaries, I entered "C:\apps\msysgit\msysgit\bin".
+                [[1]] Click on the "Git Bash" icon after the installation is complete.
 
-                [[3]] TortoiseGIT launchers have been added to your right click
-                menus and available from the explorer window as well. 
+                [[1]] Follow the instructions below for testing your access to the
+                git repository
 
             * Eclipse Users: There is an git plugin for Eclipse available
             called {{{http://eclipse.org/egit/}EGit}}. You can install it
+            by going to Help->Eclipse Marketplace, typing Git in the search field,
+            and clicking Install for EGit.
+
             by following the instructions located at {{http://eclipse.org/egit/download/}} 
             once you have Eclipse installed. I added the following site to my 
             Eclipse sites configuration {http://download.eclipse.org/releases/indigo}}.
@@ -182,8 +187,8 @@ Java HotSpot(TM) Client VM (build 20.1-b02, mixed mode, sharing)
 
             []
 
-        [[1]] Test out your git  installation by performing a checkout
-        of the ejava-javaee course files. 
+        [[1]] Test out your git installation and access to the class repository
+        by performing a checkout of the ejava-javaee course files. 
 
             [[1]] Create a directory for class work; e.g., c:/jhu/784
 
@@ -192,42 +197,42 @@ Java HotSpot(TM) Client VM (build 20.1-b02, mixed mode, sharing)
             {{{github}https://github.com/}}.
 
 ---
-Url: git://github.com/jcstaff/ejava-javaee.git
-Directory: C:\jhu\784\ejava-javaee
+$ mkdir -p c:/jhu/784
+$ cd c:/jhu/784
+$ git clone git://github.com/jcstaff/ejava-javaee.git
+Cloning into 'ejava-javaee'...
+remote: Counting objects: 14459, done.
+remote: Compressing objects: 100% (5064/5064), done.
+remote: Total 14459 (delta 6582), reused 14351 (delta 6474)
+Receiving objects: 100% (14459/14459), 15.91 MiB | 805 KiB/s, done.
+Resolving deltas: 100% (6582/6582), done.
+
+$ ls
+ejava-javaee
+
+$ cd ejava-javaee
+$ git branch
+* master
 ---
 
----
-git.exe clone   --progress -v  "git://github.com/jcstaff/ejava-javaee.git" "C:\jhu\784\ejava-javaee"
-
-Receiving objects: 100% (13680/13680), 14.91 MiB | 2.00 MiB/s
-Resolving deltas: 100% (6227/6227)
-Checking out files: 100% (1504/1504)
-Checking out files: 100% (1504/1504), done.
----
-
-            [Note:] The master and several working branches will have a lot
-            of information in them. The semester branch will start out
-            small and reach that size over time. It is intended that you 
-            limit your work to the semester branch to not get confused with
-            material that we won't be covering for weeks.
+            [Note:] The master branch and my working branch contain 
+            everything in them. The class branch is tuned for what you 
+            will be interested in.
 
             []
 
-            [[1]] Switch to the development/2011fall branch by dowing a git
-            checkout in the directory you just created. Don't worry, you can
-            always get back to the previous content or you can clone a separate
-            copy.
+            [[1]] Create a local branch from the origin/2012spring-class
+            branch. Don't worry, you can always get back to the previous
+            content with the check command or you can clone a separate copy
+            again.
 
 ---
-Branch: remotes/origin/2011fall-class
-Create New Branch: 2011fall-class
-Track
----
----
-git.exe checkout  --track -b 2011fall-class remotes/origin/2011fall-class
+$ git checkout -b origin/2012spring-class
+Switched to a new branch 'origin/2012fall-class'
 
-Branch 2011fall-class set up to track remote branch 2011fall-class from origin.
-Switched to a new branch '2011fall-class'
+$ git branch
+  master
+* origin/2012spring-class
 ---
 
             [[1]] Repeat after me, "Cool!". This beats managing a bunch of 
@@ -243,10 +248,10 @@ Switched to a new branch '2011fall-class'
     are for when you want to reference Maven repositories within Ant.
 
     [[1]] Unzip the archive. I put mine in c:/apps/, which resulted in a
-    c:/apps/apache-maven-3.0.3 directory. 
+    c:/apps/apache-maven-3.0.4 directory. 
 
 ---
-$ ls c:/apps/apache-maven-3.0.3
+$ ls c:/apps/apache-maven-3.0.4
 LICENSE.txt  NOTICE.txt  README.txt  bin  boot  conf  lib
 ---
 
@@ -261,13 +266,13 @@ LICENSE.txt  NOTICE.txt  README.txt  bin  boot  conf  lib
 
 ---
 $ which mvn
-/cygdrive/c/apps/apache-maven-3.0.2/bin/mvn
+/cygdrive/c/apps/apache-maven-3.0.4/bin/mvn
 
 $ mvn -version
-Apache Maven 3.0.3 (r1075438; 2011-02-28 12:31:09-0500)
-Maven home: C:\apps\apache-maven-3.0.3\bin\..
-Java version: 1.6.0_26, vendor: Sun Microsystems Inc.
-Java home: C:\apps\java\jdk1.6.0_26\jre
+Apache Maven 3.0.4 (r1232337; 2012-01-17 03:44:56-0500)
+Maven home: C:\apps\apache-maven-3.0.4\bin\..
+Java version: 1.6.0_30, vendor: Sun Microsystems Inc.
+Java home: C:\apps\java\jdk1.6.0_30\jre
 Default locale: en_US, platform encoding: Cp1252
 OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
 ---
@@ -282,10 +287,10 @@ $ cygpath --unix c:/
 /cygdrive/c
 
 $ cygpath --unix $MAVEN_HOME
-/cygdrive/c/apps/apache-maven-3.0.3
+/cygdrive/c/apps/apache-maven-3.0.4
 
 $ cygpath --windows $MAVEN_HOME
-c:\apps\apache-maven-3.0.3
+c:\apps\apache-maven-3.0.4
 
 $ cygpath --windows /cygdrive/c
 c:\
@@ -321,6 +326,25 @@ settings.xml
         Windows users will end up with a new c:/jhu/repository directory
         created when they issue the mvn command in the following steps.
 
+    [[1]] Look at the environment-specific valies in this file and 
+    modify if they are not appropriate to your system. The most common to
+    edit is the localRepository and jboss.home values.
+
+        * localRepository - this is where Maven will store local
+        copies of downloaded artifacts. By default, it will be located
+        in HOME/.m2/repository
+
+        * jboss.home - this is the installation directory for 
+        your unzipped JBoss installation.
+
+---
+    <!-- this overrides the default $HOME/.m2/repository location. -->
+    <localRepository>c:/jhu/repository</localRepository>
+
+    ...
+    <jboss.home>c:/apps/jboss-6.1.0.Final</jboss.home>
+---
+
     [[1]] cd to the root directory you checked out from subversion and
     attempt to build the project.
 
@@ -343,10 +367,11 @@ $ mvn clean install
     Download site for the JBoss Application Server}}.  Download version
     6.1.0.Final. 
 
-    [Note:] JBoss 7.x was relased within the last month but was too significant of
-    a change to integrate with class for this semester. The grader and I will be
-    installing and supporting JBoss 6 this semester and all work must be submitted
-    such that it works with the environment described in this exercise.
+    [Note:] JBoss 7.x has been relased but is too significant of a change
+    for the value derived to integrate with class for this semester. The
+    grader and I will be installing and supporting JBoss 6 this semester
+    and all work must be submitted such that it works with the environment
+    described in this exercise.
 
     []
 
@@ -354,7 +379,7 @@ $ mvn clean install
     path. This produced a directory called c:/apps/jboss-6.1.0.Final.
 
     [Note:] If you choose a directory other than c:/apps/jboss-6.1.0.Final, make sure to 
-    update the value for jboss.home in the MAVEN %HOME%/.m2/settings.xml file.
+    update the value for jboss.home in the maven HOME/.m2/settings.xml file.
 
     []
 
@@ -381,8 +406,7 @@ all  default  ejava-jboss6  jbossweb-standalone  minimal  standard
     * Copy in class configuration files for the server. Be sure to use ejava-jboss61 as the source of the copy and ejava-jboss6 as the destination of the copy. This will be the only time you will need to reference the 61 directory. From here on out we will just refer to the server as ejava-jboss6.
 
 ---
-$ tree /home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/
-/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/
+$ tree c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/
 |-- conf
 |   `-- login-config.xml
 `-- deploy
@@ -393,14 +417,13 @@ $ tree /home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resour
     |-- hsqldb-ds.xml
     `-- jboss-logging.xml
 
-$ cp -rv /home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/* ejava-jboss6/
-
-`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/conf/login-config.xml' -> `ejava-jboss6/conf/login-config.xml'
-`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hsqldb-ds.xml' -> `ejava-jboss6/deploy/hsqldb-ds.xml'
-`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/ejava-jdbc-ds.xml' -> `ejava-jboss6/deploy/ejava-jdbc-ds.xml'
-`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hornetq/hornetq-jms.xml' -> `ejava-jboss6/deploy/hornetq/hornetq-jms.xml'
-`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hornetq/hornetq-configuration.xml' -> `ejava-jboss6/deploy/hornetq/hornetq-configuration.xml'
-`/home/jcstaff/proj/ejava-javaee/git/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/jboss-logging.xml' -> `ejava-jboss6/deploy/jboss-logging.xml'
+$ cp -rv c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/* ejava-jboss6/
+`c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/conf/login-config.xml' -> `ejava-jboss6/conf/login-config.xml'
+`c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/ejava-jdbc-ds.xml' -> `ejava-jboss6/deploy/ejava-jdbc-ds.xml'
+`c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hornetq/hornetq-configuration.xml' -> `ejava-jboss6/deploy/hornetq/hornetq-configuration.xml'
+`c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hornetq/hornetq-jms.xml' -> `ejava-jboss6/deploy/hornetq/hornetq-jms.xml'
+`c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/hsqldb-ds.xml' -> `ejava-jboss6/deploy/hsqldb-ds.xml'
+`c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/deploy/jboss-logging.xml' -> `ejava-jboss6/deploy/jboss-logging.xml'
 ---
 
         []
@@ -536,7 +559,7 @@ java -classpath c:/apps/jboss-6.1.0.Final/common/lib/hsqldb.jar org.hsqldb.Serve
         Java EE developers.
 
     [[1]] Download and install
-    {{{http://www.eclipse.org/}Eclipse}}. Download the Indigo version
+    {{{http://www.eclipse.org/}Eclipse}}. Download the Indigo (3.7.1) version
     for Java EE Developers.
 
         * I extracted the files to c:/apps, which resulted in a c:/apps/eclipse 
@@ -546,18 +569,26 @@ java -classpath c:/apps/jboss-6.1.0.Final/common/lib/hsqldb.jar org.hsqldb.Serve
         was just an unzip, there was nothing automatically added to your
         start menu.
 
-    [[1]] Install the Maven2  Integration for Eclipse (m2e) Plug-in to allow maven
-    builds to be kicked off within Eclipse. Core documentation is located 
-    at {{{http://eclipse.org/m2e/} the m2eclipse site}}. You don't
-    manually download any artifacts. All downloads and installation are
-    handled within the Eclipse software updates mechanism.
+    [[1]] Install the Maven Integration for Eclipse (m2e) Plug-in to allow 
+    Eclipse projects to stay in-sync with Maven project definitions and
+    to be able to kick off Maven-based builds from within Eclipse.
 
-        * Open Help -> Install New Software
+        * Open Help -> Eclipse Marketplace...
 
-        * Click "Add ..." and enter "http://download.eclipse.org/technology/m2e/releases"
+        * Type "m2e" in the search bar
 
-        * Check "m2e" - Maven Integration for Eclipse and m2e - slf4j over logback 
-        logging and click "Install...". Mine came up as version 1.0.0.20110607-2117.
+        * Click "Install" for "Maven Integration for Eclipse"
+
+        * Follow instructions to complete installation.
+
+    [[1]] Install the Maven Integration for Eclipse WTP to allow 
+    JavaEE Eclipse projects to stay in-sync with Maven project definitions.
+
+        * Open Help -> Eclipse Marketplace...
+
+        * Type "m2e" in the search bar
+
+        * Click "Install" for "Maven Integration for Eclipse WTP"
 
         * Follow instructions to complete installation.
 
@@ -577,7 +608,7 @@ java -classpath c:/apps/jboss-6.1.0.Final/common/lib/hsqldb.jar org.hsqldb.Serve
 
         * Preferences -> Java -> Installed JREs -> Add...
 
-        * JRE home: c:\apps\java\jdk1.6.0_26
+        * JRE home: c:\apps\java\jdk1.6.0_30
 
         * Finish
 
