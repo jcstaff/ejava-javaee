@@ -176,12 +176,6 @@ Java HotSpot(TM) Client VM (build 20.5-b03, mixed mode, sharing)
             by going to Help->Eclipse Marketplace, typing Git in the search field,
             and clicking Install for EGit.
 
-            by following the instructions located at {{http://eclipse.org/egit/download/}} 
-            once you have Eclipse installed. I added the following site to my 
-            Eclipse sites configuration {http://download.eclipse.org/releases/indigo}}.
-            Use of this plugin is of best use when you are
-            commiting changes to the baseline. You will *not* be doing this during class.
-
             [Note:] You can checkout the class examples using any of the git clients
             above. 
 
@@ -194,7 +188,7 @@ Java HotSpot(TM) Client VM (build 20.5-b03, mixed mode, sharing)
 
             [[1]] Clone the class repository using
             {{git://github.com/jcstaff/ejava-javaee.git}}. This is located on
-            {{{github}https://github.com/}}.
+            {{https://github.com/}}.
 
 ---
 $ mkdir -p c:/jhu/784
@@ -227,12 +221,13 @@ $ git branch
             again.
 
 ---
-$ git checkout -b origin/2012spring-class
-Switched to a new branch 'origin/2012fall-class'
+$ git checkout --track origin/2012spring-class
+Branch 2012spring-working set up to track remote branch 2012spring-working from origin.
+Switched to a new branch '2012spring-class'
 
 $ git branch
   master
-* origin/2012spring-class
+* 2012spring-class
 ---
 
             [[1]] Repeat after me, "Cool!". This beats managing a bunch of 
@@ -359,6 +354,17 @@ $ mvn clean install
     [[1]] We'll look at and configure Maven a bit more in Exercise 1. 
     You'll be responsible for basic tasks of building and 
     testing an application. There will be plenty of examples supplied in class.
+
+    [Note:] Later in the semester when the source tree becomes much larger -
+    if you encounter Out of Memory errors. Set JVM properties of the 
+    build by setting these values thru MAVEN_OPTS in your shell
+
+---
+example:
+export MAVEN_OPTS="-Xms128m -Xmx512m -XX:MaxPermSize=512m"
+---
+
+    []
 
 * {Part E}: Download and install JBoss Application Server
 
@@ -631,7 +637,7 @@ java -classpath c:/apps/jboss-6.1.0.Final/common/lib/hsqldb.jar org.hsqldb.Serve
     to my shortcut for Eclipse.
 
 ---
-Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_26\bin
+Target: C:\apps\eclipse\eclipse.exe -vm c:\apps\java\jdk1.6.0_30\bin
 ---
     
     [[1]] Feel free to experiment whether the embedded or external 
