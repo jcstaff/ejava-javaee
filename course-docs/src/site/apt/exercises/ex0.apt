@@ -31,7 +31,8 @@ Exercise 0: Development Environment Setup
     to manage our portable build environment.
 
     * {{{Part_E}Download and install the JBoss Application Server}}
-    with EJB3 Support to supply a database and application server for our projects.
+    to supply an application server with JavaEE containers and a 
+    database for our projects.
 
     * {{{Part_F}Download and install Eclipse IDE}} to provide a mechanism
     for enhanced code development and debugging support.
@@ -42,27 +43,25 @@ Exercise 0: Development Environment Setup
 
 * {Part A}: (Optional!) Download and install Cygwin
 
-        [Note:] This really is optional; especially if you are not using
-        a Windows Operating System. I know of no mandatory
-        tools in class that require this Unix emulator interface. 
-        However, all posted shell command lines will be expressed in bash.
-        If you are comfortable with the DOS shell and can easily translate 
-        my bash commands into window clicks and DOS commands (e.g., how
-        do you translate "find src -type f" into DOS?) feel free to skip it.
+        [Note:] This really is optional and does not even apply if you are
+        not using a Windows Operating System. I know of no mandatory tools
+        in class that require this Unix emulator interface.  However,
+        all posted shell command lines will be expressed in bash.  If you
+        are comfortable with the DOS shell and can easily translate my
+        bash commands into window clicks and DOS commands (e.g., how do
+        you translate "find src -type f" into DOS?) feel free to skip it.
+        If you are in doubt -- skip it.
 
     [[1]] Download the Cygwin installer from the 
     {{{http://cygwin.com/}Cygwin Site}}.
 
-    [[1]] The following
-    {{{./cygwininstall/cygwin_install.html}
-    cygwin installation example snapshot trail}}
-    may be of some assistance in installation. A full installation can 
-    take many, many hours. The example has a few hints as to how
-    to download enough without getting the entire application. If you find
-    out you are missing a command/tool, you can go back to the installer
-    later and download/install that specific package. Use {{{http://cygwin.com/packages/}
-    Setup Package Search}} to help locate anything that you are missing. Be sure
-    to also select the following
+    [[1]] A full installation can take many, many hours to install a
+    lot of things you will never need. My recommendation is that you
+    start out with the following short list of tools for now.  If you
+    find out you are missing a command/tool, you can go back to the
+    installer later and download/install that specific package. Use
+    {{{http://cygwin.com/packages/} Setup Package Search}} to help locate
+    anything that you are missing.
 
         * Archive -> zip & unizip
 
@@ -83,7 +82,10 @@ Exercise 0: Development Environment Setup
         * System -> ping - helpful when debugging a failed URL
 
         * Utils ->util-linux - to get a larger collection of command line
-        utilities, including "more"
+
+    The following {{{./cygwininstall/cygwin_install.html} cygwin
+    installation example snapshot trail}} may be of some assistance
+    in installation.
 
     [[1]] Windows users; welcome to the sane world of the bash shell and vi.
 
@@ -97,10 +99,11 @@ Exercise 0: Development Environment Setup
 
     [[1]] Go to the
     {{{http://www.oracle.com/technetwork/java/javase/downloads/index.html}
-    JavaSE Download Page}} and download JDK 6 (not 7). They have alternate
-    packaging of the JDK to include JavaEE and NetBeans. The JavaEE includes
-    the Glassfish Application Server. We will not be using Glassfish or
-    Netbeans as a part of class -- so please just take the JavaSE 6 JDK.
+    JavaSE Download Page}} and download JDK 6 (not 7). They have
+    alternate packaging of the JDK to include JavaEE and NetBeans. The
+    JavaEE packaging includes the Glassfish Application Server. We will
+    not be using Glassfish or Netbeans as a part of class -- so please
+    just take the JavaSE 6 JDK.
 
     [[1]] Change the installation directory so that it does not have
     a spaces in its path. On Windows XP, I changed mine to 
@@ -207,6 +210,14 @@ ejava-javaee
 $ cd ejava-javaee
 $ git branch
 * master
+
+$ git branch -a
+* master
+  remotes/origin/2011fall-working
+  remotes/origin/2012spring-class
+  remotes/origin/2012spring-working
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
 ---
 
             [Note:] The master branch and my working branch contain 
@@ -217,8 +228,8 @@ $ git branch
 
             [[1]] Create a local branch from the origin/2012spring-class
             branch. Don't worry, you can always get back to the previous
-            content with the check command or you can clone a separate copy
-            again.
+            content with the checkout command or you can clone a separate
+            copy again.
 
 ---
 $ git checkout --track origin/2012spring-class
@@ -232,8 +243,27 @@ $ git branch
 
             [[1]] Repeat after me, "Cool!". This beats managing a bunch of 
             zip files any day. As the content is updated during the
-            semester, just do an update to see changes
+            semester, just do a git "fetch" and "rebase" within the class 
+            branch to see changes
 
+---
+$ git checkout 2012spring-class
+Switched to branch '2012spring-class'
+
+$ git fetch origin
+remote: Counting objects: 55, done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 17 (delta 9), reused 17 (delta 9)
+Unpacking objects: 100% (17/17), done.
+From git://github.com/jcstaff/ejava-javaee
+   16f601d..39f423d  2011fall-class -> origin/2011fall-class
+   6cd872c..c36d6da  2012spring-class -> origin/2012spring-class
+   c9e577f..c36d6da  master     -> origin/master
+
+$ git rebase origin/2012spring-class
+First, rewinding head to replay your work on top of it...
+Fast-forwarded 2012spring-class to origin/2012spring-class.
+---
 
 * {Part D}: Download and install Maven Build System
 
@@ -296,12 +326,13 @@ $ export PATH=$PATH:`cygpath --unix $MAVEN_HOME/bin`
     []
 
     [[1]] Add a personal maven configuration file, called settings.xml,
-    to your $HOME/.m2 directory (windows and Cygwin users will put this in
-    %HOME%/.m2). If your operating system home directory has spaces in the
-    path this settings.xml file can be used to relocate it to a different
-    location. If your home directory does not have a space in it (e.g.,
-    Windows 7, MacOS, Linux), you can turn off this option.
-    Use the <<{{{../files/maven/settings.xml} following file}}>> as a starting point.
+    to your HOME/.m2 directory (windows and Cygwin users will put this
+    in %HOME%/.m2). If your operating system home directory has spaces in
+    the path this settings.xml file can be used to relocate the repository
+    to a different location. If your home directory does not have a space
+    in it (e.g., Windows 7, MacOS, Linux), you can turn off this option.
+    Use the <<{{{../files/maven/settings.xml} following file}}>> as a
+    starting point.
 
 ---
 $ cd %HOME%
@@ -317,10 +348,6 @@ settings.xml
         no matter if you are using Cygwin or DOS, this will be what Windows
         uses for you (ex. c:\Documents and Settings\jcstaff\.m2). 
 
-        [Note:] If you place the settings.xml file in the correct location,
-        Windows users will end up with a new c:/jhu/repository directory
-        created when they issue the mvn command in the following steps.
-
     [[1]] Look at the environment-specific valies in this file and 
     modify if they are not appropriate to your system. The most common to
     edit is the localRepository and jboss.home values.
@@ -333,8 +360,9 @@ settings.xml
         your unzipped JBoss installation.
 
 ---
-    <!-- this overrides the default $HOME/.m2/repository location. -->
+    <!-- this overrides the default $HOME/.m2/repository location. 
     <localRepository>c:/jhu/repository</localRepository>
+    -->
 
     ...
     <jboss.home>c:/apps/jboss-6.1.0.Final</jboss.home>
@@ -360,6 +388,9 @@ $ mvn clean install
     build by setting these values thru MAVEN_OPTS in your shell
 
 ---
+example:
+set MAVEN_OPTS="-Xms128m -Xmx512m -XX:MaxPermSize=512m"
+
 example:
 export MAVEN_OPTS="-Xms128m -Xmx512m -XX:MaxPermSize=512m"
 ---
@@ -395,8 +426,6 @@ export MAVEN_OPTS="-Xms128m -Xmx512m -XX:MaxPermSize=512m"
 
     * Copy the jboss-6.1.0.Final/server/standard directory to ejava-jboss6.
 
-    * Overwrite several of the files in the new directory with the following
-
     []
 
 ---
@@ -409,10 +438,14 @@ $ ls
 all  default  ejava-jboss6  jbossweb-standalone  minimal  standard
 ---
 
-    * Copy in class configuration files for the server. Be sure to use ejava-jboss61 as the source of the copy and ejava-jboss6 as the destination of the copy. This will be the only time you will need to reference the 61 directory. From here on out we will just refer to the server as ejava-jboss6.
+    * Copy in class configuration files for the server. Be sure to use
+    ejava-jboss61 as the source of the copy and ejava-jboss6 as the
+    destination of the copy. This will be the only time you will need
+    to reference the 61 directory. From here on out we will just refer
+    to the server as ejava-jboss6.
 
 ---
-$ tree c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/
+c:/jhu/784/ejava-javaee/servers/ejava-jboss61/src/main/resources/ejava-jboss61/
 |-- conf
 |   `-- login-config.xml
 `-- deploy
@@ -450,13 +483,13 @@ $ c:/apps/jboss-6.1.0.Final/bin/run.sh -c ejava-jboss6
 
   JBOSS_HOME: C:\apps\jboss-6.1.0.Final
 
-  JAVA: /cygdrive/c/apps/java/jdk1.6.0_21/bin/java
+  JAVA: /cygdrive/c/apps/java/jdk1.6.0_30/bin/java
 
   JAVA_OPTS: -server -Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.
 rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Dprogram.name=run.sh -Dja
 va.library.path=C:\apps\jboss-6.1.0.Final\bin\native\bin
 
-  CLASSPATH: C:\apps\jboss-6.1.0.Final\bin\run.jar;C:\apps\java\jdk1.6.0_21\lib\tools.jar
+  CLASSPATH: C:\apps\jboss-6.1.0.Final\bin\run.jar;C:\apps\java\jdk1.6.0_30\lib\tools.jar
 
  =========================================================================
 
@@ -529,7 +562,7 @@ Server shutdown may take a while - check logfiles for completion
 
 ---
 > cd c:/apps/jboss-6.1.0.Final/server/ejava-jboss6/data/hypersonic
-> java -classpath c:/apps/jboss-6.1.0.GA/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+> java -classpath c:/apps/jboss-6.1.0.Final/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
 ---
 
     [Note:] I created a startdb.bat script that looks something like the following. -address 
