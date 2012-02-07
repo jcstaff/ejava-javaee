@@ -1,6 +1,7 @@
-package ejava.examples.dao.jdbc;
+package ejava.examples.daoex.jdbc;
 
 import static org.junit.Assert.*;
+
 
 import java.sql.Connection;
 
@@ -12,9 +13,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ejava.examples.dao.BookDAO;
-import ejava.examples.dao.DAOException;
-import ejava.examples.dao.domain.Book;
+import ejava.examples.daoex.bo.Book;
+import ejava.examples.daoex.dao.BookDAO;
+import ejava.examples.daoex.dao.DAOException;
+import ejava.examples.daoex.jdbc.JDBCBookDAO;
 
 
 /**
@@ -24,12 +26,10 @@ import ejava.examples.dao.domain.Book;
  * since there are no JTA transactions available outside of the JavaEE
  * container.
  * 
- * @author jcstaff
- * $Id:$
  */
 public class JDBCBookDAOTest {
     public static final boolean USE_GENERATED_ID = false;
-    static Log log_ = org.apache.commons.logging.LogFactory
+    static Log log = org.apache.commons.logging.LogFactory
             .getLog(JDBCBookDAOTest.class);
 
 	private static String dbDriver = 
@@ -52,12 +52,10 @@ public class JDBCBookDAOTest {
      * to obtain a new connection to the database.
      */
     private static Connection getConnection() throws Exception {
-        log_.info("getConnection(" + dbUrl + ", " + dbUser + ", "
-                + dbPassword + ")");
+        log.info(String.format("getConnection(%s, %s, %s",dbUrl, dbUser,dbPassword));
         Thread.currentThread().getContextClassLoader().loadClass(
                         dbDriver).newInstance();
-        return DriverManager.getConnection(dbUrl, dbUser,
-                        dbPassword);
+        return DriverManager.getConnection(dbUrl, dbUser, dbPassword);
     }
 
     /**
@@ -65,7 +63,7 @@ public class JDBCBookDAOTest {
      * to the database. Ideally, we would cache connections, but ... 
      */
     private void closeConnection() throws Exception {
-        log_.info("closeConnection()=" + connection);
+        log.info(String.format("closeConnection()=%s",connection));
         if (connection != null) {
            connection.close();
            connection = null;
@@ -74,17 +72,17 @@ public class JDBCBookDAOTest {
 
     /**
      * Before each test is run, we need to make sure we have a connection
-     * to the database and the DAOs within this thread have a reference 
-     * to it.
+     * to the database and the DAOs have a reference to it.
      */
     @Before
     public void setUp() throws Exception {
         connection = getConnection();
         connection.setAutoCommit(false);
-        JDBCBookDAO.setConnection(connection);
         dao = new JDBCBookDAO();
+        ((JDBCBookDAO)dao).setConnection(connection);
+        cleanup();
     }
-
+    
     /**
      * Close (or return to cache) connections between each test so we 
      * don't leak valuable resources.
@@ -92,14 +90,25 @@ public class JDBCBookDAOTest {
     @After
     public void tearDown() throws Exception {
         closeConnection();
-    }    
+    }
+    
+    /**
+     * Remove all books in DB under test.
+     * @throws DAOException
+     */
+    protected void cleanup() throws Exception {
+    	for (Book b : dao.findAll(0, 0)) {
+    		dao.remove(b);
+    	}
+    	connection.commit();
+    }
 
     /**
      * This test verifies the ability of the DAO to create an object.
      */
     @Test
     public void testCreate() throws Exception {
-        log_.info("testCreate()");
+        log.info("testCreate()");
 
         Book book = new Book(nextId());
         book.setTitle("a");
@@ -108,14 +117,14 @@ public class JDBCBookDAOTest {
         book.setPages(20);
 
         try {
-            log_.info("creating book=" + book);
+            log.info("creating book=" + book);
             Book book2 = dao.create(book);
             connection.commit();
             assertNotNull(book2);
-            log_.info("created book=" + book2);
+            log.info("created book=" + book2);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             connection.rollback();
             fail("" + ex);
         }
@@ -126,7 +135,7 @@ public class JDBCBookDAOTest {
      */
     @Test
     public void testUpdate() throws Exception {
-        log_.info("testUpdate()");
+        log.info("testUpdate()");
 
         Book book = new Book(nextId());
         dao.create(book);
@@ -141,26 +150,24 @@ public class JDBCBookDAOTest {
             connection.commit();
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             connection.rollback();
             fail("" + ex);
         }
         
         Book book3 = dao.get(book.getId());
-        log_.info("book1=" + book);
-        log_.info("book2=" + book2);
-        log_.info("book3=" + book3);
+        log.info("book1=" + book);
+        log.info("book2=" + book2);
+        log.info("book3=" + book3);
 
         assertEquals(book.getId(), book2.getId());
 
         assertEquals(book2.getId(), book3.getId());
-        assertTrue("authors not match", book2.getAuthor().equals(
-                book3.getAuthor()));
-        assertTrue("titles not match", book2.getTitle()
-                .equals(book3.getTitle()));
-        assertTrue("descriptions not match ", book2.getDescription().equals(
-                book3.getDescription()));
-        assertTrue("pages not match", book2.getPages() == book3.getPages());
+        assertEquals("authors not match", book2.getAuthor(), book3.getAuthor());
+        assertEquals("titles not match", book2.getTitle(), book3.getTitle());
+        assertEquals("descriptions not match", book2.getDescription(), 
+        		book3.getDescription());
+        assertEquals("pages not match", book2.getPages(), book3.getPages());
     }
 
     /**
@@ -169,7 +176,7 @@ public class JDBCBookDAOTest {
      */
     @Test
     public void testGet() throws Exception {
-        log_.info("testGet()");
+        log.info("testGet()");
 
         Book book = new Book(nextId());
         book.setTitle("a");
@@ -181,7 +188,7 @@ public class JDBCBookDAOTest {
             connection.commit();
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             connection.rollback();
             fail("" + ex);
         }
@@ -200,7 +207,7 @@ public class JDBCBookDAOTest {
      */
     @Test
     public void testRemove() throws Exception {
-        log_.info("testRemove()");
+        log.info("testRemove()");
         Book book = new Book(nextId());
         book.setDescription("testRemove");
         try {
@@ -208,7 +215,7 @@ public class JDBCBookDAOTest {
             connection.commit();
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             connection.rollback();
             fail("" + ex);
         }
@@ -227,7 +234,7 @@ public class JDBCBookDAOTest {
     
     @Test
     public void testFind() throws Exception {
-        log_.info("testFind()");
+        log.info("testFind()");
         try {
             for(int i=0; i<100; i++) {
                 Book book = new Book(nextId());
@@ -237,35 +244,12 @@ public class JDBCBookDAOTest {
             connection.commit();
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             connection.rollback();
             fail("" + ex);
         }
 
         Collection<Book> books = dao.findAll(20, 25);
-        assertTrue("unexpected number of books:" + books.size(), 
-            books.size()==25);
-    }
-
-    /**
-     * This test verifies that the framework can create a connection and
-     * make it available to the DAO. A test class is used to inspect the 
-     * non-public access to that connection.
-     */
-    @Test
-    public void testGetConnection() throws Exception {
-        log_.info("testGetConnection()");
-        Connection connection = JDBCBookDAOTest.getConnection();
-        JDBCBookDAO.setConnection(connection);
-
-        TestClass dao = new TestClass();
-
-        assertEquals(connection, dao.getConnection());
-        JDBCBookDAO.setConnection(null);
-    }
-    private class TestClass extends JDBCDAOBase {
-        public Connection getConnection() {
-            return super.getConnection();
-        }
+        assertEquals("unexpected number of books", 25, books.size());
     }
 }

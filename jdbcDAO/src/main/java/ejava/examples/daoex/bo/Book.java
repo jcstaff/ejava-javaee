@@ -1,4 +1,4 @@
-package ejava.examples.dao.domain;
+package ejava.examples.daoex.bo;
 
 import java.io.Serializable;
 
@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class Book implements Serializable {
     private static final long serialVersionUID = 1L;
     private long id;
-    private long version = 0;
+    private long version;
     private String title;
     private String author;
     private int pages;
@@ -61,10 +61,10 @@ public class Book implements Serializable {
     public String toString() {
         StringBuilder text = new StringBuilder();
         text.append("id=" + id);
-        text.append(", title=" + title);
-        text.append(", author=" + author);
-        text.append(", pages=" + pages);
-        text.append(", version=" + version);
+        text.append(", title=").append(title);
+        text.append(", author=").append(author);
+        text.append(", pages=").append(pages);
+        text.append(", version=").append(version);
         return text.toString();
     }
 }

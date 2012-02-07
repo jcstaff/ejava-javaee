@@ -1,8 +1,8 @@
-package ejava.examples.dao;
+package ejava.examples.daoex.dao;
 
 import java.util.Collection;
 
-import ejava.examples.dao.domain.Book;
+import ejava.examples.daoex.bo.Book;
 
 /**
  * This interface provides an example DAO interface for a Book. Note that
@@ -12,12 +12,6 @@ import ejava.examples.dao.domain.Book;
  * @author jcstaff
  */
 public interface BookDAO {
-
-    /**
-     * Get next unique ID for a book.
-     */
-    int getNextId() throws DAOException;
-
     /**
      * Add the book to the database.
      */
