@@ -14,7 +14,8 @@ import ejava.projects.eleague.ejb.ParserTestRemote;
 
 public class ParserServerTest {
 	private static final Log log = LogFactory.getLog(ParserServerTest.class);
-	private static final String jndiName = System.getProperty("jndi.name");
+	private static final String jndiName = 
+		System.getProperty("jndi.name","ejava/projects/eLeagueTestEJB/ParserTestEJB/remote");
 	
 	private static ParserTestRemote parser;
 

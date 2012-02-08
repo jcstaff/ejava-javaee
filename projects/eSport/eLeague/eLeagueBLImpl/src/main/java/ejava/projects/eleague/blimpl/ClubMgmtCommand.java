@@ -24,7 +24,7 @@ public class ClubMgmtCommand extends ELeagueIngestCommand {
 	private static PrintStream out = System.out;
 	
 	private static EntityManagerFactory getEMF() {
-		return Persistence.createEntityManagerFactory("eLeagueBO");
+		return Persistence.createEntityManagerFactory("eLeagueBO-test");
 	}
 	
 	private static void invoke(ClubMgmt clubMgmt) throws Exception {

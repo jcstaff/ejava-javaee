@@ -44,12 +44,12 @@
     <build>
          <!--tell the resource plugin to perform filtering on resources 
              to fill in JDBC URL, etc. -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
                 <filtering>true</filtering>
-            </resource>
-        </resources>
+            </testResource>
+        </testResources>
 
         <plugins>
             <plugin>
@@ -57,26 +57,35 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>                                
-                        <property>
-                          <name>jdbc.driver</name>
-                          <value>${jdbc.driver}</value>
-                        </property>
-                        <property>
-                          <name>jdbc.url</name>
-                          <value>${jdbc.url}</value>          
-                        </property>
-                        <property>
-                          <name>jdbc.user</name>
-                          <value>${jdbc.user}</value>          
-                        </property>
-                        <property>
-                          <name>jdbc.password</name>
-                          <value>${jdbc.password}</value>          
-                        </property>
-                    </systemProperties>                                
+                    <systemPropertyVariables>
+                        <jdbc.driver>${jdbc.driver}</jdbc.driver>
+                        <jdbc.url>${jdbc.url}</jdbc.url>
+                        <jdbc.user>${jdbc.user}</jdbc.user>
+                        <jdbc.password>${jdbc.password}</jdbc.password>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
+            
+           <!-- this is an example of creating a reusable test archive -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <!-- include or exclude as appropriate -->
+                            <includes>
+                                <include>META-INF/persistence.xml</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
         </plugins>
     </build>
 
