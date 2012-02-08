@@ -1,8 +1,10 @@
-package ejava.examples.dao.domain;
+package ejava.examples.daoex.bo;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import ejava.examples.daoex.bo.Book;
 
 public class BookTest {
     private static String LONG_DESCRIPTION;

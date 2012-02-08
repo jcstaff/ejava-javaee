@@ -1,5 +1,8 @@
 package ejava.projects.eleague.blimpl;
 
+import static org.junit.Assert.*;
+
+
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,40 +15,42 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.projects.eleague.blimpl.ELeagueIngestor;
 import ejava.projects.eleague.bo.Venue;
 import ejava.projects.eleague.dao.ClubDAO;
 import ejava.projects.eleague.jdbc.JDBCClubDAO;
 
-import junit.framework.TestCase;
-
-public class ELeagueIngestorTest extends TestCase {
+/**
+ * This class provides a test of the business logic classes in the league.
+ * @author jcstaff
+ *
+ */
+public class ELeagueIngestorTest {
 	private static Log log = LogFactory.getLog(ELeagueIngestorTest.class);
-	private static String jdbcDriver = System.getProperty("jdbc.driver");
-	private static String jdbcURL = System.getProperty("jdbc.url");
-	private static String jdbcUser = System.getProperty("jdbc.user");
-	private static String jdbcPassword = System.getProperty("jdbc.password");
+	private static String jdbcDriver = System.getProperty("jdbc.driver","org.hsqldb.jdbcDriver");
+	private static String jdbcURL = System.getProperty("jdbc.url","jdbc:hsqldb:hsql://localhost:9001");
+	private static String jdbcUser = System.getProperty("jdbc.user","sa");
+	private static String jdbcPassword = System.getProperty("jdbc.password","");
 	
 	private EntityManagerFactory emf;
 	private EntityManager em;
 	private ClubDAO clubDAO;
 	private Connection connection;
-	
+
+	@Before
 	public void setUp() throws Exception {
-		assertNotNull("jdbc.driver not supplied", jdbcDriver);
-		assertNotNull("jdbc.url not supplied", jdbcURL);
-		assertNotNull("jdbc.user not supplied", jdbcUser);
-		assertNotNull("jdbc.password not supplied", jdbcPassword);
-		
 		log.debug("loading JDBC driver:" + jdbcDriver);
 		Thread.currentThread()
 		      .getContextClassLoader()
 		      .loadClass(jdbcDriver)
 		      .newInstance();
 		
-		log.debug("getting connection(" + jdbcURL +
-				", user=" + jdbcUser + ", password=" + jdbcPassword + ")");
+		log.debug(String.format("getting connection(%s, %s, %s)",
+				jdbcURL, jdbcUser, jdbcPassword));
 		connection = 
 			DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPassword);
 		
@@ -54,7 +59,7 @@ public class ELeagueIngestorTest extends TestCase {
 		
 		connection.setAutoCommit(false);
 		
-		emf = Persistence.createEntityManagerFactory("eLeagueBO");
+		emf = Persistence.createEntityManagerFactory("eLeagueBO-test");
 		em = emf.createEntityManager();
 		//we could easily switch this to the JPA version here
 		//clubDAO = new JPAClubDAO();
@@ -64,7 +69,8 @@ public class ELeagueIngestorTest extends TestCase {
 		em.getTransaction().begin();
 	}
 	
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (connection != null) {
 			connection.commit();
 			connection.close();
@@ -94,7 +100,7 @@ public class ELeagueIngestorTest extends TestCase {
 		em.getTransaction().commit();
 	}
 
-
+	@Test
 	public void testIngestAll() throws Exception {
 		log.info("*** testIngestAll ***");
 		
@@ -108,6 +114,11 @@ public class ELeagueIngestorTest extends TestCase {
 		ingestor.setClubDAO(clubDAO);
 		ingestor.setInputStream(is);
 		ingestor.ingest();
+		
+		assertEquals("unexpected number of addresses", 18,
+			((Long)em.createQuery("select count(a) from Address a").getSingleResult()).intValue());
+		assertEquals("unexpected number of venues", 18,
+				((Long)em.createQuery("select count(v) from Venue v").getSingleResult()).intValue());
 	}
 
 }

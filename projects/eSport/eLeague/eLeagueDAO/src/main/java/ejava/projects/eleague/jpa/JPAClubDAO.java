@@ -18,15 +18,21 @@ import ejava.projects.eleague.dao.ClubDAOException;
 public class JPAClubDAO implements ClubDAO {
 	private EntityManager em;
 	
+	/**
+	 * This method injects an entity manager to be used by all DAO methods.
+	 * @param em
+	 */
 	public void setEntityManager(EntityManager em) {
 		this.em = em;
 	}
 
+	@Override
 	public void createVenue(Venue venue) {
         em.persist(venue);
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
     public List<Venue> getVenues(int index, int count) 
         throws ClubDAOException {
 	    return (List<Venue>)em.createQuery("select v from Venue v")

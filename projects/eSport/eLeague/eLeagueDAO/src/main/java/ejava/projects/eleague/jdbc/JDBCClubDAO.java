@@ -16,14 +16,25 @@ import ejava.projects.eleague.dao.ClubDAOException;
 import ejava.projects.eleague.bo.Address;
 import ejava.projects.eleague.bo.Venue;
 
+/**
+ * This class implements data access to the club portion of the league
+ * using JDBC.
+ * @author jcstaff
+ *
+ */
 public class JDBCClubDAO implements ClubDAO {
 	private static Log log = LogFactory.getLog(JDBCClubDAO.class);
 	private Connection connection;
 	
+	/**
+	 * This method injects a connection to be used by all DAO methods.
+	 * @param connection
+	 */
 	public void setConnection(Connection connection) {
 		this.connection = connection;
 	}
 
+	@Override
 	public void createVenue(Venue venue) {
 		PreparedStatement statement1 = null;
 		Statement statement2 = null;
@@ -38,8 +49,7 @@ public class JDBCClubDAO implements ClubDAO {
 		
 		try {
             statement1 = connection.prepareStatement(
-                    "INSERT INTO ELEAGUE_ADDR " +
-                    "(ID, CITY) " +
+                    "INSERT INTO ELEAGUE_ADDR (ID, CITY) " +
                     "VALUES (null, ?)");
             statement1.setString(1, venue.getAddress().getCity());
 		    statement1.execute();
@@ -57,8 +67,7 @@ public class JDBCClubDAO implements ClubDAO {
             }
 		    
 			statement3 = connection.prepareStatement(
-                "INSERT INTO ELEAGUE_VEN " +
-                "(ID, NAME, ADDR_ID) " +
+                "INSERT INTO ELEAGUE_VEN (ID, NAME, ADDR_ID) " +
                 "VALUES (null, ?, ?)");
 			statement3.setString(1, venue.getName());
 			statement3.setLong(2, venue.getAddress().getId());
@@ -93,6 +102,10 @@ public class JDBCClubDAO implements ClubDAO {
 		}
 	}
 
+	/**
+	 * This method is left un-implemented,
+	 */
+	@Override
 	public List<Venue> getVenues(int index, int count)
 			throws ClubDAOException {
 		throw new ClubDAOException("not implemented", null);

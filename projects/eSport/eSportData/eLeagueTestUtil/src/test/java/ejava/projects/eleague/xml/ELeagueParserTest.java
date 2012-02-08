@@ -1,6 +1,9 @@
 package ejava.projects.eleague.xml;
 
+import static org.junit.Assert.*;
+
 import java.io.BufferedInputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -11,22 +14,34 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.projects.eleague.dto.Contest;
 import ejava.projects.eleague.dto.Division;
 import ejava.projects.eleague.dto.ELeague;
 import ejava.projects.eleague.dto.Season;
 
-import junit.framework.TestCase;
-
-public class ELeagueParserTest extends TestCase {
+/**
+ * This class provides a test of the provided XML data file and DTO parer.
+ * @author jcstaff
+ *
+ */
+public class ELeagueParserTest {
 	private static final Log log = LogFactory.getLog(ELeagueParserTest.class);
-	private String inputDir = System.getProperty("inputDir");
+	private String inputDir = System.getProperty("inputDir", "target/classes/xml");
 	
+	@Before
 	public void setUp() {
 		assertNotNull("inputDir not supplied", inputDir);
 	}
 	
+	/**
+	 * This test will parse each of the XML present in the resource
+	 * directory.
+	 * @throws Exception
+	 */
+	@Test
 	public void testParser() throws Exception {
 		File inDir = new File(inputDir);
 		File[] files = inDir.listFiles(new FilenameFilter() {
@@ -39,7 +54,7 @@ public class ELeagueParserTest extends TestCase {
 			testParser(file.getCanonicalPath());
 		}
 	}
-	public void testParser(String inputFile) throws Exception {
+	private void testParser(String inputFile) throws Exception {
 		log.info("*** testParser:" + inputFile + " ***");
 		
 		InputStream is = new FileInputStream(inputFile);
@@ -112,13 +127,13 @@ public class ELeagueParserTest extends TestCase {
 		return text.toString();
 	}
 	
-	public void checkSeason(Season season) {
+	private void checkSeason(Season season) {
 		for (Division division : season.getDivision()) {
 			checkDivision(season, division);
 		}
 	}
 	
-	public void checkDivision(Season season, Division division) {
+	private void checkDivision(Season season, Division division) {
 		if ("Spring NeverEnds".equals(season.getName())) {
 	        assertNotNull("division contact was null", division.getContact());
 		}

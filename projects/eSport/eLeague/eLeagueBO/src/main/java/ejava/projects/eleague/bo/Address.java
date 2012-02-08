@@ -17,9 +17,9 @@ import javax.persistence.Table;
  * @author jcstaff
  *
  */
-@SuppressWarnings("serial")
 @Entity @Table(name="ELEAGUE_ADDR")
 public class Address implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private long id;
 	private String city;
 	

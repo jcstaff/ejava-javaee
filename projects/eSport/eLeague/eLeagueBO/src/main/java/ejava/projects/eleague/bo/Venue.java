@@ -18,10 +18,10 @@ import javax.persistence.Table;
  * @author jcstaff
  *
  */
-@SuppressWarnings("serial")
 @Entity @Table(name="ELEAGUE_VEN")
 public class Venue implements Serializable {
-    private long id;
+	private static final long serialVersionUID = 1L;
+	private long id;
     private String name;
     private Address address;
     
