@@ -1,6 +1,6 @@
-package ejava.examples.dao;
+package ejava.examples.daoex;
 
-import ejava.examples.dao.domain.Author;
+import ejava.examples.daoex.bo.Author;
 
 public interface AuthorDAO {
 

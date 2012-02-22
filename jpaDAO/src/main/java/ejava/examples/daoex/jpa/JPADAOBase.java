@@ -1,4 +1,4 @@
-package ejava.examples.dao.jpa;
+package ejava.examples.daoex.jpa;
 
 import javax.persistence.EntityManager;
 
