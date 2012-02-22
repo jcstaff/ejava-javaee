@@ -1,4 +1,4 @@
-package ejava.examples.dao.jpa;
+package ejava.examples.daoex.jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -6,8 +6,8 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ejava.examples.dao.AuthorDAO;
-import ejava.examples.dao.domain.Author;
+import ejava.examples.daoex.AuthorDAO;
+import ejava.examples.daoex.bo.Author;
 
 /**
  * This class implements a DAO using javax.persistence.EntityManager. Most

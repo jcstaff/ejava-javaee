@@ -1,4 +1,4 @@
-package ejava.examples.dao.jpa;
+package ejava.examples.daoex.jpa;
 
 import org.junit.runner.RunWith;
 

@@ -1,4 +1,4 @@
-package ejava.examples.dao.jpa;
+package ejava.examples.daoex.jpa;
 
 import static org.junit.Assert.*;
 
@@ -14,20 +14,18 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ejava.examples.dao.domain.Author;
+import ejava.examples.daoex.bo.Author;
 
 /**
- * This class provides an exploded view of the DAO operations for clarify
- * of the Java Persistence API, but at the risk of obscuring the use of a 
- * DAO. DAOs are still useful and necessary when using JPA. This unit test
- * is just an early demo of the mechanics of the API, NOT the architecture 
- * that should surround the use of the API.
+ * This class provides a scalled down version of JPAAuthorDAOTest, in that
+ * it only employs an Extended Persistence Context and eliminates the
+ * DAO in order to simplify the presentation of the code.
  * 
  * @author jcstaff
  */
-public class JPANoDAODemo {
-    private static Log log_ = LogFactory.getLog(JPANoDAODemo.class);
-    EntityManagerFactory emf; 
+public class JPAExtendedOnlyDemo {
+    private static Log log_ = LogFactory.getLog(JPAExtendedOnlyDemo.class);
+    private EntityManagerFactory emf;
     private EntityManager em;    
         
     @Before
@@ -171,36 +169,16 @@ public class JPANoDAODemo {
         author.setLastName(lastName);
         author.setSubject(subject);
         author.setPublishDate(published);        
-        em.persist(author);                
-        assertTrue("author is not managed", em.contains(author));
-        em.getTransaction().begin();
-        em.getTransaction().commit();
+        em.persist(author);
         
-        //make sure we have our author in the DB but not currently 
-        //managed by the entity manager
-        em.clear();
-        assertFalse("author is still managed", em.contains(author));        
-        
-        //now make some changes to our baseline object
         author.setFirstName("updated " + firstName);
         author.setLastName("updated " + lastName);
         author.setSubject("updated " + subject);
         author.setPublishDate(new Date(published.getTime()+ 1000));
-        
-        //show that the DB has not been updated
-        Author dbAuthor = em.find(Author.class,author.getId());
-        assertFalse("unexpected first name", 
-                author.getFirstName().equals(dbAuthor.getFirstName()));
-        assertFalse("unexpected last name", 
-                author.getLastName().equals(dbAuthor.getLastName()));
-        assertFalse("unexpected subject", 
-                author.getFirstName().equals(dbAuthor.getSubject()));
-        assertFalse("unexpected publish date", 
-                author.getFirstName().equals(dbAuthor.getPublishDate()));        
-        
         try {
-            //example of using setter methods to make changes in DB
-            dbAuthor = em.find(Author.class, author.getId());
+            em.getTransaction().begin();
+            em.getTransaction().commit();
+            Author dbAuthor = em.find(Author.class, author.getId());
 
             dbAuthor.setFirstName(author.getFirstName());
             dbAuthor.setLastName(author.getLastName());
@@ -219,7 +197,6 @@ public class JPANoDAODemo {
             fail("" + ex);
         }
         
-        //now verify changes were made to DB
         Author author2 = null;
         try {
             author2 = em.find(Author.class, author.getId());
@@ -258,8 +235,8 @@ public class JPANoDAODemo {
             em.getTransaction().begin();
             em.persist(author);
             em.flush();
-            em.getTransaction().commit();
             em.clear();
+            em.getTransaction().commit();
             log_.info("created author:" + author);
         }
         catch (Exception ex) {
@@ -268,7 +245,6 @@ public class JPANoDAODemo {
             fail("" + ex);
         }
         
-        //create a new object with the same primary key as the one in the DB
         Author author2 = new Author(author.getId());
         author2.setFirstName("updated " + author.getFirstName());
         author2.setLastName("updated " + author.getLastName());
@@ -280,8 +256,6 @@ public class JPANoDAODemo {
             em.getTransaction().begin();
             em.getTransaction().commit();
             log_.info("merged author:" + tmp);
-            assertFalse("author2 is managed", em.contains(author2));
-            assertTrue("tmp Author is not managed", em.contains(tmp));
         }
         catch (Exception ex) {
             log_.fatal(ex);
@@ -289,7 +263,6 @@ public class JPANoDAODemo {
             fail("" + ex);
         }
         
-        //verify our changes were made to the DB
         Author author3 = null;
         try {
             author3 = em.find(Author.class, author.getId());

@@ -1,4 +1,4 @@
-package ejava.examples.dao;
+package ejava.examples.daoex;
 
 /**
  * This is the base exception for example DAOs.
