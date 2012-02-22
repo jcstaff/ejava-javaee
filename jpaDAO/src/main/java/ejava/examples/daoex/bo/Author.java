@@ -1,4 +1,4 @@
-package ejava.examples.dao.domain;
+package ejava.examples.daoex.bo;
 
 import java.io.Serializable;
 import java.util.Date;
