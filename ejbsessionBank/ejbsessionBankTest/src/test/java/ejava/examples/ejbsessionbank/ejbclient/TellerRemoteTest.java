@@ -22,7 +22,7 @@ import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 public class TellerRemoteTest {
     Log log = LogFactory.getLog(TellerRemoteTest.class);
     InitialContext jndi;
-    String jndiName = System.getProperty("jndi.name", "TellerEJB/remote");
+    String jndiName = System.getProperty("jndi.name", "ejava/examples/ejbsessionbank/TellerEJB/remote");
     
     @Before
     public void setUp() throws Exception {
