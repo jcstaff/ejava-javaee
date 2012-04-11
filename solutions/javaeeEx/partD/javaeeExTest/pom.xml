@@ -143,6 +143,10 @@
                     <groupId>com.sun.istack</groupId>
                     <artifactId>istack-commons-runtime</artifactId>
                 </exclusion>
+                <exclusion> <!-- troubles finding this artifact -->
+                    <groupId>woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -199,7 +203,7 @@
                         <id>deploy-component</id>
                         <phase>test-compile</phase>
                         <goals>
-                            <goal>deploy</goal>
+                            <goal>redeploy</goal>
                         </goals>
                     </execution>
                 </executions>
