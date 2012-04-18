@@ -824,6 +824,10 @@ $ cat javaeeExTest/pom.xml
                     <groupId>com.sun.istack</groupId>
                     <artifactId>istack-commons-runtime</artifactId>
                 </exclusion>
+                <exclusion> <!-- troubles finding this artifact -->
+                    <groupId>woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -1293,7 +1297,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                         <id>deploy-component</id>
                         <phase>test-compile</phase>
                         <goals>
-                            <goal>deploy</goal>
+                            <goal>redeploy</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -1334,6 +1338,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
                                 <goals>
                                   <goal>deploy</goal>
                                   <goal>undeploy</goal>
+                                  <goal>redeploy</goal>
                                 </goals>
                               </pluginExecutionFilter>
                               <action>

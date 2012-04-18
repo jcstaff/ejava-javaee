@@ -49,7 +49,7 @@
         <maven-surefire-plugin.version>2.9</maven-surefire-plugin.version>
         <maven-verifier-plugin.version>1.0</maven-verifier-plugin.version>
 
-        <maven-dependency-plugin.version>2.2</maven-dependency-plugin.version>        
+        <maven-dependency-plugin.version>2.4</maven-dependency-plugin.version>        
         <maven-ear-plugin.version>2.6</maven-ear-plugin.version>
         <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
         <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
@@ -156,16 +156,31 @@
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
+        <!--
         <repository>
-            <id>java.net-repo</id>
-            <name>Java.net Maven Repository</name>
-            <url>http://download.java.net/maven/2</url>
+            <id>java.net-repo-subst</id>
+            <name>Java.net Maven Repository Substitute</name>
+            <url>http://maven.generationcp.org/m2repo/</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+        -->
+        <repository>
+            <id>java.net-repo</id>
+            <name>Java.net Maven Repository</name>
+            <url>http://download.java.net/maven/2</url>
+            <releases>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
@@ -215,11 +230,11 @@
             <name>Java.net Maven Repository</name>
             <url>http://download.java.net/maven/2</url>
             <releases>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
                 <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </pluginRepository>
@@ -323,6 +338,10 @@
                     <exclusion> <!-- troubles finding this artifact -->
                         <groupId>com.sun.istack</groupId>
                         <artifactId>istack-commons-runtime</artifactId>
+                    </exclusion>
+                    <exclusion> <!-- troubles finding this artifact -->
+                        <groupId>woodstox</groupId>
+                        <artifactId>wstx-asl</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -542,6 +561,10 @@
                                 <exclusion> <!-- troubles finding this artifact -->
                                     <groupId>com.sun.istack</groupId>
                                     <artifactId>istack-commons-runtime</artifactId>
+                                </exclusion>
+                                <exclusion> <!-- troubles finding this artifact -->
+                                    <groupId>woodstox</groupId>
+                                    <artifactId>wstx-asl</artifactId>
                                 </exclusion>
                             </exclusions>
                         </dependency>
