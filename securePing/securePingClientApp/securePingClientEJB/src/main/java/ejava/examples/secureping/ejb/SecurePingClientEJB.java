@@ -39,7 +39,7 @@ public class SecurePingClientEJB
      */
     private String getInfo(String prefix) {
         StringBuilder text = new StringBuilder();
-        text.append("called " + prefix);
+        text.append("securePingClient called " + prefix);
         try {
             text.append(", principal=" + ctx.getCallerPrincipal().getName());
             text.append(", isUser=" + ctx.isCallerInRole("user"));
@@ -61,7 +61,7 @@ public class SecurePingClientEJB
      * a run-as.
      */
     public String pingAll() {
-        return getInfo("pingAll") + ":" + securePingServer.pingAll();
+        return getInfo("pingAll") + ":\nsecurePing=" + securePingServer.pingAll();
     }
 
     /**
@@ -69,7 +69,7 @@ public class SecurePingClientEJB
      * a run-as.
      */
     public String pingUser() {
-        return getInfo("pingUser") + ":" + securePingServer.pingUser();
+        return getInfo("pingUser") + ":\nsecurePing=" + securePingServer.pingUser();
     }
 
     /**
@@ -77,7 +77,7 @@ public class SecurePingClientEJB
      * a run-as.
      */
     public String pingAdmin() {        
-        return getInfo("pingAdmin") + ":" + securePingServer.pingAdmin();
+        return getInfo("pingAdmin") + ":\nsecurePing=" + securePingServer.pingAdmin();
     }
 
     /**
@@ -85,7 +85,7 @@ public class SecurePingClientEJB
      * a run-as.
      */
     public String pingExcluded() {
-        return getInfo("pingExcluded") + ":" + securePingServer.pingExcluded();
+        return getInfo("pingExcluded") + ":\nsecurePing=" + securePingServer.pingExcluded();
     }
     
     /**
@@ -95,9 +95,9 @@ public class SecurePingClientEJB
      */
     public boolean isCallerInRole(String role) {
         boolean result = ctx.isCallerInRole(role);
-        log.debug("user=" + ctx.getCallerPrincipal().getName() + 
+        log.debug("securePingClient.user=" + ctx.getCallerPrincipal().getName() + 
                 ", isCallerInRole(" + role + ")=" + result + 
-                ":" + securePingServer.isCallerInRole(role));  
+                "\n:securePing=" + securePingServer.isCallerInRole(role));  
         return result;
     }
 }
