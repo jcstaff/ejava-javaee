@@ -1,0 +1,327 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <bookinfo>
+    <title>Building RESTful Web Services with Java Course Docs</title>
+  </bookinfo>
+    <toc/>
+    
+    <chapter id="http-ws-topics">
+        <title>Multiple Axes of Http Web Service</title>
+        <figure id="http-ws-topics-image">
+            <title>Multiple Axes of Http Web Services
+            <footnote id="rest-apis-must-be-hypertext-driven"><para>
+                <ulink url="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">
+                "REST APIs must be hypertext-driven", Roy T. Fielding, 2008-10-20</ulink>
+                </para></footnote>
+            </title>
+            <graphic fileref="images/http-ws-topics.jpg"/>
+        </figure>
+    </chapter>
+    
+    <chapter id="syllabus">
+        <title>Syllabus</title>
+        <table>
+            <title>Syllabus</title>
+            <tgroup cols='5' align='left' colsep='1' rowsep='0'>
+            <colspec colname='session'/>
+            <colspec colname='theme'/>
+            <colspec colname='area'/>
+            <colspec colname='topic'/>
+            <colspec colname='refass'/>
+            <thead>
+                <row>
+                  <entry>Session</entry>
+                  <entry>Theme</entry>
+                  <entry>Area</entry>
+                  <entry>Topic</entry>
+                  <entry>Reference/Assignment</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="session">1</entry>
+                  <entry namest="theme">Introduction</entry>
+                  <entry namest="area">Architecture</entry>
+                  <entry namest="topic">Web Architecture</entry>
+                  <entry namest="refass">REST in Practice: Ch 1, 3-5</entry>
+                </row>
+                <row>
+                  <entry namest="refass">RESTful Java: Ch 1-2</entry>
+                </row>
+                <row>
+                  <entry namest="topic">CRUD Web Service Introduction</entry>
+                </row>
+                <row>
+                  <entry namest="topic">Hypermedia Web Service Introduction</entry>
+                </row>
+                <row>
+                  <entry namest="area">Development/Realization</entry>
+                  <entry namest="topic">Development Environment Parts and Setup</entry>
+                  <entry namest="refass">Ex0: Development Environment Setup</entry>
+                </row>
+
+                <row rowsep="1" >
+                  <entry namest="session">2</entry>
+                  <entry namest="theme">Development</entry>
+                  <entry namest="area">Architecture</entry>
+                  <entry namest="topic">(continue/finish)</entry>
+                </row>
+                <row>
+                  <entry namest="area">Development/Realization</entry>
+                  <entry namest="topic">Using the Development Environment</entry>
+                  <entry namest="refass">Ex1: Development Environment Use Cases</entry>
+                </row>
+
+                <row rowsep="1" >
+                  <entry namest="session">3</entry>
+                  <entry namest="theme">Resource Access</entry>
+                  <entry namest="area">Concepts/APIs</entry>
+                  <entry namest="topic">HTTP Method and URI Matching</entry>
+                  <entry namest="refass">RESTful Java: Ch 4</entry>
+                </row>
+                <row>
+                  <entry namest="topic">HTTP/REST Clients</entry>
+                  <entry namest="refass">RESTful Java: Ch 9</entry>
+                </row>
+                <row>
+                  <entry namest="topic">JAX-RS Injection</entry>
+                  <entry namest="refass">RESTful Java: Ch 5</entry>
+                </row>
+                <row>
+                  <entry namest="topic">Responses</entry>
+                  <entry namest="refass">RESTful Java: Ch 7</entry>
+                </row>
+                
+                <row rowsep="1" >
+                  <entry namest="session">4</entry>
+                  <entry namest="theme">Data Marshalling</entry>
+                  <entry namest="area">Concepts/APIs</entry>
+                  <entry namest="topic">HTTP Content Negotiation</entry>
+                  <entry namest="refass">RESTful Java: Ch 8</entry>
+                </row>
+                <row>
+                  <entry namest="topic">JAX-RS Content Handlers</entry>
+                  <entry namest="refass">RESTful Java: Ch 6</entry>
+                </row>
+                <row>
+                  <entry namest="topic">XML Marshalling (JAXB)</entry>
+                </row>
+                <row>
+                  <entry namest="topic">JSON Marshalling</entry>
+                </row>
+                
+                <row rowsep="1" >
+                  <entry namest="session">5</entry>
+                  <entry namest="theme">Scaling</entry>
+                  <entry namest="area">Concepts/APIs</entry>
+                  <entry namest="topic">Caching</entry>
+                  <entry namest="refass">RESTful Java: Ch 10</entry>
+                </row>
+                <row>
+                  <entry namest="topic">Coordination</entry>
+                  <entry namest="refass">REST in Practice: Ch 6</entry>
+                </row>
+                
+                <row rowsep="1" >
+                  <entry namest="session">6</entry>
+                  <entry namest="theme">Scenarios</entry>
+                  <entry namest="area">Concepts/APIs</entry>
+                  <entry namest="topic">Data Streaming</entry>
+                </row>
+                <row>
+                  <entry namest="topic">Redirects</entry>
+                </row>
+                <row>
+                  <entry namest="topic">EJB Deployment</entry>
+                </row>
+                <row>
+                  <entry namest="topic">Hibernate Integration</entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+            <note>
+                <para>In the interest of covering important concepts well within 
+                the time available -- the official class will likely end at 
+                this point and the following topics will have to be covered 
+                independently or through follow-on brown-bags, etc.</para>
+            </note>
+        <table>
+            <title>Other Topics</title>
+            <tgroup cols='5' align='left' colsep='1' rowsep='0'>
+            <colspec colname='session'/>
+            <colspec colname='theme'/>
+            <colspec colname='area'/>
+            <colspec colname='topic'/>
+            <colspec colname='refass'/>
+            <thead>
+                <row>
+                  <entry>Session</entry>
+                  <entry>Theme</entry>
+                  <entry>Area</entry>
+                  <entry>Topic</entry>
+                  <entry>Reference/Assignment</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                  <entry namest="area">Concepts/APIs</entry>
+                  <entry namest="topic">HATEAOS</entry>
+                  <entry namest="refass">REST in Practice: 5</entry>
+                </row>
+                <row>
+                  <entry namest="refass">RESTful Java: Ch 9</entry>
+                </row>
+                <row>
+                  <entry namest="area">Concepts/APIs</entry>
+                  <entry namest="topic">Atom/AtomPub</entry>
+                  <entry namest="refass">REST in Practice: Ch 7-8</entry>
+                </row>
+                <row>
+                  <entry namest="area">Security</entry>
+                  <entry namest="topic">BASIC</entry>
+                  <entry namest="refass">REST in Practice: 5</entry>
+                </row>
+                <row>
+                  <entry namest="area">Security</entry>
+                  <entry namest="topic">OpenId</entry>
+                  <entry namest="refass">RESTful Java: Ch 12</entry>
+                </row>
+                <row>
+                  <entry namest="area">Security</entry>
+                  <entry namest="topic">OAuth</entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+  </chapter>
+    
+  <chapter id="intro-primary-sources">
+    <title>Primary Sources</title>
+    <orderedlist>
+        <listitem><para>
+        <emphasis>"REST in Practice; Hypermedia Systems Architecture"</emphasis>, 
+        Jim Weber, Savas Parastatidis, Ian Robinson, 2010 <ulink url="http://shop.oreilly.com/product/9780596805838.do">O'Reilly</ulink>,
+        <ulink url="http://www.amazon.com/REST-Practice-Hypermedia-Architecture-ebook/dp/B0046RERXY/ref=kinw_dp_ke?ie=UTF8&amp;m=AG56TWVU5XWC2">Amazon Kindle</ulink>
+        ISBN 0596805829 
+        </para>
+        </listitem>
+
+        <listitem><para>
+        <emphasis>"RESTful Web Services Cookbook"</emphasis>, 
+        Subbu Allamaraju, 2010, 
+        <ulink url="http://shop.oreilly.com/product/9780596801694.do">O'Reilly</ulink>,
+        <ulink url="http://www.amazon.com/RESTful-Web-Services-Cookbook-ebook/dp/B0043D2ESQ/ref=kinw_dp_ke?ie=UTF8&amp;m=AG56TWVU5XWC2">Amazon Kindle</ulink>
+        ISBN 0596801688 
+        </para></listitem>
+        
+        <listitem><para>
+        <emphasis>"RESTful Java with JAX-RS (Animal Guide)"</emphasis>, 
+        Bill Burke, 2009, 
+        <ulink url="http://shop.oreilly.com/product/9780596158057.do">O'Reilly</ulink>,
+        <ulink url="http://www.amazon.com/RESTful-JAX-RS-Animal-Guide-ebook/dp/B0043D2ELI/ref=pd_sim_kstore_3?ie=UTF8&amp;m=AG56TWVU5XWC2">Amazon Kindle</ulink>
+        ISBN 0596158041 
+        </para></listitem>
+        
+        <listitem><para>
+        <emphasis>"Representational State Transfer",</emphasis>
+        <ulink url="http://en.wikipedia.org/wiki/Representational_state_transfer">Wikipedia</ulink>
+        </para>
+        </listitem>
+    </orderedlist>
+  </chapter>
+  
+  <appendix id="terms">
+    <title>Terms</title>
+    <variablelist>
+        <varlistentry>
+            <term><filename>DELETE (Method)</filename></term>
+            <listitem><para>An HTTP method that should delete
+            a resource.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>GET (Method)</filename></term>
+            <listitem><para>An HTTP method that should return a 
+            representation of a resource.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>HEAD (Method)</filename></term>
+            <listitem><para>An HTTP method very similar to a GET except that
+            it only returns the headers associated with the GET and not
+            the actual representation.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>Idempotence</filename></term>
+            <listitem><para>A characteristic of being able to be performed
+            multiple times with the same result. HTTP GET, PUT, DELETE, and HEAD
+            are meant to be idempotent while POST is not.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>(Method) Safety</filename></term>
+            <listitem><para>Safe methods do not change the state of the resource.
+            Unsafe methods are known to change the state of the resource. HTTP
+            GET and HEAD are suppose to be safe. HTTP PUT, POST, and DELETE are
+            suppose to be unsafe.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>OPTIONS (Method)</filename></term>
+            <listitem><para>An HTTP method that will list the methods
+            implemented by the server and available for a specific resource.
+            </para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>PUT (Method)</filename></term>
+            <listitem><para>An HTTP method that should 
+            set the representation of a resource -- including create
+            in cases where the full identity is known by the client ahead
+            of time.
+            </para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>POST (Method)</filename></term>
+            <listitem><para>An HTTP method that can create resources
+            and perform opaque actions on resources.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>Representation</filename></term>
+            <listitem><para>An encapsulation of information (e.g., state) 
+            encoded using a format (e.g. XML, JSON, HTML).
+            </para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>Resource</filename></term>
+            <listitem><para>Anything that can be identified by a URI. A 
+            resource can have multiple representations.
+            </para></listitem>
+        </varlistentry>        
+        <varlistentry>
+            <term><filename>RESTful</filename></term>
+            <listitem><para>Conforming to REST constraints.
+            </para></listitem>
+        </varlistentry>
+        
+        <varlistentry>
+            <term><filename>URI</filename></term>
+            <listitem><para>Uniform Resource Identifier - Identifies a name or
+            resource. URIs can be absolute (e.g.,http://myorg.org/readme.html) 
+            or relative (e.g., /readme.html) path. URIs are more general than
+            a URL. Not all URIs are URLs.
+            </para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>URL</filename></term>
+            <listitem><para>Uniform Resource Locator - Identifies how to
+            find a resource (e.g., http://myorg.org/book/isbn/12345/pdf).
+            All URLs are also URIs.
+            </para></listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><filename>URN</filename></term>
+            <listitem><para>Uniform Resource Name - Identifies a resource's 
+            name (e.g., urn:isbn:12345)</para></listitem>
+        </varlistentry>        
+    </variablelist>
+  </appendix>  
+  
+</book>

@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>ejava.javaee</groupId>
-        <artifactId>dependencies</artifactId>
-        <version>2.0.2012.1-SNAPSHOT</version>
-        <relativePath>dependencies</relativePath>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ejava-javaee</artifactId>
+    <groupId>ejava</groupId>
+    <artifactId>ejava-root</artifactId>
+    <version>3.0.2012.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Enterprise Java (605.784) Root</name>
+    <name>Enterprise Java</name>
     <description>
         This is the parent project for the content modules. Content gets
         added to this project as the semester moves forward.
@@ -19,6 +15,7 @@
 
     <modules>
         <module>dependencies</module>
+        <!-- These will be posted over the course of the semester
         <module>site-skin</module>
         <module>course-docs</module>
         <module>solutions</module>
@@ -38,8 +35,8 @@
         <module>securePing</module>
         <module>jmsCore</module>
         <module>asyncEJB</module>
-        <!-- These will be posted over the course of the semester
         -->
+        <module>coursedocs</module>
     </modules>
 
     <developers>
@@ -80,6 +77,7 @@
 
     <build>
         <plugins>
+        <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
@@ -104,6 +102,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
             <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
@@ -184,4 +183,140 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!--
+            This profile is triggered by the presence of src/docbook directory. 
+            It docbook generation functionality to the sub-project.
+        -->
+        <profile>
+            <id>docbook</id>
+            <activation>
+                <file>
+                    <exists>${basedir}/src/docbook</exists>
+                </file>
+            </activation>
+            
+            <properties>
+                <sourceDocumentName>${doc.base}.xml</sourceDocumentName>
+                <htmlName>${doc.base}.html</htmlName>
+                <pdfName>${doc.base}.pdf</pdfName>
+            </properties>
+
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>jboss-nexus</id>
+                    <name>JBoss Nexus Repository</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jboss.maven.plugins</groupId>
+                        <artifactId>maven-jdocbook-plugin</artifactId>
+                        <version>2.3.7</version>
+                        <extensions>true</extensions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.jboss</groupId>
+                                <artifactId>jbossorg-docbook-xslt</artifactId>
+                                <version>1.1.1</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.jboss</groupId>
+                                <artifactId>jbossorg-jdocbook-style</artifactId>
+                                <version>1.1.1</version>
+                                <type>jdocbook-style</type>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <sourceDocumentName>${sourceDocumentName}</sourceDocumentName>
+                            <sourceDirectory>${basedir}/src/docbook</sourceDirectory>
+                            <cssResource>
+                                <directory>${basedir}/src/docbook</directory>
+                                <includes>
+                                    <include>css/*</include>
+                                </includes>
+                            </cssResource>
+                            <imageResource>
+                                <directory>${basedir}/src/docbook</directory>
+                                <includes>
+                                    <include>images/*</include>
+                                </includes>
+                            </imageResource>
+        
+                            <formats>
+                                <format>
+                                    <formatName>html</formatName>
+                                    <stylesheetResource>file://${basedir}/src/docbook/xslt/xhtml.xsl</stylesheetResource>
+                                    <finalName>${htmlName}</finalName>
+                                </format>
+                            <!--
+                                <format>
+                                    <formatName>html_single</formatName>
+                                    <stylesheetResource>${basedir}/src/docbook/xslt/xhtml-single.xsl</stylesheetResource>
+                                    <finalName>${htmlName}</finalName>
+                                </format>
+                                <format>
+                                    <formatName>pdf</formatName>
+                                    <stylesheetResource>${basedir}/src/docbook/xslt/pdf.xsl</stylesheetResource>
+                                    <finalName>${pdfName}</finalName>
+                                </format>
+                                -->
+                            </formats>
+                            <options>
+                                <xincludeSupported>true</xincludeSupported>
+                                <xmlTransformerType>saxon</xmlTransformerType>
+                                <docbookVersion>1.72.0</docbookVersion>
+                                <transformerParameters>
+                                    <property>
+                                        <name>javax.xml.parsers.DocumentBuilderFactory</name>
+                                        <value>org.apache.xerces.jaxp.DocumentBuilderFactoryImpl</value>
+                                    </property>
+                                    <property>
+                                        <name>javax.xml.parsers.SAXParserFactory</name>
+                                        <value>org.apache.xerces.jaxp.SAXParserFactoryImpl</value>
+                                    </property>
+                                </transformerParameters>
+                            </options>
+                        </configuration>
+                    </plugin>
+
+                  <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.7</version>
+                    <executions>
+                      <execution>
+                        <id>attach-war</id>
+                        <phase>package</phase>
+                        <goals>
+                          <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                          <artifacts>
+                              <artifact>
+                                  <file>${basedir}/target/classes/${project.artifactId}-${project.version}.war</file>
+                                  <type>war</type>
+                              </artifact>
+                          </artifacts>
+                        </configuration>
+                      </execution>
+                    </executions>
+                  </plugin>
+
+                </plugins>
+            </build>
+        </profile>        
+    </profiles>        
 </project>
