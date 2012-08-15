@@ -15,6 +15,7 @@
 
     <modules>
         <module>dependencies</module>
+        <module>ejava-build</module>
         <!-- These will be posted over the course of the semester
         <module>site-skin</module>
         <module>course-docs</module>
@@ -107,6 +108,7 @@
             <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
+                <version>3.0</version>
                 <executions>
                     <execution>
                         <id>attach-descriptor</id>
@@ -198,6 +200,8 @@
             </activation>
             
             <properties>
+                <docProfile>605-784-docbook-xslt</docProfile>
+                <docProfile.version>${project.version}</docProfile.version>
                 <sourceDocumentName>${doc.base}.xml</sourceDocumentName>
                 <htmlName>${doc.base}.html</htmlName>
                 <pdfName>${doc.base}.pdf</pdfName>
@@ -220,76 +224,116 @@
             </pluginRepositories>
 
             <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.jboss.maven.plugins</groupId>
+                            <artifactId>maven-jdocbook-plugin</artifactId>
+                            <version>2.3.7</version>
+                            <extensions>true</extensions>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>net.sf.docbook</groupId>
+                                    <artifactId>docbook</artifactId>
+                                    <version>1.72.0</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.jboss.docs</groupId>
+                                    <artifactId>highlight</artifactId>
+                                    <version>1.0.0</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.jboss</groupId>
+                                    <artifactId>jbossorg-jdocbook-style</artifactId>
+                                    <version>1.1.1</version>
+                                    <type>jdocbook-style</type>
+                                </dependency>
+                            </dependencies>
+                            <configuration>
+                                <sourceDirectory>${basedir}/target/resources/ejava/docs</sourceDirectory>
+                                <sourceDocumentName>${sourceDocumentName}</sourceDocumentName>
+                                <cssResource>
+                                    <directory>${basedir}/target/resources/ejava/docs</directory>
+                                    <includes>
+                                        <include>css/*</include>
+                                    </includes>
+                                </cssResource>
+                                <imageResource>
+                                    <directory>${basedir}/target/resources/ejava/docs</directory>
+                                    <includes>
+                                        <include>images/*</include>
+                                    </includes>
+                                </imageResource>
+            
+                                <options>
+                                    <xincludeSupported>true</xincludeSupported>
+                                    <xmlTransformerType>saxon</xmlTransformerType>
+                                    <docbookVersion>1.72.0</docbookVersion>
+                                    <transformerParameters>
+                                        <property>
+                                            <name>javax.xml.parsers.DocumentBuilderFactory</name>
+                                            <value>org.apache.xerces.jaxp.DocumentBuilderFactoryImpl</value>
+                                        </property>
+                                        <property>
+                                            <name>javax.xml.parsers.SAXParserFactory</name>
+                                            <value>org.apache.xerces.jaxp.SAXParserFactoryImpl</value>
+                                        </property>
+                                    </transformerParameters>
+                                </options>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+
+
                 <plugins>
+                    <!-- unzip the web artifacts into the current docbook project -->
                     <plugin>
-                        <groupId>org.jboss.maven.plugins</groupId>
-                        <artifactId>maven-jdocbook-plugin</artifactId>
-                        <version>2.3.7</version>
-                        <extensions>true</extensions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.jboss</groupId>
-                                <artifactId>jbossorg-docbook-xslt</artifactId>
-                                <version>1.1.1</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.jboss</groupId>
-                                <artifactId>jbossorg-jdocbook-style</artifactId>
-                                <version>1.1.1</version>
-                                <type>jdocbook-style</type>
-                            </dependency>
-                        </dependencies>
-                        <configuration>
-                            <sourceDocumentName>${sourceDocumentName}</sourceDocumentName>
-                            <sourceDirectory>${basedir}/src/docbook</sourceDirectory>
-                            <cssResource>
-                                <directory>${basedir}/src/docbook</directory>
-                                <includes>
-                                    <include>css/*</include>
-                                </includes>
-                            </cssResource>
-                            <imageResource>
-                                <directory>${basedir}/src/docbook</directory>
-                                <includes>
-                                    <include>images/*</include>
-                                </includes>
-                            </imageResource>
-        
-                            <formats>
-                                <format>
-                                    <formatName>html</formatName>
-                                    <stylesheetResource>file://${basedir}/src/docbook/xslt/xhtml.xsl</stylesheetResource>
-                                    <finalName>${htmlName}</finalName>
-                                </format>
-                            <!--
-                                <format>
-                                    <formatName>html_single</formatName>
-                                    <stylesheetResource>${basedir}/src/docbook/xslt/xhtml-single.xsl</stylesheetResource>
-                                    <finalName>${htmlName}</finalName>
-                                </format>
-                                <format>
-                                    <formatName>pdf</formatName>
-                                    <stylesheetResource>${basedir}/src/docbook/xslt/pdf.xsl</stylesheetResource>
-                                    <finalName>${pdfName}</finalName>
-                                </format>
-                                -->
-                            </formats>
-                            <options>
-                                <xincludeSupported>true</xincludeSupported>
-                                <xmlTransformerType>saxon</xmlTransformerType>
-                                <docbookVersion>1.72.0</docbookVersion>
-                                <transformerParameters>
-                                    <property>
-                                        <name>javax.xml.parsers.DocumentBuilderFactory</name>
-                                        <value>org.apache.xerces.jaxp.DocumentBuilderFactoryImpl</value>
-                                    </property>
-                                    <property>
-                                        <name>javax.xml.parsers.SAXParserFactory</name>
-                                        <value>org.apache.xerces.jaxp.SAXParserFactoryImpl</value>
-                                    </property>
-                                </transformerParameters>
-                            </options>
-                        </configuration>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.5</version>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>ejava.build</groupId>
+                                            <artifactId>${docProfile}</artifactId>
+                                            <version>${docProfile.version}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${basedir}/target/resources</outputDirectory>
+                                    <includes>ejava/**/*</includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.5</version>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                  <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/resources/ejava/docs</outputDirectory>
+                                    <resources>          
+                                        <resource>
+                                            <directory>${basedir}/src/docbook</directory>
+                                        </resource>
+                                    </resources>              
+                                </configuration>            
+                            </execution>
+                        </executions>
                     </plugin>
 
                   <plugin>

@@ -17,4 +17,34 @@
     <properties>
        <doc.base>605-784</doc.base>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+                <configuration>
+                    <formats>
+                        <format>
+                            <formatName>html</formatName>
+                            <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/xhtml.xsl</stylesheetResource>
+                            <finalName>${htmlName}</finalName>
+                        </format>
+                        <!--
+                        <format>
+                            <formatName>html_single</formatName>
+                            <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/xhtml-single.xsl</stylesheetResource>
+                            <finalName>${htmlName}</finalName>
+                        </format>
+                        <format>
+                            <formatName>pdf</formatName>
+                            <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/pdf.xsl</stylesheetResource>
+                            <finalName>${pdfName}</finalName>
+                        </format>
+                        -->
+                    </formats>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava</groupId>
+        <artifactId>ejava-root</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>ejava.build</groupId>
+    <artifactId>ejava-build</artifactId>
+    <packaging>pom</packaging>
+
+    <name>EJava Build</name>
+    <description>
+        This project houses artifacts specific to building production artifacts.
+    </description>
+
+    <modules>
+        <!--
+        <module>ejava-versions</module>
+        <module>ejava-project</module>
+        -->
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>docs</id>
+            <modules>
+                <module>605-784-docbook-xslt</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>

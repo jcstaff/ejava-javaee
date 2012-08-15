@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.build</groupId>
+        <artifactId>ejava-build</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>605-784-docbook-xslt</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Enterprise Java (605.784) Docbook Style</name>
+
+    <properties>
+        <style.resource>605-784-common.xsl</style.resource>
+        <jbossorg-docbook-xslt.version>1.1.1</jbossorg-docbook-xslt.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jbossorg-docbook-xslt</artifactId>
+            <version>${jbossorg-docbook-xslt.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.docbook</groupId>
+            <artifactId>docbook</artifactId>
+            <version>1.72.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.docs</groupId>
+            <artifactId>highlight</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jboss</groupId>
+                                    <artifactId>jbossorg-docbook-xslt</artifactId>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <target>
+                            <move todir="${basedir}/target/classes/ejava/docs/xslt"
+                                  flatten="true">
+                                <fileset dir="${basedir}/target/dependency/xslt/org/jboss">
+                                    <exclude name="xhtml-common.xsl"/>
+                                </fileset>
+                            </move>
+                            <replace dir="${basedir}/target/classes/ejava/docs/xslt"
+                                token="xhtml-common.xsl" value="${style.resource}">
+                            </replace>
+                        </target>
+                    </configuration>
+                  </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
