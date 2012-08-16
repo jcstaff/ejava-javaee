@@ -105,6 +105,7 @@
             </plugin>
             -->
 
+            <!--
             <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -121,14 +122,12 @@
                 <configuration>
                     <siteDirectory>${basedir}/src/site</siteDirectory>
                     <reportPlugins>
-                        <!-- creates standard reports -->
                         <plugin> 
                             <artifactId>maven-project-info-reports-plugin</artifactId>
                             <groupId>org.apache.maven.plugins</groupId>
                             <version>${maven-project-info-reports-plugin.version}</version>
                         </plugin>
 
-                        <!-- generates test reports -->
                         <plugin> 
                             <artifactId>maven-surefire-report-plugin</artifactId>
                             <groupId>org.apache.maven.plugins</groupId>
@@ -138,7 +137,6 @@
                             </configuration>
                         </plugin>
 
-                        <!-- generates aggregated javadoc for root project -->
                         <plugin> 
                             <artifactId>maven-javadoc-plugin</artifactId>
                             <groupId>org.apache.maven.plugins</groupId>
@@ -153,7 +151,6 @@
                                 </links>
                             </configuration>
                         </plugin>
-                        <!-- -->
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>findbugs-maven-plugin</artifactId>
@@ -164,7 +161,6 @@
                             </configuration>
                         </plugin>
 
-                        <!-- generates HTML pages for java code -->
                         <plugin> 
                             <artifactId>maven-jxr-plugin</artifactId>
                             <version>${maven-jxr-plugin.version}</version>
@@ -174,7 +170,6 @@
                             </configuration>
                         </plugin>
 
-                        <!-- generates code coverage report -->
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>cobertura-maven-plugin</artifactId>
@@ -183,6 +178,8 @@
                     </reportPlugins>
                 </configuration>
             </plugin>
+            -->
+
         </plugins>
     </build>
 

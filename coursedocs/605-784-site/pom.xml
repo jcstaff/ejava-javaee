@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.coursedocs</groupId>
+        <artifactId>coursedocs</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>605-784-site</artifactId>
+    <packaging>war</packaging>
+
+    <name>Enterprise Computing with Java (605.784.31) Site</name>
+    <description>
+        This course...
+    </description>
+    <url>http://webdev.apl.jhu.edu/~jcs/ejava-javaee</url>
+
+    <organization>
+        <name>
+            John's Hopkins University, Engineering Programs for Professionals 
+        </name>
+        <url>http://ep.jhu.edu</url>
+    </organization>
+    <mailingLists>
+        <mailingList>
+            <name>class newsgroup (for class use)</name>
+            <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
+        </mailingList>
+    </mailingLists>
+
+    <scm>
+        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/master</url>
+        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
+        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
+    </scm>
+
+    <ciManagement>
+        <system>jenkins</system>
+        <url>http://ejava.info/jenkins/job/2012-fall-ejava-javaee/</url>
+    </ciManagement>
+
+    <distributionManagement>
+        <site>
+            <id>webdev.website</id>
+            <name>ejava JHU webdev website</name>
+            <url>${webdev.scp.root}/ejava-javaee</url>
+        </site>
+        <repository>
+            <id>webdev.repository</id>
+            <name>ejava JHU repository</name>
+            <url>${webdev.scp.root}/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>webdev.snapshot.repo</id>
+            <name>ejava JHU snapshot repository</name>
+            <url>${webdev.scp.root}/maven2-snapshot</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <developers>
+        <developer>
+            <id>jcstaff</id>
+            <name>Jim Stafford</name>
+            <email>jcstaff@apl.jhu.edu</email>
+            <url>http://www.apl.jhu.edu/~jcstaff</url>
+            <organization>SRA International</organization>
+            <organizationUrl>http://www.sra.com</organizationUrl>
+            <timezone>-4</timezone>
+            <roles>
+                <role>Instructor</role>
+                <role>Author</role>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <name>Mark Sholund</name>
+            <email>mdsholund@gmail.com</email>
+            <timezone>-4</timezone>
+            <roles>
+                <role>Grader</role>
+            </roles>
+        </contributor>
+        <contributor>
+            <name>Bruce Cohen</name>
+            <email>ejava@cohenmail.net</email>
+            <organization>SRA International</organization>
+            <organizationUrl>http://www.sra.com</organizationUrl>
+            <timezone>-4</timezone>
+            <roles>
+                <role>Grader</role>
+            </roles>
+        </contributor>
+    </contributors>
+
+    <dependencies>
+        <dependency>
+            <groupId>ejava.coursedocs</groupId>
+            <artifactId>605-784-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.2</version>
+            <executions>
+                <execution>
+                    <phase>pre-site</phase>
+                    <goals>
+                        <goal>war</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+              <overlays>
+                <overlay>
+                  <groupId>ejava.coursedocs</groupId>
+                  <artifactId>605-784-docbook</artifactId>
+                  <type>war</type>
+                  <targetPath>../site/docs/content</targetPath>
+                </overlay>
+              </overlays>
+            </configuration>
+          </plugin>
+        </plugins>
+    </build>
+</project>
