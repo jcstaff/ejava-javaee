@@ -21,6 +21,20 @@
         <item name="Maven" href="http://maven.apache.org/maven2/"/>
     </links>
 
+    <breadcrumbs>
+        <item name="Course Root" href="./index.html"/>
+    </breadcrumbs>
+
+    <menu name="Quick Links" inherit="top">
+        <item name="Course Description" href="${project.url}/course-docs/ejava-course-description.html"/>
+        <item name="Syllabus" href="${project.url}/coursedocs/605-784-site/docs/content/html/syllabus.html"/>
+        <item name="Reference Links" href="${project.url}/course-docs/links.html"/>
+        <item name="Exercises" href="${project.url}/course-docs/exercises/exercises.html"/>
+        <item name="Course Javadoc" href="${project.url}/apidocs/index.html"/>
+        <item name="Course Source Code" href="${project.url}/xref/index.html"/>
+        <item name="Course Test Source Code" href="${project.url}/xref-test/index.html"/>
+    </menu>
+
     <menu name="Docs">
         <item name="Dir" href="./docs"/>
         <item name="Course Intro" href="./docs/content/html/605-784.html"/>
@@ -30,6 +44,9 @@
         <item name="Ex0: Dev Env Setup" href="./docs/exercises/devenv/html/devenv.html"/>
     </menu>
 
+    <menu ref="modules" inherit="bottom"/>
     <menu ref="reports" inherit="bottom"/>
+
+    <footer>No rights reserved:) Enjoy!</footer>
   </body>
 </project>

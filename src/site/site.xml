@@ -1,6 +1,52 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="${project.name}">
+    <publishDate position="navigation-bottom" format="MMM-dd-yyyy"/>
+    <bannerLeft>
+        <name>Enterprise Java (605.784.31)</name>
+        <src>${project.url}/images/605-784-white.png</src>
+        <href>${project.url}/index.html</href>
+    </bannerLeft>
+    <bannerRight>
+        <name>Fall 2012</name>
+        <src>${project.url}/images/fall-2012.png</src>
+        <href>http://ep.jhu.edu/</href>
+    </bannerRight>
+
   <body>
-    <menu ref="modules"/>
+    <links>
+        <item name="Newsgroup" href="http://groups.yahoo.com/group/ejava_class/" />
+        <item name="JavaSE" href="http://download.oracle.com/javase/6/docs/api/"/>
+        <item name="JavaEE" href="http://download.oracle.com/javaee/6/api/"/>
+        <item name="JBoss" href="http://www.jboss.org/"/>
+        <item name="Maven" href="http://maven.apache.org/maven2/"/>
+    </links>
+
+    <breadcrumbs>
+        <item name="Root" href="./index.html"/>
+    </breadcrumbs>
+
+    <menu name="Docs">
+        <item name="Dir" href="./coursedocs/605-784-site/docs"/>
+        <item name="Course Intro" href="./coursedocs/605-784-site/docs/content/html/605-784.html"/>
+    </menu>
+
+    <menu name="Exercises">
+        <item name="Ex0: Dev Env Setup" href="./coursedocs/605-784-site/docs/exercises/devenv/html/devenv.html"/>
+    </menu>
+
+    <menu name="Quick Links" inherit="top">
+        <item name="Course Description" href="${project.url}/ejava-javaee/course-docs/ejava-course-description.html"/>
+        <item name="Syllabus" href="./coursedocs/605-784-site/docs/content/html/syllabus.html"/>
+        <item name="Reference Links" href="${project.url}/ejava-javaee/course-docs/links.html"/>
+        <item name="Exercises" href="${project.url}/ejava-javaee/course-docs/exercises/exercises.html"/>
+        <item name="Course Javadoc" href="${project.url}/ejava-javaee/apidocs/index.html"/>
+    </menu>
+
+    <menu ref="modules" inherit="bottom"/>
+    <menu ref="reports" inherit="bottom"/>
+
+    <footer>
+        <footer>No rights reserved. Enjoy:)</footer>
+    </footer>
   </body>
 </project>

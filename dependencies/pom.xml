@@ -3,38 +3,14 @@
 
     <groupId>ejava.javaee</groupId>
     <artifactId>dependencies</artifactId>
-    <version>2.0.2012.1-SNAPSHOT</version>
+    <version>3.0-1</version>
     <packaging>pom</packaging>
 
-    <name>Enterprise Java Parent POM</name>
+    <name>Dependencies POM</name>
     <description>
         This project defines dependencies used across the ejava-javaee examples,
         solutions, and projects.
     </description>
-    <url>http://webdev.apl.jhu.edu/~jcs/ejava-javaee</url>
-
-    <organization>
-        <name>
-            John's Hopkins University, Engineering Programs for Professionals 
-        </name>
-        <url>http://ep.jhu.edu</url>
-    </organization>
-    <mailingLists>
-        <mailingList>
-            <name>class newsgroup (for class use)</name>
-            <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
-        </mailingList>
-    </mailingLists>
-    <scm>
-        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/master</url>
-        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
-        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
-    </scm>
-
-    <ciManagement>
-        <system>hudson</system>
-        <url>http://ejava.info/jenkins/job/2011-fall-ejava-javaee/</url>
-    </ciManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -109,25 +85,6 @@
         <jboss.password>admin</jboss.password>
 
     </properties>
-
-    <distributionManagement>
-        <site>
-            <id>webdev.website</id>
-            <name>ejava JHU webdev website</name>
-            <url>${webdev.scp.root}/ejava-javaee</url>
-        </site>
-        <repository>
-            <id>webdev.repository</id>
-            <name>ejava JHU repository</name>
-            <url>${webdev.scp.root}/maven2</url>
-        </repository>
-        <snapshotRepository>
-            <id>webdev.snapshot.repo</id>
-            <name>ejava JHU snapshot repository</name>
-            <url>${webdev.scp.root}/maven2-snapshot</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
 
     <repositories>
         <repository>
