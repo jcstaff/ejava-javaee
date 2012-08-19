@@ -108,7 +108,7 @@
                                 <configuration>
                                     <hibernatetool destdir="target/classes/ddl">
                                         <jpaconfiguration persistenceunit="ormRelations"/>
-                                        <hbm2ddl export="false" create="false" drop="true" format="format" 
+                                        <hbm2ddl export="false" create="false" drop="true" format="true" 
                                             outputfilename="${project.artifactId}-drop.ddl"/>
                                     </hibernatetool>
                                 </configuration>
@@ -122,7 +122,7 @@
                                 <configuration>
                                     <hibernatetool destdir="target/classes/ddl">
                                         <jpaconfiguration persistenceunit="ormRelations"/>
-                                        <hbm2ddl export="false" create="true" drop="false" format="format" 
+                                        <hbm2ddl export="false" create="true" drop="false" format="true" 
                                             outputfilename="${project.artifactId}-create.ddl"/>
                                     </hibernatetool>
                                 </configuration>

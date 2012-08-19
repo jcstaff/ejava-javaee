@@ -40,7 +40,7 @@
         <maven-project-info-reports-plugin.version>2.4</maven-project-info-reports-plugin.version>
 
         <maven-ant-plugin.version>2.3</maven-ant-plugin.version>
-        <maven-antrun-plugin.version>1.6</maven-antrun-plugin.version>
+        <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
         <maven-archetype-plugin.version>2.0</maven-archetype-plugin.version>
         <maven-assembly-plugin.version>2.2.1</maven-assembly-plugin.version>
         <maven-dependency-plugin.version>2.2</maven-dependency-plugin.version>
@@ -741,6 +741,21 @@
 	                            <execute />
 	                          </action>
 	                        </pluginExecution>
+	                        
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+				                <groupId>org.apache.maven.plugins</groupId>
+				                <artifactId>maven-antrun-plugin</artifactId>
+                                <versionRange>[1.6,)</versionRange>
+                                <goals>
+                                  <goal>run</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <execute />
+                              </action>
+                            </pluginExecution>
+	                        
 	                      </pluginExecutions>
 	                    </lifecycleMappingMetadata>
 	                  </configuration>
