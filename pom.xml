@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>ejava.javaee</groupId>
+        <groupId>ejava</groupId>
         <artifactId>dependencies</artifactId>
         <version>3.0-1</version>
-        <relativePath>dependencies</relativePath>
+        <relativePath>ejava-build/dependencies</relativePath>
     </parent>
 
     <groupId>ejava</groupId>
@@ -20,18 +20,11 @@
     </description>
 
     <modules>
-    <!--
-        <module>dependencies</module>
         <module>ejava-build</module>
-        -->
-        <!-- These will be posted over the course of the semester
-        <module>site-skin</module>
         <module>course-docs</module>
         <module>solutions</module>
-        -->
         <module>projects</module>
         <module>javase5Enhancements</module>
-        <!--
         <module>jdbcDAO</module>
         <module>jpaDAO</module>
         <module>ormCore</module>
@@ -46,8 +39,9 @@
         <module>securePing</module>
         <module>jmsCore</module>
         <module>asyncEJB</module>
-        -->
         <module>coursedocs</module>
+        <!-- These will be posted over the course of the semester
+        -->
     </modules>
 
     <url>http://webdev.apl.jhu.edu/~jcs/ejava-javaee</url>
@@ -330,7 +324,7 @@
             </activation>
             
             <properties>
-                <docProfile>605-784-docbook-xslt</docProfile>
+                <docProfile>605-784-style</docProfile>
                 <docProfile.version>${project.version}</docProfile.version>
                 <sourceDocumentName>${doc.base}.xml</sourceDocumentName>
                 <htmlName>${doc.base}.html</htmlName>
