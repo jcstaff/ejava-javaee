@@ -3,12 +3,12 @@
     <publishDate position="navigation-bottom" format="MMM-dd-yyyy"/>
     <bannerLeft>
         <name>Enterprise Java (605.784.31)</name>
-        <src>${project.url}/ejava-build/605-784-docbook-xslt/images/605-784-white.png</src>
+        <src>${project.url}/coursedocs/605-784-site/images/605-784-white.png</src>
         <href>${project.url}/index.html</href>
     </bannerLeft>
     <bannerRight>
         <name>Fall 2012</name>
-        <src>${project.url}/coursedocs/605-784-site/images/fall-2012.png</src>
+        <src>${project.url}/coursedocs/605-784-site/images/semester.png</src>
         <href>http://ep.jhu.edu/</href>
     </bannerRight>
 
@@ -25,17 +25,9 @@
         <item name="Course Root" href="./index.html"/>
     </breadcrumbs>
 
-    <menu name="Docs">
-        <item name="Dir" href="./coursedocs/605-784-site/docs"/>
-        <item name="Course Intro" href="./coursedocs/605-784-site/docs/content/html/605-784.html"/>
-    </menu>
-
-    <menu name="Exercises">
-        <item name="Ex0: Dev Env Setup" href="./coursedocs/605-784-site/docs/exercises/devenv/html/devenv.html"/>
-    </menu>
-
     <menu name="Quick Links" inherit="top">
-        <item name="Course Description" href="${project.url}/course-docs/ejava-course-description.html"/>
+        <item name="Course Description"
+        href="${project.url}/coursedocs/605-784-site/docs/content/html/605-784.html"/>
         <item name="Syllabus" href="${project.url}/coursedocs/605-784-site/docs/content/html/syllabus.html"/>
         <item name="Reference Links" href="${project.url}/course-docs/links.html"/>
         <item name="Exercises" href="${project.url}/course-docs/exercises/exercises.html"/>
@@ -44,7 +36,14 @@
         <item name="Course Test Source Code" href="${project.url}/xref-test/index.html"/>
     </menu>
 
-    <menu ref="parent" inherit="top"/>
+    <menu name="Docs">
+        <item name="Dir" href="./coursedocs/605-784-site/docs"/>
+        <item name="Course Intro" href="./coursedocs/605-784-site/docs/content/html/605-784.html"/>
+    </menu>
+    <menu name="Exercises">
+        <item name="Ex0: Dev Env Setup" href="./coursedocs/605-784-site/docs/exercises/devenv/html/devenv.html"/>
+    </menu>
+
     <menu ref="modules" inherit="bottom"/>
     <menu ref="reports" inherit="bottom"/>
 
