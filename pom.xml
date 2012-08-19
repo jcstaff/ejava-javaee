@@ -198,6 +198,45 @@
 
     <profiles>
         <profile>
+            <id>jenkins</id>
+            <activation>
+                <property>
+                    <name>env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <modules>
+                <module>ejava-build</module>
+                <module>course-docs</module>
+                <module>solutions</module>
+                <module>projects</module>
+                <module>javase5Enhancements</module>
+                <module>jdbcDAO</module>
+                <module>jpaDAO</module>
+                <module>ormCore</module>
+                <module>ormRelations</module>
+                <module>ormEJBQL</module>
+                <module>ormInheritance</module>
+                <module>ormListeners</module>
+                <module>ejbsessionBank</module>
+                <module>jndiDemo</module>
+                <module>txReservation</module>
+                <module>webtier</module>
+                <module>securePing</module>
+                <module>jmsCore</module>
+                <module>asyncEJB</module>
+                <module>coursedocs</module>
+            </modules>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
             <id>non-java</id>
             <activation>
                 <file>
@@ -217,30 +256,6 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                        <executions>  
-                            <execution>  
-                                <id>clean</id>  
-                                    <phase>pre-site</phase>  
-                                <goals>  
-                                    <goal>clean</goal>  
-                                </goals>  
-                            </execution>  
-                            <execution>  
-                                <id>package</id>  
-                                    <phase>package</phase>  
-                                <goals>  
-                                    <goal>cobertura</goal>  
-                                </goals>  
-                                <configuration>
-                                    <aggregate>true</aggregate>
-                                </configuration>
-                            </execution>  
-                        </executions>  
-                    </plugin>
-
                     <plugin> 
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-site-plugin</artifactId>
