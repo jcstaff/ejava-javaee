@@ -49,7 +49,8 @@
         <maven-plugin-plugin.version>2.8</maven-plugin-plugin.version>
         <maven-release-plugin.version>2.2.1</maven-release-plugin.version>
         <maven-scm-plugin.version>1.4</maven-scm-plugin.version>
-        <hibernate3-maven-plugin.version>2.2</hibernate3-maven-plugin.version>
+        <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
+        <hibernate3.version>3.6.0.Final</hibernate3.version>
         <maven-jaxb2-plugin.version>0.7.1</maven-jaxb2-plugin.version>
         <maven-jetty-plugin.version>6.1.26</maven-jetty-plugin.version>
 
@@ -480,6 +481,13 @@
                     <artifactId>hibernate3-maven-plugin</artifactId>
                     <version>${hibernate3-maven-plugin.version}</version>
                     <extensions>true</extensions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-entitymanager</artifactId>
+                            <version>${hibernate3.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -699,6 +707,7 @@
 	                            <versionRange>[2.2,)</versionRange>
 	                            <goals>
 	                              <goal>hbm2ddl</goal>
+	                              <goal>run</goal>
 	                            </goals>
 	                          </pluginExecutionFilter>
 	                          <action>
