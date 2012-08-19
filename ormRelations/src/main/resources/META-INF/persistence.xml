@@ -6,9 +6,9 @@
     <persistence-unit name="ormRelations">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
+            <!-- moved hibernate properties to hibernate.properties file
             <property name="hibernate.dialect" 
                 value="${hibernate.dialect}"/>
-            <!-- moved hibernate properties to hibernate.properties file
             <property name="hibernate.connection.url"
                 value="${jdbc.url}"/>
             <property name="hibernate.connection.driver_class" 

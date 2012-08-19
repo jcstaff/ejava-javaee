@@ -100,6 +100,14 @@
                     <plugin>
                         <artifactId>hibernate3-maven-plugin</artifactId>
                         <groupId>org.codehaus.mojo</groupId>
+                        <configuration>
+                            <hibernatetool destdir="target/classes/ddl">
+                                <classpath>
+                                    <path location="${project.build.directory}/test-classes"/>
+                                </classpath>
+                                <jpaconfiguration persistenceunit="ormCore"/>
+                            </hibernatetool>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>generate-drop-ddl</id>
@@ -108,8 +116,7 @@
                                     <goal>run</goal>
                                 </goals>
                                 <configuration>
-                                    <hibernatetool destdir="target/classes/ddl">
-                                        <jpaconfiguration persistenceunit="ormCore"/>
+                                    <hibernatetool>
                                         <hbm2ddl export="false" create="false" drop="true" format="true" 
                                             outputfilename="${project.artifactId}-drop.ddl"/>
                                     </hibernatetool>
@@ -122,8 +129,7 @@
                                     <goal>run</goal>
                                 </goals>
                                 <configuration>
-                                    <hibernatetool destdir="target/classes/ddl">
-                                        <jpaconfiguration persistenceunit="ormCore"/>
+                                    <hibernatetool>
                                         <hbm2ddl export="false" create="true" drop="false" format="true" 
                                             outputfilename="${project.artifactId}-create.ddl"/>
                                     </hibernatetool>

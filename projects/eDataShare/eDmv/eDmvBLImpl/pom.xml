@@ -17,6 +17,12 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>eDmvBO</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>eDmvDAO</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -25,6 +31,11 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- THIS IS A REAL DEPENDENCY THAT YOU WOULD COPY INTO YOUR POM.XML 
@@ -136,27 +147,28 @@
 
     <profiles>
         <profile> <!-- defines our default database -->
-            <id>hsql</id>
+            <id>h2db</id>
             <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>!jdbcdb</name>
+                <property>
+                    <name>jdbcdb</name>
+                    <value>h2</value>
                 </property>
             </activation>
             <properties>
-                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
+                  <jdbc.password/>
                   <hibernate.dialect>
-                      org.hibernate.dialect.HSQLDialect
+                      org.hibernate.dialect.H2Dialect
                   </hibernate.dialect>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
                     <scope>test</scope>
-                </dependency>       
+                </dependency>
             </dependencies>
         </profile>
 
@@ -181,25 +193,5 @@
             </dependencies>
         </profile>
 
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate.javax.persistence</groupId>
-                    <artifactId>hibernate-jpa-2.0-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
     </profiles>
 </project>
