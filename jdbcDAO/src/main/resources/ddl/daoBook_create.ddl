@@ -7,12 +7,12 @@ create table DAO_BOOK_UID (
 insert into DAO_BOOK_UID (ID) VALUES ( NEXT VALUE FOR DAO_BOOK_SEQ );
 
 create table DAO_BOOK (
-    ID          bigint not null identity,
+    ID          bigint not null,
     VERSION     bigint not null,
     TITLE       varchar(64),
     AUTHOR      varchar(64),
     DESCRIPTION varchar(2000),
     PAGES       int,
 
-    CONSTRAINT dao_BookPK PRIMARY KEY(ID)
+    PRIMARY KEY(ID)
 );
