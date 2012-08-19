@@ -44,7 +44,7 @@ public class Sale {
         this.store = store;
     }    
 
-    @Column(scale=7, precision=2)
+    @Column(precision=5, scale=2)
     public BigDecimal getAmount() {
         return amount;
     }
