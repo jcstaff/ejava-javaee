@@ -3,8 +3,10 @@ package ejava.examples.ejbsessionbank.blimpl;
 
 import java.util.Collection;
 
+import static org.junit.Assert.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.ejbsessionbank.DemoBase;
 import ejava.examples.ejbsessionbank.bl.BankException;
@@ -20,8 +22,9 @@ import ejava.examples.ejbsessionbank.jpa.JPAOwnerDAO;
 public class TellerTest extends DemoBase {
     private Log log = LogFactory.getLog(TellerTest.class);
     Teller teller;
-    
-    protected void setUp() throws Exception {
+
+    @Override
+    public void setUp() throws Exception {
         super.setUp();
 
         AccountDAO acctDAO = new JPAAccountDAO();
@@ -35,7 +38,7 @@ public class TellerTest extends DemoBase {
         ((TellerImpl)teller).setOwnerDAO(ownerDAO);
     }
     
-    
+    @Test
     public void testCreateAccount() throws BankException {
         Account account = teller.createAccount("111");
         assertNotNull("no account returned", account);
@@ -44,6 +47,7 @@ public class TellerTest extends DemoBase {
         assertNotNull("no account found", account2);        
     }
     
+    @Test
     public void testCloseAccount() throws BankException {
         Account account = teller.createAccount("111");
         em.getTransaction().commit();
@@ -69,6 +73,7 @@ public class TellerTest extends DemoBase {
         teller.closeAccount(account.getAccountNumber());
     }
     
+    @Test
     public void testGetOverdrawnAccounts() throws BankException {
         log.info("*** testGetOverdrawnAccounts ***");
         
@@ -109,6 +114,7 @@ public class TellerTest extends DemoBase {
                 0, teller.getOverdrawnAccounts(0, 1000).size());
     }
     
+    @Test
     public void testGetLedgerCount() throws BankException {
         double total = 0;
         for(int i=0; i<100; i++) {
@@ -120,21 +126,22 @@ public class TellerTest extends DemoBase {
             teller.updateAccount(account2);
         }
         assertEquals("unexpected total", total,
-                teller.getLedgerSum());
+                teller.getLedgerSum(),1);
         assertEquals("unexpected ave", total/100,
-                teller.getLedgerAveBalance());
+                teller.getLedgerAveBalance(),1);
         assertEquals("unexpected count", 100,
                 teller.getLedgerCount());
         
         Ledger ledger = teller.getLedger();
         assertEquals("unexpected ledger total",total,
-                ledger.getTotalAssets());
+                ledger.getTotalAssets(),1);
         assertEquals("unexpected ledger average",total/100,
-                ledger.getAverageAssets());
+                ledger.getAverageAssets(),1);
         assertEquals("unexpected ledger count",100,
                 ledger.getNumberOfAccounts());        
     }
     
+    @Test
     public void testOwner() throws BankException {
         Owner owner = teller.createOwner("joe", "smith", "123");
         em.getTransaction().commit();

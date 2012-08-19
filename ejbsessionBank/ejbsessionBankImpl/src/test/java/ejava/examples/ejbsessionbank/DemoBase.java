@@ -2,6 +2,8 @@ package ejava.examples.ejbsessionbank;
 
 import java.util.List;
 
+
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -9,36 +11,48 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.dao.AccountDAO;
 import ejava.examples.ejbsessionbank.jpa.JPAAccountDAO;
 
-import junit.framework.TestCase;
-
-public abstract class DemoBase extends TestCase {
+public class DemoBase {
     protected Log log = LogFactory.getLog(getClass());
-    private static final String PERSISTENCE_UNIT = "ejbsessionbank";
+    private static final String PERSISTENCE_UNIT = "ejbsessionBank-test";
     protected AccountDAO acctDAO = null;
-    protected static EntityManagerFactory emf =
-        Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+    protected static EntityManagerFactory emf;
     protected EntityManager em;
 
-    protected void setUp() throws Exception {
+    @BeforeClass
+    public static void setUpClass() {
+    	emf=Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+    }
+    
+    @Before
+    public void setUp() throws Exception {
         em = emf.createEntityManager();
         acctDAO = new JPAAccountDAO();
         cleanup();
         em.getTransaction().begin();
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         EntityTransaction tx = em.getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
             else                              { tx.commit(); }
         }
         em.close();
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
         emf.close();
     }
     

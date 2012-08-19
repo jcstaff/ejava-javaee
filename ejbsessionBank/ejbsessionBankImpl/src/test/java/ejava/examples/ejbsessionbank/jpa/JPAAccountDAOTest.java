@@ -1,9 +1,12 @@
 package ejava.examples.ejbsessionbank.jpa;
 
+import static org.junit.Assert.*;
+
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.ejbsessionbank.DemoBase;
 import ejava.examples.ejbsessionbank.bo.Account;
@@ -20,13 +23,15 @@ public class JPAAccountDAOTest extends DemoBase {
     private static Log log = LogFactory.getLog(JPAAccountDAOTest.class);
     protected AccountDAO accountDAO;
 
-    protected void setUp() throws Exception {
+    @Override
+    public void setUp() throws Exception {
         super.setUp();
         
         accountDAO = new JPAAccountDAO();
         ((JPAAccountDAO)accountDAO).setEntityManager(em);
     }
 
+    @Test
     public void testCreateAccount() {
         log.info("*** testCreateAccount ***");
         
@@ -46,6 +51,7 @@ public class JPAAccountDAOTest extends DemoBase {
                 account3.getId());
     }
 
+    @Test
     public void testFindAccounts() {
         log.info("*** testFindAccounts ***");
         
@@ -67,6 +73,7 @@ public class JPAAccountDAOTest extends DemoBase {
     }
 
 
+    @Test
     public void testRemoveAccount() {
         log.info("*** testRemoveAccount ***");
         
@@ -86,6 +93,7 @@ public class JPAAccountDAOTest extends DemoBase {
                     AccountDAO.GET_ACCOUNTS_QUERY, null, 0, 100).size());
     }
 
+    @Test
     public void testUpdateAccount() {
         log.info("*** testUpdateAccount");
         
@@ -98,7 +106,7 @@ public class JPAAccountDAOTest extends DemoBase {
         em.clear();
 
         Account account2 = accountDAO.getAccountById(account.getId());
-        assertEquals("unexpected amount", 10.00, account2.getBalance());
+        assertEquals("unexpected amount", 10.00, account2.getBalance(),1);
         
         Account account3 = 
             new Account(account.getId(), account.getAccountNumber());
@@ -108,10 +116,11 @@ public class JPAAccountDAOTest extends DemoBase {
         em.getTransaction().commit();
         
         Account account4 = accountDAO.getAccountById(account.getId());
-        assertEquals("unexpected amount", 20.00, account4.getBalance());
+        assertEquals("unexpected amount", 20.00, account4.getBalance(),1);
         
     }
 
+    @Test
     public void testGetLedger() {
         log.info("*** testGetLedger ***");
      
@@ -131,12 +140,12 @@ public class JPAAccountDAOTest extends DemoBase {
         long count = accountDAO.getLedgerCount();
         double sum = accountDAO.getLedgerSum();
         
-        assertEquals("unexpected sum", sumTotal, sum);
+        assertEquals("unexpected sum", sumTotal, sum,1);
         assertEquals("unexpected ledger sum", 
-                sumTotal, ledger.getTotalAssets());
+                sumTotal, ledger.getTotalAssets(),1);
         
         assertEquals("unexpected ave", 
-                aveBalance, ledger.getAverageAssets());
+                aveBalance, ledger.getAverageAssets(),1);
         assertEquals("unexpected count", count, 
                 countTotal, ledger.getNumberOfAccounts());
     }

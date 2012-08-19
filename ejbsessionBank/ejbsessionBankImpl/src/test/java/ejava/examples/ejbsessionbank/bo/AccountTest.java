@@ -2,6 +2,7 @@ package ejava.examples.ejbsessionbank.bo;
 
 import javax.persistence.Query;
 
+import static org.junit.Assert.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

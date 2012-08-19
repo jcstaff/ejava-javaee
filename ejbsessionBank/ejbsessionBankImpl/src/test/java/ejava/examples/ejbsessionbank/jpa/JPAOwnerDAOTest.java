@@ -1,6 +1,8 @@
 package ejava.examples.ejbsessionbank.jpa;
 
 import java.util.Collection;
+
+import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.util.List;
 
@@ -8,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.ejbsessionbank.DemoBase;
 import ejava.examples.ejbsessionbank.bo.Account;
@@ -20,7 +23,8 @@ public class JPAOwnerDAOTest extends DemoBase {
     protected OwnerDAO ownerDAO;
     protected AccountDAO accountDAO;
     
-    protected void setUp() throws Exception {
+    @Override
+    public void setUp() throws Exception {
         super.setUp();
         
         ownerDAO = new JPAOwnerDAO();
@@ -30,6 +34,7 @@ public class JPAOwnerDAOTest extends DemoBase {
         ((JPAAccountDAO)accountDAO).setEntityManager(em);
     }
 
+    @Test
     public void testCreateOwner() {
         log.info("*** testCreateOwner ***");
         
@@ -117,6 +122,7 @@ public class JPAOwnerDAOTest extends DemoBase {
         assertEquals("unexpected number of accounts", 0, count);
     }
 
+    @Test
     public void testGetAuthor() throws Exception {
         Owner owner = new Owner();
         owner.setFirstName("johnx");
