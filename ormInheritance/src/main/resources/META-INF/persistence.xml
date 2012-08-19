@@ -6,9 +6,8 @@
     <persistence-unit name="ormInheritance">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
             <!-- moved hibernate-specific properties to hibernate.properties
-            <property name="hibernate.dialect" value="
-                ${hibernate.dialect}"/>
             <property name="hibernate.connection.url"
                 value="${jdbc.url}"/>
             <property name="hibernate.connection.driver_class" 
