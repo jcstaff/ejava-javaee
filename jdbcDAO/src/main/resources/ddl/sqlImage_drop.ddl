@@ -1,2 +1,2 @@
-DROP TABLE Image_IMAGE;
-DROP TABLE Image_DECODER;
+DROP TABLE Image_IMAGE if exists;
+DROP TABLE Image_DECODER if exists;

@@ -528,5 +528,82 @@
                 </plugins>
             </build>
         </profile>        
+
+        <profile> <!-- defines our default database -->
+            <id>h2db</id>
+            <activation>
+                <property>
+                    <name>jdbcdb</name>
+                    <value>h2</value>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:target/h2db/ejava</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+                  <hibernate.dialect>
+                      org.hibernate.dialect.H2Dialect
+                  </hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>hsql</id>
+            <activation>
+                <property>
+                    <name>jdbcdb</name>
+                    <value>hsql</value>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password />
+                  <hibernate.dialect>
+                      org.hibernate.dialect.HSQLDialect
+                  </hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
+        </profile>
+        <profile> 
+            <id>mysql</id>
+            <activation>
+                <property>
+                    <name>jdbcdb</name>
+                    <value>mysql</value>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:mysql://${db.host}:3306/test</jdbc.url>
+                  <jdbc.user>jboss</jdbc.user>
+                  <jdbc.password>password</jdbc.password>
+                  <hibernate.dialect>
+                      org.hibernate.dialect.MySQLDialect
+                  </hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <scope>test</scope>
+                </dependency>       
+            </dependencies>
+        </profile>
     </profiles>        
 </project>

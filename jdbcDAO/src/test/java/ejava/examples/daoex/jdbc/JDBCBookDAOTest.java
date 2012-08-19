@@ -33,13 +33,11 @@ public class JDBCBookDAOTest {
             .getLog(JDBCBookDAOTest.class);
 
 	private static String dbDriver = 
-		System.getProperty("jdbc.driver", "org.hsqldb.jdbcDriver");
+		System.getProperty("jdbc.driver", "org.h2.Driver");
 	private static String dbUrl = 
-		System.getProperty("jdbc.url", "jdbc:hsqldb:hsql://localhost:9001");
-	private static String dbUser = 
-		System.getProperty("jdbc.user", "sa");
-	private static String dbPassword = 
-		System.getProperty("jdbc.password", "");
+		System.getProperty("jdbc.url", "jdbc:h2:target/h2db/ejava");
+	private static String dbUser = System.getProperty("jdbc.user", "sa");
+	private static String dbPassword = System.getProperty("jdbc.password");
     private static long id=2001;    
     private static long nextId() { 
         return (USE_GENERATED_ID) ? 0 : id++; 

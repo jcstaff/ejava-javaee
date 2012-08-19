@@ -1,4 +1,5 @@
-create sequence DAO_BOOK_SEQ as int start with 100 increment by 2;
+--create sequence DAO_BOOK_SEQ as int start with 100 increment by 2;
+create sequence DAO_BOOK_SEQ start with 100 increment by 2;
 
 create table DAO_BOOK_UID (
     ID bigint

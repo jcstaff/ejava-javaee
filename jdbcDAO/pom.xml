@@ -71,50 +71,6 @@
   </build>
   
   <profiles>
-        <profile> <!-- defines our default database -->
-            <id>hsql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
-                </property>
-            </activation>
-            <properties>
-                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
-                  <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <scope>test</scope>
-                </dependency>       
-            </dependencies>
-        </profile>
-        <profile> 
-            <id>mysql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>mysql</value>
-                </property>
-            </activation>
-            <properties>
-                  <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                  <jdbc.url>jdbc:mysql://${db.host}:3306/test</jdbc.url>
-                  <jdbc.user>jboss</jdbc.user>
-                  <jdbc.password>password</jdbc.password>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
-                    <scope>test</scope>
-                </dependency>       
-            </dependencies>
-        </profile>
 
     <profile>
       <id>testing</id>
@@ -131,16 +87,21 @@
             <artifactId>sql-maven-plugin</artifactId>        
             
             <dependencies>
-              <dependency>
-                <groupId>hsqldb</groupId>
-                <version>${hsqldb.version}</version>
-                <artifactId>hsqldb</artifactId>
-              </dependency>
-              <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql-connector-java.version}</version>
-              </dependency>       
+                <dependency>
+                    <groupId>hsqldb</groupId>
+                    <version>${hsqldb.version}</version>
+                    <artifactId>hsqldb</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>${mysql-connector-java.version}</version>
+                </dependency>       
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2db.version}</version>
+                </dependency>
             </dependencies>
             
             <configuration>
@@ -232,7 +193,7 @@
                 <version>1.2</version>
                 <executions>
                     <execution>
-                        <phase>integration-test</phase>
+                        <phase>test</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
@@ -256,7 +217,7 @@
                         </systemProperty>
                         <systemProperty>
                             <key>jdbc.password</key>
-                            <value>""${jdbc.password}</value>
+                            <value>${jdbc.password}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>
