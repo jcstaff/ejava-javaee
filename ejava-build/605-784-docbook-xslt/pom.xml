@@ -42,6 +42,29 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>          
+                                <resource>
+                                    <directory>src/site/resources</directory>
+                                </resource>
+                            </resources>              
+                            <outputDirectory>${basedir}/target/classes/ejava/docs</outputDirectory>
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.5</version>
                 <executions>
