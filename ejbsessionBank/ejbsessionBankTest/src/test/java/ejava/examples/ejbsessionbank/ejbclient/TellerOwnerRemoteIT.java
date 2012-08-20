@@ -3,6 +3,7 @@ package ejava.examples.ejbsessionbank.ejbclient;
 import java.util.List;
 
 
+
 import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
@@ -20,8 +21,8 @@ import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.dto.OwnerDTO;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
-public class TellerOwnerRemoteTest {
-    private static Log log = LogFactory.getLog(TellerOwnerRemoteTest.class);
+public class TellerOwnerRemoteIT {
+    private static Log log = LogFactory.getLog(TellerOwnerRemoteIT.class);
     protected InitialContext jndi;
     protected String jndiName = 
         System.getProperty("jndi.name", "TellerEJB/remote");

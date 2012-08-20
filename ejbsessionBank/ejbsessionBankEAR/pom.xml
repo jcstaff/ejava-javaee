@@ -22,12 +22,14 @@
             <artifactId>ejbsessionBankEJB</artifactId>
             <version>${project.version}</version>
             <type>ejb</type>
+            <!--
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+            -->
         </dependency>
 
         <dependency>
@@ -35,6 +37,12 @@
             <artifactId>ejbsessionBankWAR</artifactId>
             <version>${project.version}</version>
             <type>war</type>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ejbsessionBankImpl</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -47,6 +55,7 @@
                     <description>
                         Example Session Bean Bank Application
                     </description>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
                     <modules>
                         <webModule>
                             <groupId>${project.groupId}</groupId>

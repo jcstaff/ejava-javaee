@@ -16,6 +16,7 @@
     </description>
 
     <dependencies>
+    <!--
         <dependency>
           <groupId>javax.annotation</groupId>
           <artifactId>jsr250-api</artifactId>
@@ -26,9 +27,27 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>        
+        -->
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ejbsessionBankEJB</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ejbsessionBankImpl</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>        
@@ -39,34 +58,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>jsr250-api</artifactId>
-                  <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>javax.ejb</groupId>
-                    <artifactId>ejb-api</artifactId>
-                  <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <!-- this is fine to compile with -->
-                <dependency>
-                    <groupId>javax</groupId>
-                    <artifactId>javaee-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        
         <profile>
             <id>jetty</id>
             <!--

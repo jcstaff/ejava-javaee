@@ -26,12 +26,12 @@
         <maven-verifier-plugin.version>1.0</maven-verifier-plugin.version>
 
         <maven-dependency-plugin.version>2.4</maven-dependency-plugin.version>        
-        <maven-ear-plugin.version>2.6</maven-ear-plugin.version>
+        <maven-ear-plugin.version>2.7</maven-ear-plugin.version>
         <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
         <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
         <maven-rar-plugin.version>2.2</maven-rar-plugin.version>
         <maven-war-plugin.version>2.1.1</maven-war-plugin.version>
-        <cargo-maven2-plugin.version>1.0.6</cargo-maven2-plugin.version>
+        <cargo-maven2-plugin.version>1.2.0</cargo-maven2-plugin.version>
 
         <cobertura-maven-plugin.version>2.5.1</cobertura-maven-plugin.version>
         <findbugs-maven-plugin.version>2.3.1</findbugs-maven-plugin.version>
@@ -78,13 +78,16 @@
         <log4j.version>1.2.13</log4j.version>
         <jms.version>1.1</jms.version>
         <jta.version>1.0.1B</jta.version>
+        <jboss.version>7.1.1.Final</jboss.version>
 
         <jboss.host>localhost</jboss.host>
+        <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
+        <jboss.mgmt.port>9999</jboss.mgmt.port>
         <jboss.protocol>http</jboss.protocol>
         <jboss.servlet.port>8080</jboss.servlet.port>
         <db.host>${jboss.host}</db.host>
         <jboss.user>admin</jboss.user>
-        <jboss.password>admin</jboss.password>
+        <jboss.password>password</jboss.password>
 
     </properties>
 
@@ -373,6 +376,29 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <execution> <!-- run the tests here -->
+                           <id>integration-tests</id> 
+                               <phase>integration-test</phase>
+                           <goals>
+                               <goal>integration-test</goal>
+                           </goals>
+                        </execution>
+                        <execution> <!--  delay failures to after undeploy -->
+                            <id>verify</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                        <testSourceDirectory>src/test/java</testSourceDirectory>
+                        <includes>
+                            <include>**/*IT.java</include>
+                        </includes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -414,11 +440,17 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-ear-plugin</artifactId>
                     <version>${maven-ear-plugin.version}</version>
+                    <configuration>
+                       <version>6</version>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-ejb-plugin</artifactId>
                     <version>${maven-ejb-plugin.version}</version>
+                    <configuration>
+                        <ejbVersion>3.1</ejbVersion>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -434,6 +466,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>${maven-war-plugin.version}</version>
+                    <configuration>
+                       <failOnMissingWebXml>false</failOnMissingWebXml>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -499,6 +534,8 @@
                     <artifactId>maven-jetty-plugin</artifactId>
                     <version>${maven-jetty-plugin.version}</version>
                 </plugin>          
+
+                <!--
                 <plugin>
                     <groupId>org.codehaus.cargo</groupId>
                     <artifactId>cargo-maven2-plugin</artifactId>
@@ -506,41 +543,42 @@
                     <configuration>
                         <container>
                             <containerId>${cargo.containerId}</containerId>
-                            <type>remote</type>                
+                            <type>remote</type>
                         </container>
                         <configuration>
                             <type>runtime</type>
                             <properties>
-                                <cargo.hostname>${jboss.host}</cargo.hostname>
-                                <cargo.remote.username>${jboss.user}</cargo.remote.username>
-                                <cargo.remote.password>${jboss.password}</cargo.remote.password>
+                                <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                                <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
                             </properties>
                         </configuration>
                     </configuration>
                     <dependencies>
                         <dependency>
-                            <groupId>org.codehaus.cargo</groupId>
-                            <artifactId>cargo-core-tools-jboss-deployer-5.1-and-onwards</artifactId>
-                            <version>${cargo-core-tools-jboss-deployer-5.1-and-onwards.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.jboss.jbossas</groupId>
-                            <artifactId>jboss-as-client</artifactId>
-                            <version>${jboss-as-client.version}</version>
-                            <type>pom</type>
-                            <exclusions>
-                                <exclusion> <!-- troubles finding this artifact -->
-                                    <groupId>com.sun.istack</groupId>
-                                    <artifactId>istack-commons-runtime</artifactId>
-                                </exclusion>
-                                <exclusion> <!-- troubles finding this artifact -->
-                                    <groupId>woodstox</groupId>
-                                    <artifactId>wstx-asl</artifactId>
-                                </exclusion>
-                            </exclusions>
+                            <groupId>org.jboss.as</groupId>
+                            <artifactId>jboss-as-controller-client</artifactId>
+                            <version>${jboss.version}</version>
                         </dependency>
                     </dependencies>
+                    <executions>
+                       <execution>
+                           <id>cargo-deploy</id> 
+                               <phase>pre-integration-test</phase>
+                           <goals>
+                               <goal>redeploy</goal>
+                           </goals>
+                       </execution>
+                        <execution>
+                            <id>cargo-undeploy</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>undeploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
+                -->
+
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>cobertura-maven-plugin</artifactId>
@@ -569,8 +607,7 @@
             <id>jboss7</id>
             <properties>
                 <jboss.server>ejava-jboss7</jboss.server>
-                <jboss-as-server.version>7.1.1.Final</jboss-as-server.version>
-                <jboss-as-client.version>7.1.1.Final</jboss-as-client.version>
+                <jboss-as-client.version>${jboss.version}</jboss-as-client.version>
                 <cargo.containerId>jboss71x</cargo.containerId>
                 <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
                 <hornetq.version>2.2.13.Final</hornetq.version>
@@ -609,6 +646,7 @@
                     </dependency>
                 </dependencies>
             </dependencyManagement>
+            <!--
             <build>
                 <pluginManagement>
                     <plugins>
@@ -627,6 +665,7 @@
                     </plugins>
                 </pluginManagement>
             </build>
+            -->
         </profile>        
         <profile> <!-- tells surefire to run JUnit tests with remote debug -->
             <id>debugger</id>

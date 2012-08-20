@@ -19,8 +19,8 @@ import ejava.examples.ejbsessionbank.bo.Ledger;
 import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
-public class TellerRemoteTest {
-    Log log = LogFactory.getLog(TellerRemoteTest.class);
+public class TellerRemoteIT {
+    Log log = LogFactory.getLog(TellerRemoteIT.class);
     InitialContext jndi;
     String jndiName = System.getProperty("jndi.name", "ejava/examples/ejbsessionbank/TellerEJB/remote");
     
