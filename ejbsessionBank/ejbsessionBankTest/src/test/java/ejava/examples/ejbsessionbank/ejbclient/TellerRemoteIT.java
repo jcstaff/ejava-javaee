@@ -3,8 +3,10 @@ package ejava.examples.ejbsessionbank.ejbclient;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.Properties;
 
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
@@ -17,21 +19,51 @@ import ejava.examples.ejbsessionbank.bl.Teller;
 import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Ledger;
 import ejava.examples.ejbsessionbank.bo.Owner;
+import ejava.examples.ejbsessionbank.ejb.TellerEJB;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
 public class TellerRemoteIT {
     Log log = LogFactory.getLog(TellerRemoteIT.class);
     InitialContext jndi;
-    String jndiName = System.getProperty("jndi.name", "ejava/examples/ejbsessionbank/TellerEJB/remote");
+    String jndiName = System.getProperty("jndi.name",getLookupName());
     
     @Before
     public void setUp() throws Exception {
-        Thread.sleep(1000); //hack -- give JBoss extra time to finish deploy
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
         
         cleanup();
+    }
+    
+    public static String getLookupName() {
+    	/*
+    	The app name is the EAR name of the deployed EJB without .ear suffix.
+    	Since we haven't deployed the application as a .ear,
+    	the app name for us will be an empty string
+    	*/
+    	String appName = "ejbsessionBankEAR-3.0.2012.2-SNAPSHOT";
+    	
+    	/* The module name is the JAR name of the deployed EJB
+    	   without the .jar suffix.
+    	   */
+    	String moduleName = "ejbsessionBankEJB-3.0.2012.2-SNAPSHOT";
+    	
+    	/*AS7 allows each deployment to have an (optional) distinct name.
+    	This can be an empty string if distinct name is not specified.
+    	*/
+    	String distinctName = "";
+
+    	// The EJB bean implementation class name
+    	String beanName = TellerEJB.class.getSimpleName();
+
+    	// Fully qualified remote interface name
+    	final String interfaceName = TellerRemote.class.getName();
+
+    	// Create a look up string name
+    	String name = "ejb:" + appName + "/" + moduleName + "/" +
+    			distinctName + "/" + beanName + "!" + interfaceName;
+    	return name;
     }
     
     private void cleanup() throws Exception {

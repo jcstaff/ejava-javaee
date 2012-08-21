@@ -25,16 +25,9 @@ public class TellerOwnerRemoteIT {
     private static Log log = LogFactory.getLog(TellerOwnerRemoteIT.class);
     protected InitialContext jndi;
     protected String jndiName = 
-        System.getProperty("jndi.name", "TellerEJB/remote");
+        System.getProperty("jndi.name", TellerRemoteIT.getLookupName());
     protected TellerRemote teller;
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        //try to avoid a race condition we have with cargo not finishing
-        //deployment before allowing the tests to start
-        Thread.sleep(3000);
-    }
-    
     @Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");

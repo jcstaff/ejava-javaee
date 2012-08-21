@@ -113,10 +113,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <jndi.name>ejb:ejbsessionBankEAR-3.0.2012.2-SNAPSHOT/ejbsessionBankEJB-3.0.2012.2-SNAPSHOT/TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
-                    <!--
-                        <jndi.name>ejb:ejbsessionBankEAR-3.0.2012.2-SNAPSHOT/ejbsessionBankEJB-3.0.2012.2-SNAPSHOT/TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
-                        -->
+        <jndi.name>ejb:ejbsessionBankEAR-${project.version}/ejbsessionBankEJB-${project.version}//TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -134,8 +131,8 @@
     </activation>
     <properties>
           <java.naming.factory.initial>org.jboss.as.naming.InitialContextFactory</java.naming.factory.initial>
-          <java.naming.provider.url>jnp://${jboss.host}:1099</java.naming.provider.url>
           <java.naming.factory.url.pkgs>org.jboss.ejb.client.naming</java.naming.factory.url.pkgs>
+          <java.naming.provider.url/>
     </properties>
 
     <dependencies>
