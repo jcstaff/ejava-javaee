@@ -150,26 +150,30 @@
                 <version>${cargo-maven2-plugin.version}</version>
                 <configuration>
                     <container>
-                        <containerId>jboss7x</containerId>
+                        <containerId>jboss71x</containerId>
+                        <type>installed</type>
+                        <home>${jboss.home}</home>
+                        <!--
                         <type>remote</type>
+                        -->
+                        <log>target/server.log</log>
+                        <output>target/output.log</output>
                     </container>
                     <configuration>
-                        <type>runtime</type>
+                        <type>existing</type>
+                        <home>${jboss.home}/ejava</home>
                         <properties>
                             <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
                             <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
                         </properties>
                     </configuration>
-                    <deployer>
-                        <type>remote</type>
-                        <deployables>
-                            <deployable>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>ejbsessionBankEAR</artifactId>
-                                <type>ear</type>
-                            </deployable>
-                        </deployables>
-                    </deployer>
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>ejbsessionBankEAR</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -183,14 +187,14 @@
                        <id>cargo-deploy</id> 
                            <phase>pre-integration-test</phase>
                        <goals>
-                           <goal>redeploy</goal>
+                           <goal>start</goal>
                        </goals>
                    </execution>
                     <execution> <!--  undeploy from server -->
                         <id>cargo-undeploy</id>
                         <phase>post-integration-test</phase>
                         <goals>
-                            <goal>undeploy</goal>
+                            <goal>stop</goal>
                         </goals>
                     </execution>
                 </executions>
