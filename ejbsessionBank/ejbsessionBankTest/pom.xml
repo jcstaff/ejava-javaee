@@ -121,86 +121,41 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>jboss</id>
+            <activation>
+                <property> <!-- activate this unless -Dserver present -->
+                    <name>!server</name>
+                </property>
+            </activation>
+            <properties>
+            </properties>
+        
+            <dependencies>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <configuration>
+                            <deployables>
+                                <deployable>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>ejbsessionBankEAR</artifactId>
+                                    <type>ear</type>
+                                </deployable>
+                            </deployables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-<profile>
-    <id>jboss</id>
-    <activation>
-        <property> <!-- activate this unless -Dserver present -->
-            <name>!server</name>
-        </property>
-    </activation>
-    <properties>
-          <java.naming.factory.initial>org.jboss.as.naming.InitialContextFactory</java.naming.factory.initial>
-          <java.naming.factory.url.pkgs>org.jboss.ejb.client.naming</java.naming.factory.url.pkgs>
-          <java.naming.provider.url/>
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <version>${cargo-maven2-plugin.version}</version>
-                <configuration>
-                    <container>
-                        <containerId>jboss71x</containerId>
-                        <type>installed</type>
-                        <home>${jboss.home}</home>
-                        <!--
-                        <type>remote</type>
-                        -->
-                        <log>target/server.log</log>
-                        <output>target/output.log</output>
-                    </container>
-                    <configuration>
-                        <type>existing</type>
-                        <home>${jboss.home}/ejava</home>
-                        <properties>
-                            <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
-                            <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
-                        </properties>
-                    </configuration>
-                    <deployables>
-                        <deployable>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>ejbsessionBankEAR</artifactId>
-                            <type>ear</type>
-                        </deployable>
-                    </deployables>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jboss.as</groupId>
-                        <artifactId>jboss-as-controller-client</artifactId>
-                        <version>${jboss.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                   <execution> <!-- deploy to server-->
-                       <id>cargo-deploy</id> 
-                           <phase>pre-integration-test</phase>
-                       <goals>
-                           <goal>start</goal>
-                       </goals>
-                   </execution>
-                    <execution> <!--  undeploy from server -->
-                        <id>cargo-undeploy</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-</profile>
     </profiles>
 </project>

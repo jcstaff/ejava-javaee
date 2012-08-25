@@ -27,8 +27,7 @@ public class JNDIHelper {
 
     private void doDump(int level, StringBuilder text, Context context, String name) 
         throws NamingException {
-        for (@SuppressWarnings("rawtypes")
-		NamingEnumeration ne = context.list(name); ne.hasMore();) {
+        for (NamingEnumeration<NameClassPair> ne = context.list(name); ne.hasMore();) {
             NameClassPair ncp = (NameClassPair) ne.next();
             String objectName = ncp.getName();
             String className = ncp.getClassName();
@@ -44,8 +43,7 @@ public class JNDIHelper {
     
     protected boolean isContext(String className) {
         try {
-            @SuppressWarnings("rawtypes")
-			Class objectClass = Thread.currentThread().getContextClassLoader()
+			Class<?> objectClass = Thread.currentThread().getContextClassLoader()
                     .loadClass(className);
             return Context.class.isAssignableFrom(objectClass);
         }

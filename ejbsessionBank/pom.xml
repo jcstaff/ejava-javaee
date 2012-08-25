@@ -21,21 +21,6 @@
         <module>ejbsessionBankEJB</module>
         <module>ejbsessionBankWAR</module>
         <module>ejbsessionBankEAR</module>
+        <module>ejbsessionBankTest</module>
     </modules>
-
-    <profiles>
-        <!-- separates testing that requires integration of several components
-            and deployment to the server -->
-        <profile>
-            <id>functional-tests</id>
-            <activation>
-                <property>
-                    <name>!maven.test.skip</name>
-                </property>
-            </activation>
-            <modules>
-                <module>ejbsessionBankTest</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
