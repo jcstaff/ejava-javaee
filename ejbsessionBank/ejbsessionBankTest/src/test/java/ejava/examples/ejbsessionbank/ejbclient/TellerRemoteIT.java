@@ -3,10 +3,6 @@ package ejava.examples.ejbsessionbank.ejbclient;
 import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.Properties;
-
-
-import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
