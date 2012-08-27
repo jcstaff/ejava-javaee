@@ -25,7 +25,6 @@ import ejava.util.jndi.JNDIUtil;
  *
  */
 @Stateful(name="BakeScheduler")
-@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 /**
  * The PersistenceContext placed at this level is not common because from the
  * Java class -- we can directly inject into the variables we want. However,
