@@ -26,49 +26,55 @@
         </dependency>
     </dependencies>
 
-<profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <!-- set application-name to prevent JNDI from appending version -->
+                    <applicationName>${project.artifactId}</applicationName>
+                    <!-- define the directory where all global modules will be loaded from -->
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    
+                    <modules>
+                        <!-- set jar name to prevent JNDI from appending version -->
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>txHotelEJB</artifactId>
+                            <bundleFileName>txHotelEJB.jar</bundleFileName>
+                        </ejbModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
     <!-- this profiles allow the EAR to be undeployed before it is deleted
         during the clean target. This behavior requires the EAR to be
         present, so it cannot be part of the default behavior. It is
         only activated when -Dundeploy or -Pundeploy is present so that
         normal cleans do not fail.  -->
-<profile>
-    <id>undeploy</id>
-    <activation>
-        <property>
-            <name>undeploy</name>
-            <value>true</value>
-        </property>
-    </activation>    
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <configuration>
-                    <deployer>
-                        <type>remote</type>
-                        <deployables>
-                            <deployable>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>${project.artifactId}</artifactId>
-                                <type>ear</type>
-                            </deployable>
-                        </deployables>
-                    </deployer>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>undeploy-ear</id>
-                        <phase>pre-clean</phase>
-                        <goals>
-                            <goal>undeploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>                    
-        </plugins>
-    </build>
-</profile>
+        <profile>
+            <id>undeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>undeploy-ear</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>undeploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>                    
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

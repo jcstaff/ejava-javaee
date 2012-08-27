@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 public abstract class DemoBase extends TestCase {
     protected Log log = LogFactory.getLog(getClass());
-    private static final String PERSISTENCE_UNIT = "txhotel";
+    private static final String PERSISTENCE_UNIT = "txhotel-test";
     protected HotelReservationist reservationist;
     protected HotelReservationSession reservationSession;
     protected ReservationDAO reservationDAO = null;

@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 
 public abstract class DemoBase extends TestCase {
     protected Log log = LogFactory.getLog(getClass());
-    private static final String PERSISTENCE_UNIT = "txhotel";
+    private static final String PERSISTENCE_UNIT = "txhotel-test";
     protected ReservationDAO reservationDAO = null;
     protected EntityManager em;
 

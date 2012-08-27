@@ -21,19 +21,9 @@
         <module>txHotelBLImpl</module>
         <module>txHotelEJB</module>
         <module>txHotelEAR</module>
+        <!--
+        <module>txHotelTest</module>
+        -->
     </modules>
 
-    <profiles>
-        <profile>
-            <id>functional-tests</id>
-            <activation>
-                <property>
-                    <name>!maven.test.skip</name>
-                </property>
-            </activation>
-            <modules>
-                <module>txHotelTest</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

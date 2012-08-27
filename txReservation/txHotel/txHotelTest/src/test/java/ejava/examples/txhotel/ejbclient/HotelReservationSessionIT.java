@@ -30,8 +30,8 @@ import junit.framework.TestCase;
  * @author jcstaff
  *
  */
-public class HotelReservationSessionTest extends TestCase {
-    Log log = LogFactory.getLog(HotelReservationSessionTest.class);
+public class HotelReservationSessionIT extends TestCase {
+    Log log = LogFactory.getLog(HotelReservationSessionIT.class);
     InitialContext jndi;
     String registrarJNDI = System.getProperty("jndi.name.hotel");
     String sessionJNDI = System.getProperty("jndi.name.hotelsession");

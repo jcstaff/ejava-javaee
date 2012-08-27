@@ -21,8 +21,8 @@ import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 
-public class HotelReservationTest extends TestCase {
-    Log log = LogFactory.getLog(HotelReservationTest.class);
+public class HotelReservationIT extends TestCase {
+    Log log = LogFactory.getLog(HotelReservationIT.class);
     InitialContext jndi;
     String registrarJNDI = System.getProperty("jndi.name.hotel");
     Map<String,HotelReservationist> reservationists = 

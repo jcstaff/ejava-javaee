@@ -9,10 +9,27 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>txHotelTest</artifactId>
-    <packaging>jar</packaging>
     <name>Tx Hotel Business Remote Test</name>
 
     <dependencies>
+        <!-- package being deployed must be a scope=compile dependency -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>txHotelEAR</artifactId>
+            <version>${project.version}</version>
+            <type>ear</type>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- brings in JBoss RMI dependencies -->
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>    
+
         <!-- core dependencies -->
         <dependency>
             <groupId>commons-logging</groupId>
@@ -34,15 +51,6 @@
             <version>${project.version}</version>
             <type>jar</type>
             <scope>test</scope>
-        </dependency>
-
-        <!-- package being deployed must be a scope=compile dependency -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>txHotelEAR</artifactId>
-            <version>${project.version}</version>
-            <type>ear</type>
-            <scope>compile</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -68,91 +76,31 @@
         </testResources>
 
         <plugins>
-            <!-- THE PROFILE-SPECIFIC DEPLOY WILL EXECUTE HERE -->
-
-              <!-- tell it to run, even though we are a pom project -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <systemPropertyVariables>
-                        <!-- The test case will locate one or more 
-                           deployments below these contexts -->
-                          <jndi.name.hotel>ejava/examples/txhotel</jndi.name.hotel>
-                          <jndi.name.hotelsession>ejava/examples/txhotelsession</jndi.name.hotelsession>
-                    </systemPropertyVariables>
-                </configuration>
-                <executions>
-                    <execution>
-                        <!-- ignored:( running during test phase -->
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>      
-    </build>
-
-    <profiles>
-<profile>
-    <id>jboss</id>
-    <activation>
-        <property> <!-- activate this unless -Dserver present -->
-            <name>!server</name>
-        </property>
-    </activation>
-    <properties>
-          <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
-          </java.naming.factory.initial>
-          <java.naming.provider.url>jnp://${jboss.host}:1099
-          </java.naming.provider.url>
-          <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
-          </java.naming.factory.url.pkgs>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-client</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
+            <!-- artifacts to deploy to server -->
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <configuration>
-                    <deployer>
-                        <type>remote</type>
-                        <deployables>
-                            <deployable>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>txHotelEAR</artifactId>
-                                <type>ear</type>
-                            </deployable>
-                        </deployables>
-                    </deployer>
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>txHotelEAR</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>deploy-component</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>                    
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+<jndi.name.hotel>ejb:txHotelEAR/txHotelEJB//HotelRegistrationEJB!ejava.examples.txhotel.ejb.HotelRegistrationRemote</jndi.name.hotel>
+<jndi.name.hotelsession>ejb:txHotelEAR/txHotelEJB//HotelReservationSessionEJB!ejava.examples.txhotel.ejb.HotelReservationSessionRemote?stateful</jndi.name.hotelsession>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-</profile>
-    </profiles>
 </project>
