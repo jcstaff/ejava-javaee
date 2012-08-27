@@ -23,6 +23,13 @@
             <artifactId>commons-logging</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>ejava-util</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- component to test within deployment-->
         <dependency>
@@ -74,7 +81,7 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>    
-
+        
         <!-- TODO: get rid of this -->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -115,7 +122,7 @@
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <systemPropertyVariables>
-<jndi.name>ejb:ejbsessionBankEAR-${project.version}/ejbsessionBankEJB-${project.version}//TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
+<jndi.name>ejb:ejbsessionBankEAR/ejbsessionBankEJB//TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

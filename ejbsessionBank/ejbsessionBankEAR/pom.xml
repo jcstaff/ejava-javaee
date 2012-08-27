@@ -56,12 +56,20 @@
                         Example Session Bean Bank Application
                     </description>
                     <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <!-- eliminates use of version in EAR JNDI name portion -->
+                    <applicationName>${project.artifactId}</applicationName>
                     <modules>
                         <webModule>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>ejbsessionBankWAR</artifactId>
                             <contextRoot>ejbsessionBank</contextRoot>
                         </webModule>
+                        <!-- eliminates use of the version in the EJB JNDI name -->
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>ejbsessionBankEJB</artifactId>
+                            <bundleFileName>ejbsessionBankEJB.jar</bundleFileName>
+                        </ejbModule>
                     </modules>
                 </configuration>
             </plugin>

@@ -19,12 +19,14 @@ import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.dto.OwnerDTO;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
+import ejava.util.ejb.EJBClient;
 
 public class TellerOwnerRemoteIT {
     private static Log log = LogFactory.getLog(TellerOwnerRemoteIT.class);
     protected InitialContext jndi;
-    protected String jndiName = 
-        System.getProperty("jndi.name", TellerRemoteIT.getLookupName());
+    String jndiName = System.getProperty("jndi.name",
+    	EJBClient.getEJBLookupName("ejbsessionBankEAR", "ejbsessionBankEJB", "", 
+    			"TellerEJB", TellerRemote.class.getName()));
     protected TellerRemote teller;
 
     @Before
