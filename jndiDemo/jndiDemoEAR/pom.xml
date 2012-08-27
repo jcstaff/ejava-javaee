@@ -37,7 +37,7 @@
                 <artifactId>maven-ear-plugin</artifactId>
                 <configuration>
                     <!-- set application-name to prevent JNDI from appending version -->
-                    <applicationName>${artifactId}</applicationName>
+                    <applicationName>${project.artifactId}</applicationName>
                     <!-- define the directory where all global modules will be loaded from -->
                     <defaultLibBundleDir>lib</defaultLibBundleDir>
                     
