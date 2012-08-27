@@ -14,5 +14,8 @@ public interface Scheduler {
     String getJndiProperty(String name);
     
     /** return the toString() of the object at the given Context.lookup name */
-    String getCtxProperty(String name);    
+    String getCtxProperty(String name);  
+    
+   /** return a string representation of java:comp/env */
+    String getEnv();
 }

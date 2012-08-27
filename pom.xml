@@ -162,7 +162,7 @@
                         <plugin> 
                             <artifactId>maven-surefire-report-plugin</artifactId>
                             <groupId>org.apache.maven.plugins</groupId>
-                            <version>${maven-surefire-report-plugin}</version>
+                            <version>${maven-surefire-report-plugin.version}</version>
                             <configuration>
                                 <aggregate>true</aggregate>
                             </configuration>
@@ -217,8 +217,8 @@
                 <module>ormInheritance</module>
                 <module>ormListeners</module>
                 <module>ejbsessionBank</module>
-                <!--
                 <module>jndiDemo</module>
+                <!--
                 <module>txReservation</module>
                 <module>webtier</module>
                 <module>securePing</module>
@@ -280,7 +280,7 @@
                                 <plugin> 
                                     <artifactId>maven-surefire-report-plugin</artifactId>
                                     <groupId>org.apache.maven.plugins</groupId>
-                                    <version>${maven-surefire-report-plugin}</version>
+                                    <version>${maven-surefire-report-plugin.version}</version>
                                     <configuration>
                                         <aggregate>false</aggregate>
                                     </configuration>

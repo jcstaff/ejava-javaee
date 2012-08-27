@@ -34,7 +34,7 @@ public class TellerOwnerRemoteIT {
         log.debug("jndi=" + jndi.getEnvironment());
         
         teller = (TellerRemote)jndi.lookup(jndiName);
-        
+        log.debug("got teller:" + teller);
         cleanup();
     }
     

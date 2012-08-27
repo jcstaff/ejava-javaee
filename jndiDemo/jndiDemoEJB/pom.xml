@@ -21,18 +21,22 @@
           <artifactId>commons-logging</artifactId>
           <scope>compile</scope>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>ejava-util</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>${javaee-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+            
+       </dependencies>
     <build>
-         <!-- this will allow the EAR to be build with the EJB.jar
-             missing version information. For JBoss6, the default
-             JNDI name is a function of the literal name of the EJB.jar.
-             This is only an issue if you do not defined a custom JNDI
-             name mapping 
-         <finalName>${project.artifactId}</finalName>
-             -->
-
-
          <!--tell the resource plugin to perform filtering on resources 
              to fill in dialect, etc. -->
         <resources>
@@ -48,12 +52,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ejb-plugin</artifactId>
                 <configuration>
-                    <ejbVersion>3.0</ejbVersion>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
                     <generateClient>true</generateClient>
                     <clientExcludes>
                         <clientExclude>**/ejb/*EJB.class</clientExclude>
@@ -63,68 +61,4 @@
             </plugin>      
         </plugins>      
     </build>
-
-    <profiles>
-        <profile> <!-- defines our persistence.xml dialect -->
-            <id>hsql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
-                </property>
-            </activation>
-            <properties>
-                  <hibernate.dialect>
-                      org.hibernate.dialect.HSQLDialect
-                  </hibernate.dialect>
-            </properties>
-        </profile>
-        <profile>
-            <id>mysql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>mysql</value>
-                </property>
-            </activation>
-            <properties>
-                  <hibernate.dialect>
-                      org.hibernate.dialect.MySQLDialect
-                  </hibernate.dialect>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>jsr250-api</artifactId>
-                  <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>javax.ejb</groupId>
-                    <artifactId>ejb-api</artifactId>
-                  <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <!-- this is fine to compile with -->
-                <dependency>
-                    <groupId>javax</groupId>
-                    <artifactId>javaee-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

@@ -50,12 +50,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ejb-plugin</artifactId>
                 <configuration>
-                    <ejbVersion>3.0</ejbVersion>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
                     <generateClient>true</generateClient>
                     <clientExcludes>
                         <clientExclude>**/ejb/*Local.class</clientExclude>

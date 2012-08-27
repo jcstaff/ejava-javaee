@@ -1,9 +1,12 @@
 package ejava.examples.jndidemo.ejb;
 
 import javax.annotation.PostConstruct;import javax.annotation.Resource;
+
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateful;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
@@ -11,7 +14,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.sql.DataSource;
 
-import ejava.examples.jndidemo.JNDIHelper;
+import ejava.util.jndi.JNDIUtil;
 
 /**
  * This class is primarily an example of configuring an EJB through 
@@ -22,43 +25,45 @@ import ejava.examples.jndidemo.JNDIHelper;
  *
  */
 @Stateful(name="BakeScheduler")
-/* This does the equivalent of declaring the PersistenceContext within the
- * ejb-jar.xml file. The JNDI ENC is populated with an EntityManager
- * for persistence.xml#name="jndidemo" at location 
- * java:comp/env/persistence/jndidemo. This will make it available for 
- * lookup within the EJB as well as direct injection.
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+/**
+ * The PersistenceContext placed at this level is not common because from the
+ * Java class -- we can directly inject into the variables we want. However,
+ * this does simulate what is beiong done from ejb-jar.xml by injecting the 
+ * persistence context into the ENC so that it can be looked up within the 
+ * component using JNDI.
  */
-@PersistenceContext(unitName="jndidemo", 
-                    name="persistence/jndidemo", 
-                    type=PersistenceContextType.EXTENDED)
+@PersistenceContext(unitName="jndidemo",
+		name="persistence/jndidemo",
+		type=PersistenceContextType.EXTENDED)
 public class BakeSchedulerEJB 
     extends SchedulerBase implements BakeSchedulerRemote {
 
     public String getName() { return "BakeSchedulerEJB"; }
     
     /*
-     * This declaration references the declared EntityManager declared 
-     * in the JNDI context java:comp/env/persistence/jndidemo. It works
-     * in parallel with the definition at the top of the class or one
-     * from the ejb-jar.xml file.
-    @PersistenceContext(name="persistence/jndidemo")
-    Only works with JBoss 6 -- works in JBoss 5 using 
-    @Resource(name="persistence/jndidemo")
+     * This injects a enity manager into the class variable. Since this 
+     * happens to be a stateless session bean -- an EXTENDED context is 
+     * chosen over a TX-scoped.
      */
+    @PersistenceContext(
+    		unitName="jndidemo",    		
+    		type=PersistenceContextType.EXTENDED)
     private EntityManager em;
-
-    /**
-     * This declaration skips the JNDI ENC name and injects the dependency
-     * straight into the variable.
-     */
-    @PersistenceContext(unitName="jndidemo", type=PersistenceContextType.EXTENDED)
-    private EntityManager em2;    
     
+    /**
+     * This instance of an entity manager is being taken out of the JNDI
+     * tree configured at the top of the class. This would be made available
+     * to any POJO called by the EJB. 
+     */
+    @Resource(name="persistence/jndidemo")
+    private EntityManager em2;
+
     /*
      * This declaration obtains a reference to the SQL DataSource in the '
      * global JNDI tree and initializes ds to that value
      */
-    @Resource(mappedName="java:/ejavaDS")
+    @Resource(mappedName="java:jboss/datasources/ExampleDS")
     private DataSource ds;
     
     /*
@@ -96,15 +101,16 @@ public class BakeSchedulerEJB
         log.info("******************* BakeScheduler Created ******************");
         log.debug("ctx=" + ctx);
         log.debug("em=" + em);
-        log.debug("em2=" + em2);
+        log.debug("em=" + em2);
         log.debug("ds=" + ds);
-        log.debug("persistence/jndidemo=" + ctx.lookup("persistence/jndidemo"));
+        //log.debug("persistence/jndidemo=" + ctx.lookup("persistence/jndidemo"));
         log.debug("message=" + message);
         log.debug("cook=" + cook);  //this will be null at this point
         log.debug("cook2=" + cook2);
         log.debug("ejb/cook=" + ctx.lookup("ejb/cook"));
         cook = (CookLocal)ctx.lookup("ejb/cook");
-        try { new JNDIHelper().dump(new InitialContext(), "java:comp/env");
-        } catch (NamingException e) { log.fatal("" + e); }
+        try { 
+        	log.debug(new JNDIUtil().dump(new InitialContext(), "java:comp/env"));
+        } catch (NamingException ex) { log.fatal("" + ex); }
     }
 }

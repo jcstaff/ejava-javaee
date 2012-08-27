@@ -1,33 +1,59 @@
 package ejava.examples.jndidemo.ejbclient;
 
+import java.io.InputStream;
+
+
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 
+import static org.junit.Assert.*;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ejava.examples.jndidemo.Scheduler;
+import ejava.examples.jndidemo.ejb.AidSchedulerRemote;
+import ejava.examples.jndidemo.ejb.BakeSchedulerRemote;
+import ejava.util.ejb.EJBClient;
 
-public class JNDITest  {
-    Log log = LogFactory.getLog(JNDITest.class);
+public class JndiIT  {
+    private static final Log log = LogFactory.getLog(JndiIT.class);
     InitialContext jndi;
-    static String aidName = System.getProperty("jndi.name.aid");
-    static String bakeName = System.getProperty("jndi.name.bake");
-    
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    	//wait initial to avoid loosing a race condition with cargo
-    	Thread.sleep(3000);
-    }
+    static String aidName = System.getProperty("jndi.name.aid",
+    	EJBClient.getEJBLookupName("jndiDemoEAR", "jndiDemoEJB", "","AidScheduler",
+        		AidSchedulerRemote.class.getName()));
+    static String bakeName = System.getProperty("jndi.name.bake",
+    	EJBClient.getEJBLookupName("jndiDemoEAR", "jndiDemoEJB", "","BakeScheduler",
+        		BakeSchedulerRemote.class.getName()) + "?stateful");
     
     @Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
+        
+        log.debug("aidName=" + aidName);
+        log.debug("bakeName=" + bakeName);
+        
+        
+        InputStream is = getClass().getResourceAsStream("/jboss-ejb-client.properties");
+        assertNotNull("jboss-ejb-client.properties 1 not found", is);
+        log.debug("jboss-ejb-client.properties\n" + IOUtils.toString(is));
+        is.close();
+        is = Thread.currentThread().getContextClassLoader().getResourceAsStream("jboss-ejb-client.properties");
+        assertNotNull("jboss-ejb-client.properties 2 not found", is);
+        log.debug("jboss-ejb-client.properties\n" + IOUtils.toString(is));
+        is.close();
+    }
+    
+    @After
+    public void tearDown() throws NamingException {
+        jndi.close();
     }
 
     @Test
@@ -36,24 +62,23 @@ public class JNDITest  {
         
         Object object = jndi.lookup(aidName);
         log.debug(aidName + "=" + object);
-        jndi.close();
         
         Scheduler s = (Scheduler)object;        
-        log.debug("got scheduler:" + s.getName());
+        log.debug("got scheduler:" + s);
+        log.debug("scheduler.name:" + s.getName());
+        log.debug("scheduler.name2:" + s.getName());
         
         String encname = "ejb/hospital";
         String jndiname = "java:comp/env/" + encname;
-        //String jbossname = "java:comp.ejb3/env/" + encname;
         log.debug("jndi: " + jndiname + "=" + s.getJndiProperty(jndiname));
-        //log.debug("jndi: " + jbossname + "=" + s.getJndiProperty(jbossname));
         log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
 
         encname = "persistence/jndidemo";
         jndiname = "java:comp/env/" + encname;
-        //jbossname = "java:comp.ejb3/env/" + encname;
         log.debug("jndi: " + jndiname + "=" + s.getJndiProperty(jndiname));
-        //log.debug("jndi: " + jbossname + "=" + s.getJndiProperty(jbossname));
         log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
+        
+        log.debug("java:comp/env=" + s.getEnv());
     }
     
     @Test
@@ -62,23 +87,22 @@ public class JNDITest  {
         
         Object object = jndi.lookup(bakeName);
         log.debug(bakeName + "=" + object);
-        jndi.close();
         
         Scheduler s = (Scheduler)object;        
-        log.debug("got scheduler:" + s.getName());
+        log.debug("got scheduler:" + s);
+        log.debug("scheduler.name:" + s.getName());
+        log.debug("scheduler.name2:" + s.getName());
         
         String encname = "ejb/cook";
         String jndiname = "java:comp/env/" + encname;
-        //String jbossname = "java:comp.ejb3/env/" + encname;
         log.debug("jndi: " + jndiname + "=" + s.getJndiProperty(jndiname));
-        //log.debug("jndi: " + jbossname + "=" + s.getJndiProperty(jbossname));
         log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
 
         encname = "persistence/jndidemo";
         jndiname = "java:comp/env/" + encname;
-        //jbossname = "java:comp.ejb3/env/" + encname;
         log.debug("jndi: " + jndiname + "=" + s.getJndiProperty(jndiname));
-        //log.debug("jndi: " + jbossname + "=" + s.getJndiProperty(jbossname));
         log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
+        
+        log.debug("java:comp/env=" + s.getEnv());
     }
 }

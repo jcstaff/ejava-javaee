@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
-<ejb-jar
-    xmlns="http://java.sun.com/xml/ns/javaee" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd"
-    version="3.0">
-    
+ <ejb-jar xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+      version="3.1">
+          
     <enterprise-beans>
         <session>
             <ejb-name>AidScheduler</ejb-name>
+            <!-- 
+            <mapped-name>ejava/examples/jndidemo/AidScheduler/remote</mapped-name>
+             -->
             <business-local>ejava.examples.jndidemo.ejb.AidSchedulerLocal</business-local>
             <business-remote>ejava.examples.jndidemo.ejb.AidSchedulerRemote</business-remote>
             <ejb-class>ejava.examples.jndidemo.ejb.AidSchedulerEJB</ejb-class>
@@ -70,6 +72,7 @@
             <business-local>ejava.examples.jndidemo.ejb.HospitalLocal</business-local>
             <business-remote>ejava.examples.jndidemo.ejb.HospitalRemote</business-remote>
             <ejb-class>ejava.examples.jndidemo.ejb.HospitalEJB</ejb-class>
+            <session-type>Stateless</session-type>
         </session>
     </enterprise-beans>   
 </ejb-jar>

@@ -59,20 +59,6 @@
             <artifactId>log4j</artifactId>
             <scope>test</scope>
         </dependency>    
-        <!--
-        <dependency>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-client</artifactId>
-            <type>pom</type>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion> 
-                    <groupId>woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ejbsessionBankEJB</artifactId>
@@ -82,7 +68,7 @@
         </dependency>
 
         <dependency>
-            <groupId>ejava.build</groupId>
+            <groupId>ejava.common</groupId>
             <artifactId>jboss-rmi-client</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
@@ -108,54 +94,32 @@
         </testResources>
 
         <plugins>
+            <!-- artifacts to deploy to server -->
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>ejbsessionBankEAR</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <argLine>${surefire.argLine}</argLine>
                     <systemPropertyVariables>
-        <jndi.name>ejb:ejbsessionBankEAR-${project.version}/ejbsessionBankEJB-${project.version}//TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
+<jndi.name>ejb:ejbsessionBankEAR-${project.version}/ejbsessionBankEJB-${project.version}//TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+
         </plugins>      
     </build>
-
-    <profiles>
-        <profile>
-            <id>jboss</id>
-            <activation>
-                <property> <!-- activate this unless -Dserver present -->
-                    <name>!server</name>
-                </property>
-            </activation>
-            <properties>
-            </properties>
-        
-            <dependencies>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-maven2-plugin</artifactId>
-                        <configuration>
-                            <deployables>
-                                <deployable>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>ejbsessionBankEAR</artifactId>
-                                    <type>ear</type>
-                                </deployable>
-                            </deployables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-    </profiles>
 </project>

@@ -2,12 +2,13 @@ package ejava.examples.jndidemo.ejb;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
-import ejava.examples.jndidemo.JNDIHelper;
+import ejava.util.jndi.JNDIUtil;
 
 /**
  * This class is primarily an example of an EJB mostly configured through 
@@ -42,11 +43,11 @@ public class AidSchedulerEJB extends SchedulerBase
         log.debug("em=" + em);
         log.debug("ds=" + ds);
         log.debug("hospital=" + hospital);
-        //see common in BaseSchedulerEJB about java:comp/env and java:comp.ejb3
-        try { new JNDIHelper().dump(new InitialContext(), "java:comp.ejb3");
-        } catch (NamingException e) { log.fatal("" + e); }        
-        try { new JNDIHelper().dump(new InitialContext(), "java:comp/env");
-        } catch (NamingException e) { log.fatal("" + e); }        
+        //peek in java:comp/env
+        try { 
+        	Context enc = (Context) new InitialContext().lookup("java:comp");
+        	log.debug(new JNDIUtil().dump(enc, "env"));
+        } catch (NamingException ex) { log.fatal("" + ex); }        
     }
     
     public String getName() { return "AidScheduler"; }    
