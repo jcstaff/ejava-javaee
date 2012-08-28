@@ -36,13 +36,19 @@
             <artifactId>commons-logging</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>ejava-util</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- include this to compile tests -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>txHotelEJB</artifactId>
             <version>${project.version}</version>
-            <type>ejb-client</type>
+            <type>jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -88,17 +94,6 @@
                             <type>ear</type>
                         </deployable>
                     </deployables>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-<jndi.name.hotel>ejb:txHotelEAR/txHotelEJB//HotelRegistrationEJB!ejava.examples.txhotel.ejb.HotelRegistrationRemote</jndi.name.hotel>
-<jndi.name.hotelsession>ejb:txHotelEAR/txHotelEJB//HotelReservationSessionEJB!ejava.examples.txhotel.ejb.HotelReservationSessionRemote?stateful</jndi.name.hotelsession>
-                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>

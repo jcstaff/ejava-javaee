@@ -1,6 +1,8 @@
 package ejava.examples.txhotel.ejbclient;
 
+import static org.junit.Assert.*;
 import java.util.ArrayList;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -14,6 +16,10 @@ import javax.naming.NamingEnumeration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import ejava.examples.txhotel.bl.HotelReservationSession;
 import ejava.examples.txhotel.bl.HotelReservationist;
@@ -22,7 +28,7 @@ import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
-import junit.framework.TestCase;
+import ejava.util.ejb.EJBClient;
 
 /**
  * This test case provides an example of conducting a failed usecase 
@@ -30,81 +36,43 @@ import junit.framework.TestCase;
  * @author jcstaff
  *
  */
-public class HotelReservationSessionIT extends TestCase {
-    Log log = LogFactory.getLog(HotelReservationSessionIT.class);
-    InitialContext jndi;
-    String registrarJNDI = System.getProperty("jndi.name.hotel");
-    String sessionJNDI = System.getProperty("jndi.name.hotelsession");
-    Map<String, HotelReservationSession> reservationSessions =
-        new HashMap<String, HotelReservationSession>();
-    HotelReservationist reservationist;
-    List<String> jndiNames = new ArrayList<String>();
+public class HotelReservationSessionIT {
+    private static final Log log = LogFactory.getLog(HotelReservationSessionIT.class);
+    static InitialContext jndi;
+    static final String sessionJNDI = System.getProperty("jndi.name.hotelsession",
+    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        	"HotelReservationSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
+    static final String requiredJNDI = System.getProperty("jndi.name.hotelsession",
+    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        	"RequiredSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
+    static final String requiresNewJNDI = System.getProperty("jndi.name.hotelsession",
+    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        	"RequiresNewSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
     
-    public void setUp() throws Exception {
+    
+    static Map<String, HotelReservationSession> reservationSessions =
+        new HashMap<String, HotelReservationSession>();
+    static HotelReservationist reservationist;
+    static Map<String, HotelReservationist> reservationists;
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
         log.debug("jndi name:" + sessionJNDI);        
         
-        /**
-         * Instead of looking up a specific EJB, we are pointed to the 
-         * root context of a JNDI tree that contains the same EJB
-         * deployed multiple times and run the purposely failed use
-         * cases against each of them to test and note their differences.
-         */
-        for(NamingEnumeration<Binding> e = jndi.listBindings(sessionJNDI);
-            e.hasMore(); ) {
-            Binding b = e.nextElement();
-            StringBuilder name = new StringBuilder(sessionJNDI);
-            name.append("/");
-            name.append(b.getName());
-            name.append("/remote");
-            try {
-                log.debug("looking up:" + name);
-                Object object = jndi.lookup(name.toString());
-                if (object instanceof HotelReservationSessionRemote) {
-                    reservationSessions.put(b.getName(), 
-                            (HotelReservationSession)object);
-                    log.info("found:" + name);
-                    jndiNames.add(name.toString());
-                }
-            }
-            catch (NameNotFoundException ex) {}
-        }
-        
-        for(NamingEnumeration<Binding> e = jndi.listBindings(registrarJNDI);
-            e.hasMore(); ) {
-            Binding b = e.nextElement();
-            StringBuilder name = new StringBuilder(registrarJNDI);
-            name.append("/");
-            name.append(b.getName());
-            name.append("/remote");
-            try {
-                log.debug("looking for reservationist:" + name);
-                Object object = jndi.lookup(name.toString());
-                if (object instanceof HotelRegistrationRemote) {
-                    log.info("found:" + name);
-                    jndiNames.add(name.toString());
-                	if (reservationist == null) {
-                		reservationist = (HotelReservationist)object;
-                        log.info("using reservationist:" + name);
-                	}
-                }
-            }
-            catch (NameNotFoundException ex) {}
-        }
-        
-        cleanup();
+       	reservationSessions.put("registrar", (HotelReservationSession)jndi.lookup(sessionJNDI));
+       	reservationSessions.put("required", (HotelReservationSession)jndi.lookup(requiredJNDI));
+       	reservationSessions.put("requiresNew", (HotelReservationSession)jndi.lookup(requiresNewJNDI));
+       	reservationists = HotelReservationIT.getReservationists();
+       	reservationist = (HotelReservationist) jndi.lookup(HotelReservationIT.registrarJNDI);
     }
     
-    @Override
-	protected void tearDown() throws Exception {
-    	StringBuilder text = new StringBuilder("JNDI names found/used:\n");
-    	for (String name : jndiNames) {
-    		text.append(name).append("\n");
-    	}
-    	log.info(text.toString());
-	}
+    @Before
+    public void setUp() throws Exception {
+        cleanup();
+    }
 
 	private void cleanup() throws Exception {
         List<Reservation> reservations = reservationist.getReservations(0, 100);
@@ -117,6 +85,7 @@ public class HotelReservationSessionIT extends TestCase {
         }        
     }
 
+	@Test
     public void testCreates() throws Exception {
         for(String key: reservationSessions.keySet()) {
             testCreates(key, reservationSessions.get(key));
@@ -153,6 +122,7 @@ public class HotelReservationSessionIT extends TestCase {
         assertEquals(baseline.size()+10,mine.size());
     }
     
+    @Test
     public void testBadCreates() throws Exception {
         for(String key: reservationSessions.keySet()) {
             testBadCreates(key, reservationSessions.get(key));
@@ -202,5 +172,4 @@ public class HotelReservationSessionIT extends TestCase {
                     " reservations were not rolled back for: " + key);            
         }        
     }
-
 }

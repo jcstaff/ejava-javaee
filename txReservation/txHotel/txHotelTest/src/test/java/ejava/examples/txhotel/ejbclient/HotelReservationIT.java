@@ -1,58 +1,72 @@
 package ejava.examples.txhotel.ejbclient;
 
+import static org.junit.Assert.*;
 import java.util.Calendar;
+
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.naming.Binding;
+import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.bl.InvalidParameterException;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
+import ejava.util.ejb.EJBClient;
 
-public class HotelReservationIT extends TestCase {
-    Log log = LogFactory.getLog(HotelReservationIT.class);
-    InitialContext jndi;
-    String registrarJNDI = System.getProperty("jndi.name.hotel");
-    Map<String,HotelReservationist> reservationists = 
-        new HashMap<String, HotelReservationist>();
-    
-    public void setUp() throws Exception {
-        Thread.sleep(3000); //hak - give extra time to deploy
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
+public class HotelReservationIT {
+    static final Log log = LogFactory.getLog(HotelReservationIT.class);
+    static String registrarJNDI = System.getProperty("jndi.name.hotel",
+    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    		"HotelRegistrationEJB", HotelRegistrationRemote.class.getName()));
+    static final String requiredJNDI = System.getProperty("jndi.name.hotel.required",
+    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    		"RequiredEJB", HotelRegistrationRemote.class.getName()));
+    static final String requiresNewJNDI = System.getProperty("jndi.name.hotel.requiresNew",
+    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    		"RequiresNewEJB", HotelRegistrationRemote.class.getName()));
+
+    static final Map<String,HotelReservationist> reservationists = 
+            new HashMap<String, HotelReservationist>();
+
+    @BeforeClass
+    public static void setUpClass() throws NamingException {
         log.debug("jndi name:" + registrarJNDI);
-        
-        for (NamingEnumeration<Binding> e=jndi.listBindings(registrarJNDI);
-             e.hasMore(); ) {
-            Binding b = e.next();
-            StringBuilder name = new StringBuilder(registrarJNDI);
-            name.append("/" + b.getName());
-            name.append("/remote");
-            try {
-                Object object = jndi.lookup(name.toString());
-                if (object instanceof HotelRegistrationRemote) {
-                    reservationists.put(b.getName(), 
-                                       (HotelReservationist)object);
-                    log.info("found:" + name);
-                }
-            }
-            catch (NameNotFoundException ex) {}
-        }                
+        reservationists.putAll(getReservationists());
+    }
+    
+    public static Map<String,HotelReservationist> getReservationists() 
+    		throws NamingException {
+        Context jndi = new InitialContext();
+        try {
+	        Map<String,HotelReservationist> reservationists = 
+	                new HashMap<String, HotelReservationist>();
+	        reservationists.put("registrar", (HotelReservationist)jndi.lookup(registrarJNDI));
+	        reservationists.put("required", (HotelReservationist)jndi.lookup(requiredJNDI));
+	        reservationists.put("requiresNew", (HotelReservationist)jndi.lookup(requiresNewJNDI));
+	        return reservationists;
+        }
+        finally {
+            if (jndi != null) { jndi.close(); }
+        }
     }
 
+    @Test
     public void testCreateReservation() throws Exception {
         for(String key: reservationists.keySet()) {
             HotelReservationist reservationist = reservationists.get(key);
@@ -80,6 +94,7 @@ public class HotelReservationIT extends TestCase {
                 reservation.getConfirmation());
     }
     
+    @Test
     public void testGetReservation() throws Exception {
         for(String key: reservationists.keySet()) {
             HotelReservationist reservationist = reservationists.get(key);
@@ -112,7 +127,7 @@ public class HotelReservationIT extends TestCase {
         assertNotNull("reservation wasn't found", reservation2);
     }
 
-
+    @Test
     public void testBadCreateReservation() throws Exception {
         for(String key: reservationists.keySet()) {
             HotelReservationist reservationist = reservationists.get(key);
@@ -162,5 +177,4 @@ public class HotelReservationIT extends TestCase {
             log.debug("got expected exception:" + ex);
         }
     }
-
 }
