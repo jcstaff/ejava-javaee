@@ -24,9 +24,8 @@ public class AgentImpl implements BookingAgent {
     protected void populateBooking(Booking booking) 
         throws AgentReservationException {
         for(String c: booking.getHotelConfirmations()) {
-            Reservation r;
             try {
-                r = reservationist.getReservationByConfirmation(c);
+            	Reservation r = reservationist.getReservationByConfirmation(c);
                 booking.addHotelReservation(r);
             } catch (HotelReservationException ex) {
                 throw new AgentReservationException(

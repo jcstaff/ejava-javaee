@@ -1,18 +1,15 @@
 package ejava.examples.txhotel.ejbclient;
 
 import static org.junit.Assert.*;
+
 import java.util.Calendar;
 
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 
 
@@ -27,6 +24,7 @@ import ejava.examples.txhotel.bl.InvalidParameterException;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
+import ejava.examples.txhotel.ejb.TestUtilRemote;
 import ejava.util.ejb.EJBClient;
 
 public class HotelReservationIT {
@@ -64,6 +62,13 @@ public class HotelReservationIT {
         finally {
             if (jndi != null) { jndi.close(); }
         }
+    }
+    
+    @Before() 
+    public void setUp() throws NamingException {
+        String hotelHelperName = EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        		"TestUtilEJB", TestUtilRemote.class.getName());
+        ((TestUtilRemote)new InitialContext().lookup(hotelHelperName)).reset();
     }
 
     @Test

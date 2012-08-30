@@ -37,7 +37,7 @@ import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
  * implementations to show anything really significant.<p/>
  * 
  * Note too that this session bean declares its transaction properties using
- * class annotations. By default, the statelful session bean runs without
+ * class annotations. By default, this stateful session bean runs without
  * a tranaction while caching reservations for the user. A transaction is 
  * required only for the commit() call, which also signals the removal of
  * this bean instance.<p/>

@@ -20,7 +20,7 @@ public class Booking implements Serializable {
     private long version;
     private String confirmation;
     private Set<String> hotelConfirmations = new HashSet<String>();
-    private List<Reservation> hotelReservations = new ArrayList<Reservation>();
+    private Set<Reservation> hotelReservations = new HashSet<Reservation>();
     
     public Booking() {}
     public Booking(
@@ -55,11 +55,11 @@ public class Booking implements Serializable {
     private void setHotelConfirmations(Set<String> hotelConfirmations) {
         this.hotelConfirmations = hotelConfirmations;
     }
-    public List<Reservation> getHotelReservations() {
-        return Collections.unmodifiableList(hotelReservations);
+    public Set<Reservation> getHotelReservations() {
+        return Collections.unmodifiableSet(hotelReservations);
     }
     @SuppressWarnings("unused")
-    private void setHotelReservations(List<Reservation> hotelReservations) {
+    private void setHotelReservations(Set<Reservation> hotelReservations) {
         this.hotelReservations = hotelReservations;
     }
     public void addHotelReservation(Reservation reservation) {
@@ -82,7 +82,22 @@ public class Booking implements Serializable {
         hotelConfirmations = (Set<String>)ois.readObject();
     }
     
-    public String toString() {
+    
+    @Override
+	public boolean equals(Object obj) {
+		if (this==obj) return true;
+		if (obj!= null && obj instanceof Booking) {
+			return confirmation.equals(((Booking)obj).confirmation);
+		}
+		return false;
+	}
+    
+	@Override
+	public int hashCode() {
+		return confirmation.hashCode();
+	}
+
+	public String toString() {
         StringBuilder text = new StringBuilder();
         text.append("id=" + id);
         text.append(", version=" + version);

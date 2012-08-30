@@ -22,6 +22,7 @@ public class HotelReservationSessionImpl implements HotelReservationSession {
     public void createReservation(Person person, Date startDate, Date endDate)
         throws HotelReservationException {
         pending.add(new Reservation(0,0,null,person, startDate, endDate));        
+    	log.debug("added pending reservation, size=" + pending.size());
     }
     
     public void cancelReservations() throws HotelReservationException {

@@ -56,7 +56,28 @@
             <type>ear</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>txHotelEAR</artifactId>
+            <version>${project.version}</version>
+            <type>ear</type>
+            <scope>compile</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>    
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>ejava-util</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>    
+        
         <!-- test dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -80,115 +101,40 @@
         </testResources>
 
         <plugins>
-            <!-- THE PROFILE-SPECIFIC DEPLOY WILL EXECUTE HERE -->
-
-              <!-- tell it to run, even though we are a pom project -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <systemPropertyVariables>
-                          <jndi.name.hotel>
-                              ejava/examples/txhotel/RequiredEJB/remote
-                          </jndi.name.hotel>
-                          <jndi.name.agent>
-                              ejava/examples/txagent/BookingAgentEJB/remote
-                          </jndi.name.agent>
-                          <jndi.name.agentsession>
-                              ${agentsession.jndi}
-                          </jndi.name.agentsession>
-                    </systemPropertyVariables>
-                </configuration>
-                <executions>
-                    <execution>
-                        <!-- ignored:( running during test phase -->
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-        </plugins>      
-    </build>
-
-    <profiles>
-<profile>
-    <id>jboss</id>
-    <activation>
-        <property> <!-- activate this unless -Dserver present -->
-            <name>!server</name>
-        </property>
-    </activation>
-    <properties>
-          <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
-          </java.naming.factory.initial>
-          <java.naming.provider.url>jnp://${jboss.host}:1099
-          </java.naming.provider.url>
-          <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
-          </java.naming.factory.url.pkgs>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-client</artifactId>
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
+            <!-- artifacts to deploy to server -->
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <configuration>
-                    <deployer>
-                        <type>remote</type>
-                        <deployables>
-                            <deployable>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>txAgentEAR</artifactId>
-                                <type>ear</type>
-                            </deployable>
-                        </deployables>
-                    </deployer>
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>txHotelEAR</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>txAgentEAR</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>deploy-component</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>                    
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+
+            <!-- this module does not play well with the site plugin -->
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <skipDeploy>true</skipDeploy>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-</profile>
-
-<profile>
-    <id>jboss5</id>
-    <properties>
-        <cargo.containerId>jboss51x</cargo.containerId>
-        <agentsession.jndi>txAgentEAR-${project.version}/AgentReservationSessionEJB/remote</agentsession.jndi>
-    </properties>
-</profile>
-
-<profile>
-    <id>jboss6</id>
-    <properties>
-        <cargo.containerId>jboss6x</cargo.containerId>
-        <agentsession.jndi>txAgentEAR-${project.version}/txAgentEJB-${project.version}.jar/AgentReservationSessionEJB!remote</agentsession.jndi>
-    </properties>
-</profile>
-    </profiles>
 </project>

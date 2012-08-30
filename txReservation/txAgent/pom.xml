@@ -19,22 +19,11 @@
     <modules>
         <module>txAgentBO</module>
         <module>txAgentDAO</module>
+        <!--
         <module>txAgentBLImpl</module>
         <module>txAgentEJB</module>
         <module>txAgentEAR</module>
+        <module>txAgentTest</module>
+        -->
     </modules>
-
-    <profiles>
-        <profile>
-            <id>functional-tests</id>
-            <activation>
-                <property>
-                    <name>!maven.test.skip</name>
-                </property>
-            </activation>
-            <modules>
-                <module>txAgentTest</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

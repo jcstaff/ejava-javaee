@@ -42,7 +42,7 @@
             <!-- used for optimistic locking -->
             <version name="version"/>            
             <many-to-one name="person">
-                <join-table name="TXHOTEL_RESERVATION_PERSON"/>
+                <join-column name="PERSON_ID"/>
                 <cascade>
                     <cascade-persist/>
                 </cascade>
@@ -66,6 +66,10 @@
             <id name="id">
                 <generated-value/>
             </id>
+            <basic name="creationDate">
+                <column insertable="true" updatable="false"/>
+                <temporal>TIMESTAMP</temporal>
+            </basic>
         </attributes>        
     </entity>
 </entity-mappings>

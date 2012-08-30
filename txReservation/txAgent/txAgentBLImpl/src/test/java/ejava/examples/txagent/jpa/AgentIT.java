@@ -1,15 +1,20 @@
 package ejava.examples.txagent.jpa;
 
+import static org.junit.Assert.*;
 import java.util.Calendar;
+
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import org.junit.Test;
 
 import ejava.examples.txagent.bo.Booking;
 import ejava.examples.txagent.jpa.DemoBase;
 import ejava.examples.txhotel.bo.Person;
 
-public class AgentDemo extends DemoBase {
+public class AgentIT extends DemoBase {
     
+	@Test
     public void testCreateBooking() throws Exception {
         log.info("*** testCreateBooking ***");
         agentSession.createBooking();
@@ -20,7 +25,9 @@ public class AgentDemo extends DemoBase {
         Calendar end = new GregorianCalendar();
         end.setTime(start.getTime());
         end.add(Calendar.DAY_OF_YEAR, 2);
-        for(int i=0; i<10; i++) {
+        
+        int count=3;
+        for(int i=0; i<count; i++) {
             agentSession.addReservation(person, start.getTime(), end.getTime());
         }
         
@@ -32,8 +39,8 @@ public class AgentDemo extends DemoBase {
         
         bookings = agent.getBookings(0, 100);
         assertEquals(1,bookings.size());
-        assertEquals(10, booking.getHotelConfirmations());
-        assertEquals(10, booking.getHotelReservations());        
+        assertEquals(count, booking.getHotelConfirmations().size());
+        assertEquals(count, booking.getHotelReservations().size());        
     }
     /*
     public void testCreateBadReservations() throws Exception {

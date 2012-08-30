@@ -1,6 +1,7 @@
 package ejava.examples.txhotel.bo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @SuppressWarnings("serial")
 public class Person implements Serializable {
@@ -8,6 +9,7 @@ public class Person implements Serializable {
     private long version;
     private String firstName;
     private String lastName;
+    private Date creationDate=new Date();
     
     public Person() {}
     public Person(long id, long version, String firstName, String lastName) { 
@@ -41,7 +43,25 @@ public class Person implements Serializable {
     public void setVersion(long version) {
         this.version = version;
     }
-    public String toString() {
+    
+    @Override
+	public boolean equals(Object obj) {
+    	try {
+    		if (this==obj) return true;
+    		Person rhs = (Person)obj;
+    		return creationDate.getTime()==rhs.creationDate.getTime() &&
+    				firstName.equals(rhs.firstName) &&
+    				lastName.equals(rhs.lastName);
+    	} catch (Exception ex) {
+    		return false;
+    	}
+	}
+	@Override
+	public int hashCode() {
+		return creationDate.hashCode();
+	}
+	
+	public String toString() {
         StringBuilder text = new StringBuilder();
         text.append("id=" + id);
         text.append(", version=" + version);

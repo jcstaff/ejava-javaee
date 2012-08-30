@@ -1,6 +1,8 @@
 package ejava.examples.txagent.ejbclient;
 
 import java.util.Calendar;
+
+import static org.junit.Assert.*;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -8,6 +10,8 @@ import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.examples.txagent.bl.AgentReservationException;
 import ejava.examples.txagent.bl.AgentReservationSession;
@@ -19,21 +23,27 @@ import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
-import junit.framework.TestCase;
+import ejava.util.ejb.EJBClient;
 
-public class AgentReservationSessionTest extends TestCase {
-    Log log = LogFactory.getLog(AgentReservationSessionTest.class);
+public class AgentReservationSessionIT {
+    Log log = LogFactory.getLog(AgentReservationSessionIT.class);
     InitialContext jndi;
-    String agentJNDI = System.getProperty("jndi.name.agent");
-    String agentsessionJNDI = System.getProperty("jndi.name.agentsession");
+    String agentJNDI = System.getProperty("jndi.name.agent",
+    	EJBClient.getEJBLookupName("txAgentEAR", "txAgentEJB", "", 
+    		"BookingAgentEJB", BookingAgentRemote.class.getName()));
+    String agentsessionJNDI = System.getProperty("jndi.name.agentsession",
+    	EJBClient.getEJBLookupName("txAgentEAR", "txAgentEJB", "", 
+        	"AgentReservationSessionEJB", AgentReservationSessionRemote.class.getName()));
     AgentReservationSession agentSession;
     BookingAgent agent;    
-    String hotelJNDI = System.getProperty("jndi.name.hotel");
+    String hotelJNDI = System.getProperty("jndi.name.hotel",
+		EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    		"HotelRegistrationEJB", HotelRegistrationRemote.class.getName()));
     HotelReservationist hotel;
     
+    @Before()
     public void setUp() throws Exception {
     	boolean fail=false;
-        Thread.sleep(3000); //hack - give jboss extra time to deploy
     	
         log.debug("getting jndi initial context");
         try {
@@ -93,6 +103,7 @@ public class AgentReservationSessionTest extends TestCase {
         }        
     }
 
+    @Test
     public void testCreate() throws Exception {
         log.info("*** testCreate: ***");       
 
@@ -133,6 +144,7 @@ public class AgentReservationSessionTest extends TestCase {
             "posted reservations to hotel");
     }
     
+    @Test
     public void testBadCreate() throws Exception {
         log.info("*** testBadCreate: ***");       
         

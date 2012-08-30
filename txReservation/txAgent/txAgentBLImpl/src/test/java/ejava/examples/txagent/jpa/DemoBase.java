@@ -1,10 +1,13 @@
 package ejava.examples.txagent.jpa;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -12,7 +15,10 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
 
+import ejava.examples.txagent.bl.AgentReservationException;
 import ejava.examples.txagent.bl.AgentReservationSession;
 import ejava.examples.txagent.bl.BookingAgent;
 import ejava.examples.txagent.blimpl.AgentImpl;
@@ -23,11 +29,13 @@ import ejava.examples.txhotel.bl.HotelReservationSession;
 import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
+import ejava.examples.txhotel.ejb.TestUtilRemote;
+import ejava.util.ejb.EJBClient;
 
 
 import junit.framework.TestCase;
 
-public abstract class DemoBase extends TestCase {
+public abstract class DemoBase {
     protected Log log = LogFactory.getLog(getClass());
     private static final String PERSISTENCE_UNIT = "txagent";
     protected HotelReservationist reservationist;
@@ -36,18 +44,19 @@ public abstract class DemoBase extends TestCase {
     protected BookingAgent agent;
     protected AgentReservationSession agentSession;
     protected EntityManager em;
+    
     protected String reservationistName = 
-        System.getProperty("jndi.name.hotel");
+        System.getProperty("jndi.name.hotel", 
+        	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        		"HotelRegistrationEJB", HotelRegistrationRemote.class.getName()));    
     protected String reservationistSessionName = 
-        System.getProperty("jndi.name.hotelsession");
-    protected String hotelJndiUrl = 
-        System.getProperty("hotel.jndi.url");
-    protected String hotelJndiFactory =
-        System.getProperty("hotel.jndi.factory");
-    protected String hotelJndiPkgs =
-        System.getProperty("hotel.jndi.pkgs");
+        System.getProperty("jndi.name.hotelsession", 
+			EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+	        	"HotelReservationSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
+    
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         EntityManagerFactory emf = 
             Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
         em = emf.createEntityManager();
@@ -56,9 +65,6 @@ public abstract class DemoBase extends TestCase {
         
         //initialize JNDI tree to txHotel
         Properties jndiProps = new Properties();
-        jndiProps.put(Context.INITIAL_CONTEXT_FACTORY, hotelJndiFactory);
-        jndiProps.put(Context.PROVIDER_URL, hotelJndiUrl);
-        jndiProps.put(Context.URL_PKG_PREFIXES, hotelJndiPkgs);
         log.debug("jndi props=" + jndiProps);
         InitialContext jndi = new InitialContext(jndiProps);
         log.debug("jndi=" + jndi.getEnvironment());
@@ -91,7 +97,8 @@ public abstract class DemoBase extends TestCase {
         em.getTransaction().begin();
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         EntityTransaction tx = em.getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
@@ -101,7 +108,7 @@ public abstract class DemoBase extends TestCase {
     }
     
     @SuppressWarnings("unchecked")
-    protected void cleanup() {
+    protected void cleanup() throws NamingException, AgentReservationException {
         log.info("cleaning up database");
         em.getTransaction().begin();
         List<Booking> bookings = 
@@ -109,14 +116,13 @@ public abstract class DemoBase extends TestCase {
         for(Booking b: bookings) {
             em.remove(b);
         }
-        
-        em.createNativeQuery("delete from TXHOTEL_RESERVATION_PERSON")
-          .executeUpdate();
-        em.createNativeQuery("delete from TXHOTEL_RESERVATION")
-          .executeUpdate();
-        em.createNativeQuery("delete from TXHOTEL_PERSON")
-          .executeUpdate();
         em.getTransaction().commit();
+        
+
+        assertEquals("unexpected bookings", 0, agent.getBookings(0, 100).size());
+        String hotelHelperName = EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        		"TestUtilEJB", TestUtilRemote.class.getName());
+        ((TestUtilRemote)new InitialContext().lookup(hotelHelperName)).reset();
     }
     
     protected void populate() {

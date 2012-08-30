@@ -60,8 +60,24 @@ public class Reservation implements Serializable {
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
-
-    public String toString() {
+    @Override
+	public boolean equals(Object obj) {
+    	try {
+    		if (this==obj) return true;
+    		Reservation rhs = (Reservation)obj;
+    		return person.equals(rhs.person) && 
+    				startDate.getTime()==rhs.startDate.getTime() &&
+    				endDate.getTime()==rhs.endDate.getTime();
+    	} catch (Exception ex) {
+    		return false;
+    	}
+	}
+	@Override
+	public int hashCode() {
+		return person.hashCode()+startDate.hashCode()+endDate.hashCode();
+	}
+    
+	public String toString() {
         StringBuilder text = new StringBuilder();
         text.append("id=" + id);
         text.append(", version=" + version);

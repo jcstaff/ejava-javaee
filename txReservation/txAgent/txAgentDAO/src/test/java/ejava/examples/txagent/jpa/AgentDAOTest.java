@@ -1,9 +1,13 @@
 package ejava.examples.txagent.jpa;
 
 import java.util.Date;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 import ejava.examples.txagent.bo.Booking;
 import ejava.examples.txhotel.bo.Person;
@@ -15,11 +19,12 @@ import ejava.examples.txhotel.bo.Reservation;
  *
  * @author jcstaff
  */
-public class AgentDAODemo extends DemoBase {
+public class AgentDAOTest extends DemoBase {
     
     /*
      * This will test the ability to create a new Reservation and Person
      */
+	@Test
     public void testCreateBooking() {
         log.info("*** testCreateBooking ***");
         
@@ -36,7 +41,7 @@ public class AgentDAODemo extends DemoBase {
         assertTrue("booking id not assigned", booking.getId()!=0);
     }
 
-
+	@Test
     public void testGetBooking() {
         log.info("*** testGetBooking ***");
 
@@ -57,6 +62,7 @@ public class AgentDAODemo extends DemoBase {
         assertNotNull(booking2);
     }
 
+	@Test
     public void testRemoveBooking() {
         log.info("*** testRemoveBooking ***");
 
@@ -82,6 +88,7 @@ public class AgentDAODemo extends DemoBase {
                 bookings1.size()-1, booking2.size());
     }
     
+	@Test
     public void testQueryByConfirmation() {
         log.info("*** testByConfirmation ***");
 
