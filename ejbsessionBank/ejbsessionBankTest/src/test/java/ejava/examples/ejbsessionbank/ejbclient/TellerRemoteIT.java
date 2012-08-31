@@ -22,7 +22,7 @@ import ejava.util.ejb.EJBClient;
 public class TellerRemoteIT {
     Log log = LogFactory.getLog(TellerRemoteIT.class);
     InitialContext jndi;
-    String jndiName = System.getProperty("jndi.name",
+    public static final String jndiName = System.getProperty("jndi.name",
     	EJBClient.getEJBLookupName("ejbsessionBankEAR", "ejbsessionBankEJB", "", 
     			"TellerEJB", TellerRemote.class.getName()));
     

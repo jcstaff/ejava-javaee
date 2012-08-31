@@ -2,9 +2,6 @@ package ejava.examples.ejbsessionbank.ejbclient;
 
 import java.util.List;
 
-
-
-
 import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
@@ -20,14 +17,11 @@ import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.dto.OwnerDTO;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
-import ejava.util.ejb.EJBClient;
 
 public class TellerOwnerRemoteIT {
     private static Log log = LogFactory.getLog(TellerOwnerRemoteIT.class);
     protected InitialContext jndi;
-    String jndiName = System.getProperty("jndi.name",
-    	EJBClient.getEJBLookupName("ejbsessionBankEAR", "ejbsessionBankEJB", "", 
-    			"TellerEJB", TellerRemote.class.getName()));
+    String jndiName = System.getProperty("jndi.name", TellerRemoteIT.jndiName);
     protected TellerRemote teller;
 
     @Before

@@ -90,6 +90,7 @@
         <slf4j.version>1.6.1</slf4j.version>
         <slf4j-jboss.version>1.6.1</slf4j-jboss.version>
 
+        <jboss.basedir>${jboss.home}/standalone</jboss.basedir>
         <jboss.host>localhost</jboss.host>
         <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
         <jboss.mgmt.port>9999</jboss.mgmt.port>
@@ -609,95 +610,132 @@
                         </execution>
                     </executions>
                 </plugin>
-
-              <plugin>
-                  <groupId>org.codehaus.cargo</groupId>
-                  <artifactId>cargo-maven2-plugin</artifactId>
-                  <version>${cargo-maven2-plugin.version}</version>
-                  <configuration>
-                      <container>
-                          <containerId>${cargo.containerId}</containerId>
-                          <type>installed</type>
-                          <home>${jboss.home}</home>
-                          <log>target/server.log</log>
-                          <output>target/output.log</output>
-                      </container>
-                      <configuration>
-                          <type>existing</type>
-                          <home>${jboss.home}/ejava</home>
-                          <properties>
-                              <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
-                              <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
-                          </properties>
-                      </configuration>
-                      <container>
-                          <containerId>${cargo.containerId}</containerId>
-                          <type>remote</type>
-                          <log>target/server.log</log>
-                          <output>target/output.log</output>
-                      </container>
-                      <configuration>
-                          <type>runtime</type>
-                          <properties>
-                              <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
-                              <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
-                          </properties>
-                      </configuration>
-                  </configuration>
-                  <dependencies>
-                      <dependency>
-                          <groupId>org.jboss.as</groupId>
-                          <artifactId>jboss-as-controller-client</artifactId>
-                          <version>${jboss.version}</version>
-                      </dependency>
-                  </dependencies>
-                 <executions>
-                    <execution>
-                        <id>cargo-prep</id> 
-                            <phase>pre-integration-test</phase>
-                        <goals>
-                             <goal>${cargo.prep.goal}</goal>
-                        </goals>
-                    </execution>
-                     <execution>
-                         <id>cargo-post</id>
-                         <phase>post-integration-test</phase>
-                         <goals>
-                             <goal>${cargo.post.goal}</goal>
-                         </goals>
-                     </execution>
-                 </executions>
-              </plugin>
-
             </plugins>
     	</pluginManagement>
     </build>
     
     <profiles>
         <profile>
-            <id>jboss-startstop</id>
+            <id>cargo-startstop</id>
             <activation>
                 <property>
                     <name>cargo-startstop</name>
                 </property>
             </activation>
-            <properties>
-                <cargo.prep.goal>start</cargo.prep.goal>
-                <cargo.post.goal>stop</cargo.post.goal>
-            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                          <groupId>org.codehaus.cargo</groupId>
+                          <artifactId>cargo-maven2-plugin</artifactId>
+                          <version>${cargo-maven2-plugin.version}</version>
+                          <configuration>
+                              <container>
+                                  <containerId>${cargo.containerId}</containerId>
+                                  <type>installed</type>
+                                  <home>${jboss.home}</home>
+                                  <log>target/cargo.log</log>
+                                  <output>target/output.log</output>
+                                  <systemProperties>
+                                      <jboss.bind.address>${jboss.host}</jboss.bind.address>
+                                      <jboss.bind.address.management>${jboss.mgmt.host}</jboss.bind.address.management>
+                                  </systemProperties>
+                              </container>
+                              <configuration>
+                                  <type>existing</type>
+                                  <home>${jboss.basedir}</home>
+                                  <properties>
+                                      <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                                      <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
+                                  </properties>
+                              </configuration>
+                          </configuration>
+                          <dependencies>
+                              <dependency>
+                                  <groupId>org.jboss.as</groupId>
+                                  <artifactId>jboss-as-controller-client</artifactId>
+                                  <version>${jboss.version}</version>
+                              </dependency>
+                          </dependencies>
+                         <executions>
+                            <execution>
+                                <id>cargo-prep</id> 
+                                    <phase>pre-integration-test</phase>
+                                <goals>
+                                     <goal>start</goal>
+                                </goals>
+                            </execution>
+                             <execution>
+                                 <id>cargo-post</id>
+                                 <phase>post-integration-test</phase>
+                                 <goals>
+                                     <goal>undeploy</goal>
+                                     <goal>stop</goal>
+                                 </goals>
+                             </execution>
+                         </executions>
+                      </plugin>
+                    </plugins>            
+                </pluginManagement>
+            </build>
         </profile>
         
         <profile>
-            <id>jboss-deploy</id>
+            <id>cargo-deploy</id>
             <activation>
                 <property>
                     <name>!cargo-startstop</name>
                 </property>
             </activation>
-            <properties>
-                <cargo.prep.goal>redeploy</cargo.prep.goal>
-                <cargo.post.goal>undeploy</cargo.post.goal>
-            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.cargo</groupId>
+                            <artifactId>cargo-maven2-plugin</artifactId>
+                            <version>${cargo-maven2-plugin.version}</version>
+                            <configuration>
+                                <container>
+                                    <containerId>${cargo.containerId}</containerId>
+                                    <type>remote</type>
+                                    <log>target/server.log</log>
+                                    <output>target/output.log</output>
+                                </container>
+                                <configuration>
+                                    <type>runtime</type>
+                                    <properties>
+                                        <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                                        <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
+                                    </properties>
+                                </configuration>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.jboss.as</groupId>
+                                    <artifactId>jboss-as-controller-client</artifactId>
+                                    <version>${jboss.version}</version>
+                                </dependency>
+                            </dependencies>
+                            <executions>
+                               <execution>
+                                   <id>cargo-prep</id> 
+                                       <phase>pre-integration-test</phase>
+                                   <goals>
+                                        <goal>redeploy</goal>
+                                   </goals>
+                               </execution>
+                                <execution>
+                                    <id>cargo-post</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>undeploy</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
 
 
