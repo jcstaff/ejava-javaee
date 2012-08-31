@@ -12,6 +12,20 @@
         solutions, and projects.
     </description>
 
+    <distributionManagement>
+        <repository>
+            <id>webdev.repository</id>
+            <name>ejava JHU repository</name>
+            <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>webdev.snapshot.repo</id>
+            <name>ejava JHU snapshot repository</name>
+            <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2-snapshot</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         
