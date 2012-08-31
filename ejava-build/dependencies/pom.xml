@@ -613,8 +613,20 @@
             </plugins>
     	</pluginManagement>
     </build>
-    
+
     <profiles>
+        <profile>
+            <id>skip-its</id>
+            <activation>
+                <property>
+                    <name>skipITs</name>
+                </property>
+            </activation>
+            <properties>
+                <cargo.maven.skip>true</cargo.maven.skip>
+            </properties>
+        </profile>
+
         <profile>
             <id>cargo-startstop</id>
             <activation>
