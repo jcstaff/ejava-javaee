@@ -2,10 +2,10 @@ package ejava.examples.txagent.jpa;
 
 import static org.junit.Assert.assertEquals;
 
+
 import java.util.List;
 import java.util.Properties;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
@@ -32,12 +32,9 @@ import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
 import ejava.examples.txhotel.ejb.TestUtilRemote;
 import ejava.util.ejb.EJBClient;
 
-
-import junit.framework.TestCase;
-
 public abstract class DemoBase {
     protected Log log = LogFactory.getLog(getClass());
-    private static final String PERSISTENCE_UNIT = "txagent";
+    private static final String PERSISTENCE_UNIT = "txagent-test";
     protected HotelReservationist reservationist;
     protected HotelReservationSession reservationSession;
     protected BookingDAO bookingDAO;

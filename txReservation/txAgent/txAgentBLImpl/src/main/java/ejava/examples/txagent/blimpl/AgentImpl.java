@@ -46,9 +46,10 @@ public class AgentImpl implements BookingAgent {
     public List<Booking> getBookings(int index, int count) 
         throws AgentReservationException {
         List<Booking> bookings = bookingDAO.getBookings(index, count);
-        for(Booking b: bookings) {
-            populateBooking(b);
-        }
+        //don't need to do this -- already populated
+        //for(Booking b: bookings) {
+        //    populateBooking(b);
+        //}
         return bookings;
     }
     public void cleanupBooking(String confirmation) 

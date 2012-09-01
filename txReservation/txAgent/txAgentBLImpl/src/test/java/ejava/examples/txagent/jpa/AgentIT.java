@@ -21,13 +21,13 @@ public class AgentIT extends DemoBase {
         
         Person person = new Person(0,0,"joe", "smith");
         Calendar start = new GregorianCalendar();
-        start.add(Calendar.DAY_OF_YEAR, 10);
         Calendar end = new GregorianCalendar();
         end.setTime(start.getTime());
-        end.add(Calendar.DAY_OF_YEAR, 2);
         
         int count=3;
         for(int i=0; i<count; i++) {
+            start.add(Calendar.DAY_OF_YEAR, 7*count);
+            end.add(Calendar.DAY_OF_YEAR, (7*count)+3);
             agentSession.addReservation(person, start.getTime(), end.getTime());
         }
         
@@ -39,8 +39,8 @@ public class AgentIT extends DemoBase {
         
         bookings = agent.getBookings(0, 100);
         assertEquals(1,bookings.size());
-        assertEquals(count, booking.getHotelConfirmations().size());
-        assertEquals(count, booking.getHotelReservations().size());        
+        assertEquals("unexpected number of confirmations", count, booking.getHotelConfirmations().size());
+        assertEquals("unexpected number of reservations", count, booking.getHotelReservations().size());        
     }
     /*
     public void testCreateBadReservations() throws Exception {

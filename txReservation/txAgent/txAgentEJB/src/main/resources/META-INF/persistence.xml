@@ -5,21 +5,13 @@
 
     <persistence-unit name="txagent">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-    	<!-- we can't use ejavaDS because the new EJB3.l1 Timers are 
-    	   hard-coded to use DefaultDS and HSQL does not support XA.
-        <jta-data-source>java:/ejavaDS</jta-data-source>
-    	 -->
-        <jta-data-source>java:/DefaultDS</jta-data-source>
-
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
         <mapping-file>META-INF/orm.xml</mapping-file>
         <jar-file>txAgentBO-${project.version}.jar</jar-file>
-
         <properties>
-            <property name="hibernate.dialect" 
-                value="${hibernate.dialect}"/>
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
             <property name="hibernate.show_sql" value="false"/>            
             <property name="hibernate.hbm2ddl.auto" value="create"/>
         </properties>
     </persistence-unit>        
-    
 </persistence>

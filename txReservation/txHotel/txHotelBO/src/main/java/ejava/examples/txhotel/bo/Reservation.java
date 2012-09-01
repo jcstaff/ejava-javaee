@@ -1,7 +1,9 @@
 package ejava.examples.txhotel.bo;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 @SuppressWarnings("serial")
 public class Reservation implements Serializable {
@@ -65,13 +67,31 @@ public class Reservation implements Serializable {
     	try {
     		if (this==obj) return true;
     		Reservation rhs = (Reservation)obj;
-    		return person.equals(rhs.person) && 
-    				startDate.getTime()==rhs.startDate.getTime() &&
+    		return person.equals(rhs.person) &&
+    				sameDate(startDate, rhs.startDate) &&
+    				sameDate(startDate, rhs.startDate) &&
     				endDate.getTime()==rhs.endDate.getTime();
     	} catch (Exception ex) {
     		return false;
     	}
 	}
+    private static boolean sameDate(Date lhsDate, Date rhsDate) {
+    	if (lhsDate==null && rhsDate==null) { 
+    		return true;
+    	}
+    	else if (lhsDate==null || rhsDate==null) {
+    		return false;
+    	}
+    	
+		Calendar lhs = new GregorianCalendar();
+		lhs.setTime(lhsDate);
+		Calendar rhs = new GregorianCalendar();
+		rhs.setTime(rhsDate);
+		return lhs.get(Calendar.YEAR)==rhs.get(Calendar.YEAR) &&
+				lhs.get(Calendar.DAY_OF_YEAR)==rhs.get(Calendar.DAY_OF_YEAR);
+    }
+    
+    
 	@Override
 	public int hashCode() {
 		return person.hashCode()+startDate.hashCode()+endDate.hashCode();

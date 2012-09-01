@@ -33,7 +33,7 @@ public class AgentReservationSessionIT {
     		"BookingAgentEJB", BookingAgentRemote.class.getName()));
     String agentsessionJNDI = System.getProperty("jndi.name.agentsession",
     	EJBClient.getEJBLookupName("txAgentEAR", "txAgentEJB", "", 
-        	"AgentReservationSessionEJB", AgentReservationSessionRemote.class.getName()));
+        	"AgentReservationSessionEJB", AgentReservationSessionRemote.class.getName()+"?stateful"));
     AgentReservationSession agentSession;
     BookingAgent agent;    
     String hotelJNDI = System.getProperty("jndi.name.hotel",
@@ -117,11 +117,11 @@ public class AgentReservationSessionIT {
 
 
         Calendar start = new GregorianCalendar();
-        start.add(Calendar.DAY_OF_YEAR, 10);
         Calendar end = new GregorianCalendar();
         end.setTime(start.getTime());
-        end.add(Calendar.DAY_OF_YEAR, 2);
         for(int i=0; i<10; i++) {
+            start.add(Calendar.DAY_OF_YEAR, (i*7));
+            end.add(Calendar.DAY_OF_YEAR, (i*7)+2);
             agentSession.addReservation(
                     person, start.getTime(), end.getTime());
         }

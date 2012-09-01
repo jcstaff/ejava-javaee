@@ -11,6 +11,7 @@ import javax.ejb.EJBException;
 import javax.ejb.Remove;
 import javax.ejb.SessionContext;
 import javax.ejb.SessionSynchronization;
+import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
@@ -49,7 +50,7 @@ import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
  *
  * @author jcstaff
  */
-//@Stateful
+@Stateful
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class AgentReservationSessionEJB
     implements AgentReservationSessionLocal, AgentReservationSessionRemote,

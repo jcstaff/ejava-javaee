@@ -1,15 +1,14 @@
 package ejava.examples.txagent.bo;
 
 import java.io.ByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import ejava.examples.txhotel.bo.Reservation;
@@ -63,8 +62,10 @@ public class Booking implements Serializable {
         this.hotelReservations = hotelReservations;
     }
     public void addHotelReservation(Reservation reservation) {
-        this.hotelConfirmations.add(reservation.getConfirmation());
-        this.hotelReservations.add(reservation);
+    	if (!hotelConfirmations.contains(reservation.getConfirmation())) {
+	        this.hotelConfirmations.add(reservation.getConfirmation());
+	        this.hotelReservations.add(reservation);
+    	}
     }
     //hibernate wouldn't persist ArrayList<String> as @Lob
     @SuppressWarnings("unused")
