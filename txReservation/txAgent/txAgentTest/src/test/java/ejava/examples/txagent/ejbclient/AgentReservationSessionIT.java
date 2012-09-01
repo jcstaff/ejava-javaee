@@ -11,6 +11,7 @@ import javax.naming.InitialContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ejava.examples.txagent.bl.AgentReservationException;
@@ -26,7 +27,7 @@ import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 import ejava.util.ejb.EJBClient;
 
 public class AgentReservationSessionIT {
-    Log log = LogFactory.getLog(AgentReservationSessionIT.class);
+    private static final Log log = LogFactory.getLog(AgentReservationSessionIT.class);
     InitialContext jndi;
     String agentJNDI = System.getProperty("jndi.name.agent",
     	EJBClient.getEJBLookupName("txAgentEAR", "txAgentEJB", "", 
@@ -40,6 +41,22 @@ public class AgentReservationSessionIT {
 		EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
     		"HotelRegistrationEJB", HotelRegistrationRemote.class.getName()));
     HotelReservationist hotel;
+    
+    @BeforeClass
+    public static void waitforDeployment() throws InterruptedException {
+    	/*
+    	 * this wait seems periodically necessary because we are deploying
+    	 * 2 EARs to the server that must be wired by the server before this
+    	 * test is run. It fails more often when using the cargo-startstop
+    	 * profile rather than the cargo-deploy profile to an already 
+    	 * running server. 
+    	 */
+    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+    		long waitTime=10000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(10000);
+    	}
+    }
     
     @Before()
     public void setUp() throws Exception {
@@ -82,7 +99,7 @@ public class AgentReservationSessionIT {
         }    
         
         //okay - now we can either fail or get on with the test setup
-        if (fail) { fail("jndi errors -- look at previous output for specific errors"); }
+        if (fail) { fail("jndi errors in our setup -- look at previous output for specific errors"); }
         else {
             try {
                     cleanup();
