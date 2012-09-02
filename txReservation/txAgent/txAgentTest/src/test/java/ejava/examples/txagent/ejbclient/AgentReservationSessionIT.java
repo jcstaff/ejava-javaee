@@ -45,9 +45,7 @@ public class AgentReservationSessionIT {
     @BeforeClass
     public static void waitforDeployment() throws InterruptedException {
     	/*
-    	 * this wait seems periodically necessary because we are deploying
-    	 * 2 EARs to the server that must be wired by the server before this
-    	 * test is run. It fails more often when using the cargo-startstop
+    	 * this wait seems periodically necessary when using the cargo-startstop
     	 * profile rather than the cargo-deploy profile to an already 
     	 * running server. 
     	 */

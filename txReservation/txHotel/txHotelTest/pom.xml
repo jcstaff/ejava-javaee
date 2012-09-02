@@ -100,6 +100,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemProperties>
+                        <cargo.startstop>${cargo-startstop}</cargo.startstop>
+                    </systemProperties>
+                </configuration>
             </plugin>
 
             <!-- this module does not play well with the site plugin -->

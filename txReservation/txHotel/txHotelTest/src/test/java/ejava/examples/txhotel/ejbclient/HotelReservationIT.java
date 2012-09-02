@@ -42,8 +42,19 @@ public class HotelReservationIT {
     static final Map<String,HotelReservationist> reservationists = 
             new HashMap<String, HotelReservationist>();
 
+    
     @BeforeClass
-    public static void setUpClass() throws NamingException {
+    public static void setUpClass() throws Exception {
+    	/*
+    	 * this wait seems periodically necessary when using the cargo-startstop
+    	 * profile rather than the cargo-deploy profile to an already 
+    	 * running server. 
+    	 */
+    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+    		long waitTime=10000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(10000);
+    	}
         log.debug("jndi name:" + registrarJNDI);
         reservationists.putAll(getReservationists());
     }

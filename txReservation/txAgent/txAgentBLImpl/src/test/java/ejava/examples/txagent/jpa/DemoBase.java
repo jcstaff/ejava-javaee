@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import ejava.examples.txagent.bl.AgentReservationException;
 import ejava.examples.txagent.bl.AgentReservationSession;
@@ -33,7 +34,7 @@ import ejava.examples.txhotel.ejb.TestUtilRemote;
 import ejava.util.ejb.EJBClient;
 
 public abstract class DemoBase {
-    protected Log log = LogFactory.getLog(getClass());
+    protected static final Log log = LogFactory.getLog(DemoBase.class);
     private static final String PERSISTENCE_UNIT = "txagent-test";
     protected HotelReservationist reservationist;
     protected HotelReservationSession reservationSession;
@@ -52,6 +53,20 @@ public abstract class DemoBase {
 	        	"HotelReservationSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
     
 
+    @BeforeClass
+    public static void waitForServerDeploy() throws InterruptedException {
+    	/*
+    	 * this wait seems periodically necessary when using the cargo-startstop
+    	 * profile rather than the cargo-deploy profile to an already 
+    	 * running server. 
+    	 */
+    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+    		long waitTime=10000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(10000);
+    	}
+    }
+    
     @Before
     public void setUp() throws Exception {
         EntityManagerFactory emf = 

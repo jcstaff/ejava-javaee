@@ -1,16 +1,21 @@
 package ejava.examples.txhotel.jpa;
 
+import static org.junit.Assert.*;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import org.junit.Test;
 
 import ejava.examples.txhotel.bl.InvalidParameterException;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.jpa.DemoBase;
 
-public class HotelReservationSessionDemo extends DemoBase {
+public class HotelReservationSessionTest extends DemoBase {
     
+	@Test
     public void testCreateReservations() throws Exception {
         log.info("*** testCreateReservations ***");
         Person person = new Person(0,0,"joe", "smith");
@@ -35,6 +40,7 @@ public class HotelReservationSessionDemo extends DemoBase {
         assertEquals(10,mine.size());
     }
     
+	@Test
     public void testCreateBadReservations() throws Exception {
         log.info("*** testCreateBadReservations ***");
         Person person = new Person(0,0,"joe", "smith");
@@ -69,5 +75,4 @@ public class HotelReservationSessionDemo extends DemoBase {
         mine = reservationist.getReservationsForPerson(person, 0, 100);
         assertEquals(0,mine.size());
     }      
-
 }

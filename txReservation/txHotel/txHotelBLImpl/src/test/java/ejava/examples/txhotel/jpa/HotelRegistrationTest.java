@@ -1,10 +1,14 @@
 package ejava.examples.txhotel.jpa;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import org.junit.Test;
 
 import ejava.examples.txhotel.bl.InvalidReservationChangeException;
 import ejava.examples.txhotel.bo.Person;
@@ -17,11 +21,12 @@ import ejava.examples.txhotel.jpa.DemoBase;
  *
  * @author jcstaff
  */
-public class HotelRegistrationDemo extends DemoBase {
+public class HotelRegistrationTest extends DemoBase {
     
     /*
      * This will test the ability to create a new Reservation and Person
      */
+	@Test
     public void testCreateRegistration() throws Exception {
         log.info("*** testCreateRegistration ***");
         Person person = new Person(0,0,"joe", "jones");
@@ -41,6 +46,7 @@ public class HotelRegistrationDemo extends DemoBase {
                 reservation.getConfirmation());        
     }
     
+	@Test
     public void testGoodCancelRegistration() throws Exception {
         log.info("*** testGoodCancelRegistration ***");
         Person person = new Person(0,0,"joe", "jones");
@@ -57,6 +63,7 @@ public class HotelRegistrationDemo extends DemoBase {
         reservationist.cancelReservation(reservation);
     }      
 
+	@Test
     public void testBadCancelRegistration() throws Exception {
         log.info("*** testBadCancelRegistration ***");
         Person person = new Person(0,0,"joe", "jones");
@@ -78,6 +85,7 @@ public class HotelRegistrationDemo extends DemoBase {
         }
     }
     
+	@Test
     public void testGetRegistrations() throws Exception {
         log.info("*** testGetRegistrations ***");
         
@@ -105,6 +113,7 @@ public class HotelRegistrationDemo extends DemoBase {
         }
     }      
 
+	@Test
     public void testGetRegistrationsForName() throws Exception {
         log.info("*** testGetRegistrations ***");
         
@@ -129,6 +138,4 @@ public class HotelRegistrationDemo extends DemoBase {
                 reservations2.size(),
                 reservations.size()/2, reservations2.size());
     }      
-    
-    
 }
