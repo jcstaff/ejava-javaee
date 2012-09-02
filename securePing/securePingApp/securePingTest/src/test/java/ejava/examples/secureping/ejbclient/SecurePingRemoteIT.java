@@ -5,11 +5,13 @@ import static org.junit.Assert.*;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 
@@ -88,6 +90,19 @@ public class SecurePingRemoteIT {
         }
     }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private SecurePing runAs(String username, String password) throws NamingException {
+        Hashtable env = new Hashtable(jndi.getEnvironment());
+        if (username != null) {
+	        env.put(Context.SECURITY_PRINCIPAL, username);
+	        env.put(Context.SECURITY_CREDENTIALS, password);
+        }
+        log.debug(String.format("%s env=%s", username, env));
+        SecurePing ejb = (SecurePingRemote)new InitialContext(env).lookup(jndiName);
+        
+        return ejb;
+    }
+    
     @Test
     public void testLoginContext() throws Exception {
         log.info("*** testLoginContext ***");
@@ -164,7 +179,8 @@ public class SecurePingRemoteIT {
     public void testPingAll() throws Exception {
         log.info("*** testPingAll ***");
         try {
-            log.info(securePing.pingAll());
+        	SecurePing ejb = runAs(null,  null);
+            log.info(ejb.pingAll());
         }
         catch (Exception ex) {
             log.info("error calling pingAll:" + ex, ex);
@@ -172,39 +188,12 @@ public class SecurePingRemoteIT {
         }
 
         try {
-            LoginContext lc = new LoginContext("securePingTest", knownLogin);
-            lc.login();
-            log.info(securePing.pingAll());
-            lc.logout();
-        }
-        catch (Exception ex) {
-            log.info("error calling pingAll:" + ex, ex);
-            fail("error calling pingAll:" +ex);
-        }
-        
-        try {
-            LoginContext lc = new LoginContext("securePingTest", userLogin);
-            lc.login();
-            log.info(securePing.pingAll());
-            lc.logout();
-        }
-        catch (Exception ex) {
-            log.info("error calling pingAll:" + ex, ex);
-            fail("error calling pingAll:" +ex);
-        }        
-
-        try {
-            LoginContext lc = new LoginContext("securePingTest", adminLogin);
-            lc.login();
-            
-            Properties props = new Properties();
-            props.put(Context.SECURITY_PRINCIPAL, "admin1"); 
-            props.put(Context.SECURITY_CREDENTIALS, "password");            
-            securePing = (SecurePingRemote)new InitialContext(props).lookup(jndiName);
-            
-            String result=securePing.pingAll();
+            //LoginContext lc = new LoginContext("securePingTest", adminLogin);
+            //lc.login();
+        	SecurePing ejb = runAs(adminUser, adminPassword);
+            String result=ejb.pingAll();
             log.info(result);
-            lc.logout();
+            //lc.logout();
             assertTrue("unexpected principle:" + result,
             		result.contains("admin"));
         }
@@ -212,6 +201,32 @@ public class SecurePingRemoteIT {
             log.info("error calling pingAll:" + ex, ex);
             fail("error calling pingAll:" +ex);
         }        
+
+        try {
+            //LoginContext lc = new LoginContext("securePingTest", knownLogin);
+            //lc.login();
+            
+        	SecurePing ejb = runAs("known", "password");
+            log.info(ejb.pingAll());
+            //lc.logout();
+        }
+        catch (Exception ex) {
+            log.info("error calling pingAll:" + ex, ex);
+            fail("error calling pingAll:" +ex);
+        }
+        
+        try {
+            //LoginContext lc = new LoginContext("securePingTest", userLogin);
+            //lc.login();
+        	SecurePing ejb = runAs(userUser, userPassword);
+            log.info(ejb.pingAll());
+            //lc.logout();
+        }
+        catch (Exception ex) {
+            log.info("error calling pingAll:" + ex, ex);
+            fail("error calling pingAll:" +ex);
+        }        
+
     }
     
     @Test
