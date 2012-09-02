@@ -12,17 +12,23 @@
 
     <name>Secure Ping WAR</name>
     <dependencies>
+    <!--
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>        
+        -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
           <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>securePingEJB</artifactId>
@@ -48,17 +54,6 @@
                 </dependency>
             </dependencies>
         </profile>
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <!-- this is fine to compile with -->
-                <dependency>
-                    <groupId>javax</groupId>
-                    <artifactId>javaee-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
         
 <profile>
     <id>jetty</id>
@@ -81,10 +76,12 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-client</artifactId>
+            <groupId>ejava.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <version>${project.version}</version>
             <type>pom</type>
-        </dependency>
+            <scope>test</scope>
+        </dependency>    
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>securePingEJB</artifactId>

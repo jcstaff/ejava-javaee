@@ -19,19 +19,6 @@
         <module>securePingEJB</module>
         <module>securePingWAR</module>
         <module>securePingEAR</module>
+        <module>securePingTest</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>functional-tests</id>
-            <activation>
-                <property>
-                    <name>!maven.test.skip</name>
-                </property>
-            </activation>
-            <modules>
-                <module>securePingTest</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

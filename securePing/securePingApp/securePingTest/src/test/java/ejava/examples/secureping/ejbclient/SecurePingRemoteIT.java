@@ -1,10 +1,14 @@
 package ejava.examples.secureping.ejbclient;
 
 
+import static org.junit.Assert.*;
+
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
@@ -13,21 +17,26 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.examples.secureping.ResetAuthenticationCache;
 import ejava.examples.secureping.ejb.SecurePing;
 import ejava.examples.secureping.ejb.SecurePingRemote;
+import ejava.util.ejb.EJBClient;
 
-public class SecurePingRemoteTest extends TestCase {
-    static Log log = LogFactory.getLog(SecurePingRemoteTest.class);
-    InitialContext jndi;
-    String jndiName = System.getProperty("jndi.name.secureping");
-    String adminUser = System.getProperty("admin.username");
-    String adminPassword = System.getProperty("admin.password");
-    String userUser = System.getProperty("user.username");
-    String userPassword = System.getProperty("user.password");
-    String jmxUser = System.getProperty("jmx.username");
-    String jmxPassword = System.getProperty("jmx.password");
+public class SecurePingRemoteIT {
+    private static final Log log = LogFactory.getLog(SecurePingRemoteIT.class);
+    private static InitialContext jndi;
+    String jndiName = System.getProperty("jndi.name.secureping",
+    	EJBClient.getEJBLookupName("securePingEAR", "securePingEJB", "", 
+   			"SecurePingEJB", SecurePingRemote.class.getName()));
+    String adminUser = System.getProperty("admin.username","admin1");
+    String adminPassword = System.getProperty("admin.password","password");
+    String userUser = System.getProperty("user.username","user1");
+    String userPassword = System.getProperty("user.password","password");
+    String jmxUser = System.getProperty("jmx.username","admin");
+    String jmxPassword = System.getProperty("jmx.password","password");
     
     SecurePing securePing;
     Map<String,CallbackHandler> logins = new HashMap<String, CallbackHandler>();
@@ -37,10 +46,12 @@ public class SecurePingRemoteTest extends TestCase {
     CallbackHandler jmxLogin;
     String skipFlush = System.getProperty("skip.flush");
     
+    @Before
     public void setUp() throws Exception {
-        Thread.sleep(1000); //hack -- give JBoss more time to finish deploy
         log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
+        Properties env = new Properties();
+        env.put("jboss.naming.client.ejb.context", true);
+        jndi = new InitialContext(env);    
         log.debug("jndi=" + jndi.getEnvironment());
         log.debug("jndi name:" + jndiName);
         
@@ -72,17 +83,12 @@ public class SecurePingRemoteTest extends TestCase {
             "false".equalsIgnoreCase(skipFlush)) {
         	LoginContext lc = new LoginContext("securePingTest", jmxLogin);
         	lc.login();
-            new ResetAuthenticationCache().execute();
+            //new ResetAuthenticationCache().execute();
             lc.logout();
         }
     }
     
-    public void testSubject() throws Exception {
-        log.info("*** testSubject ***");
-        
-        //Subject.getSubject(acc);
-    }
-    
+    @Test
     public void testLoginContext() throws Exception {
         log.info("*** testLoginContext ***");
         
@@ -104,7 +110,8 @@ public class SecurePingRemoteTest extends TestCase {
         }
         lc.logout();
     }
-    
+
+    @Test
     public void testIsCallerInRole() throws Exception {
         log.info("*** testIsCallerInRole ***");
         
@@ -153,9 +160,9 @@ public class SecurePingRemoteTest extends TestCase {
         lc.logout();        
     }
 
+    @Test
     public void testPingAll() throws Exception {
         log.info("*** testPingAll ***");
-        /*
         try {
             log.info(securePing.pingAll());
         }
@@ -185,21 +192,29 @@ public class SecurePingRemoteTest extends TestCase {
             log.info("error calling pingAll:" + ex, ex);
             fail("error calling pingAll:" +ex);
         }        
-*/
-        for(int i=0; i<10; i++) {
+
         try {
             LoginContext lc = new LoginContext("securePingTest", adminLogin);
             lc.login();
-            log.info(securePing.pingAll());
+            
+            Properties props = new Properties();
+            props.put(Context.SECURITY_PRINCIPAL, "admin1"); 
+            props.put(Context.SECURITY_CREDENTIALS, "password");            
+            securePing = (SecurePingRemote)new InitialContext(props).lookup(jndiName);
+            
+            String result=securePing.pingAll();
+            log.info(result);
             lc.logout();
+            assertTrue("unexpected principle:" + result,
+            		result.contains("admin"));
         }
         catch (Exception ex) {
             log.info("error calling pingAll:" + ex, ex);
             fail("error calling pingAll:" +ex);
         }        
-        }
     }
     
+    @Test
     public void testPingUser() throws Exception {
         log.info("*** testPingUser ***");
         try {
@@ -244,6 +259,7 @@ public class SecurePingRemoteTest extends TestCase {
         }        
     }
 
+    @Test
     public void testPingAdmin() throws Exception {
         log.info("*** testPingAdmin ***");
         try {
@@ -289,6 +305,7 @@ public class SecurePingRemoteTest extends TestCase {
         
     }
 
+    @Test
     public void testPingExcluded() throws Exception {
         log.info("*** testPingExcluded ***");
         try {

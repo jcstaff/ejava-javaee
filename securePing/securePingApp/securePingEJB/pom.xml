@@ -19,6 +19,12 @@
           <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- test dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -34,22 +40,13 @@
 
     <build>
         <plugins>
-              <!-- tell the EJB plugin we are using EJB3  and configure client-jar -->
+              <!-- tell the EJB plugin to build client-jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ejb-plugin</artifactId>
                 <configuration>
-                    <ejbVersion>3.0</ejbVersion>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
                     <generateClient>true</generateClient>
                     <clientExcludes>
-                    <!-- jboss stateful remote proxies need local class
-                        <clientExclude>**/*Local.class</clientExclude>
-                        -->
                         <clientExclude>**/*EJB.class</clientExclude>
                         <clientExclude>META-INF/*.xml</clientExclude>
                     </clientExcludes>
@@ -57,39 +54,4 @@
             </plugin>      
         </plugins>      
     </build>
-    
-    <profiles>
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>jsr250-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>javax.ejb</groupId>
-                    <artifactId>ejb-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <!-- this is fine to compile with -->
-                <dependency>
-                    <groupId>javax</groupId>
-                    <artifactId>javaee-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

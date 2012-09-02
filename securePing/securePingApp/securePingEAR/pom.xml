@@ -17,13 +17,6 @@
             <artifactId>securePingEJB</artifactId>
             <version>${project.version}</version>
             <type>ejb</type>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-logging</artifactId>
-                    <groupId>commons-logging</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -31,53 +24,59 @@
             <artifactId>securePingWAR</artifactId>
             <version>${project.version}</version>
             <type>war</type>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <applicationName>${project.artifactId}</applicationName>
+                    <modules>
+                        <webModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>securePingWAR</artifactId>
+                            <contextRoot>securePingApp</contextRoot>
+                        </webModule>
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>securePingEJB</artifactId>
+                            <bundleFileName>securePingEJB.jar</bundleFileName>
+                        </ejbModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
     <!-- this profiles allow the EAR to be undeployed before it is deleted
         during the clean target. This behavior requires the EAR to be
         present, so it cannot be part of the default behavior. It is
-        only activated when -Dundeploy or -Pundeploy is present so that
+        only activated when -Pundeploy is present so that
         normal cleans do not fail.  -->
-<profile>
-    <id>undeploy</id>
-    <activation>
-        <property>
-            <name>undeploy</name>
-            <value>true</value>
-        </property>
-    </activation>    
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <configuration>
-                    <deployer>
-                        <type>remote</type>
-                        <deployables>
-                            <deployable>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>${project.artifactId}</artifactId>
-                                <type>ear</type>
-                            </deployable>
-                        </deployables>
-                    </deployer>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>undeploy-ear</id>
-                        <phase>pre-clean</phase>
-                        <goals>
-                            <goal>undeploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>                    
-        </plugins>
-    </build>
-</profile>
+        <profile>
+            <id>undeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>undeploy-ear</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>undeploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>                    
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
