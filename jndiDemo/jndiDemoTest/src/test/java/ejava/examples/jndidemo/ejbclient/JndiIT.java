@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ejava.examples.jndidemo.Scheduler;
@@ -23,13 +24,27 @@ import ejava.util.ejb.EJBClient;
 
 public class JndiIT  {
     private static final Log log = LogFactory.getLog(JndiIT.class);
-    InitialContext jndi;
+    private static InitialContext jndi;
     static String aidName = System.getProperty("jndi.name.aid",
     	EJBClient.getEJBLookupName("jndiDemoEAR", "jndiDemoEJB", "","AidScheduler",
         		AidSchedulerRemote.class.getName()));
     static String bakeName = System.getProperty("jndi.name.bake",
     	EJBClient.getEJBLookupName("jndiDemoEAR", "jndiDemoEJB", "","BakeScheduler",
         		BakeSchedulerRemote.class.getName()) + "?stateful");
+    
+    @BeforeClass
+    public static void waitForServerDeploy() throws InterruptedException {
+    	/*
+    	 * this wait seems periodically necessary when using the cargo-startstop
+    	 * profile rather than the cargo-deploy profile to an already 
+    	 * running server. 
+    	 */
+    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+    		long waitTime=10000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(10000);
+    	}
+    }
     
     @Before
     public void setUp() throws Exception {

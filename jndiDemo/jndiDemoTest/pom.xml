@@ -104,6 +104,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
+                        <cargo.startstop>${cargo-startstop}</cargo.startstop>
 <jndi.name.aid>ejb:jndiDemoEAR/jndiDemoEJB//AidScheduler!ejava.examples.jndidemo.ejb.AidSchedulerRemote</jndi.name.aid>
 <jndi.name.bake>ejb:jndiDemoEAR/jndiDemoEJB//BakeScheduler!ejava.examples.jndidemo.ejb.BakeSchedulerRemote?stateful</jndi.name.bake>
                     <!-- version numbers were eliminated by setting key properties in EAR/application.xml
