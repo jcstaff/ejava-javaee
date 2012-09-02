@@ -57,6 +57,16 @@ public class HotelReservationSessionIT {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
+    	/*
+    	 * this wait seems periodically necessary when using the cargo-startstop
+    	 * profile rather than the cargo-deploy profile to an already 
+    	 * running server. 
+    	 */
+    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+    		long waitTime=10000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(10000);
+    	}
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
