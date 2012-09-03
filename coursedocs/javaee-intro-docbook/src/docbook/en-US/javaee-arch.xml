@@ -1,0 +1,132 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="javaee-arch">
+    <title>JavaEE Architecture</title>
+    <para/>
+    <figure>
+        <title>JavaEE Architecture</title>
+        <graphic scalefit="1" fileref="images/javaee-arch-size1.png"/>
+    </figure>        
+        
+    <section id="javaee-profiles">
+        <title>Profiles</title>
+        <itemizedlist>
+            <listitem><para>Subset of JavaEE APIs targeted at key use cases</para></listitem>
+            <listitem><para>Share common underlying APIs for consistency</para></listitem>
+            <listitem><para>Provide smaller gates of entry for providers</para></listitem>
+            <listitem><para>Provide means to eliminate deprecated specs from concern</para></listitem>
+            <listitem><para>Risk fragmenting community and introducing confusion -- not taken lightly</para></listitem>
+        </itemizedlist>
+        
+        <section id="javaee-profiles-web">
+            <title>Web Profile</title>
+            <itemizedlist>
+                <listitem><para>WAR deployments</para></listitem>
+                <listitem><para>Only JavaEE profile to date</para></listitem>
+                <listitem><para>Required APIs</para>
+                    <itemizedlist>
+                        <listitem><para>Servlet 3.0</para></listitem>
+                        <listitem><para>JavaServer Pages (JSP) 2.2</para></listitem>
+                        <listitem><para>Expression Language (EL) 2.2</para></listitem>
+                        <listitem><para>Debugging Support for Other Languages (JSR-45)</para></listitem> 1.0
+                        <listitem><para>Standard Tag Library for JavaServer Pages (JSTL) 1.2</para></listitem>
+                        <listitem><para>JavaServer Faces (JSF) 2.0</para></listitem>
+                        <listitem><para>Common Annotations for theJava Platform (JSR-250) 1.1</para></listitem>
+                        <listitem><para>Enterprise JavaBeans (EJB) 3.1 Lite</para></listitem>
+                        <listitem><para>Java Transaction API (JTA) 1.1</para></listitem>
+                        <listitem><para>Java Persistence API (JPA) 2.0</para></listitem>
+                        <listitem><para>Bean Validation 1.0</para></listitem>
+                        <listitem><para>Managed Beans 1.0</para></listitem>
+                        <listitem><para>Interceptors 1.1</para></listitem>
+                        <listitem><para>Contexts and Dependency Injection for the Java EE Platform 1.0</para></listitem>
+                        <listitem><para>Dependency Injection for Java 1.0</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Noted Exclusions</para>
+                    <itemizedlist>
+                        <listitem><para>JMS and Message-Driven Beans (MDBs)</para></listitem>
+                        <listitem><para>Full EJB support, including remote interfaces and legacy 2.x capabilities</para></listitem>
+                        <listitem><para>JAX-WS/SOAP endpoints</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+            
+        </section>                   
+    </section>
+    
+    <section id="javaee-appcomp">
+        <title>Application Components</title>
+        <para>Different types</para>
+        <itemizedlist>
+                <listitem><para>Deployed to client (Applets)</para></listitem>
+                <listitem><para>Deployed to data center (Servlets and EJBs)</para></listitem>
+                <listitem><para>Undefined deployment (App Clients)</para></listitem>
+        </itemizedlist>
+
+        <section id="javaee-appcomp-appclients">
+            <title>Application Clients</title>
+            <itemizedlist>
+                <listitem><para>Java programs (e.g., GUI running on client)</para></listitem>
+                <listitem><para>Have access to middle-tier</para></listitem>
+            </itemizedlist>                   
+        </section>
+                           
+        <section id="javaee-appcomp-applets">
+            <title>Applets</title>
+            <itemizedlist>
+                <listitem><para>GUI components typically running in browser</para></listitem>
+                <listitem><para>Access middle-tier indirectly thru Web container and HTTP</para></listitem>
+            </itemizedlist>                   
+        </section>
+                           
+        <section id="javaee-appcomp-servlets">
+            <title>Servlets/JSPs/JSF</title>
+            <itemizedlist>
+                <listitem><para>Generate content to browser from Web container</para></listitem>
+                <listitem><para>Can be UI/HTML-based</para></listitem>
+                <listitem><para>Can be service/XML (or other structured data forms)-based</para></listitem>
+                <listitem><para>May contain EJBs providing transactional support</para></listitem>
+            </itemizedlist>                   
+        </section>
+                           
+        <section id="javaee-appcomp-ejbs">
+            <title>Enterprise JavaBeans(tm) (EJB)</title>
+            <itemizedlist>
+                <listitem><para>Contain business logic</para></listitem>
+                <listitem><para>Manage transactions, resources, security, etc.</para></listitem>
+                <listitem><para>May provide direct support for RMI and Web service clients</para></listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
+
+    <section id="javaee-container">
+        <title>Containers</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="javaee-ra">
+        <title>Resource Adapters</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="javaee-db">
+        <title>Database</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+
+</chapter>
+  

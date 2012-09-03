@@ -1,0 +1,79 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="javaee-levels">
+    <title>Java Technology Levels</title>
+    
+    <section id="javaee-levels-jse">
+        <title>Java Standard Edition(tm) (JavaSE or JSE)</title>
+        <itemizedlist>
+            <listitem><para>Core Language</para></listitem>
+            <listitem><para>Formerly called J2SE. Changed started with JavaSE 6</para></listitem>
+            <listitem><para>Java APIs are what applications are written against.</para>
+                <itemizedlist>
+                    <listitem><para>Standardized</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Java Runtime Edition (JRE) is what applications run with.</para>
+                <itemizedlist>
+                    <listitem><para>Many providers</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Java Developer Kit (JDK) is what applications are built with</para>
+                <itemizedlist>
+                    <listitem><para>Many providers</para></listitem>
+                    <listitem><para>JRE and JDK provider choices are independent</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="javaee-levels-me">
+        <title>Java Micro Edition(tm) (JavaME)</title>
+        <itemizedlist>
+            <listitem><para>Formerly called J2ME</para></listitem>
+            <listitem><para>Targeted at smaller devices</para>
+                <itemizedlist>
+                    <listitem><para>Small footprint</para></listitem>
+                    <listitem><para>Limited power</para></listitem>
+                    <listitem><para>Limited and sporadic bandwidth</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+    
+    <section id="javaee-levels-ee">
+        <title>Java Enterprise Edition(tm) (JavaEE or JEE)</title>
+        <itemizedlist>
+            <listitem><para>Formerly called J2EE. Change started with JavaEE 5</para></listitem>
+            <listitem><para>Targeted at enterprise deployments commonly deployed to data centers</para>
+                <itemizedlist>
+                    <listitem><para>Persistence/Data Access</para></listitem>
+                    <listitem><para>Scaling</para></listitem>
+                    <listitem><para>Transactions</para></listitem>
+                    <listitem><para>Security</para></listitem>
+                    <listitem><para>Resource Management</para></listitem>
+                    <listitem><para>Availability</para></listitem>
+                    <listitem><para>Distributed</para></listitem>
+                    <listitem><para>Web-based</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Generally deployed in N-Tiers</para>
+                <itemizedlist>
+                    <listitem><para>Interface</para></listitem>
+                    <listitem><para>Transacted Business Logic</para></listitem>
+                    <listitem><para>Persistence/Back-end Integration</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Contains</para>
+                <itemizedlist>
+                    <listitem><para>APIs (standardized)</para></listitem>
+                    <listitem><para>Compatibility test suites</para></listitem>
+                    <listitem><para>Reference Implementation (Glassfish)</para></listitem>
+                    <listitem><para>Providers (e.g., Glassfish, JBoss, WebSphere, WebLogic)</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+</chapter>
+  
