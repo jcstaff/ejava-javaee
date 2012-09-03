@@ -21,6 +21,177 @@
                 <listitem><para>Use of HTTP over secure socket layer (SSL) protocol</para></listitem>
             </itemizedlist>                   
         </section>
+        <section id="javaee-services-jms">
+            <title>Java Messaging Service (JMS)</title>
+            <itemizedlist>
+                <listitem><para>Publish/Subscribe Messaging</para></listitem>
+                <listitem><para>Queue Messaging</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-mail">
+            <title>JavaMail(tm)</title>
+            <itemizedlist>
+                <listitem><para>API to send Internet mail</para></listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
+
+
+    <section id="javaee-services-persistence">
+        <title>Persistence Services</title>
+        <section id="javaee-services-jdbc">
+            <title>Java Database Connectivity (JDBC) API</title>
+            <itemizedlist>
+                <listitem><para>Connectivity with relational databases</para></listitem>
+                <listitem><para>Client API is DB-centric(rows, columns, result sets)</para></listitem>
+                <listitem><para>Resource Adapater API preferred over legacy JDBC SPI 
+                    for integrating DB drivers</para></listitem>
+            </itemizedlist>                   
+        </section>
+
+        <section id="javaee-services-jpa">
+            <title>Java Persistence API (JPA)</title>
+            <itemizedlist>
+                <listitem><para>Object/Relational mapping with (relational) databases</para></listitem>
+                <listitem><para>Client API is Java object-centric (classes, properties, collections)</para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
+
+    <section id="javaee-services-coord">
+        <title>Coordination Services</title>
+
+        <section id="javaee-services-jndi">
+            <title>Java Naming and Directory Interface (JNDI)</title>
+            <itemizedlist>
+                <listitem><para>API for naming and directory services</para></listitem>
+                <listitem><para>Primarily used as a bootstrap to identify and/or access other components</para></listitem>
+                <listitem><para>Plays a registry role in dependency injection</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-jta">
+            <title>Java Transaction API (JTA)</title>
+            <itemizedlist>
+                <listitem><para>Used by application to demarcate transaction boundaries</para></listitem>
+                <listitem><para>Interface between transaction manager and 
+                    individual resource managers (e.g. database) to coordinate transaction</para></listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
+
+    <section id="javaee-services-wsxml">
+        <title>Web/XML Services</title>
+
+        <section id="javaee-services-jaxp">
+            <title>Java API for XML Processing (JAXP)</title>
+            <para>Standard API for XML processing</para>
+            <itemizedlist>
+                <listitem><para>SAX parser</para></listitem>
+                <listitem><para>DOM parser</para></listitem>
+                <listitem><para>XSLT transformation</para></listitem>
+            </itemizedlist>                   
+        </section>
+        
+        <section id="javaee-services-stax">
+            <title>Streaming API for XML (StAX)</title>
+            <itemizedlist>
+                <listitem><para>Pull parser</para></listitem>
+            </itemizedlist>                   
+        </section>
+
+        <section id="javaee-services-jaxrpc">
+            <title>Java API for XML-based RPC (JAX-RPC)</title>
+            <itemizedlist>
+                <listitem><para>Original API for supporting SOAP-based communication over HTTP</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-jaxws">
+            <title>Java API for XML Web Services (JAX-WS)</title>
+            <itemizedlist>
+                <listitem><para>Follow-on API for supporting SOAP and other Web service communication</para></listitem>
+                <listitem><para>Supports multiple bindings and protocols</para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-jaxb">
+            <title>Java API for XML Binding (JAXB)</title>
+            <itemizedlist>
+                <listitem><para>Mapping between Java classes and XML</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-saaj">
+            <title>SOAP with Attachments API for Java (SAAJ)</title>
+            <itemizedlist>
+                <listitem><para>Low-level SOAP messaging API</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-wsmd">
+            <title>Web Services Metadata </title>
+            <itemizedlist>
+                <listitem><para>Defines language annotations for developing web services</para></listitem>
+            </itemizedlist>                   
+        </section>
+
+        <section id="javaee-services-jaxrs">
+            <title>Java API for RESTful Web Services (JAX-RS)</title>
+            <itemizedlist>
+                <listitem><para>API for more web-centric, Web service communication</para></listitem>
+                <listitem><para>High level API for application-level processing</para></listitem>
+                <listitem><para>Low level API for special handling of input/output content</para></listitem>
+            </itemizedlist>                   
+        </section>
+
+        <section id="javaee-services-jaxr">
+            <title>Java API for XML Registries (JAXR)</title>
+            <itemizedlist>
+                <listitem><para>API for interacting with XML registries</para></listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
+    
+    <section id="javaee-services-security">
+        <title>Security Services</title>
+
+        <section id="javaee-services-jaas">
+            <title>Java Authentication and Authorization (JAAS) API</title>
+            <itemizedlist>
+                <listitem><para>Plugable framework for authentication modules</para></listitem>
+            </itemizedlist>                   
+        </section>
+
+        <section id="javaee-services-jacc">
+            <title>Java Authorization Service Provider Contract for Containers (JACC)</title>
+            <itemizedlist>
+                <listitem><para>Definition between application servers and security providers</para></listitem>
+                <listitem><para>Allows for custom security providers to be plugged into application servers</para></listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
+
+    <section id="javaee-services-mgmt">
+        <title>Management Services</title>
+
+        <section id="javaee-services-jeemgmt">
+            <title>JavaEE Management Specification</title>
+            <itemizedlist>
+                <listitem><para>API for managing JavaEE Servers</para></listitem>
+                <listitem><para>Based on JMX</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-jeedeploy">
+            <title>JavaEE Deployment Specification</title>
+            <itemizedlist>
+                <listitem><para>Contract for deployment tools and JavaEE products</para></listitem>
+                <listitem><para>Plugin capability to deploy applications to application servers</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-jmx">
+            <title>JavaEE Management Extensions (JMX) API</title>
+            <itemizedlist>
+                <listitem><para></para></listitem>
+            </itemizedlist>                   
+        </section>
     </section>
 
     <section id="javaee-services-corba">
@@ -53,19 +224,25 @@
         </section>
     </section>
 
-
-    <section id="javaee-services-coord">
-        <title>Coordination Services</title>
-
-        <section id="javaee-services-jta">
-            <title>Java Transaction API (JTA)</title>
+    <section id="javaee-services-integration">
+        <title>Integration Services</title>
+        <section id="javaee-services-jca">
+            <title>JavaEE Connector Architecture</title>
             <itemizedlist>
-                <listitem><para>Used by application to demarcate transaction boundaries</para></listitem>
-                <listitem><para>Interface between transaction manager and 
-                    individual resource managers (e.g. database) to coordinate transaction</para></listitem>
+                <listitem><para>API for the Resource Adapter discussed earlier</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-jaf">
+            <title>JavaBeans(tm) Activation Framework (JAF)</title>
+            <itemizedlist>
+                <listitem><para>Handing of different MIME types</para></listitem>
+                <listitem><para>Used by JavaMail</para></listitem>
             </itemizedlist>                   
         </section>
     </section>
+
+
+
 
 </chapter>
   
