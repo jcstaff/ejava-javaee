@@ -1,0 +1,184 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+
+<chapter id="devenv-eclipse-setup">
+    <title>Eclipse Setup</title>
+    <para/>
+    
+    <section id="devenv-eclipse-install">
+        <title>Download and Install Eclipse Indigo Service Release 2</title>
+        <warning>
+            <para>
+                I found the new Eclipse Juno (4.2) to have horrible performance
+                for even the simplest tasks. I strongly recommend against using 
+                it and go with the Indigo SR2 version instead.
+            </para>
+        </warning>
+        <orderedlist>
+            <listitem>
+                <para>
+                    Download Eclipse IDE for JavaEE Developers 
+                    <ulink url="http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigosr2">http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigosr2</ulink>
+                    (look to the right side of the page)
+                </para>
+            </listitem>
+            <listitem><para>Unzip the downloaded archive.</para>
+                <programlisting><![CDATA[
+$ tar xzf ~/Downloads/eclipse-jee-indigo-SR2-linux-gtk.tar.gz 
+
+$ ls eclipse
+about_files  artifacts.xml  dropins  eclipse.ini   features  libcairo-swt.so  p2       readme
+about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      plugins
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Create a shortcut for starting Eclipse</para></listitem>
+            <listitem><para>Start Eclipse</para></listitem>
+        </orderedlist>
+    </section>
+    
+    <section id="setup-m2e">
+        <title>Setup Maven Eclipse Integration (m2e)</title>
+        <para>m2e is a plugin installed into Eclipse that configures Eclipse
+        based on the Maven pom.xml configuration. When adjusting your builds,
+        you should always define changes within the Maven pom.xml and rely on
+        m2e to translate that into Eclipse. Any changes added directly to 
+        Eclipse will not be seen by the command-line build.</para>
+        <orderedlist>
+            <listitem><para><code>Help-&gt;Eclipse Marketplace...</code></para></listitem>
+            <listitem><para>Enter "m2e"</para></listitem>
+            <listitem><para>Installer "Maven Integration for Eclipse" by Eclipse.org</para></listitem>
+            <listitem><para>Complete the installation steps for Maven Integration for Eclipse</para></listitem>
+            <listitem><para>Register your Maven installation with m2e</para>
+                <orderedlist>
+                    <listitem><para><code>Window-&gt;Preferences-&gt;Maven-&gt;Installations-&gt;Add...</code></para></listitem>
+                    <listitem><para>Navigate and select the MAVEN_HOME directory installed earlier</para></listitem>
+                    <listitem><para>Re-select the internal Maven instance as the default</para></listitem>
+                </orderedlist>
+            </listitem>
+            <listitem><para>Add the Java Package Explorer to the JavaEE Perspective.
+                    I find this easier to work with than the Project 
+                    Explorer used by default in the JavaEE perspective.</para>
+                <orderedlist>
+                    <listitem><para>Select Window-&gt;Show View-&gt;Other-&gt;Java-&gt;Package Explorer.</para></listitem>
+                    <listitem><para>Drag the Package Explorer to the panel with the Project Explorer</para></listitem>
+                    <listitem><para>Select Top Level Elements-&gt;Working Sets from the down-facing triangle on the Package Explorer.</para></listitem>
+                    <listitem><para>Create a New Java Working Set and call it "class-examples"</para></listitem>
+                    <listitem><para>Press OK</para></listitem>
+                </orderedlist>
+            </listitem>
+            <listitem><para>Import the class examples into Eclipse as a Maven Project</para>
+                <orderedlist>
+                    <listitem><para>Right click on "class-examples" in the Package 
+                        Explorer and select Import...-&gt;Maven-&gt;Existing Maven Projects</para></listitem>
+                    <listitem><para>Browse to the project area where you performed 
+                        the Git checkout earlier and select the class-examples folder.</para></listitem>
+                    <listitem><para>Select Next to have the current project(s)
+                        added to the selected working set.</para>
+                    <note>
+                        <para>There will be an extra panel that appears the 
+                        first time you import a project with a new maven plugin.
+                        Allow Eclipse to setup any that it knows about, discover 
+                        ones that may be new, or resolve later for those that
+                        it cannot find. There will be unsigned content warnings
+                        for most of the plugins. Eclipse will want to restart
+                        after installing any new plugins.</para>
+                    </note>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Build and test the application using 
+                            Run As-&gt;Maven Install by right clicking on any of the 
+                            project folders.
+                       </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Try also Run As-&gt;JUnit Test.
+                       </para>
+                    </listitem>
+                </orderedlist>
+            </listitem>
+        </orderedlist>
+    </section>
+    
+    
+    <section id="setup-egit">
+        <title>Setup EGit Eclipse Team Provider</title>
+        <para>You can use the command line Git to functionally clone the 
+            remote repository and update your local copy. However, having
+            Git integrated into Eclipse allows the plugin to make Eclipse
+            transition easier between one checked out branch to another or 
+            correctly react to an updated branch. To do this -- install the 
+            EGit plugin.</para>
+            <orderedlist>
+                <listitem><para>Open the Eclipse Marketplace panel using 
+                    <code>Help-&gt;Eclipse Marketplace</code></para>
+                </listitem>
+                <listitem><para>Type EGit into the seach field and press Go</para></listitem>
+                <listitem><para>Click Install for the <code>EGit - Git Team Provider</code>.
+                    This will end up selecting both EGit and JGit. JGit is the 
+                    underlying pure Java interface for Git. EGit is the portion
+                    that integrates the capability into Eclipse.</para></listitem>
+                <listitem><para>Complete the installation process</para></listitem>
+                <listitem><para>Right click on the <code>simple-bank-war6</code>
+                   project imported earlier and select 
+                   <code>Team-&gt;Share Project...-&gt;Git-&gt;Use of create repository in parent folder of project-&gt;Finish</code></para></listitem>
+                <listitem><para><code>[(branch-name)]</code> should not be displayed 
+                    to the right of the project name</para></listitem>
+            </orderedlist>
+    </section>
+    
+    <section id="setup-jbosstools">
+        <title>Setup JBoss Eclipse Integration</title>
+        <para>Add the following repository to your Eclipse instance and
+           install the plugin</para>
+        <orderedlist>
+            <listitem><para><code>Help-&gt;Install New Software->Add...</code></para></listitem>
+            <listitem><para>Enter</para>
+                <itemizedlist>
+                    <listitem><para>Name: jboss-tools</para></listitem>
+                    <listitem><para>URL: <ulink url="http://download.jboss.org/jbosstools/updates/development/indigo/">http://download.jboss.org/jbosstools/updates/development/indigo/</ulink></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Complete the installation steps for JBoss Tools. There
+                are a lot of tools in the repository. Not all of them are
+                needed for class and some do not yet seem functional or obvious 
+                how to use them without more investigation. You can opt for 
+                installing all or choose the following minimal set.</para>
+                <itemizedlist>
+                    <listitem><para>JBoss Web and JavaEE Development</para>
+                        <itemizedlist>
+                            <listitem><para>JBoss AS Tools</para></listitem>
+                            <listitem><para>JBoss JAX-RS Tools</para></listitem>
+                            <listitem><para>JBoss WebServices Tools</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+                <note>
+                    <para>You will receive a warning about the content within the 
+                    plugin being unsigned.</para>
+                </note>
+            </listitem>
+            <listitem><para>Define a Server Instance for JBoss AS 7</para>
+                <orderedlist>
+                    <listitem><para>Open the JavaEE Perspective</para></listitem>
+                    <listitem><para>Select "new server wizard..." in the Servers panel</para></listitem>
+                    <listitem><para>Select JBossAS 7.1</para></listitem>
+                    <listitem><para>Set HOME to your jboss-as-7.1.1.Final directory
+                       using the Browse button on the next panel</para></listitem>
+                    <listitem><para>Name the server "standalone" and leave the 
+                       to match the default "standalone.xml" configuration file.</para></listitem>
+                    <listitem><para>Set the JRE to the JDK instance you installed earlier</para></listitem>
+                    <listitem><para>Review options. Note that I generally start my 
+                        server externally so that standard output does not compete 
+                        with my other actions within Eclipse. However, there are
+                        pros and cons to both methods and I will start you with
+                        internally launched here.</para></listitem>
+                    <listitem><para>Start the server by right clicking on it
+                        and selecting Start</para></listitem>
+                </orderedlist>
+            </listitem>
+        </orderedlist>
+    </section>
+</chapter>
