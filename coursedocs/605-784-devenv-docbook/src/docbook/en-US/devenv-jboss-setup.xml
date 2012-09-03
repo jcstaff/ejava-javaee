@@ -1,0 +1,225 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+    
+<chapter id="devenv-jboss-setup">
+    <title>JBoss Setup</title>    
+
+    <section id="devenv-jboss-install">
+        <title>Download and Install JBoss Application Server 7</title>
+        <orderedlist>
+            <listitem><para>Download JBoss AS 7.1.1.Final
+                <ulink url="http://www.jboss.org/jbossas/downloads">http://www.jboss.org/jbossas/downloads</ulink></para>
+            </listitem>
+            <listitem>
+                <para>
+                    Install JBoss AS into a directory that does not
+                    have any spaces in its path.
+                </para>
+                <programlisting><![CDATA[
+$ unzip ~/Downloads/jboss-as-7.1.1.Final.zip                
+                
+$ ls jboss-as-7.1.1.Final/
+]]></programlisting>                        
+            </listitem>
+            <listitem>
+                <para>
+                    Test the installation by starting the default
+                    configuration installation.
+                </para>
+                <programlisting><![CDATA[
+$ jboss-as-7.1.1.Final/bin/bin/standalone.sh
+user@ubuntu:/opt$ ./jboss-as-7.1.1.Final/bin/standalone.sh 
+=========================================================================
+
+  JBoss Bootstrap Environment
+
+  JBOSS_HOME: /opt/jboss-as-7.1.1.Final
+
+  JAVA: java
+
+  JAVA_OPTS:  -server -XX:+TieredCompilation -Xms64m -Xmx512m -XX:MaxPermSize=256m 
+  -Djava.net.preferIPv4Stack=true -Dorg.jboss.resolver.warning=true 
+  -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 
+  -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true 
+  -Djboss.server.default.config=standalone.xml
+
+=========================================================================
+
+22:41:07,659 INFO  [org.jboss.modules] JBoss Modules version 1.1.1.GA
+22:41:08,223 INFO  [org.jboss.msc] JBoss MSC version 1.0.2.GA
+...
+22:41:49,257 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
+22:41:49,258 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss AS 7.1.1.Final "Brontes" 
+started in 7908ms - Started 133 of 208 services (74 services are passive or on-demand)
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Verify you can access the server</para>
+                <itemizedlist>
+                    <listitem><para>Main Page:<ulink url="http://localhost:8080">http://localhost:8080</ulink></para></listitem>
+                    <listitem><para>Admin Page:<ulink url="http://localhost:9990/console">http://localhost:9990/console</ulink>
+                    This will fail until the admin account is added.</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </orderedlist>
+    </section>
+    
+    <section id="devenv-jboss-configure">
+        <title>Configure JBoss Server</title>
+        <orderedlist>
+            <listitem><para>Shutdown the server using Control-C</para></listitem>
+            <listitem><para>Make a copy of the standalone.xml and use it as a backup</para>
+                <programlisting><![CDATA[
+$ cp jboss-as-7.1.1.Final/standalone/configuration/standalone.xml jboss-as-7.1.1.Final/standalone/configuration/standalone-original.xml
+]]></programlisting>
+            <note>
+                <para>
+                    The instructions state to backup the original and edit the 
+                    default server. We could have also chosen to make a copy of the 
+                    default server and edit one by a new name. In the later case,
+                    we would need to add "-c copyof-standalone.xml" to the startup
+                    command to point to the non-default server from the command line.
+                    I have found that option to confuse some of the tool
+                    integration.
+                </para>
+            </note>                                    
+            </listitem>
+            <listitem>
+                <para>
+                    Add a logger for the class examples so the server prints 
+                    debug messages to the logs. The <code>ejava</code> logger
+                    is for the class examples. The <code>jhu</code> logger
+                    is for student projects. Your java packages should start
+                    with jhu.xxx to make this work easily.
+                </para>
+                <programlisting language="xml"><![CDATA[
+...
+            </logger>
+            <logger category="ejava">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="jhu">
+                <level name="DEBUG"/>
+            </logger>
+            <root-logger>
+...
+]]></programlisting>
+            </listitem>
+        </orderedlist>        
+    </section>
+    
+    <section id="add-jboss-admin">
+        <title>Add JBoss Admin Account</title>
+        <orderedlist>
+            <listitem><para>Use the batch script to add an admin user to 
+                the system.</para>
+                <programlisting><![CDATA[
+user@ubuntu:/opt$ ./jboss-as-7.1.1.Final/bin/add-user.sh 
+
+What type of user do you wish to add? 
+ a) Management User (mgmt-users.properties) 
+ b) Application User (application-users.properties)
+(a): a
+
+Enter the details of the new user to add.
+Realm (ManagementRealm) : 
+Username : admin
+Password : 
+Re-enter Password : 
+The username 'admin' is easy to guess
+Are you sure you want to add user 'admin' yes/no? yes
+About to add user 'admin' for realm 'ManagementRealm'
+Is this correct yes/no? yes
+Added user 'admin' to file '/opt/jboss-as-7.1.1.Final/standalone/configuration/mgmt-users.properties'
+Added user 'admin' to file '/opt/jboss-as-7.1.1.Final/domain/configuration/mgmt-users.properties'
+]]></programlisting>                        
+            </listitem>
+            <listitem>
+                <para>Retry logging into the Admin Application
+                    <ulink url="http://localhost:9990/console">http://localhost:9990/console</ulink>
+                </para></listitem>
+        </orderedlist>
+    </section>
+    
+    <section id="enable-jboss-debug">
+        <title>Enable JBoss Remote Debugging</title>
+        <para>Prepare your server for remote debugging for later.</para>
+        <orderedlist>
+            <listitem><para>Uncomment the following line in either 
+            bin/standalone.conf (Linux) or bin/standalone.conf.bat (Windows)</para>
+                <programlisting><![CDATA[
+# Sample JPDA settings for remote socket debugging
+JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Restart the server and notice the additional listen
+                output. Use control-C to stop the server.</para>
+                <programlisting><![CDATA[
+$ ./jboss-as-7.1.1.Final/bin/standalone.sh 
+=========================================================================
+...
+
+Listening for transport dt_socket at address: 8787
+23:01:50,460 INFO  [org.jboss.modules] JBoss Modules version 1.1.1.GA
+23:01:51,688 INFO  [org.jboss.msc] JBoss MSC version 1.0.2.GA
+]]></programlisting>                        
+            </listitem>
+            
+            <listitem>
+                <para>
+                    If you already have a process listening on 8080 or any of 
+                    the other JBoss ports on 127.0.0.1, you can switch addresses
+                    by editing the <code>interfaces</code> section of 
+                    standandalone.xml. You can also do this at runtime by adding 
+                    <code>-Djboss.bind.address.management=...</code>
+                    and/or 
+                    <code>-Djboss.bind.address=...</code> on the command line. 
+                </para>
+                <programlisting language="xml"><![CDATA[
+    <interfaces>
+        <interface name="management">
+            <loopback-address value="${jboss.bind.address.management:127.0.0.5}"/>
+        </interface>
+        <interface name="public">
+            <loopback-address value="${jboss.bind.address:127.0.0.5}"/>
+        </interface>
+        <interface name="unsecure">
+            <inet-address value="${jboss.bind.address.unsecure:127.0.0.5}"/>
+        </interface>
+    </interfaces>
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+    </section>
+    
+    <section id="devenv-jboss-maven">
+        <title>Define JBoss Maven Properties in settings.xml</title>
+        <orderedlist>
+            <listitem>
+                <para>
+                    Provide a specification to maven where your JBoss server
+                    has been installed in the <code>.m2/settings.xml</code>
+                    file using the <code>jboss.home</code> property. If you 
+                    have changed the address -- you can specify that using
+                    the <code>jboss.host</code> property. 
+                </para>
+                <programlisting language="xml"><![CDATA[
+        <profile>
+            <id>jboss7</id>
+            <properties>
+                <jboss.host>127.0.0.5</jboss.host>
+                <jboss.home>/opt/jboss-as-7.1.1.Final</jboss.home>
+            </properties>
+        </profile>
+    </profiles>
+        ...
+    <activeProfiles>
+        <activeProfile>jboss7</activeProfile>
+        <activeProfile>h2db</activeProfile>
+    </activeProfiles>
+</settings>
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+    </section>
+</chapter>

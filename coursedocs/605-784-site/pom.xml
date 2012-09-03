@@ -26,6 +26,13 @@
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>ejava.coursedocs</groupId>
+            <artifactId>605-784-devenv-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -44,11 +51,17 @@
             <configuration>
               <overlays>
                 <overlay>
-                  <groupId>ejava.coursedocs</groupId>
-                  <artifactId>605-784-docbook</artifactId>
-                  <type>war</type>
-                  <targetPath>../site/docs/content</targetPath>
-                </overlay>
+                    <groupId>ejava.coursedocs</groupId>
+                    <artifactId>605-784-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.coursedocs</groupId>
+                    <artifactId>605-784-devenv-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
               </overlays>
             </configuration>
           </plugin>
