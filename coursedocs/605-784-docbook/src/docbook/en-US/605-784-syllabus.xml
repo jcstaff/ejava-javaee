@@ -1,179 +1,221 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="605-784-syllabus">
+<chapter id="cs-784-syllabus">
     <title>Fall 2012 Syllabus</title>
+    
     <table>
-        <title>Syllabus</title>
-        <tgroup cols='5' align='left' colsep='1' rowsep='0'>
-        <colspec colname='session'/>
-        <colspec colname='theme'/>
-        <colspec colname='area'/>
-        <colspec colname='topic'/>
-        <colspec colname='refass'/>
+        <title>Data Tier</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+        <colspec colname="week"/>
+        <colspec colname="date"/>
+        <colspec colname="topic"/>
+        <colspec colname="comment"/>
         <thead>
             <row>
-              <entry>Session</entry>
-              <entry>Theme</entry>
-              <entry>Area</entry>
+              <entry>Week</entry>
+              <entry>Date</entry>
               <entry>Topic</entry>
-              <entry>Reference/Assignment</entry>
+              <entry>Comments</entry>
             </row>
         </thead>
         <tbody>
             <row rowsep="1">
               <entry namest="session">1</entry>
-              <entry namest="theme">Introduction</entry>
-              <entry namest="area">Architecture</entry>
-              <entry namest="topic">Web Architecture</entry>
-              <entry namest="refass">REST in Practice: Ch 1, 3-5</entry>
+              <entry namest="date">Sep05</entry>
+              <entry namest="topic">Course Introduction</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 1-4</entry>
             </row>
-            <row>
-              <entry namest="refass">RESTful Java: Ch 1-2</entry>
+            <row rowsep="1">
+              <entry namest="comment">Exercise: <ulink url="TBD">Development Environment Setup</ulink></entry>
             </row>
-            <row>
-              <entry namest="topic">CRUD Web Service Introduction</entry>
+            <row rowsep="1">
+              <entry namest="comment">Exercise: <ulink url="TBD">First Simple Application</ulink></entry>
             </row>
-            <row>
-              <entry namest="topic">Hypermedia Web Service Introduction</entry>
-            </row>
-            <row>
-              <entry namest="area">Development/Realization</entry>
-              <entry namest="topic">Development Environment Parts and Setup</entry>
-              <entry namest="refass">Ex0: Development Environment Setup</entry>
-            </row>
-
-            <row rowsep="1" >
+            
+            
+            <row rowsep="1">
               <entry namest="session">2</entry>
-              <entry namest="theme">Development</entry>
-              <entry namest="area">Architecture</entry>
-              <entry namest="topic">(continue/finish)</entry>
+              <entry namest="date">Sep12</entry>
+              <entry namest="topic">Business Logic and DAOs</entry>
             </row>
-            <row>
-              <entry namest="area">Development/Realization</entry>
-              <entry namest="topic">Using the Development Environment</entry>
-              <entry namest="refass">Ex1: Development Environment Use Cases</entry>
+            <row rowsep="1">
+              <entry namest="topic">Unit/Integration Testing</entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic">JDBC</entry>
+              <entry namest="comment">Exercise: <ulink url="TBD">JDBC Tutorial</ulink></entry>
             </row>
 
-            <row rowsep="1" >
+
+            <row rowsep="1">
               <entry namest="session">3</entry>
-              <entry namest="theme">Resource Access</entry>
-              <entry namest="area">Concepts/APIs</entry>
-              <entry namest="topic">HTTP Method and URI Matching</entry>
-              <entry namest="refass">RESTful Java: Ch 4</entry>
+              <entry namest="date">Sep19</entry>
+              <entry namest="topic">JPA Entity Manager</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 9</entry>
             </row>
-            <row>
-              <entry namest="topic">HTTP/REST Clients</entry>
-              <entry namest="refass">RESTful Java: Ch 9</entry>
+            <row rowsep="1">
+              <entry namest="comment">Exercise: <ulink url="TBD">Entity Manager Tutorial</ulink></entry>
             </row>
-            <row>
-              <entry namest="topic">JAX-RS Injection</entry>
-              <entry namest="refass">RESTful Java: Ch 5</entry>
+            <row rowsep="1">
+              <entry namest="comment">Project Startup/Sanity Check due by Sun, 8am Sep23</entry>
             </row>
-            <row>
-              <entry namest="topic">Responses</entry>
-              <entry namest="refass">RESTful Java: Ch 7</entry>
-            </row>
-            
-            <row rowsep="1" >
+
+            <row rowsep="1">
               <entry namest="session">4</entry>
-              <entry namest="theme">Data Marshalling</entry>
-              <entry namest="area">Concepts/APIs</entry>
-              <entry namest="topic">HTTP Content Negotiation</entry>
-              <entry namest="refass">RESTful Java: Ch 8</entry>
+              <entry namest="date">Sep26</entry>
+              <entry namest="topic">JPA Core Entity Mapping</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 10</entry>
             </row>
-            <row>
-              <entry namest="topic">JAX-RS Content Handlers</entry>
-              <entry namest="refass">RESTful Java: Ch 6</entry>
-            </row>
-            <row>
-              <entry namest="topic">XML Marshalling (JAXB)</entry>
-            </row>
-            <row>
-              <entry namest="topic">JSON Marshalling</entry>
-            </row>
-            
-            <row rowsep="1" >
+
+
+            <row rowsep="1">
               <entry namest="session">5</entry>
-              <entry namest="theme">Scaling</entry>
-              <entry namest="area">Concepts/APIs</entry>
-              <entry namest="topic">Caching</entry>
-              <entry namest="refass">RESTful Java: Ch 10</entry>
-            </row>
-            <row>
-              <entry namest="topic">Coordination</entry>
-              <entry namest="refass">REST in Practice: Ch 6</entry>
+              <entry namest="date">Oct03</entry>
+              <entry namest="topic">JPA Relationships</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 11</entry>
             </row>
             
-            <row rowsep="1" >
+
+            <row rowsep="1">
               <entry namest="session">6</entry>
-              <entry namest="theme">Scenarios</entry>
-              <entry namest="area">Concepts/APIs</entry>
-              <entry namest="topic">Data Streaming</entry>
+              <entry namest="date">Oct10</entry>
+              <entry namest="topic">JPA Query Language</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 13</entry>
             </row>
-            <row>
-              <entry namest="topic">Redirects</entry>
+            <row rowsep="1">
+              <entry namest="topic">JPA Entity Inheritance</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 12</entry>
             </row>
-            <row>
-              <entry namest="topic">EJB Deployment</entry>
+            <row rowsep="1">
+              <entry namest="topic">JPA Entity Callbacks and Listeners</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 14</entry>
             </row>
+            <row rowsep="1">
+              <entry namest="comment"><ulink url="TBD">Project 1</ulink> due by Sun, 8am Oct21</entry>
+            </row>
+            
+        </tbody>
+        </tgroup>
+    </table>    
+
+    <table>
+        <title>N-Tier Application</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+        <colspec colname="week"/>
+        <colspec colname="date"/>
+        <colspec colname="topic"/>
+        <colspec colname="comment"/>
+        <thead>
             <row>
-              <entry namest="topic">Hibernate Integration</entry>
+              <entry>Week</entry>
+              <entry>Date</entry>
+              <entry>Topic</entry>
+              <entry>Comments</entry>
+            </row>
+        </thead>
+        <tbody>
+            <row rowsep="1">
+              <entry namest="session">7</entry>
+              <entry namest="date">Oct17</entry>
+              <entry namest="topic">Remote Facades and DTOs</entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic">Session Beans and EAR Deployments</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 5-7</entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic">RMI Clients and JNDI</entry>
+            </row>
+            
+            <row rowsep="1">
+              <entry namest="session">8</entry>
+              <entry namest="date">Oct24</entry>
+              <entry namest="topic">JNDI ENC</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 16</entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic">Context and Dependency Injection</entry>
+            </row>
+            
+            <row rowsep="1">
+              <entry namest="session">9</entry>
+              <entry namest="date">Oct31</entry>
+              <entry namest="topic">Transactions</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 17</entry>
+            </row>
+            
+            <row rowsep="1">
+              <entry namest="session">10</entry>
+              <entry namest="date">Nov07</entry>
+              <entry namest="topic">Web Tier Integration</entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic">EJB War Deployments</entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="topic">JAX-RS Clients and JAXB DTOs</entry>
+            </row>
+            <row rowsep="1">
+              <entry namest="comment"><ulink url="TBD">Project 2</ulink> due by Sun, 8am Nov11</entry>
             </row>
         </tbody>
         </tgroup>
     </table>    
-        <note>
-            <para>In the interest of covering important concepts well within 
-            the time available -- the official class will likely end at 
-            this point and the following topics will have to be covered 
-            independently or through follow-on brown-bags, etc.</para>
-        </note>
+
     <table>
-        <title>Other Topics</title>
-        <tgroup cols='5' align='left' colsep='1' rowsep='0'>
-        <colspec colname='session'/>
-        <colspec colname='theme'/>
-        <colspec colname='area'/>
-        <colspec colname='topic'/>
-        <colspec colname='refass'/>
+        <title>Security and Asynchronous Applications</title>
+        <tgroup cols='4' align='left' colsep='1' rowsep='0'>
+        <colspec colname="week"/>
+        <colspec colname="date"/>
+        <colspec colname="topic"/>
+        <colspec colname="comment"/>
         <thead>
             <row>
-              <entry>Session</entry>
-              <entry>Theme</entry>
-              <entry>Area</entry>
+              <entry>Week</entry>
+              <entry>Date</entry>
               <entry>Topic</entry>
-              <entry>Reference/Assignment</entry>
+              <entry>Comments</entry>
             </row>
         </thead>
         <tbody>
-            <row>
-              <entry namest="area">Concepts/APIs</entry>
-              <entry namest="topic">HATEAOS</entry>
-              <entry namest="refass">REST in Practice: 5</entry>
+            <row rowsep="1">
+              <entry namest="session">11</entry>
+              <entry namest="date">Nov14</entry>
+              <entry namest="topic">Security</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 15</entry>
             </row>
-            <row>
-              <entry namest="refass">RESTful Java: Ch 9</entry>
+
+            <row rowsep="1">
+              <entry namest="session">--</entry>
+              <entry namest="date">Nov21</entry>
+              <entry namest="topic">Thanksgiving week - no class</entry>
             </row>
-            <row>
-              <entry namest="area">Concepts/APIs</entry>
-              <entry namest="topic">Atom/AtomPub</entry>
-              <entry namest="refass">REST in Practice: Ch 7-8</entry>
+
+            <row rowsep="1">
+              <entry namest="session">12</entry>
+              <entry namest="date">Nov28</entry>
+              <entry namest="topic">Java Messaging Service</entry>
             </row>
-            <row>
-              <entry namest="area">Security</entry>
-              <entry namest="topic">BASIC</entry>
-              <entry namest="refass">REST in Practice: 5</entry>
+
+            <row rowsep="1">
+              <entry namest="session">13</entry>
+              <entry namest="date">Dec05</entry>
+              <entry namest="topic">Message Driven Beans</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 8</entry>
             </row>
-            <row>
-              <entry namest="area">Security</entry>
-              <entry namest="topic">OpenId</entry>
-              <entry namest="refass">RESTful Java: Ch 12</entry>
+            <row rowsep="1">
+              <entry namest="topic">Timer Service</entry>
+              <entry namest="comment">Rubinger &amp; Burke: Ch 19</entry>
             </row>
-            <row>
-              <entry namest="area">Security</entry>
-              <entry namest="topic">OAuth</entry>
+
+            <row rowsep="1">
+              <entry namest="session">14</entry>
+              <entry namest="date">Dec12</entry>
+              <entry namest="topic">finish final projects -- no class</entry>
+              <entry namest="comment"><ulink="TBD">Project 3</ulink> due by Wed evening/midnight, Dec12</entry>
             </row>
+
         </tbody>
         </tgroup>
     </table>    

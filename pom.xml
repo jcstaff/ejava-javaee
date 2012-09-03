@@ -190,12 +190,7 @@
 
     <profiles>
         <profile>
-            <id>jenkins</id>
-            <activation>
-                <property>
-                    <name>env.BUILD_NUMBER</name>
-                </property>
-            </activation>
+            <id>all-modules</id>
             <modules>
                 <module>ejava-build</module>
                 <module>ejava-common</module>
@@ -221,6 +216,15 @@
                 <module>coursedocs</module>
                 -->
             </modules>
+        </profile>
+
+        <profile>
+            <id>jenkins</id>
+            <activation>
+                <property>
+                    <name>env.BUILD_NUMBER</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

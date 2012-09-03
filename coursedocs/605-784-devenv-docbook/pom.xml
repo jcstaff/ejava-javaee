@@ -9,13 +9,19 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>605-784-docbook</artifactId>
+    <artifactId>605-784-devenv-docbook</artifactId>
     <packaging>pom</packaging>
 
-    <name>Enterprise Java (605.784) Course Overview</name>
+    <name>Enterprise Java (605.784) Development Env Setup</name>
+    <description>
+        This project contains instructions for setting up a development
+        environment to operate within class. This dev env will be suitable
+        for executing the sample projects and developing class projects
+        to turn in for course work.
+    </description>
     
     <properties>
-       <doc.base>605-784</doc.base>
+       <doc.base>605-784-devenv</doc.base>
     </properties>
 
     <build>
@@ -30,6 +36,7 @@
                             <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/xhtml.xsl</stylesheetResource>
                             <finalName>${htmlName}</finalName>
                         </format>
+                        <!--
                         <format>
                             <formatName>html_single</formatName>
                             <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/xhtml-single.xsl</stylesheetResource>
@@ -40,6 +47,7 @@
                             <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/pdf.xsl</stylesheetResource>
                             <finalName>${pdfName}</finalName>
                         </format>
+                        -->
                     </formats>
                 </configuration>
             </plugin>

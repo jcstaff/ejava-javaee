@@ -1,0 +1,67 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="devenv-jdk-setup">
+    <title>Java JDK Setup</title>
+    <para>
+        You will need a copy of the Java 6 SDK installed. The Java 7
+        JDK is available but I have not yet tried it.
+    </para>
+    <note>
+        <para>
+            Keep the 32/64-bit choice consistent with what
+            you download later for Eclipse.
+        </para>
+    </note>
+
+    <section id="devenv-jdk-install">
+        <title>Download and Install JDK</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Linux Users: The alternate JDKs (e.g., OpenJDK)
+                    available from your package manager will work fine for
+                    class.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Windows Users: Install the Java 6 JDK from Sun/Oracle
+                </para>
+                <orderedlist>
+                    <listitem>
+                        <para>
+                            Download a copy of the Java 6 JDK
+                            <ulink
+    url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html
+                            </ulink>.
+                            Choose Java SE 6 Update (latest) JDK. We will only be using the
+                            JDK portion in class so avoid the alternate downloads that add in the
+                            Glassfish JavaEE Application Server and NetBeans. We will be
+                            using JBoss and Eclipse.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Install the JDK and associated JRE in a
+                            directory that does not have spaces in its path.
+                        </para>
+                    </listitem>
+                </orderedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="devenv-jdk-verify">
+    <title>Verify your JDK is installed</title>
+    <programlisting><![CDATA[
+$ java -version
+java version "1.6.0_20"
+OpenJDK Runtime Environment (IcedTea6 1.9.13) (6b20-1.9.13-0ubuntu1~10.04.1)
+OpenJDK Client VM (build 19.0-b09, mixed mode, sharing)
+user@ubuntu:~$ javac -version
+javac 1.6.0_20
+]]></programlisting>
+    </section>    
+</chapter>
+  

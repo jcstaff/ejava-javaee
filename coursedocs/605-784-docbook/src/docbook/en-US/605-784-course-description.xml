@@ -1,10 +1,10 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="605-784-course-description">
+<chapter id="cs-784-course-description">
     <title>Course Description</title>
 
-    <section id="605-784-meeting">
+    <section id="cs-784-meeting">
         <title>Meeting Times/Location</title>
         <itemizedlist>
             <listitem><para>Wednesdays, 4:30-7:10pm</para></listitem>
@@ -12,7 +12,7 @@
         </itemizedlist>
     </section>
 
-    <section id="605-784-description">
+    <section id="cs-784-description">
         <title>Description</title>
         <para>
         This course focuses on enterprise computing technologies using Java Enterprise Edition (Java EE). The
@@ -23,8 +23,10 @@
         synchronous business processing and message-driven beans and timers for asynchronous business processing
         will be described. The Data Access tier discussion will focus on Java Database Connectivity (JDBC), data
         access patterns, and the Java Persistence API. Finally, enterprise services will be described, including
-        the Java Naming and Directory Interface (JNDI), Remote Method Invocation (RMI), Java Transaction API (JTA),
-        Java EE Security, and Java Message Service (JMS).</para>
+        the Java Naming and Directory Interface (JNDI), Dependency Injection for Java (JSR-330), 
+        Context and Dependency Injection for JavaEE (CDI/JSR-299), Remote Method Invocation (RMI), 
+        Java Transaction API (JTA), Java EE Security, and Java Message Service (JMS).
+        </para>
         <para>
         Using modern development tools, commercial persistence providers, and application servers, students will
         design and implement several significant programming projects using the above mentioned technologies and
@@ -32,7 +34,7 @@
         </para>
     </section>
 
-    <section id="605-784-student-background">
+    <section id="cs-784-student-background">
         <title>Student Background</title>
         <itemizedlist>
             <listitem><para>Prerequisite: 605.481 Distributed Development on the World Wide Web or equivalent</para></listitem>
@@ -40,16 +42,16 @@
         </itemizedlist>
     </section>
 
-    <section id="605-784-student-commitment">
+    <section id="cs-784-student-commitment">
         <title>Student Commitment</title>
         <itemizedlist>
             <listitem><para>Students should be prepared to spend between 10-16 hours a week outside of class.</para></listitem>
         </itemizedlist>
     </section>
 
-    <section id="605-784-texts">
+    <section id="cs-784-texts">
         <title>Course Text(s)</title>
-        <section id="605-784-texts-recommended">
+        <section id="cs-784-texts-recommended">
             <title>Recommended Text(s)</title>
             <itemizedlist>
 	            <listitem><para>
@@ -60,7 +62,7 @@
             </itemizedlist>
         </section>
 
-        <section id="605-784-texts-optional">
+        <section id="cs-784-texts-optional">
             <title>Optional Text(s)</title>
             <itemizedlist>
                 <listitem><para>A Servlet/JSP Text</para>
@@ -74,36 +76,166 @@
                 </listitem>
             </itemizedlist>
         </section>
+    </section>
         
-        <section id="605-784-required-software">
-            <title>Required Software</title>
-            <para>This course will make heavy use of development tools (Git, Maven 3, 
-                JUnit, Log4j, and Eclipse), databases (Hypersonic; comes with JBoss), 
-                persistence providers (Hibernate; comes with JBoss), and application 
-                servers (JBoss AS 7). Students are strongly encouraged to establish a 
-                local development environment. Detailed instructions for setup are 
-                part of the first exercise (Development Environment Setup).
-            </para>
-        </section>
-        
-        <section id="605-784-references">
-            <title>References</title>
-            <para>
-                The core of the EJB3 content is covered in the primary text for 
-                the course (and competing texts as well as online). Associated 
-                topics (database schema, JDBC, Web Tier, JMS, and tools) are not 
-                covered in the course text, but documentation will be provided 
-                through course slides, examples, and tutorials. A list of online 
-                references can be found on this site. Each lecture will supply a 
-                list of references for that technical area.            
-            </para>
-        </section>
-
-        <section id="605-784-grading">
-            <title>Grading</title>
-            <para></para>
-        </section>
+    <section id="cs-784-required-software">
+        <title>Required Software</title>
+        <para>This course will make heavy use of development tools (Git, Maven 3, 
+            JUnit, Log4j, and Eclipse), databases (Hypersonic; comes with JBoss), 
+            persistence providers (Hibernate; comes with JBoss), and application 
+            servers (JBoss AS 7). Students are strongly encouraged to establish a 
+            local development environment. Detailed instructions for setup are 
+            part of the first exercise (Development Environment Setup).
+        </para>
+    </section>
+    
+    <section id="cs-784-references">
+        <title>References</title>
+        <para>
+            The core of the EJB3 content is covered in the primary text for 
+            the course (and competing texts as well as online). Associated 
+            topics (database schema, JDBC, Web Tier, JMS, and tools) are not 
+            covered in the course text, but documentation will be provided 
+            through course slides, examples, and tutorials. A list of online 
+            references can be found on this site. Each lecture will supply a 
+            list of references for that technical area.            
+        </para>
     </section>
 
+    <section id="cs-784-grading">
+        <title>Grading</title>
+        <para></para>
+        
+        <itemizedlist>            
+            <listitem>
+                <para>
+                    100 &gt;= A &gt;= 90 &gt; B &gt;= 80 &gt; C &gt;= 70 &gt; F
+                </para>
+            </listitem>
+        </itemizedlist>
+        
+        <table>
+            <title/>
+            <tgroup cols='2' align='left' colsep='1' rowsep='0'>
+            <colspec colname="col1"/>
+            <colspec colname="col2"/>
+            <thead>
+                <row>
+                  <entry>Assessment</entry>
+                  <entry>% of Semester Grade</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row rowsep="1">
+                  <entry namest="col1">Class/Newsgroup Participation</entry>
+                  <entry namest="col2">10%</entry>
+                </row>
+                <row rowsep="1">
+                  <entry namest="col1">Project Startup/Sanity Check</entry>
+                  <entry namest="col2">5%</entry>
+                </row>
+                <row rowsep="1">
+                  <entry namest="col1">Project 1</entry>
+                  <entry namest="col2">30%</entry>
+                </row>
+                <row rowsep="1">
+                  <entry namest="col1">Project 2</entry>
+                  <entry namest="col2">30%</entry>
+                </row>
+                <row rowsep="1">
+                  <entry namest="col1">Project 3</entry>
+                  <entry namest="col2">25%</entry>
+                </row>
+            </tbody>
+            </tgroup>
+        </table>    
+        <itemizedlist>            
+            <listitem>
+                <para>
+                    Projects will be done individually and graded 100 though 0 based
+                    on posted project grading criteria.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Class/newsgroup participation will be based on instructor 
+                    judgment whether the student has made a contribution to class
+                    to either the classroom or newsgroup on a consistent weekly basis.
+                    A newsgroup contribution may be a well-formed technical observation/lesson 
+                    learned, a well formed question that leads to a well formed follow up from 
+                    another student, or a well formed answer/follow-up to another student's 
+                    question. Well formed submissions are those that clearly summarize the 
+                    topic in the subject, and clearly describe the objective, environment, 
+                    and conditions in the body. The instructor will be the judge of whether 
+                    a newsgroup contribution meets the minimum requirements for the week. 
+                    The intent of this requirment is to promote public collaboration 
+                    between class members.
+                    </para>
+            </listitem>
+            <listitem>
+                <para>
+                    There will be one required project startup/sanity check submission
+                    and will be primarily graded on a done/not-done basis.
+                    The intent of this requirement is to promote early, more-focused
+                    productivity and exchange of artifacts between the 
+                    student and instructor. 
+                </para>
+            </listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="cs-784-grading-policy">
+        <title>Grading Policy</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Late projects will be deducted 10pts/week late, starting after the due date/time, 
+                    with one exception. A student may submit a single project up to 4 days late without 
+                    receiving approval and still receive complete credit. Students taking advantage of 
+                    the free first pass should still submit an e-mail to the graders notifying them of 
+                    their intent.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Projects must be submitted via e-mail to the grader(s) and instructor with source code 
+                    in a zip file with a README. Top level, pre-built artifacts (e.g., EARs) must also be 
+                    included in the submission. All source code must be written to portably compile in the 
+                    grader's environment using Maven 3. This will be clearly spelled out during the course.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Class attendance is strongly recommended, but not mandatory. The student is responsible 
+                    for obtaining any written or oral information covered during their absence.                
+                </para>
+            </listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="cs-784-academic-integrity">
+        <title>Academic Integrity</title>
+        <para>
+            Collaboration of ideas and approaches are strongly encouraged. You may use partial 
+            solutions provided by others as a part of your project submission. However, the bulk 
+            usage of another students implementation or project will result in a 0 for the project. 
+            There is a difference between sharing ideas/code snippets and turning in someone 
+            else's work as your own. When in doubt, document your sources.
+        </para>
+    </section>
+
+    <section id="cs-784-instructor-availability">
+        <title>Instructor Availability</title>
+        <para>
+            I am available at least 20min before class, breaks, and most times after class 
+            for extra discussion. I provide detailed answers to general/technical questions 
+            through the <ulink url="http://groups.yahoo.com/group/ejava_class">course newsgroup</ulink>. 
+            You can get individual/non-technical questions 
+            answered via <ulink url="mailto:jcstaff@apl.jhu.edu">e-mail</ulink>. 
+            I usually have all questions posted by 9pm answered by 
+            COB that evening. Students needing further assistance are also welcome 
+            make other arrangements during the week.        
+        </para>
+    </section>
 </chapter>
   
