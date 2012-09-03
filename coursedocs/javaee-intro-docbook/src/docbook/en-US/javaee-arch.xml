@@ -103,30 +103,44 @@
     <section id="javaee-container">
         <title>Containers</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Provide runtime support for JavaEE application components</para></listitem>
+            <listitem><para>Provide an interpose layer arround/between each component</para></listitem>
+            <listitem><para>Inject required components</para></listitem>
+            <listitem><para>Application developers may think of the Application Server==Container</para></listitem>
+            <listitem><para>Containers address specifics of the standards (e.g., deployment artifact structure)</para></listitem>
         </itemizedlist>                   
+        
+        <section id="javaee-container-server">
+            <title>Servers</title>
+            <itemizedlist>
+                <listitem><para>Host the containers and their application clients</para></listitem>
+                <listitem><para>No physical requirements (single server or multiple servers per container/conatiner type)</para></listitem>
+                <listitem><para>May be a general-purpose transaction platform adapted to JavaEE by the containers</para></listitem>
+            </itemizedlist>                   
+        </section>
     </section>
 
     <section id="javaee-ra">
         <title>Resource Adapters</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>System-level software component</para></listitem>
+            <listitem><para>Extends standard APIs into specific resources (e.g., JDBC)</para></listitem>
+            <listitem><para>Framework provided for:</para>
+                <itemizedlist>
+                    <listitem><para>Connection/Resource Pooling</para></listitem>
+                    <listitem><para>Security Management</para></listitem>
+                    <listitem><para>Transaction Management</para></listitem>
+                </itemizedlist>                   
+            </listitem>
         </itemizedlist>                   
     </section>
 
     <section id="javaee-db">
-        <title>Database</title>
+        <title>Databases</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Pervasive player in most JavaEE application clients</para></listitem>
+            <listitem><para>Not applicable for Applets </para></listitem>
         </itemizedlist>                   
     </section>
-
-
 </chapter>
   

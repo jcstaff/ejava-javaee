@@ -7,13 +7,65 @@
 
     <section id="javaee-services-comms">
         <title>Communication Services</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+
+        <section id="javaee-services-http">
+            <title>HTTP</title>
+            <itemizedlist>
+                <listitem><para>Client-side API defined by <code>java.net</code></para></listitem>
+                <listitem><para>JavaEE adds server-side APIs for servlet, JSPs, JSF, and web services</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-https">
+            <title>HTTPS</title>
+            <itemizedlist>
+                <listitem><para>Use of HTTP over secure socket layer (SSL) protocol</para></listitem>
+            </itemizedlist>                   
+        </section>
     </section>
 
+    <section id="javaee-services-corba">
+        <title>CORBA Services</title>
+        <section id="javaee-services-iiop">
+            <title>IIOP</title>
+            <itemizedlist>
+                <listitem><para>Extends the RMI-style of remote interfaces to be independent of underlying protocol</para>
+                    <itemizedlist>
+                        <listitem><para>JavaSE Native Remote Protocol (JRMP)</para></listitem>
+                        <listitem><para>CORBA IIOP</para></listitem>
+                    </itemizedlist>                   
+                </listitem>
+                <listitem><para>Permit Java EE application components to access CORBA 
+                    services compatible with RMI programming restrictions</para></listitem>
+                <listitem><para>Permit CORBA clients to access EJB components</para></listitem>
+                <listitem><para>Using dependency injection versus JNDI lookup eliminates 
+                    the need for applications to use most of API</para></listitem>
+            </itemizedlist>                   
+        </section>
+        <section id="javaee-services-idl">
+            <title>Java IDL</title>
+            <itemizedlist>
+                <listitem><para>Access distributed, non-Java endpoints using 
+                    a CORBA-IIOP client API</para></listitem>
+                <listitem><para>Permit CORBA clients to access EJB components</para></listitem>
+                <listitem><para>Using dependency injection versus JNDI lookup eliminates 
+                    the need for applications to use most of API</para></listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
+
+
+    <section id="javaee-services-coord">
+        <title>Coordination Services</title>
+
+        <section id="javaee-services-jta">
+            <title>Java Transaction API (JTA)</title>
+            <itemizedlist>
+                <listitem><para>Used by application to demarcate transaction boundaries</para></listitem>
+                <listitem><para>Interface between transaction manager and 
+                    individual resource managers (e.g. database) to coordinate transaction</para></listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
 
 </chapter>
   
