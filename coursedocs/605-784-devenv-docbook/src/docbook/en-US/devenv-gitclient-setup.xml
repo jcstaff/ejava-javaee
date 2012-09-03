@@ -1,0 +1,175 @@
+<?xml version='1.0'?>
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="devenv-gitclient-setup">
+    <title>Git Client Setup</title>
+    <para>
+        You will use Git in this class to perform an initial checkout and
+        get updates for source files. Any Git client should be able to perform
+        that function. You can determine if you have a command line Git 
+        client already installed using the following simple command.
+    </para>
+    <programlisting><![CDATA[
+//my ubuntu system
+$ git --version
+git version 1.7.0.4
+
+//my win7/msysGit system
+$ git --version
+git version 1.7.5.GIT
+]]></programlisting>
+
+    <section id="devenv-gitclient-install">
+        <title>Install Git Client</title>
+        <para>There are a number of options and some are going to be
+            based on on your platform. Your basic options include command
+            line or using an Eclipse plugin
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Linux Command-Line Users: Use your package 
+                    installer. Select git-core, gitk, and git-gui packages.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Cygwin Command-Line Users: Use the cygwin setup
+                    tool to locate the git packages
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Windows Command-Line Users: Git comes in a core
+                    layer and then OS-layer add-ons. The core layer is
+                    sufficient for class
+                    and can be found at
+                    <ulink url="http://msysgit.github.com/">http://msysgit.github.com/</ulink>
+                </para>
+                <orderedlist>
+                    <listitem>
+                        <para>
+                            Download
+                            <ulink
+                                url="http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git">Full Installer</ulink>
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>Accept the default installation option of
+                            "Use Git Bash bash only". As the prompt
+                            states, it has the least risk and will be suitable 
+                            for the minor amount of use required in class.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>Chose your checkout style. Don't worry about 
+                            commit style you will only be performing
+                            read-only checkouts. I chose "Checkout as-is,
+                            commit Unix-style line endings" since I used all
+                            linux-style editors on Windows. You may want the
+                            Window checkout format.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Click on the "Git Bash" icon after the installation 
+                            is complete.
+                        </para>
+                    </listitem>
+                </orderedlist>
+            </listitem>
+            <listitem>
+                <para>
+                    Eclipse GUI Users: There is a git plugin for
+                    Eclipse available called EGit. You can install it by going to
+                    <code>Help->Eclipse Marketplace</code>, typing Git in 
+                    the search field, and clicking Install for EGit.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="devenv-gitclient-getrepo">
+        <title>Get Class Repository</title>
+        <para>
+            The class repository is located on github and can be browsed
+            using the following http URL
+            <ulink url="https://github.com/jcstaff/ejava-javaee">https://github.com/jcstaff/ejava-javaee</ulink>.
+            With a cloned copy, you can receive file updates during the semester.
+        </para>
+        <orderedlist>
+            <listitem>
+                <para>CD to a directory you wish to place source code.
+                    Make sure the path to this directory contains no
+                    spaces.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Clone the class repository using the following
+                    URL
+                    <ulink url="git://github.com/jcstaff/ejava-javaee.git">git://github.com/jcstaff/ejava-javaee.git</ulink>
+                </para>
+                <programlisting><![CDATA[
+git clone git://github.com/jcstaff/ejava-javaee.git
+...
+
+$ ls ejava-javaee/
+...
+
+$ cd ejava-javaee
+$ git branch -a    //list all branches -- local and remote
+...
+]]></programlisting>
+            </listitem>
+            
+            <listitem>
+                <para>Perform a mock update. This is what you will be
+                    doing several times this semester to get file
+                    updates.
+                </para>
+                <programlisting><![CDATA[
+$ git checkout master //switches to master branch
+$ git pull            //downloads changes and attempts merge
+Already up-to-date.
+]]></programlisting>
+                <note>
+                    <para>
+                        There are many modules within the class repository.
+                        Some are ready for use, some are still being ported 
+                        to JBoss 7, and some are not for use this semester.
+                        The ones ready for your use will be wired into the 
+                        build and will be compiled during a follow-on section.
+                        The list will increase as the semester moves forward. 
+                        Please ignore these extra modules. Keeping them within
+                        the baseline helps me keep related things centralized.
+                    </para>
+                </note>
+                <note>
+                    <para>
+                        If you ever make changes to the class examples and would like
+                        to keep those changes separate from the updates. Store them
+                        in a new branch at any time using the following git commands.
+                    </para>
+                        <programlisting><![CDATA[
+$ git checkout -b new-branch master  //creates new branch from master 
+                                     //and switches to that branch
+$ git commit -a -m "saving my stuff" //commits all dirty files to new branch
+$ git checkout master                //switches back to the master branch 
+]]></programlisting>
+                    <para>
+                        If you simply want to throw away any changes you made, you 
+                        can discard those changes to tracked files using the following
+                        git commands.
+                    </para>
+                        <programlisting><![CDATA[
+$ git reset --hard master
+$ git clean -rn  //shows you what it would delete without deleting 
+$ git clean -rf  //deletes files not managed or specifically ignored by git
+]]></programlisting>
+                </note>
+            </listitem>
+        </orderedlist>
+    </section>
+</chapter>
