@@ -2,12 +2,13 @@ Exercise 1: First Simple Application
 
 * Part C: Adding Logging
 
-    [Note:] This part requires commons-loggin and log4j.jar. If you do not 
-    already have these, they can be downloaded from the ibiblio 
-    repository; 
-    {{{http://www.ibiblio.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar}commons-logging}}, 
-    {{{http://www.ibiblio.org/maven2/log4j/log4j/1.2.13/log4j-1.2.13.jar}
-    log4j}}.
+    [Note:] This part requires commons-logging and log4j.jar. These should have
+    been downloaded to your repository when you built the class examples.
+    Look in M2_REPO/commons-logging/commons-logging/(version) and
+    M2_REPO/log4j/log4j/(version).
+
+    [Note:] If you skipped the Ant section, you should still go thru this 
+    part and simply build with Maven in the next part.
 
 
 ** Objectives
@@ -57,11 +58,12 @@ package myorg.mypackage.ex1;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class AppTest extends TestCase {
+public class AppTest {
     private static Log log = LogFactory.getLog(AppTest.class);
 
 ...
 
+    @Test
     public void testApp() {
         //System.out.println("testApp");
         log.info("testApp");
@@ -135,7 +137,7 @@ public class AppTest extends TestCase {
 
     [Note:] The log4j.xml is placed in the JVM classpath; where log4j will 
     locate it by default. However, it should not be placed in with the 
-    main classes (ex1.jar). Placing it in a our JAR file would pollute 
+    main classes (ex1.jar). Placing it in a our JAR file would polute 
     the application assembler and deployer's job of specifying the 
     correct configuration file at runtime. Our test classes and resources
     are not a part of follow-on deployment.
@@ -149,7 +151,7 @@ public class AppTest extends TestCase {
 
 ---
 # ex1 build.properties
-commons.logging.classpath=${M2_REPO}/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+commons.logging.classpath=${M2_REPO}/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar
 log4j.classpath=${M2_REPO}/log4j/log4j/1.2.13/log4j-1.2.13.jar
 ---
 

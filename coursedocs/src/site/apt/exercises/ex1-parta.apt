@@ -4,12 +4,13 @@ Exercise 1: First Simple Application
 
     [Note:] This part requires junit.jar. This should have been downloaded for
     you when you built the class examples and can be located in 
-    $M2_REPO/junit/junit/(version)/. Where M2_REPO is $HOME/.m2 or 
-    c:/jhu/repository depending on your setup for settings.xml. (version) 
+    $M2_REPO/junit/junit/(version)/. Where M2_REPO is HOME/.m2/repository
+    or the location you have specified in the localRepository element of 
+    HOME/.m2/settings.xml.
 
 ** Objectives
 
-    * Build and populate a directory structure for developing simple 
+    * Build and populate a directory structure for developing a simple 
     project consisting of a single Java archive.
 
     * Test our implementation and look at report.
@@ -67,23 +68,19 @@ public class App {
 ---
 package myorg.mypackage.ex1;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest extends TestCase {
+public class AppTest {
+    private static Log log = LogFactory.getLog(AppTest.class);
 
-    public AppTest( String testName ) {
-        super( testName );
-    }
-
-    public static Test suite() {
-        return new TestSuite( AppTest.class );
-    }
-
+    @Test
     public void testApp() {
         System.out.println("testApp");
         App app = new App();
@@ -117,7 +114,7 @@ myorg/mypackage/ex1/App.class
    target/test-classes. 
    
 ---
-> export JUNIT_JAR=`cygpath --windows c:/jhu/repository/junit/junit/4.7/junit-4.7.jar
+> export JUNIT_JAR=`cygpath --windows c:/jhu/repository/junit/junit/4.10/junit-4.7.jar
 > javac -classpath "target/ex1.jar;$JUNIT_JAR" \
 src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
 
@@ -146,6 +143,7 @@ OK (1 test)
 
 ---
     //AppTest.java
+    @Test
     public void testFail() {
         System.out.println("testFail");
         App app = new App();

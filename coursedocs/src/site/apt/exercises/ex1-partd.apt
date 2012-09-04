@@ -1,6 +1,6 @@
 Exercise 1: First Simple Application
 
-* {Part D}: Automate project development with Maven
+* {Part D}: Portable and repeatable project builds with Maven
 
 ** Objectives
 
@@ -23,7 +23,7 @@ Exercise 1: First Simple Application
     is relevant to what you are doing in class. If you are still stuck
     on Maven issues
     -- send it to me. I will fix it personally. There is nothing more
-    irritating for your than to be fighting with the builds when you
+    irritating for you than to be fighting with the builds when you
     want to be spending more time understanding, designing, trying,
     and mastering the product of what is being built.
 
@@ -146,14 +146,14 @@ Exercise 1: First Simple Application
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
+            <version>1.1.1</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -169,7 +169,7 @@ Exercise 1: First Simple Application
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.5.1</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -405,12 +405,12 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.1</version>
             </plugin>
             <plugin> 
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <version>2.2</version>
+                <version>2.5</version>
             </plugin>
         </pluginManagement>
         ...
@@ -429,7 +429,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             <plugin> 
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <version>2.7</version>
+                <version>2.8.1</version>
                 <configuration>
                     <detectLinks/>
                     <show>private</show>
@@ -486,8 +486,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
     [[1]] Let's start a settings.xml file to store properties that 
     are specific to out build site. You can find details about each setting
-    at the following {{{http://maven.apache.org/settings.html}URL}}. I suggest 
-    you start with the {{{../files/maven/settings.xml}settings.xml}} with this site.
+    at the following {{{http://maven.apache.org/settings.html}URL}}.
 
 ---
 <?xml version="1.0"?>
@@ -513,126 +512,10 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
     <localRepository>c:/jhu/repository</localRepository>
 ---
 
-    [[1]] Add a profiles section that defines property values for this local system.
-    The profile can have any "id" value, but must be listed as an activeProfile to 
-    have an impact on the maven environment.
-
-        * m2.repo - this is used by class examples to create expanded classpaths 
-        at build time. It needs to be the same value as localRepository at all
-        times. 
-
-        * jboss.home - this is used by class examples to directly reference
-        the JBoss installation instance for client jarfiles. This assures your
-        testing is being done against the same version installed on your system.
-
-        * jboss.server - this is used by class examples to name the
-        the JBoss server profile to use within jboss.home. We will be using the
-        (Java EE 6) "ejava-jboss6" profile that you built in exercise 0
-        (which is _not_ the "default" profile).
-
-        * jboss.(remaining) - used by the Maven cargo plugin to set deployment
-        variables to their non-default values
-
-        * jboss5/jboss6 profiles - used to trigger backward and forward-based
-        testing of the baseline. Your implementations will only need the 
-        jboss6 profile.
-
----
-    <profiles>
-        <profile>
-            <id>ejavaPC</id>
-            <!-- some of these paths will need to be updated to match your
-                 specific configuration -->
-            <properties>
-                <m2.repo>c:/jhu/repository</m2.repo>
-
-                <jboss.protocol>http</jboss.protocol>
-                <jboss.host>localhost</jboss.host>
-                <jboss.servlet.port>8080</jboss.servlet.port>
-                <jboss.user>admin</jboss.user>
-                <jboss.password>password</jboss.password>
-            </properties>                                   
-        </profile>        
-        <profile>
-            <id>jboss6</id>
-            <properties>
-                <jboss.home>c:/apps/jboss-6.1.0.Final</jboss.home>
-                <jboss.server>ejava-jboss6</jboss.server>
-            </properties>
-        </profile>        
-...
-    </profile>        
-    <activeProfiles>
-        <activeProfile>ejavaPC</activeProfile>
-        <activeProfile>jboss6</activeProfile>
-        ...
-    </activeProfiles>
----
-
-    [[1]] Add another activeProfile to define the location for the maven2 repositories
-    used in class. 
-
-        * webdev-baseline - contains baseline versions of class and external 
-        artifacts.
-
-        * webdev-snapshot - contains in-progress versions of class artifacts.
-
-        * webdev-plugins - contains baseline versions of maven plugins. These are 
-        typically plugins where a particular SNAPSHOT version was made into a 
-        baseline version for use in class.
-
-        []
-
----
-        <profile>
-            <id>webdev-repositories</id>
-            <repositories>
-                <repository>
-                    <id>webdev-baseline</id>
-                    <name>webdev.apl.jhu.edu baseline</name>
-                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
-                </repository>
-                <repository>
-                    <id>webdev-snapshot</id>
-                    <name>webdev.apl.jhu.edu SNAPSHOT</name>
-                    <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>daily</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>webdev-plugins</id>
-                    <name>ejava webdev repository</name>
-                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>        
-
-...
-
-        <activeProfile>webdev-repositories</activeProfile>
----    
-
-    [[1]] Activate a standard profile that is located in all class example
-    modules that interact with the database. This value is used by many of
-    the modules to decide which database they will work with at compile time
-    and allow for portability and comparison tests to be easily performed.
-
----    
-        <activeProfile>hsql</activeProfile>
----    
-
-    [Note:] Maven will report a warning about not being able to activate 
-    the hsql profile for modules that do not define one. These warnings
-    can be ignored since those modules do not use the database.
-
-    []
-
-    [[1]] While you are in this file, add an optional profile that changes the 
-    command line to the maven/junit invocation to allow remote debugging. More will
+    [[1]] Add the following specification to either the settings.xml file or the
+    local pom.xml file. If you specify it to the local pom.xml file -- it will
+    only apply to that project. If you specify it in the settings.xml file --
+    it will be global to all projects in your area.  More will
     be covered on this later. However, it should be noted that this profile
     is not active unless someone specifically asks for it (-Pdebugger) or the 
     "debugger" environment variable is set (-Ddebugger=(anything)).

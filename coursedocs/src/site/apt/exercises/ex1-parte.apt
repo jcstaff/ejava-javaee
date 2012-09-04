@@ -5,7 +5,6 @@ Exercise 1: First Simple Application
 ** Objectives
 
     * {{{Section_A}Import a project into Eclipse}}
-    using maven-eclipse-plugin goals
 
     * {{{Section_B}Setup Eclipse to be able to execute Maven project goals}}
 
@@ -23,45 +22,24 @@ Exercise 1: First Simple Application
     should be considered "old school". You can forget using this plugin
     for class.
 
-    * The Eclipse side is handled by a set of competing plug-ins that
-    get installed into Eclipse; m2eclipse/M2E and q4e/IAM.  Out of the
-    two, m2eclipse seems to be the most popular and is supported by 
-    the main developers of Maven.
+    * The Eclipse side is handled by the m2e plugin from Eclipse.org.
+    You should have installed this plugin during ex0 using the Eclipse
+    Marketplace. The m2e plugin dynamically updates the Eclipse environment
+    whenever there is a detected change to the pom.xml file.
 
-        ** The {{{http://m2eclipse.codehaus.org/} m2eclipse plugin}} has gone
-        through considerable changes over the years and has evolved into a
-        really solid product. It is based on Maven 3 and is in the process
-        of becoming an {{{http://www.eclipse.org/m2e/} Eclipse project (M2E)}}
-
-        ** There is an alternative offered by
-        {{{http://code.google.com/p/q4e/} Google's q4e}}
-        , which is soon to be
-        {{{http://www.eclipse.org/iam/} Eclipse IAM}}. A comparison of 
-        the various options is located on the 
-        {{{http://docs.codehaus.org/display/MAVENUSER/Eclipse+Integration}
-        Codehaus Wiki}}. 
-
-        []
-
-    We will be using m2eclipse and you will import your projects as Maven 
-    Projects and access goals through the "Run..." button. You should
-    have already installed this in exercise 0.
+    We will be using m2e and you will import your projects as Maven 
+    Projects and access goals through the "Run..." button.
 
     []
 
 
 *** {Section B}: Importing a Maven project into Eclipse
 
-        [Note:] Any changes to the project dependencies you make within
-        Eclipse are not updated in the pom.xml. Use the pom.xml file
-        to specify all project dependencies and refresh your Eclipse
-        project to see the changes. You may also edit the pom.xml
-        through various helpers provided by the m2eclipse plugin. 
-        Just remember that you are setting up a Maven project that
-        will be processed by m2eclipse and not an Eclipse project
-        to be processed by anything within Maven. If you tweak your
-        project within Eclipse, be sure those changes are documented
-        through a change to the Maven pom.xml.
+        [Note:] Any manual changes you make to the project dependencies
+        directly within Eclipse will not be reflected in your Maven pom.xml
+        and will not be part of the portable and repeatable build. You
+        should make all dependency changes in the pom.xml and have them
+        get automatically reflected in Eclipse by the m2e plugin.
 
     [[1]] Inside Eclipse, turn on Working Set foldering (a personal preference
     of mine). This works best from the Package Explorer (default navigator
@@ -171,7 +149,7 @@ Exercise 1: First Simple Application
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
 ---
@@ -196,7 +174,7 @@ Exercise 1: First Simple Application
         * Set Profiles to "debugger". This should match the profile
         added in your settings.xml. See next step.
 
-        * Verify that you are using a JDK 5 instance under the JRE tab.
+        * Verify that you are using a JDK 6 instance under the JRE tab.
 
         * press Apply and Close
 
