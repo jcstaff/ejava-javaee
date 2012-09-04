@@ -23,13 +23,12 @@
         <module>ejava-build</module>
         <module>ejava-common</module>
         <!--
-        <module>course-docs</module>
         <module>solutions</module>
         <module>projects</module>
         -->
         <module>javase5Enhancements</module>
-        <module>jdbcDAO</module>
         <!--
+        <module>jdbcDAO</module>
         <module>jpaDAO</module>
         <module>ormCore</module>
         <module>ormRelations</module>
@@ -73,24 +72,6 @@
         <url>http://ejava.info/jenkins/job/2012-fall-ejava-javaee/</url>
     </ciManagement>
 
-    <distributionManagement>
-        <site>
-            <id>webdev.website</id>
-            <name>ejava JHU webdev website</name>
-            <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/ejava-javaee</url>
-        </site>
-        <repository>
-            <id>webdev.repository</id>
-            <name>ejava JHU repository</name>
-            <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2</url>
-        </repository>
-        <snapshotRepository>
-            <id>webdev.snapshot.repo</id>
-            <name>ejava JHU snapshot repository</name>
-            <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2-snapshot</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
 
 
     <developers>
@@ -217,6 +198,50 @@
                 -->
             </modules>
         </profile>
+
+        <profile>
+            <id>webdev-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>webdev.website</id>
+                    <name>ejava JHU webdev website</name>
+                    <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/ejava-javaee</url>
+                </site>
+                <repository>
+                    <id>webdev.repository</id>
+                    <name>ejava JHU repository</name>
+                    <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/maven2</url>
+                </repository>
+                <snapshotRepository>
+                    <id>webdev.snapshot.repo</id>
+                    <name>ejava JHU snapshot repository</name>
+                    <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>test-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>webdev.website</id>
+                    <name>ejava JHU webdev website</name>
+                    <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/ejava-javaee</url>
+                </site>
+                <repository>
+                    <id>webdev.repository</id>
+                    <name>ejava JHU repository</name>
+                    <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2</url>
+                </repository>
+                <snapshotRepository>
+                    <id>webdev.snapshot.repo</id>
+                    <name>ejava JHU snapshot repository</name>
+                    <url>scpexe://jcs@webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+
 
         <profile>
             <id>jenkins</id>
