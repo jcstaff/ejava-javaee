@@ -109,6 +109,7 @@
         <jboss.host>localhost</jboss.host>
         <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
         <jboss.mgmt.port>9999</jboss.mgmt.port>
+        <jboss.naming.port>4447</jboss.naming.port>
         <jboss.protocol>http</jboss.protocol>
         <jboss.servlet.port>8080</jboss.servlet.port>
         <db.host>${jboss.host}</db.host>
@@ -117,9 +118,14 @@
         <cargo.containerId>jboss71x</cargo.containerId>
 
         <!-- used with JBoss RMI client -->
+        <!--
         <java.naming.factory.initial>org.jboss.as.naming.InitialContextFactory</java.naming.factory.initial>
         <java.naming.factory.url.pkgs>org.jboss.ejb.client.naming</java.naming.factory.url.pkgs>
         <java.naming.provider.url/>
+        -->
+        <java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</java.naming.factory.initial>
+        <java.naming.provider.url>remote://${jboss.host}:${jboss.naming.port}</java.naming.provider.url>
+        <java.naming.factory.url.pkgs/>
     </properties>
 
     <repositories>

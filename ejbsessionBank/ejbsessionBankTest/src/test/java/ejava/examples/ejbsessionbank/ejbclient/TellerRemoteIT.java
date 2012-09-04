@@ -2,7 +2,6 @@ package ejava.examples.ejbsessionbank.ejbclient;
 
 import static org.junit.Assert.*;
 
-
 import java.util.List;
 import javax.naming.InitialContext;
 
@@ -20,14 +19,15 @@ import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 import ejava.util.ejb.EJBClient;
 
 public class TellerRemoteIT {
-    Log log = LogFactory.getLog(TellerRemoteIT.class);
-    InitialContext jndi;
+    private static final Log log = LogFactory.getLog(TellerRemoteIT.class);
+    private static InitialContext jndi;
     public static final String jndiName = System.getProperty("jndi.name",
-    	EJBClient.getEJBLookupName("ejbsessionBankEAR", "ejbsessionBankEJB", "", 
+    	EJBClient.getRemoteLookupName("ejbsessionBankEAR", "ejbsessionBankEJB", 
     			"TellerEJB", TellerRemote.class.getName()));
     
     @Before
     public void setUp() throws Exception {
+        log.debug("jndiName=" + jndiName);
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi=" + jndi.getEnvironment());
