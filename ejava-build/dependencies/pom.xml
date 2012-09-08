@@ -126,6 +126,8 @@
         <java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</java.naming.factory.initial>
         <java.naming.provider.url>remote://${jboss.host}:${jboss.naming.port}</java.naming.provider.url>
         <java.naming.factory.url.pkgs/>
+        <jndi.user>known</jndi.user>
+        <jndi.password>password</jndi.password>
     </properties>
 
     <repositories>
@@ -452,10 +454,6 @@
                     <version>${maven-failsafe-plugin.version}</version>
                     <configuration>
                         <argLine>${surefire.argLine}</argLine>
-                        <testSourceDirectory>src/test/java</testSourceDirectory>
-                        <includes>
-                            <include>**/*IT.java</include>
-                        </includes>
                     </configuration>
                     <executions>
                         <execution> <!-- run the tests here -->

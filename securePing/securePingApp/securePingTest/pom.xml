@@ -98,6 +98,9 @@
                         <jmx.username>${jboss.user}</jmx.username>
                         <jmx.password>${jboss.password}</jmx.password>
                     </systemPropertyVariables>
+                   <excludes>
+                        <exclude>**/SecurePingRemoteIT.java</exclude>
+                   </excludes>
                 </configuration>
             </plugin>
 
