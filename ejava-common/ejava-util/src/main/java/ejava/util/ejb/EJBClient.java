@@ -67,7 +67,9 @@ public class EJBClient {
      * This method returns a JNDI name usable with JBoss remote-naming.<p/>
      * org.jboss.naming.remote.client.InitialContextFactory<p/>
      * The physical JNDI name will be listed as:<p/>
-     * java:jboss/exported/(ear)/(module)/(ejbClass)!(remoteInterface)
+     * <pre>
+java:jboss/exported/(ear)/(module)/(ejbClass)!(remoteInterface)
+     * </pre></p>
      * @param earNameVersion
      * @param ejbModuleNameVersion
      * @param ejbClassName
