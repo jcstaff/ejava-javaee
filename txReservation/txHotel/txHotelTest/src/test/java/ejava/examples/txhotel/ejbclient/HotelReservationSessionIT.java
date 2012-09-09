@@ -41,13 +41,13 @@ public class HotelReservationSessionIT {
     static InitialContext jndi;
     static final String sessionJNDI = System.getProperty("jndi.name.hotelsession",
     	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
-        	"HotelReservationSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
+        	"HotelReservationSessionEJB", HotelReservationSessionRemote.class.getName(), true));
     static final String requiredJNDI = System.getProperty("jndi.name.hotelsession",
     	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
-        	"RequiredSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
+        	"RequiredSessionEJB", HotelReservationSessionRemote.class.getName(), true));
     static final String requiresNewJNDI = System.getProperty("jndi.name.hotelsession",
     	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
-        	"RequiresNewSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
+        	"RequiresNewSessionEJB", HotelReservationSessionRemote.class.getName(), true));
     
     
     static Map<String, HotelReservationSession> reservationSessions =
@@ -69,7 +69,6 @@ public class HotelReservationSessionIT {
     	}
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
         log.debug("jndi name:" + sessionJNDI);        
         
        	reservationSessions.put("registrar", (HotelReservationSession)jndi.lookup(sessionJNDI));
