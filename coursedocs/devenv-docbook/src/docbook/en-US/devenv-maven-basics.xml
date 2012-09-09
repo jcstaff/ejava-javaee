@@ -344,49 +344,67 @@ myorg/
         <section id="devenv-mavenbasics-repositories">
             <title>Maven Repositories</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
+                <listitem><para>Locations where Maven stores and locates artifacts</para></listitem>
+                <listitem><para>Each user has a local repository referenced by <code>${settings.localRepository}</code>.
+                    This defaults to $HOME/.m2/repository</para>
+                <programlisting language="xml"><![CDATA[<settings xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-            <section id="devenv-mavenbasics-repositories-local">
-                <title>Local Maven Repository</title>
-                <itemizedlist>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>                   
-                <programlisting language=""><![CDATA[
+    <localRepository>c:/jhu/repository</localRepository>
+    ...]]></programlisting>
+                </listitem>
+                <listitem><para>MAVEN_HOME/con/settings.xml defines a core set of remote repositories</para></listitem>
+                <listitem><para>Maven poms can define extensions to the remote repository list</para>
+                <programlisting language="xml"><![CDATA[<repositories>
+    <repository>
+        <id>jboss-nexus</id>
+        <name>JBoss Nexus Repository</name>
+        <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </repository>
+</repositories>]]></programlisting>
+                </listitem>
+            </itemizedlist>                   
+            <figure>
+                <title>Maven Repositories
+                    <footnote id="rest-apis-must-be-hypertext-driven"><para>
+                        <ulink url="http://fusesource.com/docs/esb/4.4/esb_deploy_osgi/Locate-BuildTime.html">fusesource.com</ulink>
+                        </para>
+                    </footnote>
+                </title>
+                <graphic scalefit="1" fileref="images/maven-repositories.gif"/>
+            </figure>        
+            <orderedlist>
+                <listitem><para>Maven will first look for a dependency artifact in the local repository</para></listitem>
+                <listitem><para>Maven will then look for a dependency artifact in a remote repository like ibiblio</para></listitem>
+                <listitem><para>Maven will search all known repositories until the artifact is found or all repositories have been checked</para></listitem>
+                <listitem><para>Maven will install module artifacts into the local repository during the <code>install</code> 
+                    phase of the build</para>
+                <programlisting language=""><![CDATA[$ mvn install
+    ...
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ ex1 ---
+[INFO] Installing /home/jcstaff/proj/ejava-javaee/solutions/ex1/target/ex1-1.0-SNAPSHOT.jar to 
+    /home/jcstaff/.m2/repository/myorg/myproject/ex1/1.0-SNAPSHOT/ex1-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/proj/ejava-javaee/solutions/ex1/pom.xml to 
+    /home/jcstaff/.m2/repository/myorg/myproject/ex1/1.0-SNAPSHOT/ex1-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
                 ]]></programlisting>
-                <itemizedlist>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>                   
-            </section>
-
-            <section id="devenv-mavenbasics-repositories-remote">
-                <title>Remote Maven Repositories</title>
-                <itemizedlist>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>                   
-                <programlisting language=""><![CDATA[
-                ]]></programlisting>
-                <itemizedlist>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>                   
-            </section>
+                    </listitem>
+            </orderedlist>
+            
+            <tip>
+                <para>Maven will limit its serach of a remote repository to 
+                    expressed time limits. If it attempts and fails to locate
+                    an artifact from a remote repository it will not re-attempt
+                    to query that repository until the time limit expires. 
+                    Sometimes the failure has nothing to do with the repository
+                    not having the artifact (e.g., wireless network down) and
+                    when you clear the error you can force Maven to retry before
+                    the timeout period expires by adding a <code>-U</code>
+                    to the command line.</para>
+            </tip>
         </section>
 
         <section id="devenv-mavenbasics-props">
