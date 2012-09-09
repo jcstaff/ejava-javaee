@@ -4,9 +4,16 @@
 <chapter id="devenv-mavenmodules">
     <title>Maven Modules</title>
     <itemizedlist>
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
-        <listitem><para></para></listitem>
+        <listitem><para>Maven modules boundaries are highly influenced by the re-usable artifacts that must be produced</para>
+            <itemizedlist>
+                <listitem><para>If you have many .jars, you likely have many maven modules</para></listitem>
+                <listitem><para>If you have few but large .jars, you likely have few but large maven modules</para></listitem>
+                <listitem><para>If you require different types of artifacts, you likely have different maven modules</para></listitem>
+            </itemizedlist>                   
+        </listitem>
+        <listitem><para>Maven can be used in multi-module configuration</para></listitem>
+        <listitem><para>Many maven modules share the same configuration needs -- could lead to duplication</para></listitem>        
+        <listitem><para>POM Inheritance helps mitigate duplication issues</para></listitem>
     </itemizedlist>                   
     <programlisting language=""><![CDATA[
     ]]></programlisting>
@@ -14,33 +21,93 @@
     <section id="devenv-mavenmodules-parent">
         <title>POM Inheritance</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+            <listitem><para>Common properties can be defined in parent pom</para>
+        <programlisting language=""><![CDATA[<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ejava</groupId>
+    <artifactId>ejava-root</artifactId>
+    <version>3.0.2012.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Enterprise Java</name>
+    <scm>
+        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/master</url>
+        <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
+        <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
+    </scm>
+    ...]]></programlisting>
+            <para>In the above example -- the parent pom is defining the CM repository for all sub-modules</para>
+            </listitem>
+
+            <listitem><para>Child projects can inherit from a parent pom</para>
+        <programlisting language=""><![CDATA[<project>
+    <parent>
+        <groupId>ejava</groupId>
+        <artifactId>ejava-root</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+            
+    <groupId>ejava.javaee.intro</groupId>
+    <artifactId>javase5Enhancements</artifactId>
+            
+    <name>Java SE 5 Enhancements</name>
+    ...]]></programlisting>
+            <para>In the above example, the javase5Enhancements project inherits the CM configuration from the parent</para>
+            <para>If you include a relativePath to the parent, then changes
+                to parents in your build environment will be immediately reused
+                without having to install them into the localRepository.</para>
+            </listitem>
+        </itemizedlist>
+        
+        <warning>
+            <title>Avoid defining fat parents</title>
+            <para>Be careful not to attempt to blindly merge all project
+                definition into a single parent pom. This can bloat the inheriting 
+                children with unwanted dependency, cause slower builds, and
+                can even break a build. When in doubt -- push active definitions
+                (like dependencies and plugin declarations) to the leaf modules
+                and leave only passive declarations (like properties, 
+                dependencyManagement, and pluginManagement) in the parent.
+            </para>
+        </warning>                   
     </section>
     
     <section id="devenv-mavenmodules-sub">
         <title>Submodules</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Parent modules can be created to delegate build commands to a group of child modules</para></listitem>
+            <listitem><para>Child modules can be physically placed anywhere, but commonly in immediate sub-directories
+                named after their artifactId</para></listitem>
             <listitem><para></para></listitem>
         </itemizedlist>                   
+        <programlisting language="xml"><![CDATA[<project>
+   <parent>
+        <groupId>ejava</groupId>
+        <artifactId>ejava-root</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+        
+    <groupId>ejava.javaee.ejb</groupId>
+    <artifactId>ejbsessionBank</artifactId>
+    <packaging>pom</packaging>
+    
+    <name>Session Bean</name>
+    <description>
+        This project is the root project for the core session bean example.
+    </description>
+    <modules>
+        <module>ejbsessionBankImpl</module>
+        <module>ejbsessionBankEJB</module>
+        <module>ejbsessionBankWAR</module>
+        <module>ejbsessionBankEAR</module>
+        <module>ejbsessionBankTest</module>
+    </modules>
+</project>]]></programlisting>
+        <para>The example above has several child modules that it will build in the order they are specified.</para>
     </section>
 
 </chapter>
