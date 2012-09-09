@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.coursedocs</groupId>
+        <artifactId>coursedocs</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>devenv-docbook</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Development Environment Overview</name>
+    <description>
+        This project contains overview information to get started using
+        development tools for enterprise java development.
+    </description>
+    
+    <properties>
+       <doc.base>devenv</doc.base>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+                <configuration>
+                    <formats>
+                        <format>
+                            <formatName>html</formatName>
+                            <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/xhtml.xsl</stylesheetResource>
+                            <finalName>${htmlName}</finalName>
+                        </format>
+                        <format>
+                            <formatName>html_single</formatName>
+                            <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/xhtml-single.xsl</stylesheetResource>
+                            <finalName>${htmlName}</finalName>
+                        </format>
+                        <format>
+                            <formatName>pdf</formatName>
+                            <stylesheetResource>file://${basedir}/target/resources/ejava/docs/xslt/pdf.xsl</stylesheetResource>
+                            <finalName>${pdfName}</finalName>
+                        </format>
+                    </formats>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

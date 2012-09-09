@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>ejava.coursedocs</groupId>
-            <artifactId>605-784-devenv-docbook</artifactId>
+            <artifactId>605-784-devenv-setup-docbook</artifactId>
             <version>${project.version}</version>
             <type>war</type>
             <scope>runtime</scope>
@@ -36,6 +36,13 @@
         <dependency>
             <groupId>ejava.coursedocs</groupId>
             <artifactId>javaee-intro-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ejava.coursedocs</groupId>
+            <artifactId>devenv-docbook</artifactId>
             <version>${project.version}</version>
             <type>war</type>
             <scope>runtime</scope>
@@ -65,13 +72,19 @@
                </overlay>
                 <overlay>
                     <groupId>ejava.coursedocs</groupId>
-                    <artifactId>605-784-devenv-docbook</artifactId>
+                    <artifactId>605-784-devenv-setup-docbook</artifactId>
                     <type>war</type>
                     <targetPath>../site/docs/content</targetPath>
                </overlay>
                 <overlay>
                     <groupId>ejava.coursedocs</groupId>
                     <artifactId>javaee-intro-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.coursedocs</groupId>
+                    <artifactId>devenv-docbook</artifactId>
                     <type>war</type>
                     <targetPath>../site/docs/content</targetPath>
                </overlay>
