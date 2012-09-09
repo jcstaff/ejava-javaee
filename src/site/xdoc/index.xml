@@ -38,8 +38,8 @@
           <li>2012-02-29: Posted ORM Relationship updates</li>
           <li>2012-02-21: Posted Core JPA TODOs</li>
           <li>2012-02-15: Posted EntityManager TODOs</li>
-          <li>2012-02-06: Posted Data Tier Topics</li>
           -->
+          <li>2012-09-xx: Posted Data Tier Topics</li>
           <li>2012-09-04: Posted initial class site</li>
       </ul>
       </subsection>
@@ -273,32 +273,53 @@
              </ul>
           </li>
       </ul></li>
+      -->
       <li><ul>
-          <li>Go through the JDBC Exercise</li>
           <li>Look over the class project and post any questions.</li>
+
           <li>Establish your project directory structure and perform a build from the root.</li>
-          <li>Design and implement a few business objects for your class project.</li>
-          <li>Design and implement a set of unit tests for your business objects.</li>
-          <li>Design and implement the test infrastructure for your
-          DAO. This should at least consist of a successful connection to the DB.</li>
-          <li>Design a draft DB schema for your implemented business objects. This should go in 
-          your DAO project.</li>
+          <li>Create the business logic interfaces and define the operations that will
+              satisfy the end-to-end scenario. Create skeletal business object classes
+              necessary to express the business logic interfaces.</li>
+          <li>Create a testcase for the business logic to address the requirements 
+              for the end-to-end scenario.  Place this testcase in with your business logic 
+              and use it to help scope your future work on the project.</li>
+          <li>Create a set of business logic classes to implement the busines logic
+              interfaces. Stub out each call for now so the end-to-end test will
+              execute.</li>
+
+          <li>Go through the JDBC Exercise</li>
+
+          <li>Design and implement the details of at least one business object 
+              used in the business logic interface above.</li>
+          <li>Design and implement a unit test for that business object.</li>
+
+          <li>Design a draft DB schema for your business object. This should go in 
+              your DAO project.</li>
           <li>Implement a way to create your schema in the DB as a part of your DAO testing.</li>
-          <li>Design and implement an initial DAO interface and JDBC implementation for your business objects.
-          You only need a create() method for the project.</li>
+
+          <li>Design and implement the test infrastructure for your DAO(s). 
+              This should at least consist of a successful connection to the DB.</li>
+          <li>Design and implement an initial DAO interface and JDBC implementation 
+              to create your business object in the database (you will only need to 
+              implement creates for work done with JDBC in class).</li>
+
           <li>Consider all BO, DB Schema, and DAO work as draft prototypes at this time to get
           something end-to-end running. You will refine over next several weeks.</li>
           <b>
           <li>Send me a copy of your project, in a stable, known state,
           sometime this week; ideally by early Monday evening. You should have
-          a project structure in place, at least one JDBC-based 
-          JUnit DAO test case implemented with connectivity thru to the DB. 
-          Concentrate of very few BO classes, tables, and DAOs at this point and 
-          focus more on the end-to-end assembly of the data tier project for JDBC. 
+          a project structure in place that can build from the root, a good 
+          start on the items mentioned above, and a list of issues or questions
+          that you would like answered about how to move forward.
           This will be used as feedback to the class.</li>
           </b>
       </ul></li>
-      -->
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
       <li><ul>
           <li>register for newsgroup and setup e-mail handling (all
           e-mails will have ejava_class in subject)</li>
@@ -306,11 +327,6 @@
           <li>setup development environment by going through exercises 0 and 1</li>
           <li>post your weekly newsgroup contribution based on development environment setup</li>
       </ul></li>
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
       <li><ul>
           <li>had a nice break!</li>
       </ul></li>
