@@ -7,9 +7,9 @@
     <section id="devenv-mavenbasics-dirs">
         <title>Directory Structure</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Follows a standard layout by convention</para></listitem>
+            <listitem><para>Can be customized</para></listitem>
+            <listitem><para>Root directory stays fairly clean</para></listitem>
         </itemizedlist>                   
         <programlisting language=""><![CDATA[
 |-- pom.xml
@@ -22,63 +22,327 @@
     |-- surefire-reports
     `-- test-classes
         ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+        <variablelist>
+            <varlistentry>
+                <term><filename>src</filename></term>
+                <listitem><para>Source tree for all developed code</para></listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>target</filename></term>
+                <listitem><para>Build tree for artifacts created by the build</para>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term><filename>pom.xml</filename></term>
+                <listitem><para>Defines the build</para>
+                    <itemizedlist>
+                        <listitem><para>Managed by CM along with src tree</para></listitem>
+                        <listitem><para>Related artifacts normally placed in src/compile, etc.</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+        </variablelist>
         
         <section id="devenv-mavenbasics-src">
             <title>Source Tree</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Managed by CM</para></listitem>
+                <listitem><para>Should not contain any auto-generated artifacts</para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>      
+            <programlisting language="">
+<![CDATA[src
+|-- main
+|   |-- java
+|   |   `-- myorg
+|   |       `-- mypackage
+|   |           `-- ex1
+|   |               `-- App.java
+|   `-- resources
+`-- test
+    |-- java
+    |   `-- myorg
+    |       `-- mypackage
+    |           `-- ex1
+    |               `-- AppTest.java
+    `-- resources
+        `-- log4j.xml]]></programlisting>
+            <variablelist>
+                <varlistentry>
+                    <term><filename>main</filename></term>
+                    <listitem><para>Contains production artifacts for module</para>
+                        <itemizedlist>
+                            <listitem><para>Built artifacts from this tree are generally placed in the produced archive</para>
+                            <programlisting language=""><![CDATA[
+jar tf target/ex1-1.0-SNAPSHOT.jar 
+META-INF/
+META-INF/MANIFEST.MF
+myorg/
+myorg/mypackage/
+myorg/mypackage/ex1/
+myorg/mypackage/ex1/App.class
+...
+                            ]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>test</filename></term>
+                    <listitem><para>Contains test artifacts for module</para>
+                        <itemizedlist>
+                            <listitem><para>Built artifacts from this tree are not generally placed in the produced archive</para></listitem>
+                            <listitem><para>A separate archive of built test artifacts can be optionally generated for reuse</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>[main or test]/java</filename></term>
+                    <listitem><para>Contains Java classes</para>
+                        <itemizedlist>
+                            <listitem><para>Placed in a directory that matches the Java package for the class</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>[main or test]/resources</filename></term>
+                    <listitem><para>Contains property or other data files</para>
+                        <itemizedlist>
+                            <listitem><para>Generally copied target tree as-is or optionally filtered by the build</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </section>             
         
         <section id="devenv-mavenbasics-target">
             <title>Build Tree</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Not managed by CM</para></listitem>
+                <listitem><para>Contains auto-generated artifacts</para></listitem>
+                <listitem><para>Can be deleted at any time</para></listitem>
             </itemizedlist>                   
             <programlisting language=""><![CDATA[
+target
+|-- classes
+|   `-- myorg
+|       `-- mypackage
+|           `-- ex1
+|               `-- App.class
+|-- ex1-1.0-SNAPSHOT.jar
+|-- log4j-out.txt
+|-- surefire-reports
+|   |-- myorg.mypackage.ex1.AppTest.txt
+|   `-- TEST-myorg.mypackage.ex1.AppTest.xml
+`-- test-classes
+    |-- log4j.xml
+    `-- myorg
+        `-- mypackage
+            `-- ex1
+                `-- AppTest.class
             ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
+            <variablelist>
+                <varlistentry>
+                    <term><filename>classes</filename></term>
+                    <listitem><para>An exploded directory tree for built artifacts to be placed into the module archive</para>
+                        <itemizedlist>
+                            <listitem><para>Mixture of java and resource artifacts</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>test-classes</filename></term>
+                    <listitem><para>An exploded directory tree for built artifacts used for test</para>
+                        <itemizedlist>
+                            <listitem><para>Mixture of java and resource artifacts</para></listitem>
+                            <listitem><para>Part of the test classpath</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>*-reports</filename></term>
+                    <listitem><para>Results of unit and integration testing</para>
+                        <itemizedlist>
+                            <listitem><para><filename>surefire-reports</filename> unit test results</para></listitem>
+                            <listitem><para><filename>failsafe-reports</filename> integration test results</para></listitem>
+                            <listitem><para>Locate details of test pass/failures within this directory</para>
+                            <programlisting language=""><![CDATA[
+$ mvn clean test
+...
+Failed tests:   testFail(myorg.mypackage.ex1.AppTest): app didn't return 0
+
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+...
+
+$ more target/surefire-reports/*.txt
+-------------------------------------------------------------------------------
+Test set: myorg.mypackage.ex1.AppTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.608 sec <<< FAILURE!
+testFail(myorg.mypackage.ex1.AppTest)  Time elapsed: 0.019 sec  <<< FAILURE!
+java.lang.AssertionError: app didn't return 0
+        at org.junit.Assert.fail(Assert.java:93)
+        at org.junit.Assert.assertTrue(Assert.java:43)
+        at myorg.mypackage.ex1.AppTest.testFail(AppTest.java:28)
+...
+                            ]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>{artifactId}-{version}.jar</filename></term>
+                    <listitem><para>Results of unit and integration testing</para>
+                        <itemizedlist>
+                            <listitem><para>Archive with contents of target/classes</para></listitem>
+                            <listitem><para>Can be installed into local Maven repo by build</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>log4j-out.txt</filename></term>
+                    <listitem><para>An example output file of the build/tests written to the target directory</para>
+                        <itemizedlist>
+                            <listitem><para>Produced by log4j following configuration in src/test/resources/log4j.xml</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </section>
     </section>
     
     <section id="devenv-mavenbasics-pom">
         <title>Maven POM</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Defines the artifact for dependents</para></listitem>
+            <listitem><para>Defines the build of the local module</para></listitem>
         </itemizedlist>                   
-        <programlisting language=""><![CDATA[
+        <programlisting language="xml"><![CDATA[
+<?xml version="1.0"?>
+<project 
+    xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.myproject</groupId>
+    <artifactId>ex1</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>My First Simple Project</name>
+        ...
+    <properties>
+        ...
+    </properties>
+
+    <dependencies>
+        ...
+    <dependencies>
+
+    <build>
+        <plugins>
+            ...
+        </plugins>
+    </build>
+</project>    
         ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
 
         <section id="devenv-mavenbasics-gav">
             <title>Project Identity</title>
             <subtitle>GroupId, ArtifactId, Version (GAV)</subtitle>
+            <para>Used to uniquely identify the module</para>
+            <programlisting language="xml"><![CDATA[
+    <groupId>myorg.myproject</groupId>
+    <artifactId>ex1</artifactId>
+    <version>1.0-SNAPSHOT</version>
+            ]]></programlisting>
+            <variablelist>
+                <varlistentry>
+                    <term><filename>groupId</filename></term>
+                    <listitem><para>Hierarchical name used to group a set of one or more artifacts</para>
+                        <itemizedlist>
+                            <listitem><para>Represented as a directory structure in repositories</para>
+            <programlisting language=""><![CDATA[
+myorg/
+`-- myproject
+    `-- ex1
+        |-- 1.0-SNAPSHOT
+        |   |-- ex1-1.0-SNAPSHOT.jar
+        |   |-- ex1-1.0-SNAPSHOT.pom
+        ...
+            ]]></programlisting>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>artifactId</filename></term>
+                    <listitem><para>Base name for the artifacts produced by this module</para>
+            <programlisting language=""><![CDATA[
+1.0-SNAPSHOT/
+|-- ex1-1.0-SNAPSHOT.jar
+|-- ex1-1.0-SNAPSHOT.pom
+|-- ex1-1.0-SNAPSHOT-tests.jar
+            ]]></programlisting>
+                    </listitem>
+                </varlistentry>
+
+
+                <varlistentry>
+                    <term><filename>version</filename></term>
+                    <listitem><para>Version ID for the artifact</para>
+                        <itemizedlist>
+                            <listitem><para>Release: 1.0</para></listitem>
+                            <listitem><para>Snapshot: 1.0-SNAPSHOT</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+
+            <section id="devenv-mavenbasics-gav-snapshots">
+                <title>Snapshot Versions</title>
+                <itemizedlist>
+                    <listitem><para>Timestamped release that does not change name</para></listitem>
+                    <listitem><para>Useful for active development not yet ready for release</para></listitem>
+                    <listitem><para>Dependents poll for new snapshots and get the latest version</para></listitem>
+                    <listitem><para>Easy to develop but nearly impossible to manage changes</para></listitem>
+                    <listitem><para>-SNAPSHOT suffix added to version</para>
+                        <programlisting language="xml"><![CDATA[<version>1.0-SNAPSHOT</version>]]></programlisting>
+            <programlisting language=""><![CDATA[1.0-SNAPSHOT/
+|-- ex1-1.0-SNAPSHOT.jar]]></programlisting>
+                    </listitem>
+                </itemizedlist>                   
+            </section>
+
+            <section id="devenv-mavenbasics-gav-releases">
+                <title>Releases</title>
+                <itemizedlist>
+                    <listitem><para>Fixed-named version of the artifact</para></listitem>
+                    <listitem><para>Contents should not change -- allows caches bypass updates</para></listitem>
+                    <listitem><para>No formal numbering schme except for lack of SNAPSHOT in name</para>
+                        <itemizedlist>
+                            <listitem><para>Plugins and community work best with major.minor.x.y dotted numbering scheme</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                    <listitem><para>Releases should not depend on SNAPSHOTs</para></listitem>
+                </itemizedlist>                   
+            </section>
+        </section>
+        
+        <section id="devenv-mavenbasics-repositories">
+            <title>Maven Repositories</title>
             <itemizedlist>
                 <listitem><para></para></listitem>
                 <listitem><para></para></listitem>
@@ -92,8 +356,8 @@
                 <listitem><para></para></listitem>
             </itemizedlist>                   
 
-            <section id="devenv-mavenbasics-gav-snapshots">
-                <title>Snapshots</title>
+            <section id="devenv-mavenbasics-repositories-local">
+                <title>Local Maven Repository</title>
                 <itemizedlist>
                     <listitem><para></para></listitem>
                     <listitem><para></para></listitem>
@@ -108,8 +372,8 @@
                 </itemizedlist>                   
             </section>
 
-            <section id="devenv-mavenbasics-gav-releases">
-                <title>Releases</title>
+            <section id="devenv-mavenbasics-repositories-remote">
+                <title>Remote Maven Repositories</title>
                 <itemizedlist>
                     <listitem><para></para></listitem>
                     <listitem><para></para></listitem>
