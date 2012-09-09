@@ -375,4 +375,8 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         return ownersDTO;
     }
 
+    @Override
+    public String whoAmI() {
+    	return ctx.getCallerPrincipal().getName();
+    }
 }

@@ -2,78 +2,33 @@ package ejava.examples.ejbsessionbank.ejbclient;
 
 import java.util.List;
 
-import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.hibernate.LazyInitializationException;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.dto.OwnerDTO;
-import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 
-public class TellerOwnerRemoteIT {
-    private static Log log = LogFactory.getLog(TellerOwnerRemoteIT.class);
-    protected InitialContext jndi;
-    String jndiName = System.getProperty("jndi.name", TellerRemoteIT.jndiName);
-    protected TellerRemote teller;
+/**
+ * This class tests the teller with additional Owner objects that 
+ * provide some issues for the remote interface. A derived class will
+ * determine which type of RMI techique is used to locate and comminicate with
+ * the remote teller object. The base class provides common setup and teardown
+ * mechanisms.
+ */
+public class TellerOwnerITBase extends TellerRemoteITBase {
+    private static Log log = LogFactory.getLog(TellerOwnerITBase.class);
 
-    @Before
-    public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        teller = (TellerRemote)jndi.lookup(jndiName);
-        log.debug("got teller:" + teller);
-        cleanup();
-    }
-    
-    private void cleanup() throws Exception {
-        if (jndi!=null) {
-            for (int index=0; ; index+=100) {
-                List<Owner> owners = teller.getOwnersLoaded(index, 100);
-                if (owners.size() == 0) { break; }
-                for (Owner owner : owners) {
-                    log.debug("removing owner:" + owner);
-                    for (Account a: owner.getAccounts()) {
-                        zeroAccount(a);
-                    }
-                    teller.removeOwner(owner.getId());
-                }
-            }
-            
-            for (@SuppressWarnings("unused")
-			int index=0; ; index+= 100) {
-                List<Account> accounts = teller.getAccounts(0, 100);
-                if (accounts.size() == 0) { break; }
-                for (Account a: accounts) {
-                    log.debug("cleaning up account:" + a);
-                    zeroAccount(a);
-                    teller.closeAccount(a.getAccountNumber());                        
-                }
-            }
-        }
-    }
-    
-    private void zeroAccount(Account account) throws BankException {
-        log.debug("cleaning up account:" + account);
-        if (account.getBalance() > 0) {
-            account.withdraw(account.getBalance());
-           teller.updateAccount(account);
-        }
-        else if (account.getBalance() < 0) {
-            account.deposit(account.getBalance() * -1);
-            teller.updateAccount(account);
-        }
-    }
-    
+    /**
+     * Demonstrates how a Lazy Load exception can occur when processing
+     * objects from server that have not been hydrated.
+     * @throws Exception
+     */
     @Test
     public void testLazy() throws Exception {
         log.info("*** testLazy ***");
@@ -108,6 +63,11 @@ public class TellerOwnerRemoteIT {
         }
     }
     
+    /**
+     * Demonstrates a fix for the LAZY Load issue but then shows how 
+     * persistence classes from the server are being leaked into the client.
+     * @throws Exception
+     */
     @Test
     public void testPOJO() throws Exception {
         log.info("*** testPOJO ***");
@@ -141,6 +101,11 @@ public class TellerOwnerRemoteIT {
         }
     }
     
+    /**
+     * Demonstrates a fix of the LAZY Load and class leakage problem by 
+     * using DTOs.
+     * @throws Exception
+     */
     @Test
     public void testDTO() throws Exception {
         log.info("*** testDTO ***");

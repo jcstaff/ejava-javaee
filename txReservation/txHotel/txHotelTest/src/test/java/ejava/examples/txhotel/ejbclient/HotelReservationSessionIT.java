@@ -40,13 +40,13 @@ public class HotelReservationSessionIT {
     private static final Log log = LogFactory.getLog(HotelReservationSessionIT.class);
     static InitialContext jndi;
     static final String sessionJNDI = System.getProperty("jndi.name.hotelsession",
-    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
         	"HotelReservationSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
     static final String requiredJNDI = System.getProperty("jndi.name.hotelsession",
-    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
         	"RequiredSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
     static final String requiresNewJNDI = System.getProperty("jndi.name.hotelsession",
-    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
         	"RequiresNewSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
     
     

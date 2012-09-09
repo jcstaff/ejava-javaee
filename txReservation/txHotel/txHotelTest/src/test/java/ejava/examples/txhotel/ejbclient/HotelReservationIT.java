@@ -30,13 +30,13 @@ import ejava.util.ejb.EJBClient;
 public class HotelReservationIT {
     static final Log log = LogFactory.getLog(HotelReservationIT.class);
     static String registrarJNDI = System.getProperty("jndi.name.hotel",
-    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
     		"HotelRegistrationEJB", HotelRegistrationRemote.class.getName()));
     static final String requiredJNDI = System.getProperty("jndi.name.hotel.required",
-    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
     		"RequiredEJB", HotelRegistrationRemote.class.getName()));
     static final String requiresNewJNDI = System.getProperty("jndi.name.hotel.requiresNew",
-    	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+    	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
     		"RequiresNewEJB", HotelRegistrationRemote.class.getName()));
 
     static final Map<String,HotelReservationist> reservationists = 
@@ -77,7 +77,7 @@ public class HotelReservationIT {
     
     @Before() 
     public void setUp() throws NamingException {
-        String hotelHelperName = EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        String hotelHelperName = EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
         		"TestUtilEJB", TestUtilRemote.class.getName());
         ((TestUtilRemote)new InitialContext().lookup(hotelHelperName)).reset();
     }

@@ -45,11 +45,11 @@ public abstract class DemoBase {
     
     protected String reservationistName = 
         System.getProperty("jndi.name.hotel", 
-        	EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
         		"HotelRegistrationEJB", HotelRegistrationRemote.class.getName()));    
     protected String reservationistSessionName = 
         System.getProperty("jndi.name.hotelsession", 
-			EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+			EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
 	        	"HotelReservationSessionEJB", HotelReservationSessionRemote.class.getName())+"?stateful");
     
 
@@ -132,7 +132,7 @@ public abstract class DemoBase {
         
 
         assertEquals("unexpected bookings", 0, agent.getBookings(0, 100).size());
-        String hotelHelperName = EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+        String hotelHelperName = EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
         		"TestUtilEJB", TestUtilRemote.class.getName());
         ((TestUtilRemote)new InitialContext().lookup(hotelHelperName)).reset();
     }

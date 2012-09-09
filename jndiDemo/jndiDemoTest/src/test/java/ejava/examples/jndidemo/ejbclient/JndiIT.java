@@ -26,10 +26,10 @@ public class JndiIT  {
     private static final Log log = LogFactory.getLog(JndiIT.class);
     private static InitialContext jndi;
     static String aidName = System.getProperty("jndi.name.aid",
-    	EJBClient.getEJBLookupName("jndiDemoEAR", "jndiDemoEJB", "","AidScheduler",
+    	EJBClient.getEJBClientLookupName("jndiDemoEAR", "jndiDemoEJB", "","AidScheduler",
         		AidSchedulerRemote.class.getName()));
     static String bakeName = System.getProperty("jndi.name.bake",
-    	EJBClient.getEJBLookupName("jndiDemoEAR", "jndiDemoEJB", "","BakeScheduler",
+    	EJBClient.getEJBClientLookupName("jndiDemoEAR", "jndiDemoEJB", "","BakeScheduler",
         		BakeSchedulerRemote.class.getName()) + "?stateful");
     
     @BeforeClass

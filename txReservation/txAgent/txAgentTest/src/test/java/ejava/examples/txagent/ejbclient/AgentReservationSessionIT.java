@@ -30,15 +30,15 @@ public class AgentReservationSessionIT {
     private static final Log log = LogFactory.getLog(AgentReservationSessionIT.class);
     InitialContext jndi;
     String agentJNDI = System.getProperty("jndi.name.agent",
-    	EJBClient.getEJBLookupName("txAgentEAR", "txAgentEJB", "", 
+    	EJBClient.getEJBClientLookupName("txAgentEAR", "txAgentEJB", "", 
     		"BookingAgentEJB", BookingAgentRemote.class.getName()));
     String agentsessionJNDI = System.getProperty("jndi.name.agentsession",
-    	EJBClient.getEJBLookupName("txAgentEAR", "txAgentEJB", "", 
+    	EJBClient.getEJBClientLookupName("txAgentEAR", "txAgentEJB", "", 
         	"AgentReservationSessionEJB", AgentReservationSessionRemote.class.getName()+"?stateful"));
     AgentReservationSession agentSession;
     BookingAgent agent;    
     String hotelJNDI = System.getProperty("jndi.name.hotel",
-		EJBClient.getEJBLookupName("txHotelEAR", "txHotelEJB", "", 
+		EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
     		"HotelRegistrationEJB", HotelRegistrationRemote.class.getName()));
     HotelReservationist hotel;
     

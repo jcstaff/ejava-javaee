@@ -88,6 +88,12 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+                    
     </dependencies>
 
     <build>
@@ -121,10 +127,6 @@
                 <configuration>
                     <systemPropertyVariables>
                         <cargo.startstop>${cargo-startstop}</cargo.startstop>
-<jndi.name>ejbsessionBankEAR/ejbsessionBankEJB/TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
-<!--
-<jndi.name>ejb:ejbsessionBankEAR/ejbsessionBankEJB//TellerEJB!ejava.examples.ejbsessionbank.ejb.TellerRemote</jndi.name>
--->
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
