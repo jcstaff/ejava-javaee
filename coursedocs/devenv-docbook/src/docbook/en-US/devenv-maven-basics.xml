@@ -522,7 +522,9 @@ java.lang.AssertionError: app didn't return 0
                     <listitem><para>All actions of the build are directed by plugins</para></listitem>
                     <listitem><para>Even the simplest commands will result in plugin downloads when you first start</para></listitem>
                     <listitem><para>Specific plugins are wired into the build by the module packaging type</para></listitem>
-                    <listitem><para>Existing plugins can be configured</para></listitem>
+                    <listitem><para>Plugins have goals (analogous to public methods)</para></listitem>
+                    <listitem><para>Plugins may have default phases for the goals to be executed</para></listitem>
+                    <listitem><para>Plugins can be configured</para></listitem>
                 </itemizedlist>                   
                 <programlisting language=""><![CDATA[<build>
     <plugins>
@@ -581,71 +583,72 @@ java.lang.AssertionError: app didn't return 0
                 </itemizedlist>                           
             </section>
         </section>
+    </section>
         
-        <section id="devenv-mavenbasics-profiles">
-            <title>Profiles</title>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-        </section>
-        
-        <section id="devenv-mavenbasics-modules">
-            <title>Modules</title>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-            
-            <section id="devenv-mavenbasics-modules-parent">
-                <title>POM Inheritance</title>
+    <section id="devenv-mavenbasics-cmds">
+        <title>Maven Commands</title>
+        <itemizedlist>
+            <listitem><para>Maven build broken into <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">phases</ulink></para></listitem>
+            <listitem><para>Plugins are added to the build and their goals execute during a specific phase</para></listitem>
+            <listitem><para>Build invoked using the <code>mvn</code> command</para></listitem>
+        </itemizedlist>                   
+        <programlisting language=""><![CDATA[
+$ mvn (phase) (plugin:goal) -D(system-property) -P(profile)
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para>phase</para>
+                <variablelist>
+                    <varlistentry>
+                        <term><filename>clean</filename></term>
+                        <listitem><para>Remove contents of target tree</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>test</filename></term>
+                        <listitem><para>Build the src/main and src/test tree and execute the unit tests as defined by the surefire plugin</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>pre-integration</filename></term>
+                        <listitem><para>Perform unit tests and perform any steps required to ready for integration test</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>integration-test</filename></term>
+                        <listitem><para>Perform integration tests as defined by the failsafe plugin</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>post-integration-test</filename></term>
+                        <listitem><para>Tear down anything required to perform integration tests</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>verify</filename></term>
+                        <listitem><para>Evaluate results of integration tests</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>install</filename></term>
+                        <listitem><para>Install module artifacts into local repository</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+            <listitem><para>(plugin:goal)</para>
                 <itemizedlist>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>                   
-                <programlisting language=""><![CDATA[
-                ]]></programlisting>
+                    <listitem><para>Manually trigger a plugin goal without a specific build lifecycle</para></listitem>
+                    <listitem><para>ex. jetty:run, dependency:tree, or dependency:help</para></listitem>
+                </itemizedlist>            
+            </listitem>
+            <listitem><para>-D(system-property)</para>
                 <itemizedlist>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>                   
-            </section>
-            
-            <section id="devenv-mavenbasics-modules-sub">
-                <title>Submodules</title>
+                    <listitem><para>Manually define a system property key or key and value to be used as a property in the build</para></listitem>
+                    <listitem><para>Must configure surefire/failsafe to promote these as properties Junit -- 
+                        these are system properties of the maven build and not of the JVM tasks kicked off
+                        by the maven build.</para></listitem>
+                </itemizedlist>            
+            </listitem>
+            <listitem><para>-P(profile)</para>
                 <itemizedlist>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>                   
-                <programlisting language=""><![CDATA[
-                ]]></programlisting>
-                <itemizedlist>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>                   
-            </section>
-        </section>
+                    <listitem><para>Manually trigger build configurations latched by a profile</para></listitem>
+                    <listitem><para>e.g., which DB driver to use</para></listitem>
+                </itemizedlist>            
+            </listitem>
+        </itemizedlist>                   
     </section>
 </chapter>
   
