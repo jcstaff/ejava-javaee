@@ -22,15 +22,22 @@ import ejava.examples.jndidemo.ejb.AidSchedulerRemote;
 import ejava.examples.jndidemo.ejb.BakeSchedulerRemote;
 import ejava.util.ejb.EJBClient;
 
+/**
+ * Performs a basic set of calls in the EJBs deployed to demonstrate 
+ * aspects of how the EJBs are configured.
+ */
 public class JndiIT  {
     private static final Log log = LogFactory.getLog(JndiIT.class);
-    private static InitialContext jndi;
+    private InitialContext jndi;
+    
     static String aidName = System.getProperty("jndi.name.aid",
-    	EJBClient.getEJBClientLookupName("jndiDemoEAR", "jndiDemoEJB", "","AidScheduler",
-        		AidSchedulerRemote.class.getName()));
+    	EJBClient.getEJBClientLookupName(
+    			"jndiDemoEAR", "jndiDemoEJB", "","AidScheduler",
+        		AidSchedulerRemote.class.getName(), false));
     static String bakeName = System.getProperty("jndi.name.bake",
-    	EJBClient.getEJBClientLookupName("jndiDemoEAR", "jndiDemoEJB", "","BakeScheduler",
-        		BakeSchedulerRemote.class.getName()) + "?stateful");
+    	EJBClient.getEJBClientLookupName(
+    			"jndiDemoEAR", "jndiDemoEJB", "","BakeScheduler",
+        		BakeSchedulerRemote.class.getName(), true));
     
     @BeforeClass
     public static void waitForServerDeploy() throws InterruptedException {
@@ -49,21 +56,23 @@ public class JndiIT  {
     @Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
+        jndi = new InitialContext();
+        //can't call this when java.naming.factory.initial not specified
+        //log.debug("jndi=" + jndi.getEnvironment());
         
-        log.debug("aidName=" + aidName);
-        log.debug("bakeName=" + bakeName);
-        
-        
-        InputStream is = getClass().getResourceAsStream("/jboss-ejb-client.properties");
+        //instead -- dump the jndi.properties and jboss-ejb-client.properties files
+        InputStream is = getClass().getResourceAsStream("/jndi.properties");
+        assertNotNull("jndi.properties not found", is);
+        log.debug("jndi.properties\n" + IOUtils.toString(is));
+        is.close();
+        is = getClass().getResourceAsStream("/jboss-ejb-client.properties");
         assertNotNull("jboss-ejb-client.properties 1 not found", is);
         log.debug("jboss-ejb-client.properties\n" + IOUtils.toString(is));
         is.close();
-        is = Thread.currentThread().getContextClassLoader().getResourceAsStream("jboss-ejb-client.properties");
-        assertNotNull("jboss-ejb-client.properties 2 not found", is);
-        log.debug("jboss-ejb-client.properties\n" + IOUtils.toString(is));
-        is.close();
+        
+        
+        log.debug("aidName=" + aidName);
+        log.debug("bakeName=" + bakeName);
     }
     
     @After
@@ -71,6 +80,10 @@ public class JndiIT  {
         jndi.close();
     }
 
+    /**
+     * Calls the EJBs that used POJOs with XML deployment descriptors.
+     * @throws Exception
+     */
     @Test
     public void testXMLPopulation() throws Exception {
         log.info("*** testXMLPopulation ***");
@@ -80,8 +93,9 @@ public class JndiIT  {
         
         Scheduler s = (Scheduler)object;        
         log.debug("got scheduler:" + s);
-        log.debug("scheduler.name:" + s.getName());
-        log.debug("scheduler.name2:" + s.getName());
+        String name = s.getName();
+        log.debug("scheduler.name:" + name);
+        assertEquals("", "AidScheduler", name);
         
         String encname = "ejb/hospital";
         String jndiname = "java:comp/env/" + encname;
@@ -96,6 +110,10 @@ public class JndiIT  {
         log.debug("java:comp/env=" + s.getEnv());
     }
     
+    /**
+     * Calls the EJBs that used annotated classes and no deployment descriptors.
+     * @throws Exception
+     */
     @Test
     public void testAnnotationPopulation() throws Exception {
         log.info("*** testAnnotationPopulation ***");
@@ -105,8 +123,9 @@ public class JndiIT  {
         
         Scheduler s = (Scheduler)object;        
         log.debug("got scheduler:" + s);
-        log.debug("scheduler.name:" + s.getName());
-        log.debug("scheduler.name2:" + s.getName());
+        String name = s.getName();
+        log.debug("scheduler.name:" + name);
+        assertEquals("", "BakeSchedulerEJB", name);
         
         String encname = "ejb/cook";
         String jndiname = "java:comp/env/" + encname;
