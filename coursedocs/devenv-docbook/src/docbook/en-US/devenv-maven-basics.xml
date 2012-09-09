@@ -228,8 +228,7 @@ java.lang.AssertionError: app didn't return 0
             <listitem><para>Defines the artifact for dependents</para></listitem>
             <listitem><para>Defines the build of the local module</para></listitem>
         </itemizedlist>                   
-        <programlisting language="xml"><![CDATA[
-<?xml version="1.0"?>
+        <programlisting language="xml"><![CDATA[<?xml version="1.0"?>
 <project 
     xmlns="http://maven.apache.org/POM/4.0.0" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -239,6 +238,7 @@ java.lang.AssertionError: app didn't return 0
     <groupId>myorg.myproject</groupId>
     <artifactId>ex1</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar<packaging>
 
     <name>My First Simple Project</name>
         ...
@@ -255,33 +255,42 @@ java.lang.AssertionError: app didn't return 0
             ...
         </plugins>
     </build>
-</project>    
-        ]]></programlisting>
+</project>]]></programlisting>
 
+        <section id="devenv-mavenbasics-packaging">
+            <title>Packaging</title>
+            <para>Defines the type of module and automatically enacts a profile of plugs (default=jar)</para>
+            <itemizedlist>
+                <listitem><para>packaging=jar - primary artifact is a Java archive</para></listitem>
+                <listitem><para>packaging=ejb - primary artifact is a JavaEE EJB</para></listitem>
+                <listitem><para>packaging=war - primary artifact is a JavaEE WAR</para></listitem>
+                <listitem><para>packaging=ear - primary artifact is a JavaEE EAR</para></listitem>
+                <listitem><para>packaging=pom - parent pom, used primarily for grouping leaf modules</para></listitem>
+                <listitem><para>packaging=... - custom extensions</para></listitem>
+            </itemizedlist>
+            <para>Value assigned relates to dependency <code>type</code> element</para>
+        </section>
+        
         <section id="devenv-mavenbasics-gav">
             <title>Project Identity</title>
             <subtitle>GroupId, ArtifactId, Version (GAV)</subtitle>
             <para>Used to uniquely identify the module</para>
-            <programlisting language="xml"><![CDATA[
-    <groupId>myorg.myproject</groupId>
-    <artifactId>ex1</artifactId>
-    <version>1.0-SNAPSHOT</version>
-            ]]></programlisting>
+            <programlisting language="xml"><![CDATA[<groupId>myorg.myproject</groupId>
+<artifactId>ex1</artifactId>
+<version>1.0-SNAPSHOT</version>]]></programlisting>
             <variablelist>
                 <varlistentry>
                     <term><filename>groupId</filename></term>
                     <listitem><para>Hierarchical name used to group a set of one or more artifacts</para>
                         <itemizedlist>
                             <listitem><para>Represented as a directory structure in repositories</para>
-            <programlisting language=""><![CDATA[
-myorg/
+            <programlisting language=""><![CDATA[myorg/
 `-- myproject
     `-- ex1
         |-- 1.0-SNAPSHOT
         |   |-- ex1-1.0-SNAPSHOT.jar
         |   |-- ex1-1.0-SNAPSHOT.pom
-        ...
-            ]]></programlisting>
+        ...]]></programlisting>
                             </listitem>
                         </itemizedlist>
                     </listitem>
@@ -290,12 +299,10 @@ myorg/
                 <varlistentry>
                     <term><filename>artifactId</filename></term>
                     <listitem><para>Base name for the artifacts produced by this module</para>
-            <programlisting language=""><![CDATA[
-1.0-SNAPSHOT/
+            <programlisting language=""><![CDATA[1.0-SNAPSHOT/
 |-- ex1-1.0-SNAPSHOT.jar
 |-- ex1-1.0-SNAPSHOT.pom
-|-- ex1-1.0-SNAPSHOT-tests.jar
-            ]]></programlisting>
+|-- ex1-1.0-SNAPSHOT-tests.jar]]></programlisting>
                     </listitem>
                 </varlistentry>
 
@@ -395,6 +402,7 @@ myorg/
             </orderedlist>
             
             <tip>
+                <title>Use <code>-U</code> to force an update check</title>
                 <para>Maven will limit its serach of a remote repository to 
                     expressed time limits. If it attempts and fails to locate
                     an artifact from a remote repository it will not re-attempt
@@ -405,57 +413,111 @@ myorg/
                     the timeout period expires by adding a <code>-U</code>
                     to the command line.</para>
             </tip>
+            <tip>
+                <title>Use the <code>-o</code> offline flag to eliminate repository checks</title>
+                <para>Many times Maven will be too aggressive searching for
+                    artifacts you already know are not of value to the current
+                    build. You can tell Maven to work in an offline mode to
+                    bypass the work involved. This is helpful when you are 
+                    disconnected from the network but will fail if you are truly
+                    missing a required artifact. You can activate/deactivate
+                    the offline more consistently using an element in the 
+                    settings.xml
+                <programlisting language="xml"><![CDATA[<offline>false</offline>]]></programlisting>
+                </para>
+            </tip>
         </section>
 
         <section id="devenv-mavenbasics-props">
             <title>Properties</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Provide a means to define behavior of the build</para></listitem>
+                <listitem><para>Provide a means to define values onces and re-use acoss the build</para></listitem>
+                <listitem><para>Promotes consistency</para></listitem>
                 <listitem><para></para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
+            <programlisting language="xml"><![CDATA[<properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+</properties>]]></programlisting>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Properties can also be expressed using <code>-Dkey=value</code> system properties</para></listitem>
             </itemizedlist>                   
         </section>
 
         <section id="devenv-mavenbasics-deps">
             <title>Dependencies</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Modules depend on artifacts from other modules</para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
+            <programlisting language=""><![CDATA[<dependencies>
+    <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.1.1</version>
+        <scope>compile</scope>
+    </dependency>
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.10</version>
+        <scope>test</scope>
+    </dependency>
+....
+</dependencies>]]></programlisting>
+            <variablelist>
+                <varlistentry>
+                    <term><filename>GAV</filename></term>
+                    <listitem><para>Must provide its groupId, artifactId, and version for each dependency</para></listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>scope</filename></term>
+                    <listitem><para>Defines when the dependency applies (default=compile)</para>
+                        <itemizedlist>
+                            <listitem><para>scope=compile - classpath of src/main, src/test, and dependents</para></listitem>
+                            <listitem><para>scope=provided - classpath of src/main, src/test but not dependents</para></listitem>
+                            <listitem><para>scope=test - classpath of src/test but not src/main and dependents</para></listitem>
+                            <listitem><para>scope=runtime - classpath of src/test and dependents but not of src/main</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>type</filename></term>
+                    <listitem><para>Defines the artifact type of ther module (default=jar)</para>
+                        <itemizedlist>
+                            <listitem><para>type=jar - java archive</para></listitem>
+                            <listitem><para>type=ejb - javaee EJB archive</para></listitem>
+                            <listitem><para>type=war - javaee WAR archive</para></listitem>
+                            <listitem><para>type=ear - javaee EAR archive</para></listitem>
+                            <listitem><para>type=... - custom type</para></listitem>
+                        </itemizedlist>
+                        <para>Value directly relates to the project packaging element of the dependency</para>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term><filename>classifier</filename></term>
+                    <listitem><para>Defines a special type of artifact/custom from a module</para>
+                        <itemizedlist>
+                            <listitem><para>classifier=tests - tests java archive</para></listitem>
+                            <listitem><para>type=... - custom classifiers</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </section>
 
         <section id="devenv-mavenbasics-build">
-            <title>Build</title>
+            <title>Build Definition</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Provides specific instructions for build</para></listitem>
+                <listitem><para>Usually does the right thing by default when possible</para></listitem>
             </itemizedlist>                   
     
             <section id="devenv-mavenbasics-plugins">
-                <title>Plugins</title>
+                <title>Build Plugins</title>
                 <itemizedlist>
                     <listitem><para></para></listitem>
                     <listitem><para></para></listitem>
