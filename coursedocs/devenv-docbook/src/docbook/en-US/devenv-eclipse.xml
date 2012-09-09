@@ -7,98 +7,81 @@
     <section id="devenv-eclipse-org">
         <title>Project Organization</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Working sets can be quite helpful organizing multi-modules</para></listitem>
+            <listitem><para>You can control their contents, order them, and hide them</para></listitem>
         </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+        <figure>
+            <title>Organize Multi-module Workspaces into Working Sets</title>
+            <graphic scalefit="1" fileref="images/devenv-eclipse-workingsets.png"/>
+        </figure>
     </section>
         
     
     <section id="devenv-eclipse-test">
         <title>Project Testing</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-    
-        <section id="devenv-eclipse-test-junit">
-            <title>Raw JUnit within Eclipse</title>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-        </section>
     
         <section id="devenv-eclipse-test-mvn">
             <title>Maven test from Eclipse</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Maven builds can be directly launched from within Eclipse</para></listitem>
+                <listitem><para>No significant difference from normal command line</para></listitem>
+                <listitem><para>Can create custom launchers for common targets and pin for easy recall</para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
+            <figure>
+                <title>Unit test directly within Eclipse</title>
+                <graphic scalefit="1" fileref="images/devenv-eclipse-mvn-test.png"/>
+            </figure>
         </section>
+
+        <section id="devenv-eclipse-test-junit">
+            <title>Raw JUnit within Eclipse</title>
+            <itemizedlist>
+                <listitem><para>Unit tests can be directly executed within Eclipse without Maven</para></listitem>
+            </itemizedlist>                   
+            <figure>
+                <title>Unit test directly within Eclipse</title>
+                <graphic scalefit="1" fileref="images/devenv-eclipse-unittest.png"/>
+            </figure>
+        </section>
+
+        <tip>
+            <title>Make your Unit Tests Eclipse-friendly</title>
+            <para>Maven is quite useful in setting up robust test environments
+               but at a cost of repeated seconds of unnecessary work at times.
+               Have your unit tests assume reasonable defaults and provide
+               the ability to optionally override those values through 
+               surefire or launcher configurations. That way you can develop
+               by compiling only changes classes within Eclipse and move forward
+               in only a few seconds. Delegate the maven build at that point to 
+               batch regression testing.
+            </para>
+        </tip>
+    
     </section>
         
 
     <section id="devenv-eclipse-debugging">
         <title>Program Debugging</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Necessary evil in application development</para></listitem>
+            <listitem><para>Powerful capabilities should not be ignored</para></listitem>
         </itemizedlist>
                            
+        <figure>
+            <title>Set Breakpoint within Eclipse</title>
+            <graphic scalefit="1" fileref="images/devenv-eclipse-set-breakpoint.png"/>
+        </figure>
+        <para>Set program breakpoints where problems have been identified</para>
+
         <section id="devenv-eclipse-debugging-junit">
             <title>Debugging within Eclipse</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>If runnable directly from Eclipse -- use debug option</para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
+            <figure>
+                <title>Debug directly within Eclipse</title>
+                <graphic scalefit="1" fileref="images/devenv-eclipse-breakpoint.png"/>
+            </figure>
         </section>
     
                            
@@ -106,17 +89,44 @@
             <title>Debugging Maven test from Eclipse</title>
             <subtitle>Remote Debugging</subtitle>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>If not runnable within Eclipse -- use remote debugging option</para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
+            <figure>
+                <title>Setup Remote Debugging Session with Maven</title>
+                <graphic scalefit="1" fileref="images/devenv-eclipse-remotedebugger-start.png"/>
+            </figure>
+            <figure>
+                <title>Connect and Remote Debug any Java process</title>
+                <graphic scalefit="1" fileref="images/devenv-eclipse-remotedebugger-stop.png"/>
+            </figure>
+            
+        <itemizedlist>
+            <listitem><para>Remote debugging requires special system properties issued to JVM</para></listitem>
+            <listitem><para>surefire and failsafe can be setup to optionally pass system properties to JUnit JVM</para>
+                <programlisting language=""><![CDATA[<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>${maven-surefire-plugin.version}</version>
+    <configuration>
+        <argLine>${surefire.argLine}</argLine>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+    </configuration>
+</plugin>]]></programlisting>
+                <programlisting language=""><![CDATA[<profile> <!-- tells surefire to run JUnit tests with remote debug -->
+    <id>debugger</id>
+    <activation>
+        <property>
+            <name>debugger</name>
+        </property>
+    </activation>
+    <properties>
+        <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
+    </properties>
+</profile>]]></programlisting>
+            </listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+            
         </section>
     </section>
 

@@ -3,53 +3,64 @@
 
 <chapter id="devenv-maveneclipse">
     <title>Maven Eclipse Integration</title>
+    <para>Maven/Eclipse integration is handled by adding the M2E plugin to 
+        your Eclipse environment and followng a pom-first configuration
+        strategy.</para>
     
     <section id="devenv-maveneclipse-import">
         <title>Project Import</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
+            <listitem><para>Import an existing maven project into Eclipse as a maven project</para></listitem>
+            <listitem><para>M2E will inpsect the pom.xml and configure Eclipse accordingly</para></listitem>
+        </itemizedlist>     
+        <figure>
+            <title>Import Existing Maven Project into Eclipse</title>
+            <graphic scalefit="1" fileref="images/devenv-import-maven-project.png"/>
+        </figure>        
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>M2E provides mechanisms to create new maven projects (we will not discuss)</para></listitem>
         </itemizedlist>                   
     </section>
         
     <section id="devenv-maveneclipse-update">
         <title>Project Update</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Notice the Eclipse project dependencies are in sync with the versions specified in the pom.xml</para></listitem>
+            <listitem><para>If you make a valid change to the pom.xml the Eclipse dependencies will update</para></listitem>
         </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
+        <figure>
+            <title>Keeping Eclipse Dependencies in Sync</title>
+            <graphic scalefit="1" fileref="images/devenv-maven-dependencies.png"/>
+        </figure>        
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Dependency hierachy shows</para>
+                <itemizedlist>
+                    <listitem><para>Which modules bring in other modules</para></listitem>
+                    <listitem><para>Specific versions and where there are conflicts</para></listitem>
+                </itemizedlist>                   
+            </listitem>
         </itemizedlist>                   
+        <figure>
+            <title>Viewing Dependency Tree</title>
+            <graphic scalefit="1" fileref="images/devenv-maven-deptree.png"/>
+        </figure>
     </section>
 
     <section id="devenv-maveneclipse-refresh">
         <title>Project Refresh</title>
+        <para>When things are not automatically updated, try...</para>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+            <listitem><para>Refresh/F5</para></listitem>
+            <listitem><para>Project-&gt;Clean</para></listitem>
+            <listitem><para>Maven-&gt;Update Projects</para></listitem>
+        </itemizedlist>
+        <note>
+            <para>A build from the command line that includes a <code>clean</code>
+                and fails to complete can leave Eclipse in an unhappy state
+                (lots of red unresolved references). Resolve with a successful
+                build and repeat some/all of the above actions.
+            </para>
+        </note>                   
     </section>
 </chapter>
  
