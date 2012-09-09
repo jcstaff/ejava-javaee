@@ -26,12 +26,24 @@
                         <listitem><para>Maven project structure</para></listitem>
                         <listitem><para>Maven project pom.xml</para></listitem>
                         <listitem><para>Maven/Eclipse integration</para></listitem>
+                        <listitem><para>Eclipse development tasks</para></listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem><para>be able to:</para>
                     <itemizedlist>
                         <listitem><para>Establish a Maven project structure</para></listitem>
-                        <listitem><para>Debug a java program</para></listitem>
+                        <listitem><para>Create and execute a test for java class</para>
+                            <itemizedlist>
+                                <listitem><para>within Eclipse</para></listitem>
+                                <listitem><para>from Eclipse, within Maven</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para>Debug a java test and its associated class</para>
+                            <itemizedlist>
+                                <listitem><para>within Eclipse</para></listitem>
+                                <listitem><para>from Eclipse, within Maven (remote debugging)</para></listitem>
+                            </itemizedlist>
+                        </listitem>
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
@@ -41,4 +53,8 @@
     <toc/>
 
     <xi:include href="devenv-maven-basics.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-maven-profiles.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-maven-basics.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-maven-eclipse.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-eclipse.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>
