@@ -4,105 +4,34 @@ import static org.junit.Assert.*;
 
 
 import java.util.List;
-import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
 import org.junit.Test;
 
 import ejava.examples.ejbsessionbank.bl.BankException;
-import ejava.examples.ejbsessionbank.bl.Teller;
 import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Ledger;
-import ejava.examples.ejbsessionbank.bo.Owner;
-import ejava.examples.ejbsessionbank.ejb.TellerRemote;
-import ejava.util.ejb.EJBClient;
 
-public class TellerRemoteIT {
-    Log log = LogFactory.getLog(TellerRemoteIT.class);
-    InitialContext jndi;
-    public static final String jndiName = System.getProperty("jndi.name",
-    	EJBClient.getEJBLookupName("ejbsessionBankEAR", "ejbsessionBankEJB", "", 
-    			"TellerEJB", TellerRemote.class.getName()));
-    
-    @Before
-    public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        cleanup();
-    }
-    
-    private void cleanup() throws Exception {
-        if (jndi!=null) {
-            TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
-            if (jndi!=null) {
-                for (int index=0; ; index+=100) {
-                    List<Owner> owners = teller.getOwnersLoaded(index, 100);
-                    if (owners.size() == 0) { break; }
-                    for (Owner owner : owners) {
-                        log.debug("removing owner:" + owner);
-                        for (Account a: owner.getAccounts()) {
-                            zeroAccount(teller, a);
-                        }
-                        teller.removeOwner(owner.getId());
-                    }
-                }
-                
-                for (@SuppressWarnings("unused")
-				int index=0; ; index+= 100) {
-                    List<Account> accounts = teller.getAccounts(0, 100);
-                    if (accounts.size() == 0) { break; }
-                    for (Account a: accounts) {
-                        log.debug("cleaning up account:" + a);
-                        zeroAccount(teller, a);
-                        teller.closeAccount(a.getAccountNumber());                        
-                    }
-                }
-            }
-        }
-    }
-    
-    private void zeroAccount(
-            Teller teller, Account account) throws BankException {
-        log.debug("cleaning up account:" + account);
-        if (account.getBalance() > 0) {
-            account.withdraw(account.getBalance());
-           teller.updateAccount(account);
-        }
-        else if (account.getBalance() < 0) {
-            account.deposit(account.getBalance() * -1);
-            teller.updateAccount(account);
-        }
-    }
+/**
+ * This class contains the core tests for the teller remote. Derived classes
+ * will show how to provide a remote stub to the server-side teller using
+ * specific techniques. The base class provides common setup and teardown 
+ * logic.
+  */
+public class TellerAccountITBase extends TellerRemoteITBase {
+    private static final Log log = LogFactory.getLog(TellerAccountITBase.class);
 
-    @Test
-    public void testLookupTellerRemote() throws Exception {
-        log.info("*** testLookupTellerRemote ***");
-        @SuppressWarnings("unused")
-        TellerRemote teller = null;
-        
-        log.debug("looking up remote:" + jndiName);
-        try {
-            Object object = jndi.lookup(jndiName);
-            log.debug("found object:" + object);
-            teller = (TellerRemote)object;
-        }
-        catch (Exception ex) {
-            log.fatal("error getting teller remote:" + ex);
-            fail("error getting teller remote:" + ex);
-        }        
-    }    
-
+    /**
+     * Tests ability to create an account from the remote client.
+     * @throws Exception
+     */
     @Test
     public void testCreateAccount() throws Exception {
         log.info("*** testCreateAccount ***");
         Account account=null;
-        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
-        
-        log.debug("creating account, teller=" + teller);
+      
+        	//try with what should be a unique number
         try {
             account = teller.createAccount("1234");
             log.debug("account created:" + account);
@@ -112,6 +41,7 @@ public class TellerRemoteIT {
             fail("error creating account:" + ex);
         }        
         
+        	//try with what we know is a duplicate number
         try {
             teller.createAccount(account.getAccountNumber());
             fail("created account with duplicate number");
@@ -122,15 +52,15 @@ public class TellerRemoteIT {
         }
     }
     
+    /**
+     * Tests ability to get an account by number.
+     * @throws Exception
+     */
     @Test
     public void testGetAccount() throws Exception {
         log.info("*** testGetAccount ***");
-        Account account = null;
-        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
-        
-        log.debug("creating account, teller=" + teller);
         try {
-            account = teller.createAccount("1234");
+            Account account = teller.createAccount("1234");
             log.debug("account created:" + account);
             Account account2 = teller.getAccount(account.getAccountNumber());
             log.debug("got account:" + account);
@@ -147,11 +77,14 @@ public class TellerRemoteIT {
         }        
     }    
 
+    /**
+     * Tests ability to update account.
+     * @throws Exception
+     */
     @Test
     public void testUpdateAccount() throws Exception {
         log.info("*** testUpdateAccount ***");
         Account account = null;
-        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
         
         log.debug("creating account, teller=" + teller);
         try {
@@ -160,8 +93,8 @@ public class TellerRemoteIT {
             
             account.deposit(5.00);
             assertEquals("unexpected balance:" + account.getBalance(),
-                    (int)(100*5.00), 
-                    (int)(100*account.getBalance()));
+                    5.00, 
+                    account.getBalance(), .1);
             teller.updateAccount(account);
             log.debug("updated account:" + account);
             
@@ -169,13 +102,13 @@ public class TellerRemoteIT {
             log.debug("retrieved updated account:" + account2);
                         
             assertEquals("unexpected account bal:"+account2.getBalance(),
-                    (int)(100*account.getBalance()), 
-                    (int)(100*account2.getBalance()));
+                    account.getBalance(), 
+                    account2.getBalance(), .1);
             
             account.withdraw(10.00);
             assertEquals("unexpected balance:" + account.getBalance(),
-		            (int)(100*-5.00), 
-		            (int)(100*account.getBalance()));
+		            -5.00,
+		            account.getBalance(), .1);
             teller.updateAccount(account);
             log.debug("updated account:" + account);
             
@@ -183,8 +116,8 @@ public class TellerRemoteIT {
             log.debug("retrieved updated account:" + account2);
                         
             assertEquals("unexpected account bal:"+account2.getBalance(),
-                    (int)(100*account.getBalance()), 
-                    (int)(100*account2.getBalance()));
+                    account.getBalance(), 
+                    account2.getBalance(), .1);
         }
         catch (Exception ex) {
             log.fatal("error updating account:" + ex, ex);
@@ -192,10 +125,13 @@ public class TellerRemoteIT {
         }        
     }    
     
+    /**
+     * Tests ability to close an account.
+     * @throws Exception
+     */
     @Test
     public void testCloseAccount() throws Exception {
         log.info("*** testCloseAccount ***");
-        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
 
         try {
             Account account = teller.createAccount("1234");
@@ -228,11 +164,13 @@ public class TellerRemoteIT {
         }
     }
 
+    /**
+     * Tests query method of teller.
+     * @throws Exception
+     */
     @Test
     public void testFindOverdrawnAccounts() throws Exception {
         log.info("*** testFindOverdrawnAccounts ***");
-        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
-
         try {
             int num = 0;
             Account account1 = teller.createAccount("" + ++num);
@@ -258,12 +196,15 @@ public class TellerRemoteIT {
         }
     }
 
+    /**
+     * Tests ability to find all accounts using paging controls.
+     * @throws Exception
+     */
     @Test
     public void testFindAllAccounts() throws Exception {
         log.info("*** testFindAllAccounts ***");
-        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
-        int TOTAL = 100;
 
+        int TOTAL = 20;
         try {
             for(int i=0; i<TOTAL; i++) {
                 Account account = teller.createAccount("" + i);
@@ -272,14 +213,14 @@ public class TellerRemoteIT {
             }
             
             int index=0;
-            for(List<Account> accounts=teller.getAccounts(index, TOTAL/10);
+            for(List<Account> accounts=teller.getAccounts(index, TOTAL/5);
                 accounts.size() > 0;
-                accounts = teller.getAccounts(index, TOTAL/10)) {
+                accounts = teller.getAccounts(index, TOTAL/5)) {
                 log.debug("got " + accounts.size() + " accounts");
                 for(Account a: accounts) {
                     assertEquals("unexpected balance",
-	                    (int)(100*index++), 
-	                    (int)(100*a.getBalance()));
+	                    index++, 
+	                    a.getBalance(),.1);
                 }
             }            
             assertEquals("unexpected number of accounts:"+index, TOTAL, index);
@@ -290,12 +231,15 @@ public class TellerRemoteIT {
         }
     }
     
+    /**
+     * Tests ability to get a ledger summary for all accounts using the 
+     * brute force technique on the server-side.
+     * @throws Exception
+     */
     @Test
     public void testGetLedger() throws Exception {
         log.info("*** testGetLedger ***");
-        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
-        int TOTAL = 100;
-
+        int TOTAL = 20;
         try {
             for(int i=0; i<TOTAL; i++) {
                 Account account = teller.createAccount("" + i);
@@ -317,11 +261,15 @@ public class TellerRemoteIT {
         }
     }
 
+    /**
+     * Tests ability to get a ledger summary for all accounts using a 
+     * database query to populate the DTO.
+     * @throws Exception
+     */
     @Test
     public void testGetLedger2() throws Exception {
         log.info("*** testGetLedger2 ***");
-        TellerRemote teller = (TellerRemote)jndi.lookup(jndiName);
-        int TOTAL = 100;
+        int TOTAL = 20;
 
         try {
             for(int i=0; i<TOTAL; i++) {

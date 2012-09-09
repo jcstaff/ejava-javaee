@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import ejava.examples.secureping.ejb.SecurePingClient;
 import ejava.examples.secureping.ejb.SecurePingClientRemote;
+import ejava.util.ejb.EJBClient;
 
 /**
  * This class peforms a check of the SecurePingClientEJB using RMI Calls.
@@ -26,12 +27,15 @@ import ejava.examples.secureping.ejb.SecurePingClientRemote;
  *
  * @author jcstaff
  */
-public class SecurePingRemoteClientTest {
-    static Log log = LogFactory.getLog(SecurePingRemoteClientTest.class);
+public class SecurePingClientIT {
+    static Log log = LogFactory.getLog(SecurePingClientIT.class);
     InitialContext jndi;
     
     //jndi name for SecurePingEJB
-    String jndiName = System.getProperty("jndi.name.secureping");
+    String jndiName = System.getProperty("jndi.name.secureping",
+    	EJBClient.getRemoteLookupName("securePingClientEAR", "securePingClientEJB", 
+			"SecurePingClientEJB", 
+			ejava.examples.secureping.ejb.SecurePingClientRemote.class.getName()));
     
     //username to use for admin login
     String adminUser = System.getProperty("admin.username");
@@ -50,7 +54,6 @@ public class SecurePingRemoteClientTest {
     
     //a login for an admin user with the "user" and "admin" roles assigned
     CallbackHandler adminLogin;
-    String skipFlush = System.getProperty("skip.flush");
     
     @Before
     public void setUp() throws Exception {

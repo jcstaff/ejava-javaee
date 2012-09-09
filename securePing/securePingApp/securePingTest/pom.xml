@@ -81,7 +81,6 @@
         </testResources>
 
         <plugins>
-              <!-- tell it to run, even though we are a pom project -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -98,6 +97,9 @@
                         <jmx.username>${jboss.user}</jmx.username>
                         <jmx.password>${jboss.password}</jmx.password>
                     </systemPropertyVariables>
+                   <excludes>
+                        <exclude>**/SecurePingRemoteIT.java</exclude>
+                   </excludes>
                 </configuration>
             </plugin>
 

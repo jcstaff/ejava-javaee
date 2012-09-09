@@ -16,4 +16,5 @@ public interface TellerRemote extends Teller {
     List<Owner> getOwnersLoaded(int index, int count) throws BankException;
     List<Owner> getOwnersPOJO(int index, int count) throws BankException;
     List<OwnerDTO> getOwnersDTO(int index, int count) throws BankException;
+    String whoAmI();
 }

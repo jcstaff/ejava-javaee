@@ -29,8 +29,28 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>securePingClientEJB</artifactId>
             <version>${project.version}</version>
-            <type>ejb-client</type>
+            <type>jar</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>securePingEAR</artifactId>
+            <version>${project.version}</version>
+            <type>ear</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>    
+        
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>ejava-util</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- package being deployed must be a scope=compile dependency -->
@@ -65,87 +85,52 @@
         </testResources>
 
         <plugins>
-              <!-- tell it to run, even though we are a pom project -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <systemPropertyVariables>
-                        <jndi.name.secureping>
-                            ejava/examples/secureping/SecurePingClientEJB/remote
-                        </jndi.name.secureping>
-                        <java.security.auth.login.config>
-                            file://${basedir}/target/test-classes/securePingClientTest-auth.conf
-                        </java.security.auth.login.config>
-                        <skip.flush>${skip.flush}</skip.flush>
-                        <admin.username>${admin.username}</admin.username>
-                        <user.username>${user.username}</user.username>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-
-        </plugins>      
-    </build>
-
-    <profiles>        
-<profile>
-    <id>jboss</id>
-    <activation>
-        <property> <!-- activate this unless -Dserver present -->
-            <name>!server</name>
-        </property>
-    </activation>
-    <properties>
-          <java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory
-          </java.naming.factory.initial>
-          <java.naming.provider.url>jnp://${jboss.host}:1099
-          </java.naming.provider.url>
-          <java.naming.factory.url.pkgs>org.jboss.naming:org.jnp.interfaces
-          </java.naming.factory.url.pkgs>
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-client</artifactId>
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
+            <!-- artifacts to deploy to server -->
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <configuration>
-                    <deployer>
-                        <type>remote</type>
-                        <deployables>
-                            <deployable>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>securePingClientEAR</artifactId>
-                                <type>ear</type>
-                            </deployable>
-                        </deployables>
-                    </deployer>
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>securePingEAR</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>securePingClientEAR</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>deploy-component</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>                    
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.security.auth.login.config>
+                            file://${basedir}/target/test-classes/securePingClientTest-auth.conf
+                        </java.security.auth.login.config>
+                        <admin.username>${admin.username}</admin.username>
+                        <user.username>${user.username}</user.username>
+                    </systemPropertyVariables>
+                   <excludes>
+                        <exclude>**/SecurePingClientIT.java</exclude>
+                   </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- this module does not play well with the site plugin -->
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <skipDeploy>true</skipDeploy>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-    </profile>
-</profiles>
 </project>

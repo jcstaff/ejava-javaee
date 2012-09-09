@@ -1,5 +1,10 @@
 package ejava.util.jndi;
 
+import java.io.IOException;
+
+import java.io.InputStream;
+import java.util.Properties;
+
 import javax.naming.Context;
 
 import javax.naming.InitialContext;
@@ -8,9 +13,41 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 
 /**
- * This class helps inspect the JNDI tree.
+ * This class helps work with the JNDI tree.
  */
 public class JNDIUtil {
+	/**
+	 * This method will return a jndi.properties object that is based on the
+	 * properties found in ejava-jndi.properties that start with the provided
+	 * prefix. This method is useful when examples are using different JNDI
+	 * mechanisms and want to keep them separate by forming the jndi.properties
+	 * in memory.
+	 * @param prefix
+	 * @return
+	 * @throws IOException
+	 */
+    public static Properties getJNDIProperties(String prefix) throws IOException {
+    	InputStream is=JNDIUtil.class.getResourceAsStream("/ejava-jndi.properties");
+    	Properties props = new Properties();
+    	props.load(is);
+    	is.close();
+    	
+    	Properties env = new Properties();
+    	for (String key : props.stringPropertyNames()) {
+    		String value = props.getProperty(key);
+    		if (key.startsWith(prefix) && value != null && !value.isEmpty()) {
+    			String name=key.substring(prefix.length(),key.length());
+    			env.put(name, value);
+    		}
+    	}
+    	return env;
+    }
+	
+	
+	
+	
+	
+	
     public String dump() throws NamingException {
         return dump(new InitialContext(),"");
     }

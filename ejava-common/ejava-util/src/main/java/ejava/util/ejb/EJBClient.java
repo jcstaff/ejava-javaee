@@ -5,62 +5,109 @@ package ejava.util.ejb;
  * tree. 
  */
 public class EJBClient {
-	private String earName;
-	private String ejbModuleName;
-	private String distinctName;
-	private String ejbClassName;
-	private String remoteInterface;
-	private String version;
-	
-    public EJBClient() {}
-    public EJBClient(String earName, String ejbModuleName, String distinctName,
-			String ejbClassName, String remoteInterface, String version) {
-		this.earName = earName;
-		this.ejbModuleName = ejbModuleName;
-		this.distinctName = distinctName;
-		this.ejbClassName = ejbClassName;
-		this.remoteInterface = remoteInterface;
-		this.version = version;
-	}
-    public String getJNDIName() {
-    	return getEJBLookupName(
-    			earName, 
-    			ejbModuleName, 
-    			distinctName, 
-    			ejbClassName, 
-    			remoteInterface, 
-    			version);
-    }
-    
-	public static String getEJBLookupName(
+    /**
+     * This method provides a convenience wrapper around the alternate  
+     * getEJBLookupName() helper method. This can be used by EJB clients
+     * trying to locate EJBs that are part of a deployment that did not
+     * turn off maven version numbers in the deployment. This method assumes
+     * the EAR and EJB versions are the same value and will appropriately 
+     * append the version to the EAR and EJB names when forming the 
+     * jboss-ejb-client JNDI name.
+     * @param earName
+     * @param ejbModuleName
+     * @param distinctName
+     * @param ejbClassName
+     * @param remoteInterface
+     * @param version
+     * @return
+     */
+	public static String getEJBClientLookupName(
     		String earName,
     		String ejbModuleName,
     		String distinctName,
     		String ejbClassName,
     		String remoteInterface,
+    		boolean stateful,
     		String version) {
-    	return getEJBLookupName(
+    	return getEJBClientLookupName(
     			String.format("%s-%s",earName,version), 
     			String.format("%s-%s", ejbModuleName, version), 
     			distinctName, 
     			ejbClassName, 
-    			remoteInterface);
+    			remoteInterface,
+    			stateful);
     }
     
-    public static String getEJBLookupName(
+	/**
+	 * This method returns an remote JNDI name that is usable by the 
+	 * jboss-ejb-client org.jboss.ejb.client.naming.ejb.ejbURLContextFactory
+	 * context factory. To use this, list "org.jboss.ejb.client.naming"
+	 * as one of your java.naming.factory.url.pkgs and be sure to have
+	 * org.jboss:jboss-ejb-client listed as a dependency. The physical
+	 * name will look like the following in JBoss:<p/>
+<pre>
+java:jboss/exported/(ear)/(module)/(ejbClass)!(remoteInterface)	 
+</pre>
+	 * <p/>
+	 * JNDI names returned will be in the following form:<p/>
+<pre>
+ejb:(ear)/(module)/(distinctName)/(ejbClass)!(remoteInterface)
+ejb:(ear)/(module)/(distinctName)/(ejbClass)!(remoteInterface)?stateful
+</pre><p/>
+	 * Where the distinct name is commonly an empty string.<p/>
+	 * @param earNameVersion
+	 * @param ejbModuleNameVersion
+	 * @param distinctName
+	 * @param ejbClassName
+	 * @param remoteInterface
+	 * @return
+	 */
+    public static String getEJBClientLookupName(
     		String earNameVersion,
     		String ejbModuleNameVersion,
     		String distinctName,
     		String ejbClassName,
-    		String remoteInterface) {
+    		String remoteInterface,
+    		boolean stateful) {
 
     	return new StringBuilder("ejb:")
     		.append(earNameVersion).append("/")
     		.append(ejbModuleNameVersion).append("/")
-    		.append(distinctName).append("/")
+    		.append(distinctName==null?"":distinctName).append("/")
+    		.append(ejbClassName).append("!")
+    		.append(remoteInterface)
+    		.append(stateful?"?stateful" : "")
+    		.toString();
+    }
+
+    /**
+     * This method returns a JNDI name usable with JBoss remote-naming.<p/>
+     * org.jboss.naming.remote.client.InitialContextFactory<p/>
+     * The physical JNDI name will be listed as:<p/>
+     * <pre>
+java:jboss/exported/(ear)/(module)/(ejbClass)!(remoteInterface)
+     * </pre></p>
+     * The name returned will have the following form:<p/>
+     * <pre>
+(ear)/(module)/(ejbClass)!(remoteInterface)
+     * </pre>
+     * @param earNameVersion
+     * @param ejbModuleNameVersion
+     * @param ejbClassName
+     * @param remoteInterface
+     * @return
+     */
+    public static String getRemoteLookupName(
+    		String earNameVersion,
+    		String ejbModuleNameVersion,
+    		String ejbClassName,
+    		String remoteInterface) {
+
+    	return new StringBuilder()
+    		.append(earNameVersion).append("/")
+    		.append(ejbModuleNameVersion).append("/")
     		.append(ejbClassName).append("!")
     		.append(remoteInterface)
     		.toString();
     }
-
 }
