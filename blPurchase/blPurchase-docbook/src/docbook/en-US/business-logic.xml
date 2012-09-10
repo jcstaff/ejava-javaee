@@ -1,0 +1,45 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+    <bookinfo>
+        <title>Business Logic</title>
+    </bookinfo>
+    <preface id="devenv-purpose">
+        <title>Purpose</title>
+
+        <section id="devenv-goals">
+            <title>Goals</title>
+            <itemizedlist>
+                <listitem><para>Introduce the architectural layer responsible
+                    for external simplicity and internal coordination</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="devenv-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist>
+                <listitem><para>have more understanding of:</para>
+                    <itemizedlist>
+                        <listitem><para>Role of business logic</para></listitem>
+                        <listitem><para>How business logic can provide top-down requirements</para></listitem>
+                        <listitem><para>How business logic tests can provide executable requirement verification</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist>
+                        <listitem><para>Define business logic interface</para></listitem>
+                        <listitem><para>Define business logic class</para></listitem>
+                        <listitem><para>Distinguish business logic from data access concerns</para></listitem>
+                        <listitem><para>Write a white-box test to act as an acceptance test</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="bl-facade.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

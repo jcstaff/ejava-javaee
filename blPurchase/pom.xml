@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <parent>
+        <groupId>ejava</groupId>
+        <artifactId>ejava-root</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ejava.bl</groupId>
+    <artifactId>blPurchase</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Business Logic Purchase</name>
+    <description>
+        This project is the root project for a business logic example
+        based on a purchasing example.
+    </description>
+    <modules>
+        <module>blPurchaseImpl</module>
+    </modules>
+    <profiles>
+        <profile>
+            <id>docs</id>
+            <modules>
+                <module>blPurchase-docbook</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>
