@@ -1,0 +1,233 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="bl_requirements">
+    <title>Using Business Logic for Requirements</title>
+
+    <section id="bl_requirements-testcase">
+        <title>Test Cases as Executable Requirements</title>
+        <itemizedlist>
+            <listitem><para>Test-first approach</para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[/**
+ * A user shall be able to establish an account with just a first 
+ * and last name and a unique email address.
+ */
+@Test
+public void establishAccount() {
+    log.info("*** establishAccount ***");
+    
+    //the user will supply their email address, first and last name
+    String email="jharb@ravens.com";
+    String firstName="john";
+    String lastName="harbaugh";
+    Account account = purchasing.createAccount(email, firstName, lastName);
+    
+    //they will get back a generated password to use as a login for the account
+    assertNotNull("no account returned", account);
+    assertNotNull("no password assigned", account.getPassword());
+}]]></programlisting>
+
+        <programlisting language="java"><![CDATA[/**
+ * A user shall be able browse products in the catalog.
+ */
+@Test
+public void browseCatalog() {
+    log.info("*** browseCatalog ***");
+    
+        //the user will ask for product summaries in pages
+    int pageSize=10;
+    int offset=0;
+    List<Product> products = catalog.getProducts(offset, pageSize);
+    
+        //they will receive <= a page size of product information
+    assertNotNull("no products returned", products);
+    assertTrue("no products provided", products.size() > 0);
+    
+        //they can page thru the entire set
+    for (int i=0; products.size() != 0; i++) {
+        offset += products.size();
+        products = catalog.getProducts(offset, pageSize);
+        assertTrue("this catalog never ends!!!", i<100);
+    }
+}]]></programlisting>
+
+        <programlisting language="java"><![CDATA[/**
+ * A user shall be able to purchase a product in the catalog.
+ */
+@Test
+public void purchaseProduct() {
+    log.info("*** purchaseProduct ***");
+    
+        //the user selects a product
+    Product product=null;
+    Random random=new Random();
+    for (int i=0; product == null; i++) {
+        List<Product> products=catalog.getProducts(random.nextInt(100), 1);
+        product=products.iterator().next();
+        assertTrue("I can't find anything to buy!!!", i<1000);
+    }
+    
+        //the user adds the product to their shopping cart by providing the 
+        //product id and their credentials
+    int count=catalog.addToCart(product.getId(), validEmail);
+        //the user receives a count of the items in the cart
+    assertEquals("somebody tweeked my cart!!!!", 1, count);
+    
+        //the user checks out with the cashier -- payment not yet implemented
+    double total=purchasing.checkout(validEmail, validPassword);
+    
+        //the user gets a total amount back as their receipt
+    assertEquals("price doesn't add up", product.getPrice(), total, .01);
+}]]></programlisting>
+    </section>
+
+
+    <section id="bl-requirements-interfaces">
+        <title>Business Interfaces Capture Functional Requirements</title>
+        <programlisting language="java"><![CDATA[
+/**
+ * Purchasing handles payment of purchased products.
+ */
+public interface Purchasing {
+    /**
+     * Creates an account for the user to use in purchasing products.
+     * @param email
+     * @param firstName
+     * @param lastName
+     * @return
+     */
+    Account createAccount(String email, String firstName, String lastName);
+
+    /**
+     * Completes the purchase of the items in the user's shopping cart,
+     * empties the cart, and returns the total cost paid.<p/>
+     * 
+     * Note that this capability is not yet fully defined.
+     * @param email
+     * @param password
+     * @return
+     */
+    double checkout(String email, String password);
+}]]></programlisting>
+
+        <programlisting language="java"><![CDATA[/**
+ * The catalog maintains a view of the inventory known to our application. 
+ */
+public interface Catalog {
+
+    /**
+     * Returns a list of products in the catalog chunked into page sizes.
+     * @param offset
+     * @param limit
+     * @return
+     */
+    List<Product> getProducts(int offset, int limit);
+
+    /**
+     * Adds the selected product to the users' shopping cart and returns
+     * the count of items.
+     * @param id
+     * @param validEmail
+     */
+    int addToCart(int id, String validEmail);
+}]]></programlisting>
+    </section>
+
+    <section id="bl-requirements-data">
+        <title>Business Objects Capture Data Requirements</title>
+        <programlisting language="java"><![CDATA[@Entity
+@NamedQueries({
+    @NamedQuery(name="blPurchasing.findAccountByEmail", 
+                query="select a from Account a where a.email=:email")
+})
+public class Account {
+    public static final String FIND_BY_EMAIL="blPurchasing.findAccountByEmail";
+    
+    @Id @GeneratedValue
+    private int id;
+    
+    @Column(nullable=false, unique=true)
+    private String email;
+    
+    @Column(nullable=false)
+    private String password;
+    
+    @Column(nullable=false)
+    private String firstName;
+    
+    @Column(nullable=false)
+    private String lastName;
+...]]></programlisting>
+
+
+        <programlisting language="java"><![CDATA[@Entity
+public class Product {
+    @Id @GeneratedValue
+    private int id; 
+    @Column(nullable=false)
+    private String name;
+    @Column(nullable=false)
+    private double price;
+    @Column(nullable=false)
+    private int count;
+...]]></programlisting>
+
+
+        <programlisting language="java"><![CDATA[@Entity
+public class Cart {
+    @Id
+    private String email;
+    
+    @OneToOne
+    @PrimaryKeyJoinColumn(referencedColumnName="email")
+    private Account account;
+    
+    @ManyToMany
+    private List<Product> products = new ArrayList<Product>();
+...]]></programlisting>
+    </section>
+
+
+    <section id="bl-requirements-layout">
+        <title>Sample Project Layout</title>
+        <programlisting language=""><![CDATA[|-- pom.xml
+`-- src
+    |-- main
+    |   |-- java
+    |   |   `-- ejava
+    |   |       `-- examples
+    |   |           `-- blpurchase
+    |   |               `-- bl
+    |   |                   |-- blimpl
+    |   |                   |   |-- CatalogImpl.java
+    |   |                   |   `-- PurchasingImpl.java
+    |   |                   |-- bo
+    |   |                   |   |-- Account.java
+    |   |                   |   |-- Cart.java
+    |   |                   |   `-- Product.java
+    |   |                   |-- Catalog.java
+    |   |                   `-- Purchasing.java
+    |   `-- resources
+    `-- test
+        |-- java
+        |   `-- ejava
+        |       `-- examples
+        |           `-- blpurchase
+        |               `-- bl
+        |                   |-- PurchaseTest.java
+        |                   `-- PurchasingFactory.java
+        `-- resources
+            |-- hibernate.properties
+            |-- log4j.xml
+            `-- META-INF
+                `-- persistence.xml]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+</chapter>
+  
