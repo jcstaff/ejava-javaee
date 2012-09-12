@@ -24,5 +24,4 @@ public interface Catalog {
 	 * @param validEmail
 	 */
 	int addToCart(int id, String validEmail);
-
 }

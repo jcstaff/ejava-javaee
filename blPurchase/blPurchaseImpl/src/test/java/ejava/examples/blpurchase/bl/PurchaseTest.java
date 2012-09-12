@@ -92,7 +92,6 @@ public class PurchaseTest {
 			//the user receives a count of the items in the cart
 		assertEquals("somebody tweeked my cart!!!!", 1, count);
 		
-		
 			//the user checks out with the cashier -- payment not yet implemented
 		double total=purchasing.checkout(validEmail, validPassword);
 		

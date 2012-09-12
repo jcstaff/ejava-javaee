@@ -1,0 +1,205 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="devenv-mgmt">
+    <title>Dependency/Plugin Management</title>
+    <itemizedlist>
+        <listitem><para>Defines what is possible without actively imposing the 
+            dependency or plugin defined</para></listitem>
+        <listitem><para>Placed in a parent of multi-module project</para></listitem>
+    </itemizedlist>
+
+    
+    <section id="devenv-mgmt-dependency">
+        <title>Dependency Management</title>
+        <itemizedlist>
+            <listitem><para>Consolidate management of dependency versions 
+                without adding active dependencies to all inheriting children</para>
+                <programlisting language="xml"><![CDATA[<properties>
+    <junit.version>4.7</junit.version>
+    <log4j.version>1.2.13</log4j.version>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        ...    
+    </dependencies>
+</dependencyManagement>]]></programlisting>
+                    <para>Parent defines dependency versions for two artifacts (passive)</para>
+                    
+                <programlisting language="xml"><![CDATA[<dependencies>
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>]]></programlisting>
+                    <para>Child declares a dependency on one of the artifacts (active)</para>
+                    
+                <programlisting language="xml"><![CDATA[<dependencies>
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.7</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>]]></programlisting>
+                    <para>Net result is a consistent version for dependency in effective pom</para>
+            </listitem>
+            
+            <listitem><para>Control artifact versions used in transitive dependencies</para></listitem>
+            <listitem><para>Exclude artifacts from transitive dependencies</para>
+        <programlisting language="xml"><![CDATA[<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-server</artifactId>
+            <version>${jboss-as-server.version}</version>
+            <classifier>jmx-invoker-adaptor-client</classifier>
+            <exclusions>
+                <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                    <groupId>org.jboss.security</groupId>
+                    <artifactId>jbosssx-client</artifactId>
+                </exclusion>
+                <exclusion> <!-- gets in the way with newer versions -->
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>]]></programlisting>
+                    <para>Parent defines exclusions for possible dependency (passive)</para>
+                    
+        <programlisting language="xml"><![CDATA[<dependencies>
+    <dependency>
+        <groupId>org.jboss.jbossas</groupId>
+        <artifactId>jboss-as-server</artifactId>
+        <classifier>jmx-invoker-adaptor-client</classifier>
+    </dependency>]]></programlisting>
+                    <para>Child includes simple dependency declaration (active)</para>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="devenv-mgmt-plugin">
+        <title>Plugin Management</title>
+        <itemizedlist>
+            <listitem><para>Consolidate management of plugin versions and
+                default configuration without adding activations to all inheriting children</para>
+            <programlisting language="xml"><![CDATA[<build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                    </configuration>                    
+                </plugin>
+                ...
+            </plugins>
+        </pluginManagement>
+    </build>]]></programlisting>
+                <para>Parent defines version for compiler plugin and configures for Java 6</para>
+                
+        <programlisting language="xml"><![CDATA[<parent>
+    <groupId>ejava</groupId>
+    <artifactId>ejava-root</artifactId>
+    <version>3.0.2012.2-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+</parent>
+<modelVersion>4.0.0</modelVersion>
+
+<groupId>ejava.javaee.intro</groupId>
+<artifactId>javase5Enhancements</artifactId>
+<packaging>jar</packaging>]]></programlisting>
+                    <para>Child of packaging=jar type automatically get compiler configured to parent specs</para>
+            </listitem>
+
+
+            <listitem><para>A more complicated example</para>
+            <programlisting language="xml"><![CDATA[<pluginManagement>
+    <plugins>
+        <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <version>${cargo-maven2-plugin.version}</version>
+            <configuration>
+                <container>
+                    <containerId>${cargo.containerId}</containerId>
+                    <type>remote</type>
+                    <log>target/server.log</log>
+                    <output>target/output.log</output>
+                </container>
+                <configuration>
+                    <type>runtime</type>
+                    <properties>
+                        <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                        <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
+                    </properties>
+                </configuration>
+            </configuration>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-controller-client</artifactId>
+                    <version>${jboss.version}</version>
+                </dependency>
+            </dependencies>
+            <executions>
+               <execution>
+                   <id>cargo-prep</id> 
+                       <phase>pre-integration-test</phase>
+                   <goals>
+                        <goal>redeploy</goal>
+                   </goals>
+               </execution>
+                <execution>
+                    <id>cargo-post</id>
+                    <phase>post-integration-test</phase>
+                    <goals>
+                        <goal>undeploy</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</pluginManagement>]]></programlisting>
+                <para>Parent defines details of deployment to JBoss container (passive)</para>
+                
+        <programlisting language="xml"><![CDATA[<build>
+    <plugins>
+        <!-- artifacts to deploy to server -->
+        <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration>
+                <deployables>
+                    <deployable>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>ejbsessionBankEAR</artifactId>
+                        <type>ear</type>
+                    </deployable>
+                </deployables>
+            </configuration>
+        </plugin>
+...
+    </plugins>
+</build>]]></programlisting>
+                    <para>Child declares plugin (active) with configuration extensions specific to child project</para>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+</chapter>
+  
