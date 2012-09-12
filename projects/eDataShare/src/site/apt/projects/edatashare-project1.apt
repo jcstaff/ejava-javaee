@@ -1,32 +1,38 @@
 Project1: eDataShare Data Access Tier and Initial Business Logic
 
-    2011-02-01 - DRAFT
+    2012-09-11
 
 * Goals
 
     * Build the data access tier and initial business logic for an
     application.
 
-    * Gain experience with JDBC and Java Persistence API technologies.
+    * Gain experience with database schema and Java Persistence API technologies.
 
     * Gain experience designing and testing project implementations around
     layered boundaries.
 
 * Objectives
 
-    * Design a relational database schema for your project.
+    * Design and implement a set of business logic interfaces that address 
+    the functional requirements of the external users.
+    
+    * Design and implement a set of business objects to represent the 
+    data requirements in the system.
 
-    * Design a set of business objects to represent the data in the system.
+    * Design and implement a relational database schema that will store the 
+    state of the business objects.
 
-    * Incorporate JDBC technology for bulk ingest database operations.
+    * Design and implement a data access tier that will handle mapping the 
+    business objects to the database using the Java Persistence API.
 
-    * Incorporate the Java Persistence API for mapping objects to 
-    the database schema.
+    * Design and implement the business logic classes that realize the 
+    business logic interfaces and leverage the data access objects to 
+    implement the scenario logic. 
 
-    * Provide a layer of business logic that coordinates interaction with
-    the data access objects.
-
-    * Test our implementations.
+    * Unit test the different levels of the architecture.
+    
+    * Integration test the end-to-end solution.
 
 * Business Description
 
@@ -54,7 +60,7 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     For eDmv, the system is initialized with a starting set of information
     pertaining to drivers, vehicle registrations, and the vehicle owners.
     New information can be added and updated, but the primary focus within
-    this project is for eDmv to respond to queries from approved clients.
+    this project is for eDmv to respond to queries from clients.
 
     For eMayberry, the system will is initialized with an empty database that
     is designed to hold people of interest and their activities.
@@ -75,37 +81,25 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     The work done during this project focuses on the business objects
     (BOs), the data access objects (DAOs) of the data access tier,
     and some initial business logic interfaces (BL) and business
-    logic implementations (BLImpl). There will be two sets of DAO
-    implementations; one based on the JDBC API (for eDmv only) and a
-    second based the one the Java Persistence API (JPA; for both eDmv
-    and eMayberry). There will only be a single version of the business
-    logic implementations (BLImpl). How you partition the implementations
-    of your projects is up to you. A sugegsted starting point is provided
+    logic implementations (BLImpl). The DAOs will be based on the 
+    Java Persistence API (JPA). How you partition the implementations
+    of your projects is up to you. A suggested starting point is provided
     at the end of this project description.
 
     The business objects encapsulate the core business data and rules
     of the application. You will design the business objects and then
-    map them to the database using JDBC (for eDmv) and JPA (for both
-    eDmv and eMayberry). You are only required to implement a create
-    capability within the JDBC DAO. This will be used during ingest.
+    map them to the database. 
     You are required to implement full CRUD (Create, Read, Update, and
     Delete) capability with JPA. You will be required to encapsulate
     all object to relational (O/R) mapping within the DAOs, descriptor
-    files, and business object annotations.  You will be given a set of
-    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eDataShare/eDmvData/eDmvTestUtil/src/main/resources/xml/}
+    files, and/or class metadata annotations.  You will be given a set of
+    {{{https://raw.github.com/jcstaff/ejava-javaee/master/projects/eDataShare/eDmvData/eDmvTestUtil/src/main/resources/xml/dmv-all.xml}
     test data}} to initially populate your applications and be the source
-    of data for the ingest requirement.  This will be provided with the
-    sample project thread mentioned above.
+    of data for the ingest requirement. To use the data, you will ingest 
+    using a parser supplied by the instructor. There is a sample thread
+    in the projects/eDataShare/eDmv directory that shows how to use the 
+    parser as well as other aspects technology within the project.  
 
-    [Note:] Its is expected/required that you implement and maintain
-    both a set of JDBC and JPA DAOs in order to develop and demonstrate an
-    understanding of how database table and Java class designs can
-    impact your JPA implementations.  You will always use the JDBC DAO
-    to implement the eDmv ingest and you will always use the JPA
-    implementation for general CRUD operations in this and follow-on
-    projects.
-
-    []
 
     The business logic will provide a set of classes with concise methods
     that map easily to use cases. The business logic will ensure proper
@@ -122,7 +116,7 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     within this specification.
 
     The test acceptance for the first project will be the unit tests and
-    a set of functional test that takes the business logic, data access
+    an integration test that takes the business logic, data access
     tier, and business objects through  a set of specified, end-to-end
     use cases.
 
@@ -140,14 +134,16 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     sample set of projects}} that implement a thin eDmv thread has
     been made available. Please ignore the TestData sub-project when
     using the example to craft your source tree. You will depend on
-    projects within that tree -- not reimplement them and not copy
+    projects within that tree -- not re-implement them and not copy
     them.
 
-
-        [Note:] The root eDataShare project should be very thin and should
-        not have a dependency on the instructor's class examples. Doing
-        so will add unnecessary web site publishing complications to your
-        project that are only needed by posted class examples.
+        [Note:] You will likely copy significant portions of the thin thread
+        example and other class examples into your project. Be aware that
+        the thin thread and othet example pom.xml files inherit from 
+        a few root projects that provide dependencyManagement and 
+        pluginManagement duties. You will either need to also inherit from
+        the dependencies/pom.xml or compensate by re-defining the management
+        sections in the grandparent pom.xml of your project.
 
     See the Getting Started section towards the end of this specification
     for a more detailed sample project layout.
@@ -161,7 +157,7 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     jcstaffDataShare,
     jcstaffDmv, jcstaffMayberry). You should also use this same pattern for
     java packages (ex. ejavaguy.dmv, ejavaguy.mayberry -or-
-    jcstaff.dmv, jcstaff.mayberry), JNDI names, DB tables, etc.
+    jcstaff.dmv, jcstaff.mayberry), DB tables, etc.
 
     [Note:] There should be no use of System.out.println() in the code and all
     implementations must use the jakarta commons logging API with the 
@@ -534,25 +530,27 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
         []
 
 ===
+
+    [Note:] Please ignore references in the diagrams that call out use of 
+    JDBC. All DAOs can be implemented exclusively with JPA for this assignment.
+
+    []    
+    
     [[1]] Design and implement a mechanism to ingest a starting state for
     eDmv based on a provided data file and parser.  You will implement
-    two primary sets of classes to support this requirement; JDBC Ingest
+    two primary sets of classes to support this requirement; the
     DAO(s) and an Ingestor. 
 
-[../images/eDmv_ingest_dao.jpg] eDmv Ingest and JDBC DAO
+[../images/eDmv_ingest_dao.jpg] eDmv Ingest and DAO
 
         [[a]] Design and implement a set of DAOs that can be used
-        to ingest eDmv business data into the database using the
-        JDBC API and the database schema you designed as a part of a
-        separate requirement. These DAOs can optionally implement a
-        common interface with the JPA DAOs you implement as a part of a
-        separate requirement -or- can be unique in how they achieve what
-        can be thought of as a performance goal (rather than working
-        within business rules).  The JDBC Ingest DAO need only support
-        create/insert operations.
+        to ingest eDmv business data into the database using 
+        the database schema you designed as a part of a
+        separate requirement. These DAOs can optionally be tuned for 
+        ingest or simply reused from your CRUD-style requirements.
 
         [[b]] Design and implement an Ingestor that will use an externally
-        provided parser to obtain business data for eDmv and use the JDBC
+        provided parser to obtain business data for eDmv and use the 
         Ingest DAO to populate the database. You will be provided the
         parser when the test data and sample project thread is posted.
 
@@ -568,10 +566,8 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     of JPA @Annotations, descriptor files, or a combination of both. Your 
     interface should encapsulate the fact that an EntityManager is being
     used and the same EntityManager should be shared among other DAOs in
-    the same Thread. Using either (a crude form of) dependency injection
-    or ThreadLocal can be quite useful here. Your DAOs should not attempt
-    to control the transaction or they will <NOT> be portable to the EJB
-    tier.
+    the same Thread. Your DAOs should not attempt to control the transaction 
+    or they will <NOT> be portable to the EJB tier.
 
         [[A]] eDmv DAOs
 
@@ -726,10 +722,6 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     adding a residence to a Person without a start date.  These tests
     should be packaged with the BOs.
     
-    [[1]] Provide a JUnit test for the eDmv JDBC DAOs. Verify they can 
-    functionally create new objects within the eDmv system. This test
-    should be packaged with the DAOs.
-
     [[1]] Provide a JUnit test for your eDmv and eMayberry JPA DAOs. This
     should test the implementation for the fundamental CRUD operations
     for each type of object. It is understood that some of the objects
@@ -740,7 +732,7 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     [[1]] Provide a JUnit test for your business logic to test the
     basic functionality of your business logic design, including ingest.
     The ingestor test should be able to reference a known data file and
-    ingest records into the database using the JDBC DAOs. These tests
+    ingest records into the database using the DAOs. These tests
     should be packaged with the business logic implementation.
 
     [[1]] Provide a set of JUnit test programs to verify the following
@@ -988,15 +980,18 @@ eDataShare
 
         * projects cleanly builds with Maven: 15pts
 
-        * business objects: 15pts
+        * managed schema (i.e., defined in a set of files and explicitly 
+        used to coldstart and initialize the database at defined times): 5pts
 
-        * JDBC DAO: 15pts
+        * business objects: 15pts
 
         * JPA DAO and JPA O/R Mapping: 25pts
 
         * Ingest: 10pts
 
         * Business Logic: 10pts
+        
+        * End-to-end Integration Test: 10pts
 
     Each area will be judged according to the following breakdown. For
     areas where testing does not apply (e.g., README and build), those 
