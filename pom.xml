@@ -554,14 +554,8 @@
             </build>
         </profile>        
 
-        <profile> <!-- defines our default database -->
+        <profile> <!-- H2 embedded/file-based DB -->
             <id>h2db</id>
-            <activation>
-                <property>
-                    <name>jdbcdb</name>
-                    <value>h2</value>
-                </property>
-            </activation>
             <properties>
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
@@ -580,14 +574,29 @@
             </dependencies>
         </profile>
 
+
+        <profile> <!-- H2 server-based DB -->
+            <id>h2srv</id>
+            <properties>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:tcp://${db.host}:9092/ejava</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+                  <hibernate.dialect>
+                      org.hibernate.dialect.H2Dialect
+                  </hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
         <profile>
-            <id>hsql</id>
-            <activation>
-                <property>
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
-                </property>
-            </activation>
+            <id>hsql</id> <!-- Hypersonic server-based DB -->
             <properties>
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
@@ -605,14 +614,9 @@
                 </dependency>       
             </dependencies>
         </profile>
+
         <profile> 
-            <id>mysql</id>
-            <activation>
-                <property>
-                    <name>jdbcdb</name>
-                    <value>mysql</value>
-                </property>
-            </activation>
+            <id>mysql</id> <!-- MySQL server-based DB -->
             <properties>
                   <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
                   <jdbc.url>jdbc:mysql://${db.host}:3306/test</jdbc.url>

@@ -1,0 +1,155 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<chapter id="devenv-h2-setup">
+    <title>H2 Database Setup</title>
+    <para>The application server and application clients used in class require 
+        a relational database. Application server vendors generally package a 
+        lightweight database with their downloads so that the server can be 
+        used immediately for basic scenarios. JBoss comes packaged with the 
+        <ulink url="http://h2database.com">H2 database</ulink>. This database 
+        can run in one of three modes</para>
+       <itemizedlist>
+            <listitem><para>Embedded/in-memory</para></listitem>
+            <listitem><para>Embedded/file</para></listitem>
+            <listitem><para>Server-based</para></listitem>
+        </itemizedlist>
+    <para>File-based versus in-memory allows you to do post-mortem analysis 
+        of the database after a test completes. File-based also allows you to 
+        initialize the database schema in one process and use the
+        database within another. Using server-based mode allows 
+        you to inspect the database while the application is running.
+    </para>
+    <para>JBoss and the class examples come setup with embedded drivers. 
+        You can change the configuration at any time to a server-based 
+        configuration using the following instructions.
+    </para>
+    <tip>
+        <title>Choose Right Mode for Right Need</title>
+        <para>Using embedded mode requires less administration overhead in the 
+            test environment.</para>
+        <para>Using server mode provides access to database state during 
+            application execution -- which is good for debugging.</para>
+    </tip>
+        
+    <section id="devenv-h2-jar">
+        <title>Locate the h2*.jar file</title>
+        <para>Obtain a copy of the H2 database jar from one of the following sources</para>
+        <itemizedlist>
+            <listitem><para>Within the JBoss installation</para>
+                <programlisting><![CDATA[jboss-as-7.x.x.Final/modules/com/h2database/h2/main/]]></programlisting>
+            </listitem>
+
+            <listitem><para>Internet Maven Repository (<ulink url="http://repo2.maven.org/maven2/com/h2database/h2/">
+                http://repo2.maven.org/maven2/com/h2database/h2/</ulink>)</para>
+            </listitem>
+
+            <listitem><para>Local Maven Repository: HOME/.m2/repository/com/h2database/h2/ 
+                if previously downloaded by a DB example module</para></listitem>
+
+            <listitem><para>Product Web Site (<ulink url="http://h2database.com/html/download.html">
+                http://h2database.com/html/download.html</ulink>)</para></listitem>
+        </itemizedlist>                   
+    </section>
+    
+    <section id="devenv-h2-server">
+        <title>Start Server</title>
+        <itemizedlist>
+            <listitem><para>Start database, web server, and launch browser page</para>
+                <programlisting language=""><![CDATA[java -jar h2.jar]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Start database and server only</para>
+                <programlisting language=""><![CDATA[java -jar h2.jar -tcp -web]]></programlisting>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    
+    <section id="devenv-h2-ui">
+        <title>Access DB User Interface</title>
+        <itemizedlist>
+            <listitem><para>Connect to URL <ulink url="http://127.0.1.1:8082">http://127.0.1.1:8082</ulink>
+                from a browser</para>
+            </listitem>
+            <listitem><para>Use JDBC URL: jdbc:h2:tcp://127.0.0.1:9092/ejava</para></listitem>
+            <listitem><para>Log in as user "sa" and empty password</para></listitem>
+        </itemizedlist>
+        <note>
+            <para>This will create a database folder called "ejava" relative to 
+                where you started the database server.</para>
+        </note>                   
+    </section>
+   
+    
+    <section id="devenv-h2-profile">
+        <title>Activate H2 Server Profile for Builds</title>
+        <para>Do one of the following</para>
+        <itemizedlist>
+            <listitem><para>add -Ph2srv to the command line of each build</para></listitem>
+            
+            <listitem><para>change the settings.xml activeProfile specification 
+                from embedded mode (h2db)</para>
+        <programlisting language="xml"><![CDATA[
+<activeProfile>h2db</activeProfile>
+        ]]></programlisting>
+                <para>to server mode (h2srv)</para>
+        <programlisting language="xml"><![CDATA[
+<activeProfile>h2srv</activeProfile>
+        ]]></programlisting>
+            </listitem>
+        </itemizedlist>
+        
+        <para>If you look at the root pom.xml, the database server profile
+            defines the following</para>
+        <programlisting language="xml"><![CDATA[<profile> <!-- H2 server-based DB -->
+    <id>h2srv</id>
+    <properties>
+          <jdbc.driver>org.h2.Driver</jdbc.driver>
+          <jdbc.url>jdbc:h2:tcp://${db.host}:9092/ejava</jdbc.url>
+          <jdbc.user>sa</jdbc.user>
+          <jdbc.password/>
+          <hibernate.dialect>
+              org.hibernate.dialect.H2Dialect
+          </hibernate.dialect>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</profile>]]></programlisting>
+                               
+    </section>
+
+    <section id="devenv-h2-jboss">
+        <title>Update JBoss to use Server Mode</title>
+        <itemizedlist>
+            <listitem><para>Change standalone/configuration/standalone.xml from</para>
+        <programlisting language="xml"><![CDATA[<connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+        ...
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>]]></programlisting>
+            </listitem>
+            
+            <listitem><para>to</para>
+        <programlisting language="xml"><![CDATA[<connection-url>jdbc:h2:tcp://${jboss.bind.address:127.0.0.1}:9092/ejava;DB_CLOSE_DELAY=-1</connection-url>
+        ...
+                    <security>
+                        <user-name>sa</user-name>
+                        <password></password>
+                    </security>]]></programlisting>
+            </listitem>
+            
+        </itemizedlist>                   
+        <note>
+            <para>This will create a database folder called "ejava" relative to 
+                where you started the database server.</para>
+        </note>                   
+    </section>
+
+</chapter>
