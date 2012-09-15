@@ -1,4 +1,4 @@
-package ejava.examples.blpurchase.bl.bo;
+package ejava.examples.blpurchase.bo;
 
 import java.util.ArrayList;
 import java.util.List;

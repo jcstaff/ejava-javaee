@@ -12,8 +12,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ejava.examples.blpurchase.bl.bo.Account;
-import ejava.examples.blpurchase.bl.bo.Product;
+import ejava.examples.blpurchase.bo.Account;
+import ejava.examples.blpurchase.bo.Product;
 
 /**
  * This test verifies the top-level requirements our purchase application.

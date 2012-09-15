@@ -1,6 +1,6 @@
 package ejava.examples.blpurchase.bl;
 
-import ejava.examples.blpurchase.bl.bo.Account;
+import ejava.examples.blpurchase.bo.Account;
 
 /**
  * Purchasing handles payment of purchased products.

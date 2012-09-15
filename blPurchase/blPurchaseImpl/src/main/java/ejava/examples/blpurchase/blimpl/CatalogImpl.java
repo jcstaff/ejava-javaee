@@ -1,4 +1,4 @@
-package ejava.examples.blpurchase.bl.blimpl;
+package ejava.examples.blpurchase.blimpl;
 
 import java.util.List;
 
@@ -9,9 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.blpurchase.bl.Catalog;
-import ejava.examples.blpurchase.bl.bo.Account;
-import ejava.examples.blpurchase.bl.bo.Cart;
-import ejava.examples.blpurchase.bl.bo.Product;
+import ejava.examples.blpurchase.bo.Account;
+import ejava.examples.blpurchase.bo.Cart;
+import ejava.examples.blpurchase.bo.Product;
 
 public class CatalogImpl implements Catalog {
 	private static final Log log = LogFactory.getLog(CatalogImpl.class);

@@ -6,10 +6,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import ejava.examples.blpurchase.bl.blimpl.CatalogImpl;
-import ejava.examples.blpurchase.bl.blimpl.PurchasingImpl;
-import ejava.examples.blpurchase.bl.bo.Account;
-import ejava.examples.blpurchase.bl.bo.Product;
+import ejava.examples.blpurchase.blimpl.CatalogImpl;
+import ejava.examples.blpurchase.blimpl.PurchasingImpl;
+import ejava.examples.blpurchase.bo.Account;
+import ejava.examples.blpurchase.bo.Product;
 
 /**
  * This class provides a factory for commonly used objects in the application.

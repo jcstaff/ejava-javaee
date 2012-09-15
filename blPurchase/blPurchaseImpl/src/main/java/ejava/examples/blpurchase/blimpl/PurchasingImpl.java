@@ -1,4 +1,4 @@
-package ejava.examples.blpurchase.bl.blimpl;
+package ejava.examples.blpurchase.blimpl;
 
 import java.util.Random;
 
@@ -8,9 +8,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.blpurchase.bl.Purchasing;
-import ejava.examples.blpurchase.bl.bo.Account;
-import ejava.examples.blpurchase.bl.bo.Cart;
-import ejava.examples.blpurchase.bl.bo.Product;
+import ejava.examples.blpurchase.bo.Account;
+import ejava.examples.blpurchase.bo.Cart;
+import ejava.examples.blpurchase.bo.Product;
 
 /**
  * This class implements basic logic used to implement the purchasing

@@ -2,7 +2,7 @@ package ejava.examples.blpurchase.bl;
 
 import java.util.List;
 
-import ejava.examples.blpurchase.bl.bo.Product;
+import ejava.examples.blpurchase.bo.Product;
 
 /**
  * The catalog maintains a view of the inventory known to our application. 

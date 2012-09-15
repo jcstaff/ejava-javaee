@@ -1,4 +1,4 @@
-package ejava.examples.blpurchase.bl.bo;
+package ejava.examples.blpurchase.bo;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
