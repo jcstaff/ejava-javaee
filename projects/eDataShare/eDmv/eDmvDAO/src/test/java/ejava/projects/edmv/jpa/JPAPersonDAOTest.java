@@ -2,25 +2,18 @@ package ejava.projects.edmv.jpa;
 
 import static org.junit.Assert.*;
 
-
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
+
+
+
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ejava.projects.edmv.bo.Person;
-import ejava.projects.edmv.bo.VehicleRegistration;
 import ejava.projects.edmv.dao.PersonDAO;
-import ejava.projects.edmv.jpa.JPAPersonDAO;
 
 /**
  * This test case provides an example of one might test the JPA DAO. It 
@@ -30,58 +23,26 @@ import ejava.projects.edmv.jpa.JPAPersonDAO;
  * @author jcstaff
  *
  */
-public class JPAPersonDAOTest {
+public class JPAPersonDAOTest extends JPADAOTestBase {
 	private static Log log = LogFactory.getLog(JPAPersonDAOTest.class);
-	//this code assumes all the JDBC properties were placed in 
-	//META-INF/persistence.xml when the file was copied from src to the 
-	//target tree
 	
-	private EntityManagerFactory emf;
-	private EntityManager em;
-	private PersonDAO dao;
+	PersonDAO dao;
 	
-	@Before
+	@Override
 	public void setUp() throws Exception {
-		emf = Persistence.createEntityManagerFactory("eDmvBO-test");
-		em = emf.createEntityManager();
-		
+		super.setUp();
 	    dao = new JPAPersonDAO();
 	    ((JPAPersonDAO)dao).setEntityManager(em);
-		
-		cleanup();
-		
 		em.getTransaction().begin();
 	}
-
-	@After
-	public void tearDown() throws Exception {
-		if (em != null) {
-			EntityTransaction tx = em.getTransaction();
-			if (tx.isActive()) {
-				if (tx.getRollbackOnly()) { tx.rollback(); }
-				else                      { tx.commit(); }
-			}
-			em.close();
-		}
-		if (emf != null) {
-			emf.close();
-		}
-	}
 	
-	@SuppressWarnings("unchecked")
-	private void cleanup() throws Exception {
-		Query query = em.createQuery("select vr from VehicleRegistration vr");
-		for (VehicleRegistration reg : 
-		    (List<VehicleRegistration>)query.getResultList()) {
-		    reg.getOwners().clear(); //remove entries from m-m link table
-			em.remove(reg);          //remove row from vehicle table
-		}
-		query = em.createQuery("select p from Person p");
-		for (Person person : (List<Person>)query.getResultList()) {
-			em.remove(person);
-		}
+	@Override
+	public void tearDown() throws Exception {
+		super.tearDown();
+		dao=null;
 	}
 
+	
 	/**
 	 * This method tests a single create into the database using the DAO. 
 	 * This tests some core functionality, but clearly more types of inserts
@@ -105,11 +66,13 @@ public class JPAPersonDAOTest {
     	//rest of this is used to test what should have happened above 
     	//and must leverage the JPA resources.
     	
-    	em.flush();
-    	assertTrue(em.contains(person));
-    	em.clear();
     	em.getTransaction().commit();
+    	assertTrue(em.contains(person));
+    	
+    		//the entity will persisted but no longer be cached after em.clear()
+    	em.clear();
     	assertFalse(em.contains(person));
+    	
     	
     	Person person2 = em.find(Person.class, person.getId());
       	log.debug("checking person...");

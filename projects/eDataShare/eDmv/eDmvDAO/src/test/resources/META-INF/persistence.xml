@@ -10,6 +10,20 @@
         <class>ejava.projects.edmv.bo.VehicleRegistration</class>
         
         <properties>
+            <!-- standard properties -->
+            <property name="javax.persistence.jdbc.url" value="${jdbc.url}"/>
+            <property name="javax.persistence.jdbc.driver" value="${jdbc.driver}"/>
+            <property name="javax.persistence.jdbc.user" value="${jdbc.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${jdbc.password}"/>
+            
+            <!-- hibernate-specific properties -->
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
+            <property name="hibernate.hbm2ddl.auto" value="false"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <!-- set to 0 to improve error messages when needed
+            <property name="hibernate.jdbc.batch_size" value="0"/>            
+             -->
         </properties>
     </persistence-unit>        
     

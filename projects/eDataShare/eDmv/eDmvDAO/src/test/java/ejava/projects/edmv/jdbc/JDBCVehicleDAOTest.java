@@ -2,9 +2,6 @@ package ejava.projects.edmv.jdbc;
 
 import static org.junit.Assert.*;
 
-
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -27,66 +24,27 @@ import ejava.projects.edmv.jdbc.JDBCVehicleDAO;
  * As more tests are added, the implementation show here would benefit from
  * re-usable techniques to check the values within the database.
  * 
- * @author jcstaff
- *
  */
-public class JDBCVehicleDAOTest {
+public class JDBCVehicleDAOTest extends JDBCDAOTestBase {
 	private static Log log = LogFactory.getLog(JDBCVehicleDAOTest.class);
-	private static String jdbcDriver = 
-		System.getProperty("jdbc.driver", "org.hsqldb.jdbcDriver");
-	private static String jdbcURL = 
-		System.getProperty("jdbc.url", "jdbc:hsqldb:hsql://localhost:9001");
-	private static String jdbcUser = 
-		System.getProperty("jdbc.user", "sa");
-	private static String jdbcPassword = 
-		System.getProperty("jdbc.password", "");
-	
-	private Connection connection;
 	private VehicleDAO vehicleDAO;
 	private PersonDAO personDAO;
 	
 	@Before
 	public void setUp() throws Exception {
-		log.debug("loading JDBC driver:" + jdbcDriver);
-		Thread.currentThread()
-		      .getContextClassLoader()
-		      .loadClass(jdbcDriver)
-		      .newInstance();
-		
-		log.debug("getting connection(" + jdbcURL +
-				", user=" + jdbcUser + ", password=" + jdbcPassword + ")");
-		connection = 
-			DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPassword);
+		super.setUp();
 		
 	    vehicleDAO = new JDBCVehicleDAO();
 	    ((JDBCVehicleDAO)vehicleDAO).setConnection(connection);
 	    personDAO = new JDBCPersonDAO();
 	    ((JDBCPersonDAO)personDAO).setConnection(connection);
-		
-		connection.setAutoCommit(false);
-		cleanup();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		if (connection != null) {
-			connection.commit();
-		    ((JDBCVehicleDAO)vehicleDAO).setConnection(null);
-			connection.close();
-		}
-	}
-	
-	private void cleanup() throws Exception {
-		Statement statement=null;
-		try {
-			statement = connection.createStatement();
-            statement.execute("DELETE FROM EDMV_VREG_OWNER_LINK");
-            statement.execute("DELETE FROM EDMV_PERSON");
-            statement.execute("DELETE FROM EDMV_VREG");
-		}
-		finally {
-            if (statement != null) { statement.close(); }			
-		}
+		super.tearDown();
+	    ((JDBCVehicleDAO)vehicleDAO).setConnection(null);
+	    ((JDBCPersonDAO)personDAO).setConnection(null);
 	}
 
 	/**

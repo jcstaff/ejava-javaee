@@ -32,60 +32,28 @@ import ejava.projects.edmv.jpa.JPAVehicleDAO;
  * @author jcstaff
  *
  */
-public class JPAVehicleDAOTest {
+public class JPAVehicleDAOTest extends JPADAOTestBase {
 	private static Log log = LogFactory.getLog(JPAVehicleDAOTest.class);
-	//this code assumes all the JDBC properties were placed in 
-	//META-INF/persistence.xml when the file was copied from src to the 
-	//target tree
-	
-	private EntityManagerFactory emf;
-	private EntityManager em;
+
 	private VehicleDAO vehicleDAO;
 	private PersonDAO personDAO;
 	
-	@Before
+	@Override
 	public void setUp() throws Exception {
-		emf = Persistence.createEntityManagerFactory("eDmvBO-test");
-		em = emf.createEntityManager();
-		
+		super.setUp();
 	    vehicleDAO = new JPAVehicleDAO();
 	    ((JPAVehicleDAO)vehicleDAO).setEntityManager(em);
 	    personDAO = new JPAPersonDAO();
 	    ((JPAPersonDAO)personDAO).setEntityManager(em);
 		
-		cleanup();
-		
 		em.getTransaction().begin();
 	}
 
-	@After
+	@Override
 	public void tearDown() throws Exception {
-		if (em != null) {
-			EntityTransaction tx = em.getTransaction();
-			if (tx.isActive()) {
-				if (tx.getRollbackOnly()) { tx.rollback(); }
-				else                      { tx.commit(); }
-			}
-			em.close();
-		}
-		if (emf != null) {
-			emf.close();
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	private void cleanup() throws Exception {
-		Query query = em.createQuery("select vr from VehicleRegistration vr");
-		for (VehicleRegistration reg : 
-		    (List<VehicleRegistration>)query.getResultList()) {
-		    reg.getOwners().clear(); //remove entries from m-m link table
-			em.remove(reg);          //remove row from vehicle table
-		}
-        query = em.createQuery("select p from Person p");
-        for (Person p : 
-            (List<Person>)query.getResultList()) {
-            em.remove(p);            //remove row from person table
-        }
+		super.tearDown();
+		vehicleDAO=null;
+		personDAO=null;
 	}
 
 	/**
@@ -121,10 +89,11 @@ public class JPAVehicleDAOTest {
     	//rest of this is used to test what should have happened above 
     	//and must leverage the JPA resources.
     	
-    	em.flush();
-    	assertTrue(em.contains(registration));
-    	em.clear();
     	em.getTransaction().commit();
+    	assertTrue(em.contains(registration));
+    	
+    		//the entity will persisted but no longer be cached after em.clear()
+    	em.clear();
     	assertFalse(em.contains(registration));
     	
     	VehicleRegistration registration2 = 

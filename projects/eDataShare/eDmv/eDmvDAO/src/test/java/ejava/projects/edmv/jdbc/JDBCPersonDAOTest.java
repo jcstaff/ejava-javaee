@@ -3,20 +3,16 @@ package ejava.projects.edmv.jdbc;
 import static org.junit.Assert.*;
 
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import ejava.projects.edmv.bo.Person;
 import ejava.projects.edmv.dao.PersonDAO;
-import ejava.projects.edmv.jdbc.JDBCPersonDAO;
 
 /**
  * This test case provides an example of one might test the JDBC DAO. It 
@@ -27,62 +23,32 @@ import ejava.projects.edmv.jdbc.JDBCPersonDAO;
  * @author jcstaff
  *
  */
-public class JDBCPersonDAOTest {
-	private static Log log = LogFactory.getLog(JDBCPersonDAOTest.class);
-	private static String jdbcDriver = 
-		System.getProperty("jdbc.driver", "org.hsqldb.jdbcDriver");
-	private static String jdbcURL = 
-		System.getProperty("jdbc.url", "jdbc:hsqldb:hsql://localhost:9001");
-	private static String jdbcUser = 
-		System.getProperty("jdbc.user", "sa");
-	private static String jdbcPassword = 
-		System.getProperty("jdbc.password", "");
+public class JDBCPersonDAOTest extends JDBCDAOTestBase {
+	static Log log = LogFactory.getLog(JDBCPersonDAOTest.class);
+	PersonDAO dao;
 	
-	private Connection connection;
-	private PersonDAO dao;
-	
-	@Before
-	public void setUp() throws Exception {		
-		log.debug("loading JDBC driver:" + jdbcDriver);
-		Thread.currentThread()
-		      .getContextClassLoader()
-		      .loadClass(jdbcDriver)
-		      .newInstance();
-		
-		log.debug("getting connection(" + jdbcURL +
-				", user=" + jdbcUser + ", password=" + jdbcPassword + ")");
-		connection = 
-			DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPassword);
-		
+	/**
+	 * Delegate common setUp tasks to parent and handle specifics of 
+	 * PersonDAO here.
+	 */
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
 	    dao = new JDBCPersonDAO();
 	    ((JDBCPersonDAO)dao).setConnection(connection);
-		
-		connection.setAutoCommit(false);
-		cleanup();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		if (connection != null) {
-			connection.commit();
-		    ((JDBCPersonDAO)dao).setConnection(null);
-			connection.close();
-		}
 	}
 	
-	private void cleanup() throws Exception {
-		Statement statement=null;
-		try {
-			statement = connection.createStatement();
-            statement.execute("DELETE FROM EDMV_VREG_OWNER_LINK");
-			statement.execute("DELETE FROM EDMV_PERSON");
-			statement.execute("DELETE FROM EDMV_VREG");
-		}
-		finally {
-            if (statement != null) { statement.close(); }			
-		}
+	/**
+	 * Delegate common tearDown tasks to parent and handle specifics of 
+	 * PersonDAO here.
+	 */
+	@Override
+	public void tearDown() throws Exception {
+		super.tearDown();
+	    ((JDBCPersonDAO)dao).setConnection(null);
 	}
-
+	
+	
 	/**
 	 * This method tests a single create into the database using the DAO. 
 	 * 
