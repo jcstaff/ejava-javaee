@@ -6,20 +6,18 @@
     <persistence-unit name="ormEJBQL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
-            <!-- moved hibernate-specific properties to hibernate.properties file
+            <!-- moved properties to hibernate.properties file
+            <property name="javax.persistence.jdbc.url" value="${jdbc.url}"/>
+            <property name="javax.persistence.jdbc.driver" value="${jdbc.driver}"/>
+            <property name="javax.persistence.jdbc.user" value="${jdbc.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${jdbc.password}"/>
+
             <property name="hibernate.dialect" 
                 value="org.hibernate.dialect.HSQLDialect"/>
-            <property name="hibernate.connection.url"
-                value="${jdbc.url}"/>
-            <property name="hibernate.connection.driver_class" 
-                value="${jdbc.driver}"/>
-            <property name="hibernate.connection.password" 
-                value="${jdbc.password}"/>
-            <property name="hibernate.connection.username" 
-                value="${jdbc.user}"/>
             <property name="hibernate.hbm2ddl.auto" value="create"/>
             <property name="hibernate.show_sql" value="false"/>            
             <property name="hibernate.format_sql" value="true"/>            
+            <property name="hibernate.jdbc.batch_size" value="0"/>            
             -->
         </properties>
     </persistence-unit>        

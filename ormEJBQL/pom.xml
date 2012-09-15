@@ -94,7 +94,8 @@
                         
             <build>
                 <plugins>
-                    <!-- generates a DDL file for persistence unit -->
+                    <!-- generates a DDL file for persistence unit 
+                        see effective-pom for full configuration -->
                     <plugin>
                         <artifactId>hibernate3-maven-plugin</artifactId>
                         <groupId>org.codehaus.mojo</groupId>
@@ -103,37 +104,10 @@
                                 <classpath>
                                     <path location="${project.build.directory}/test-classes"/>
                                 </classpath>
-                                <jpaconfiguration persistenceunit="ormEJBQL"/>
+                                <jpaconfiguration persistenceunit="ormEJBQL"
+                                     propertyfile="${basedir}/target/test-classes/hibernate.properties"/>
                             </hibernatetool>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>generate-drop-ddl</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <hibernatetool>
-                                        <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                            outputfilename="${project.artifactId}-drop.ddl"/>
-                                    </hibernatetool>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>generate-create-ddl</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <hibernatetool>
-                                        <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                            outputfilename="${project.artifactId}-create.ddl"/>
-                                    </hibernatetool>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

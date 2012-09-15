@@ -114,6 +114,9 @@
 
                  Change the persistenceunit element to match your persistence unit
                  name when you copy this.
+
+                 See mvn help:effective-pom to see full definition inherited from 
+                 parent
                  -->
             <plugin>
                 <artifactId>hibernate3-maven-plugin</artifactId>
@@ -126,34 +129,6 @@
                         <jpaconfiguration persistenceunit="eDmvBO-test"/>
                     </hibernatetool>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>generate-drop-ddl</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <hibernatetool>
-                                <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                    outputfilename="${project.artifactId}-dropJPA.ddl"/>
-                            </hibernatetool>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>generate-create-ddl</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <hibernatetool>
-                                <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                    outputfilename="${project.artifactId}-createJPA.ddl"/>
-                            </hibernatetool>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

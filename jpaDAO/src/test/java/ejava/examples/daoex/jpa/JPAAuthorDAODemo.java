@@ -41,18 +41,20 @@ public class JPAAuthorDAODemo {
     @After
     public void tearDown() throws Exception {
         try {
-            log_.debug("tearDown() started, em=" + em);            
-            em.getTransaction().begin();
-            em.getTransaction().commit();
-            log_.debug("tearDown() complete, em=" + em);
+        	if (em != null) {
+	            log_.debug("tearDown() started, em=" + em);            
+	            em.getTransaction().begin();
+	            em.getTransaction().commit();
+	            log_.debug("tearDown() complete, em=" + em);
+        	}
         }
         catch (Exception ex) {
             log_.fatal("tearDown failed", ex);
             throw ex;
         }
         finally {
-            em.close();
-            emf.close();
+        	if (em != null) { em.close();   em=null;}
+            if (emf != null) { emf.close(); emf=null; }
         }
     }
     
