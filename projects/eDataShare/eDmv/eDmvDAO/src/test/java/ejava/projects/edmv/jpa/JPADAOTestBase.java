@@ -51,7 +51,7 @@ public class JPADAOTestBase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void cleanup() throws Exception {
+	protected void cleanup() throws Exception {
 		Query query = em.createQuery("select vr from VehicleRegistration vr");
 		for (VehicleRegistration reg : 
 		    (List<VehicleRegistration>)query.getResultList()) {
@@ -62,6 +62,8 @@ public class JPADAOTestBase {
 		for (Person person : (List<Person>)query.getResultList()) {
 			em.remove(person);
 		}
+		em.getTransaction().begin();
+		em.getTransaction().commit();
 	}
 
 }
