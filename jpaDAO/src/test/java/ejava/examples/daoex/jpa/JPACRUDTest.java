@@ -372,4 +372,74 @@ public class JPACRUDTest extends JPATestBase {
             fail("object not deleted");
         }        
     }
+    
+    
+    /**
+     * Demonstrates that removing a new entity is ignored.
+     * @throws Exception
+     */
+    @Test
+    public void testRemoveNew() throws Exception {
+        log.info("*** testRemoveNew() ***");
+
+        Author author = new Author();
+        author.setFirstName("test");
+        author.setLastName("New");
+        author.setSubject("testing");
+        author.setPublishDate(new Date());
+
+        //entity managers will ignore removal of new entity
+        log.debug("em.contains(author)=" + em.contains(author));
+        em.remove(author);
+        log.debug("em.contains(author)=" + em.contains(author));
+    }
+
+    /**
+     * Demonstrates that removing a new entity is rejected
+     * @throws Exception
+     */
+    @Test
+    public void testRemoveDetached() throws Exception {
+        log.info("*** testRemoveDetached() ***");
+
+        Author author = new Author(1);
+        author.setFirstName("test");
+        author.setLastName("Detached");
+        author.setSubject("testing");
+        author.setPublishDate(new Date());
+
+        try {
+        	//entity managers will reject the removal of detached entity
+        	em.remove(author);
+        	fail("did not reject removal of detached object");
+        } catch (IllegalArgumentException ex) {
+        	log.debug("caught expected exception:" + ex);
+        }
+    }
+    
+    /**
+     * Demonstrates that removing a removed entity is ignored.
+     * @throws Exception
+     */
+    @Test
+    public void testRemoveRemoved() throws Exception {
+        log.info("*** testRemoveRemoved() ***");
+
+        Author author = new Author();
+        author.setFirstName("test");
+        author.setLastName("New");
+        author.setSubject("testing");
+        author.setPublishDate(new Date());
+        em.persist(author);
+        log.debug("peristed:" + author);
+        
+        log.debug("em.contains(author)=" + em.contains(author));
+        em.remove(author);
+        log.debug("em.contains(author)=" + em.contains(author));
+        
+        //entity managers will ignore the removal of a removed entity
+        em.remove(author);
+        log.debug("em.contains(author)=" + em.contains(author));
+    }
+
 }

@@ -69,7 +69,6 @@ log.debug("em.contains(author)=" + em.contains(author));
         author.setFirstName("dr");
 ...
         log.debug("creating author:" + author);
-
         log.debug("em.contains(author)=" + em.contains(author));
         try {
             em.persist(author);
@@ -89,6 +88,8 @@ log.debug("em.contains(author)=" + em.contains(author));
             </listitem>
         </itemizedlist>                   
     </section>
+
+
 
     <section id="jpa-crud-find">
         <title>find()</title>
@@ -142,6 +143,8 @@ log.debug("em.contains(author)=" + em.contains(author));
         </itemizedlist>                   
     </section>
 
+
+
     <section id="jpa-crud-remove">
         <title>merge()</title>
         <itemizedlist>
@@ -153,9 +156,66 @@ log.debug("em.contains(author)=" + em.contains(author));
 void remove(Object entity);
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Managed entity is removed from database</para></listitem>
+            <listitem><para>Actual delete time depends on transaction active and FlushMode</para>
+                <itemizedlist>
+                    <listitem><para>Extended Persistence Context - queues delete until transaction active</para></listitem>
+                </itemizedlist>
+            </listitem>
+            
+            <listitem><para>New entities are ignored but CascadeType.REMOVE and ALL relationships are cascaded</para>
+        <programlisting language="java"><![CDATA[
+log.debug("em.contains(author)=" + em.contains(author));
+em.remove(author);
+log.debug("em.contains(author)=" + em.contains(author));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-em.contains(author)=false
+-HHH000114: Handling transient entity in delete processing
+-em.contains(author)=false
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Detached entities are rejected</para>
+        <programlisting language="java"><![CDATA[
+Author author = new Author(1);
+...
+try {
+    em.remove(author);
+    fail("did not reject removal of detached object");
+} catch (IllegalArgumentException ex) {
+    log.debug("caught expected exception:" + ex);
+}
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-caught expected exception:java.lang.IllegalArgumentException: 
+        Removing a detached instance ejava.examples.daoex.bo.Author#1
+]]></programlisting>
+            </listitem>
+            
+            
+            <listitem><para>Removed entities are ignored</para>
+        <programlisting language="java"><![CDATA[
+Author author = new Author();
+...
+log.debug("peristed:" + author);
+
+log.debug("em.contains(author)=" + em.contains(author));
+em.remove(author);
+log.debug("em.contains(author)=" + em.contains(author));
+
+//entity managers will ignore the removal of a removed entity
+em.remove(author);
+log.debug("em.contains(author)=" + em.contains(author));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-peristed:ejava.examples.daoex.bo.Author@6c5356, id=50, ...
+-em.contains(author)=true
+-em.contains(author)=false
+-em.contains(author)=false
+]]></programlisting>
+            </listitem>
+
         </itemizedlist>                   
     </section>
 </chapter>

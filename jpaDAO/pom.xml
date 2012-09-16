@@ -7,14 +7,16 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>ejava.javaee.jpa</groupId>
+  <groupId>ejava.jpa</groupId>
   <artifactId>jpaDAO</artifactId>
+  <packaging>jar</packaging>
 
   <name>Java Persistance API</name>
   <description>
     This module provides an basic example of using the Java Persistence API
     to map a flat POJO to a database.
   </description>
+  
   <dependencies>
     <!-- core dependencies -->
     <dependency>
@@ -79,18 +81,6 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
-        </profile>
-
-        <profile>
-            <id>docs</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jboss.maven.plugins</groupId>
-                        <artifactId>maven-jdocbook-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>
