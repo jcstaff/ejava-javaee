@@ -4,14 +4,9 @@ import static org.junit.Assert.*;
 
 
 import java.util.Date;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import ejava.examples.daoex.bo.Author;
@@ -22,42 +17,9 @@ import ejava.examples.daoex.bo.Author;
  * DAO. DAOs are still useful and necessary when using JPA. This unit test
  * is just an early demo of the mechanics of the API, NOT the architecture 
  * that should surround the use of the API.
- * 
- * @author jcstaff
  */
-public class JPANoDAODemo {
-    private static Log log_ = LogFactory.getLog(JPANoDAODemo.class);
-    EntityManagerFactory emf; 
-    private EntityManager em;    
-        
-    @Before
-    public void setUp() throws Exception {
-        log_.debug("setUp() started, em=" + em);
-        emf = Persistence.createEntityManagerFactory("jpaDemo");
-        em = emf.createEntityManager();
-    }
-    
-    @After
-    public void tearDown() throws Exception {
-        try {
-        	if (em != null) {
-	            log_.debug("tearDown() started, em=" + em);            
-	            em.getTransaction().begin();
-	            em.getTransaction().commit();
-	            log_.debug("tearDown() complete, em=" + em);
-        	}
-        }
-        catch (Exception ex) {
-            log_.fatal("tearDown failed", ex);
-            throw ex;
-        }
-        finally {
-        	if (em != null) { em.close();   em=null;}
-            if (emf != null) { emf.close(); emf=null; }
-        }
-    }
-    
-    
+public class JPANoDAOTest extends JPATestBase {
+    static Log log_ = LogFactory.getLog(JPANoDAOTest.class);
     /**
      * This test verifies we can persist an entity.
      */

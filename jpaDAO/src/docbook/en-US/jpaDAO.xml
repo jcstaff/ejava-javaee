@@ -5,6 +5,7 @@
     <bookinfo>
         <title>Java Persistence API</title>
         <subtitle>Entities and EntityManager</subtitle>
+        <pubdate>2012-09-18</pubdate>
     </bookinfo>
     <preface id="jpa-purpose">
         <title>Purpose</title>
@@ -12,7 +13,7 @@
         <section id="jpa-goals">
             <title>Goals</title>
             <itemizedlist>
-                <listitem><para>Introduce the Java Persistance API
+                <listitem><para>Introduce the Java Persistence API
                     and its capabilities</para></listitem>
             </itemizedlist>
         </section>
@@ -21,14 +22,19 @@
             <title>Objectives</title>
             <para>At the completion of this topic, the student shall</para>
             <itemizedlist>
-                <listitem><para>have more understanding of:</para>
+                <listitem><para>have an understanding of:</para>
                     <itemizedlist>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Requirements for entity classes</para></listitem>
+                        <listitem><para>How to define a persistence unit</para></listitem>
+                        <listitem><para>How to obtain an entity manager</para></listitem>
+                        <listitem><para>Persistence methods available from EntityManager</para></listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem><para>be able to:</para>
                     <itemizedlist>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Define a Java class as an entity</para></listitem>
+                        <listitem><para>Define a persistence unit with entity class(es)</para></listitem>
+                        <listitem><para>Implement DAO operations in terms of javax.persistence.Persistence API</para></listitem>
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
@@ -38,4 +44,10 @@
     <toc/>
 
     <xi:include href="jpa-entities.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entitymanager.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-crud.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-membership.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-locking.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-query.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-methods-other.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

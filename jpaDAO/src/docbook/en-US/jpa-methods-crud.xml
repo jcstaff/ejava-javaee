@@ -1,0 +1,96 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-methods-crud">
+    <title>Entity Manager CRUD Methods</title>
+    
+
+    <section id="jpa-crud-persist">
+        <title>persist()</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+void persist(Object entity);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-crud-find">
+        <title>find()</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+<T> T find(Class<T> entityClass, Object primaryKey);
+<T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-crud-getReference">
+        <title>getReference()</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+<T> T getReference(Class<T> entityClass, Object primaryKey);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-crud-merge">
+        <title>merge()</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+<T> T merge(T entity);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-crud-remove">
+        <title>merge()</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+void remove(Object entity);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+</chapter>
+  
+
+  

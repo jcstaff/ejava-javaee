@@ -54,6 +54,13 @@
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>ejava.jpa</groupId>
+            <artifactId>jpaDAO</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -98,6 +105,12 @@
                 <overlay>
                     <groupId>ejava.bl</groupId>
                     <artifactId>blPurchase-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.jpa</groupId>
+                    <artifactId>jpaDAO</artifactId>
                     <type>war</type>
                     <targetPath>../site/docs/content</targetPath>
                </overlay>

@@ -2,59 +2,31 @@ package ejava.examples.daoex.jpa;
 
 import static org.junit.Assert.*;
 
-
 import java.util.Date;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
+import ejava.examples.daoex.AuthorDAO;
 import ejava.examples.daoex.bo.Author;
+import ejava.examples.daoex.jpa.JPAAuthorDAO;
 
 /**
- * This class provides a scalled down version of JPAAuthorDAOTest, in that
- * it only employs an Extended Persistence Context and eliminates the
- * DAO in order to simplify the presentation of the code.
+ * This class provides demo of using a DAO implemented with JPA
  * 
  * @author jcstaff
  */
-public class JPAExtendedOnlyDemo {
-    private static Log log_ = LogFactory.getLog(JPAExtendedOnlyDemo.class);
-    private EntityManagerFactory emf;
-    private EntityManager em;    
+public class JPAAuthorDAOTest extends JPATestBase {
+    private static Log log_ = LogFactory.getLog(JPAAuthorDAOTest.class);
+    private AuthorDAO dao;
         
-    @Before
+    @Override
     public void setUp() throws Exception {
-        log_.debug("setUp() started, em=" + em);
-        emf = Persistence.createEntityManagerFactory("jpaDemo");
-        em = emf.createEntityManager();
+    	super.setUp();
+        dao = new JPAAuthorDAO();
+        ((JPAAuthorDAO)dao).setEntityManager(em);
     }
-    
-    @After
-    public void tearDown() throws Exception {
-        try {
-        	if (em != null) {
-	            log_.debug("tearDown() started, em=" + em);            
-	            em.getTransaction().begin();
-	            em.getTransaction().commit();
-	            log_.debug("tearDown() complete, em=" + em);
-        	}
-        }
-        catch (Exception ex) {
-            log_.fatal("tearDown failed", ex);
-            throw ex;
-        }
-        finally {
-        	if (em != null) { em.close();   em=null;}
-            if (emf != null) { emf.close(); emf=null; }
-        }
-    }
-    
     
     /**
      * This test verifies we can persist an entity.
@@ -71,7 +43,7 @@ public class JPAExtendedOnlyDemo {
 
         //entity managers with extended persistence contexts can be called
         //outside of a transaction
-        em.persist(author);
+        dao.create(author);
         log_.info("created author:" + author);        
     }
     
@@ -91,11 +63,11 @@ public class JPAExtendedOnlyDemo {
         author.setPublishDate(new Date());
         
         log_.info("creating author:" + author);
-        em.persist(author);
+        dao.create(author);
         log_.info("created author:" + author);        
 
         Author author2=null;
-        author2 = em.find(Author.class, author.getId());
+        author2 = dao.get(author.getId());
         log_.info("got author author:" + author2);
 
         assertEquals(author.getFirstName(), author2.getFirstName());
@@ -119,7 +91,7 @@ public class JPAExtendedOnlyDemo {
         author.setPublishDate(new Date());
         
         log_.info("creating author:" + author);
-        em.persist(author);
+        dao.create(author);
         
         //need to associate em with Tx to allow query to see entity in DB
         try {
@@ -136,9 +108,7 @@ public class JPAExtendedOnlyDemo {
       
         Author author2 = null;
         try {
-            Query query = em.createQuery(
-                    "from jpaAuthor where id=" + author.getId());
-            author2 = (Author)query.getSingleResult();
+            author2 = dao.getByQuery(author.getId());
             log_.info("got author:" + author2);
         }
         catch (Exception ex) {
@@ -171,24 +141,39 @@ public class JPAExtendedOnlyDemo {
         author.setLastName(lastName);
         author.setSubject(subject);
         author.setPublishDate(published);        
-        em.persist(author);
+        dao.create(author);        
+        assertTrue("author is not managed", em.contains(author));
+        em.getTransaction().begin();
+        em.getTransaction().commit();
         
+        //make sure we have our author in the DB but not currently 
+        //managed by the entity manager
+        em.clear();
+        assertFalse("author is still managed", em.contains(author));        
+        
+        //now make some changes to our baseline object
         author.setFirstName("updated " + firstName);
         author.setLastName("updated " + lastName);
         author.setSubject("updated " + subject);
         author.setPublishDate(new Date(published.getTime()+ 1000));
-        try {
-            em.getTransaction().begin();
-            em.getTransaction().commit();
-            Author dbAuthor = em.find(Author.class, author.getId());
+        
+        //show that the DB has not been updated
+        Author dbAuthor = dao.get(author.getId());
+        assertFalse("unexpected first name", 
+                author.getFirstName().equals(dbAuthor.getFirstName()));
+        assertFalse("unexpected last name", 
+                author.getLastName().equals(dbAuthor.getLastName()));
+        assertFalse("unexpected subject", 
+                author.getFirstName().equals(dbAuthor.getSubject()));
+        assertFalse("unexpected publish date", 
+                author.getFirstName().equals(dbAuthor.getPublishDate()));
 
-            dbAuthor.setFirstName(author.getFirstName());
-            dbAuthor.setLastName(author.getLastName());
-            dbAuthor.setSubject(author.getSubject());
-            dbAuthor.setPublishDate(author.getPublishDate());
-            
+        try {
+            //example of using update to make changes in DB
+            dao.update(author);
             em.getTransaction().begin();
             em.getTransaction().commit();
+
             log_.info("updated author:" + author);
         }
         catch (Exception ex) {
@@ -198,10 +183,11 @@ public class JPAExtendedOnlyDemo {
             }
             fail("" + ex);
         }
-        
+
+        //verify changes were made to DB
         Author author2 = null;
         try {
-            author2 = em.find(Author.class, author.getId());
+            author2 = dao.get(author.getId());
             log_.info("got author:" + author2);
         }
         catch (Exception ex) {
@@ -235,10 +221,10 @@ public class JPAExtendedOnlyDemo {
         author.setPublishDate(published);        
         try {
             em.getTransaction().begin();
-            em.persist(author);
+            dao.create(author);
             em.flush();
-            em.clear();
             em.getTransaction().commit();
+            em.clear();
             log_.info("created author:" + author);
         }
         catch (Exception ex) {
@@ -247,6 +233,7 @@ public class JPAExtendedOnlyDemo {
             fail("" + ex);
         }
         
+        //create a new object with the same primary key as the one in the DB
         Author author2 = new Author(author.getId());
         author2.setFirstName("updated " + author.getFirstName());
         author2.setLastName("updated " + author.getLastName());
@@ -254,10 +241,13 @@ public class JPAExtendedOnlyDemo {
         author2.setPublishDate(new Date(published.getTime()+ 1000));
         try {
             log_.info("merging with author:" + author2);
-            Author tmp = em.merge(author2);
+            Author tmp = dao.updateByMerge(author2);
             em.getTransaction().begin();
             em.getTransaction().commit();
             log_.info("merged author:" + tmp);
+            
+            assertFalse("author2 is managed", em.contains(author2));
+            assertTrue("tmp Author is not managed", em.contains(tmp));
         }
         catch (Exception ex) {
             log_.fatal(ex);
@@ -265,9 +255,10 @@ public class JPAExtendedOnlyDemo {
             fail("" + ex);
         }
         
+        //verify our changes were made to the DB
         Author author3 = null;
         try {
-            author3 = em.find(Author.class, author.getId());
+            author3 = dao.get(author.getId());
             log_.info("got author:" + author3);
         }
         catch (Exception ex) {
@@ -293,7 +284,7 @@ public class JPAExtendedOnlyDemo {
         author.setPublishDate(new Date());
         try {
             em.getTransaction().begin();
-            em.persist(author);
+            dao.create(author);
             em.getTransaction().commit();
             log_.info("created author:" + author);
         }
@@ -304,7 +295,7 @@ public class JPAExtendedOnlyDemo {
         }
         
         try {
-            em.remove(author); //remove doesn't happen until tx
+            dao.remove(author); //remove doesn't happen until tx
             em.getTransaction().begin();
             em.getTransaction().commit();
             log_.info("removed author:" + author);
@@ -317,7 +308,7 @@ public class JPAExtendedOnlyDemo {
 
         Author author2=null;
         try {
-            author2 = em.find(Author.class, author.getId());
+            author2 = dao.get(author.getId());
             log_.info("removed author:" + author);
         }
         catch (Exception ex) {
@@ -328,4 +319,5 @@ public class JPAExtendedOnlyDemo {
             fail("object not deleted");
         }        
     }
+
 }

@@ -72,19 +72,13 @@ javax.persistence.criteria.CriteriaBuilder getCriteriaBuilder();
             ]]></programlisting>
         </section>
 
-        <section id="jpa-em-methods-tx">
-            <title>Transaction Operations</title>
-           <programlisting language="java"><![CDATA[
-javax.persistence.EntityTransaction getTransaction();
-void joinTransaction();
-            ]]></programlisting>
-        </section>
-        
-        <section id="jpa-em-methods-overhead">
-            <title>Overhead Operations</title>
+        <section id="jpa-em-methods-other">
+            <title>Other Operations</title>
            <programlisting language="java"><![CDATA[
 void close();
 boolean isOpen();
+javax.persistence.EntityTransaction getTransaction();
+void joinTransaction();
 void setProperty(String key, Object value);
 java.util.Map getProperties();
 <T> T unwrap(Class<T> clazz);

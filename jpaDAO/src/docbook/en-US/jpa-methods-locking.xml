@@ -1,0 +1,61 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-methods-locking">
+    <title>Entity Manager Locking Methods</title>
+    
+
+    <section id="jpa-locking-lock">
+        <title>lock()</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+void lock(Object entity, javax.persistence.LockModeType);
+void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> properties);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-locking-find">
+        <title>find(lock)</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+<T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType);
+<T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType, Map<String, Object> properties);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-locking-getLockMode">
+        <title>()</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+javax.persistence.LockModeType getLockMode(Object entity);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+</chapter>
