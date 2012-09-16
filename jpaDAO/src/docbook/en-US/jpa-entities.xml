@@ -1,0 +1,25 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entities">
+    <title>Entities</title>
+    
+    <section id="jpa-entities-class">
+        <title>Entity Class</title>
+        <itemizedlist>
+            <listitem><para>Must be annotated with the Entity annotation or denoted in the XML descriptor as entity</para></listitem>
+            <listitem><para>Must have a public or protected no-arg constructor</para></listitem>
+            <listitem><para>Must be a top-level class</para>
+                <itemizedlist>
+                    <listitem><para>Enums and interfaces cannot not be designated as entity</para></listitem>
+                </itemizedlist>                   
+            </listitem> 
+            <listitem><para>Must not be final class</para></listitem> 
+            <listitem><para>Methods or persistent instance variables must not be final</para></listitem>
+        </itemizedlist>                   
+        <programlisting language=""><![CDATA[
+        ]]></programlisting>
+    </section>
+
+</chapter>
+  

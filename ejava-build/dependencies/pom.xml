@@ -39,6 +39,7 @@
         <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
         <maven-verifier-plugin.version>1.0</maven-verifier-plugin.version>
 
+        <build-helper-maven-plugin.version>1.7</build-helper-maven-plugin.version>
         <maven-dependency-plugin.version>2.5</maven-dependency-plugin.version>        
         <maven-ear-plugin.version>2.7</maven-ear-plugin.version>
         <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
@@ -53,6 +54,7 @@
         <maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
         <maven-project-info-reports-plugin.version>2.5</maven-project-info-reports-plugin.version>
         <maven-surefire-report-plugin.version>2.9</maven-surefire-report-plugin.version>
+        <maven-jdocbook-plugin.version>2.3.7</maven-jdocbook-plugin.version>
 
         <maven-ant-plugin.version>2.3</maven-ant-plugin.version>
         <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
@@ -493,6 +495,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${maven-resources-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

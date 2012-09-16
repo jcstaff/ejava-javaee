@@ -1,0 +1,99 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entitymanager">
+    <title>Entity Manager</title>
+    
+    <section id="jpa-em-methods">
+        <title>Entity Manager Methods</title>
+        <programlisting language=""><![CDATA[
+public interface javax.persistence.EntityManager{
+...
+}
+        ]]></programlisting>
+
+        <section id="jpa-em-methods-crud">
+            <title>Basic CRUD Operations</title>
+           <programlisting language="java"><![CDATA[
+void persist(Object entity);
+<T> T find(Class<T> entityClass, Object primaryKey);
+<T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties);
+<T> T merge(T entity);
+void remove(Object entity);
+<T> T getReference(Class<T> entityClass, Object primaryKey);
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-em-methods-membership">
+            <title>Membership Operations</title>
+           <programlisting language="java"><![CDATA[
+void clear();
+void detach(Object entity);
+boolean contains(Object entity);
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-em-methods-sync">
+            <title>State Synchronization Operations</title>
+           <programlisting language="java"><![CDATA[
+void flush();
+void setFlushMode(javax.persistence.FlushModeType);
+javax.persistence.FlushModeType getFlushMode();
+void refresh(Object);
+void refresh(Object, java.util.Map);
+void refresh(Object, javax.persistence.LockModeType);
+void refresh(Object, javax.persistence.LockModeType, Map<String, Object> properties);
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-em-methods-locking">
+            <title>Locking Operations</title>
+           <programlisting language="java"><![CDATA[
+void lock(Object entity, javax.persistence.LockModeType);
+void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> properties);
+<T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType);
+<T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType, Map<String, Object> properties);
+javax.persistence.LockModeType getLockMode(Object entity);
+            ]]></programlisting>
+        </section>
+        
+        <section id="jpa-em-methods-query">
+            <title> Query Operations</title>
+           <programlisting language="java"><![CDATA[
+javax.persistence.Query createQuery(String jpaql);
+<T> javax.persistence.TypedQuery<T> createQuery(String jpaql, Class<T> resultClass);
+javax.persistence.Query createNamedQuery(String name);
+<T> javax.persistence.TypedQuery<T> createNamedQuery(String name, Class<T> resultClass);
+javax.persistence.Query createNativeQuery(String sql);
+javax.persistence.Query createNativeQuery(String sql, Class resultClass);
+javax.persistence.Query createNativeQuery(String sql, String resultMapping);
+<T> javax.persistence.TypedQuery<T> createQuery(javax.persistence.criteria.CriteriaQuery<T> criteria);
+javax.persistence.criteria.CriteriaBuilder getCriteriaBuilder();
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-em-methods-tx">
+            <title>Transaction Operations</title>
+           <programlisting language="java"><![CDATA[
+javax.persistence.EntityTransaction getTransaction();
+void joinTransaction();
+            ]]></programlisting>
+        </section>
+        
+        <section id="jpa-em-methods-overhead">
+            <title>Overhead Operations</title>
+           <programlisting language="java"><![CDATA[
+void close();
+boolean isOpen();
+void setProperty(String key, Object value);
+java.util.Map getProperties();
+<T> T unwrap(Class<T> clazz);
+Object getDelegate();
+javax.persistence.metamodel.Metamodel getMetamodel();
+javax.persistence.EntityManagerFactory getEntityManagerFactory();
+            ]]></programlisting>
+        </section>
+    </section>
+
+</chapter>
+  
