@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 
 import java.util.Date;
+
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,27 +20,80 @@ import ejava.examples.daoex.bo.Author;
  * is just an early demo of the mechanics of the API, NOT the architecture 
  * that should surround the use of the API.
  */
-public class JPANoDAOTest extends JPATestBase {
-    static Log log_ = LogFactory.getLog(JPANoDAOTest.class);
+public class JPACRUDTest extends JPATestBase {
+    static Log log = LogFactory.getLog(JPACRUDTest.class);
     /**
      * This test verifies we can persist an entity.
      */
     @Test
-    public void testCreate() throws Exception {
-        log_.info("testCreate()");
+    public void testCreate() {
+        log.info("*** testCreate() ***");
         Author author = new Author();
         author.setFirstName("dr");
         author.setLastName("seuss");
         author.setSubject("children");
         author.setPublishDate(new Date());
-        log_.info("creating author:" + author);
+        log.debug("creating author:" + author);
+        assertFalse("unexpected initialized id", author.getId() > 0);
 
+        log.debug("em.contains(author)=" + em.contains(author));
         //entity managers with extended persistence contexts can be called
         //outside of a transaction
         em.persist(author);
-        log_.info("created author:" + author);        
+        log.debug("created author:" + author);        
+        log.debug("em.contains(author)=" + em.contains(author));
+        assertTrue("missing id", author.getId() > 0);
     }
     
+    /**
+     * Demonstrates existing entity persist is ignored
+     * @throws Exception
+     */
+    @Test
+    public void testCreateExisting() {
+    	log.info("*** testCreateExisting ***");
+    	
+        Author author = new Author();
+        author.setFirstName("dr");
+        author.setLastName("seuss");
+        author.setSubject("children");
+        author.setPublishDate(new Date());
+        log.debug("creating author first time:" + author);
+
+        log.debug("em.contains(author)=" + em.contains(author));
+        em.persist(author);
+        log.debug("created author:" + author);        
+        log.debug("em.contains(author)=" + em.contains(author));
+
+        //entity managers will ignore persists for existing entity
+        em.persist(author);
+    }
+    
+
+    /**
+     * Demonstrates how a detached entity will get rejected from persist
+     * @throws Exception
+     */
+    @Test
+    public void testCreateDetached() throws Exception {
+        log.info("*** testCreateDetached() ***");
+        Author author = new Author(1);
+        author.setFirstName("dr");
+        author.setLastName("seuss");
+        author.setSubject("children");
+        author.setPublishDate(new Date());
+        log.debug("creating author:" + author);
+
+        log.debug("em.contains(author)=" + em.contains(author));
+        //entity managers will reject a detached entity
+        try {
+        	em.persist(author);
+        	fail("did not detect detached entity");
+        } catch (PersistenceException ex) {
+        	log.debug("caught expected exception:" + ex);
+        }
+        log.debug("em.contains(author)=" + em.contains(author));
+    }
 
     /**
      * This test verifies the ability of the DAO to get an object from the 
@@ -47,20 +102,20 @@ public class JPANoDAOTest extends JPATestBase {
      */
     @Test
     public void testGet() throws Exception {
-        log_.info("testGet()");
+        log.info("*** testGet() ***");
         Author author = new Author();
         author.setFirstName("thing");
         author.setLastName("one");
         author.setSubject("children");
         author.setPublishDate(new Date());
         
-        log_.info("creating author:" + author);
+        log.debug("creating author:" + author);
         em.persist(author);
-        log_.info("created author:" + author);        
+        log.debug("created author:" + author);        
 
         Author author2=null;
         author2 = em.find(Author.class, author.getId());
-        log_.info("got author author:" + author2);
+        log.debug("got author author:" + author2);
 
         assertEquals(author.getFirstName(), author2.getFirstName());
         assertEquals(author.getLastName(), author2.getLastName());
@@ -74,7 +129,7 @@ public class JPANoDAOTest extends JPATestBase {
      */
     @Test
     public void testQuery() throws Exception {
-        log_.info("testQuery()");
+        log.info("*** testQuery() ***");
         
         Author author = new Author();
         author.setFirstName("test");
@@ -82,7 +137,7 @@ public class JPANoDAOTest extends JPATestBase {
         author.setSubject("testing");
         author.setPublishDate(new Date());
         
-        log_.info("creating author:" + author);
+        log.debug("creating author:" + author);
         em.persist(author);
         
         //need to associate em with Tx to allow query to see entity in DB
@@ -92,7 +147,7 @@ public class JPANoDAOTest extends JPATestBase {
             em.getTransaction().commit();
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             em.getTransaction().rollback();
             fail("" + ex);
         }
@@ -103,10 +158,10 @@ public class JPANoDAOTest extends JPATestBase {
             Query query = em.createQuery(
                     "from jpaAuthor where id=" + author.getId());
             author2 = (Author)query.getSingleResult();
-            log_.info("got author:" + author2);
+            log.debug("got author:" + author2);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             fail("" + ex);
         }
         
@@ -123,7 +178,7 @@ public class JPANoDAOTest extends JPATestBase {
      */
     @Test
     public void testUpdate() throws Exception {
-        log_.info("testUpdate");
+        log.info("*** testUpdate");
         
         String firstName="test";
         String lastName="Update";
@@ -173,10 +228,10 @@ public class JPANoDAOTest extends JPATestBase {
             
             em.getTransaction().begin();
             em.getTransaction().commit();
-            log_.info("updated author:" + author);
+            log.debug("updated author:" + author);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -187,10 +242,10 @@ public class JPANoDAOTest extends JPATestBase {
         Author author2 = null;
         try {
             author2 = em.find(Author.class, author.getId());
-            log_.info("got author:" + author2);
+            log.debug("got author:" + author2);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             fail("" + ex);
         }
         
@@ -206,7 +261,7 @@ public class JPANoDAOTest extends JPATestBase {
      */
     @Test
     public void testMerge() throws Exception {
-        log_.info("testMerge");
+        log.info("*** testMerge");
         
         String firstName="test";
         String lastName="Merge";
@@ -224,10 +279,10 @@ public class JPANoDAOTest extends JPATestBase {
             em.flush();
             em.getTransaction().commit();
             em.clear();
-            log_.info("created author:" + author);
+            log.debug("created author:" + author);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             em.getTransaction().rollback();
             fail("" + ex);
         }
@@ -239,16 +294,16 @@ public class JPANoDAOTest extends JPATestBase {
         author2.setSubject("updated " + author.getSubject());
         author2.setPublishDate(new Date(published.getTime()+ 1000));
         try {
-            log_.info("merging with author:" + author2);
+            log.debug("merging with author:" + author2);
             Author tmp = em.merge(author2);
             em.getTransaction().begin();
             em.getTransaction().commit();
-            log_.info("merged author:" + tmp);
+            log.debug("merged author:" + tmp);
             assertFalse("author2 is managed", em.contains(author2));
             assertTrue("tmp Author is not managed", em.contains(tmp));
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             em.getTransaction().rollback();
             fail("" + ex);
         }
@@ -257,10 +312,10 @@ public class JPANoDAOTest extends JPATestBase {
         Author author3 = null;
         try {
             author3 = em.find(Author.class, author.getId());
-            log_.info("got author:" + author3);
+            log.debug("got author:" + author3);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             fail("" + ex);
         }
         
@@ -273,7 +328,7 @@ public class JPANoDAOTest extends JPATestBase {
     
     @Test
     public void testRemove() throws Exception {
-        log_.info("testRemove()");
+        log.info("*** testRemove() ***");
 
         Author author = new Author();
         author.setFirstName("test");
@@ -284,10 +339,10 @@ public class JPANoDAOTest extends JPATestBase {
             em.getTransaction().begin();
             em.persist(author);
             em.getTransaction().commit();
-            log_.info("created author:" + author);
+            log.debug("created author:" + author);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             em.getTransaction().rollback();
             fail("" + ex);
         }
@@ -296,10 +351,10 @@ public class JPANoDAOTest extends JPATestBase {
             em.remove(author); //remove doesn't happen until tx
             em.getTransaction().begin();
             em.getTransaction().commit();
-            log_.info("removed author:" + author);
+            log.debug("removed author:" + author);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             em.getTransaction().rollback();
             fail("" + ex);
         }
@@ -307,10 +362,10 @@ public class JPANoDAOTest extends JPATestBase {
         Author author2=null;
         try {
             author2 = em.find(Author.class, author.getId());
-            log_.info("removed author:" + author);
+            log.debug("removed author:" + author);
         }
         catch (Exception ex) {
-            log_.fatal(ex);
+            log.fatal(ex);
             fail("" + ex);
         }
         if (author2 != null) {

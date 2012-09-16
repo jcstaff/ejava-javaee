@@ -7,18 +7,86 @@
 
     <section id="jpa-crud-persist">
         <title>persist()</title>
+        <programlisting language="java"><![CDATA[Author author = new Author();
+author.setFirstName("dr");
+author.setLastName("seuss");
+author.setSubject("children");
+author.setPublishDate(new Date());
+
+log.debug("creating author:" + author);
+em.persist(author);
+log.debug("created author:" + author);]]></programlisting>
+
+        <programlisting language=""><![CDATA[
+-creating author:ejava.examples.daoex.bo.Author@17e7691, id=0, fn=dr, ln=seuss, subject=children, pdate=Sun Sep 16 10:14:32 EDT 2012, version=0
+-created author:ejava.examples.daoex.bo.Author@17e7691, id=50, fn=dr, ln=seuss, subject=children, pdate=Sun Sep 16 10:14:32 EDT 2012, version=0
+]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+            <listitem><para>Inserts entity into database</para></listitem>
+            <listitem><para>Actual insert time depends on transaction active and FlushMode</para>
+                <itemizedlist>
+                    <listitem><para>Extended Persistence Context - queues insert until transaction active</para></listitem>
+                    <listitem><para>Transaction-Scoped Persistence Context - always has transaction active</para></listitem>
+                    <listitem><para>Flush occurs automatically prior to or during commit()</para></listitem>
+                    <listitem><para>Flush can be forced with manual <code>em.flush()</code> call</para></listitem>
+                </itemizedlist>
+            </listitem>
+            
+            <listitem><para>New or removed entity enters managed state</para>
+                <itemizedlist>
+                    <listitem><para>All further changes are watched and will update database</para></listitem>
+                </itemizedlist>                   
         <programlisting language="java"><![CDATA[
-void persist(Object entity);
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+log.debug("em.contains(author)=" + em.contains(author));
+em.persist(author);
+log.debug("created author:" + author);        
+log.debug("em.contains(author)=" + em.contains(author));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-em.contains(author)=false
+-created author:...
+-em.contains(author)=true
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Existing entity is ignored</para>
+                <itemizedlist>
+                    <listitem><para>Cascades will still occur for CascadeType.PERSIST and ALL relationships</para></listitem>
+                </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+        em.persist(author);
+        ...
+        em.persist(author);
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Detached entities will be rejected</para>
+                <itemizedlist>
+                    <listitem><para>Entities with an identity but not associated with a persistence context</para></listitem>
+                </itemizedlist>                   
+                <programlisting language="java"><![CDATA[
+        Author author = new Author(1);
+        author.setFirstName("dr");
+...
+        log.debug("creating author:" + author);
+
+        log.debug("em.contains(author)=" + em.contains(author));
+        try {
+            em.persist(author);
+            fail("did not detect detached entity");
+        } catch (PersistenceException ex) {
+            log.debug("caught expected exception:" + ex.getLocalizedMessage(), ex);
+        }
+        log.debug("em.contains(author)=" + em.contains(author));
+]]></programlisting>
+                <programlisting language=""><![CDATA[
+-creating author:ejava.examples.daoex.bo.Author@ad339b, id=1, ...
+-em.contains(author)=false
+-caught expected exception:javax.persistence.PersistenceException: org.hibernate.PersistentObjectException: 
+        detached entity passed to persist: ejava.examples.daoex.bo.Author
+-em.contains(author)=false
+]]></programlisting>
+            </listitem>
         </itemizedlist>                   
     </section>
 
