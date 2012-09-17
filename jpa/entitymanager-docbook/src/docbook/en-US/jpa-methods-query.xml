@@ -7,59 +7,38 @@
 
     <section id="jpa-query-jpa">
         <title>JPA Queries</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 javax.persistence.Query createQuery(String jpaql);
 <T> javax.persistence.TypedQuery<T> createQuery(String jpaql, Class<T> resultClass);
 javax.persistence.Query createNamedQuery(String name);
 <T> javax.persistence.TypedQuery<T> createNamedQuery(String name, Class<T> resultClass);
-        ]]></programlisting>
+]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Create query based on JPA Query Language (JPAQL)</para></listitem>
         </itemizedlist>                   
     </section>
 
 
     <section id="jpa-query-native">
         <title>Native Queries</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 javax.persistence.Query createNativeQuery(String sql);
 javax.persistence.Query createNativeQuery(String sql, Class resultClass);
 javax.persistence.Query createNativeQuery(String sql, String resultMapping);
-        ]]></programlisting>
+]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Create query based on SQL</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-query-criteria">
         <title>Criteria Queries</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 <T> javax.persistence.TypedQuery<T> createQuery(javax.persistence.criteria.CriteriaQuery<T> criteria);
 javax.persistence.criteria.CriteriaBuilder getCriteriaBuilder();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Create query based on typed criteria API</para></listitem>
         </itemizedlist>                   
     </section>
     </chapter>
