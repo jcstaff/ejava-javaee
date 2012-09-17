@@ -276,15 +276,11 @@ public class JPACRUDTest extends JPATestBase {
         try {
             em.getTransaction().begin();
             em.persist(author);
-            em.flush();
             em.getTransaction().commit();
-            em.clear();
             log.debug("created author:" + author);
         }
         catch (Exception ex) {
-            log.fatal(ex);
-            em.getTransaction().rollback();
-            fail("" + ex);
+            fail("unexpected error during persist" + ex);
         }
         
         //create a new object with the same primary key as the one in the DB
@@ -301,23 +297,15 @@ public class JPACRUDTest extends JPATestBase {
             log.debug("merged author:" + tmp);
             assertFalse("author2 is managed", em.contains(author2));
             assertTrue("tmp Author is not managed", em.contains(tmp));
+            assertSame("merged result not existing managed", author, tmp);
         }
         catch (Exception ex) {
-            log.fatal(ex);
-            em.getTransaction().rollback();
-            fail("" + ex);
+            fail("unexpected error during merge" + ex);
         }
         
         //verify our changes were made to the DB
-        Author author3 = null;
-        try {
-            author3 = em.find(Author.class, author.getId());
-            log.debug("got author:" + author3);
-        }
-        catch (Exception ex) {
-            log.fatal(ex);
-            fail("" + ex);
-        }
+        Author author3 = em.find(Author.class, author.getId());
+        log.debug("got author:" + author3);
         
         assertNotNull(author3);
         assertEquals("updated " + firstName, author3.getFirstName());
