@@ -41,18 +41,76 @@ void clear();
 
     <section id="jpa-membership-detach">
         <title>detach()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
-void detach(Object entity);
-        ]]></programlisting>
+em.persist(author);
+
+//callers can detach entity from persistence context
+log.debug("em.contains(author)="+em.contains(author));
+log.debug("detaching author");
+em.getTransaction().begin();
+em.flush();
+em.detach(author);
+log.debug("em.contains(author)="+em.contains(author));
+em.getTransaction().commit();
+
+//changes to detached entities do not change database
+author.setFirstName("foo");
+em.getTransaction().begin();
+em.getTransaction().commit();
+Author author2 = em.find(Author.class, author.getId());
+log.debug("author.firstName=" + author.getFirstName());
+log.debug("author2.firstName=" + author2.getFirstName());
+assertFalse("unexpected name change", 
+        author.getFirstName().equals(author2.getFirstName()));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-em.contains(author)=true
+-detaching author
+-em.contains(author)=false
+-author.firstName=foo
+-author2.firstName=dr
+]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Detaches existing entity from persistence context</para></listitem>
+            <listitem><para>Detach cascaded to CascadeType.DETACH and ALL relationships</para></listitem>
+            <listitem><para>Subsequent changes to entity will not change database</para></listitem>
+            <listitem><para>Portable use requires call to flush() prior to detach()</para></listitem>
+            <listitem><para>New entities are ignored</para>
+        <programlisting language="java"><![CDATA[
+Author author = new Author();
+
+log.debug("em.contains(author)="+em.contains(author));
+log.debug("detaching author");
+em.detach(author);
+log.debug("em.contains(author)="+em.contains(author));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-em.contains(author)=false
+-detaching author
+-em.contains(author)=false
+]]></programlisting>
+            </listitem>
+            <listitem><para>Detached entities are ignored</para>
+        <programlisting language="java"><![CDATA[
+Author author = new Author();
+...
+em.persist(author);
+em.getTransaction().begin();
+em.getTransaction().commit();
+
+//detaching detached entity will be ignored
+Author detached = new Author(author.getId());
+log.debug("em.contains(author)="+em.contains(detached));
+log.debug("detaching detached author");
+em.detach(detached);
+log.debug("em.contains(author)="+em.contains(detached));
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-em.contains(author)=false
+-detaching detached author
+-em.contains(author)=false
+]]></programlisting>
+            </listitem>
         </itemizedlist>                   
     </section>
 </chapter>
