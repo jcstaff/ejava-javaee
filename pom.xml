@@ -376,7 +376,6 @@
                 <sourceDocumentName>${doc.base}.xml</sourceDocumentName>
                 <htmlName>${doc.base}.html</htmlName>
                 <pdfName>${doc.base}.pdf</pdfName>
-                <skipAttach>true</skipAttach>
             </properties>
 
             <pluginRepositories>
@@ -551,11 +550,9 @@
                               <goal>attach-artifact</goal>
                             </goals>
                             <configuration>
-                              <skipAttach>${skipAttach}</skipAttach>
                               <artifacts>
                                   <artifact>
                                       <file>${basedir}/target/classes/${project.artifactId}-${project.version}.war</file>
-                                      <classifier>docbook</classifier>
                                       <type>war</type>
                                   </artifact>
                               </artifacts>

@@ -1,0 +1,136 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-methods-sync">
+    <title>Entity Manager State Synchronization Methods</title>
+
+    <section id="jpa-methods-sync-flush">
+        <title>flush()</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+void flush();
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+
+    <section id="jpa-methods-sync-flushmode">
+        <title>FlushMode</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+void setFlushMode(javax.persistence.FlushModeType);
+javax.persistence.FlushModeType getFlushMode();
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-methods-sync-refresh">
+        <title>refresh()</title>
+        <programlisting language="java"><![CDATA[
+em.persist(author);
+em.getTransaction().begin();
+em.getTransaction().commit();
+
+//change DB state out-of-band from the cache
+em.getTransaction().begin();
+String newName="foo";
+int count=em.createQuery(
+        "update jpaAuthor a set a.firstName=:name where a.id=:id")
+    .setParameter("id", author.getId())
+    .setParameter("name", newName)
+    .executeUpdate();
+em.getTransaction().commit();
+assertEquals("unexpected count", 1, count);
+
+//object state becomes stale when DB changed out-of-band
+log.debug("author.firstName=" + author.getFirstName());
+assertFalse("unexpected name", author.getFirstName().equals(newName));
+
+//get the cached object back in sync
+log.debug("calling refresh");
+em.refresh(author);
+log.debug("author.firstName=" + author.getFirstName());
+assertEquals("unexpected name", newName, author.getFirstName());
+]]></programlisting>
+        
+        <programlisting language=""><![CDATA[
+-author.firstName=dr
+-calling refresh
+-author.firstName=foo
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para>Updates/overwrites cached entity state with database state</para></listitem>
+
+            <listitem><para>Refresh of new entity results in java.lang.IllegalArgumentException</para>
+        <programlisting language="java"><![CDATA[
+Author author = new Author();
+author.setFirstName("test");
+author.setLastName("new");
+
+try {
+    em.refresh(author);
+    fail("refresh of new entity not detected");
+} catch (IllegalArgumentException ex) {
+    log.debug("caught expected exception:" + ex);
+}
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-caught expected exception:java.lang.IllegalArgumentException: Entity not managed
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Refresh of detached entity results in java.lang.IllegalArgumentException</para>
+        <programlisting language="java"><![CDATA[
+em.persist(author);
+em.getTransaction().begin();
+em.getTransaction().commit();
+
+//refreshing a detached entity will get rejected
+Author detached = new Author(author.getId());
+em.refresh(author);
+log.debug("refreshed managed entity");
+try {
+    em.refresh(detached);
+    fail("refresh of detached entity not detected");
+} catch (IllegalArgumentException ex) {
+    log.debug("caught expected exception:" + ex);
+}
+]]></programlisting>
+        <programlisting language=""><![CDATA[
+-refreshed managed entity
+-caught expected exception:java.lang.IllegalArgumentException: Entity not managed
+]]></programlisting>
+            </listitem>
+
+
+
+
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+</chapter>
+  
+
+  

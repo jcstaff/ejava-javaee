@@ -41,6 +41,25 @@ void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> pro
         </itemizedlist>                   
     </section>
 
+    <section id="jpa-locking-refresh">
+        <title>refresh(lock)</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+void refresh(Object, javax.persistence.LockModeType);
+void refresh(Object, javax.persistence.LockModeType, Map<String, Object> properties);
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+
     <section id="jpa-locking-getLockMode">
         <title>()</title>
         <itemizedlist>
