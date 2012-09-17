@@ -3,6 +3,56 @@
 
 <chapter id="jpa-entitymanager">
     <title>Entity Manager</title>
+ 
+     <section id="jpa-em-persistencecontext">
+        <title>Persistence Context</title>
+        <itemizedlist>
+            <listitem><para>A set of managed instances managed by an EntityManager</para></listitem>
+            <listitem><para>All entities become detached once closed</para></listitem>
+            <listitem><para>Two types:</para>
+                <itemizedlist>
+                    <listitem><para>Extended</para>
+                                <programlisting language="java"><![CDATA[
+Author author = new Author();
+...
+em.persist(author);
+em.getTransaction().begin();
+em.getTransaction().commit();
+
+author.setFirstName("foo");
+em.getTransaction().begin();
+em.getTransaction().commit();
+
+em.getTransaction().begin();
+author.setFirstName("bar");
+em.getTransaction().commit();
+]]></programlisting>
+                        <itemizedlist>
+                            <listitem><para>Live beyond a single transaction</para></listitem>
+                            <listitem><para>Allow long-lived algorithms to process without tying up a database transaction</para></listitem>
+                            <listitem><para></para>
+                            </listitem>
+                        </itemizedlist>
+
+                    
+                    </listitem>
+                    <listitem><para>Transaction-Scoped</para>
+                        <programlisting language="java"><![CDATA[
+]]></programlisting>
+                        <itemizedlist>
+                            <listitem><para>Begin/end at transaction boundaries</para></listitem>
+                            <listitem><para>Injected by containers</para></listitem>
+                            <listitem><para></para>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    
+ 
     
     <section id="jpa-em-methods">
         <title>Entity Manager Methods</title>

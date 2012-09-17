@@ -25,13 +25,25 @@
     <section id="jpa-entity-state">
         <title>Entity States</title>
         
+        <section id="jpa-entity-state-attached">
+            <title>Managed</title>
+            <itemizedlist>
+                <listitem><para>Associated with persistence context</para></listitem>
+                <listitem><para>Has identity</para></listitem>
+                <listitem><para>Changes to the entity will impact the database</para></listitem>
+                <listitem><para>Method <code>em.contains(entity)</code> returns true</para></listitem>
+            </itemizedlist>                   
+        </section>
+
         <section id="jpa-entity-state-detached">
             <title>Detached</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Has identity but not associated with persistence context</para></listitem>
+                <listitem><para>Changes to entity will not impact the database</para></listitem>
+                <listitem><para>Method <code>em.contains(entity)</code> returns false</para></listitem>
                 <listitem><para>An entity becomes detached when:</para>
                     <itemizedlist>
+                        <listitem><para>Has not yet been persisted</para></listitem>
                         <listitem><para>After a transaction-scoped transaction is committed</para></listitem>
                         <listitem><para>After a transaction rollback</para></listitem>
                         <listitem><para>Manually detaching entity from persistence context thru <code>em.detach()</code></para></listitem>
