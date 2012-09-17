@@ -7,35 +7,22 @@
 
     <section id="jpa-membership-contains">
         <title>contains()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 boolean contains(Object entity);
-        ]]></programlisting>
+]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Returns true if object is managed in the persistence context</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-membership-clear">
         <title>clear()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 void clear();
-        ]]></programlisting>
+]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Clears all entities and queued changes from the persistence context</para></listitem>
+            <listitem><para>All entities become detached</para></listitem>
         </itemizedlist>                   
     </section>
 
