@@ -4,6 +4,27 @@
 <chapter id="jpa-methods-locking">
     <title>Entity Manager Locking Methods</title>
     
+    <section id="jpa-locking-types">
+        <title>Primary Lock Types</title>
+        <itemizedlist>
+            <listitem><para>Optimistic</para>
+                <itemizedlist>
+                    <listitem><para>Entity assumed not to have concurrent access</para></listitem>
+                    <listitem><para>No active database locks are obtained at start</para></listitem>
+                    <listitem><para>Success judged based on entity state at end</para></listitem>
+                    <listitem><para>State tracked in entity <code>@Version</code> field</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+            <listitem><para>Pessimistic</para>
+                <itemizedlist>
+                    <listitem><para>Entity requires mitigation for concurrent access</para></listitem>
+                    <listitem><para>Active database locks are obtained at start of transaction</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+    </section>
+    
+    
     <section id="jpa-locking-lockmode">
         <title>LockModeType</title>
         <itemizedlist>
@@ -53,66 +74,40 @@
                 </itemizedlist>                   
             </listitem>
         </itemizedlist>                   
-
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
     </section>
 
 
 
     <section id="jpa-locking-lock">
         <title>lock()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 void lock(Object entity, javax.persistence.LockModeType);
 void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> properties);
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para>Performs optimistic version checks when obtaining the lock</para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Requests lock on entity</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-locking-find">
         <title>find(lock)</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 <T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType);
 <T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType, Map<String, Object> properties);
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Find object by primary key and lock</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-locking-refresh">
         <title>refresh(lock)</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 void refresh(Object, javax.persistence.LockModeType);
 void refresh(Object, javax.persistence.LockModeType, Map<String, Object> properties);
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
+            <listitem><para>Refresh entity state and obtain lock</para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
         </itemizedlist>                   
@@ -120,19 +115,12 @@ void refresh(Object, javax.persistence.LockModeType, Map<String, Object> propert
 
 
     <section id="jpa-locking-getLockMode">
-        <title>()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+        <title>getLockMode()</title>
         <programlisting language="java"><![CDATA[
 javax.persistence.LockModeType getLockMode(Object entity);
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Get lock mode for entity</para></listitem>
         </itemizedlist>                   
     </section>
 
