@@ -4,163 +4,98 @@
 <chapter id="jpa-methods-other">
     <title>Other Entity Manager Methods</title>
 
-    <section id="jpa-other-close">
-        <title>close() and isOpen</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+    <section id="jpa-other-isopen">
+        <title>isOpen()</title>
         <programlisting language="java"><![CDATA[
-void close();
 boolean isOpen();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Returns true if persistence context is open</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-other-close">
+        <title>close()</title>
+        <programlisting language="java"><![CDATA[
+void close();
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para>Closes persistence context</para></listitem>
+            <listitem><para>All contained entities become detached</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-other-getTransaction">
         <title>getTransaction()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 javax.persistence.EntityTransaction getTransaction();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Returns transaction object for inspection and control</para></listitem>
+            <listitem><para>Invalid call for transaction-scoped persistence contexts</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-other-joinTransaction">
-        <title>()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+        <title>joinTransaction()</title>
         <programlisting language="java"><![CDATA[
 void joinTransaction();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Associate a persistence context with a JTA transaction</para></listitem>
         </itemizedlist>                   
     </section>
 
-    <section id="jpa-other-">
-        <title>()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language="java"><![CDATA[
-void setProperty(String key, Object value);
-java.util.Map getProperties();
-<T> T unwrap(Class<T> clazz);
-Object getDelegate();
-javax.persistence.metamodel.Metamodel getMetamodel();
-javax.persistence.EntityManagerFactory getEntityManagerFactory();
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-    </section>
     <section id="jpa-other-unwrap">
         <title>unwrap()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 <T> T unwrap(Class<T> clazz);
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Return object of specified type</para></listitem>
+            <listitem><para>Provides access to underlying implementation classes</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-other-getDelegate">
         <title>getDelegate()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 Object getDelegate();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Returns vendor-specific object backing EntityManager</para></listitem>
         </itemizedlist>                   
     </section>
 
 
     <section id="jpa-other-getMetamodel">
         <title>getMetaModel()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 javax.persistence.metamodel.Metamodel getMetamodel();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Returns metamodel object for persistence context</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-other-getEntityManagerFactory">
         <title>getEntityManagerFactory()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 javax.persistence.EntityManagerFactory getEntityManagerFactory();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Returns EntityManagerFactory associated with EntityManager</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-other-properties">
         <title>setProperties()/getProperties()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 void setProperty(String key, Object value);
 java.util.Map getProperties();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Access EntityManager properties</para></listitem>
         </itemizedlist>                   
     </section>
 
