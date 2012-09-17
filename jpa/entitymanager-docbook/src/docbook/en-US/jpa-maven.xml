@@ -1,0 +1,164 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-maven">
+    <title>JPA Maven Environment</title>
+    
+    
+    <programlisting language=""><![CDATA[
+src
+|-- main
+|   |-- java
+|   |   `-- ejava
+|   |       `-- examples
+|   |           `-- daoex
+|   |               |-- AuthorDAO.java
+|   |               |-- bo
+|   |               |   `-- Author.java
+|   |               |-- DAOException.java
+|   |               `-- jpa
+|   |                   `-- JPAAuthorDAO.java
+|   `-- resources
+|       `-- META-INF
+|           |-- orm.xml
+|           `-- persistence.xml (could be placed in src/test branch)
+`-- test
+    |-- java
+    |   `-- ejava
+    |       `-- examples
+    |           `-- daoex
+    |               `-- jpa
+    |                   |-- JPAAuthorDAOTest.java
+    |                   |-- JPACRUDTest.java
+    |                   `-- JPATestBase.java
+    `-- resources
+        |-- hibernate.properties (optional)
+        `-- log4j.xml
+]]></programlisting>        
+    
+    
+
+    <section id="jpa-maven-dependencies">
+        <title>JPA Maven Dependencies</title>
+        
+        <section id="jpa-maven-dependencies-jpa">
+            <title>JPA API classes</title>
+            <programlisting language="xml"><![CDATA[
+<dependency>
+    <groupId>org.hibernate.javax.persistence</groupId>
+    <artifactId>hibernate-jpa-2.0-api</artifactId>
+    <version>1.0.1.Final</version>
+    <scope>provided</scope>
+</dependency>
+]]></programlisting>
+        </section>
+
+        <section id="jpa-maven-dependencies-provider">
+            <title>JPA Provider classes</title>
+            <programlisting language="xml"><![CDATA[
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-entitymanager</artifactId>
+    <version>4.0.1.Final</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-log4j12</artifactId>
+    <version>1.6.1</version>
+    <scope>test</scope>
+</dependency>
+]]></programlisting>
+        </section>
+
+        <section id="jpa-maven-dependencies-database">
+            <title>Database</title>
+            <programlisting language="xml"><![CDATA[
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>test</scope>
+</dependency>
+]]></programlisting>
+        </section>
+
+    </section>
+    
+    <section id="jpa-maven-resources">
+        <title>Supplying Runtime Properties</title>
+
+        <section id="jpa-maven-resources-filtering-pom">
+            <title>Turn on Resource Filtering in pom.xml</title>
+            <programlisting language="xml"><![CDATA[
+<build>
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+    </resources>
+    <testResources>
+        <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+        </testResource>
+    </testResources>
+    ...
+</build>
+]]></programlisting>
+            <para>Above will depend on whether you use src/main or src/test for resource file(s)</para>
+        </section>
+
+        <section id="jpa-maven-resources-file">
+            <title>Use ${variable} References in Resource Files</title>
+            <programlisting language="xml"><![CDATA[
+<properties>
+    <!-- standard properties -->
+    <property name="javax.persistence.jdbc.url" value="${jdbc.url}"/>
+    <property name="javax.persistence.jdbc.driver" value="${jdbc.driver}"/>
+    <property name="javax.persistence.jdbc.user" value="${jdbc.user}"/>
+    <property name="javax.persistence.jdbc.password" value="${jdbc.password}"/>
+
+    <!-- hibernate-specific properties -->
+    <property name="hibernate.dialect" value="${hibernate.dialect}"/>
+...
+</properties>
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-maven-resources-properties">
+            <title>Define Property Values in Parent pom.xml</title>
+            <programlisting language="xml"><![CDATA[
+<properties>
+      <jdbc.driver>org.h2.Driver</jdbc.driver>
+      <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
+      <jdbc.user>sa</jdbc.user>
+      <jdbc.password/>
+      <hibernate.dialect>
+          org.hibernate.dialect.H2Dialect
+      </hibernate.dialect>
+</properties>
+]]></programlisting>
+        </section>
+
+
+        <section id="jpa-maven-resources-filtered">
+            <title>Run with Filtered Values</title>
+            <programlisting language="xml"><![CDATA[
+<properties>
+    <!-- standard properties -->
+    <property name="javax.persistence.jdbc.url" value="jdbc:h2:/home/jcstaff/proj/ejava-javaee/git/jpaDAO/target/h2db/ejava"/>
+    <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+    <property name="javax.persistence.jdbc.user" value="sa"/>
+    <property name="javax.persistence.jdbc.password" value=""/>
+
+    <!-- hibernate-specific properties -->
+    <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+...
+</properties>
+]]></programlisting>
+        </section>
+        
+    </section>
+</chapter>
+  

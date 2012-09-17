@@ -1,0 +1,648 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-overview">
+    <title>JPA Overview</title>
+ 
+    
+     <section id="jpa-overview-background">
+        <title>Background</title>
+        <itemizedlist>
+            <listitem><para>Earlier versions of EJB Spec defined persistence as part of <code>javax.ejb.EntityBean</code></para></listitem>
+
+            <listitem><para>JavaEE 5 moved persistence to its own specification</para>
+                <itemizedlist>
+                    <listitem><para>Java Persistence API (JPA) version 1.0</para></listitem>
+                    <listitem><para>javax.persistence</para></listitem>
+                    <listitem><para>Ease of use API above JDBC</para></listitem>
+                    <listitem><para>Provides</para>
+                        <itemizedlist>
+                            <listitem><para>Object/Relational Mapping (ORM) Engine</para></listitem>
+                            <listitem><para>Query Language (JPA-QL) - SQL-like - main carryover from EJB 2.x</para></listitem>
+                        </itemizedlist>                   
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>JavaEE 6 advanced specification</para>
+                <itemizedlist>
+                    <listitem><para>Java Persistence API (JPA) version 2.0</para></listitem>
+                    <listitem><para>More mapping capabilities</para></listitem>
+                    <listitem><para>More entity manager capabilities</para></listitem>
+                    <listitem><para>Standardization of properties</para></listitem>
+                    <listitem><para>Criteria API</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-overview-em">
+        <title>EntityManager</title>
+        <itemizedlist>
+            <listitem><para>Replaced EJB 2.x Home Functionality</para></listitem>
+            <listitem><para>Handles O/R Mapping to the database</para></listitem>
+            <listitem><para>Provides APIs for</para>
+                <itemizedlist>
+                    <listitem><para>Inserting into database</para></listitem>
+                    <listitem><para>Updating entities in database</para></listitem>
+                    <listitem><para>Finding and querying for entities in database</para></listitem>
+                    <listitem><para>Removing entities from database</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+            <listitem><para>Provides caching</para></listitem>
+            <listitem><para>Integrates with JTA transactions</para></listitem>
+            <listitem><para>Tightly integrated with JavaEE and EJB, but not coupled to it</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-overview-entity">
+        <title>Entity</title>
+        <itemizedlist>
+            <listitem><para>Plain Old Java Objects (POJOs)</para>
+                <itemizedlist>
+                    <listitem><para>Nothing special happens when calling new()</para>
+<programlisting language="java"><![CDATA[
+Author author = new Author();
+]]></programlisting>
+                    </listitem>
+                    <listitem><para>From JPA perspective the above is a new/unmanaged entity</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+            
+            <listitem><para>Persistent when associated with an entity manager/persistence context</para>
+        <programlisting language="java"><![CDATA[
+em.persist(author);        
+]]></programlisting>
+            </listitem>
+            
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+@javax.persistence.Entity
+public class Author implements Serializable {
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue
+    private long id;
+    private long version=0;
+    private String firstName;
+    private String lastName;
+    private String subject;
+    private Date publishDate;
+    
+    public Author() {
+    }
+    ...
+}        
+        ]]></programlisting>
+        <para>Entity minimum requirements:</para>
+        <itemizedlist>
+            <listitem><para>Annotated as entity or declared in orm.xml</para></listitem>
+            <listitem><para>Unique identity (form primary key(s))</para></listitem>
+            <listitem><para>Non-primary default constructor</para></listitem>
+        </itemizedlist>                   
+    </section>
+    
+    <section id="jpa-overview-example">
+        <title>JPA Example</title>
+        <programlisting language="java"><![CDATA[
+Author author = new Author();
+author.setFirstName("dr");
+author.setLastName("seuss");
+author.setSubject("children");
+author.setPublishDate(new Date());
+log.debug("creating author:" + author);
+assertFalse("unexpected initialized id", author.getId() > 0);
+
+log.debug("em.contains(author)=" + em.contains(author));
+em.persist(author);
+log.debug("created author:" + author);        
+assertTrue("missing id", author.getId() > 0);
+]]></programlisting>
+
+        <programlisting language=""><![CDATA[
+-creating author:ejava.examples.daoex.bo.Author@1d8e9e, id=0, 
+    fn=dr, ln=seuss, subject=children, pdate=Mon Sep 17 00:22:25 EDT 2012, version=0
+-em.contains(author)=false
+-created author:ejava.examples.daoex.bo.Author@1d8e9e, id=50, 
+    fn=dr, ln=seuss, subject=children, pdate=Mon Sep 17 00:22:25 EDT 2012, version=0
+-em.contains(author)=true
+]]></programlisting>
+    </section>
+
+
+    <section id="jpa-overview-entity-state">
+        <title>Entity States</title>
+        
+        <section id="jpa-entity-state-attached">
+            <title>Managed</title>
+            <itemizedlist>
+                <listitem><para>Associated with persistence context</para></listitem>
+                <listitem><para>Has identity</para></listitem>
+                <listitem><para>Changes to the entity will impact the database</para></listitem>
+                <listitem><para>Method <code>em.contains(entity)</code> returns true</para></listitem>
+            </itemizedlist>                   
+        </section>
+
+        <section id="jpa-entity-state-detached">
+            <title>Detached</title>
+            <itemizedlist>
+                <listitem><para>Has identity but not associated with persistence context</para></listitem>
+                <listitem><para>Changes to entity will not impact the database</para></listitem>
+                <listitem><para>Method <code>em.contains(entity)</code> returns false</para></listitem>
+                <listitem><para>An entity becomes detached when:</para>
+                    <itemizedlist>
+                        <listitem><para>Has not yet been persisted</para></listitem>
+                        <listitem><para>After a transaction-scoped transaction is committed</para></listitem>
+                        <listitem><para>After a transaction rollback</para></listitem>
+                        <listitem><para>Manually detaching entity from persistence context thru <code>em.detach()</code></para></listitem>
+                        <listitem><para>Manually clearing the persistence context thru <code>em.clear()</code></para></listitem>
+                        <listitem><para>Closing EntityManager</para></listitem>
+                        <listitem><para>Serializing entity thru a remote interface</para></listitem>
+                    </itemizedlist>                   
+                </listitem>
+            </itemizedlist>                   
+        </section>
+    </section>
+
+
+
+ 
+     <section id="jpa-overview-persistencecontext">
+        <title>Persistence Context</title>
+        <itemizedlist>
+            <listitem><para>A set of managed instances managed by an EntityManager</para></listitem>
+            <listitem><para>All entities become detached once closed</para></listitem>
+            <listitem><para>Two types:</para>
+                <itemizedlist>
+                    <listitem><para>Extended</para>
+                                <programlisting language="java"><![CDATA[
+Author author = new Author();
+...
+em.persist(author);
+em.getTransaction().begin();
+em.getTransaction().commit();
+
+author.setFirstName("foo");
+em.getTransaction().begin();
+em.getTransaction().commit();
+
+em.getTransaction().begin();
+author.setFirstName("bar");
+em.getTransaction().commit();
+]]></programlisting>
+                        <itemizedlist>
+                            <listitem><para>Live beyond a single transaction</para></listitem>
+                            <listitem><para>Allow long-lived algorithms to process without tying up a database transaction</para></listitem>
+                        </itemizedlist>
+
+                    
+                    </listitem>
+                    <listitem><para>Transaction-Scoped</para>
+                        <programlisting language="java"><![CDATA[
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public Author createAuthor(...) {
+    Author author = new Author();
+    ...
+    em.persist(author);
+    return author;
+}
+]]></programlisting>
+                        <itemizedlist>
+                            <listitem><para>Begin/end at transaction boundaries</para></listitem>
+                            <listitem><para>Injected by containers</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+    </section>
+
+
+    <section id="jpa-overview-pu">
+        <title>Persistence Unit</title>
+        <itemizedlist>
+            <listitem><para>A set of classes that are mapped to the database</para></listitem>
+            <listitem><para>Defined in META-INF/persistence.xml</para></listitem>
+            <listitem><para>Entity classes may be named in persistence.xml or searched for</para></listitem>
+            <listitem><para>Entity mapping may be provided, augmented, or overridden with <code>orm.xml</code> mapping file</para></listitem>
+        </itemizedlist>                   
+    </section>
+
+    <section id="jpa-overview-layout">
+        <title>Example Layout</title>
+        <programlisting language=""><![CDATA[
+|-- ejava
+|   `-- examples
+|       `-- daoex
+|           |-- AuthorDAO.class
+|           |-- bo
+|           |   `-- Author.class
+|           |-- DAOException.class
+|           `-- jpa
+|               `-- JPAAuthorDAO.class
+`-- META-INF
+    |-- orm.xml
+    `-- persistence.xml
+]]></programlisting>
+    </section>
+
+    <section id="jpa-overview-persistencexml">
+        <title>Persistence.xml</title>
+        
+        
+        <section id="jpa-overview-persistencexml-app">
+                <title>Application Example</title>
+            <programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation=
+        "http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" 
+    version="2.0">
+
+    <persistence-unit name="jpaDemo">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>META-INF/orm.xml</mapping-file>
+        <properties>
+            <!-- standard properties -->
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:./target/h2db/ejava"/>
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+
+            <!-- hibernate-specific properties -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <!-- set to 0 to improve error messages when needed
+            <property name="hibernate.jdbc.batch_size" value="0"/>            
+             -->
+        </properties>
+    </persistence-unit>
+</persistence>
+]]></programlisting>
+            <para>Above example defines properties for entity manager to establish physical connections to database</para>
+        </section>
+
+        <section id="jpa-overview-persistencexml-server">
+                <title>Server Example</title>
+            <programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation=
+        "http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" 
+    version="2.0">
+
+    <persistence-unit name="ejbsessionbank">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        <jar-file>lib/ejbsessionBankImpl-3.0.2012.2-SNAPSHOT.jar</jar-file>
+        
+        <properties>
+            <property name="hibernate.dialect" 
+                value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <!-- create is used here for demo project only -->
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <!--
+            <property name="hibernate.jdbc.batch_size" value="0"/>
+            -->
+        </properties>
+    </persistence-unit>
+</persistence>
+]]></programlisting>
+            <para>Above example used DataSource from JNDI tree to obtain connections to database</para>
+        </section>
+
+
+        <section id="jpa-overview-hibernate-properties">
+            <title>Optional hibernate.propertires</title>
+            <itemizedlist>
+                <listitem><para>Can be used to specify connection properties outside of persistence.xml</para></listitem>
+                <listitem><para>Useful in separating production mapping information from runtime connection properties</para></listitem>
+            </itemizedlist>                   
+            <programlisting language=""><![CDATA[
+#hibernate-specific alternate source of persistence.xml properties 
+
+hibernate.dialect=org.hibernate.dialect.H2Dialect
+hibernate.connection.url=jdbc:h2:./target/h2db/ejava
+hibernate.connection.driver_class=org.h2.Driver
+hibernate.connection.password=
+hibernate.connection.username=sa
+hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
+            ]]></programlisting>
+        </section>
+        
+        <section id="jpa-overview-ormxml">
+            <title>Sample orm.xml</title>
+            <programlisting language=""><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation=
+        "http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" 
+    version="2.0">
+    
+    <entity class="ejava.examples.daoex.bo.Author" 
+            access="FIELD"
+            metadata-complete="false"
+            name="jpaAuthor">
+        <table name="DAO_AUTHOR"/>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="SEQUENCE" 
+                    generator="AUTHOR_SEQUENCE"/>                
+            </id>
+        </attributes>
+    </entity>
+</entity-mappings>
+]]></programlisting>
+        </section>
+
+        
+        <section id="jpa-overview-persistencexml-elements">
+            <title>persistrence.xml Elements</title>
+
+            <variablelist>
+                <varlistentry>
+                    <term><filename>name</filename></term>
+                    <listitem><para>Identity to reference persistence unit</para></listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>provider</filename></term>
+                    <listitem><para>Fully qualified name of javax.persistence.PersistenceProvider</para>
+                        <itemizedlist>
+                            <listitem><para>Not needed if provider is in classpath</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>mapping-file</filename></term>
+                    <listitem><para>Path reference to an <code>orm.xml</code> mapping file</para></listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>jta-data-source</filename></term>
+                    <listitem><para>JNDI path of a JTA javax.sql.DataSource</para></listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>non-jta-datasource</filename></term>
+                    <listitem><para>JNDI path of a RESOURCE_LOCAL javax.sql.DataSource</para></listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>jarfile</filename></term>
+                    <listitem><para>Reference to an archive with entity classes</para></listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>class</filename></term>
+                    <listitem><para>Fully qualified package name of entity class</para>
+                        <itemizedlist>
+                            <listitem><para>One source of entity information</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>exclude-unlisted-classes</filename></term>
+                    <listitem><para>If set, provider will not scan to discover entity classes</para></listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term><filename>properties</filename></term>
+                    <listitem><para>name/value property pairs to express additional configuration info</para></listitem>
+                </varlistentry>
+            </variablelist>
+        </section>
+        
+        
+        <section id="jpa-overview-entity-discover">
+            <title>Entity Discovery</title>
+            <itemizedlist>
+                <listitem><para>Classes with @Entity annotation</para>
+                    <itemizedlist>
+                        <listitem><para>In persistence.xml's JAR file</para></listitem>
+                        <listitem><para>Contained in any JAR listed in persistence.xml#jar-file element</para></listitem>
+                    </itemizedlist>                   
+                </listitem>
+                                
+                <listitem><para>Classes mapped</para>
+                    <itemizedlist>
+                        <listitem><para>With a META-INF/orm.xml file</para></listitem>
+                        <listitem><para>With custom mapping files</para></listitem>
+                    </itemizedlist>                   
+                </listitem>
+                
+                <listitem><para>Classes listed in persistence.xml#class element</para></listitem>
+            </itemizedlist>                   
+        </section>
+        
+    </section>
+
+
+    <section id="jpa-overview-steps">
+        <title>Basic Steps</title>
+        <itemizedlist>
+            <listitem><para>setUp</para>
+                <itemizedlist>
+                    <listitem><para>Create EntityManagerFactory</para>
+                    <programlisting language="java"><![CDATA[
+public class javax.persistence.Persistence extends java.lang.Object{
+    public static javax.persistence.EntityManagerFactory createEntityManagerFactory(java.lang.String);
+    public static javax.persistence.EntityManagerFactory createEntityManagerFactory(java.lang.String, java.util.Map);
+...
+}
+]]></programlisting>
+                    <programlisting language="java"><![CDATA[
+private static EntityManagerFactory emf;
+
+@BeforeClass
+public static void setUpClass() {
+    emf = Persistence.createEntityManagerFactory("jpaDemo");
+]]></programlisting>
+                    </listitem>
+
+                    <listitem><para>Create EntityManager</para>
+                    
+                    
+                    <programlisting language="java"><![CDATA[
+public interface javax.persistence.EntityManagerFactory{
+    public abstract javax.persistence.EntityManager createEntityManager();
+    public abstract javax.persistence.EntityManager createEntityManager(java.util.Map);
+...
+}
+]]></programlisting>
+                    <programlisting language="java"><![CDATA[
+private EntityManager em;
+
+@Before
+public void setUp() throws Exception {
+    em = emf.createEntityManager();
+]]></programlisting>
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>Runtime</para>
+                <itemizedlist>
+                    <listitem><para>Start Transaction</para>
+                    <programlisting language="java"><![CDATA[
+em.getTransaction().begin();
+]]></programlisting>
+                    </listitem>
+
+                    <listitem><para>Interact with EntityManager</para>
+                    <programlisting language="java"><![CDATA[
+em.persist(author);
+]]></programlisting>
+                    </listitem>
+
+                    <listitem><para>Commit Transaction</para>
+                    <programlisting language="java"><![CDATA[
+em.getTransaction().commit();
+]]></programlisting>
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+            
+            <listitem><para>tearDown</para>
+                <itemizedlist>
+                    <listitem><para>Close EntityManager</para>
+                    <programlisting language="java"><![CDATA[
+@After
+public void tearDown() throws Exception {
+    try {
+        if (em != null) {
+            if (!em.getTransaction().isActive()) {
+                em.getTransaction().begin();
+                em.getTransaction().commit();
+            }
+            else if (!em.getTransaction().getRollbackOnly()) {
+                em.getTransaction().commit();
+            }
+            else {
+                em.getTransaction().rollback();
+            }
+        }
+    }
+    finally {
+        if (em != null) { em.close(); em=null;}
+    }
+]]></programlisting>
+                    </listitem>
+
+                    <listitem><para>Close EntityManagerFactory</para>
+                    <programlisting language="java"><![CDATA[
+@AfterClass
+public static void tearDownClass() {
+    if (emf != null) {
+        emf.close();
+        emf=null;
+    }
+}
+]]></programlisting>
+                    </listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+    </section>
+    
+    
+ 
+    
+    <section id="jpa-overview-methods">
+        <title>Entity Manager Methods</title>
+        <programlisting language=""><![CDATA[
+public interface javax.persistence.EntityManager{
+...
+}
+        ]]></programlisting>
+
+        <section id="jpa-overview-methods-crud">
+            <title>Basic CRUD Operations</title>
+           <programlisting language="java"><![CDATA[
+void persist(Object entity);
+<T> T find(Class<T> entityClass, Object primaryKey);
+<T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties);
+<T> T merge(T entity);
+void remove(Object entity);
+<T> T getReference(Class<T> entityClass, Object primaryKey);
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-overview-methods-membership">
+            <title>Membership Operations</title>
+           <programlisting language="java"><![CDATA[
+void clear();
+void detach(Object entity);
+boolean contains(Object entity);
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-overview-methods-sync">
+            <title>State Synchronization Operations</title>
+           <programlisting language="java"><![CDATA[
+void flush();
+void setFlushMode(javax.persistence.FlushModeType);
+javax.persistence.FlushModeType getFlushMode();
+void refresh(Object);
+void refresh(Object, java.util.Map);
+void refresh(Object, javax.persistence.LockModeType);
+void refresh(Object, javax.persistence.LockModeType, Map<String, Object> properties);
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-overview-methods-locking">
+            <title>Locking Operations</title>
+           <programlisting language="java"><![CDATA[
+void lock(Object entity, javax.persistence.LockModeType);
+void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> properties);
+<T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType);
+<T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType, Map<String, Object> properties);
+javax.persistence.LockModeType getLockMode(Object entity);
+            ]]></programlisting>
+        </section>
+        
+        <section id="jpa-overview-methods-query">
+            <title> Query Operations</title>
+           <programlisting language="java"><![CDATA[
+javax.persistence.Query createQuery(String jpaql);
+<T> javax.persistence.TypedQuery<T> createQuery(String jpaql, Class<T> resultClass);
+javax.persistence.Query createNamedQuery(String name);
+<T> javax.persistence.TypedQuery<T> createNamedQuery(String name, Class<T> resultClass);
+javax.persistence.Query createNativeQuery(String sql);
+javax.persistence.Query createNativeQuery(String sql, Class resultClass);
+javax.persistence.Query createNativeQuery(String sql, String resultMapping);
+<T> javax.persistence.TypedQuery<T> createQuery(javax.persistence.criteria.CriteriaQuery<T> criteria);
+javax.persistence.criteria.CriteriaBuilder getCriteriaBuilder();
+            ]]></programlisting>
+        </section>
+
+        <section id="jpa-overview-methods-other">
+            <title>Other Operations</title>
+           <programlisting language="java"><![CDATA[
+void close();
+boolean isOpen();
+javax.persistence.EntityTransaction getTransaction();
+void joinTransaction();
+void setProperty(String key, Object value);
+java.util.Map getProperties();
+<T> T unwrap(Class<T> clazz);
+Object getDelegate();
+javax.persistence.metamodel.Metamodel getMetamodel();
+javax.persistence.EntityManagerFactory getEntityManagerFactory();
+            ]]></programlisting>
+        </section>
+    </section>
+
+</chapter>
+  

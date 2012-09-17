@@ -142,8 +142,6 @@ assertSame("merged result not existing managed", author, tmp);
 Author author3 = em.find(Author.class, author.getId());
 assertEquals("updated " + firstName, author3.getFirstName());            
 ]]></programlisting>
-        <programlisting language=""><![CDATA[
-]]></programlisting>
         <itemizedlist>
             <listitem><para>Update database with state of detached object</para></listitem>
             <listitem><para>State of detached object copied into managed entity or new instance created</para></listitem>
@@ -174,7 +172,7 @@ public Author update(Author author) {
 
 
     <section id="jpa-crud-remove">
-        <title>merge()</title>
+        <title>remove()</title>
         <programlisting language="java"><![CDATA[
 void remove(Object entity);
         ]]></programlisting>

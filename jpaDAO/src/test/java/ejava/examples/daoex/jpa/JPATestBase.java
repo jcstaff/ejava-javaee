@@ -25,7 +25,7 @@ public class JPATestBase {
 	@BeforeClass
 	public static void setUpClass() {
 	    log.debug("setUpClass() getting emf=" + PU_NAME);
-	    emf = Persistence.createEntityManagerFactory("jpaDemo");
+	    emf = Persistence.createEntityManagerFactory(PU_NAME);
 	    log.debug("emf.getProperties()=" + emf.getProperties());
 	}
 	
