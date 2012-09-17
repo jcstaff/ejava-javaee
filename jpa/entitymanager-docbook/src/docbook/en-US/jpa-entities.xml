@@ -21,5 +21,30 @@
         ]]></programlisting>
     </section>
 
+
+    <section id="jpa-entity-state">
+        <title>Entity States</title>
+        
+        <section id="jpa-entity-state-detached">
+            <title>Detached</title>
+            <itemizedlist>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para>An entity becomes detached when:</para>
+                    <itemizedlist>
+                        <listitem><para>After a transaction-scoped transaction is committed</para></listitem>
+                        <listitem><para>After a transaction rollback</para></listitem>
+                        <listitem><para>Manually detaching entity from persistence context thru <code>em.detach()</code></para></listitem>
+                        <listitem><para>Manually clearing the persistence context thru <code>em.clear()</code></para></listitem>
+                        <listitem><para>Closing EntityManager</para></listitem>
+                        <listitem><para>Serializing entity thru a remote interface</para></listitem>
+                    </itemizedlist>                   
+                </listitem>
+            </itemizedlist>                   
+        </section>
+
+                      
+    </section>
+
 </chapter>
   
