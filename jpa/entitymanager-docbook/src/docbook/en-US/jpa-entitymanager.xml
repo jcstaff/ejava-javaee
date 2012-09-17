@@ -38,6 +38,13 @@ em.getTransaction().commit();
                     </listitem>
                     <listitem><para>Transaction-Scoped</para>
                         <programlisting language="java"><![CDATA[
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public Author createAuthor(...) {
+    Author author = new Author();
+    ...
+    em.persist(author);
+    return author;
+}
 ]]></programlisting>
                         <itemizedlist>
                             <listitem><para>Begin/end at transaction boundaries</para></listitem>

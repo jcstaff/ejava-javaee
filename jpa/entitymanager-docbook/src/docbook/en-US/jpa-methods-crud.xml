@@ -93,46 +93,31 @@ log.debug("em.contains(author)=" + em.contains(author));
 
     <section id="jpa-crud-find">
         <title>find()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 <T> T find(Class<T> entityClass, Object primaryKey);
 <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties);
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Searches for the entity by primary key value</para></listitem>
+            <listitem><para>Returns managed entity if found, else null</para></listitem>
+            <listitem><para>Properties permitted for vendor-specific values and ignored if not understood</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-crud-getReference">
         <title>getReference()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 <T> T getReference(Class<T> entityClass, Object primaryKey);
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Searches for the entity by primary key</para></listitem>
+            <listitem><para>Returns a LAZY load reference if found</para></listitem>
+            <listitem><para>Throws EntityNotFoundException if not exist</para></listitem>
         </itemizedlist>                   
     </section>
 
     <section id="jpa-crud-merge">
         <title>merge()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 //create initial author
 Author author = new Author();
@@ -190,11 +175,6 @@ public Author update(Author author) {
 
     <section id="jpa-crud-remove">
         <title>merge()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 void remove(Object entity);
         ]]></programlisting>

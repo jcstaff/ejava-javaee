@@ -4,6 +4,64 @@
 <chapter id="jpa-methods-locking">
     <title>Entity Manager Locking Methods</title>
     
+    <section id="jpa-locking-lockmode">
+        <title>LockModeType</title>
+        <itemizedlist>
+            <listitem><para>NONE</para>
+                <itemizedlist>
+                    <listitem><para>No locks</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>OPTIMISTIC (was READ)</para>
+                <itemizedlist>
+                    <listitem><para>Requires entity to have a <code>@Version</code> property</para></listitem>
+                    <listitem><para>Prevent dirty reads</para></listitem>
+                    <listitem><para>Prevent non-repeatable reads</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>OPTIMISTIC_FORCE_INCREMENT (was WRITE)</para>
+                <itemizedlist>
+                    <listitem><para>Requires entity to have a <code>@Version</code> property</para></listitem>
+                    <listitem><para>Update only occurs if change has proper version</para></listitem>
+                    <listitem><para>Version is incremented upon update</para></listitem>
+                    <listitem><para>Incorrect version results in OptimisticLockException</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>PESSIMISTIC_READ</para>
+                <itemizedlist>
+                    <listitem><para>Supported with or without <code>@Version</code> property</para></listitem>
+                    <listitem><para>Obtains active database lock</para></listitem>
+                    <listitem><para>Provides repeatable reads</para></listitem>
+                    <listitem><para>Does not block other reads</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>PESSIMISTIC_WRITE</para>
+                <itemizedlist>
+                    <listitem><para>Supported with or without <code>@Version</code> property</para></listitem>
+                    <listitem><para>Forces serialization of entity updates among transactions</para></listitem>
+                </itemizedlist>                   
+            </listitem>
+
+            <listitem><para>PESSIMISTIC_FORCE_INCREMENT</para>
+                <itemizedlist>
+                    <listitem><para>Requires entity to have a <code>@Version</code> property</para></listitem>
+                    <listitem><para>PESSIMISTIC_WRITE lock with increment of <code>@Version</code></para></listitem>
+                </itemizedlist>                   
+            </listitem>
+        </itemizedlist>                   
+
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+
 
     <section id="jpa-locking-lock">
         <title>lock()</title>
@@ -17,6 +75,7 @@ void lock(Object entity, javax.persistence.LockModeType);
 void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> properties);
         ]]></programlisting>
         <itemizedlist>
+            <listitem><para>Performs optimistic version checks when obtaining the lock</para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
