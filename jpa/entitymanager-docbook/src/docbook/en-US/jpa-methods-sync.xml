@@ -6,37 +6,25 @@
 
     <section id="jpa-methods-sync-flush">
         <title>flush()</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 void flush();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Synchronizes cached changes with underlying database</para></listitem>
+            <listitem><para>Requires active transaction</para></listitem>
         </itemizedlist>                   
     </section>
 
 
     <section id="jpa-methods-sync-flushmode">
         <title>FlushMode</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 void setFlushMode(javax.persistence.FlushModeType);
 javax.persistence.FlushModeType getFlushMode();
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>AUTO (default) - unspecified</para></listitem>
+            <listitem><para>COMMIT - flush only happens during commit</para></listitem>
         </itemizedlist>                   
     </section>
 
@@ -117,19 +105,6 @@ try {
 -caught expected exception:java.lang.IllegalArgumentException: Entity not managed
 ]]></programlisting>
             </listitem>
-
-
-
-
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-    </section>
-
 </chapter>
   
 
