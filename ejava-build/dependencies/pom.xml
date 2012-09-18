@@ -194,6 +194,17 @@
                 <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>webdev-snapshot</id>
+            <name>ejava webdev snapshot repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
             </snapshots>
