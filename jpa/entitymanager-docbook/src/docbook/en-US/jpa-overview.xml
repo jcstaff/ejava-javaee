@@ -255,10 +255,10 @@ public Author createAuthor(...) {
             <programlisting language="xml"><![CDATA[
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation=
-        "http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" 
-    version="2.0">
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation=
+"http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" 
+version="2.0">
 
     <persistence-unit name="jpaDemo">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
@@ -290,10 +290,10 @@ public Author createAuthor(...) {
             <programlisting language="xml"><![CDATA[
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation=
-        "http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" 
-    version="2.0">
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation=
+"http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" 
+version="2.0">
 
     <persistence-unit name="ejbsessionbank">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
@@ -318,7 +318,7 @@ public Author createAuthor(...) {
 
 
         <section id="jpa-overview-hibernate-properties">
-            <title>Optional hibernate.propertires</title>
+            <title>Optional hibernate.properties</title>
             <itemizedlist>
                 <listitem><para>Can be used to specify connection properties outside of persistence.xml</para></listitem>
                 <listitem><para>Useful in separating production mapping information from runtime connection properties</para></listitem>
@@ -340,13 +340,13 @@ hibernate.format_sql=true
         
         <section id="jpa-overview-ormxml">
             <title>Sample orm.xml</title>
-            <programlisting language=""><![CDATA[
+            <programlisting language="xml"><![CDATA[
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation=
-        "http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" 
-    version="2.0">
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation=
+"http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" 
+version="2.0">
     
     <entity class="ejava.examples.daoex.bo.Author" 
             access="FIELD"
@@ -371,7 +371,7 @@ hibernate.format_sql=true
             <variablelist>
                 <varlistentry>
                     <term><filename>name</filename></term>
-                    <listitem><para>Identity to reference persistence unit</para></listitem>
+                    <listitem><para>Identity used to reference persistence unit</para></listitem>
                 </varlistentry>
                 
                 <varlistentry>
@@ -596,8 +596,6 @@ void setFlushMode(javax.persistence.FlushModeType);
 javax.persistence.FlushModeType getFlushMode();
 void refresh(Object);
 void refresh(Object, java.util.Map);
-void refresh(Object, javax.persistence.LockModeType);
-void refresh(Object, javax.persistence.LockModeType, Map<String, Object> properties);
             ]]></programlisting>
         </section>
 
@@ -608,6 +606,8 @@ void lock(Object entity, javax.persistence.LockModeType);
 void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> properties);
 <T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType);
 <T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType, Map<String, Object> properties);
+void refresh(Object, javax.persistence.LockModeType);
+void refresh(Object, javax.persistence.LockModeType, Map<String, Object> properties);
 javax.persistence.LockModeType getLockMode(Object entity);
             ]]></programlisting>
         </section>
