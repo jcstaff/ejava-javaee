@@ -37,8 +37,8 @@
           <li>2012-03-07: Posted JPA-QL TODOs</li>
           <li>2012-02-29: Posted ORM Relationship updates</li>
           <li>2012-02-21: Posted Core JPA TODOs</li>
-          <li>2012-02-15: Posted EntityManager TODOs</li>
           -->
+          <li>2012-09-18: Posted EntityManager Materials</li>
           <li>2012-09-11: Posted Business Logic and Data Tier Topics</li>
           <li>2012-09-04: Posted initial class site</li>
       </ul>
@@ -212,82 +212,74 @@
           </li>
           </b>
       </ul></li>
-      <li><ul>
-          <li>Go through the EntityManager Exercise</li>
-          <li>Look over the class project example implementation under the 
-          projects/eSport/eLeague directory</li>
-          <li>Add JPA/Hibernate infrastructure to your project DAO module.
-          This should at least consist of a successful connection to
-          the DB.  You are done with this goal when you have a separate
-          JPA JUnit test for the DAO and the setUp() method is able to
-          create an EntityManager.</li>
-          <li>Define a few business object (BO) classes as being an
-          @Entity and identify the primary key property with the @Id
-          tag. Make sure you have a default constructor, but leave
-          other things default for now. Annotate all collections with
-          @Transient annotation. We are not ready to cover relationships
-          just yet.</li>
-
-          <li>Design and implement an initial JPA implementation for your DAO(s).</li>
-
-          <li>Design and implement a set of unit tests for your JPA
-          DAO(s). Note how the default schema for the @Entities may not
-          match up with your DB schema at this point when you run
-          the tests.</li>
-
-          <li>Add additional JPA @Annotations to your class project
-          business objects to properly map the @Entities to the database
-          schema design you created last time (primarily a topic for
-          next week)</li>
-
-          <li>Refine your BOs, DB Schema, and DAO based on your understanding 
-          to date.</li>
-
-          <li>Move forward with your DB Schema design, BO classes, and JDBC DAO
-          implementation if there is extra time. You can turn off your JPA 
-          JUnit Test by adding an excludes definition to your surefire 
-          configuration. Perform a google search on "surefire excludes" for
-          details.</li>
-
-          <b>
-          <li>If you have not yet done so, please submit a copy of your
-          project to me for early submission feedback. If you did so last
-          week and I pointed out significant issues - please resubmit.
-          You should have a project structure in place, at least one
-          JDBC-based and one JPA-based JUnit DAO test case implemented
-          with connectivity thru to the DB.  Concentrate of very few
-          BO classes, tables, and DAOs at this point and focus more on
-          the end-to-end assembly of the data tier project. This will be
-          used as feedback to the class.</li>
-          </b>
-
-          <li>Continue to consider all BO, DB Schema, and DAO work as
-          draft prototypes at this time to get something end-to-end
-          running. You will refine over next several weeks.</li>
-          <li>missed class?
-             <ul>
-                <li>see the 
-                <a href="http://webdev.apl.jhu.edu/~jcs/rss/ejava-javaee-rss-2009-spring.xml">
-                RSS Feed (http://webdev.apl.jhu.edu/~jcs/rss/ejava-javaee-rss-2009-spring.xml)</a> 
-                for coverage of JPA materials</li>
-             </ul>
-          </li>
-      </ul></li>
       -->
-          <!--
-          <li>Design a draft DB schema for your business object. This should go in 
-              your DAO project.</li>
-          <li>Implement a way to create your schema in the DB as a part of your DAO testing.</li>
+      <li><ul>
+            <li>Examples
+            <ul>
+              <li>Go through the EntityManager Exercise</li>          
+              <li>Look over the class project example implementation under the 
+                projects/eDataShare/eDmv directory
+              </li>
+            </ul>
+            </li>
 
-          <li>Design and implement the test infrastructure for your DAO(s). 
-              This should at least consist of a successful connection to the DB.</li>
-          <li>Design and implement an initial DAO interface and JDBC implementation 
-              to create your business object in the database (you will only need to 
-              implement creates for work done with JDBC in class).</li>
+            <li>Database Schema
+            <ul>
+              <li>Design a draft DB schema for your business object. This should go in 
+                  your DAO project.</li>
+              <li>Implement a way to create your schema in the DB as a part of your DAO testing.</li>
+            </ul>
+            </li>
 
-          <li>Consider all BO, DB Schema, and DAO work as draft prototypes at this time to get
-          something end-to-end running. You will refine over next several weeks.</li>
-          -->
+            <li>Maven and DAO Unit Test Framework
+            <ul>
+              <li>Add JPA/Hibernate infrastructure to your project DAO/Impl module.
+                This should at least consist of a successful connection to
+                the DB.  You are done with this goal when you have a
+                JPA JUnit test for the DAO and the setUp() method is able to
+                create an EntityManager.
+              </li>
+            </ul>
+            </li>          
+          
+            <li>JPA Entities and DAOs
+            <ul>
+              <li>Enhance your business object (BO) definition with @Entity
+                declarations, a non-private default constructor, and a primary
+                key designation (@Id) to make them legal entities. Leave
+                other things default for now. Annotate all collections with
+                @Transient annotation. We are not ready to cover relationships
+                just yet.
+              </li>
+              <li>Design DAO interfaces to support the data access requirements
+                  of your business logic participating in the end-to-end 
+                  scenario. These interfaces should be void of persistence
+                  technology detail -- but feel free to commit to JPA for the 
+                  semantics of how the calls should work.
+              </li>
+              <li>Implement an initial JPA implementation for your DAO
+                   interfaces. Keep in mind the scope of the end-to-end 
+                   scenario when building these methods to help limit and
+                   focus the work performed.
+              </li>
+            </ul>
+            </li>
+
+            <li>DAO Testing
+            <ul>
+              <li>Design and implement a set of unit tests for a few of your JPA
+                DAO(s). Note how the default schema for the @Entities may not
+                match up with your desired DB schema at this point when you run
+                the tests.
+              </li>
+            </ul>
+            </li>
+      </ul></li>
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
       <li><ul>
           <li>Look over the class project and post any questions.</li>
 
@@ -315,11 +307,6 @@
           This will be used as feedback to the class.</li>
           </b>
       </ul></li>
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
       <li><ul>
           <li>register for newsgroup and setup e-mail handling (all
           e-mails will have ejava_class in subject)</li>
