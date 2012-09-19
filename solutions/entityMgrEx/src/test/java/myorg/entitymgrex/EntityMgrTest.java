@@ -45,10 +45,18 @@ public class EntityMgrTest {
     public void tearDown() throws Exception {
         try {
             log.debug("tearDown() started, em=" + em);
-            em.getTransaction().begin();
-            em.flush();            
-            logAutos();            
-            em.getTransaction().commit();            
+            if (!em.getTransaction().isActive()) {
+                em.getTransaction().begin();
+                em.flush();            
+                logAutos();            
+                em.getTransaction().commit();            
+            } else if (!em.getTransaction().getRollbackOnly()) {
+                em.flush();            
+                logAutos();            
+                em.getTransaction().commit();                        	
+            } else {
+            	em.getTransaction().rollback();
+            }
             em.close();
             log.debug("tearDown() complete, em=" + em);
         }

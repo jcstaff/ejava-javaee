@@ -134,7 +134,7 @@
             </activation>
             <properties>
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
-                  <jdbc.url>jdbc:h2:./target/h2db/ejava</jdbc.url>
+                  <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password/>
                   <hibernate.dialect>
