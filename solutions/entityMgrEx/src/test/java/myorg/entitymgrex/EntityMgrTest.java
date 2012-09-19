@@ -16,22 +16,28 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 public class EntityMgrTest {
     private static Log log = LogFactory.getLog(EntityMgrTest.class);
     private static final String PERSISTENCE_UNIT = "entityMgrEx";
-    EntityManagerFactory emf;
+    private static EntityManagerFactory emf;
     private EntityManager em;    
 
+    @BeforeClass
+    public static void setUpClass() {
+        log.debug("creating entity manager factory");
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+    }
+    
     @Before
     public void setUp() throws Exception {
         log.debug("creating entity manager");
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
         em = emf.createEntityManager();
-        assertNotNull(em);
         cleanup();
     }
 
@@ -44,7 +50,6 @@ public class EntityMgrTest {
             logAutos();            
             em.getTransaction().commit();            
             em.close();
-            emf.close();
             log.debug("tearDown() complete, em=" + em);
         }
         catch (Exception ex) {
@@ -52,6 +57,12 @@ public class EntityMgrTest {
             throw ex;
         }
      }
+    
+    @AfterClass
+    public static void tesrDownClass() {
+        log.debug("closing entity manager factory");
+        emf.close();
+    }
     
     public void logAutos() {
         Query query = em.createQuery("select a from Auto as a");

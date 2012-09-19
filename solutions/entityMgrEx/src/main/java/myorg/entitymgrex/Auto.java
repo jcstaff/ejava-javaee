@@ -11,13 +11,13 @@ import javax.persistence.Table;
 @Entity @Table(name="EM_AUTO")
 public class Auto implements Serializable {
     private static final long serialVersionUID = 1L;
+    @Id @GeneratedValue
     private long id;
     private String make;
     private String model;
     private String color;
     private int mileage;
         
-    @Id @GeneratedValue //@Column(nullable=false)
     public long getId() {
         return id;
     }

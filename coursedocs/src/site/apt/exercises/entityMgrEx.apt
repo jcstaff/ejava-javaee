@@ -11,572 +11,69 @@ Exercise: Entity Manager
 
     * {{{Part_A} Setup and Start Database}}
 
-    * {{{Part_B} Setup Project Structure}}
+    * {{{Part_B} Create Core POM}}
 
-    * {{{Part_C} Setup Maven Project Definition}}
+    * {{{Part_C} Setup Database Schema}}
 
-    * {{{Part_D} Test Entity Manager Functions}}
+    * {{{Part_D} Setup JPA Persistence Unit}}
 
-    * {{{Part_E} Automatically Generating Schema}}
+    * {{{Part_E} Setup JPA Test Project}}
+
+    * {{{Part_F} Ready Project for Import Into Eclipse}}
+    
+    * {{{Part_G} Test Entity Manager Functions}}
+    
+    * {{{Part_H} Automatically Generate Schema}}
 
 * Steps
 
     [Note:] Although this exercise will show you how to create each file,
     many of them are boilerplate from other exercises. If you already have
-    the JDBC Tutorial Exercise completed, you can consider starting 
+    the another exercise completed, you can consider starting 
     with a copy of that project and modifying it.
 
 ** {Part A}: Setup and Start Database
 
-    * If you haven't done so already, perform the setup instructions
-    for JBoss and the database as defined in 
-    {{{./ex0.html#Part_E}Exercise 0}}. Refer back to those instructions for 
-    basic commands.
+    * Prepare your environment to run the database in server mode for this
+    exercise by following the instructions defined in 
+    {{{../../coursedocs/605-784-site/docs/content/html/devenv-h2-setup.html}Exercise 0}}. 
 
-    * Start the database (using the JBoss run.sh or run.bat
-    commands). Note that the application server is not necessary for
-    this exercise. We are just taking advantage of the fact it will
-    start and stop the database process.
-
-    [Note:] You can also start the database manually to save some resources 
-    on your system for now. You should test that the manual start creates
-    the same instance of the database as JBoss. You can do this by checking
-    that a manual start of the database creates a set of files called "ejava.*"
-    in the JBOSS_HOME/server/JBOSS_SERVER/data/hypersonic directory. If they already
-    exist, you can safely delete them to test for expected behavior. You will
-    do this anyway in the future if you want to coldstart your database after
-    significant schema changes have been made.
+    * Start the database and web server server in a directory where you wish 
+    to create database files. Your h2.jar file source be located in 
+    M2_REPO/com/h2database/h2/*/h2*.jar to name at least one location.
+    Another location is JBOSS_HOME/modules/com/h2database/h2/main/h2*.jar
 
 ---
-cd ${JBOSS_HOME}/server/${JBOSS_SERVER}/data/hypersonic
-java -classpath ${JBOSS_HOME}/common/lib/hsqldb.jar org.hsqldb.Server -database.0 ejava
+cd /tmp
+java -jar h2.jar
 ---
 
-    []
-
-    * Start the DB GUI and login using the "HSQL Database Engine Server"
-    option.  You can view the contents of your database at any time through the database
-    UI using the following command, configuring it to talk to the server (3rd option
-    on the drop-down list) and entering the proper query SQL.
+    * This should result in a database server process and a  
+    {{{http://127.0.1.1:8082/login.jsp}web page login displayed}}
+    
+    * Connect using the following URL. This should create an h2db directory
+    relative to where you started your server. You can also provide a fully
+    qualified path name.
 
 ---
-java -classpath ${JBOSS_HOME}/common/lib/hsqldb.jar org.hsqldb.util.DatabaseManager
----
+Driver Class: org.h2.Driver
+JDBC URL: jdbc:h2:./h2db/ejava
+User Name: sa
+Password:
+---    
 
-** {Part B}: Setup Project Structure
+** {Part B}: Create Core POM
 
-    You will create a project structure during this exercise that will
-    end up looking like the following. The entity class, persistence
-    descriptor, and database definition files will be in the src/main
-    branch of the tree. The unit tests and test support files will be
-    in the src/test branch of the tree. The src directory and pom.xml
-    file will be the part of the module we place under configuration
-    management. You are not using a DAO in this exercise. All behavior
-    normally implemented by a DAO will be placed within the unit test.
-    Think of the unit test as a place to experiment different things
-    a DAO can do with an Entity Manager without worrying about different
-    architectural layers.
-
-    All built artifacts will end up under target (Maven will
-    create this). The target directory and the artifacts within it should
-    not be considered configuration managed.  They are formed as part of
-    a repeatable build process and configuration managed source artifacts.
-
+    Create the starting point for the exercise by defining a few core
+    elements that will allow Maven and Eclipse to recognize the elements
+    of your source tree.
+    
+    * Create a root directory for your project and populate with a pom.xml 
+    file.
+    
 ---
 |-- pom.xml
-`-- src
-    |-- main
-    |   |-- java
-    |   |   `-- myorg
-    |   |       `-- entitymgrex
-    |   |           `-- Auto.java
-    |   `-- resources
-    |       |-- ddl
-    |       |   |-- emauto_create.ddl
-    |       |   |-- emauto_delete.ddl
-    |       |   `-- emauto_drop.ddl
-    |       `-- META-INF
-    |           `-- persistence.xml
-    `-- test
-        |-- java
-        |   `-- myorg
-        |       `-- entitymgrex
-        |           `-- EntityMgrTest.java
-        `-- resources
-            |-- hibernate.properties
-            `-- log4j.xml
----
-
-    * Create a set of ddl scripts in src/main/resources/ddl to
-    handle creating the schema, deleting rows in the schema, and
-    dropping tables in the schema. Make sure each script has the 
-    word "create", "delete", or "drop" in its file name to match 
-    some search strings we'll use later. Have the database generate
-    a value for the primary key. That value should not be allowed
-    to be null.
-
-    [Note:] We could actually skip this step and have the persistence 
-    provider create the table for us. That approach is great for quick
-    Java-first prototypes. However, creating the schema outside of the
-    persistence provider is a more realistic scenario for larger 
-    developments.
-
-    []
-
----
-# emauto_create.ddl
-CREATE TABLE EM_AUTO (
-    ID BIGINT generated by default as identity (start with 1) not null,
-    MAKE VARCHAR(32),
-    MODEL VARCHAR(32),
-    COLOR VARCHAR(32),
-    MILEAGE INT,
-
-    CONSTRAINT em_autoPK PRIMARY KEY(ID)
-)
-
-# emauto_delete.ddl
-DELETE * FROM EM_AUTO;
-
-# emauto_drop.ddl
-DROP TABLE EM_AUTO if EXISTS;
----
-
-    * Create a META-INF/persistence.xml file to define the 
-    persistence unit for our jar file.
-
-        * persistence-unit name: must match what we place in our JUnit test
-
-        * provider: specify that this persistence unit is defined for 
-        the org.hibernate.ejb.HibernatePersistence provider.
-
-        * define provider-specific properties that tell the provider how to 
-        obtain a connection to the database as well as some other configuration
-        properties. 
-        
-            [Note:] The technique to add the provider-specific properties
-            includes somewhat sensitive information like user credentials.
-            If we place them in the persistence.xml file within the src/main
-            tree, these properties will become part of our deployed 
-            artifact. To avoid this, we will define them in a separate
-            hibernate.properties file placed in the src/test tree.
-        
-        []
-
----
-<?xml version="1.0" encoding="UTF-8"?>
-<persistence xmlns="http://java.sun.com/xml/ns/persistence"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" version="1.0">
-
-    <persistence-unit name="entityMgrEx">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <properties>
-            <!-- defined in src/test/resources/hibernate.properties -->
-        </properties>
-    </persistence-unit>
-</persistence>
----
-
-    * Create a hibernate.properties file in src/test/resources to hold 
-    information we want to suport testing, but may not want to be 
-    part of the deployed artifact. Leave the volatile values as variables
-    so they can be expanded into the target tree during compile time.
-
-        * the variables will be filled in during the build process using
-        "filtering" and the resources plugin.
-
-        * the show and format_sql options are only turned on during
-        early development and debug.
-
-        * the jdbc.batch_size property set to 0 is also used during
-        debug. Setting it to this value will eliminate any batching
-        of SQL commands, allowing errors about the commands to be 
-        better reported to the developer. 
-
----
-hibernate.dialect=${hibernate.dialect}
-hibernate.connection.url=${jdbc.url}
-hibernate.connection.driver_class=${jdbc.driver}
-hibernate.connection.password=${jdbc.password}
-hibernate.connection.username=${jdbc.user}
-#hibernate.hbm2ddl.auto=create
-hibernate.show_sql=true
-hibernate.format_sql=true
-#hibernate.jdbc.batch_size=0
----
-
-    * Create a JUnit Test case to hold your test code. The following
-    is an example of a 4.x JUnit test case that uses @Annotations.
-    You may also use a JUnit 3.x approach that uses he older 
-    inheritance approach.
-
----
-package myorg.entitymgrex;
-
-import javax.persistence.EntityManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-
-public class EntityMgrTest {
-    private static Log log = LogFactory.getLog(EntityMgrTest.class);
-
-    @Test
-    public void testTemplate() {
-        log.info("testTemplate");
-    }
-}
----
-
-    * Provide a setUp() method that will be called before each testMethod
-    is executed. Have this method create an entity manager and factory
-    for the tests to use.
-
----
-    private static final String PERSISTENCE_UNIT = "entityMgrEx";
-    EntityManagerFactory emf;
-    private EntityManager em;    
-
-    @Before
-    public void setUp() throws Exception {
-        log.debug("creating entity manager");
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
-        em = emf.createEntityManager();
-        assertNotNull(em);
-        cleanup();
-    }
----
-
-    * Provide a tearDown() method that will be called after each
-    testMethod.  Have this flush all remaining items in the persistence
-    context to the database and close the entity manager and factory.
-
----
-    @After
-    public void tearDown() throws Exception {
-        try {
-            log.debug("tearDown() started, em=" + em);
-            em.getTransaction().begin();
-            em.flush();            
-            logAutos();            
-            em.getTransaction().commit();            
-            em.close();
-            emf.close();
-            log.debug("tearDown() complete, em=" + em);
-        }
-        catch (Exception ex) {
-            log.fatal("tearDown failed", ex);
-            throw ex;
-        }
-     }
----
-
-    * Add in a logAutos() method to query and print all autos in the 
-    database. Do this after flushing the entity manager in the tearDown()
-    method so you can see the changes from the previous test. The following
-    example uses the entity manager to create an ad-hoc EJB-QL statement.
-
----
-    public void logAutos() {
-        Query query = em.createQuery("select a from Auto as a");
-        for (Object o: query.getResultList()) {
-            log.info("EM_AUTO:" + o);
-        }        
-    }
----
-
-    * You might also want to add a cleanup() to clear out the Auto
-    table between tests. The example below uses the entity manager to
-    create a native SQL statement.
-    
----
-    public void cleanup() {
-        em.getTransaction().begin();
-        Query query = em.createNativeQuery("delete from EM_AUTO");
-        int rows = query.executeUpdate();
-        em.getTransaction().commit();
-        log.info("removed " + rows + " rows");
-    }
----
-
-    * Add a log4j.xml file to src/test/resources that has your 
-    desired settings. The one below produces less timestamp information
-    at the console and more details in the logfile.
-
-    [Note:] Although it might be a bit entertaining to set the priority
-    of the root appender to debug to see everything the persistence provider
-    has to say, it is quite noisy. Consider changing to root priority to
-    fatal so that a majority of the log statements are yours.
-
-    []
-
----
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-<log4j:configuration
-    xmlns:log4j="http://jakarta.apache.org/log4j/"
-    debug="false">
-
-    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
-        <param name="Target" value="System.out"/>
-
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern"
-                   value="(%F:%M:%L)  -%m%n"/>
-        </layout>
-    </appender>
-
-    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="target/log4j-out.txt"/>
-        <param name="Append" value="false"/>
-        <param name="MaxFileSize" value="100KB"/>
-        <param name="MaxBackupIndex" value="1"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern"
-                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
-        </layout>
-   </appender>
-
-   <logger name="myorg">
-      <level value="debug"/>
-      <appender-ref ref="logfile"/>
-   </logger>
-
-   <root>
-      <priority value="fatal"/>
-      <appender-ref ref="CONSOLE"/>
-   </root>
-
-</log4j:configuration>
----
-
-    * Create a (Plain Old Java Object (POJO)) Class to represent an
-    automobile. Use class annotations to prvide the following:
-
-        * @Entity annotation on the class to tell persistence provider 
-        this is part of persistence unit
-
-        * @Table(name="EM_AUTO") annotation on the class to match the 
-        table name in the emauto_create.ddl file
-
-        * properties to hold id:long, make:String, model:String, color:String,
-        mileage:int.
-
-        * a public getId():long to return the id field.
-
-        * a private setId(long) to set the primary key. This will be called
-        by the persistence provider. You may want to add a 
-        @SuppressWarnings("unused") if your compiler is warning you that
-        the private setId() is not being used within the class.
-
-        * @Id annotation on the getId() method to tell the persistence 
-        provider the id property is the primary key and to use 
-        PROPERTY type access (get/setId() versus FIELD type access)
-
-        * @Column annotation on the getId() method to tell the persistence
-        provider the id property is not nullable.
-
-        * make the class implement java.io.Serializable. 
-
----
-package myorg.entitymgrex;
-
-import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-@Entity @Table(name="EM_AUTO")
-public class Auto implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private long id;
-    private String make;
-    private String model;
-    private String color;
-    private int mileage;
-
-    @Id @GeneratedValue @Column(nullable=false)
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
-
-    //more getter/setters go here
-}
----
-
-    * Add the remaining setter/getter methods to the class. If you are
-    using Eclipse to author the class -- right click->Source->Generate
-    Getters and Setters will generate all of this for you.  Since we
-    are using generated primary key values, there is no immediate need
-    for a constructor to set the id. If you add this later, remember to
-    also add a default constructor, which was removed by the compiler
-    when you manually add the first constructor.
-    
----
-    public String getMake() {
-        return make;
-    }
-    public void setMake(String make) {
-        this.make = make;
-    }
-    public int getMileage() {
-        return mileage;
-    }
-    public void setMileage(int mileage) {
-        this.mileage = mileage;
-    }
-    public String getModel() {
-        return model;
-    }
-    public void setModel(String model) {
-        this.model = model;
-    }
-    public String getColor() {
-        return color;
-    }
-    public void setColor(String color) {
-        this.color = color;
-    }    
-}
----
-
-    * You may also want to add a public toString():String method to 
-    conveniently print your Auto objects. Eclipse can also generate 
-    that on demand and configurable.
-
----
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder
-            .append("id=").append(id)
-            .append(", make=").append(make)
-            .append(", model=").append(model)
-            .append(", color=").append(color)
-            .append(", mileage=").append(mileage);
-        return builder.toString();
-    }    
----
-
-    * Check that you have the following artifacts in your project src
-    tree.
-
----
-src/
-|-- main
-|   |-- java
-|   |   `-- myorg
-|   |       `-- entitymgrex
-|   |           `-- Auto.java
-|   `-- resources
-|       |-- META-INF
-|       |   `-- persistence.xml
-|       `-- ddl
-|           |-- emauto_create.ddl
-|           |-- emauto_delete.ddl
-|           `-- emauto_drop.ddl
-`-- test
-    |-- java
-    |   `-- myorg
-    |       `-- entitymgrex
-    |           `-- EntityMgrTest.java
-    `-- resources
-        |-- hibernate.properties
-        `-- log4j.xml
----
-
-** {Part C}: Setup Maven Project Definition
-
-    [Note:] This project definition may be long, but realize there is 
-    a very limited amount that is project specific. Maven provides the 
-    mechanism to create a layered set of pom.xml files, which can help
-    establish templates for each lower-level project to take advantage of.
-    The full pom.xml is being provided here to be complete. You would 
-    surely refactor repeated details in a non-class environment.
-
-    [Note:] Eclipse Indigo users may get a warning/error for 
-    hibernate3-maven-plugin and sql-maven-plugin plugins. The error is related 
-    to Eclipse trying to have a tighter integration with Maven by trying to 
-    perform comparable tasks inside of Eclipse for what would happen in 
-    a normal Maven command line build. For some of the plugins -- Maven does
-    not know yet what to do with them and will be asking you for assistance 
-    on how to treat the plugin. In most cases you will just tell Eclipse to
-    ignore the plugin.  These can be ignored but but adding the following profile 
-    will eliminate the error shown by Eclipse for the project pom.xml.
-
----
-        <!--  tell Eclipse what to do with some of the plugins -->
-        <profile>
-          <id>m2e</id>
-          <activation>
-            <property>
-              <name>m2e.version</name>
-            </property>
-          </activation>
-          <build>
-            <pluginManagement>
-                <plugins>
-                    <plugin>
-                      <groupId>org.eclipse.m2e</groupId>
-                      <artifactId>lifecycle-mapping</artifactId>
-                      <version>1.0.0</version>
-                      <configuration>
-                        <lifecycleMappingMetadata>
-                          <pluginExecutions>
-
-                            <pluginExecution>
-                              <pluginExecutionFilter>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>hibernate3-maven-plugin</artifactId>
-                                <versionRange>[2.2,)</versionRange>
-                                <goals>
-                                  <goal>hbm2ddl</goal>
-                                </goals>
-                              </pluginExecutionFilter>
-                              <action>
-                                <ignore/>
-                              </action>
-                            </pluginExecution>
-
-                            <pluginExecution>
-                              <pluginExecutionFilter>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>sql-maven-plugin</artifactId>
-                                <versionRange>[1.4,)</versionRange>
-                                <goals>
-                                  <goal>execute</goal>
-                                </goals>
-                              </pluginExecutionFilter>
-                              <action>
-                                <ignore/>
-                              </action>
-                            </pluginExecution>
-    
-                          </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                      </configuration>
-                    </plugin>
-
-                </plugins>
-            </pluginManagement>
-           </build>
-        </profile>
----
-
-    []
-
-    * Create a pom.xml file to define the project
+---    
 
 ---
 <?xml version="1.0"?>
@@ -594,7 +91,42 @@ src/
 </project> 
 ---
 
-    * Add the src/main dependenciies. This represents what your code depends
+    * Define a remote repository to use to download hibernate artifacts
+---
+   <!-- needed to resolve some hibernate dependencies -->
+    <repositories>
+        <repository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+    </repositories>
+---
+
+
+    * Add property definitions for versions of dependencies and plugins 
+    we will be using.
+    
+---
+    <properties>
+        <jboss.host>localhost</jboss.host>
+        <db.host>${jboss.host}</db.host>
+        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
+        <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
+        <commons-logging.version>1.0.4</commons-logging.version>
+        <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
+        <junit.version>4.10</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
+        <slf4j.version>1.6.1</slf4j.version>
+        <h2db.version>1.3.168</h2db.version>
+        <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
+        <hibernate3.version>3.6.0.Final</hibernate3.version>
+    </properties>
+---    
+
+    * Add the src/main dependencies. This represents what your code depends
     upon at compile time and runtime. 
 
         * scope=compile is used when your src/main code depends on
@@ -613,32 +145,19 @@ src/
         <dependency>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
-          <version>1.0.4</version>
+          <version>${commons-logging.version}</version>
           <scope>compile</scope>
         </dependency>
+    
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>1.0.0.Final</version>
+            <version>${hibernate-jpa-2.0-api.version}</version>
             <scope>provided</scope>
         </dependency>
+        ...
     </dependencies>
 ---
-
-    [Note:] The above example uses the JPA 2.0 API. For JPA 1.0
-    only, use the following. Note too that the posted solution
-    uses a profile to determine which to use at build time.
-
----
-        <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>persistence-api</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
----
-
-    []
 
     * Add the src/test standard dependencies. 
 
@@ -655,15 +174,15 @@ src/
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
-          <version>1.2.13</version>
-            <scope>test</scope>
-        </dependency>
+          <version>${log4j.version}</version>
+          <scope>test</scope>
+        </dependency>    
 ---
 
     * Add a build section and begin by specifying that test resource files should be 
@@ -683,25 +202,22 @@ src/
     </build>
 ---
 
-    * Add a plugin specification for Java 1.6. Java 1.5 could be used
-    here as well. I read that version 2.3.2 of the maven-compiler
-    plugin defaults to 1.5 if left unspecified.
+    * Add a plugin specification for Java 1.6. 
 
 ---
     <build>
         ...
-
         <plugins>
-              <!-- make sure we are building java5 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
             </plugin>
+            ...      
         </plugins>
     </build>
 ---
@@ -717,7 +233,7 @@ src/
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
                     <systemPropertyVariables>
@@ -726,41 +242,10 @@ src/
                         -->
                     </systemPropertyVariables>
                 </configuration>
-
-            </plugin>
+            </plugin>            
 ---
 
-    * Add a set of properties that will define defaults for how the
-    module is configured.  Configure a default within the pom.xml and
-    these values can be overridden with a -DsystemProperty=value on the
-    command line or an entry from the HOME/.m2/settings.xml file.
-
-        * where to locate the database host 
-
-        * which version of libraries to use
-
-        []
-
----
-    <properties>
-        <jboss.host>localhost</jboss.host>
-        <db.host>${jboss.host}</db.host>
-        <hibernate-entitymanager.version>3.6.0.Final</hibernate-entitymanager.version>
-        <slf4j.version>1.6.1</slf4j.version>
-    </properties>
----
-
-    [Note:] The above example shows usage of a JPA 2.0 version of hibernate. Use
-    the following for a JPA 1.0 implementation.
-
----
-        <hibernate-entitymanager.version>3.4.0.GA</hibernate-entitymanager.version>
-        <slf4j.version>1.5.2</slf4j.version>
----
-
-    []
-
-    * Add a set of profiles that define Hypersonic and Hibernate as our database and 
+    * Add a set of profiles that define H2 and Hibernate as our database and 
     persistence provider.
 
     [Note:] Profiles can be used to control which options are enabled at
@@ -774,28 +259,27 @@ src/
 
 ---
     <profiles>
-        <profile> <!-- defines our default database -->
-            <id>hsql</id>
+        <profile> <!-- H2 server-based DB -->
+            <id>h2srv</id>
             <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
+                <property> 
+                    <name>!jdbcdb</name>
                 </property>
             </activation>
             <properties>
-                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
+                  <jdbc.password/>
                   <hibernate.dialect>
-                      org.hibernate.dialect.HSQLDialect
+                      org.hibernate.dialect.H2Dialect
                   </hibernate.dialect>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <version>1.8.0.4</version>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2db.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -809,15 +293,6 @@ src/
                     <name>!jpa</name>
                 </property>
             </activation>
-
-           <!-- needed to resolve some hibernate dependencies -->
-            <repositories>
-                <repository>
-                    <id>jboss-nexus</id>
-                    <name>JBoss Nexus Repository</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                </repository>
-            </repositories>
 
             <dependencies>
                 <dependency>
@@ -835,6 +310,71 @@ src/
             </dependencies>
         </profile>
 ---
+
+    * Perform a test of your pom.xml by issuing a sample build command.
+    All should complete even though there is nothing yet in your source tree.
+    
+---
+$ mvn clean test
+---    
+
+** {Part C}: Setup Database Schema
+
+    You will first need some database schema to get started. Begin
+    filling out your source tree by creating some schema files that
+    will be used to create schema, delete rows, and drop schema.
+
+    * Create a set of ddl scripts in src/main/resources/ddl to
+    handle creating the schema, deleting rows in the schema, and
+    dropping tables in the schema. Make sure each script has the 
+    word "create", "delete", or "drop" in its file name to match 
+    some search strings we'll use later. Have the database generate
+    a value for the primary key. That value should not be allowed
+    to be null.
+
+---
+`-- src
+    |-- main
+    |   |-- java
+    |   `-- resources
+    |       |-- ddl
+    |       |   |-- emauto_create.ddl
+    |       |   |-- emauto_delete.ddl
+    |       |   `-- emauto_drop.ddl
+    `-- test
+        |-- java
+        `-- resources
+---
+
+    [Note:] We could actually skip this step and have the persistence 
+    provider create the table for us. That approach is great for quick
+    Java-first prototypes. However, creating the schema outside of the
+    persistence provider is a more realistic scenario for larger 
+    developments.
+
+    []
+
+---
+# src/main/resources/ddl/emauto_create.ddl
+CREATE TABLE EM_AUTO (
+    ID BIGINT generated by default as identity (start with 1) not null,
+    MAKE VARCHAR(32),
+    MODEL VARCHAR(32),
+    COLOR VARCHAR(32),
+    MILEAGE INT,
+
+    CONSTRAINT em_autoPK PRIMARY KEY(ID)
+)
+
+# src/main/resources/ddl/emauto_delete.ddl
+DELETE * FROM EM_AUTO;
+
+# src/main/resources/ddl/emauto_drop.ddl
+DROP TABLE EM_AUTO if EXISTS;
+---
+
+    * You can perform a sanity check of the above scripts by pasting them
+    into the DB UI SQL area and executing.
 
     * Add the standard database setup and teardown scripts. This allows us
     to create a legacy database schema and write classes that map to that
@@ -854,22 +394,22 @@ src/
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>sql-maven-plugin</artifactId>
-                        <version>1.4</version>        
-
+                        <artifactId>sql-maven-plugin</artifactId>        
+                        <version>${sql-maven-plugin.version}</version>        
+                    
                         <dependencies>
                             <dependency>
-                                <groupId>hsqldb</groupId>
-                                <artifactId>hsqldb</artifactId>
-                                <version>1.8.0.4</version>
+                                <groupId>com.h2database</groupId>
+                                <artifactId>h2</artifactId>
+                                <version>${h2db.version}</version>
                             </dependency>
                         </dependencies>
-
+                    
                         <configuration>
                             <username>${jdbc.user}</username>
                             <password>${jdbc.password}</password>
                             <driver>${jdbc.driver}</driver>
-                            <url>${jdbc.url}</url>
+                            <url>${jdbc.url}</url>          
                         </configuration>
 
                         <executions>
@@ -976,10 +516,506 @@ src/
         </execution>
 ---
 
-    * Build and run the tests.
+    * Build and run the tests. The schema should show up in the DB UI.
+    
+** {Part D}: Setup JPA Persistence Unit
+
+    Create the entity class(es), the persistence.xml, and associated 
+    property file to define the persistence unit.
+    
+---
+`-- src
+    |-- main
+    |   |-- java
+    |   |   `-- myorg
+    |   |       `-- entitymgrex
+    |   |           `-- Auto.java
+    |   `-- resources
+    |       `-- META-INF
+    |           `-- persistence.xml
+    `-- test
+        |-- java
+        `-- resources
+            `-- hibernate.properties
+---
+
+    * Create a (Plain Old Java Object (POJO)) Class to represent an
+    automobile. Use class annotations to prvide the following:
+
+        * @Entity annotation on the class to tell persistence provider 
+        this is part of persistence unit
+
+        * @Table(name="EM_AUTO") annotation on the class to match the 
+        table name in the emauto_create.ddl file
+
+        * properties to hold id:long, make:String, model:String, color:String,
+        mileage:int.
+
+        * a public getId():long to return the id field.
+
+        * a private setId(long) to set the primary key. This will be called
+        by the persistence provider. You may want to add a 
+        @SuppressWarnings("unused") if your compiler is warning you that
+        the private setId() is not being used within the class.
+
+        * @Id annotation on the id attribute to tell the persistence 
+        provider the id property is the primary key and to use 
+        FIELD type access (versus get/setId() PROPERTY type access)
+
+        * @GeneratedValue to tell the provider to generate primary keys
+        for rows inserted for this entity.
+
+        * make the class implement java.io.Serializable. 
+
+---
+package myorg.entitymgrex;
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity @Table(name="EM_AUTO")
+public class Auto implements Serializable {
+    private static final long serialVersionUID = 1L;
+    @Id @GeneratedValue
+    private long id;
+    private String make;
+    private String model;
+    private String color;
+    private int mileage;
+
+    public long getId() {
+        return id;
+    }
+    @SuppressWarnings("unused")
+    private void setId(long id) {
+        this.id = id;
+    }
+
+    //more getter/setters go here
+}
+---
+
+    * Add the remaining setter/getter methods to the class. If you are
+    using Eclipse to author the class -- right click->Source->Generate
+    Getters and Setters will generate all of this for you.  Since we
+    are using generated primary key values, there is no immediate need
+    for a constructor to set the id. If you add this later, remember to
+    also add a default constructor, which was removed by the compiler
+    when you manually add the first constructor.
+    
+---
+    public String getMake() {
+        return make;
+    }
+    public void setMake(String make) {
+        this.make = make;
+    }
+    public int getMileage() {
+        return mileage;
+    }
+    public void setMileage(int mileage) {
+        this.mileage = mileage;
+    }
+    public String getModel() {
+        return model;
+    }
+    public void setModel(String model) {
+        this.model = model;
+    }
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }    
+}
+---
+
+    * You may also want to add a public toString():String method to 
+    conveniently print your Auto objects. Eclipse can also generate 
+    that on demand and configurable.
+
+---
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder
+            .append("id=").append(id)
+            .append(", make=").append(make)
+            .append(", model=").append(model)
+            .append(", color=").append(color)
+            .append(", mileage=").append(mileage);
+        return builder.toString();
+    }    
+---
+    
+    * Create a META-INF/persistence.xml file to define the 
+    persistence unit for our jar file.
+
+        * persistence-unit name: must match what we place in our JUnit test
+
+        * provider: specify that this persistence unit is defined for 
+        the org.hibernate.ejb.HibernatePersistence provider.
+
+        * define provider-specific properties that tell the provider how to 
+        obtain a connection to the database as well as some other configuration
+        properties. 
+        
+            [Note:] The technique to add the provider-specific properties
+            includes somewhat sensitive information like user credentials.
+            If we place them in the persistence.xml file within the src/main
+            tree, these properties will become part of our deployed 
+            artifact. To avoid this, we will define them in a separate
+            hibernate.properties file placed in the src/test tree.
+        
+        []
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" version="1.0">
+
+    <persistence-unit name="entityMgrEx">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <properties>
+            <!-- defined in src/test/resources/hibernate.properties -->
+        </properties>
+    </persistence-unit>
+</persistence>
+---
+
+    * Create a hibernate.properties file in src/test/resources to hold 
+    information we want to suport testing, but may not want to be 
+    part of the deployed artifact. Leave the volatile values as variables
+    so they can be expanded into the target tree during compile time.
+
+        * the variables will be filled in during the build process using
+        "filtering" and the resources plugin.
+
+        * the show and format_sql options are only turned on during
+        early development and debug.
+
+        * the jdbc.batch_size property set to 0 is also used during
+        debug. Setting it to this value will eliminate any batching
+        of SQL commands, allowing errors about the commands to be 
+        better reported to the developer. 
+
+---
+hibernate.dialect=${hibernate.dialect}
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.password=${jdbc.password}
+hibernate.connection.username=${jdbc.user}
+#hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
+---
 
 
-** {Part D}: Test Entity Manager Functions
+    
+
+** {Part E}: Setup JPA Test Project
+
+    Create the unit test and supporting file(s) to be able to work with
+    the perstence unit and database schema in the database.
+
+---
+`-- src
+    `-- test
+        |-- java
+        |   `-- myorg
+        |       `-- entitymgrex
+        |           `-- EntityMgrTest.java
+        `-- resources
+            `-- log4j.xml
+---
+
+    * Create a JUnit Test case to hold your test code. The following
+    is an example of a 4.x JUnit test case that uses @Annotations.
+    You may also use a JUnit 3.x approach that uses he older 
+    inheritance approach.
+
+---
+package myorg.entitymgrex;
+
+import javax.persistence.EntityManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+
+public class EntityMgrTest {
+    private static Log log = LogFactory.getLog(EntityMgrTest.class);
+
+    @Test
+    public void testTemplate() {
+        log.info("testTemplate");
+    }
+}
+---
+
+    * Provide a setUpClass() method that runs once before all tests that
+    can create the entity manager. This method must be static.
+    
+---
+    private static final String PERSISTENCE_UNIT = "entityMgrEx";
+    private static EntityManagerFactory emf;
+
+    @BeforeClass
+    public static void setUpClass() {
+        log.debug("creating entity manager factory");
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+    }
+---    
+
+    * Provide a setUp() method that will be called before each testMethod
+    is executed. Have this method create an entity manager
+    for the tests to use.
+
+---
+    private EntityManager em;    
+
+    @Before
+    public void setUp() throws Exception {
+        log.debug("creating entity manager");
+        em = emf.createEntityManager();
+        //cleanup();
+    }
+---
+
+    * Provide a tearDown() method that will be called after each
+    testMethod.  Have this flush all remaining items in the persistence
+    context to the database and close the entity manager.
+
+---
+
+    @After
+    public void tearDown() throws Exception {
+        try {
+            log.debug("tearDown() started, em=" + em);
+            em.getTransaction().begin();
+            em.flush();            
+            //logAutos();            
+            em.getTransaction().commit();            
+            em.close();
+            log.debug("tearDown() complete, em=" + em);
+        }
+        catch (Exception ex) {
+            log.fatal("tearDown failed", ex);
+            throw ex;
+        }
+     }
+---
+
+    * Provide a tearDownClass() method that will be called after all 
+    testMethods have completed. This method must be static and should 
+    close the entity manager factory.
+    
+---
+    @AfterClass
+    public static void tesrDownClass() {
+        log.debug("closing entity manager factory");
+        emf.close();
+    }
+---    
+
+    * Add in a logAutos() method to query and print all autos in the 
+    database. Do this after flushing the entity manager in the tearDown()
+    method so you can see the changes from the previous test. The following
+    example uses the entity manager to create an ad-hoc EJB-QL statement.
+
+---
+    @After
+    public void tearDown() throws Exception {
+...
+            em.flush();            
+            logAutos();            
+            em.getTransaction().commit();            
+...
+     }
+
+    public void logAutos() {
+        Query query = em.createQuery("select a from Auto as a");
+        for (Object o: query.getResultList()) {
+            log.info("EM_AUTO:" + o);
+        }        
+    }
+---
+
+    * You might also want to add a cleanup() to clear out the Auto
+    table between tests. The example below uses the entity manager to
+    create a native SQL statement.
+    
+---
+    @Before
+    public void setUp() throws Exception {
+        ...
+        em = emf.createEntityManager();
+        cleanup();
+    }
+
+    public void cleanup() {
+        em.getTransaction().begin();
+        Query query = em.createNativeQuery("delete from EM_AUTO");
+        int rows = query.executeUpdate();
+        em.getTransaction().commit();
+        log.info("removed " + rows + " rows");
+    }
+---
+
+    * Add a log4j.xml file to src/test/resources that has your 
+    desired settings. The one below produces less timestamp information
+    at the console and more details in the logfile.
+
+    [Note:] Although it might be a bit entertaining to set the priority
+    of the root appender to debug to see everything the persistence provider
+    has to say, it is quite noisy. Consider changing to root priority to
+    fatal so that a majority of the log statements are yours.
+
+    []
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration
+    xmlns:log4j="http://jakarta.apache.org/log4j/"
+    debug="false">
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="(%F:%M:%L)  -%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="target/log4j-out.txt"/>
+        <param name="Append" value="false"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+        </layout>
+   </appender>
+
+   <logger name="myorg">
+      <level value="debug"/>
+      <appender-ref ref="logfile"/>
+   </logger>
+
+   <root>
+      <priority value="fatal"/>
+      <appender-ref ref="CONSOLE"/>
+   </root>
+
+</log4j:configuration>
+---
+
+    * Check that you have the following artifacts in your project src
+    tree.
+
+---
+src/
+|-- main
+|   |-- java
+|   |   `-- myorg
+|   |       `-- entitymgrex
+|   |           `-- Auto.java
+|   `-- resources
+|       |-- META-INF
+|       |   `-- persistence.xml
+|       `-- ddl
+|           |-- emauto_create.ddl
+|           |-- emauto_delete.ddl
+|           `-- emauto_drop.ddl
+`-- test
+    |-- java
+    |   `-- myorg
+    |       `-- entitymgrex
+    |           `-- EntityMgrTest.java
+    `-- resources
+        |-- hibernate.properties
+        `-- log4j.xml
+---
+
+** {Part F}: Ready Project for Import Into Eclipse
+
+    Eclipse Indigo users will get a warning/error for the 
+    sql-maven-plugin. The error is related 
+    to Eclipse trying to have a tighter integration with Maven by trying to 
+    perform comparable tasks inside of Eclipse for what would happen in 
+    a normal Maven command line build. For some of the plugins -- Maven does
+    not know yet what to do with them and will be asking you for assistance 
+    on how to treat the plugin. In most cases you will just tell Eclipse to
+    ignore the plugin.  These can be ignored but but adding the following profile 
+    will eliminate the error shown by Eclipse for the project pom.xml.
+
+---
+    <profiles>
+       ...
+        <!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+          <id>m2e</id>
+          <activation>
+            <property>
+              <name>m2e.version</name>
+            </property>
+          </activation>
+          <build>
+            <pluginManagement>
+                <plugins>
+                    <plugin>
+                      <groupId>org.eclipse.m2e</groupId>
+                      <artifactId>lifecycle-mapping</artifactId>
+                      <version>1.0.0</version>
+                      <configuration>
+                        <lifecycleMappingMetadata>
+                          <pluginExecutions>
+                            
+                            <!-- more plugin exclusions will go here -->
+
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>sql-maven-plugin</artifactId>
+                                <versionRange>[1.4,)</versionRange>
+                                <goals>
+                                  <goal>execute</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+    
+                          </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                      </configuration>
+                    </plugin>
+
+                </plugins>
+            </pluginManagement>
+           </build>
+        </profile>
+    ...
+    </profiles>        
+---
+
+
+
+** {Part G}: Test Entity Manager Functions
 
     [Note:] The following changes are all made to the EntityMgrTest.java
     JUnit test class. Everything is being done within this file to 
@@ -1295,9 +1331,9 @@ src/
  -removing car:myorg.entitymgrex.Auto@28305d, id=11, make=Jeep, model=Cherokee, color=Green, mileage=30000
 ---
 
-** {Part E}: Automatically Generating Schema
+** {Part H}: Automatically Generate Schema
 
-    In part B, you manually created a set of DDL files to create schema, 
+    In part C, you manually created a set of DDL files to create schema, 
     delete rows from the schema in the database, and drop the schema
     from the database. Since your persistence provider knows how to
     work with schema, you can optionally get it to create schema for 
@@ -1331,67 +1367,84 @@ src/
     into target/classes/ddl
 
 ---
+        <!-- generates a DDL file for persistence unit 
+        -->
         <plugin>
-            <artifactId>hibernate3-maven-plugin</artifactId>
             <groupId>org.codehaus.mojo</groupId>
-            <version>2.2</version>
+            <artifactId>hibernate3-maven-plugin</artifactId>
+            <version>${hibernate3-maven-plugin.version}</version>
+            <configuration>
+                <hibernatetool destdir="target/classes/ddl">
+                    <classpath>
+                        <path location="${project.build.directory}/test-classes"/>
+                    </classpath>
+                    <jpaconfiguration persistenceunit="entityMgrEx"
+                         propertyfile="${basedir}/target/test-classes/hibernate.properties"/>
+                </hibernatetool>
+            </configuration>
+
+            <extensions>true</extensions>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>${hibernate3.version}</version>
+                </dependency>
+            </dependencies>
             <executions>
                 <execution>
                     <id>generate-drop-ddl</id>
-                    <phase>compile</phase>
+                    <phase>process-test-resources</phase>
                     <goals>
-                        <goal>hbm2ddl</goal>
+                        <goal>run</goal>
                     </goals>
                     <configuration>
-                        <componentProperties>
-                            <outputfilename>
-                                ${pom.artifactId}-dropGEN.ddl
-                            </outputfilename>
-                            <drop>true</drop>
-                            <create>false</create>
-                        </componentProperties>
+                        <hibernatetool>
+                            <hbm2ddl export="false" create="false" drop="true" format="true" 
+                                outputfilename="${project.artifactId}-dropJPA.ddl"/>
+                        </hibernatetool>
                     </configuration>
                 </execution>
                 <execution>
                     <id>generate-create-ddl</id>
-                    <phase>compile</phase>
+                    <phase>process-test-resources</phase>
                     <goals>
-                        <goal>hbm2ddl</goal>
+                        <goal>run</goal>
                     </goals>
                     <configuration>
-                        <componentProperties>
-                            <outputfilename>
-                                ${pom.artifactId}-createGEN.ddl
-                            </outputfilename>
-                            <drop>false</drop>
-                            <create>true</create>
-                        </componentProperties>
+                        <hibernatetool>
+                            <hbm2ddl export="false" create="true" drop="false" format="true" 
+                                outputfilename="${project.artifactId}-createJPA.ddl"/>
+                        </hibernatetool>
                     </configuration>
                 </execution>
             </executions>
-            <configuration>
-                <components>
-                    <component>
-                        <name>hbm2ddl</name>
-                        <implementation>
-                            jpaconfiguration
-                        </implementation>
-                        <outputDirectory>
-                            target/classes/ddl
-                        </outputDirectory>
-                    </component>
-                </components>
-                <componentProperties>
-                    <persistenceunit>
-                        entityMgrEx
-                    </persistenceunit>
-                    <export>false</export>
-                    <format>true</format>
-                </componentProperties>
-            </configuration>
         </plugin>
 ---
 
+    * Add a lifecycle mapping for the hibernate3-maven-plugin to tell Eclipse
+    to ignore the functionality of the plugin and eliminate any errors Eclipse
+    might display. This goes with the definition you created for the sql-maven-plugin. 
+    
+---
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>hibernate3-maven-plugin</artifactId>
+                                <versionRange>[2.2,)</versionRange>
+                                <goals>
+                                  <goal>hbm2ddl</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+---    
+
+    * Run a maven build and observe the generated schema created in the 
+    target/classes tree.
+    
 ---
 target/classes/
 ...
