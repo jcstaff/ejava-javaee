@@ -1,7 +1,6 @@
 package ejava.examples.txagent.jpa;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +15,7 @@ import javax.persistence.Persistence;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
@@ -32,15 +32,17 @@ import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
 import ejava.examples.txhotel.ejb.TestUtilRemote;
 import ejava.util.ejb.EJBClient;
+import ejava.util.jndi.JNDIUtil;
 
-public abstract class DemoBase {
-    protected static final Log log = LogFactory.getLog(DemoBase.class);
+public abstract class AgentBLTestBase {
+    protected static final Log log = LogFactory.getLog(AgentBLTestBase.class);
     private static final String PERSISTENCE_UNIT = "txagent-test";
     protected HotelReservationist reservationist;
     protected HotelReservationSession reservationSession;
     protected BookingDAO bookingDAO;
     protected BookingAgent agent;
     protected AgentReservationSession agentSession;
+    protected static EntityManagerFactory emf; 
     protected EntityManager em;
     
     protected String reservationistName = 
@@ -52,58 +54,59 @@ public abstract class DemoBase {
 			EJBClient.getRemoteLookupName("txHotelEAR", "txHotelEJB", 
 	        	"HotelReservationSessionEJB", HotelReservationSessionRemote.class.getName()));
     
-
     @BeforeClass
-    public static void waitForServerDeploy() throws InterruptedException {
-    	/*
-    	 * this wait seems periodically necessary when using the cargo-startstop
-    	 * profile rather than the cargo-deploy profile to an already 
-    	 * running server. 
-    	 */
-    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-    		long waitTime=10000;
-	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
-	    	Thread.sleep(10000);
-    	}
+    public static void setUpClass() throws Exception {
+    	log.info("*** setUpClass() ***");
+    	log.debug("creating entityManagerFactory:" + PERSISTENCE_UNIT);
+        emf=Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
     }
     
     @Before
     public void setUp() throws Exception {
-        EntityManagerFactory emf = 
-            Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
-        em = emf.createEntityManager();
-        bookingDAO = new JPABookingDAO();
-        ((JPABookingDAO)bookingDAO).setEntityManager(em);
-        
-        //initialize JNDI tree to txHotel
-        Properties jndiProps = new Properties();
-        log.debug("jndi props=" + jndiProps);
-        InitialContext jndi = new InitialContext(jndiProps);
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        //setup the stateless hotel reservation impl
-        log.debug("looking up:" + reservationistName);
-        reservationist = 
-            (HotelRegistrationRemote)
-            jndi.lookup(reservationistName);
-        
-        //setup the stateful hotel reservation impl 
-        log.debug("looking up:" + reservationistSessionName);
-        reservationSession = 
-            (HotelReservationSessionRemote)
-            jndi.lookup(reservationistSessionName);
-        
-        log.debug("jndi look ups complete");
-        
-        //setup the stateless agent impl
-        agent = new AgentImpl();
-        ((AgentImpl)agent).setBookingDAO(bookingDAO);
-        ((AgentImpl)agent).setReservationist(reservationist);
-        
-        //setup the stateful agent impl
-        agentSession = new AgentSessionImpl();
-        ((AgentSessionImpl)agentSession).setBookingDAO(bookingDAO);
-        ((AgentSessionImpl)agentSession).setReservationist(reservationSession);
+    	log.info("*** setUp() ***");
+    	
+    	try {
+	    	log.debug("creating entityManager");
+	        em = emf.createEntityManager();
+	        bookingDAO = new JPABookingDAO();
+	        ((JPABookingDAO)bookingDAO).setEntityManager(em);
+	        log.debug("em=" + em);
+	        
+	        log.debug("getting jndi context");
+	        //initialize JNDI tree to txHotel
+	        Properties jndiProps = new Properties();
+	        log.debug("jndi props=" + jndiProps);
+	        InitialContext jndi = new InitialContext(jndiProps);
+	        log.debug("jndi=" + jndi.getEnvironment());
+	        
+	        //setup the stateless hotel reservation impl
+	        log.debug("looking up:" + reservationistName);
+	        //address any server startup delays for first remote lookup
+	        reservationist = JNDIUtil.lookup(
+	        	jndi, HotelRegistrationRemote.class, reservationistName, 15);
+	        log.debug("reservationist=" + reservationist);
+	        
+	        //setup the stateful hotel reservation impl 
+	        log.debug("looking up:" + reservationistSessionName);
+	        reservationSession = JNDIUtil.lookup(
+	    		jndi, HotelReservationSessionRemote.class, reservationistSessionName, 15);
+	        log.debug("reservationSession=" + reservationSession);
+	        
+	        log.debug("jndi look ups complete");
+	        
+	        //setup the stateless agent impl
+	        agent = new AgentImpl();
+	        ((AgentImpl)agent).setBookingDAO(bookingDAO);
+	        ((AgentImpl)agent).setReservationist(reservationist);
+	        
+	        //setup the stateful agent impl
+	        agentSession = new AgentSessionImpl();
+	        ((AgentSessionImpl)agentSession).setBookingDAO(bookingDAO);
+	        ((AgentSessionImpl)agentSession).setReservationist(reservationSession);
+    	} catch (Throwable ex) {
+    		ex.printStackTrace();
+    		fail("unexpected error in setUp()" + ex);
+    	}
                 
         cleanup();
         em.getTransaction().begin();
@@ -111,12 +114,23 @@ public abstract class DemoBase {
 
     @After
     public void tearDown() throws Exception {
+    	log.info("*** tearDown() ***");
         EntityTransaction tx = em.getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
             else                              { tx.commit(); }
         }
         em.close();
+        em=null;
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
+    	log.info("*** tearDownClass() ***");
+    	if (emf != null) {
+    		emf.close();
+    		emf=null;
+    	}
     }
     
     @SuppressWarnings("unchecked")
@@ -132,9 +146,16 @@ public abstract class DemoBase {
         
 
         assertEquals("unexpected bookings", 0, agent.getBookings(0, 100).size());
+        
+        //use remote interface to cleanup the hotel side of the dual application 
         String hotelHelperName = EJBClient.getRemoteLookupName("txHotelEAR", "txHotelEJB", 
         		"TestUtilEJB", TestUtilRemote.class.getName());
-        ((TestUtilRemote)new InitialContext().lookup(hotelHelperName)).reset();
+        
+        TestUtilRemote testUtil=
+    		JNDIUtil.lookup(new InitialContext(), 
+    				TestUtilRemote.class, 
+    				hotelHelperName, 5);
+        testUtil.reset();
     }
     
     protected void populate() {

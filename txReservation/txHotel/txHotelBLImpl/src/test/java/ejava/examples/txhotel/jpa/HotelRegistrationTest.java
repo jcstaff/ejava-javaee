@@ -2,6 +2,7 @@ package ejava.examples.txhotel.jpa;
 
 import static org.junit.Assert.*;
 
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,7 +14,6 @@ import org.junit.Test;
 import ejava.examples.txhotel.bl.InvalidReservationChangeException;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
-import ejava.examples.txhotel.jpa.DemoBase;
 
 /** 
  * This class tests the ReservationDAO. The code contained here will be 
@@ -21,7 +21,7 @@ import ejava.examples.txhotel.jpa.DemoBase;
  *
  * @author jcstaff
  */
-public class HotelRegistrationTest extends DemoBase {
+public class HotelRegistrationTest extends HotelDAOTestBase {
     
     /*
      * This will test the ability to create a new Reservation and Person

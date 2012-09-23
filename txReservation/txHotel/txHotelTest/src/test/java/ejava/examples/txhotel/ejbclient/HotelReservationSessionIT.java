@@ -29,6 +29,7 @@ import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
 import ejava.util.ejb.EJBClient;
+import ejava.util.jndi.JNDIUtil;
 
 /**
  * This test case provides an example of conducting a failed usecase 
@@ -57,19 +58,17 @@ public class HotelReservationSessionIT {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-    	/*
-    	 * this wait seems periodically necessary when using the cargo-startstop
-    	 * profile rather than the cargo-deploy profile to an already 
-    	 * running server. 
-    	 */
-    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-    		long waitTime=10000;
-	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
-	    	Thread.sleep(10000);
-    	}
-        log.debug("getting jndi initial context");
+    	log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi name:" + sessionJNDI);        
+        
+    	/*
+    	 * this wait seems periodically necessary when using the cargo-startstop
+    	 * profile rather than the cargo-deploy profile to an already running server. 
+    	 */
+    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+    		JNDIUtil.lookup(new InitialContext(), HotelReservationSession.class, sessionJNDI, 15);
+    	} 
         
        	reservationSessions.put("registrar", (HotelReservationSession)jndi.lookup(sessionJNDI));
        	reservationSessions.put("required", (HotelReservationSession)jndi.lookup(requiredJNDI));

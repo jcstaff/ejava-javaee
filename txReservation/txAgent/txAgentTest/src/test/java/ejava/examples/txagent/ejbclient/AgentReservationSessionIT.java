@@ -24,7 +24,9 @@ import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
+import ejava.examples.txhotel.ejb.TestUtilRemote;
 import ejava.util.ejb.EJBClient;
+import ejava.util.jndi.JNDIUtil;
 
 public class AgentReservationSessionIT {
     private static final Log log = LogFactory.getLog(AgentReservationSessionIT.class);
@@ -42,20 +44,6 @@ public class AgentReservationSessionIT {
     		"HotelRegistrationEJB", HotelRegistrationRemote.class.getName()));
     HotelReservationist hotel;
     
-    @BeforeClass
-    public static void waitforDeployment() throws InterruptedException {
-    	/*
-    	 * this wait seems periodically necessary when using the cargo-startstop
-    	 * profile rather than the cargo-deploy profile to an already 
-    	 * running server. 
-    	 */
-    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-    		long waitTime=10000;
-	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
-	    	Thread.sleep(10000);
-    	}
-    }
-    
     @Before()
     public void setUp() throws Exception {
     	boolean fail=false;
@@ -70,7 +58,8 @@ public class AgentReservationSessionIT {
 
         try {
             log.info("looking up:" + agentJNDI);
-            agent = (BookingAgentRemote)jndi.lookup(agentJNDI);
+            //address server start-up delays on first lookup
+        	agent=JNDIUtil.lookup(jndi, BookingAgentRemote.class, agentJNDI, 15);
             log.info("found:" + agent);
         } catch (Exception ex) {
                 log.error("Error looking up:" + agentJNDI, ex);
@@ -115,7 +104,15 @@ public class AgentReservationSessionIT {
                 agent.cleanupBooking(b.getConfirmation());
             }
             bookings = agent.getBookings(0, 100);
-        }        
+        }     
+        
+        //use remote interface to cleanup the hotel side of the dual application 
+        String hotelHelperName = EJBClient.getRemoteLookupName("txHotelEAR", "txHotelEJB", 
+        		"TestUtilEJB", TestUtilRemote.class.getName());
+        
+        TestUtilRemote testUtil=
+    		JNDIUtil.lookup(new InitialContext(), TestUtilRemote.class, hotelHelperName, 5);
+        testUtil.reset();
     }
 
     @Test

@@ -22,7 +22,11 @@ import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.dao.ReservationDAO;
 import ejava.examples.txhotel.jpa.JPAReservationDAO;
 
-public abstract class DemoBase {
+/**
+ * This class contains the common setUp and tearDown logic for all
+ * DAO tests for the Hotel application.
+ */
+public abstract class HotelDAOTestBase {
     protected Log log = LogFactory.getLog(getClass());
     private static final String PERSISTENCE_UNIT = "txhotel-test";
     protected HotelReservationist reservationist;

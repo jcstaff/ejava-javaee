@@ -21,6 +21,7 @@ import ejava.examples.jndidemo.Scheduler;
 import ejava.examples.jndidemo.ejb.AidSchedulerRemote;
 import ejava.examples.jndidemo.ejb.BakeSchedulerRemote;
 import ejava.util.ejb.EJBClient;
+import ejava.util.jndi.JNDIUtil;
 
 /**
  * Performs a basic set of calls in the EJBs deployed to demonstrate 
@@ -40,17 +41,9 @@ public class JndiIT  {
         		BakeSchedulerRemote.class.getName(), true));
     
     @BeforeClass
-    public static void waitForServerDeploy() throws InterruptedException {
-    	/*
-    	 * this wait seems periodically necessary when using the cargo-startstop
-    	 * profile rather than the cargo-deploy profile to an already 
-    	 * running server. 
-    	 */
-    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-    		long waitTime=10000;
-	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
-	    	Thread.sleep(10000);
-    	}
+    public static void waitForServerDeploy() throws NamingException {
+    	//lookup a test remote EJB to be sure server is up
+    	JNDIUtil.lookup(new InitialContext(), BakeSchedulerRemote.class, bakeName, 15);
     }
     
     @Before

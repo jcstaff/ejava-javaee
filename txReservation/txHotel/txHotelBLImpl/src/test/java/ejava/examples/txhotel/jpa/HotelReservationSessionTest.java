@@ -11,9 +11,9 @@ import org.junit.Test;
 import ejava.examples.txhotel.bl.InvalidParameterException;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
-import ejava.examples.txhotel.jpa.DemoBase;
+import ejava.examples.txhotel.jpa.HotelDAOTestBase;
 
-public class HotelReservationSessionTest extends DemoBase {
+public class HotelReservationSessionTest extends HotelDAOTestBase {
     
 	@Test
     public void testCreateReservations() throws Exception {

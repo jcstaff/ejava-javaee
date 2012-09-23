@@ -1,6 +1,7 @@
-package ejava.examples.txhotel.jpa;
+package ejava.examples.txagent.jpa;
 
 import java.util.List;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -9,31 +10,32 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
 
-import ejava.examples.txhotel.bo.Person;
-import ejava.examples.txhotel.bo.Reservation;
-import ejava.examples.txhotel.dao.ReservationDAO;
-import ejava.examples.txhotel.jpa.JPAReservationDAO;
+import ejava.examples.txagent.bo.Booking;
+import ejava.examples.txagent.dao.BookingDAO;
+import ejava.examples.txagent.jpa.JPABookingDAO;
 
-import junit.framework.TestCase;
-
-public abstract class DemoBase extends TestCase {
+public abstract class AgentDAOTestBase {
     protected Log log = LogFactory.getLog(getClass());
-    private static final String PERSISTENCE_UNIT = "txhotel-test";
-    protected ReservationDAO reservationDAO = null;
+    private static final String PERSISTENCE_UNIT = "txagent-test";
+    protected BookingDAO bookingDAO = null;
     protected EntityManager em;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         EntityManagerFactory emf = 
-            Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);                                
+            Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
         em = emf.createEntityManager();
-        reservationDAO = new JPAReservationDAO();
-        ((JPAReservationDAO)reservationDAO).setEntityManager(em);
+        bookingDAO = new JPABookingDAO();
+        ((JPABookingDAO)bookingDAO).setEntityManager(em);
         cleanup();
         em.getTransaction().begin();
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         EntityTransaction tx = em.getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
@@ -46,16 +48,10 @@ public abstract class DemoBase extends TestCase {
     protected void cleanup() {
         log.info("cleaning up database");
         em.getTransaction().begin();
-        List<Reservation> reservations = 
-            em.createQuery("select r from Reservation r").getResultList();
-        for(Reservation r: reservations) {
-            r.setPerson(null);
-            em.remove(r);
-        }
-        List<Person> people = 
-            em.createQuery("select p from Person p").getResultList();
-        for(Person p: people) {
-            em.remove(p);
+        List<Booking> bookings = 
+            em.createQuery("select b from Booking b").getResultList();
+        for(Booking b: bookings) {
+            em.remove(b);
         }
         em.getTransaction().commit();
     }
@@ -67,5 +63,4 @@ public abstract class DemoBase extends TestCase {
         
         //em.getTransaction().commit();
     }
-    
 }

@@ -26,6 +26,7 @@ import ejava.examples.txhotel.bo.Reservation;
 import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 import ejava.examples.txhotel.ejb.TestUtilRemote;
 import ejava.util.ejb.EJBClient;
+import ejava.util.jndi.JNDIUtil;
 
 public class HotelReservationIT {
     static final Log log = LogFactory.getLog(HotelReservationIT.class);
@@ -51,10 +52,8 @@ public class HotelReservationIT {
     	 * running server. 
     	 */
     	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-    		long waitTime=10000;
-	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
-	    	Thread.sleep(10000);
-    	}
+    		JNDIUtil.lookup(new InitialContext(), HotelReservationist.class, registrarJNDI, 15);
+    	} 
         log.debug("jndi name:" + registrarJNDI);
         reservationists.putAll(getReservationists());
     }
@@ -77,9 +76,19 @@ public class HotelReservationIT {
     
     @Before() 
     public void setUp() throws NamingException {
-        String hotelHelperName = EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
-        		"TestUtilEJB", TestUtilRemote.class.getName(), false);
-        ((TestUtilRemote)new InitialContext().lookup(hotelHelperName)).reset();
+    	TestUtilRemote testUtil=null;
+    	while (testUtil==null) {
+    		try {
+		        String hotelHelperName = EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
+		        		"TestUtilEJB", TestUtilRemote.class.getName(), false);
+		        log.debug("looking up:" + hotelHelperName);
+		        testUtil = (TestUtilRemote)new InitialContext().lookup(hotelHelperName);
+		        testUtil.reset();
+    		} catch (Exception ex) {
+    			log.error(ex.toString());
+    			try { Thread.sleep(1000); } catch (Exception ex2) {}
+    		}
+    	}
     }
 
     @Test

@@ -14,7 +14,7 @@ import ejava.examples.txhotel.bo.Reservation;
  *
  * @author jcstaff
  */
-public class HotelRegistrationDAODemo extends DemoBase {
+public class HotelRegistrationDAOTest extends DAOTestBase {
     
     /*
      * This will test the ability to create a new Reservation and Person

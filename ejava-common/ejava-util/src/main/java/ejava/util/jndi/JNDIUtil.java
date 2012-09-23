@@ -12,10 +12,15 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This class helps work with the JNDI tree.
  */
 public class JNDIUtil {
+	private static final Log log = LogFactory.getLog(JNDIUtil.class);
+	
 	/**
 	 * This method will return a jndi.properties object that is based on the
 	 * properties found in ejava-jndi.properties that start with the provided
@@ -43,6 +48,38 @@ public class JNDIUtil {
     	return env;
     }
 	
+    /**
+     * Performs a JNDI lookup and will wait supplied number of seconds before 
+     * giving up.
+     * @param ctx
+     * @param type
+     * @param name
+     * @param waitSecs
+     * @return
+     * @throws NamingException 
+     */
+    @SuppressWarnings("unchecked")
+	public static <T> T lookup(Context ctx, Class<T> type, String name, int waitSecs) 
+			throws NamingException {
+    	log.debug(String.format("looking up %s, wait=%d", name, waitSecs));
+    	
+    	T object=null;
+    	//wait increments should be at least 1sec
+    	long interval=Math.max(waitSecs*1000/10, 1000);
+    	for (int elapsed=0; elapsed<waitSecs; elapsed += interval) {
+    		if (elapsed + interval < waitSecs*1000) {
+	    		try {
+					object = (T) ctx.lookup(name);
+				} catch (Throwable ex) {
+					log.debug(String.format("error in jndi.lookup(%s)=%s", name, ex));
+					try { Thread.sleep(interval); } catch (Exception ex2) {}
+				}
+    		} else {
+				object = (T) ctx.lookup(name);
+    		}
+    	}
+    	return object;
+    }
 	
 	
 	

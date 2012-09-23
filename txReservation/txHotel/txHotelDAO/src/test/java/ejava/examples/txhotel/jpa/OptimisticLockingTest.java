@@ -18,7 +18,7 @@ import ejava.examples.txhotel.bo.Reservation;
  *
  * @author jcstaff
  */
-public class OptimisticLockingDemo extends DemoBase {
+public class OptimisticLockingTest extends DAOTestBase {
 
     /**
      * Person has a version field, but it is not registered with the provider.

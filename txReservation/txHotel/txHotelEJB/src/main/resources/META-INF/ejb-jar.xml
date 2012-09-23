@@ -26,6 +26,10 @@
             <ejb-name>HotelReservationSessionEJB</ejb-name>
             <ejb-class>ejava.examples.txhotel.ejb.HotelReservationSessionEJB</ejb-class>
             <session-type>Stateful</session-type>
+            <stateful-timeout>
+                <timeout>3</timeout>
+                <unit>Minutes</unit>
+            </stateful-timeout>            
             <remove-method>
                 <bean-method>
                     <method-name>commit</method-name>
@@ -63,6 +67,10 @@
             <ejb-name>RequiredSessionEJB</ejb-name>                       
             <ejb-class>ejava.examples.txhotel.ejb.HotelReservationSessionEJB</ejb-class>
             <session-type>Stateful</session-type>
+            <stateful-timeout>
+                <timeout>3</timeout>
+                <unit>Minutes</unit>
+            </stateful-timeout>            
             <remove-method>
                 <bean-method>
                     <method-name>commit</method-name>
@@ -89,6 +97,10 @@
             <ejb-name>RequiresNewSessionEJB</ejb-name>
             <ejb-class>ejava.examples.txhotel.ejb.HotelReservationSessionEJB</ejb-class>
             <session-type>Stateful</session-type>
+            <stateful-timeout>
+                <timeout>3</timeout>
+                <unit>Minutes</unit>
+            </stateful-timeout>            
             <remove-method>
                 <bean-method>
                     <method-name>commit</method-name>

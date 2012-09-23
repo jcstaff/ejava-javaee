@@ -1,6 +1,7 @@
 package ejava.examples.txagent.jpa;
 
 import static org.junit.Assert.*;
+
 import java.util.Calendar;
 
 import java.util.GregorianCalendar;
@@ -9,10 +10,9 @@ import java.util.List;
 import org.junit.Test;
 
 import ejava.examples.txagent.bo.Booking;
-import ejava.examples.txagent.jpa.DemoBase;
 import ejava.examples.txhotel.bo.Person;
 
-public class AgentIT extends DemoBase {
+public class AgentIT extends AgentBLTestBase {
     
 	@Test
     public void testCreateBooking() throws Exception {

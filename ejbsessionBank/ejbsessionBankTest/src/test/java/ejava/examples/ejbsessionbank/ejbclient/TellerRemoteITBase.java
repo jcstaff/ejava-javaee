@@ -17,6 +17,7 @@ import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Owner;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
+import ejava.util.jndi.JNDIUtil;
 
 /**
  * This class contains reusable artifacts and setup/teardown mechanisms for
@@ -52,6 +53,9 @@ public class TellerRemoteITBase {
     	log.debug("getting jndi initial context");
         jndiProperties.list(System.out);
         jndi = new InitialContext(jndiProperties);    
+        
+       //be sure server is running and application fully deployed
+        JNDIUtil.lookup(jndi, TellerRemote.class, jndiName, 15);
     	
         //lookup the remote teller interface
         log.debug("looking up teller remote:" + jndiName);

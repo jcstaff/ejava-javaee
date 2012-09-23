@@ -1,8 +1,10 @@
 package ejava.examples.txhotel.ejb;
 
 import java.rmi.RemoteException;
+
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -11,6 +13,7 @@ import javax.ejb.EJBException;
 import javax.ejb.Remove;
 import javax.ejb.SessionContext;
 import javax.ejb.SessionSynchronization;
+import javax.ejb.StatefulTimeout;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +56,8 @@ import ejava.examples.txhotel.bo.Reservation;
  *
  * @author jcstaff
  */
-//@Stateless - will be supplied in ejb-jar.xml due to multi deploy
+//@Stateful - will be supplied in ejb-jar.xml due to multi deploy
+@StatefulTimeout(value=3, unit=TimeUnit.MINUTES)
 public class HotelReservationSessionEJB
     implements HotelReservationSessionLocal, HotelReservationSessionRemote,
     SessionSynchronization {

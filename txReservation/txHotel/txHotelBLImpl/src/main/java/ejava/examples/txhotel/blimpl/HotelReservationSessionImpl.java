@@ -13,6 +13,11 @@ import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
 
+/**
+ * This class represents some stateful business logic that caches desired
+ * reservations until the caller calls commit. At that time they will all
+ * be added to the hotel using the stateless reservationist.
+ */
 public class HotelReservationSessionImpl implements HotelReservationSession {
     private static final Log log = 
         LogFactory.getLog(HotelReservationSessionImpl.class);
