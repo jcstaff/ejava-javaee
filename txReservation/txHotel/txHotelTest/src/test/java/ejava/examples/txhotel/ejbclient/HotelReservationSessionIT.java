@@ -1,7 +1,6 @@
 package ejava.examples.txhotel.ejbclient;
 
 import static org.junit.Assert.*;
-import java.util.ArrayList;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -9,14 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.Binding;
 import javax.naming.InitialContext;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,7 +22,6 @@ import ejava.examples.txhotel.bl.HotelReservationist;
 import ejava.examples.txhotel.bl.InvalidParameterException;
 import ejava.examples.txhotel.bo.Person;
 import ejava.examples.txhotel.bo.Reservation;
-import ejava.examples.txhotel.ejb.HotelRegistrationRemote;
 import ejava.examples.txhotel.ejb.HotelReservationSessionRemote;
 import ejava.util.ejb.EJBClient;
 import ejava.util.jndi.JNDIUtil;
@@ -37,7 +32,7 @@ import ejava.util.jndi.JNDIUtil;
  * @author jcstaff
  *
  */
-public class HotelReservationSessionIT {
+public class HotelReservationSessionIT extends HotelRemoteTestBase {
     private static final Log log = LogFactory.getLog(HotelReservationSessionIT.class);
     static InitialContext jndi;
     static final String sessionJNDI = System.getProperty("jndi.name.hotelsession",
@@ -51,39 +46,40 @@ public class HotelReservationSessionIT {
         	"RequiresNewSessionEJB", HotelReservationSessionRemote.class.getName(), true));
     
     
-    static Map<String, HotelReservationSession> reservationSessions =
-        new HashMap<String, HotelReservationSession>();
-    static HotelReservationist reservationist;
-    static Map<String, HotelReservationist> reservationists;
+    private HotelReservationist reservationist;
     
-    @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static HotelReservationist getReservationist() throws NamingException {
+    	return HotelReservationIT.getReservationist();
+    }
+    
+    public static Map<String, HotelReservationist> getReservationists() throws NamingException {
+       	return HotelReservationIT.getReservationists();
+    }
+    
+    static Map<String, HotelReservationSession> getReservationSessions() throws NamingException {
     	log.debug("getting jndi initial context");
         jndi = new InitialContext();    
         log.debug("jndi name:" + sessionJNDI);        
-        
-    	/*
-    	 * this wait seems periodically necessary when using the cargo-startstop
-    	 * profile rather than the cargo-deploy profile to an already running server. 
-    	 */
-    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-    		JNDIUtil.lookup(new InitialContext(), HotelReservationSession.class, sessionJNDI, 15);
-    	} 
-        
-       	reservationSessions.put("registrar", (HotelReservationSession)jndi.lookup(sessionJNDI));
+        Map<String, HotelReservationSession> reservationSessions =
+        		new HashMap<String, HotelReservationSession>();
+        //have the first lookup be willing to wait for application to fully deploy
+        HotelReservationSession registrar =  	
+    		JNDIUtil.lookup(jndi, HotelReservationSession.class, sessionJNDI, 15);
+       	reservationSessions.put("registrar", registrar);
        	reservationSessions.put("required", (HotelReservationSession)jndi.lookup(requiredJNDI));
        	reservationSessions.put("requiresNew", (HotelReservationSession)jndi.lookup(requiresNewJNDI));
-       	reservationists = HotelReservationIT.getReservationists();
-       	reservationist = (HotelReservationist) jndi.lookup(HotelReservationIT.registrarJNDI);
+       	return reservationSessions;
     }
     
     @Before
     public void setUp() throws Exception {
+    	log.info("** setUp ***");
+    	reservationist=getReservationist();
         cleanup();
     }
 
 	private void cleanup() throws Exception {
-        List<Reservation> reservations = reservationist.getReservations(0, 100);
+	    List<Reservation> reservations = reservationist.getReservations(0, 100);
         while (reservations.size() > 0) {
             for(Reservation r: reservations) {
                 try { reservationist.cancelReservation(r); }
@@ -95,6 +91,7 @@ public class HotelReservationSessionIT {
 
 	@Test
     public void testCreates() throws Exception {
+		Map<String, HotelReservationSession> reservationSessions = getReservationSessions();
         for(String key: reservationSessions.keySet()) {
             testCreates(key, reservationSessions.get(key));
         }
@@ -132,6 +129,7 @@ public class HotelReservationSessionIT {
     
     @Test
     public void testBadCreates() throws Exception {
+		Map<String, HotelReservationSession> reservationSessions = getReservationSessions();
         for(String key: reservationSessions.keySet()) {
             testBadCreates(key, reservationSessions.get(key));
         }

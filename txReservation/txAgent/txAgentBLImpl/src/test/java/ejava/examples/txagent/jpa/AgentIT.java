@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import ejava.examples.txagent.bl.AgentReservationSession;
+import ejava.examples.txagent.bl.BookingAgent;
 import ejava.examples.txagent.bo.Booking;
 import ejava.examples.txhotel.bo.Person;
 
@@ -17,6 +19,7 @@ public class AgentIT extends AgentBLTestBase {
 	@Test
     public void testCreateBooking() throws Exception {
         log.info("*** testCreateBooking ***");
+        AgentReservationSession agentSession=getReservationSession();
         agentSession.createBooking();
         
         Person person = new Person(0,0,"joe", "smith");
@@ -28,13 +31,15 @@ public class AgentIT extends AgentBLTestBase {
         for(int i=0; i<count; i++) {
             start.add(Calendar.DAY_OF_YEAR, 7*count);
             end.add(Calendar.DAY_OF_YEAR, (7*count)+3);
+            log.debug("adding reservation to impl");
             agentSession.addReservation(person, start.getTime(), end.getTime());
         }
         
-        
+        BookingAgent agent=getBookingAgent();
         List<Booking> bookings = agent.getBookings(0, 100);
         assertEquals(0,bookings.size());
 
+        log.debug("calling commit() on impl");
         Booking booking = agentSession.commit();
         
         bookings = agent.getBookings(0, 100);

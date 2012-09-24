@@ -66,7 +66,7 @@ public class JNDIUtil {
     	T object=null;
     	//wait increments should be at least 1sec
     	long interval=Math.max(waitSecs*1000/10, 1000);
-    	for (int elapsed=0; elapsed<waitSecs; elapsed += interval) {
+    	for (int elapsed=0; elapsed<(waitSecs*1000); elapsed += interval) {
     		if (elapsed + interval < waitSecs*1000) {
 	    		try {
 					object = (T) ctx.lookup(name);
@@ -78,6 +78,7 @@ public class JNDIUtil {
 				object = (T) ctx.lookup(name);
     		}
     	}
+    	log.debug("object=" + object);
     	return object;
     }
 	

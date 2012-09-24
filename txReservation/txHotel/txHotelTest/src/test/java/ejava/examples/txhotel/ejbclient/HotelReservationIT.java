@@ -16,7 +16,6 @@ import javax.naming.NamingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ejava.examples.txhotel.bl.HotelReservationist;
@@ -28,7 +27,7 @@ import ejava.examples.txhotel.ejb.TestUtilRemote;
 import ejava.util.ejb.EJBClient;
 import ejava.util.jndi.JNDIUtil;
 
-public class HotelReservationIT {
+public class HotelReservationIT extends HotelRemoteTestBase {
     static final Log log = LogFactory.getLog(HotelReservationIT.class);
     static String registrarJNDI = System.getProperty("jndi.name.hotel",
     	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
@@ -40,31 +39,21 @@ public class HotelReservationIT {
     	EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
     		"RequiresNewEJB", HotelRegistrationRemote.class.getName(), false));
 
-    static final Map<String,HotelReservationist> reservationists = 
-            new HashMap<String, HotelReservationist>();
-
-    
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    	/*
-    	 * this wait seems periodically necessary when using the cargo-startstop
-    	 * profile rather than the cargo-deploy profile to an already 
-    	 * running server. 
-    	 */
-    	if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-    		JNDIUtil.lookup(new InitialContext(), HotelReservationist.class, registrarJNDI, 15);
-    	} 
-        log.debug("jndi name:" + registrarJNDI);
-        reservationists.putAll(getReservationists());
+    public static HotelReservationist getReservationist() throws NamingException {
+    	return JNDIUtil.lookup(new InitialContext(), 
+    		HotelReservationist.class, registrarJNDI, 15);
     }
-    
+
     public static Map<String,HotelReservationist> getReservationists() 
     		throws NamingException {
         Context jndi = new InitialContext();
         try {
 	        Map<String,HotelReservationist> reservationists = 
 	                new HashMap<String, HotelReservationist>();
-	        reservationists.put("registrar", (HotelReservationist)jndi.lookup(registrarJNDI));
+	        //have the first lookup be willing to wait for the application to fully load
+	        HotelReservationist registrar = JNDIUtil.lookup(jndi, 
+	        		HotelReservationist.class, registrarJNDI, 15); 
+	        reservationists.put("registrar", registrar);
 	        reservationists.put("required", (HotelReservationist)jndi.lookup(requiredJNDI));
 	        reservationists.put("requiresNew", (HotelReservationist)jndi.lookup(requiresNewJNDI));
 	        return reservationists;
@@ -76,28 +65,21 @@ public class HotelReservationIT {
     
     @Before() 
     public void setUp() throws NamingException {
-    	TestUtilRemote testUtil=null;
-    	while (testUtil==null) {
-    		try {
-		        String hotelHelperName = EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
-		        		"TestUtilEJB", TestUtilRemote.class.getName(), false);
-		        log.debug("looking up:" + hotelHelperName);
-		        testUtil = (TestUtilRemote)new InitialContext().lookup(hotelHelperName);
-		        testUtil.reset();
-    		} catch (Exception ex) {
-    			log.error(ex.toString());
-    			try { Thread.sleep(1000); } catch (Exception ex2) {}
-    		}
-    	}
+    	log.info("*** setUp() ***");
+        String hotelHelperName = EJBClient.getEJBClientLookupName("txHotelEAR", "txHotelEJB", "", 
+        		"TestUtilEJB", TestUtilRemote.class.getName(), false);
+        //have first lookup be willing to wait until application fully deployed
+        TestUtilRemote testUtil = JNDIUtil.lookup(new InitialContext(), TestUtilRemote.class, hotelHelperName, 15);
+        testUtil.reset();
     }
 
     @Test
     public void testCreateReservation() throws Exception {
+    	Map<String, HotelReservationist> reservationists = getReservationists();
         for(String key: reservationists.keySet()) {
             HotelReservationist reservationist = reservationists.get(key);
             doTestCreateReservation(key, reservationist);
         }
-        reservationists.clear();
     }        
     public void doTestCreateReservation(
             String name, 
@@ -121,11 +103,11 @@ public class HotelReservationIT {
     
     @Test
     public void testGetReservation() throws Exception {
+    	Map<String, HotelReservationist> reservationists = getReservationists();
         for(String key: reservationists.keySet()) {
             HotelReservationist reservationist = reservationists.get(key);
             doTestGetReservation(key, reservationist);
         }
-        reservationists.clear();
     }        
     public void doTestGetReservation(
             String name, 
@@ -154,11 +136,11 @@ public class HotelReservationIT {
 
     @Test
     public void testBadCreateReservation() throws Exception {
+    	Map<String, HotelReservationist> reservationists = getReservationists();
         for(String key: reservationists.keySet()) {
             HotelReservationist reservationist = reservationists.get(key);
             doTestBadCreateReservation(key, reservationist);
         }
-        reservationists.clear();
     }        
     public void doTestBadCreateReservation(
             String name, 

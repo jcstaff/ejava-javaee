@@ -1,6 +1,7 @@
 package ejava.examples.txagent.blimpl;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +30,7 @@ public class AgentSessionImpl implements AgentReservationSession {
     public void addReservation(Person person, Date startDate, Date endDate) 
         throws AgentReservationException {
         try {
+        	log.debug("creating reservation in stateful session bean");
             reservationist.createReservation(person, startDate, endDate);
         } 
         catch (InvalidParameterException ex) {
@@ -60,10 +62,13 @@ public class AgentSessionImpl implements AgentReservationSession {
             booking.setConfirmation(confirmation);
             bookingDAO.createBooking(booking);
             log.debug("committing hotels for booking");
-            for (Reservation r: reservationist.commit()) {
+            List<Reservation> reservations = reservationist.commit();
+            log.debug(String.format("commit complete, adding %d hotel reservations to booking",
+            		reservations.size()));
+            for (Reservation r: reservations) {
                 booking.addHotelReservation(r);
             }
-            log.debug("committed booking:" + booking);
+            log.debug("completed booking:" + booking);
             return booking;
         } 
         catch (HotelReservationException ex) {
