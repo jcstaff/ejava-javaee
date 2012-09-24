@@ -41,10 +41,19 @@ public class JndiIT  {
         		BakeSchedulerRemote.class.getName(), true));
     
     @BeforeClass
-    public static void waitForServerDeploy() throws NamingException {
-    	//lookup a test remote EJB to be sure server is up
-    	JNDIUtil.lookup(new InitialContext(), BakeSchedulerRemote.class, bakeName, 15);
+    public static void setUpClass() throws Exception {
+    	log.info("*** setUpClass() ***");
+		//give application time to fully deploy
+		if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+			long waitTime=30000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(waitTime);
+		}
+		else {
+	    	log.info(String.format("startstop not set"));
+		}
     }
+    
     
     @Before
     public void setUp() throws Exception {

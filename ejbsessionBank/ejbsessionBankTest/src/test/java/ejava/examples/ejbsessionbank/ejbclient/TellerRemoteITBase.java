@@ -7,11 +7,13 @@ import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bo.Account;
@@ -37,6 +39,21 @@ public class TellerRemoteITBase {
     
     //context used to locate remote teller
     private Context jndi;
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    	log.info("*** setUpClass() ***");
+		//give application time to fully deploy
+		if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+			long waitTime=30000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(waitTime);
+		}
+		else {
+	    	log.info(String.format("startstop not set"));
+		}
+    }
+    
         
     /**
      * Setup will get the system under test into a common known state prior
