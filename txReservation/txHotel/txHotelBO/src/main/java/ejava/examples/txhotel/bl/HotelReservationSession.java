@@ -13,4 +13,5 @@ public interface HotelReservationSession {
         throws HotelReservationException;
     void cancelReservations()
         throws HotelReservationException;
+    void close();
 }

@@ -49,4 +49,8 @@ public class HotelReservationSessionImpl implements HotelReservationSession {
     public void setReservationist(HotelReservationist reservationist) {
         this.reservationist = reservationist;
     }
+    
+    @Override
+    public void close() {
+    }
 }

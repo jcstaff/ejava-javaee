@@ -14,4 +14,5 @@ public interface AgentReservationSession {
         throws AgentReservationException;
     Booking commit()
         throws AgentReservationException;
+    void close();
 }

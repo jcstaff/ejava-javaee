@@ -98,7 +98,7 @@ public class AgentReservationSessionEJB
      * the @PreDestory annotation.
      */
     @PreDestroy
-    public void close() {
+    public void closing() {
         log.info("*** AgentReservationSessionEJB closing ***");
     }
 
@@ -125,11 +125,16 @@ public class AgentReservationSessionEJB
      * stored. If something fails (e.g., an invalid reservation date), then
      * nothing will be saved.
      */
-    @Remove(retainIfException=false)
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public Booking commit() throws AgentReservationException {
         return agentSession.commit();
     }
+    
+    @Remove(retainIfException=false)
+    public void close() {
+	    log.info("*** AgentReservationSessionEJB close ***");
+	    agentSession.close();
+	}
     
     /**
      * This method is called at the beginning of a transaction because of

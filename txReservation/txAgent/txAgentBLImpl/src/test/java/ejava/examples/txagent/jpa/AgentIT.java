@@ -45,7 +45,7 @@ public class AgentIT extends AgentBLTestBase {
         bookings = agent.getBookings(0, 100);
         assertEquals(1,bookings.size());
         assertEquals("unexpected number of confirmations", count, booking.getHotelConfirmations().size());
-        assertEquals("unexpected number of reservations", count, booking.getHotelReservations().size());        
+        assertEquals("unexpected number of reservations", count, booking.getHotelReservations().size());
     }
     /*
     public void testCreateBadReservations() throws Exception {

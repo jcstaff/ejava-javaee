@@ -96,8 +96,17 @@ public class HotelReservationSessionEJB
      * should map to the ejb-jar.xml pre-destroy element. 
      */
     @PreDestroy
-    public void close() {
+    public void closing() {
         log.info("*** HotelReservationSessionEJB closing ***");
+    }
+
+    /**
+     * This method will destroy the stateful instance.
+     */
+    @Remove
+    public void close() {
+        log.info("*** HotelReservationSessionEJB close ***");
+        impl.close();
     }
 
     public void createReservation(Person person, Date startDate, Date endDate)
@@ -109,7 +118,6 @@ public class HotelReservationSessionEJB
         impl.cancelReservations();
     }
 
-    @Remove
     public List<Reservation> commit() throws HotelReservationException {
         return impl.commit();
     }

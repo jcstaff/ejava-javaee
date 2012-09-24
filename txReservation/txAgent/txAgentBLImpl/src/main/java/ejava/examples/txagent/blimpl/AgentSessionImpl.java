@@ -76,6 +76,12 @@ public class AgentSessionImpl implements AgentReservationSession {
             throw new AgentReservationException(
                     "error committing booking", ex);
         }
+        finally {
+            //reservationist.close();        	
+        }
+    }
+    @Override
+    public void close() {
     }
     public void setBookingDAO(BookingDAO bookingDAO) {
         this.bookingDAO = bookingDAO;

@@ -125,6 +125,7 @@ public class HotelReservationSessionIT extends HotelRemoteTestBase {
         
         mine = reservationist.getReservationsForPerson(person, 0, 100);
         assertEquals(baseline.size()+10,mine.size());
+        //session.close();
     }
     
     @Test
@@ -166,6 +167,7 @@ public class HotelReservationSessionIT extends HotelRemoteTestBase {
         }
         catch (InvalidParameterException ex) {
             log.debug("got expected exception:" + ex);
+            //session.close();
         }
         
         //if everyone was a part of the tx, none should have been added
