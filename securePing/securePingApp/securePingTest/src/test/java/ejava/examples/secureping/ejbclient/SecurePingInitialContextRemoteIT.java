@@ -30,19 +30,8 @@ java.naming.provider.url=remote://127.0.0.1:4447
 jboss.naming.client.ejb.context=true
 </pre>
  */
-public class SecurePingInitialContextRemoteIT {
+public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
     private static final Log log = LogFactory.getLog(SecurePingInitialContextRemoteIT.class);
-    String jndiName = System.getProperty("jndi.name.secureping",
-    	EJBClient.getRemoteLookupName("securePingEAR", "securePingEJB", 
-   			"SecurePingEJB", SecurePingRemote.class.getName()));
-    String knownUser = System.getProperty("known.username", "known");
-    String knownPassword = System.getProperty("known.password", "password");
-    String userUser = System.getProperty("user.username","user1");
-    String userPassword = System.getProperty("user.password","password");
-    String adminUser = System.getProperty("admin.username","admin1");
-    String adminPassword = System.getProperty("admin.password","password");
-    
-    SecurePing ejb;
     
     /**
      * Sets up the proxy reference to the remote interface of the EJB.
@@ -51,13 +40,10 @@ public class SecurePingInitialContextRemoteIT {
     public void setUp() throws Exception {
     	log.info("== setUp() ==");
         log.debug("jndi name:" + jndiName);
-        
-        	//server is secured -- must have a known user to get InitialContext
-        Context jndi = runAs(knownUser, knownPassword);
-        ejb = (SecurePing)jndi.lookup(jndiName);
-        
-        log.debug("ejb=" + ejb);
-        jndi.close(); //logout of this user
+    }
+    
+    SecurePing getEJB(Context ctx) throws NamingException {
+        return (SecurePing)ctx.lookup(jndiName);
     }
     
     /**
@@ -118,6 +104,7 @@ public class SecurePingInitialContextRemoteIT {
         Context jndi=null;
         try {        	
         	jndi=runAs(null, null);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
 	        assertFalse("anonomous in admin role",
 	                ejb.isCallerInRole("admin"));
 	        assertFalse("anonomous in user role",
@@ -134,6 +121,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {        	
         	jndi=runAs(knownUser, knownPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
 	        assertFalse("known in admin role",
 	           ejb.isCallerInRole("admin"));
 	        assertFalse("known in user role",
@@ -147,6 +135,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
         	jndi=runAs(userUser, userPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
 	        assertFalse("user in admin role",
 	           ejb.isCallerInRole("admin"));
 	        assertTrue("user not in user role",
@@ -160,6 +149,7 @@ public class SecurePingInitialContextRemoteIT {
         
         try {
 	    	jndi=runAs(adminUser, adminPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
 	        assertTrue("admin not in admin role",
                 ejb.isCallerInRole("admin"));
 	        assertTrue("admin not in user role",
@@ -184,11 +174,13 @@ public class SecurePingInitialContextRemoteIT {
         log.info("*** testPingAll ***");
         Context jndi=null;
         try {
+        	jndi=runAs(null, null);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             String result = ejb.pingAll();
             log.info(result);
             fail("anonymous user not detected"); 
         }
-        catch (IllegalStateException ex) {
+        catch (NamingException ex) {
             log.info("expected error calling pingAll:" + ex);
         }
         catch (Exception ex) {
@@ -201,6 +193,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
         	jndi = runAs("known", "password");
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             String result = ejb.pingAll();
             log.info(result);
             assertEquals("unexpected result for known",
@@ -217,6 +210,7 @@ public class SecurePingInitialContextRemoteIT {
         
         try {
         	jndi = runAs(userUser, userPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             String result = ejb.pingAll();
             log.info(result);
             assertEquals("unexpected result for admin",
@@ -233,6 +227,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
         	jndi = runAs(adminUser, adminPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             String result=ejb.pingAll();
             log.info(result);
             assertEquals("unexpected result for admin",
@@ -259,10 +254,12 @@ public class SecurePingInitialContextRemoteIT {
         log.info("*** testPingUser ***");
         Context jndi=null;
         try {
+        	jndi=runAs(null, null);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingUser());
             fail("didn't detect anonymous user");
         }
-        catch (IllegalStateException ex) {
+        catch (NamingException ex) {
             log.info("expected exception thrown:" + ex);
         }
         catch (Exception ex) {
@@ -274,6 +271,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
         	jndi=runAs(knownUser, knownPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingUser());
             fail("didn't detect known, but non-user");
         }
@@ -289,6 +287,7 @@ public class SecurePingInitialContextRemoteIT {
         
         try {
             jndi = runAs(userUser, userPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingUser());
         }
         catch (Exception ex) {
@@ -301,6 +300,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
             jndi = runAs(adminUser, adminPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingUser());
         }
         catch (Exception ex) {
@@ -323,10 +323,12 @@ public class SecurePingInitialContextRemoteIT {
         log.info("*** testPingAdmin ***");
         Context jndi=null;
         try {
+        	jndi=runAs(null, null);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingAdmin());
             fail("didn't detect anonymous user");
         }
-        catch (IllegalStateException ex) {
+        catch (NamingException ex) {
             log.info("expected exception thrown:" + ex);
         }
         catch (Exception ex) {
@@ -338,6 +340,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
             jndi=runAs(knownUser, knownPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingAdmin());
             fail("didn't detect known, but non-admin user");
         }
@@ -353,6 +356,7 @@ public class SecurePingInitialContextRemoteIT {
         
         try {
             jndi = runAs(userUser, userPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingAdmin());
             fail("didn't detect non-admin user");
         }
@@ -368,6 +372,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
             jndi = runAs(adminUser, adminPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingAdmin());
         }
         catch (Exception ex) {
@@ -389,10 +394,12 @@ public class SecurePingInitialContextRemoteIT {
         log.info("*** testPingExcluded ***");
         Context jndi=null;
         try {
+        	jndi=runAs(null, null);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingExcluded());
             fail("didn't detect excluded");
         }
-        catch (IllegalStateException ex) {
+        catch (NamingException ex) {
             log.info("expected exception thrown:" + ex);
         }
         catch (Exception ex) {
@@ -404,6 +411,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
             jndi=runAs(knownUser, knownPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingExcluded());
             fail("didn't detect excluded");
         }
@@ -419,6 +427,7 @@ public class SecurePingInitialContextRemoteIT {
         
         try {
             jndi = runAs(userUser, userPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingExcluded());
             fail("didn't detect excluded");
         }
@@ -434,6 +443,7 @@ public class SecurePingInitialContextRemoteIT {
 
         try {
             jndi = runAs(adminUser, adminPassword);
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingExcluded());
             fail("didn't detect excluded");
         }

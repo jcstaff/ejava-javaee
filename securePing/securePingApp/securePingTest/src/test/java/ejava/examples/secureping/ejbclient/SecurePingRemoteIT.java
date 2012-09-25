@@ -7,7 +7,6 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -15,28 +14,16 @@ import javax.naming.NamingException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ejava.examples.secureping.ResetAuthenticationCache;
 import ejava.examples.secureping.ejb.SecurePing;
-import ejava.examples.secureping.ejb.SecurePingRemote;
-import ejava.util.ejb.EJBClient;
 
-public class SecurePingRemoteIT {
+public class SecurePingRemoteIT extends SecurePingTestBase {
     private static final Log log = LogFactory.getLog(SecurePingRemoteIT.class);
-    String jndiName = System.getProperty("jndi.name.secureping",
-    	EJBClient.getRemoteLookupName("securePingEAR", "securePingEJB", 
-   			"SecurePingEJB", SecurePingRemote.class.getName()));
-    String adminUser = System.getProperty("admin.username","admin1");
-    String adminPassword = System.getProperty("admin.password","password");
-    String userUser = System.getProperty("user.username","user1");
-    String userPassword = System.getProperty("user.password","password");
     String jmxUser = System.getProperty("jmx.username","admin");
     String jmxPassword = System.getProperty("jmx.password","password");
     
