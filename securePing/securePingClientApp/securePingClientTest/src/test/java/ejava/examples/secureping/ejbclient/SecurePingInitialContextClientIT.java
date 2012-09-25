@@ -60,6 +60,7 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
         log.info("*** testIsCallerInRole ***");
         Context jndi=null;
         
+        /* can't test this -- jndi.properties providing default user
         try {
         	jndi=runAs(null);        	
         	SecurePingClient ejb=(SecurePingClient)jndi.lookup(jndiName);
@@ -78,6 +79,7 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
         finally {
         	if (jndi != null) { jndi.close(); jndi=null; }
         }
+        */
         
         try {
         	jndi=runAs(knownUser);
@@ -134,7 +136,8 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
         log.info("*** testPingAll ***");
         Context jndi=null;
         
-        try {
+        /* can't test this -- jndi.properties providing default user
+       try {
         	jndi=runAs(null);
         	SecurePingClient ejb=(SecurePingClient)jndi.lookup(jndiName);
             log.info(ejb.pingAll());
@@ -149,6 +152,7 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
         finally {
         	if (jndi != null) { jndi.close(); jndi=null; }
         }
+        */
 
         try {
         	jndi = runAs(knownUser);
@@ -281,6 +285,7 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
     public void testPingAdmin() throws Exception {    	
         log.info("*** testPingAdmin ***");
         Context jndi=null;
+        /* can't test this -- jndi.properties providing default user
         try {
         	jndi=runAs(null);
         	SecurePingClient ejb=(SecurePingClient)jndi.lookup(jndiName);
@@ -296,6 +301,7 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
         finally {
         	if (jndi!=null) { jndi.close(); jndi=null; }
         }
+        */
 
         try {
         	jndi = runAs(adminUser);
@@ -347,6 +353,7 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
     public void testPingExcluded() throws Exception {
         log.info("*** testPingExcluded ***");
         Context jndi=null;
+        /* can't test this -- jndi.properties providing default user
         try {
         	jndi=runAs(null);
         	SecurePingClient ejb=(SecurePingClient)jndi.lookup(jndiName);
@@ -362,6 +369,7 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
         finally {
         	if (jndi!=null) { jndi.close(); jndi=null; }
         }
+        */
 
         try {
         	jndi = runAs(knownUser);
