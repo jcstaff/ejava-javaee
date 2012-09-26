@@ -4,6 +4,7 @@
     <property name="MAVEN_HOME" value="/opt/apache-maven-3.0.4/"/>
     <property name="JBOSS5_HOME" value="/opt/jboss-5.1.0.GA"/>
     <property name="JBOSS6_HOME" value="/opt/jboss-6.1.0.Final"/>
+    <property name="JBOSS7_HOME" value="/opt/jboss-as-7.1.1.Final"/>
 
     <property name="jboss.server" value="standard"/>
     <property name="jboss.servlet.port" value="8080"/>
@@ -47,12 +48,32 @@
         <property name="jboss.shutdown.address.option" value="-o"/>
         <echo message="using JBoss 6"/>
     </target>
+    <target name="jboss7.configure" if="jboss7">
+        <property name="jboss.home" value="${JBOSS7_HOME}"/>
+        <property name="cargo.containerId" value="jboss71x"/>
+        <property name="jboss.server.home" 
+                  value="${jboss.home}/standalone"/>
+        <!--
+        <property name="jboss.project" location="servers/ejava-jboss6"/>
+        <property name="jboss.bind.address" value="127.0.0.5"/>
+        <property name="jboss.host" value="${jboss.bind.address}"/>
+        <property name="jboss.console" 
+                  value="${jboss.server.home}/log/console.log"/>
+        <property name="jboss.url" 
+                  value="http://${jboss.host}:${jboss.servlet.port}/index.html"/>
+        <property name="jboss.shutdown.address.option" value="-o"/>
+        -->
+        <echo message="using JBoss 7"/>
+    </target>
     <target name="setup">
         <condition property="jboss5" value="true">
             <matches string="${jboss.profile}" pattern="jboss5"/>
         </condition>
         <condition property="jboss6" value="true">
             <matches string="${jboss.profile}" pattern="jboss6"/>
+        </condition>
+        <condition property="jboss7" value="true">
+            <matches string="${jboss.profile}" pattern="jboss7"/>
         </condition>
     </target>
 
@@ -74,18 +95,13 @@
             <fileset dir="${jboss.server.home}">
                 <include name="deploy/*.ear"/>
                 <include name="deploy/*.war"/>
+                <include name="deployments/*.ear"/>
+                <include name="deployments/*.war"/>
                 <type type="file"/>
             </fileset>
         </delete>
         <delete>
             <fileset dir="${jboss.server.home}">
-                <!--
-                <include name="data/hypersonic/ejava.*"/>
-                <include name="data/hornetq/**/*"/>
-                <include name="data/tx-object-store/**/*"/>
-                <include name="data/xmbean-attrs/**/*"/>
-                <include name="data/jnp-service.url"/>
-                -->
                 <include name="data/**/*"/>
                 <include name="tmp/**/*"/>
                 <include name="work/**/*"/>
