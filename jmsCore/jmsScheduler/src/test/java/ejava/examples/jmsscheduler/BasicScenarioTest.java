@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ejava.examples.jmsmechanics.JMSAdmin;
+import ejava.examples.jmsmechanics.JMSAdminJMX;
 import ejava.examples.jmsscheduler.Requestor;
 import ejava.examples.jmsscheduler.Worker;
 
@@ -53,9 +53,9 @@ public class BasicScenarioTest {
 		dlqJNDI = props.getProperty("jndi.name.DLQ") + "-test";
 		factoryJNDI = props.getProperty("jndi.name.connFactory");
 
-		new JMSAdmin().destroyQueue(requestQueueName)
+		new JMSAdminJMX().destroyQueue(requestQueueName)
 		              .deployQueue(requestQueueName, requestQueueJNDI);		
-		new JMSAdmin().destroyQueue(dlqName)
+		new JMSAdminJMX().destroyQueue(dlqName)
                       .deployQueue(dlqName, dlqJNDI);		
 	}
 	

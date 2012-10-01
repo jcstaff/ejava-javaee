@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import ejava.examples.jmsmechanics.JMSAdmin;
+import ejava.examples.jmsmechanics.JMSAdminJMX;
 
 public class SimpleDemoTest {
 	static final Log log = LogFactory.getLog(SimpleDemoTest.class);
@@ -41,7 +41,7 @@ public class SimpleDemoTest {
 		topicJNDI = props.getProperty("jndi.name.testTopic") + "-test";
 		factoryJNDI = props.getProperty("jndi.name.connFactory");
 
-		new JMSAdmin().destroyTopic(topicName)
+		new JMSAdminJMX().destroyTopic(topicName)
 		              .deployTopic(topicName, topicJNDI);
 	}
 	

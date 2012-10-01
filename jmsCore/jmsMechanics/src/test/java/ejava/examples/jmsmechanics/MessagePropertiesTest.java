@@ -43,7 +43,7 @@ public class MessagePropertiesTest extends TestCase {
         log.debug("jndi=" + jndi.getEnvironment());
         
         assertNotNull("jndi.name.testTopic not supplied", destinationJNDI);
-        new JMSAdmin().destroyTopic("topic1")
+        new JMSAdminJMX().destroyTopic("topic1")
                       .deployTopic("topic1", destinationJNDI);
         
         assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);

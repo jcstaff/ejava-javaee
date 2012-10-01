@@ -33,7 +33,7 @@ public class SecurePingClientTestBase {
 	public static void setUpClass() throws Exception {
 		//give application time to fully deploy
 		if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-			long waitTime=30000;
+			long waitTime=15000;
 	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
 	    	Thread.sleep(waitTime);
 		}

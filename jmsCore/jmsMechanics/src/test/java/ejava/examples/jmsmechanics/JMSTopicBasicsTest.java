@@ -1,6 +1,7 @@
 package ejava.examples.jmsmechanics;
 
 import javax.jms.Connection;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Message;
@@ -9,10 +10,13 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.naming.InitialContext;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * This test case performs the basic steps to send/receive messages to/from
@@ -21,46 +25,43 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class JMSTopicBasicsTest extends TestCase {
+public class JMSTopicBasicsTest extends JMSTestBase {
     static Log log = LogFactory.getLog(JMSTopicBasicsTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
     String destinationJNDI = System.getProperty("jndi.name.testTopic",
-        "topic/ejava/examples/jmsMechanics/topic1");
+        "/topic/ejava/examples/jmsMechanics/topic1");
     String msgCountStr = System.getProperty("multi.message.count", "20");
     
-    ConnectionFactory connFactory;
     Destination destination;        
     MessageCatcher catcher1;
     MessageCatcher catcher2;
     int msgCount;
     
+    @Before
     public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
         
-        assertNotNull("jndi.name.testTopic not supplied", destinationJNDI);
-        new JMSAdmin().destroyTopic("topic1")
-                      .deployTopic("topic1", destinationJNDI);
-        
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
+    	//dynamically create necessary JMS resources
+        new JMSAdminHornetQ(connFactory, adminUser, adminPassword)
+        	.destroyTopic("topic1")
+            .deployTopic("topic1", jmsEmbedded ? destinationJNDI :
+            	"/jboss/exported" + destinationJNDI)
+            .close();
         
         log.debug("destination name:" + destinationJNDI);
-        destination = (Topic) jndi.lookup(destinationJNDI);
+        destination = (Topic) lookup(destinationJNDI);
+        assertNotNull("destination null:" + destinationJNDI, destination);
         
-        assertNotNull("multi.message.count not supplied", msgCountStr);
         msgCount = Integer.parseInt(msgCountStr);
         
         catcher1 = new MessageCatcher("subscriber1");
         catcher1.setConnFactory(connFactory);
+        catcher1.setUser(user);
+        catcher1.setPassword(password);
         catcher1.setDestination(destination);
         
         catcher2 = new MessageCatcher("subscriber2");
         catcher2.setConnFactory(connFactory);
+        catcher2.setUser(user);
+        catcher2.setPassword(password);
         catcher2.setDestination(destination);
         
         //topics will only deliver messages to subscribers that are 
@@ -79,26 +80,30 @@ public class JMSTopicBasicsTest extends TestCase {
         }
     }
     
-    protected void tearDown() throws Exception {
-        catcher1.stop();
-        catcher2.stop();
-        while (catcher1.isStopped() != true) {
-            log.debug("waiting for catcher1 to stop");
-            Thread.sleep(2000);
-        }
-        while (catcher2.isStopped() != true) {
-            log.debug("waiting for catcher2 to stop");
-            Thread.sleep(2000);
-        }
+    @After
+    public void tearDown() throws Exception {
+    	if (catcher1 != null) {
+    		catcher1.stop();
+            while (catcher1.isStopped() != true) {
+                log.debug("waiting for catcher1 to stop");
+                Thread.sleep(2000);
+            }
+    	}
+    	if (catcher2 != null) {
+    		catcher2.stop();
+            while (catcher2.isStopped() != true) {
+                log.debug("waiting for catcher2 to stop");
+                Thread.sleep(2000);
+            }
+    	}
     }
 
+    @Test
     public void testTopicSend() throws Exception {
         log.info("*** testTopicSend ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         try {
-            connection = connFactory.createConnection();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
             producer = session.createProducer(destination);
@@ -120,17 +125,15 @@ public class JMSTopicBasicsTest extends TestCase {
         finally {
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
     
+    @Test
     public void testTopicMultiSend() throws Exception {
         log.info("*** testTopicMultiSend ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         try {
-            connection = connFactory.createConnection();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
             producer = session.createProducer(destination);
@@ -154,7 +157,6 @@ public class JMSTopicBasicsTest extends TestCase {
         finally {
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
 }

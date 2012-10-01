@@ -3,7 +3,7 @@
 
     <groupId>ejava.build</groupId>
     <artifactId>dependencies</artifactId>
-    <version>3.0-1</version>
+    <version>3.0-2</version>
     <packaging>pom</packaging>
 
     <name>Dependencies POM</name>
@@ -410,6 +410,11 @@
             <dependency>
                 <groupId>org.hornetq</groupId>
                 <artifactId>hornetq-jms-client</artifactId>
+                <version>${hornetq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hornetq</groupId>
+                <artifactId>hornetq-jms</artifactId>
                 <version>${hornetq.version}</version>
             </dependency>
             <dependency>

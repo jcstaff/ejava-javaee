@@ -47,7 +47,7 @@ public class MessageDeliveryModeTest extends TestCase {
         log.debug("jndi=" + jndi.getEnvironment());
 
         assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
-        new JMSAdmin().destroyQueue("queue1")
+        new JMSAdminJMX().destroyQueue("queue1")
                       .deployQueue("queue1", destinationJNDI);        
 
         assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);

@@ -25,6 +25,8 @@ import org.apache.commons.logging.LogFactory;
 public class MessageCatcher implements Runnable {
     private static final Log log = LogFactory.getLog(MessageCatcher.class);
     protected ConnectionFactory connFactory;
+    protected String user;
+    protected String password;
     protected Session sharedSession;
     protected Destination destination;
     protected int ackMode = Session.AUTO_ACKNOWLEDGE;
@@ -40,6 +42,12 @@ public class MessageCatcher implements Runnable {
     public void setConnFactory(ConnectionFactory connFactory) {
         this.connFactory = connFactory;
     }
+	public void setUser(String user) {
+		this.user = user;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
     public void setSession(Session session) {
         this.sharedSession = session;
     }
@@ -67,13 +75,20 @@ public class MessageCatcher implements Runnable {
     public boolean isStarted() {
         return started;
     }
+    
+    protected Connection getConnection() throws JMSException {
+    	return user==null ? 
+			connFactory.createConnection() : 
+			connFactory.createConnection(user, password);
+    }
+    
     public void execute() throws JMSException {
         Connection connection = null;
         Session session = this.sharedSession;
         MessageConsumer consumer = null;
         try {
             if (session == null) {
-                connection = connFactory.createConnection();
+                connection = getConnection();
                 session = connection.createSession(false, ackMode);
             }
             consumer = session.createConsumer(destination);
@@ -154,6 +169,4 @@ public class MessageCatcher implements Runnable {
             System.exit(-1);            
         }
     }
-
-
 }
