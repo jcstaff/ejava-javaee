@@ -27,31 +27,28 @@ import static org.junit.Assert.*;
  */
 public class JMSTopicBasicsTest extends JMSTestBase {
     static Log log = LogFactory.getLog(JMSTopicBasicsTest.class);
-    String destinationJNDI = System.getProperty("jndi.name.testTopic",
-        "/topic/ejava/examples/jmsMechanics/topic1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
+    protected String destinationJNDI = System.getProperty("jndi.name.testTopic",
+            "/topic/ejava/examples/jmsMechanics/topic1");
+    protected int msgCount = Integer.parseInt(System.getProperty("multi.message.count", "20"));
     
-    Destination destination;        
-    MessageCatcher catcher1;
-    MessageCatcher catcher2;
-    int msgCount;
+    protected Destination destination;        
+    protected MessageCatcher catcher1;
+    protected MessageCatcher catcher2;
     
     @Before
     public void setUp() throws Exception {
         
     	//dynamically create necessary JMS resources
-        new JMSAdminHornetQ(connFactory, adminUser, adminPassword)
-        	.destroyTopic("topic1")
-            .deployTopic("topic1", jmsEmbedded ? destinationJNDI :
-            	"/jboss/exported" + destinationJNDI)
-            .close();
+        jmsAdmin.destroyTopic("topic1")
+            	.deployTopic("topic1", destinationJNDI);
         
         log.debug("destination name:" + destinationJNDI);
         destination = (Topic) lookup(destinationJNDI);
         assertNotNull("destination null:" + destinationJNDI, destination);
         
-        msgCount = Integer.parseInt(msgCountStr);
-        
+        catcher1 = createCatcher("subscriber1", destination);
+        catcher2 = createCatcher("subscriber2", destination);
+
         catcher1 = new MessageCatcher("subscriber1");
         catcher1.setConnFactory(connFactory);
         catcher1.setUser(user);

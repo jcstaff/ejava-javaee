@@ -9,6 +9,8 @@ import javax.jms.QueueRequestor;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hornetq.api.jms.HornetQJMSClient;
 import org.hornetq.api.jms.management.JMSManagementHelper;
 
@@ -17,8 +19,10 @@ import org.hornetq.api.jms.management.JMSManagementHelper;
  * server.
  */
 public class JMSAdminHornetQ implements JMSAdmin {
+	private static final Log log = LogFactory.getLog(JMSAdminHornetQ.class);
 	private Connection connection;
 	private Queue managementQueue;
+	private String jndiPrefix;
 	
 	public JMSAdminHornetQ(ConnectionFactory connFactory, String adminUser, String adminPassword) throws JMSException {
 		connection = connFactory.createConnection(adminUser, adminPassword);
@@ -27,10 +31,34 @@ public class JMSAdminHornetQ implements JMSAdmin {
 	}
 	
 	@Override
+	public JMSAdmin setJNDIPrefix(String prefix) {
+		this.jndiPrefix = prefix;
+		return this;
+	}
+	
+	@Override
 	public void close() throws JMSException {
 		if (connection != null) {
 			connection.close();
 		}
+	}
+	
+	/**
+	 * Concatenates two JNDI names making sure there is a single "/" character
+	 * separating them
+	 * @param name1
+	 * @param name2
+	 * @return
+	 */
+	private static String concat(String name1, String name2) {
+		if (name1==null) { return name2; }
+		else if (name2==null) { return name1; }
+		
+		String name= name1.endsWith("/") || name2.startsWith("/") ?
+				String.format("%s%s", name1, name2) : 
+				String.format("%s/%s", name1, name2); 
+		name=name.replace("//", "/");
+		return name;
 	}
 
 	public JMSAdmin deployDestination(String method, String name, String jndiName) throws Exception {
@@ -40,8 +68,9 @@ public class JMSAdminHornetQ implements JMSAdmin {
 		   session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		   requestor=new QueueRequestor((QueueSession) session, managementQueue);
 		   Message message = session.createMessage();
-		   JMSManagementHelper.putOperationInvocation(message, "jms.server", method, name, 
-				   jndiName);
+		   jndiName = concat(jndiPrefix, jndiName);
+		   JMSManagementHelper.putOperationInvocation(message, "jms.server", method, name, jndiName);
+		   log.debug(String.format("%s: %s, jndi=%s", method, name, jndiName));
 		   Message reply = requestor.request(message);
 		   if (!JMSManagementHelper.hasOperationSucceeded(reply)) {
 			   throw new RuntimeException("failed to create desintation:" + name);
@@ -64,7 +93,7 @@ public class JMSAdminHornetQ implements JMSAdmin {
 		   JMSManagementHelper.putOperationInvocation(message, "jms.server", method, name);
 		   Message reply = requestor.request(message);
 		   if (!JMSManagementHelper.hasOperationSucceeded(reply)) {
-			   throw new RuntimeException("failed to destroy desintation:" + name);
+			   log.info("failed to destroy desintation:" + name);
 		   }
 	    } finally {
 		   if (requestor != null) { requestor.close(); }

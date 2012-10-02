@@ -17,6 +17,10 @@
         messages.
     </description>
 
+    <properties>
+        <jms.embedded>true</jms.embedded>
+    </properties>
+
     <dependencies>
         <!-- core dependencies -->
         <dependency>
@@ -44,6 +48,28 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>    
+
+        <!-- brings in JBoss HornetQ dependencies -->
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-jms</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-jms-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.netty</groupId>
+            <artifactId>netty</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- test dependencies -->
         <dependency>
@@ -85,62 +111,14 @@
                     <systemPropertyVariables>
                         <testx>${testx}</testx>
                         <multi.message.count>${jmsmechanics.multi.message.count}</multi.message.count>
+                        <jms.embedded>${jms.embedded}</jms.embedded>
                     </systemPropertyVariables>
+                    <includes>
+                        <include>**/JMS*BasicsTest.java</include>
+                    </includes>
                 </configuration>
             </plugin>
         </plugins>      
     </build>
 
-    <profiles>        
-        <profile>
-            <id>hornetq-jms-client</id>
-            <activation>
-                <property> 
-                    <name>embedded-jms</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hornetq</groupId>
-                    <artifactId>hornetq-jms-client</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hornetq</groupId>
-                    <artifactId>hornetq-core</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.netty</groupId>
-                    <artifactId>netty</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>hornetq-jms-embedded</id>
-            <activation>
-                <property> 
-                    <name>!embedded-jms</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hornetq</groupId>
-                    <artifactId>hornetq-jms</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hornetq</groupId>
-                    <artifactId>hornetq-core</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.netty</groupId>
-                    <artifactId>netty</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

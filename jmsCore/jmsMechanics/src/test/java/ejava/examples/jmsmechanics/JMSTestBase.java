@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -23,6 +24,7 @@ public class JMSTestBase {
 		System.getProperty("jms.embedded", "true"));
     private static String connFactoryJNDI = 
 		System.getProperty("jndi.name.connFactory", "ConnectionFactory");
+
     protected static String adminUser = System.getProperty("admin.user", "admin1");
     protected static String adminPassword = System.getProperty("admin.password", "password");
     protected static String user = System.getProperty("user", "user1");
@@ -32,6 +34,7 @@ public class JMSTestBase {
     protected static Context jndi;     //used when JMS server remote in JBoss
     protected static ConnectionFactory connFactory;
     protected static Connection connection;
+    protected static JMSAdmin jmsAdmin;
     
 
 	@BeforeClass
@@ -42,6 +45,7 @@ public class JMSTestBase {
 			server.start();
 			
 			connFactory=(ConnectionFactory) server.lookup(connFactoryJNDI);
+	        jmsAdmin=new JMSAdminHornetQ(connFactory, adminUser, adminPassword);
 		}
 		else {
 	        log.debug("getting jndi initial context");
@@ -50,6 +54,8 @@ public class JMSTestBase {
 			
 	        log.debug("connection factory name:" + connFactoryJNDI);
 	        connFactory = (ConnectionFactory)jndi.lookup("/jms/RemoteConnectionFactory");
+	        jmsAdmin=new JMSAdminHornetQ(connFactory, adminUser, adminPassword)
+	        	.setJNDIPrefix("/jboss/exported");
 		}		
 		connection = connFactory.createConnection(user, password);
 		connection.start();
@@ -57,8 +63,14 @@ public class JMSTestBase {
 	
 	@AfterClass
 	public static final void tearDownClass() throws Exception {
+		jmsAdmin.close();
+		connection.stop();
+		connection.close();
 		if (server != null) {
 			server.stop();
+		}
+		if (jndi != null) {
+			jndi.close();
 		}
 	}
 	
@@ -66,6 +78,15 @@ public class JMSTestBase {
 		return (server != null) ?
 			server.lookup(name) :
 			jndi.lookup(name);	
+	}
+	
+	protected MessageCatcher createCatcher(String name, Destination destination) {
+        MessageCatcher catcher = new MessageCatcher(name);
+        catcher.setConnFactory(connFactory);
+        catcher.setDestination(destination);
+        catcher.setUser(user);
+        catcher.setPassword(password);
+        return catcher;
 	}
 	
 }
