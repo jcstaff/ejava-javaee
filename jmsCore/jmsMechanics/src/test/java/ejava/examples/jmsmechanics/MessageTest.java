@@ -1,5 +1,8 @@
 package ejava.examples.jmsmechanics;
 
+import static org.junit.Assert.*;
+
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
@@ -10,8 +13,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -24,62 +25,37 @@ import javax.jms.Session;
 import javax.jms.Queue;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case performs a demonstration of using a each message type.
  *
  * @author jcstaff
  */
-public class MessageTest extends TestCase {
+public class MessageTest extends JMSTestBase {
     static Log log = LogFactory.getLog(MessageTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue",
-        "queue/ejava/examples/jmsMechanics/queue1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    protected ConnectionFactory connFactory;
     protected Destination destination;        
-    protected int msgCount;
     
-    protected Connection connection = null;
     protected Session session = null;
     protected MessageProducer producer = null;
     protected MessageConsumer consumer = null;
     protected MessageConsumer replyConsumer = null;
     protected Destination replyDestination = null;
     protected Replier client;
-    
-    public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyQueue("queue1")
-                      .deployQueue("queue1", destinationJNDI);        
 
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Queue) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);
+    @Before
+    public void setUp() throws Exception {
+        destination = (Queue) lookup(queueJNDI);
+        assertNotNull("null destination:" + queueJNDI, destination);
         
         emptyQueue();
 
         //setup replies
-        connection = connFactory.createConnection();
         session = connection.createSession(
                 false, Session.AUTO_ACKNOWLEDGE);
         consumer = session.createConsumer(destination);
@@ -91,22 +67,22 @@ public class MessageTest extends TestCase {
         replyConsumer = session.createConsumer(replyDestination);
         connection.start();
     }
-    protected void tearDown() throws Exception {
+    
+    @After
+    public void tearDown() throws Exception {
         if (client != null) { client.close(); }
         if (connection != null) { connection.stop(); }
         if (replyConsumer != null) { replyConsumer.close(); }
         if (consumer != null) { consumer.close(); }
         if (producer != null) { producer.close(); }
         if (session != null)  { session.close(); }
-        if (connection != null) { connection.close(); }
     }
     
     protected void emptyQueue() throws JMSException {
-        Connection connection = null;
         Session session = null;
         MessageConsumer consumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             session = connection.createSession(
                 false, Session.AUTO_ACKNOWLEDGE);
             consumer = session.createConsumer(destination);
@@ -121,7 +97,6 @@ public class MessageTest extends TestCase {
         finally {
             if (consumer != null) { consumer.close(); }
             if (session != null) { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
     
@@ -245,6 +220,7 @@ public class MessageTest extends TestCase {
         }
     }
     
+    @Test
     public void testStreamMessage() throws Exception {
         log.info("*** testStreamMessage ***");
         
@@ -261,6 +237,7 @@ public class MessageTest extends TestCase {
         assertEquals("wrong answer:" + result, 5, result);
     }
     
+    @Test
     public void testMapMessage() throws Exception {
         log.info("*** testMapMessage ***");
         
@@ -277,6 +254,7 @@ public class MessageTest extends TestCase {
         assertEquals("wrong answer:" + result, 5, result);
     }
 
+    @Test
     public void testTextMessage() throws Exception {
         log.info("*** testTextMessage ***");
         
@@ -298,6 +276,7 @@ public class MessageTest extends TestCase {
         assertEquals("wrong answer:" + result, 5, result);
     }
 
+    @Test
     public void testObjectMessage() throws Exception {
         log.info("*** testObjectMessage ***");
         
@@ -316,6 +295,7 @@ public class MessageTest extends TestCase {
         assertEquals("wrong answer:" + result, 5, result);
     }
 
+    @Test
     public void testBytesMessage() throws Exception {
         log.info("*** testBytesMessage ***");
        
@@ -335,6 +315,7 @@ public class MessageTest extends TestCase {
         assertEquals("wrong answer:" + result, 5, result);
     }
 
+    @Test
     public void testMessage() throws Exception {
         log.info("*** testMessage ***");
 
