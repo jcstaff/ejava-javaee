@@ -1,12 +1,14 @@
 package ejava.examples.jmsmechanics;
 
+import static org.junit.Assert.*;
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -15,12 +17,11 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Queue;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case performs a demonstration of using a message time to live.
@@ -29,47 +30,21 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class MessageReplyToTest extends TestCase {
+public class MessageReplyToTest extends JMSTestBase {
     static Log log = LogFactory.getLog(MessageReplyToTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue",
-        "queue/ejava/examples/jmsMechanics/queue1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    ConnectionFactory connFactory;
-    Destination destination;        
-    int msgCount;
-    
-    public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyQueue("queue1")
-                      .deployQueue("queue1", destinationJNDI);        
+    protected Destination destination;        
 
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Queue) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);
-        
+    @Before
+    public void setUp() throws Exception {
+        destination = (Queue) lookup(queueJNDI);
+        assertNotNull("null destination:" + queueJNDI, destination);
         emptyQueue();
     }
     
     protected void emptyQueue() throws JMSException {
-        Connection connection = null;
         Session session = null;
         MessageConsumer consumer = null;
         try {
-            connection = connFactory.createConnection();
             session = connection.createSession(
                 false, Session.AUTO_ACKNOWLEDGE);
             consumer = session.createConsumer(destination);
@@ -84,11 +59,7 @@ public class MessageReplyToTest extends TestCase {
         finally {
             if (consumer != null) { consumer.close(); }
             if (session != null) { session.close(); }
-            if (connection != null) { connection.close(); }
         }
-    }
-    
-    protected void tearDown() throws Exception {
     }
     
     private class Replier implements MessageListener {
@@ -114,16 +85,16 @@ public class MessageReplyToTest extends TestCase {
             }
         }        
     }
-    
+
+    @Test
     public void testReplyTo() throws Exception {
         log.info("*** testReplyTo ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer consumer = null;
         List<MessageConsumer> replyConsumers = new ArrayList<MessageConsumer>();
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             session = connection.createSession(
                     false, Session.CLIENT_ACKNOWLEDGE);
 
@@ -194,19 +165,18 @@ public class MessageReplyToTest extends TestCase {
             if (consumer != null) { consumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
-    
+
+    @Test
     public void testReplyToMulti() throws Exception {
         log.info("*** testReplyToMulti ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer consumer = null;
         List<MessageConsumer> replyConsumers = new ArrayList<MessageConsumer>();
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             session = connection.createSession(
                     false, Session.CLIENT_ACKNOWLEDGE);
 
@@ -283,7 +253,6 @@ public class MessageReplyToTest extends TestCase {
             if (consumer != null) { consumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }    
 
