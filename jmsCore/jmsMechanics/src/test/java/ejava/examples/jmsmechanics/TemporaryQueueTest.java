@@ -1,17 +1,18 @@
 package ejava.examples.jmsmechanics;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
+import static org.junit.Assert.*;
+
+
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case tests the ability to create and send/receive messages 
@@ -19,68 +20,32 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class TemporaryQueueTest extends TestCase {
+public class TemporaryQueueTest extends JMSTestBase {
     static Log log = LogFactory.getLog(TemporaryQueueTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    protected ConnectionFactory connFactory;
-    protected Connection connection = null;
     protected Session session = null;
     protected MessageCatcher catcher1;
     protected MessageCatcher catcher2;
     protected int msgCount;
     
+    @Before
     public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);
-        
-        catcher1 = new MessageCatcher("receiver1");
-        catcher2 = new MessageCatcher("receiver2");
+        catcher1 = createCatcher("receiver1", null);
+        catcher2 = createCatcher("receiver2", null);
     }
     
-    protected void tearDown() throws Exception {
-        while (catcher1.isStarted() != true) {
-            log.debug("waiting for catcher1 to start");
-            Thread.sleep(2000);
-        }
-        catcher1.stop();
-        
-        while (catcher2.isStarted() != true) {
-            log.debug("waiting for catcher2 to start");
-            Thread.sleep(2000);
-        }
-        catcher2.stop();
-
-        while (catcher1.isStopped() != true) {
-            log.debug("waiting for catcher1 to stop");
-            Thread.sleep(2000);
-        }
-        while (catcher2.isStopped() != true) {
-            log.debug("waiting for catcher2 to stop");
-            Thread.sleep(2000);
-        }
-
+    @After
+    public void tearDown() throws Exception {
+    	shutdownCatcher(catcher1);
+    	shutdownCatcher(catcher2);
         if (session != null)  { session.close(); }
-        if (connection != null) { connection.close(); }
     }
 
-    
+
+    @Test
     public void testTemporaryQueueSend() throws Exception {
         log.info("*** testTemporaryQueueSend ***");
         MessageProducer producer = null;
         try {
-            connection = connFactory.createConnection();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
             connection.start();
@@ -119,12 +84,12 @@ public class TemporaryQueueTest extends TestCase {
             if (producer != null) { producer.close(); }
         }
     }
-    
+
+    @Test
     public void testTemporaryQueueMultiSend() throws Exception {
         log.info("*** testTemporaryQueueMultiSend ***");
         MessageProducer producer = null;
         try {
-            connection = connFactory.createConnection();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
             connection.start();
