@@ -1,14 +1,10 @@
 package ejava.examples.jmsmechanics;
 
-import javax.jms.Connection;
-
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,40 +23,19 @@ import static org.junit.Assert.*;
  */
 public class JMSTopicBasicsTest extends JMSTestBase {
     static Log log = LogFactory.getLog(JMSTopicBasicsTest.class);
-    protected String destinationJNDI = System.getProperty("jndi.name.testTopic",
-            "/topic/ejava/examples/jmsMechanics/topic1");
-    protected int msgCount = Integer.parseInt(System.getProperty("multi.message.count", "20"));
-    
     protected Destination destination;        
     protected MessageCatcher catcher1;
     protected MessageCatcher catcher2;
     
     @Before
     public void setUp() throws Exception {
-        
-    	//dynamically create necessary JMS resources
-        jmsAdmin.destroyTopic("topic1")
-            	.deployTopic("topic1", destinationJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Topic) lookup(destinationJNDI);
-        assertNotNull("destination null:" + destinationJNDI, destination);
+                
+        destination = (Topic) lookup(topicJNDI);
+        assertNotNull("destination null:" + topicJNDI, destination);
         
         catcher1 = createCatcher("subscriber1", destination);
         catcher2 = createCatcher("subscriber2", destination);
 
-        catcher1 = new MessageCatcher("subscriber1");
-        catcher1.setConnFactory(connFactory);
-        catcher1.setUser(user);
-        catcher1.setPassword(password);
-        catcher1.setDestination(destination);
-        
-        catcher2 = new MessageCatcher("subscriber2");
-        catcher2.setConnFactory(connFactory);
-        catcher2.setUser(user);
-        catcher2.setPassword(password);
-        catcher2.setDestination(destination);
-        
         //topics will only deliver messages to subscribers that are 
         //successfully registered prior to the message being published. We
         //need to wait for the catcher to start so it doesn't miss any 

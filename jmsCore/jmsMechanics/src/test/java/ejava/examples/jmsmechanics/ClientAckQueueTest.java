@@ -1,18 +1,18 @@
 package ejava.examples.jmsmechanics;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
+import static org.junit.Assert.*;
+
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case performs the basic steps to send/receive messages to/from
@@ -21,81 +21,33 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class ClientAckQueueTest extends TestCase {
+public class ClientAckQueueTest extends JMSTestBase {
     static Log log = LogFactory.getLog(ClientAckQueueTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue",
-        "queue/ejava/examples/jmsMechanics/queue1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    protected ConnectionFactory connFactory;
     protected Destination destination;        
     protected MessageCatcher catcher1;
-    MessageCatcher catcher2;
-    int msgCount;
-    
+    protected MessageCatcher catcher2;
+
+    @Before
     public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
+        destination = (Queue) lookup(queueJNDI);
+        assertNotNull("destination null:" + queueJNDI, destination);
         
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyQueue("queue1")
-                      .deployQueue("queue1", destinationJNDI);
-        
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Queue) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);
-        
-        catcher1 = new MessageCatcher("receiver1");
-        catcher1.setConnFactory(connFactory);
-        catcher1.setDestination(destination);
-        catcher1.setAckMode(Session.CLIENT_ACKNOWLEDGE);
-
-        catcher2 = new MessageCatcher("receiver2");
-        catcher2.setConnFactory(connFactory);
-        catcher2.setDestination(destination);
-        catcher2.setAckMode(Session.CLIENT_ACKNOWLEDGE);
+        catcher1 = createCatcher("receiver1", destination).setAckMode(Session.CLIENT_ACKNOWLEDGE);
+        catcher2 = createCatcher("receiver2", destination).setAckMode(Session.CLIENT_ACKNOWLEDGE);
     }
     
-    protected void tearDown() throws Exception {
-        while (catcher1.isStarted() != true) {
-            log.debug("waiting for catcher1 to start");
-            Thread.sleep(2000);
-        }
-        catcher1.stop();
-        
-        while (catcher2.isStarted() != true) {
-            log.debug("waiting for catcher2 to start");
-            Thread.sleep(2000);
-        }
-        catcher2.stop();
-
-        while (catcher1.isStopped() != true) {
-            log.debug("waiting for catcher1 to stop");
-            Thread.sleep(2000);
-        }
-        while (catcher2.isStopped() != true) {
-            log.debug("waiting for catcher2 to stop");
-            Thread.sleep(2000);
-        }
+    @After
+    public void tearDown() throws Exception {
+    	shutdownCatcher(catcher1);
+    	shutdownCatcher(catcher2);
     }
 
+    @Test
     public void testQueueSend() throws Exception {
         log.info("*** testQueueSend ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         try {
-            connection = connFactory.createConnection();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
             producer = session.createProducer(destination);
@@ -126,17 +78,15 @@ public class ClientAckQueueTest extends TestCase {
         finally {
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
-    
+
+    @Test
     public void testQueueMultiSend() throws Exception {
         log.info("*** testQueueMultiSend ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         try {
-            connection = connFactory.createConnection();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
             producer = session.createProducer(destination);
@@ -163,7 +113,6 @@ public class ClientAckQueueTest extends TestCase {
         finally {
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
 }

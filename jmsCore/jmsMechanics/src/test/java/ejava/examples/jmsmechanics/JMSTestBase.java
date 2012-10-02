@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hornetq.jms.server.embedded.EmbeddedJMS;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 
@@ -22,8 +23,13 @@ public class JMSTestBase {
 	private static final Log log = LogFactory.getLog(JMSTestBase.class);
     protected static boolean jmsEmbedded = Boolean.parseBoolean( 
 		System.getProperty("jms.embedded", "true"));
+    protected int msgCount = Integer.parseInt(System.getProperty("multi.message.count", "20"));
     private static String connFactoryJNDI = 
-		System.getProperty("jndi.name.connFactory", "ConnectionFactory");
+		System.getProperty("jndi.name.connFactory", "/jms/RemoteConnectionFactory");
+    protected static String queueJNDI = System.getProperty("jndi.name.testQueue",
+            "queue/ejava/examples/jmsMechanics/queue1");
+    protected static String topicJNDI = System.getProperty("jndi.name.testTopic",
+            "topic/ejava/examples/jmsMechanics/topic1");
 
     protected static String adminUser = System.getProperty("admin.user", "admin1");
     protected static String adminPassword = System.getProperty("admin.password", "password");
@@ -53,12 +59,21 @@ public class JMSTestBase {
 	        log.debug("jndi=" + jndi.getEnvironment());
 			
 	        log.debug("connection factory name:" + connFactoryJNDI);
-	        connFactory = (ConnectionFactory)jndi.lookup("/jms/RemoteConnectionFactory");
+	        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
 	        jmsAdmin=new JMSAdminHornetQ(connFactory, adminUser, adminPassword)
 	        	.setJNDIPrefix("/jboss/exported");
 		}		
 		connection = connFactory.createConnection(user, password);
 		connection.start();
+	}
+	
+	@Before
+	public void commonSetup() throws Exception {
+    	//dynamically create necessary JMS resources
+        jmsAdmin.destroyTopic("topic1")
+            	.destroyQueue("queue1")
+            	.deployTopic("topic1", topicJNDI)
+            	.deployQueue("queue1", queueJNDI);
 	}
 	
 	@AfterClass
@@ -75,6 +90,7 @@ public class JMSTestBase {
 	}
 	
 	protected Object lookup(String name) throws NamingException {
+		log.debug("lookup:" + name);
 		return (server != null) ?
 			server.lookup(name) :
 			jndi.lookup(name);	
@@ -87,6 +103,20 @@ public class JMSTestBase {
         catcher.setUser(user);
         catcher.setPassword(password);
         return catcher;
+	}
+	
+	protected void shutdownCatcher(MessageCatcher catcher) throws Exception {
+    	if (catcher != null) {
+	        for (int i=0; catcher.isStarted() != true && i< 10; i++) {
+	            log.debug(String.format("waiting for %s to start", catcher.getName()));
+	            Thread.sleep(2000);
+	        }
+	        catcher.stop();
+	        for (int i=0; catcher.isStopped() != true && i<10; i++) {
+	            log.debug(String.format("waiting for %s to stop", catcher.getName()));
+	            Thread.sleep(2000);
+	        }
+    	}		
 	}
 	
 }

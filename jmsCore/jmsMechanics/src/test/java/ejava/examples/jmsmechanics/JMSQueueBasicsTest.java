@@ -11,6 +11,7 @@ import javax.jms.Session;
 import javax.naming.InitialContext;
 
 import static org.junit.Assert.*;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -36,11 +37,8 @@ public class JMSQueueBasicsTest extends JMSTestBase {
     
     @Before
     public void setUp() throws Exception {
-    	jmsAdmin.destroyQueue("queue1")
-                .deployQueue("queue1", destinationJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Queue) lookup(destinationJNDI);
+        destination = (Queue) lookup(queueJNDI);
+        assertNotNull("destination null:" + queueJNDI, destination);
         
         catcher1 = createCatcher("receiver1", destination);
         catcher2 = createCatcher("receiver2", destination);

@@ -39,6 +39,7 @@ public class MessageCatcher implements Runnable {
     public MessageCatcher(String name) {
         this.name = name;
     }
+    public String getName() { return name; }
     public void setConnFactory(ConnectionFactory connFactory) {
         this.connFactory = connFactory;
     }
@@ -54,8 +55,9 @@ public class MessageCatcher implements Runnable {
     public void setDestination(Destination destination) {
         this.destination = destination;
     }    
-    public void setAckMode(int ackMode) {
+    public MessageCatcher setAckMode(int ackMode) {
         this.ackMode = ackMode;
+        return this;
     }
     public int getCount() {
         return messages.size();
