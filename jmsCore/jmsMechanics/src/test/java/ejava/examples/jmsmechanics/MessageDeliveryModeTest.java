@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.MapMessage;
@@ -15,12 +14,12 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Queue;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * This test case performs a demonstration of using a message delivery mode.
@@ -28,40 +27,15 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class MessageDeliveryModeTest extends TestCase {
+public class MessageDeliveryModeTest extends JMSTestBase {
     static Log log = LogFactory.getLog(MessageDeliveryModeTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue",
-        "queue/ejava/examples/jmsMechanics/queue1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
+    protected Destination destination;        
     
-    ConnectionFactory connFactory;
-    Destination destination;        
-    int msgCount;
-    
+    @Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyQueue("queue1")
-                      .deployQueue("queue1", destinationJNDI);        
-
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Queue) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr)*100;        
-    }
-    
-    protected void tearDown() throws Exception {
+        destination = (Queue) lookup(queueJNDI);
+        assertNotNull("null destination:" + queueJNDI, destination);
     }
     
     private interface MyClient {
@@ -100,6 +74,7 @@ public class MessageDeliveryModeTest extends TestCase {
         private Mode(int mode) { this.mode = mode; }
     }
     
+    @Test
     public void testProducerDeliveryMode() throws Exception {
         Map<Mode,Long> hacks = new HashMap<Mode, Long>();
         for(int i=0; i<2; i++) {
@@ -121,12 +96,11 @@ public class MessageDeliveryModeTest extends TestCase {
     }
     public long doTestProducerDeliveryMode(Mode mode) throws Exception {
         log.info("*** testProducerDeliverMode:"+ mode.name() + " ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer consumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
 
@@ -179,7 +153,6 @@ public class MessageDeliveryModeTest extends TestCase {
             if (consumer != null) { consumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }    
 }
