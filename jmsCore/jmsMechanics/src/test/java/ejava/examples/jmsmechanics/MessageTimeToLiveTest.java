@@ -1,9 +1,10 @@
 package ejava.examples.jmsmechanics;
 
+import static org.junit.Assert.*;
+
+
 import java.util.LinkedList;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -12,12 +13,11 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Queue;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case performs a demonstration of using a message time to live.
@@ -26,40 +26,14 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class MessageTimeToLiveTest extends TestCase {
+public class MessageTimeToLiveTest extends JMSTestBase {
     static Log log = LogFactory.getLog(MessageTimeToLiveTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue",
-        "queue/ejava/examples/jmsMechanics/queue1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    ConnectionFactory connFactory;
-    Destination destination;        
-    int msgCount;
-    
+    protected Destination destination;        
+
+    @Before
     public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyQueue("queue1")
-                      .deployQueue("queue1", destinationJNDI);        
-        
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Queue) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);        
-    }
-    
-    protected void tearDown() throws Exception {
+        destination = (Queue) lookup(queueJNDI);
+        assertNotNull("null destination:"+ queueJNDI, destination);
     }
     
     private interface MyClient {
@@ -88,15 +62,15 @@ public class MessageTimeToLiveTest extends TestCase {
             return (messages.isEmpty() ? null : messages.remove());
         }
     }
-    
+
+    @Test
     public void testProducerTimeToLive() throws Exception {
         log.info("*** testProducerPriority ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer consumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
 
@@ -150,18 +124,17 @@ public class MessageTimeToLiveTest extends TestCase {
             if (consumer != null) { consumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }    
 
+    @Test
     public void testSendTimeToLive() throws Exception {
         log.info("*** testSendTimeToLive ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer consumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
 
@@ -217,7 +190,6 @@ public class MessageTimeToLiveTest extends TestCase {
             if (consumer != null) { consumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }    
 }
