@@ -1,11 +1,11 @@
 package ejava.examples.jmsmechanics;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -14,12 +14,11 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case performs a demonstration of the two mechanisms that a 
@@ -27,40 +26,14 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class MessageConsumerTopicTest extends TestCase {
+public class MessageConsumerTopicTest extends JMSTestBase {
     static Log log = LogFactory.getLog(MessageConsumerTopicTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testTopic",
-        "topic/ejava/examples/jmsMechanics/topic1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    ConnectionFactory connFactory;
-    Destination destination;        
-    int msgCount;
-    
+    protected Destination destination;        
+
+    @Before
     public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        assertNotNull("jndi.name.testTopic not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyTopic("topic1")
-                      .deployTopic("topic1", destinationJNDI);
-        
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Topic) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);        
-    }
-    
-    protected void tearDown() throws Exception {
+        destination = (Topic) lookup(topicJNDI);
+        assertNotNull("null destination:" + topicJNDI, destination);
     }
     
     private interface MyClient {
@@ -104,15 +77,15 @@ public class MessageConsumerTopicTest extends TestCase {
         }
     }
 
+    @Test
     public void testMessageConsumer() throws Exception {
         log.info("*** testMessageConsumer ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer asyncConsumer = null;
         MessageConsumer syncConsumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             session = connection.createSession(
                     false, Session.CLIENT_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
@@ -155,19 +128,18 @@ public class MessageConsumerTopicTest extends TestCase {
             if (syncConsumer != null) { syncConsumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
     
+    @Test
     public void testMessageConsumerMulti() throws Exception {
         log.info("*** testMessageConsumerMulti ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer asyncConsumer = null;
         MessageConsumer syncConsumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             session = connection.createSession(
                     false, Session.CLIENT_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
@@ -215,7 +187,6 @@ public class MessageConsumerTopicTest extends TestCase {
             if (syncConsumer != null) { syncConsumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }    
     
