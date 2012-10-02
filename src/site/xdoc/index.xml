@@ -35,8 +35,8 @@
           <li>2012-03-20: Posted EJB/Server-side Materials</li>
           <li>2012-03-14: Posted Final Project 1 TODOs</li>
           <li>2012-03-07: Posted JPA-QL TODOs</li>
-          <li>2012-02-29: Posted ORM Relationship updates</li>
           -->
+          <li>2012-10-02: Posted ORM Relationship updates</li>
           <li>2012-09-25: Posted Core JPA TODOs</li>
           <li>2012-09-18: Posted EntityManager Materials</li>
           <li>2012-09-11: Posted Business Logic and Data Tier Topics</li>
@@ -159,64 +159,47 @@
           <li>Finish adding required business logic for end-to-end 
           testing.</li>
       </ul></li>
-      <li><ul>
-          <li>Enhance your Business Objects to include JPA relationships.
-          Be sure to include proper deletion as a part of your cleanup
-          in your test case. This now must take foreign key constraints
-          into consideration (e.g., can't delete an Auction when you
-          still have related Bids)</li>
-          <li>Begin adding required business logic to satisfy the
-          specified end-to-end scenario. Add unit tests to verify
-          the functionality of the individual business logic methods.</li>
-          <li>Implement your ingest capability. Provide some sort of 
-          verification that the ingest worked. You don't have to test
-          for the entire model ingested, but provide a brief set of 
-          sanity checks that compares pre/post and selected information.
-          </li>
-          <li>Implement your populate() method using your ingest capability.
-          Encapsulate it and your resetAll() within a TestUtilImpl class.
-          Re-use this class as a part of your unit testing. You may want 
-          to reference the following examples when implementing this class.
-          <ul>
-              <li><a href="https://github.com/jcstaff/ejava-javaee/blob/master/solutions/javaeeEx/partC/javaeeExImpl/src/main/java/myorg/javaeeex/blimpl/TestUtilImpl.java">TestUtilImpl.java</a></li>
-              <li><a href="https://github.com/jcstaff/ejava-javaee/blob/master/solutions/javaeeEx/partC/javaeeExImpl/src/main/java/myorg/javaeeex/jpa/DBUtil.java">DBUtil.java</a></li>
-          </ul>
-          </li>
-      </ul></li>
       -->
       <li><ul>
             <li>JPA Entities
-            <ul>
-              <li>Create the remainder of your Business Objects for the project.</li>
-              <li>Declare the Business Objects as Entities and map the classes
-              to tables and columns in your database. Your schema file(s) and JPA
-              DAOs should be using the same database tables at this point.
-              Mark relationships and problem fields as @Transient at this point 
-              in time.</li>
-              <li>Create unit tests for any non-trivial business rules implemented
-              within the business object classes.</li>
-            </ul>
+                <ul>
+                  <li>Enhance your Business Objects to include JPA relationships.
+                  Be sure to include proper deletion as a part of your cleanup
+                  in your test case. This now must take foreign key constraints
+                  into consideration (e.g., can't delete an Person when you
+                  still have related PhysicalDetails)</li>
+                </ul>
             </li>
-      </ul></li>
-      <li><ul>
-            <li>JPA DAOs
-            <ul>
-              <li>Create unit tests for the ability to create your business objects
-              and get them by primary key.
-              Pay attention to the business rules your application has for ordering
-              the creation (e.g., must have Person before having PhysicalDetails).
-              Solve dependency issues with sensible pre-conditions for child objects.</li>
-            </ul>
+            <li>DAOs
+                <ul>
+                  <li>Enhance your DAOs and DAO unit tests to account for storing
+                  parent/child relationships. It is recommended that you *not*
+                  use Cascades when starting out. Keep the functionality implemented
+                  within the scope of the requirements of the end-to-end scenario.
+                  </li>
+                </ul>
             </li>
-      </ul></li>
-      <li><ul>
             <li>Business Logic
-            <ul>
-              <li>Create unit test for injest and begin implementation of injest
-              for at least one of the types in your model and provided test data.
-              Try to avoid using classes with required relationships at this point
-              (e.g., Person doesn't require anything but PhysicalDetails does).</li>
-            </ul>
+                <ul>
+                  <li>Fully implement your ingest capability. Provide some sort of 
+                  verification that the ingest worked. You don't have to test
+                  for the entire model ingested, but provide a brief set of 
+                  sanity checks that compares pre/post and selected information.
+                  </li>
+                  <li>Implement your populate() method of the end-to-end scenario 
+                  using your ingest capability.
+                  Encapsulate it and your resetAll() within a TestUtilImpl class.
+                  Re-use this class as a part of your unit testing. You may want 
+                  to reference the following examples when implementing this class.
+                    <ul>
+                      <li><a href="https://github.com/jcstaff/ejava-javaee/blob/master/solutions/javaeeEx/partC/javaeeExImpl/src/main/java/myorg/javaeeex/blimpl/TestUtilImpl.java">TestUtilImpl.java</a></li>
+                      <li><a href="https://github.com/jcstaff/ejava-javaee/blob/master/solutions/javaeeEx/partC/javaeeExImpl/src/main/java/myorg/javaeeex/jpa/DBUtil.java">DBUtil.java</a></li>
+                    </ul>
+                  </li>
+                  <li>Begin filling in business logic methods to satisfy the
+                  specified end-to-end scenario. Add unit tests to verify
+                  the functionality of the individual business logic methods.</li>
+                </ul>
             </li>
       </ul></li>
       </ul>
@@ -224,6 +207,37 @@
 
       <subsection name="Things you should have finished!" id="completed">
       <ul>
+      <li><ul>
+            <li>JPA Entities
+                <ul>
+                  <li>Create the remainder of your Business Objects for the project.</li>
+                  <li>Declare the Business Objects as Entities and map the classes
+                  to tables and columns in your database. Your schema file(s) and JPA
+                  DAOs should be using the same database tables at this point.
+                  Mark relationships and problem fields as @Transient at this point 
+                  in time.</li>
+                  <li>Create unit tests for any non-trivial business rules implemented
+                  within the business object classes.</li>
+                </ul>
+            </li>
+            <li>JPA DAOs
+                <ul>
+                  <li>Create unit tests for the ability to create your business objects
+                  and get them by primary key.
+                  Pay attention to the business rules your application has for ordering
+                  the creation (e.g., must have Person before having PhysicalDetails).
+                  Solve dependency issues with sensible pre-conditions for child objects.</li>
+                </ul>
+            </li>
+            <li>Business Logic
+                <ul>
+                  <li>Create unit test for injest and begin implementation of injest
+                  for at least one of the types in your model and provided test data.
+                  Try to avoid using classes with required relationships at this point
+                  (e.g., Person doesn't require anything but PhysicalDetails does).</li>
+                </ul>
+            </li>
+      </ul></li>
       <li><ul>
             <li>Examples
             <ul>
