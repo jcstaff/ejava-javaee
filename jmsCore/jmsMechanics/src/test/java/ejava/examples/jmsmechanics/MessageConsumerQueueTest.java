@@ -1,5 +1,7 @@
 package ejava.examples.jmsmechanics;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +22,8 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case performs a demonstration of the two mechanisms that a 
@@ -27,40 +31,14 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class MessageConsumerQueueTest extends TestCase {
+public class MessageConsumerQueueTest extends JMSTestBase {
     static Log log = LogFactory.getLog(MessageConsumerQueueTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue",
-        "queue/ejava/examples/jmsMechanics/queue1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    ConnectionFactory connFactory;
     Destination destination;        
-    int msgCount;
-    
-    public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyQueue("queue1")
-                      .deployQueue("queue1", destinationJNDI);        
 
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Queue) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);        
-    }
-    
-    protected void tearDown() throws Exception {
+    @Before
+    public void setUp() throws Exception {
+        destination = (Queue) lookup(queueJNDI);
+        assertNotNull("destination null:" + queueJNDI, destination);
     }
     
     private interface MyClient {
@@ -104,15 +82,15 @@ public class MessageConsumerQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testMessageConsumer() throws Exception {
         log.info("*** testMessageConsumer ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer asyncConsumer = null;
         MessageConsumer syncConsumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             //need to use CLIENT_ACK to avoid race condition within this app
             session = connection.createSession(
                     false, Session.CLIENT_ACKNOWLEDGE);
@@ -155,19 +133,18 @@ public class MessageConsumerQueueTest extends TestCase {
             if (syncConsumer != null) { syncConsumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
-    
+
+    @Test
     public void testMessageConsumerMulti() throws Exception {
         log.info("*** testMessageConsumerMulti ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer asyncConsumer = null;
         MessageConsumer syncConsumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             //need to use CLIENT_ACK to avoid race condition within this app
             session = connection.createSession(
                     false, Session.CLIENT_ACKNOWLEDGE);
@@ -224,7 +201,6 @@ public class MessageConsumerQueueTest extends TestCase {
             if (syncConsumer != null) { syncConsumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }    
     
