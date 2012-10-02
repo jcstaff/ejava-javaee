@@ -1,11 +1,11 @@
 package ejava.examples.jmsmechanics;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -14,52 +14,28 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case performs a demonstration of durable topic subscriptions. 
  *
  * @author jcstaff
  */
-public class DurableSubscriberTest extends TestCase {
+public class DurableSubscriberTest extends JMSTestBase {
     static Log log = LogFactory.getLog(DurableSubscriberTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testTopic",
-        "topic/ejava/examples/jmsMechanics/topic1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    ConnectionFactory connFactory;
-    Destination destination;        
-    int msgCount;
-    
-    public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        assertNotNull("jndi.name.testTopic not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyTopic("topic1")
-                      .deployTopic("topic1", destinationJNDI);
+    protected Destination destination;        
 
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
+    @Before
+    public void setUp() throws Exception {
+        destination = (Topic) lookup(topicJNDI);
+        assertNotNull("destination null:" + topicJNDI, destination);
         
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Topic) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);        
-    }
-    
-    protected void tearDown() throws Exception {
+        //close connection started by base
+        if (connection !=null) { connection.close(); connection=null; }
     }
     
     private interface MyClient {
@@ -101,15 +77,15 @@ public class DurableSubscriberTest extends TestCase {
         }
     }
 
+    @Test
     public void testNonDurableSubscription() throws Exception {
         log.info("*** testNonDurableSubscription ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer asyncConsumer = null;
         MessageConsumer syncConsumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection = createConnection();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
@@ -153,10 +129,10 @@ public class DurableSubscriberTest extends TestCase {
             clients.clear();
             producer.close();
             session.close();
-            connection.close();
+            connection.close(); connection=null;;
             
             //come back and send some messages
-            connection = connFactory.createConnection();
+            connection = createConnection();
             session = connection.createSession(
                     false, Session.AUTO_ACKNOWLEDGE);
             producer = session.createProducer(destination);
@@ -195,19 +171,19 @@ public class DurableSubscriberTest extends TestCase {
             if (syncConsumer != null) { syncConsumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
+            if (connection != null) { connection.close(); connection=null;; }
         }
     }
     
+    @Test
     public void testDurableSubscription() throws Exception {
         log.info("*** testNonDurableSubscription ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer asyncConsumer = null;
         MessageConsumer syncConsumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection = createConnection();
             //the Connection.clientID is needed for Durable Subscriptions 
             connection.setClientID("testDurableSubscription"); 
             session = connection.createSession(
@@ -258,10 +234,10 @@ public class DurableSubscriberTest extends TestCase {
             clients.clear();
             producer.close();
             session.close();
-            connection.close();
+            connection.close(); connection=null;;
             
             //come back and send some messages
-            connection = connFactory.createConnection();
+            connection = createConnection();
             //the Connection.clientID is needed for Durable Subscriptions 
             connection.setClientID("testDurableSubscription"); 
             session = connection.createSession(
@@ -310,7 +286,7 @@ public class DurableSubscriberTest extends TestCase {
             if (session != null) { session.unsubscribe("sync1"); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
+            if (connection != null) { connection.close(); connection=null;; }
         }
     }
     

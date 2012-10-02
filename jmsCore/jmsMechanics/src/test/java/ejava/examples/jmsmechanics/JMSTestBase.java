@@ -1,11 +1,9 @@
 package ejava.examples.jmsmechanics;
 
-import static ejava.examples.jmsmechanics.JMSTestBase.connFactory;
-import static org.junit.Assert.assertNotNull;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -37,8 +35,8 @@ public class JMSTestBase {
     protected static String password = System.getProperty("password", "password");
 
     private static EmbeddedJMS server; //used when JMS server embedded in JVM
-    protected static Context jndi;     //used when JMS server remote in JBoss
-    protected static ConnectionFactory connFactory;
+    private static Context jndi;     //used when JMS server remote in JBoss
+    private static ConnectionFactory connFactory;
     protected static Connection connection;
     protected static JMSAdmin jmsAdmin;
     
@@ -63,7 +61,7 @@ public class JMSTestBase {
 	        jmsAdmin=new JMSAdminHornetQ(connFactory, adminUser, adminPassword)
 	        	.setJNDIPrefix("/jboss/exported");
 		}		
-		connection = connFactory.createConnection(user, password);
+		connection = createConnection();
 		connection.start();
 	}
 	
@@ -79,14 +77,21 @@ public class JMSTestBase {
 	@AfterClass
 	public static final void tearDownClass() throws Exception {
 		jmsAdmin.close();
-		connection.stop();
-		connection.close();
+		if (connection != null) {
+			connection.stop();
+			connection.close();
+			connection = null;
+		}
 		if (server != null) {
 			server.stop();
 		}
 		if (jndi != null) {
 			jndi.close();
 		}
+	}
+
+	protected static Connection createConnection() throws JMSException {
+		return connFactory.createConnection(user, password);
 	}
 	
 	protected Object lookup(String name) throws NamingException {
