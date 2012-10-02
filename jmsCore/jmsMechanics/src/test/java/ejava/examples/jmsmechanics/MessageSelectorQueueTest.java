@@ -1,11 +1,12 @@
 package ejava.examples.jmsmechanics;
 
+import static org.junit.Assert.*;
+
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -14,12 +15,11 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Queue;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This test case performs a demonstration of using a message selector with
@@ -30,40 +30,14 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jcstaff
  */
-public class MessageSelectorQueueTest extends TestCase {
+public class MessageSelectorQueueTest extends JMSTestBase {
     static Log log = LogFactory.getLog(MessageSelectorQueueTest.class);
-    InitialContext jndi;
-    String connFactoryJNDI = System.getProperty("jndi.name.connFactory",
-        "ConnectionFactory");
-    String destinationJNDI = System.getProperty("jndi.name.testQueue",
-        "queue/ejava/examples/jmsMechanics/queue1");
-    String msgCountStr = System.getProperty("multi.message.count", "20");
-    
-    ConnectionFactory connFactory;
-    Destination destination;        
-    int msgCount;
-    
+    protected Destination destination;        
+
+    @Before
     public void setUp() throws Exception {
-        log.debug("getting jndi initial context");
-        jndi = new InitialContext();    
-        log.debug("jndi=" + jndi.getEnvironment());
-        
-        assertNotNull("jndi.name.testQueue not supplied", destinationJNDI);
-        new JMSAdminJMX().destroyQueue("queue1")
-                      .deployQueue("queue1", destinationJNDI);
-        
-        assertNotNull("jndi.name.connFactory not supplied", connFactoryJNDI);
-        log.debug("connection factory name:" + connFactoryJNDI);
-        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-        
-        log.debug("destination name:" + destinationJNDI);
-        destination = (Queue) jndi.lookup(destinationJNDI);
-        
-        assertNotNull("multi.message.count not supplied", msgCountStr);
-        msgCount = Integer.parseInt(msgCountStr);        
-    }
-    
-    protected void tearDown() throws Exception {
+        destination = (Queue) lookup(queueJNDI);
+        assertNotNull("null destination:" + queueJNDI, destination);
     }
     
     private interface MyClient {
@@ -109,15 +83,15 @@ public class MessageSelectorQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testMessageSelector() throws Exception {
         log.info("*** testMessageSelector ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer asyncConsumer = null;
         MessageConsumer syncConsumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             //need to use CLIENT_ACK to avoid race condition within this app
             session = connection.createSession(
                     false, Session.CLIENT_ACKNOWLEDGE);
@@ -169,19 +143,18 @@ public class MessageSelectorQueueTest extends TestCase {
             if (syncConsumer != null) { syncConsumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }
     
+    @Test
     public void testMessageSelectorMulti() throws Exception {
         log.info("*** testMessageSelectorMulti ***");
-        Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer asyncConsumer = null;
         MessageConsumer syncConsumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection.stop();
             //need to use CLIENT_ACK to avoid race condition within this app
             session = connection.createSession(
                     false, Session.CLIENT_ACKNOWLEDGE);
@@ -239,7 +212,6 @@ public class MessageSelectorQueueTest extends TestCase {
             if (syncConsumer != null) { syncConsumer.close(); }
             if (producer != null) { producer.close(); }
             if (session != null)  { session.close(); }
-            if (connection != null) { connection.close(); }
         }
     }    
     
