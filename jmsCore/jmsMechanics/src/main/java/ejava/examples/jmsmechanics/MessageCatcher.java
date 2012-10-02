@@ -49,8 +49,9 @@ public class MessageCatcher implements Runnable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-    public void setSession(Session session) {
+    public MessageCatcher setSession(Session session) {
         this.sharedSession = session;
+        return this;
     }
     public void setDestination(Destination destination) {
         this.destination = destination;
