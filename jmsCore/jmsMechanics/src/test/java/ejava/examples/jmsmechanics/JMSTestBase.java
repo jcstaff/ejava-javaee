@@ -105,6 +105,14 @@ public class JMSTestBase {
         return catcher;
 	}
 	
+	protected void startCatcher(MessageCatcher catcher) throws Exception {
+        new Thread(catcher).start();
+        while (catcher.isStarted() != true) {
+            log.debug(String.format("waiting for %s to start", catcher.getName()));
+            Thread.sleep(2000);
+        }
+	}
+	
 	protected void shutdownCatcher(MessageCatcher catcher) throws Exception {
     	if (catcher != null) {
 	        for (int i=0; catcher.isStarted() != true && i< 10; i++) {

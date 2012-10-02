@@ -46,29 +46,8 @@ public class JMSQueueBasicsTest extends JMSTestBase {
     
     @After
     public void tearDown() throws Exception {
-    	if (catcher1 != null) {
-	        while (catcher1.isStarted() != true) {
-	            log.debug("waiting for catcher1 to start");
-	            Thread.sleep(2000);
-	        }
-	        catcher1.stop();
-	        while (catcher1.isStopped() != true) {
-	            log.debug("waiting for catcher1 to stop");
-	            Thread.sleep(2000);
-	        }
-    	}
-    	
-    	if (catcher2 != null) {
-            while (catcher2.isStarted() != true) {
-                log.debug("waiting for catcher2 to start");
-                Thread.sleep(2000);
-            }
-            catcher2.stop();
-            while (catcher2.isStopped() != true) {
-                log.debug("waiting for catcher2 to stop");
-                Thread.sleep(2000);
-            }
-    	}
+    	shutdownCatcher(catcher1);
+    	shutdownCatcher(catcher2);
     }
 
     @Test

@@ -40,34 +40,14 @@ public class JMSTopicBasicsTest extends JMSTestBase {
         //successfully registered prior to the message being published. We
         //need to wait for the catcher to start so it doesn't miss any 
         //messages.
-        new Thread(catcher1).start();
-        new Thread(catcher2).start();
-        while (catcher1.isStarted() != true) {
-            log.debug("waiting for catcher1 to start");
-            Thread.sleep(2000);
-        }
-        while (catcher2.isStarted() != true) {
-            log.debug("waiting for catcher2 to start");
-            Thread.sleep(2000);
-        }
+        startCatcher(catcher1);
+        startCatcher(catcher2);
     }
     
     @After
     public void tearDown() throws Exception {
-    	if (catcher1 != null) {
-    		catcher1.stop();
-            while (catcher1.isStopped() != true) {
-                log.debug("waiting for catcher1 to stop");
-                Thread.sleep(2000);
-            }
-    	}
-    	if (catcher2 != null) {
-    		catcher2.stop();
-            while (catcher2.isStopped() != true) {
-                log.debug("waiting for catcher2 to stop");
-                Thread.sleep(2000);
-            }
-    	}
+    	shutdownCatcher(catcher1);
+    	shutdownCatcher(catcher2);
     }
 
     @Test
