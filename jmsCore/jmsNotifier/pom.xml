@@ -16,15 +16,6 @@
         topic to distribute information.
     </description>
 
-   <!-- this repositories holds many of the javaee5 jar files -->
-    <repositories>
-        <repository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <!-- core dependencies -->
         <dependency>
@@ -37,10 +28,48 @@
             <artifactId>commons-logging</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <scope>provided</scope>
+        </dependency>
+        -->
+        <!-- brings in JBoss RMI dependencies -->
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>    
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>ejava-util</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>    
+
+        <!-- brings in JBoss HornetQ dependencies -->
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-jms</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-jms-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.netty</groupId>
+            <artifactId>netty</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -86,12 +115,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <systemProperties>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <multi.message.count>${jmsmechanics.multi.message.count}</multi.message.count>
+                        <jms.embedded>${jms.embedded}</jms.embedded>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -110,114 +137,4 @@
             </plugin>      
         </plugins>      
     </build>
-
-    <profiles>        
-        <profile>
-            <id>jboss</id>
-            <activation>
-                <property> 
-                    <name>!server</name>
-                </property>
-            </activation>
-            <properties>
-                  <java.naming.factory.initial>
-                      org.jnp.interfaces.NamingContextFactory
-                  </java.naming.factory.initial>
-                  <java.naming.provider.url>
-                      jnp://${jboss.host}:1099
-                  </java.naming.provider.url>
-                  <java.naming.factory.url.pkgs>
-                      org.jboss.naming:org.jnp.interfaces
-                  </java.naming.factory.url.pkgs>
-                  <jmsmechanics.multi.message.count>20
-                  </jmsmechanics.multi.message.count>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.jbossas</groupId>
-                    <artifactId>jboss-as-client</artifactId>
-                    <type>pom</type>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hornetq</groupId>
-                    <artifactId>hornetq-jms-client</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.hornetq</groupId>
-                    <artifactId>hornetq-core</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.netty</groupId>
-                    <artifactId>netty</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.jbossas</groupId>
-                    <artifactId>jboss-as-server</artifactId>
-                    <classifier>jmx-invoker-adaptor-client</classifier>
-                    <scope>test</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.jboss.microcontainer</groupId>
-                            <artifactId>jboss-dependency</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging-spi</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging-log4j</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>jboss5</id>
-            <!-- JBoss5/JBM supported application-specific deployment 
-                 descriptors for statically defining destinations. This 
-                 plugin will copy one for this project so that the JSE
-                 subscribers will have destinations in place when they 
-                 run outside of the test harness. -->
-            <build>
-               <plugins>
-                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <executions>
-                     <execution>
-                       <phase>process-test-resources</phase>
-                       <configuration>
-                         <tasks>
-                           <copy todir="${jboss.home}/server/${jboss.server}/deploy">
-                              <fileset dir="${basedir}/target/test-classes" includes="*jms-service.xml" />
-                           </copy>
-                         </tasks>
-                       </configuration>
-                       <goals>
-                         <goal>run</goal>
-                       </goals>
-                     </execution>
-                    </executions>
-                </plugin> 
-              </plugins>
-            </build>
-        </profile>
-
-    </profiles>
 </project>
