@@ -29,6 +29,8 @@ public class Publisher implements Runnable {
     protected String name;
     protected long sleepTime=10000;
     protected int maxCount=10;
+    protected String username;
+    protected String password;
         
     public Publisher(String name) {
         this.name = name;
@@ -60,12 +62,21 @@ public class Publisher implements Runnable {
     public boolean isStarted() {
         return started;
     }
+    public void setUsername(String username) {
+		this.username = username;
+	}
+    public void setPassword(String password) {
+		this.password = password;
+	}
+    
     public void execute() throws Exception {
         Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
         try {
-            connection = connFactory.createConnection();
+            connection = username==null ?
+            		connFactory.createConnection() :
+            		connFactory.createConnection(username, password);
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             producer = session.createProducer(destination);
             stopped = stop = false;
@@ -104,7 +115,8 @@ public class Publisher implements Runnable {
         }
     }    
 
-    public static void main(String args[]) {
+    public static int main(String args[]) {
+        boolean noExit=false;
         try {
             System.out.print("Publisher args:");
             for (String s: args) {
@@ -116,6 +128,8 @@ public class Publisher implements Runnable {
             String name="";
             Long sleepTime=null;
             Integer maxCount=null;
+            String username=null;
+            String password=null;
              for (int i=0; i<args.length; i++) {
                 if ("-jndi.name.connFactory".equals(args[i])) {
                     connFactoryJNDI = args[++i];
@@ -131,6 +145,15 @@ public class Publisher implements Runnable {
                 }
                 else if ("-max".equals(args[i])) {
                     maxCount=new Integer(args[++i]);
+                }
+                else if ("-username".equals(args[i])) {
+                	username=args[++i];
+                }
+                else if ("-password".equals(args[i])) {
+                	password=args[++i];
+                }
+                else if ("-noExit".equals(args[i])) {
+                	noExit=true;
                 }
             }
             if (connFactoryJNDI==null) { 
@@ -150,11 +173,18 @@ public class Publisher implements Runnable {
             if (sleepTime!=null) {
                 publisher.setSleepTime(sleepTime);
             }
+            publisher.setUsername(username);
+            publisher.setPassword(password);
             publisher.execute();
+            return 0;
         }
         catch (Exception ex) {
             log.fatal("",ex);
-            System.exit(-1);            
+            if (noExit) {
+            	return -1;
+            }
+            System.exit(-1);
+            return -1;
         }
     }
 

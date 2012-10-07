@@ -10,6 +10,7 @@ import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hornetq.jms.server.config.JMSConfiguration;
 import org.hornetq.jms.server.embedded.EmbeddedJMS;
 
 import org.junit.AfterClass;

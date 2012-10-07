@@ -92,6 +92,7 @@ public class JNDIUtil {
 
     public String dump(Context context, String name) {
         StringBuilder text = new StringBuilder();
+        if (name==null) { name = ""; }
         try {
             text.append("listing ").append(name);
             doDump(0, text, context, name);

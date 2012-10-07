@@ -3,35 +3,41 @@ package ejava.examples.jmsnotifier;
 
 import java.io.InputStream;
 
+
 import java.util.Properties;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hornetq.jms.server.embedded.EmbeddedJMS;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import ejava.examples.jmsmechanics.JMSAdmin;
 import ejava.examples.jmsmechanics.JMSAdminHornetQ;
-import ejava.examples.jmsmechanics.JMSAdminJMX;
-import ejava.examples.jmsmechanics.JMSTestBase;
+import ejava.util.jndi.JNDIUtil;
 
-public class SimpleDemoTest {
-	static final Log log = LogFactory.getLog(SimpleDemoTest.class);
-    protected static boolean jmsEmbedded = Boolean.parseBoolean( 
-		System.getProperty("jms.embedded", "true"));
+/**
+ * This integration test verifies the jmsNotifier functionality as wrapped 
+ * by the Ant scripts. It runs as an integration test with the JMS server
+ * launched separately from this JVM.
+ */
+public class SimpleDemoIT {
+	static final Log log = LogFactory.getLog(SimpleDemoIT.class);
     protected static String adminUser = System.getProperty("admin.user", "admin1");
     protected static String adminPassword = System.getProperty("admin.password", "password");
-    private static EmbeddedJMS server; //used when JMS server embedded in JVM
-    private static Context jndi; //used when JMS server is remote
+    protected static boolean jmsEmbedded = Boolean.parseBoolean(System.getProperty("jms.embedded", "true"));
+    private static Context jndi; 
 
     protected static Properties props;
 	public static String topicName;
@@ -42,50 +48,43 @@ public class SimpleDemoTest {
 	@BeforeClass
 	public static void init() throws Exception {
 		log.info("*** init() ***");
-		
+
+		//read property file used by the Ant script to use same properties
 		InputStream in = Thread.currentThread()
         			           .getContextClassLoader()
                                .getResourceAsStream("jmsNotifier.properties");
-
 		assertNotNull("could not locate properties file",in);
         props = new Properties();
         props.load(in);
-        //mangle these names to keep from overlapping with statically defined
+        connFactoryJNDI= props.getProperty("jndi.name.connFactory");
         topicName = props.getProperty("jmx.name.testTopic");
-		topicJNDI = props.getProperty("jndi.name.testTopic");
-		connFactoryJNDI = props.getProperty("jndi.name.connFactory");
+        topicJNDI = props.getProperty("jndi.name.testTopic");
 
-		JMSAdmin jmsAdmin=null;
-		ConnectionFactory connFactory=null;
-		if (jmsEmbedded) {
-			log.info("using embedded JMS server");
-			server = new EmbeddedJMS();
-			server.start();
-			
-			connFactory=(ConnectionFactory) server.lookup(connFactoryJNDI);
-	        jmsAdmin=new JMSAdminHornetQ(connFactory, adminUser, adminPassword);
-		}
-		else {
-	        log.debug("getting jndi initial context");
-	        jndi = new InitialContext();    
-	        log.debug("jndi=" + jndi.getEnvironment());
-			
-	        log.debug("connection factory name:" + connFactoryJNDI);
-	        connFactory = (ConnectionFactory)jndi.lookup(connFactoryJNDI);
-	        jmsAdmin=new JMSAdminHornetQ(connFactory, adminUser, adminPassword)
-	        	.setJNDIPrefix("/jboss/exported");
-		}		
-		
-		//jmsAdmin.destroyTopic(topicName)
-		//        .deployTopic(topicName, topicJNDI);
+        //perform some setup on the topics used for the test
+		log.debug("getting jndi initial context");
+        jndi = new InitialContext();    
+        log.debug("jndi=" + jndi.getEnvironment());
+        
+        //wait for JMS server to start
+        JNDIUtil.lookup(jndi, ConnectionFactory.class, connFactoryJNDI, 10);
+        log.debug(new JNDIUtil().dump(jndi,""));
+        
+	}
+	
+	//@Before -- uncomment to dynamically deploy --otherwise pre-configure
+	public void setUp() throws Exception {
+		ConnectionFactory connFactory= 
+				(ConnectionFactory)jndi.lookup(connFactoryJNDI);
+		//jboss-hosted JMS requires extra prefix in JNDI name to expose globally
+        JMSAdmin jmsAdmin=new JMSAdminHornetQ(connFactory, adminUser, adminPassword)
+    		.setJNDIPrefix(jmsEmbedded ? null : "/jboss/exported");
+		jmsAdmin.destroyTopic(topicName)
+		        .deployTopic(topicName, topicJNDI);
 		jmsAdmin.close();
 	}
 	
 	@AfterClass
 	public static void tearDownClass() throws Exception {
-		if (server != null) {
-			server.stop();
-		}
 		if (jndi != null) {
 			jndi.close();
 		}
@@ -93,44 +92,63 @@ public class SimpleDemoTest {
 	
 	protected Object lookup(String name) throws NamingException {
 		log.debug("lookup:" + name);
-		return (server != null) ?
-			server.lookup(name) :
-			jndi.lookup(name);	
+		return jndi.lookup(name);
 	}
 	
+	/**
+	 * This test just verifies that the necessary resources can be found
+	 * in the server.
+	 * @throws Exception
+	 */
 	@Test
 	public void verifyResources() throws Exception {
-		InitialContext jndi = new InitialContext();
-		log.info("looking up JNDI factory:" + connFactoryJNDI);
+		log.info("*** verifyResources ***");
+        JNDIUtil.lookup(jndi, ConnectionFactory.class, connFactoryJNDI, 10);
+        log.debug(new JNDIUtil().dump(jndi,""));
 		
-		@SuppressWarnings("unused")
-		ConnectionFactory connFactory = (ConnectionFactory)lookup(connFactoryJNDI);
-		assertNotNull("connFactory not found", connFactory);
-		
-		log.info("looking up topic:" + topicJNDI);
-		@SuppressWarnings("unused")
+        assertNotNull("jndi.name.testTopic not found in props", topicJNDI);
+        assertNotNull("jndi.name.connFactory not found in props", connFactoryJNDI);
+
+        log.info("looking up connectionFactory:" + connFactoryJNDI);
+		ConnectionFactory cf = (ConnectionFactory) lookup(connFactoryJNDI);
+		log.info(String.format("%s=%s", connFactoryJNDI, cf));
+
+        log.info("looking up topic:" + topicJNDI);
 		Topic topic = (Topic) lookup(topicJNDI);
+		log.info(String.format("%s=%s", topicJNDI, topic));
+
+		assertNotNull("connectionFactory not found", cf);
 		assertNotNull("topic not found", topic);
 	}
 
+	/**
+	 * This test executes the demo publisher and subscriber classes in
+	 * a test scenario. It uses the same main() method used by the Ant 
+	 * scripts.
+	 */
 	@Test
 	public void publishToSubscribers() {
 		log.info("*** publishToSubscribers ***");
 				
 		String name = props.getProperty("publisher.name");
 		String sleep = props.getProperty("publisher.sleep");
-		//String max = props.getProperty("publisher.max");		
+		String publisherUsername = props.getProperty("publisher.username");
+		String publisherPassword = props.getProperty("publisher.password");
 		String pubArgs[] = {
 				"-jndi.name.connFactory", connFactoryJNDI,
 				"-jndi.name.destination", topicJNDI,
 				"-name", name, 
                 "-sleep", sleep,
-                "-max", "10"};
+                "-max", "10",
+                "-username", publisherUsername,
+                "-password", publisherPassword};
 
 		String name0 = props.getProperty("subscriber.name");
 		String sleep0 = props.getProperty("subscriber.sleep");
 		String durable0 = props.getProperty("subscriber.durable");
 		String selector0 = props.getProperty("subscriber.selector");
+		String subscriberUsername = props.getProperty("subscriber.username");
+		String subscriberPassword = props.getProperty("subscriber.password");
 		final String sub0Args[] = {
             "-jndi.name.connFactory", connFactoryJNDI,
             "-jndi.name.destination", topicJNDI,
@@ -138,11 +156,13 @@ public class SimpleDemoTest {
             "-sleep", sleep0,
             "-max", "10",
             "-durable", durable0,
-            "-selector", selector0};
+            "-selector", selector0,
+	        "-username", subscriberUsername,
+	        "-password", subscriberPassword};
 		
 		new Thread() {
 			public void run() {
-				Subscriber.main(sub0Args);
+				assertEquals("subscriber failure", 0, Subscriber.main(sub0Args));
 			}			
 		}.start();
 		
@@ -157,10 +177,12 @@ public class SimpleDemoTest {
             "-sleep", sleep1,
             "-max", "2",
             "-durable", durable1,
-            "-selector", selector1};
+            "-selector", selector1,
+	        "-username", subscriberUsername,
+	        "-password", subscriberPassword};
 		new Thread() {
 			public void run() {
-				Subscriber.main(sub1Args);
+				assertEquals("subscriber 1 failure", 0, Subscriber.main(sub1Args));
 			}			
 		}.start();
 
@@ -175,10 +197,12 @@ public class SimpleDemoTest {
             "-sleep", sleep2,
             "-max", "2",
             "-durable", durable2,
-            "-selector", selector2};
+            "-selector", selector2,
+	        "-username", subscriberUsername,
+	        "-password", subscriberPassword};
 		new Thread() {
 			public void run() {
-				Subscriber.main(sub2Args);
+				assertEquals("subscriber 2 failure", 0, Subscriber.main(sub2Args));
 			}			
 		}.start();
 
@@ -193,10 +217,12 @@ public class SimpleDemoTest {
             "-sleep", sleep3,
             "-max", "2",
             "-durable", durable3,
-            "-selector", selector3};
+            "-selector", selector3,
+	        "-username", subscriberUsername,
+	        "-password", subscriberPassword};
 		new Thread() {
 			public void run() {
-				Subscriber.main(sub3Args);
+				assertEquals("subscriber 3 failure", 0, Subscriber.main(sub3Args));
 			}			
 		}.start();
 
@@ -211,10 +237,13 @@ public class SimpleDemoTest {
             "-sleep", sleep4,
             "-max", "2",
             "-durable", durable4,
-            "-selector", selector4};
+            "-selector", selector4,
+	        "-username", subscriberUsername,
+	        "-password", subscriberPassword};
 		new Thread() {
 			public void run() {
 				Subscriber.main(sub4Args);
+				assertEquals("subscriber 4 failure", 0, Subscriber.main(sub4Args));
 			}			
 		}.start();
 

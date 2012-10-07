@@ -34,6 +34,8 @@ public class Subscriber implements Runnable {
     protected int maxCount=0;
     protected boolean durable=false;
     protected String selector=null;
+    protected String username;
+    protected String password;
         
     public Subscriber(String name) {
         this.name = name;
@@ -71,12 +73,21 @@ public class Subscriber implements Runnable {
     public boolean isStarted() {
         return started;
     }
+    public void setUsername(String username) {
+		this.username = username;
+	}
+    public void setPassword(String password) {
+		this.password = password;
+	}
+
     public void execute() throws Exception {
         Connection connection = null;
         Session session = null;
         MessageConsumer consumer = null;
         try {
-            connection = connFactory.createConnection();
+            connection = username==null ?
+            		connFactory.createConnection() :
+            		connFactory.createConnection(username, password);
             connection.setClientID(name);
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             if (durable == false) {                
@@ -135,7 +146,8 @@ public class Subscriber implements Runnable {
         }
     }    
 
-    public static void main(String args[]) {
+    public static int main(String args[]) {
+    	boolean noExit=false;
         try {
             String connFactoryJNDI=null;
             String destinationJNDI=null;
@@ -144,6 +156,8 @@ public class Subscriber implements Runnable {
             Integer maxCount=null;
             Boolean durable=null;
             String selector=null;
+            String username=null;
+            String password=null;
             for (int i=0; i<args.length; i++) {
                 if ("-jndi.name.connFactory".equals(args[i])) {
                     connFactoryJNDI = args[++i];
@@ -169,6 +183,15 @@ public class Subscriber implements Runnable {
                 else if ("-selector".equals(args[i])) {
                     selector=args[++i];
                 }
+                else if ("-username".equals(args[i])) {
+                	username=args[++i];
+                }
+                else if ("-password".equals(args[i])) {
+                	password=args[++i];
+                }
+                else if ("-noExit".equals(args[i])) {
+                	noExit=true;
+                }
             }
             if (connFactoryJNDI==null) { 
                 throw new Exception("jndi.name.connFactory not supplied");
@@ -193,11 +216,19 @@ public class Subscriber implements Runnable {
             if (selector!=null) {
                 subscriber.setSelector(selector);
             }
+            subscriber.setUsername(username);
+            subscriber.setPassword(password);
             subscriber.execute();
+            return 0;
         }
         catch (Exception ex) {
             log.fatal("",ex);
             System.exit(-1);            
+            if (noExit) {
+            	return -1;
+            }
+            System.exit(-1);
+            return -1;
         }
     }
 }

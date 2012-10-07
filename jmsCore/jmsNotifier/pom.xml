@@ -16,12 +16,21 @@
         topic to distribute information.
     </description>
 
+    <properties>
+        <jms.host>localhost</jms.host>
+        <jndi.host>${jms.host}</jndi.host>
+        <jndi.rmihost>${jms.host}</jndi.rmihost>
+        <hornetq.remoting.netty.host>${jms.host}</hornetq.remoting.netty.host>
+        <jms.spawn>true</jms.spawn>
+    </properties>
+
+
     <dependencies>
         <!-- core dependencies -->
         <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>jms</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -53,30 +62,23 @@
         <!-- brings in JBoss HornetQ dependencies -->
         <dependency>
             <groupId>org.hornetq</groupId>
-            <artifactId>hornetq-jms</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hornetq</groupId>
             <artifactId>hornetq-jms-client</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hornetq</groupId>
-            <artifactId>hornetq-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.netty</groupId>
-            <artifactId>netty</artifactId>
-            <scope>test</scope>
-        </dependency>
+
 
         <!-- test dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jmsMechanics</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jmsMechanics</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -89,6 +91,41 @@
             <artifactId>log4j</artifactId>
             <scope>test</scope>
         </dependency>    
+
+        <!-- runtime dependencies required to run JMS server instance -->
+        <dependency>
+            <groupId>org.jboss.microcontainer</groupId>
+            <artifactId>jboss-kernel</artifactId>
+            <version>2.0.6.GA</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-bootstrap</artifactId>
+            <version>${hornetq.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-core</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hornetq</groupId>
+            <artifactId>hornetq-jms</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.naming</groupId>
+            <artifactId>jnpserver</artifactId>
+            <version>5.0.3.GA</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.netty</groupId>
+            <artifactId>netty</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -97,16 +134,18 @@
             <testResource>
                 <directory>src/test/resources</directory>
                 <filtering>true</filtering>
-                <excludes>
-                    <exclude>**/*.xml</exclude>
-                </excludes>
+                <includes>
+                    <include>**/hornetq*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
             </testResource>
             <testResource>
                 <directory>src/test/resources</directory>
                 <filtering>false</filtering>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
+                <excludes>
+                    <exclude>**/hornetq*.xml</exclude>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
             </testResource>
         </testResources>
 
@@ -121,6 +160,10 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
 
             <!-- create a classpath for our JSE clients to run -->
             <plugin>
@@ -133,8 +176,81 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                     </execution>
-                </executions>
+                 </executions>
             </plugin>      
+
+            <!-- allocate an unused port for the JMS server -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>reserve-network-port</goal>
+                        </goals>
+                        <configuration>
+                        <!--
+                            <outputFile>${project.build.directory}/test-classes/ports.properties</outputFile>
+                            -->
+                            <portNames>
+                                <portName>hornetq.remoting.netty.port</portName>
+                                <portName>jndi.port</portName>
+                                <portName>jndi.rmiport</portName>
+                            </portNames>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>start-jms-server</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <java classname="org.hornetq.integration.bootstrap.HornetQBootstrapServer"
+                                     fork="true"
+                                     spawn="${jms.spawn}">
+                                     <classpath>
+                                         <path location="${project.build.directory}/test-classes/hornetq"/>
+                                         <path refid="maven.runtime.classpath"/>
+                                     </classpath>
+                                     <!--
+                                     <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent"/>
+                                     <sysproperty key="java.compiler" value="NONE"/>
+                                     -->
+                                     <sysproperty key="hornetq.config.dir" value="${project.build.directory}/test-classes/hornetq"/>
+                                     <arg value="${project.build.directory}/test-classes/hornetq/hornetq-beans.xml"/>
+                                </java>
+                                <echo>started JMS Server</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop-jms-server</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo>stopping JMS Server</echo>
+                                <echo file="${project.build.directory}/test-classes/hornetq/STOP_ME"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                </dependencies>
+            </plugin>
+
         </plugins>      
     </build>
 </project>
