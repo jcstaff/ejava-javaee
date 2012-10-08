@@ -44,28 +44,34 @@ public class AuctionAdminHandlerServlet extends HttpServlet {
     private static final String UNKNOWN_COMMAND_URL = 
         "/WEB-INF/content/UnknownCommand.jsp";
 
+    
     public void init() throws ServletException {
         log.debug("init() called, auctionMgmt=" + auctionMgmt + ", userMgmt=" + userMgmt);
+        JNDIHelper jndi = null;
         try {
-            JNDIHelper jndi = new JNDIHelper();
-            ServletContext ctx = getServletContext();
-            if (auctionMgmt == null) {
-                auctionMgmt = jndi.getAuctionMgmt(ctx);
-            }        
-            if (userMgmt == null) {
-                userMgmt = jndi.getUserMgmt(ctx);
-            }        
-            
             //build a list of handlers for individual commands
             handlers.put(MAINMENU_COMMAND, new AdminMenu());
             handlers.put(CANCELTIMERS_COMMAND, new CancelTimers());
             handlers.put(INITTIMERS_COMMAND, new InitTimers());
             handlers.put(REMOVEACCOUNT_COMMAND, new RemoveAccount());
             handlers.put(LOGOUT_COMMAND, new Logout());
+
+            //verify local references were injected or replace with remote
+            ServletContext ctx = getServletContext();
+            //TODO: jndi = new JNDIHelper(ctx);
+            if (auctionMgmt == null) {
+                auctionMgmt = jndi.getAuctionMgmt();
+            }        
+            if (userMgmt == null) {
+                userMgmt = jndi.getUserMgmt();
+            }        
         }
         catch (Exception ex) {
             log.fatal("error initializing handler", ex);
             throw new ServletException("error initializing handler", ex);
+        }
+        finally {
+        	if (jndi != null) { jndi.close(); }
         }
     }
 

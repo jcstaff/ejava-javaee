@@ -23,20 +23,60 @@ import ejava.examples.asyncmarket.ejb.SellerLocal;
 import ejava.examples.asyncmarket.ejb.SellerRemote;
 import ejava.examples.asyncmarket.ejb.UserMgmtLocal;
 import ejava.examples.asyncmarket.ejb.UserMgmtRemote;
+import ejava.util.ejb.EJBClient;
 
 /**
- * This is a helper class used to locate application-specific EJBs in the
- * JNDI tree. It was originally written when JBoss was in the 4.x stage of
- * adopting Java EE 5 and did not support @EJB injection into the Servlets.
- * Although @EJB injection is now supported, it is still useful for use
- * within the Jetty environment. However, the Local interface logic
- * can be removed at this time.
- *
+ * This is a helper class used to help locate EJBs when running in a 
+ * remote web container -- such as Jetty.
+ *  
+ * TODO: factor out JNDI properties into a jndi.properties file
  */
 public class JNDIHelper {
     private static final Log log = LogFactory.getLog(JNDIHelper.class);
+    public static final String AUCTION_MGMT_REMOTE_JNDI=
+    	EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
+			"AuctionMgmtEJB", AuctionMgmtRemote.class.getName());    
+	public static final String USER_MGMT_REMOTE_JNDI =
+		EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
+			"UserMgmtEJB", UserMgmtRemote.class.getName());
+	public static final String SELLER_REMOTE_JNDI = 
+		EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
+			"SellerEJB", SellerRemote.class.getName());	
+	public static final String BUYER_REMOTE_JNDI = 
+		EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
+			"BuyerEJB", BuyerRemote.class.getName());
+
+    private Context jndi;
     
-    public Context getInitialContext(ServletContext context) 
+    public JNDIHelper(ServletContext context) throws NamingException {
+    	jndi=getInitialContext(context);
+    }
+    public void close() {
+    	try {
+    		jndi.close();
+    	} catch (NamingException ex) {
+    		throw new RuntimeException("unexpected error during JNDI.close()", ex);
+    	}
+    }
+    
+    public AuctionMgmt getAuctionMgmt() throws NamingException {
+    	return lookup(AuctionMgmt.class, jndi, AUCTION_MGMT_REMOTE_JNDI);
+    }
+    
+    public UserMgmt getUserMgmt() throws NamingException {
+    	return lookup(UserMgmt.class, jndi, USER_MGMT_REMOTE_JNDI);
+    }
+
+    public Seller getSeller() throws NamingException {
+    	return lookup(Seller.class, jndi, SELLER_REMOTE_JNDI);
+    }
+    
+    public Buyer getBuyer() throws NamingException {
+    	return lookup(Buyer.class, jndi, BUYER_REMOTE_JNDI);
+    }
+
+    
+    private Context getInitialContext(ServletContext context) 
         throws NamingException {
         
         //build an InitialContext from Servlet.init properties in web.xml
@@ -55,68 +95,12 @@ public class JNDIHelper {
         return jndi;
     }
 
-    public AuctionMgmt getAuctionMgmt(ServletContext context) 
-        throws NamingException {
-        AuctionMgmt auctionMgmt = null;
-        
-        Context jndi = getInitialContext(context);
-        String jndiName = context.getInitParameter("auctionmgmt.local");
-        try { auctionMgmt = (AuctionMgmtLocal)jndi.lookup(jndiName); }
-        catch (Throwable ex) {
-            log.debug(jndiName + " not found, trying remote");
-            jndiName = context.getInitParameter("auctionmgmt.remote");
-            auctionMgmt = (AuctionMgmtRemote)jndi.lookup(jndiName);
-        }
-        log.debug("auctionMgmt=" + auctionMgmt);
-        return auctionMgmt;
+    @SuppressWarnings("unchecked")
+	private <T> T lookup(Class<T> lazz, Context jndi, String remoteJNDI) 
+    		throws NamingException { 
+        T object = null;            
+        object = (T)jndi.lookup(remoteJNDI);
+        log.debug("object=" + object);
+        return object;
     }
-    
-    public UserMgmt getUserMgmt(ServletContext context) 
-        throws NamingException {
-        UserMgmt userMgmt = null;
-        
-        Context jndi = getInitialContext(context);
-        String jndiName = context.getInitParameter("usermgmt.local");
-        try { userMgmt = (UserMgmtLocal)jndi.lookup(jndiName); }
-        catch (Throwable ex) {
-            log.debug(jndiName + " not found, trying remote");
-            jndiName = context.getInitParameter("usermgmt.remote");
-            userMgmt = (UserMgmtRemote)jndi.lookup(jndiName);
-        }
-        log.debug("auctionMgmt=" + userMgmt);
-        return userMgmt;
-    }
-
-    public Seller getSeller(ServletContext context) 
-        throws NamingException {
-        Seller seller = null;
-        
-        Context jndi = getInitialContext(context);
-        String jndiName = context.getInitParameter("seller.local");
-        try { seller = (SellerLocal)jndi.lookup(jndiName); }
-        catch (Throwable ex) {
-            log.debug(jndiName + " not found, trying remote");
-            jndiName = context.getInitParameter("seller.remote");
-            seller = (SellerRemote)jndi.lookup(jndiName);
-        }
-        log.debug("seller=" + seller);
-        return seller;
-   }
-    
-    public Buyer getBuyer(ServletContext context) 
-        throws NamingException {
-        Buyer buyer = null;
-        
-        Context jndi = getInitialContext(context);
-        String jndiName = context.getInitParameter("buyer.local");
-        try { buyer = (BuyerLocal)jndi.lookup(jndiName); }
-        catch (Throwable ex) {
-            log.debug(jndiName + " not found, trying remote");
-            jndiName = context.getInitParameter("buyer.remote");
-            buyer = (BuyerRemote)jndi.lookup(jndiName);
-        }
-        log.debug("buyer=" + buyer);
-        return buyer;
-    }
-    
 }

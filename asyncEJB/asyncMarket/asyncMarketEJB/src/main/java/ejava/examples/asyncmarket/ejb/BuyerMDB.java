@@ -46,7 +46,7 @@ import ejava.examples.asyncmarket.jpa.JPAOrderDAO;
                 propertyValue="javax.jms.Topic"),            
         @ActivationConfigProperty(
                 propertyName="destination",
-                propertyValue="topic/asyncMarketTopic1"),            
+                propertyValue="java:/topic/ejava/examples/asyncMarket/topic1"),            
         @ActivationConfigProperty(
                 propertyName="messageSelector",
                 propertyValue="JMSType in ('forSale', 'saleUpdate')"),

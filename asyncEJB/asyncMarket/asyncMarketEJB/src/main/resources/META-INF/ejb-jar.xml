@@ -12,12 +12,11 @@
 
         <session>
             <ejb-name>SellerEJB</ejb-name>
+            <!-- example of how could be mapped in XML 
             <resource-ref>
                 <res-ref-name>jms/ConnectionFactory</res-ref-name>
                 <res-type>javax.jms.ConnectionFactory</res-type>
-                <!-- this could be specified here, but specific to JBoss
                 <mapped-name>ConnectionFactory</mapped-name>
-                -->
                 <injection-target>
                     <injection-target-class>
                         ejava.examples.asyncmarket.ejb.SellerEJB
@@ -42,6 +41,7 @@
                     </injection-target-name>
                 </injection-target>
             </resource-env-ref>            
+             -->
         </session>
         <session>
             <ejb-name>AuctionMgmtEJB</ejb-name>
@@ -58,6 +58,7 @@
                     </injection-target-name>
                 </injection-target>
             </env-entry>
+            <!-- example of how could be mapped in XML
             <resource-ref>
                 <res-ref-name>jms/ConnectionFactory</res-ref-name>
                 <res-type>javax.jms.ConnectionFactory</res-type>
@@ -85,6 +86,7 @@
                     </injection-target-name>
                 </injection-target>
             </resource-env-ref>            
+             -->
         </session>
 
         <message-driven>
@@ -97,11 +99,7 @@
                 </activation-config-property>
                 <activation-config-property>
                     <activation-config-property-name>destination</activation-config-property-name>
-                    <activation-config-property-value>topic/asyncMarketTopic1</activation-config-property-value>
-                </activation-config-property>
-                <activation-config-property>
-                    <activation-config-property-name>messageSelector</activation-config-property-name>
-                    <activation-config-property-value>JMSType in ('forSale', 'saleUpdate')</activation-config-property-value>
+                    <activation-config-property-value>java:/topic/ejava/examples/asyncMarket/topic1</activation-config-property-value>
                 </activation-config-property>
                 <activation-config-property>
                     <activation-config-property-name>messageSelector</activation-config-property-name>

@@ -1,42 +1,64 @@
 package ejava.examples.asyncmarket.ejbclient;
 
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+
 import java.util.List;
 
 import javax.naming.InitialContext;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 import ejava.examples.asyncmarket.AuctionMgmt;
 import ejava.examples.asyncmarket.Buyer;
 import ejava.examples.asyncmarket.Seller;
 import ejava.examples.asyncmarket.UserMgmt;
 import ejava.examples.asyncmarket.bo.AuctionItem;
-import ejava.examples.asyncmarket.bo.Order;
 import ejava.examples.asyncmarket.bo.Person;
 import ejava.examples.asyncmarket.ejb.AuctionMgmtRemote;
 import ejava.examples.asyncmarket.ejb.BuyerRemote;
 import ejava.examples.asyncmarket.ejb.SellerRemote;
 import ejava.examples.asyncmarket.ejb.UserMgmtRemote;
+import ejava.util.ejb.EJBClient;
+import junit.framework.TestCase;
 
-public class BuyerTest extends TestCase {
-    Log log = LogFactory.getLog(BuyerTest.class);
-    InitialContext jndi;
-    static String auctionmgmtJNDI = System.getProperty("jndi.name.auctionmgmt");
-    static String usermgmtJNDI = System.getProperty("jndi.name.usermgmt");
-    static String sellerJNDI = System.getProperty("jndi.name.seller");
-    static String buyerJNDI = System.getProperty("jndi.name.buyer");
+public abstract class MarketITBase extends TestCase {
+	private static final Log log = LogFactory.getLog(MarketITBase.class);
+	protected static String auctionmgmtJNDI = System.getProperty("jndi.name.auctionmgmt",
+		EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
+				"AuctionMgmtEJB", AuctionMgmtRemote.class.getName()));
+	protected static String usermgmtJNDI = System.getProperty("jndi.name.usermgmt",
+		EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
+			"UserMgmtEJB", UserMgmtRemote.class.getName()));
+	protected static String sellerJNDI = System.getProperty("jndi.name.seller",
+		EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
+			"SellerEJB", SellerRemote.class.getName()));
+	protected static String buyerJNDI = System.getProperty("jndi.name.buyer",
+		EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
+			"BuyerEJB", BuyerRemote.class.getName()));
+	protected static InitialContext jndi;
+	protected AuctionMgmt auctionmgmt;
+	protected UserMgmt usermgmt;
+	protected Seller seller;
+	protected Buyer buyer;
+	
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+    	log.info("*** setUpClass() ***");
+		//give application time to fully deploy
+		if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+			long waitTime=15000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(waitTime);
+		}
+		else {
+	    	log.info(String.format("startstop not set"));
+		}
+	}
 
-    AuctionMgmt auctionmgmt;
-    UserMgmt usermgmt;
-    Seller seller;
-    Buyer buyer;
-    
+	@Before
     public void setUp() throws Exception {
         log.debug("getting jndi initial context");
         jndi = new InitialContext();    
@@ -62,13 +84,15 @@ public class BuyerTest extends TestCase {
         }
     }
     
+	/**
+	 * Use remote interfaces to clear DB for next test.
+	 * @throws Exception
+	 */
     private void cleanup() throws Exception {
-        int index = 0;
-        
         auctionmgmt.cancelTimers();
         
         List<AuctionItem> items = null;
-        index=0;
+        int index=0;
         do {
             items = auctionmgmt.getItems(index, 10);
             for (AuctionItem item : items) {
@@ -89,43 +113,5 @@ public class BuyerTest extends TestCase {
             index += users.size();
         } while (users.size() > 0);       
     }
-    
-    public void testOrder() throws Exception {
-        log.info("*** testOrder ***");
-        
-        String userId = "mjones";
-        String name = "Mary Jones";
-        @SuppressWarnings("unused")
-        long sellerId = usermgmt.createUser(userId, name);
-        log.info("created user:" + name);
-        
-        AuctionItem item = new AuctionItem();
-        item.setName("my stuff");
-        item.setMinBid(4.00);
-        Calendar cal = new GregorianCalendar();
-        item.setStartDate(cal.getTime());
-        cal.add(Calendar.SECOND, 10);
-        item.setEndDate(cal.getTime());
-        long itemId = seller.sellProduct(userId, item);
-        log.info("created product:" + item);
-        
-        try {
-            item = seller.getItem(itemId);            
-            log.info("item:" + item);
-            assertNotNull("item not found:" + itemId, item);
-            assertFalse(item.isClosed());
-            
-            assertEquals("unexpected number of available items", 1, 
-                    buyer.getAvailableItems(0, 100).size());
-            long order1Id = buyer.placeOrder(item.getId(), userId, 10);
-            Order order1 = buyer.getOrder(order1Id);
-            assertNotNull(order1);
-            assertEquals("unexpected orderId", 
-                    order1.getItem().getId(), item.getId());
-            
-        } catch (UndeclaredThrowableException ue) {
-            log.error("undeclared exception:", ue.getCause());
-            fail("" + ue.getUndeclaredThrowable());
-        }        
-    }
+	
 }

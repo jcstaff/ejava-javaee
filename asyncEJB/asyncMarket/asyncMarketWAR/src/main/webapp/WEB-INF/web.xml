@@ -12,15 +12,15 @@
             -->
     <context-param>
         <param-name>java.naming.factory.initial</param-name>
-        <param-value>org.jnp.interfaces.NamingContextFactory</param-value>
+        <param-value>org.jboss.naming.remote.client.InitialContextFactory</param-value>
     </context-param>        
     <context-param>
         <param-name>java.naming.provider.url</param-name>
-        <param-value>jnp://localhost:1099</param-value>
+        <param-value>remote://127.0.0.5:4447</param-value>
     </context-param>        
     <context-param>
         <param-name>java.naming.factory.url.pkgs</param-name> 
-        <param-value>org.jboss.naming:org.jnp.interfaces</param-value>
+        <param-value></param-value>
     </context-param>        
     <context-param>
         <param-name>auctionmgmt.local</param-name> 

@@ -49,26 +49,33 @@ public class SellerHandlerServlet extends HttpServlet {
 
     public void init() throws ServletException {
         log.debug("init() called, seller=" + seller + ", userMgmt=" + userMgmt);
+        JNDIHelper jndi = null;;
         try {
-            ServletContext ctx = getServletContext();
-            JNDIHelper jndi = new JNDIHelper();
-            if (seller == null) {
-                seller = jndi.getSeller(ctx);
-            }        
-            if (userMgmt == null) {
-                userMgmt = jndi.getUserMgmt(ctx);
-            }        
-            
             //build a list of handlers for individual commands
             handlers.put(MAINMENU_COMMAND, new AdminMenu());
             handlers.put(CREATEACCOUNT_COMMAND, new CreateAccount());
             handlers.put(SELLPRODUCT_COMMAND, new SellProduct());
             handlers.put(GETITEMS_COMMAND, new GetItems());
             handlers.put(LOGOUT_COMMAND, new Logout());
+
+            //verify local injected or replace with remote
+            ServletContext ctx = getServletContext();
+            //TODO: jndi = new JNDIHelper(ctx);
+            if (seller == null) {
+                seller = jndi.getSeller();
+            }        
+            if (userMgmt == null) {
+                userMgmt = jndi.getUserMgmt();
+            }                    
         }
         catch (Exception ex) {
             log.fatal("error initializing handler", ex);
             throw new ServletException("error initializing handler", ex);
+        }
+        finally {
+        	if (jndi != null) {
+        		jndi.close();
+        	}
         }
     }
 

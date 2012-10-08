@@ -20,6 +20,7 @@ import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.jms.Topic;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -51,7 +52,9 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
     //injected
     long checkItemInterval;
     
+    @Resource(mappedName="java:/JmsXA")
     private ConnectionFactory connFactory;
+    @Resource(mappedName="java:/topic/ejava/examples/asyncMarket/topic1", type=Topic.class)
     private Destination sellTopic;
     
     @PostConstruct

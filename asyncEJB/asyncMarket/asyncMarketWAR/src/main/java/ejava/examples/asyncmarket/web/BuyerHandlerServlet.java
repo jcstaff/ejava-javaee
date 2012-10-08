@@ -1,6 +1,7 @@
 package ejava.examples.asyncmarket.web;
 
 import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,16 +53,8 @@ public class BuyerHandlerServlet extends HttpServlet {
 
     public void init() throws ServletException {
         log.debug("init() called, buyer=" + buyer + ", userMgmt=" + userMgmt);
+        JNDIHelper jndi = null;
         try {
-            ServletContext ctx = getServletContext();
-            JNDIHelper jndi = new JNDIHelper();
-            if (buyer == null) {
-                buyer = jndi.getBuyer(ctx);
-            }        
-            if (userMgmt == null) {
-                userMgmt = jndi.getUserMgmt(ctx);
-            }        
-            
             //build a list of handlers for individual commands
             handlers.put(MAINMENU_COMMAND, new AdminMenu());
             handlers.put(CREATEACCOUNT_COMMAND, new CreateAccount());
@@ -70,10 +63,23 @@ public class BuyerHandlerServlet extends HttpServlet {
             handlers.put(PLACE_ORDER_COMMAND, new PlaceOrder());
             handlers.put(GET_ORDER_COMMAND, new GetOrder());
             handlers.put(LOGOUT_COMMAND, new Logout());
+
+            //verify local injected or replace with remote
+            ServletContext ctx = getServletContext();
+            //TODO: jndi = new JNDIHelper(ctx);
+            if (buyer == null) {
+                buyer = jndi.getBuyer();
+            }        
+            if (userMgmt == null) {
+                userMgmt = jndi.getUserMgmt();
+            }        
         }
         catch (Exception ex) {
             log.fatal("error initializing handler", ex);
             throw new ServletException("error initializing handler", ex);
+        }
+        finally {
+        	if (jndi != null) { jndi.close(); }
         }
     }
 

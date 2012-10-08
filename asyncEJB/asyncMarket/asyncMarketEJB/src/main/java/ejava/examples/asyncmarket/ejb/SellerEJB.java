@@ -20,6 +20,7 @@ import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.jms.Topic;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -42,22 +43,15 @@ public class SellerEJB
     implements SellerLocal, SellerRemote {
     Log log = LogFactory.getLog(SellerEJB.class);
     
-    /* this could be specified here, but mapped name specific to JBoss
-    @Resource(mappedName="ConnectionFactory")
-    */
+    @Resource(mappedName="java:/JmsXA")
     private ConnectionFactory connFactory;
-    /* this could also be specified here, but is better specified in
-     * a deployment descriptor
-    @Resource(mappedName="topic/ejava/examples/asyncMarket/topic1")
-    */
+    @Resource(mappedName="java:/topic/ejava/examples/asyncMarket/topic1", type=Topic.class)
     private Destination sellTopic;
     
     @Resource
     private TimerService timerService;
-    
     @Resource
     private SessionContext ctx;
-    
     @PersistenceContext(unitName="asyncMarket")
     private EntityManager em;
     
