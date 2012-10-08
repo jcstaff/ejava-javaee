@@ -3,10 +3,13 @@
 
     <property file="test-classes/${ant.project.name}.properties"/>
 
+    <loadfile property="dependency-classpath" srcFile="test-classes/dependency-classpath" failonerror="false"/>
+
     <path id="demo.classpath">
         <pathelement path="test-classes"/>
         <pathelement path="classes"/>
-        <fileset dir="dependency" includes="*.jar"/>
+        <fileset dir="." includes="dependency/*.jar"/>
+        <pathelement path="${dependency-classpath}"/>
     </path>
 
     <description>

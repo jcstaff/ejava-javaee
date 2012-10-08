@@ -21,7 +21,16 @@
         <jms.host>localhost</jms.host>
         <jndi.host>${jms.host}</jndi.host>
         <hornetq.remoting.netty.host>${jms.host}</hornetq.remoting.netty.host>
+        <!-- set -Djms.spawn=false to run server in foreground. Requires 2 windows. -->
         <jms.spawn>true</jms.spawn>
+
+        <!-- Ant script designed to reference a built classpath into M2_REPO
+             or a directory of .jar files in target/dependencies. 
+             * set to build-classpath to save time/space (~25-30MB)
+             * set to copy-dependencies if generated classpath too long (~many K chars)
+             Switch between them by using -Djms.classpath=(goal)
+             -->
+        <jms.classpath>build-classpath</jms.classpath>
     </properties>
 
     <dependencies>
@@ -88,13 +97,11 @@
         <dependency>
             <groupId>org.jboss.microcontainer</groupId>
             <artifactId>jboss-kernel</artifactId>
-            <version>2.0.6.GA</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.hornetq</groupId>
             <artifactId>hornetq-bootstrap</artifactId>
-            <version>${hornetq.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -110,7 +117,6 @@
         <dependency>
             <groupId>org.jboss.naming</groupId>
             <artifactId>jnpserver</artifactId>
-            <version>5.0.3.GA</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -166,10 +172,13 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>${jms.classpath}</goal>
                         </goals>
                     </execution>
-                </executions>
+                 </executions>
+                 <configuration>
+                     <outputFile>target/test-classes/dependency-classpath</outputFile>
+                 </configuration>
             </plugin>      
 
             <!-- allocate an unused port for the JMS server -->
