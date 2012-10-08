@@ -146,7 +146,7 @@ public class Subscriber implements Runnable {
         }
     }    
 
-    public static int main(String args[]) {
+    public static void main(String args[]) {
     	boolean noExit=false;
         try {
             String connFactoryJNDI=null;
@@ -219,16 +219,14 @@ public class Subscriber implements Runnable {
             subscriber.setUsername(username);
             subscriber.setPassword(password);
             subscriber.execute();
-            return 0;
         }
         catch (Exception ex) {
             log.fatal("",ex);
             System.exit(-1);            
             if (noExit) {
-            	return -1;
+            	throw new RuntimeException("error in subscriber", ex);
             }
             System.exit(-1);
-            return -1;
         }
     }
 }

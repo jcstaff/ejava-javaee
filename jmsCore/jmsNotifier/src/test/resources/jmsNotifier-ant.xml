@@ -38,12 +38,14 @@
     </target>
 
     <target name="init">
-        <copy todir="${JBOSS_HOME}/server/${JBOSS_SERVER}/deploy"
-              file="test-classes/${ant.project.name}-jms-service.xml"/>
-        <sleep seconds="5"/>
+        <!-- replace the integration test jndi.properties with the demo
+            copy referencing the live JBoss instance -->
+        <copy tofile="test-classes/jndi.properties"
+              file="test-classes/jboss-jndi.properties"
+              overwrite="true"/>
     </target>
 
-    <target name="publisher">
+    <target name="publisher" depends="init">
         <java classname="ejava.examples.jmsnotifier.Publisher"
             fork="true">
             <classpath>
@@ -66,7 +68,7 @@
         </java>
     </target>
 
-    <target name="subscriber">
+    <target name="subscriber" depends="init">
         <java classname="ejava.examples.jmsnotifier.Subscriber"
             fork="true">
             <classpath>
@@ -113,6 +115,10 @@
             <arg value="${subscriberd.durable}"/>
             <arg value="-selector"/>
             <arg value="${subscriberd.selector}"/>
+            <arg value="-username"/>
+            <arg value="${subscriber.username}"/>
+            <arg value="-password"/>
+            <arg value="${subscriber.password}"/>
         </java>
     </target>
 
@@ -136,6 +142,10 @@
             <arg value="${subscriber1.durable}"/>
             <arg value="-selector"/>
             <arg value="${subscriber1.selector}"/>
+            <arg value="-username"/>
+            <arg value="${subscriber.username}"/>
+            <arg value="-password"/>
+            <arg value="${subscriber.password}"/>
         </java>
     </target>
 
@@ -159,6 +169,10 @@
             <arg value="${subscriber2.durable}"/>
             <arg value="-selector"/>
             <arg value="${subscriber2.selector}"/>
+            <arg value="-username"/>
+            <arg value="${subscriber.username}"/>
+            <arg value="-password"/>
+            <arg value="${subscriber.password}"/>
         </java>
     </target>
 
@@ -182,6 +196,10 @@
             <arg value="${subscriber2d.durable}"/>
             <arg value="-selector"/>
             <arg value="${subscriber2d.selector}"/>
+            <arg value="-username"/>
+            <arg value="${subscriber.username}"/>
+            <arg value="-password"/>
+            <arg value="${subscriber.password}"/>
         </java>
     </target>
 
@@ -205,6 +223,10 @@
             <arg value="${subscriber3.durable}"/>
             <arg value="-selector"/>
             <arg value="${subscriber3.selector}"/>
+            <arg value="-username"/>
+            <arg value="${subscriber.username}"/>
+            <arg value="-password"/>
+            <arg value="${subscriber.password}"/>
         </java>
     </target>
 
@@ -228,6 +250,10 @@
             <arg value="${subscriber4.durable}"/>
             <arg value="-selector"/>
             <arg value="${subscriber4.selector}"/>
+            <arg value="-username"/>
+            <arg value="${subscriber.username}"/>
+            <arg value="-password"/>
+            <arg value="${subscriber.password}"/>
         </java>
     </target>
 </project>

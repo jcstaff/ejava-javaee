@@ -162,7 +162,7 @@ public class SimpleDemoIT {
 		
 		new Thread() {
 			public void run() {
-				assertEquals("subscriber failure", 0, Subscriber.main(sub0Args));
+				Subscriber.main(sub0Args);
 			}			
 		}.start();
 		
@@ -182,7 +182,7 @@ public class SimpleDemoIT {
 	        "-password", subscriberPassword};
 		new Thread() {
 			public void run() {
-				assertEquals("subscriber 1 failure", 0, Subscriber.main(sub1Args));
+				Subscriber.main(sub1Args);
 			}			
 		}.start();
 
@@ -202,7 +202,7 @@ public class SimpleDemoIT {
 	        "-password", subscriberPassword};
 		new Thread() {
 			public void run() {
-				assertEquals("subscriber 2 failure", 0, Subscriber.main(sub2Args));
+				Subscriber.main(sub2Args);
 			}			
 		}.start();
 
@@ -222,7 +222,7 @@ public class SimpleDemoIT {
 	        "-password", subscriberPassword};
 		new Thread() {
 			public void run() {
-				assertEquals("subscriber 3 failure", 0, Subscriber.main(sub3Args));
+				Subscriber.main(sub3Args);
 			}			
 		}.start();
 
@@ -243,7 +243,6 @@ public class SimpleDemoIT {
 		new Thread() {
 			public void run() {
 				Subscriber.main(sub4Args);
-				assertEquals("subscriber 4 failure", 0, Subscriber.main(sub4Args));
 			}			
 		}.start();
 

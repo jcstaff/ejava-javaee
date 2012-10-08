@@ -115,7 +115,7 @@ public class Publisher implements Runnable {
         }
     }    
 
-    public static int main(String args[]) {
+    public static void main(String args[]) {
         boolean noExit=false;
         try {
             System.out.print("Publisher args:");
@@ -176,15 +176,13 @@ public class Publisher implements Runnable {
             publisher.setUsername(username);
             publisher.setPassword(password);
             publisher.execute();
-            return 0;
         }
         catch (Exception ex) {
             log.fatal("",ex);
             if (noExit) {
-            	return -1;
+            	throw new RuntimeException("error in publisher", ex);
             }
             System.exit(-1);
-            return -1;
         }
     }
 
