@@ -37,6 +37,8 @@ public class Worker implements Runnable {
     protected int count=0;
     protected int maxCount=0;
     protected long delay[] = {0, 0, 0, 0, 10, 10, 10, 10, 100, 100}; 
+    protected String username;
+    protected String password;
 
     public Worker(String name) {
         this.name = name;
@@ -73,8 +75,16 @@ public class Worker implements Runnable {
     }
     protected Connection createConnection(ConnectionFactory connFactory) 
         throws Exception {
-        return connFactory.createConnection();
+        return username==null ? 
+        		connFactory.createConnection() :
+        		connFactory.createConnection(username, password);
     }
+    public void setUsername(String username) {
+		this.username = username;
+	}
+    public void setPassword(String password) {
+		this.password = password;
+	}
     public void execute() throws Exception {
         Connection connection = null;
         Session session = null;
@@ -159,6 +169,7 @@ public class Worker implements Runnable {
     }    
 
     public static void main(String args[]) {
+    	boolean noExit=false;
         try {
             System.out.print("Worker args:");
             for (String s: args) {
@@ -171,6 +182,8 @@ public class Worker implements Runnable {
             String name="";
             Integer maxCount=null;
             boolean noFail=false;
+            String username=null;
+            String password=null;
             for (int i=0; i<args.length; i++) {
                 if ("-jndi.name.connFactory".equals(args[i])) {
                     connFactoryJNDI = args[++i];
@@ -189,6 +202,15 @@ public class Worker implements Runnable {
                 }
                 else if ("-noFail".equals(args[i])) {
                 	noFail=Boolean.parseBoolean(args[++i]);
+                }
+                else if ("-username".equals(args[i])) {
+                    username=args[++i];
+                }
+                else if ("-password".equals(args[i])) {
+                    password=args[++i];
+                }
+                else if ("-noExit".equals(args[i])) {
+                    noExit=true;
                 }
             }
             if (connFactoryJNDI==null) { 
@@ -210,10 +232,15 @@ public class Worker implements Runnable {
             if (maxCount!=null) {
                 worker.setMaxCount(maxCount);
             }
+            worker.setUsername(username);
+            worker.setPassword(password);
             worker.execute();
         }
         catch (Exception ex) {
             log.fatal("",ex);
+            if (noExit) {
+            	throw new RuntimeException("worker error", ex);
+            }
             System.exit(-1);            
         }
     }

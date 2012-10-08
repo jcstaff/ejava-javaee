@@ -52,12 +52,14 @@
     </target>
 
     <target name="init">
-        <copy todir="${JBOSS_HOME}/server/${JBOSS_SERVER}/deploy"
-              file="test-classes/${ant.project.name}-jms-service.xml"/>
-        <sleep seconds="5"/>
+        <!-- replace the integration test jndi.properties with the demo
+            copy referencing the live JBoss instance -->
+        <copy tofile="test-classes/jndi.properties"
+              file="test-classes/jboss-jndi.properties"
+              overwrite="true"/>
     </target>
 
-    <target name="requestor">
+    <target name="requestor" depends="init">
         <java classname="ejava.examples.jmsscheduler.Requestor"
             fork="true">
             <classpath>
@@ -75,6 +77,10 @@
             <arg value="${requestor.sleep}"/>
             <arg value="-max"/>
             <arg value="${requestor.max}"/>
+            <arg value="-username"/>
+            <arg value="${requestor.username}"/>
+            <arg value="-password"/>
+            <arg value="${requestor.password}"/>
         </java>
     </target>
 
@@ -96,10 +102,14 @@
             <arg value="${requestor1.sleep}"/>
             <arg value="-max"/>
             <arg value="${requestor1.max}"/>
+            <arg value="-username"/>
+            <arg value="${requestor.username}"/>
+            <arg value="-password"/>
+            <arg value="${requestor.password}"/>
         </java>
     </target>
 
-    <target name="worker">
+    <target name="worker" depends="init">
         <java classname="ejava.examples.jmsscheduler.Worker"
             fork="true">
             <classpath>
@@ -115,6 +125,10 @@
             <arg value="${worker.name}"/>
             <arg value="-max"/>
             <arg value="${worker.max}"/>
+            <arg value="-username"/>
+            <arg value="${worker.username}"/>
+            <arg value="-password"/>
+            <arg value="${worker.password}"/>
         </java>
     </target>
 
@@ -134,6 +148,10 @@
             <arg value="${worker1.name}"/>
             <arg value="-max"/>
             <arg value="${worker1.max}"/>
+            <arg value="-username"/>
+            <arg value="${worker.username}"/>
+            <arg value="-password"/>
+            <arg value="${worker.password}"/>
         </java>
     </target>
 
@@ -153,6 +171,10 @@
             <arg value="${worker2.name}"/>
             <arg value="-max"/>
             <arg value="${worker2.max}"/>
+            <arg value="-username"/>
+            <arg value="${worker.username}"/>
+            <arg value="-password"/>
+            <arg value="${worker.password}"/>
         </java>
     </target>
 
@@ -172,6 +194,10 @@
             <arg value="${worker3.name}"/>
             <arg value="-max"/>
             <arg value="${worker3.max}"/>
+            <arg value="-username"/>
+            <arg value="${worker.username}"/>
+            <arg value="-password"/>
+            <arg value="${worker.password}"/>
         </java>
     </target>
 
@@ -191,6 +217,10 @@
             <arg value="${worker4.name}"/>
             <arg value="-max"/>
             <arg value="${worker4.max}"/>
+            <arg value="-username"/>
+            <arg value="${worker.username}"/>
+            <arg value="-password"/>
+            <arg value="${worker.password}"/>
         </java>
     </target>
 </project>

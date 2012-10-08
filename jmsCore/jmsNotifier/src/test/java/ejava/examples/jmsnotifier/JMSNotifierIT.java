@@ -4,22 +4,19 @@ package ejava.examples.jmsnotifier;
 import java.io.InputStream;
 
 
+
 import java.util.Properties;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -28,12 +25,12 @@ import ejava.examples.jmsmechanics.JMSAdminHornetQ;
 import ejava.util.jndi.JNDIUtil;
 
 /**
- * This integration test verifies the jmsNotifier functionality as wrapped 
- * by the Ant scripts. It runs as an integration test with the JMS server
- * launched separately from this JVM.
+ * This integration test verifies the jmsNotifier functionality the gets
+ *  wrapped by the Ant scripts. It runs as an integration test with the 
+ * JMS server launched separately from mavn during the pre-integration phase.
  */
-public class SimpleDemoIT {
-	static final Log log = LogFactory.getLog(SimpleDemoIT.class);
+public class JMSNotifierIT {
+	static final Log log = LogFactory.getLog(JMSNotifierIT.class);
     protected static String adminUser = System.getProperty("admin.user", "admin1");
     protected static String adminPassword = System.getProperty("admin.password", "password");
     protected static boolean jmsEmbedded = Boolean.parseBoolean(System.getProperty("jms.embedded", "true"));
@@ -46,8 +43,8 @@ public class SimpleDemoIT {
 
 	/** Creates the topic for use in tests */
 	@BeforeClass
-	public static void init() throws Exception {
-		log.info("*** init() ***");
+	public static void setUpClass() throws Exception {
+		log.info("*** setUpClass() ***");
 
 		//read property file used by the Ant script to use same properties
 		InputStream in = Thread.currentThread()
@@ -56,6 +53,7 @@ public class SimpleDemoIT {
 		assertNotNull("could not locate properties file",in);
         props = new Properties();
         props.load(in);
+        in.close();
         connFactoryJNDI= props.getProperty("jndi.name.connFactory");
         topicName = props.getProperty("jmx.name.testTopic");
         topicJNDI = props.getProperty("jndi.name.testTopic");

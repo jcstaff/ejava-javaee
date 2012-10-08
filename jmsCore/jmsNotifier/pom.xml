@@ -34,15 +34,9 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        -->
+
         <!-- brings in JBoss RMI dependencies -->
         <dependency>
             <groupId>ejava.common</groupId>
@@ -58,7 +52,7 @@
             <scope>test</scope>
         </dependency>    
 
-        <!-- brings in JBoss HornetQ dependencies -->
+        <!-- brings in JBoss HornetQ driver -->
         <dependency>
             <groupId>org.hornetq</groupId>
             <artifactId>hornetq-jms-client</artifactId>
@@ -154,11 +148,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <multi.message.count>${jmsmechanics.multi.message.count}</multi.message.count>
                         <jms.embedded>${jms.embedded}</jms.embedded>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+
+            <!-- needed to run IT tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -190,9 +185,6 @@
                             <goal>reserve-network-port</goal>
                         </goals>
                         <configuration>
-                        <!--
-                            <outputFile>${project.build.directory}/test-classes/ports.properties</outputFile>
-                            -->
                             <portNames>
                                 <portName>hornetq.remoting.netty.port</portName>
                                 <portName>jndi.port</portName>
@@ -202,6 +194,9 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <!-- start/stop the JMS server during IT tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -246,8 +241,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                </dependencies>
             </plugin>
 
         </plugins>      

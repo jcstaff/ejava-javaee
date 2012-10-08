@@ -12,8 +12,11 @@
         </entries>
     </connection-factory>
 
-    <!-- topics used by client(s) -->
-    <topic name="jmsNotifier-topic1">
-        <entry name="/topic/ejava/examples/jmsNotifier/topic1"/>
-    </topic>
+    <!-- queues used by client(s) -->
+    <queue name="jmsScheduler-requestQueue">
+        <entry name="/queue/ejava/examples/jmsScheduler/requestQueue"/>
+    </queue>
+    <queue name="jmsScheduler-DLQ">
+        <entry name="/queue/jmsScheduler/DLQ"/>
+    </queue>
 </configuration>

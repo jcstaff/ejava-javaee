@@ -38,6 +38,8 @@ public class Requestor implements Runnable, MessageListener {
     protected Map<String, Message> requests = new HashMap<String,Message>();
     protected int responseCount=0;
     protected long startTime=0;
+    protected String username;
+    protected String password;
         
     public Requestor(String name) {
         this.name = name;
@@ -71,11 +73,19 @@ public class Requestor implements Runnable, MessageListener {
     }
     protected Connection createConnection(ConnectionFactory connFactory) 
         throws Exception {
-        return connFactory.createConnection();
+        return username==null ? 
+        		connFactory.createConnection() :
+        		connFactory.createConnection(username, password);
     }
     protected Destination getReplyTo(Session session) throws Exception {
         return session.createTemporaryQueue();
     }
+    public void setUsername(String username) {
+		this.username = username;
+	}
+    public void setPassword(String password) {
+		this.password = password;
+	}
     public void execute() throws Exception {
         Connection connection = null;
         Session session = null;
@@ -169,6 +179,7 @@ public class Requestor implements Runnable, MessageListener {
     }
 
     public static void main(String args[]) {
+        boolean noExit=false;
         try {
             System.out.print("Requestor args:");
             for (String s: args) {
@@ -180,6 +191,8 @@ public class Requestor implements Runnable, MessageListener {
             String name="";
             Long sleepTime=null;
             Integer maxCount=null;
+            String username=null;
+            String password=null;
              for (int i=0; i<args.length; i++) {
                 if ("-jndi.name.connFactory".equals(args[i])) {
                     connFactoryJNDI = args[++i];
@@ -195,6 +208,15 @@ public class Requestor implements Runnable, MessageListener {
                 }
                 else if ("-max".equals(args[i])) {
                     maxCount=new Integer(args[++i]);
+                }
+                else if ("-username".equals(args[i])) {
+                    username=args[++i];
+                }
+                else if ("-password".equals(args[i])) {
+                    password=args[++i];
+                }
+                else if ("-noExit".equals(args[i])) {
+                    noExit=true;
                 }
             }
             if (connFactoryJNDI==null) { 
@@ -214,10 +236,15 @@ public class Requestor implements Runnable, MessageListener {
             if (sleepTime!=null) {
                 requestor.setSleepTime(sleepTime);
             }
+            requestor.setUsername(username);
+            requestor.setPassword(password);
             requestor.execute();
         }
         catch (Exception ex) {
             log.fatal("",ex);
+            if (noExit) {
+            	throw new RuntimeException("requestor error", ex);
+            }
             System.exit(-1);            
         }
     }

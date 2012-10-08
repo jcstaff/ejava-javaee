@@ -37,13 +37,22 @@
             <permission type="createNonDurableQueue" roles="admin"/>
             <permission type="deleteNonDurableQueue" roles="admin"/>
         </security-setting>
-
-        <security-setting match="jms.topic.jmsNotifier-topic1">
-            <permission type="consume" roles="subscriber"/>
-            <permission type="send" roles="publisher"/>
-            <permission type="createNonDurableQueue" roles="subscriber"/>
-        </security-setting>
         
+       <security-setting match="jms.queue.jmsScheduler-requestQueue">
+           <permission type="consume" roles="worker"/>
+           <permission type="send" roles="requestor"/>
+           <permission type="createNonDurableQueue" roles="requestor"/>
+       </security-setting>    
+       <security-setting match="jms.queue.jmsScheduler-DLQ">
+           <permission type="consume" roles="admin"/>
+           <permission type="send" roles="worker"/>
+       </security-setting>    
+       <security-setting match="jms.tempqueue.#">
+           <permission type="consume" roles="requestor"/>
+           <permission type="send" roles="worker"/>
+           <permission type="createNonDurableQueue" roles="requestor"/>
+       </security-setting> 
+
        <security-setting match="jms.queue.hornetq.management">
           <permission type="manage" roles="admin" />
        </security-setting>    
