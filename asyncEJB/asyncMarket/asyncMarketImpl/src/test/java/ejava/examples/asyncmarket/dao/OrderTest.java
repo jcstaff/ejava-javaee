@@ -1,21 +1,25 @@
 package ejava.examples.asyncmarket.dao;
 
+import static org.junit.Assert.*;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-import ejava.examples.asyncmarket.DemoBase;
+import ejava.examples.asyncmarket.MarketTestBase;
 import ejava.examples.asyncmarket.bo.AuctionItem;
 import ejava.examples.asyncmarket.bo.Bid;
 import ejava.examples.asyncmarket.bo.Order;
 import ejava.examples.asyncmarket.bo.Person;
 
-public class OrderDemo extends DemoBase {
-    Log log = LogFactory.getLog(OrderDemo.class);
+public class OrderTest extends MarketTestBase {
+    Log log = LogFactory.getLog(OrderTest.class);
 
+    @Test
     public void testOrder() throws Exception {
         log.info("*** testOrder ***");
 

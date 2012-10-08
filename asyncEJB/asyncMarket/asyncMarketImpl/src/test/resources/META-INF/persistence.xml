@@ -3,8 +3,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
 
-    <persistence-unit name="asyncMarket">
+    <persistence-unit name="asyncMarket-test">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>ejava.examples.asyncmarket.bo.Bid</class>
+        <class>ejava.examples.asyncmarket.bo.Person</class>
+        <class>ejava.examples.asyncmarket.bo.Order</class>
+        <class>ejava.examples.asyncmarket.bo.AuctionItem</class>
         <properties>
             <!-- moved hibernate-specific properties to hibernate.properties file
             <property name="hibernate.dialect" 

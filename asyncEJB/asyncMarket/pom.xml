@@ -23,21 +23,6 @@
         <module>asyncMarketEJB</module>
         <module>asyncMarketWAR</module>
         <module>asyncMarketEAR</module>
+        <module>asyncMarketTest</module>
     </modules>
-
-    <profiles>
-        <!-- separates testing that requires integration of several components
-            and deployment to the server -->
-        <profile>
-            <id>functional-tests</id>
-            <activation>
-                <property>
-                    <name>!maven.test.skip</name>
-                </property>
-            </activation>
-            <modules>
-                <module>asyncMarketTest</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

@@ -16,25 +16,32 @@
     </description>
 
     <dependencies>
+        <!-- src/main, test, runtime, and dependency classpaths -->
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <!-- src/main, test, and runtime classpaths -->
         <dependency>
             <groupId>javax.transaction</groupId>
             <artifactId>jta</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- src/test and runtime classpaths -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- only the runtime classpath -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>    
     </dependencies>
 
@@ -47,177 +54,50 @@
                 <filtering>true</filtering>
             </testResource>
         </testResources>
-
-        <plugins>
-              <!-- pass in driver information to JUnit -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                </configuration>
-            </plugin>            
-        </plugins>    
     </build>
 
     <profiles>
-        <profile> <!-- defines our default database -->
-            <id>hsql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
-                </property>
-            </activation>
-            <properties>
-                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
-                  <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
-                  <hibernate.dialect>
-                      org.hibernate.dialect.HSQLDialect
-                  </hibernate.dialect>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <scope>test</scope>
-                </dependency>       
-            </dependencies>
-        </profile>
-        <profile> <!-- defines our default database -->
-            <id>mysql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>mysql</value>
-                </property>
-            </activation>
-            <properties>
-                  <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                  <jdbc.url>jdbc:mysql://${db.host}:3306/test</jdbc.url>
-                  <jdbc.user>jboss</jdbc.user>
-                  <jdbc.password>password</jdbc.password>
-                  <hibernate.dialect>
-                      org.hibernate.dialect.MySQLDialect
-                  </hibernate.dialect>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
-                    <scope>test</scope>
-                </dependency>       
-            </dependencies>
-        </profile>
-
-        <profile> <!-- defines our default persistence provider -->
+        <profile> <!-- defines our API and default persistence provider -->
             <id>hibernate</id>
             <activation>
-                <property> <!-- use this property to name alt persistence provider -->
+                <property>
                     <name>!jpa</name>
                 </property>
             </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-
-            <build>
-                <plugins>
-                    <!-- generates a DDL file for persistence unit -->
-                    <plugin>
-                        <artifactId>hibernate3-maven-plugin</artifactId>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <extensions>true</extensions>
-                        <executions>
-                            <execution>
-                                <id>generate-drop-ddl</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>hbm2ddl</goal>
-                                </goals>
-                                <configuration>
-                                    <componentProperties>
-                                        <outputfilename>
-                                            ${project.artifactId}-drop.ddl
-                                        </outputfilename>
-                                        <drop>true</drop>
-                                        <create>false</create>
-                                    </componentProperties>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>generate-create-ddl</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>hbm2ddl</goal>
-                                </goals>
-                                <configuration>
-                                    <componentProperties>
-                                        <outputfilename>
-                                            ${project.artifactId}-create.ddl
-                                        </outputfilename>
-                                        <drop>false</drop>
-                                        <create>true</create>
-                                    </componentProperties>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <components>
-                                <component>
-                                    <name>hbm2ddl</name>
-                                    <implementation>
-                                        jpaconfiguration
-                                    </implementation>
-                                    <outputDirectory>
-                                        target/classes/ddl
-                                    </outputDirectory>
-                                </component>
-                            </components>
-                            <componentProperties>
-                                <persistenceunit>
-                                    asyncMarket
-                                </persistenceunit>
-                                <export>false</export>
-                                <format>true</format>
-                            </componentProperties>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jboss6</id>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate.javax.persistence</groupId>
                     <artifactId>hibernate-jpa-2.0-api</artifactId>
                     <scope>provided</scope>
                 </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <configuration>
+                            <hibernatetool destdir="target/classes/ddl">
+                                <classpath>
+                                    <path location="${project.build.directory}/test-classes"/>
+                                </classpath>
+                                <jpaconfiguration persistenceunit="asyncMarket-test"
+                                     propertyfile="${basedir}/target/test-classes/hibernate.properties"/>
+                            </hibernatetool>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

@@ -1,5 +1,7 @@
 package ejava.examples.asyncmarket.dao;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -7,15 +9,17 @@ import java.util.GregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-import ejava.examples.asyncmarket.DemoBase;
+import ejava.examples.asyncmarket.MarketTestBase;
 import ejava.examples.asyncmarket.bo.AuctionItem;
 import ejava.examples.asyncmarket.bo.Bid;
 import ejava.examples.asyncmarket.bo.Person;
 
-public class AuctionItemDemo extends DemoBase {
-    Log log = LogFactory.getLog(AuctionItemDemo.class);
+public class AuctionItemTest extends MarketTestBase {
+    Log log = LogFactory.getLog(AuctionItemTest.class);
     
+    @Test
     public void testAuction() {
         log.info("*** testAuction ***");
         

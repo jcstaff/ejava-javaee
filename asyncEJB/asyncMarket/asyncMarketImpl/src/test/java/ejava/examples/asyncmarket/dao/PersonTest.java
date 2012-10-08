@@ -1,16 +1,20 @@
 package ejava.examples.asyncmarket.dao;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-import ejava.examples.asyncmarket.DemoBase;
+import ejava.examples.asyncmarket.MarketTestBase;
 import ejava.examples.asyncmarket.bo.Person;
 
-public class PersonDemo extends DemoBase {
-    Log log = LogFactory.getLog(PersonDemo.class);
+public class PersonTest extends MarketTestBase {
+    Log log = LogFactory.getLog(PersonTest.class);
     
+    @Test
     public void testPerson() {
         log.info("*** testCreatePerson ***");
         
@@ -24,6 +28,7 @@ public class PersonDemo extends DemoBase {
         assertTrue("personId not assigned", person.getId() > 0);
     }
     
+    @Test
     public void testGetPerson() {
         log.info("*** testGetPerson ***");
                 
@@ -44,6 +49,7 @@ public class PersonDemo extends DemoBase {
         assertNotNull("person not found", person3);        
     }
 
+    @Test
     public void testGetPeople() {
         log.info("*** testGetPeople ***");
         
@@ -57,6 +63,5 @@ public class PersonDemo extends DemoBase {
         List<Person> people = personDAO.getPeople(0, 100);
         assertEquals("unexpected number of people found:" + people.size(),
                 10, people.size());
-    }
-    
+    }    
 }
