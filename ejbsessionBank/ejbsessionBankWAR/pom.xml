@@ -16,19 +16,6 @@
     </description>
 
     <dependencies>
-    <!--
-        <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>jsr250-api</artifactId>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>        
-        -->
-
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -51,10 +38,24 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>        
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>ejava-util</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <finalName>ejbsessionBankWAR</finalName>
+
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
     </build>
 
     <profiles>
@@ -73,6 +74,7 @@
                         <artifactId>maven-jetty-plugin</artifactId>
                         <configuration>
                             <scanIntervalSeconds>10</scanIntervalSeconds>
+                            <useTestClasspath>true</useTestClasspath>
                             <connectors>
                                 <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
                                     <port>9090</port>
@@ -85,15 +87,26 @@
             </build>
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss.jbossas</groupId>
-                    <artifactId>jboss-as-client</artifactId>
-                    <type>pom</type>
-                </dependency>
-                <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>ejbsessionBankEJB</artifactId>
                     <version>${project.version}</version>
                 </dependency>        
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>ejbsessionBankImpl</artifactId>
+                    <version>${project.version}</version>
+                </dependency>        
+                <dependency>
+                    <groupId>ejava.common</groupId>
+                    <artifactId>ejava-util</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>ejava.common</groupId>
+                    <artifactId>jboss-rmi-client</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type>
+                </dependency>    
                 <dependency>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>

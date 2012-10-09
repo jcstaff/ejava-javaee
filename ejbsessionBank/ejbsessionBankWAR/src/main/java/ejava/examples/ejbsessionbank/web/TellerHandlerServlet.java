@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
@@ -24,6 +25,8 @@ import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Ledger;
 import ejava.examples.ejbsessionbank.ejb.TellerLocal;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
+import ejava.util.ejb.EJBClient;
+import ejava.util.jndi.JNDIUtil;
 
 @SuppressWarnings("serial")
 public class TellerHandlerServlet extends HttpServlet {
@@ -41,6 +44,9 @@ public class TellerHandlerServlet extends HttpServlet {
     public static final String CREATE_ACCOUNTS_COMMAND = "Create Accounts";
     public static final String GET_LEDGER_COMMAND = "Get Ledger";
     public static final String STEAL_ALL_ACCOUNTS_COMMAND = "Steal All Accounts";
+    public static final String jndiName = EJBClient.getRemoteLookupName(
+    	"ejbsessionBankEAR", "ejbsessionBankEJB",  
+    	"TellerEJB", TellerRemote.class.getName());
     
     private static final String UNKNOWN_COMMAND_URL = 
         "/WEB-INF/content/UnknownCommand.jsp";
@@ -153,33 +159,15 @@ public class TellerHandlerServlet extends HttpServlet {
      * development environment may need to establish a remote connection.
      * @throws NamingException
      */
-    protected void initTeller() throws NamingException {
-        ServletConfig config = getServletConfig();
-        try {
-            new JNDIHelper().dump(new InitialContext(), "java:/comp/env");
-        } catch (Exception ex) {}
-        if (tellerRemote != null && teller == null) {
-        	log.info("using injected remote interface");
-        	teller = tellerRemote;
-        }
-        else if (teller == null) { //get the interface manually
+    protected void initTeller() throws Exception {
+    	//if teller not injected -- need to lookup remote manually
+        if (teller == null) {         	
             log.info("teller was null, getting teller manually");
-            Properties jndiProperties = new Properties();
-            for(@SuppressWarnings("rawtypes")
-			Enumeration e=config.getInitParameterNames();
-                e.hasMoreElements(); ) {
-                String key = (String)e.nextElement();
-                String value=(String)config.getInitParameter(key);
-                if (key.startsWith("java.naming")) {
-                    jndiProperties.put(key, value);
-                }                    
-            }
-            log.debug("jndiProperties=" + jndiProperties);
-            InitialContext jndi = new InitialContext(jndiProperties);
-            log.debug("jndi context environment=" + jndi.getEnvironment());
-            String jndiName = config.getInitParameter("teller.jndi.name");
+        	Properties env=JNDIUtil.getJNDIProperties("jboss.remoting.");
+            InitialContext jndi = new InitialContext(env);
             log.debug("teller jndi name:" + jndiName);
             teller = (Teller)jndi.lookup(jndiName);
+            log.debug("teller=" + teller);
         }
     }
     
