@@ -22,19 +22,33 @@
             <artifactId>ejbsessionBankEJB</artifactId>
             <version>${project.version}</version>
             <type>ejb</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
+<!--
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ejbsessionBankWAR</artifactId>
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
+        -->
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ejbsessionBankImpl</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -51,11 +65,13 @@
                     <!-- eliminates use of version in EAR JNDI name portion -->
                     <applicationName>${project.artifactId}</applicationName>
                     <modules>
+                    <!--
                         <webModule>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>ejbsessionBankWAR</artifactId>
                             <contextRoot>ejbsessionBank</contextRoot>
                         </webModule>
+                        -->
                         <!-- eliminates use of the version in the EJB JNDI name -->
                         <ejbModule>
                             <groupId>${project.groupId}</groupId>
