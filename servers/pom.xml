@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava</groupId>
+        <artifactId>ejava-root</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-    <groupId>ejava.javaee.servers</groupId>
+    <groupId>ejava.servers</groupId>
     <artifactId>servers</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.2011.2-SNAPSHOT</version>
 
     <name>Servers Root</name>
     <description>
@@ -13,7 +18,6 @@
     </description>
 
     <modules>
-        <module>ejava-jboss5</module>
-        <module>ejava-jboss6</module>
+        <module>ejava-jboss711</module>
     </modules>
 </project>
