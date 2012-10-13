@@ -1,13 +1,12 @@
 package ejava.examples.ejbsessionbank.web;
 
 import java.io.IOException;
-import java.util.Enumeration;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
@@ -67,7 +66,7 @@ public class TellerHandlerServlet extends HttpServlet {
      * server and remote interface. Unfortunately, the Jetty container
      * does not support this feature.
      */
-    @javax.ejb.EJB(name="ejb/tellerRemote")
+    @javax.ejb.EJB
     private TellerRemote tellerRemote;
 
     /**
