@@ -23,6 +23,12 @@
       <scope>compile</scope>
     </dependency>
 
+    <dependency>
+        <groupId>org.hibernate.javax.persistence</groupId>
+        <artifactId>hibernate-jpa-2.0-api</artifactId>
+        <scope>provided</scope>
+    </dependency>
+
     <!-- core project testing dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -36,26 +42,4 @@
     </dependency>    
   </dependencies>
 
-    <profiles>
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate.javax.persistence</groupId>
-                    <artifactId>hibernate-jpa-2.0-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

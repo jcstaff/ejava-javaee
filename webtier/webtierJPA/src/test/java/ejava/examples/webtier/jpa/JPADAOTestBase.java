@@ -2,11 +2,14 @@ package ejava.examples.webtier.jpa;
 
 import java.util.List;
 
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
 
 import ejava.examples.webtier.jpa.JPADAOTypeFactory;
 import ejava.examples.webtier.jpa.JPAUtil;
@@ -14,14 +17,13 @@ import ejava.examples.webtier.bo.Student;
 import ejava.examples.webtier.dao.DAOFactory;
 import ejava.examples.webtier.dao.StudentDAO;
 
-import junit.framework.TestCase;
-
-public abstract class DemoBase extends TestCase {
+public class JPADAOTestBase {
     protected Log log = LogFactory.getLog(getClass());
     private static final String PERSISTENCE_UNIT = "webtier";
     protected StudentDAO dao = null;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         new JPADAOTypeFactory();
         dao = DAOFactory.getDAOTypeFactory(JPADAOTypeFactory.NAME).getStudentDAO();
         EntityManager em = JPAUtil.getEntityManager(PERSISTENCE_UNIT);
@@ -29,7 +31,8 @@ public abstract class DemoBase extends TestCase {
         em.getTransaction().begin();
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         EntityTransaction tx = JPAUtil.getEntityManager().getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }

@@ -1,10 +1,13 @@
 package ejava.examples.webtier.dao;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.webtier.dao.DAOFactory;
 import ejava.examples.webtier.dao.DAOTypeFactory;
@@ -13,9 +16,10 @@ import ejava.examples.webtier.dao.StudentDAOException;
 import ejava.examples.webtier.bo.Student;
 import junit.framework.TestCase;
 
-public class DAOFactoryTest extends TestCase {
+public class DAOFactoryTest  {
     Log log = LogFactory.getLog(DAOFactoryTest.class);
 
+    @Test
     public void testDAOFactory() throws Exception {
         log.info("*** testDAOFactory ***");
         TestDAOFactory.class.newInstance();

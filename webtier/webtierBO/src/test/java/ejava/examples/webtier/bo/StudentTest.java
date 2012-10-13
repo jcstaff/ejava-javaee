@@ -1,5 +1,8 @@
 package ejava.examples.webtier.bo;
 
+import static org.junit.Assert.*;
+
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -7,15 +10,15 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.webtier.bo.Grade;
 import ejava.examples.webtier.bo.Student;
 
-import junit.framework.TestCase;
-
-public class StudentTest extends TestCase {
+public class StudentTest {
     Log log = LogFactory.getLog(StudentTest.class);
 
+    @Test
     public void testGrade() {
         log.info("*** testGrade ***");
         
@@ -53,6 +56,7 @@ public class StudentTest extends TestCase {
                 gradeVal, grade.getGrade());
     }
     
+    @Test
     public void testStudent() {
         log.info("*** testStudent ***");
         

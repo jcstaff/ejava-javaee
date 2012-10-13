@@ -48,6 +48,12 @@
             <artifactId>webtierJPA</artifactId>
             <version>${project.version}</version>          
             <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>ejava-util</artifactId>
+            <version>${project.version}</version>
         </dependency>        
     </dependencies>
     
@@ -126,15 +132,10 @@
                     <scope>compile</scope>
                 </dependency>    
                 <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
                     <scope>compile</scope>
-                </dependency>       
-                <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
-                    <scope>compile</scope>
-                </dependency>       
+                </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>

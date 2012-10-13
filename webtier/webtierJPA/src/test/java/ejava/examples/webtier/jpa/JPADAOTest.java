@@ -1,5 +1,7 @@
 package ejava.examples.webtier.jpa;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -7,10 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
 import ejava.examples.webtier.bo.Grade;
 import ejava.examples.webtier.bo.Student;
 
-public class JPADAODemo extends DemoBase {
+public class JPADAOTest extends JPADAOTestBase {
+	@Test
     public void testDAOCreate() {
         log.info("*** testDAOCreate ***");
         
@@ -20,6 +25,7 @@ public class JPADAODemo extends DemoBase {
         dao.create(student);        
     }
     
+	@Test
     public void testDAOGet() {
         log.info("*** testDAOGet ***");
         Student student = new Student();
@@ -31,6 +37,7 @@ public class JPADAODemo extends DemoBase {
         assertNotNull("failed to get student",student2);        
     }
 
+	@Test
     public void testDAOFind() {
         log.info("*** testDAOGet ***");
         dao.create(new Student(0,"cat", "inhat", new ArrayList<Grade>()));
@@ -67,6 +74,7 @@ public class JPADAODemo extends DemoBase {
 
     }
     
+	@Test	
     public void testUpdate() {
         log.info("*** testUpdate ***");
 
@@ -88,6 +96,7 @@ public class JPADAODemo extends DemoBase {
                 0, student3.getGrades().size());        
     }
     
+	@Test
     public void testDAORemove() {
         log.info("*** testDAORemove ***");
 
@@ -110,7 +119,8 @@ public class JPADAODemo extends DemoBase {
         }
     }
     
-    public void testDAONamedQuery() {
+	@Test
+	public void testDAONamedQuery() {
         log.info("*** testDAONamedQuery ***");
 
         dao.create(new Student(0,"cat", "inhat", new ArrayList<Grade>())); 
@@ -127,6 +137,7 @@ public class JPADAODemo extends DemoBase {
                 2, students.size());        
     }
     
+	@Test
     public void testDAONamedQuery2() {
         log.info("*** testDAONamedQuery2 ***");
 
@@ -145,6 +156,7 @@ public class JPADAODemo extends DemoBase {
     }
 
     
+	@Test
     public void testNewSudents() {
         log.info("*** testNewStudents ***");
         Calendar cal = new GregorianCalendar();
@@ -183,6 +195,7 @@ public class JPADAODemo extends DemoBase {
     }
 
 
+	@Test
     public void testGraduating() {
         log.info("*** testGraduating ***");
         Calendar cal = new GregorianCalendar();

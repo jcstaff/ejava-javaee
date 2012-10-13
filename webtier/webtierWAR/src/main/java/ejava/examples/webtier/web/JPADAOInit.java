@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.webtier.dao.DAOFactory;
 import ejava.examples.webtier.dao.DAOTypeFactory;
+import ejava.util.jndi.JNDIUtil;
 
 @SuppressWarnings("serial")
 public class JPADAOInit extends HttpServlet {
@@ -43,10 +44,8 @@ public class JPADAOInit extends HttpServlet {
         StringBuilder text = new StringBuilder();
         try {
             InitialContext jndi = new InitialContext();
-            new JNDIHelper().dump(jndi,"");
-            new JNDIHelper().dump(jndi,"java:comp/env");
-            //Object object = jndi.lookup("persistence");
-            //text.append("jndi.lookup(persistence)=" + object);
+            log.debug(new JNDIUtil().dump(jndi,""));
+            log.debug(new JNDIUtil().dump(jndi,"java:comp/env"));
         }
         catch (Exception ex) {
             text.append(ex.toString());            
