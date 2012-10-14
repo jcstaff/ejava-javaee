@@ -63,9 +63,10 @@ public class HotelReservationSessionIT extends HotelRemoteTestBase {
         Map<String, HotelReservationSession> reservationSessions =
         		new HashMap<String, HotelReservationSession>();
         //have the first lookup be willing to wait for application to fully deploy
-        HotelReservationSession registrar =  	
+        //lets just store one of each type and not the default
+        //HotelReservationSession registrar =  	
     		JNDIUtil.lookup(jndi, HotelReservationSession.class, sessionJNDI, 15);
-       	reservationSessions.put("registrar", registrar);
+       	//reservationSessions.put("registrar", registrar);
        	reservationSessions.put("required", (HotelReservationSession)jndi.lookup(requiredJNDI));
        	reservationSessions.put("requiresNew", (HotelReservationSession)jndi.lookup(requiresNewJNDI));
        	return reservationSessions;
