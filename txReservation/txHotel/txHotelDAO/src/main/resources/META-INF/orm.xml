@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
 
     <entity class="ejava.examples.txhotel.bo.Reservation" 
-            access="PROPERTY"
+            access="FIELD"
             metadata-complete="true"
             name="Reservation">
         <table name="TXHOTEL_RESERVATION"/>
@@ -52,7 +52,7 @@
     
     <entity class="ejava.examples.txhotel.bo.Person"
             metadata-complete="true"
-            access="PROPERTY"
+            access="FIELD"
             name="Person">
         <table name="TXHOTEL_PERSON"/>
         <named-query name="getPersonByName">
