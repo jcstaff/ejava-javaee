@@ -291,4 +291,32 @@ public class TellerAccountITBase extends TellerRemoteITBase {
             fail("error getting ledger2:" + ex);
         }
     }
+    
+    @Test
+    public void testStats() throws BankException {
+    	log.info("*** testStats ***");
+    	stats.reset();
+    	assertEquals("unexpected delta", 0, stats.getDelta());
+    	assertEquals("unexpected total", 0, stats.getTotal());
+    	
+    	//create some accounts
+    	int createCount=10;
+    	for (int i=0; i<createCount; i++) {
+    		teller.createAccount(""+i);
+    	}
+    	
+    	log.debug(String.format("delta=%d, total=%d", stats.getDelta(), stats.getTotal()));
+    	assertEquals("unexpected delta", createCount, stats.getDelta());
+    	assertEquals("unexpected total", createCount, stats.getTotal());
+
+    	//close some accounts
+    	int closeCount=5;
+    	for (int i=0; i<closeCount; i++) {
+    		teller.closeAccount(""+i);
+    	}
+    	
+    	log.debug(String.format("delta=%d, total=%d", stats.getDelta(), stats.getTotal()));
+    	assertEquals("unexpected delta", createCount-closeCount, stats.getDelta());
+    	assertEquals("unexpected total", createCount+closeCount, stats.getTotal());
+    }
 }

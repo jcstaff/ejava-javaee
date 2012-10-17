@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
@@ -51,6 +52,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     
     @Resource(name="daoClass")
     protected String daoClassName;
+    
+    @EJB
+    private StatsLocal stats;
 
     /** The peristence context will be defined as a property to allow a 
      * derived class to override this value and assist in unit testing.
@@ -106,7 +110,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public Account createAccount(String accountNumber) throws BankException {
         debug();
         try {
-            return teller.createAccount(accountNumber);
+        	Account account = teller.createAccount(accountNumber);
+        	stats.open();
+            return account;
         }
         catch (DAOException ex) {
             ctx.setRollbackOnly();
@@ -118,7 +124,9 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     public Account closeAccount(String acctNum) throws BankException {
         debug();
         try {
-            return teller.closeAccount(acctNum);
+            Account account = teller.closeAccount(acctNum);
+            stats.close();
+            return account;
         }
         catch (DAOException ex) {
             ctx.setRollbackOnly();

@@ -18,6 +18,7 @@ import org.junit.BeforeClass;
 import ejava.examples.ejbsessionbank.bl.BankException;
 import ejava.examples.ejbsessionbank.bo.Account;
 import ejava.examples.ejbsessionbank.bo.Owner;
+import ejava.examples.ejbsessionbank.ejb.StatsRemote;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 import ejava.util.jndi.JNDIUtil;
 
@@ -33,9 +34,12 @@ public class TellerRemoteITBase {
     
     //naming technique-specific JNDI name for teller initialized by derived class
     protected String jndiName;
+    protected String statsJNDI;
     
     //remote interface to teller, setup in derived class' setUp() method
     protected TellerRemote teller;
+    
+    protected StatsRemote stats;
     
     //context used to locate remote teller
     private Context jndi;
@@ -78,6 +82,11 @@ public class TellerRemoteITBase {
         log.debug("looking up teller remote:" + jndiName);
         teller = (TellerRemote)jndi.lookup(jndiName);
         log.debug("teller=" + teller);
+        
+        //lookup the remote for the stats
+        log.debug("looking up stats remote:" + statsJNDI);
+        stats = (StatsRemote)jndi.lookup(statsJNDI);
+        log.debug("status=" + stats);
         
         //sanity check who the teller thinks they are talking to
         String user=teller.whoAmI();

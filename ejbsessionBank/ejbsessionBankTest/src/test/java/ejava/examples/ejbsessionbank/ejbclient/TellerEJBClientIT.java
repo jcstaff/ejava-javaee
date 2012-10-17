@@ -1,5 +1,6 @@
 package ejava.examples.ejbsessionbank.ejbclient;
 
+import ejava.examples.ejbsessionbank.ejb.StatsRemote;
 import ejava.examples.ejbsessionbank.ejb.TellerRemote;
 import ejava.util.ejb.EJBClient;
 import ejava.util.jndi.JNDIUtil;
@@ -45,7 +46,10 @@ ejb:(ear)/(module)/(distinctName)/(ejbClass)!(remoteInterface)?stateful
      */
     public static final String jndiName = System.getProperty("jndi.name.ejbclient",
     	EJBClient.getEJBClientLookupName("ejbsessionBankEAR", "ejbsessionBankEJB", 
-    			"","TellerEJB", TellerRemote.class.getName(), false));
+			"","TellerEJB", TellerRemote.class.getName(), false));
+    public static final String statsJNDI = System.getProperty("stats.jndi.ejbclient",
+    	EJBClient.getEJBClientLookupName("ejbsessionBankEAR", "ejbsessionBankEJB", 
+			"","StatsEJB", StatsRemote.class.getName(), false));
     
     /**
      * Initializes the parent class' teller remote reference using 
@@ -55,6 +59,7 @@ ejb:(ear)/(module)/(distinctName)/(ejbClass)!(remoteInterface)?stateful
     public void setUp() throws Exception {
         super.jndiProperties = JNDIUtil.getJNDIProperties("jboss.ejbclient.");
         super.jndiName = TellerEJBClientIT.jndiName;
+        super.statsJNDI = TellerEJBClientIT.statsJNDI;
         super.setUp();
     }
 }

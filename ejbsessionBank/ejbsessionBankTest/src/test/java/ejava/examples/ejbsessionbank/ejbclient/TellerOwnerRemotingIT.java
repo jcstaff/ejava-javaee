@@ -15,6 +15,7 @@ public class TellerOwnerRemotingIT extends TellerOwnerITBase {
     public void setUp() throws Exception {
     	super.jndiProperties = JNDIUtil.getJNDIProperties("jboss.remoting.");
     	super.jndiName = TellerRemotingIT.jndiName;
+    	super.statsJNDI = TellerRemotingIT.statsJNDI;
         super.setUp();
     }
 }

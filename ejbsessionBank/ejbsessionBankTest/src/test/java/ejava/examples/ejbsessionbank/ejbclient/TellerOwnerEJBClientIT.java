@@ -15,6 +15,7 @@ public class TellerOwnerEJBClientIT extends TellerOwnerITBase {
     public void setUp() throws Exception {
         super.jndiProperties = JNDIUtil.getJNDIProperties("jboss.ejbclient.");
         super.jndiName = TellerEJBClientIT.jndiName;
+        super.statsJNDI = TellerEJBClientIT.statsJNDI;
         super.setUp();
     }
 }
