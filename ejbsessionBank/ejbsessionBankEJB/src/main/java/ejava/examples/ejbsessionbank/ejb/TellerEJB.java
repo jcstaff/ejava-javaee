@@ -42,13 +42,16 @@ import ejava.examples.ejbsessionbank.jpa.JPAOwnerDAO;
  */
 @Stateless
 public class TellerEJB implements TellerLocal, TellerRemote {
-    Log log = LogFactory.getLog(TellerEJB.class);
+    private static final Log log = LogFactory.getLog(TellerEJB.class);
 
-    protected EntityManager em;
-    protected Teller teller;
-    
     @Resource
     protected SessionContext ctx;
+    
+    /** The peristence context will be defined as a property to allow a 
+     * derived class to override this value and assist in unit testing.
+     */    
+    @PersistenceContext(unitName="ejbsessionbank")
+    protected EntityManager em;
     
     @Resource(name="daoClass")
     protected String daoClassName;
@@ -56,14 +59,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
     @EJB
     private StatsLocal stats;
 
-    /** The peristence context will be defined as a property to allow a 
-     * derived class to override this value and assist in unit testing.
-     */    
-    @PersistenceContext(unitName="ejbsessionbank")
-    public void setEm(EntityManager em) {
-        log.debug("container setting entity manager:" + em);
-        this.em = em;
-    }
+    protected Teller teller;
     
     /**
      * This method performs one-time initialization for the session bean.
