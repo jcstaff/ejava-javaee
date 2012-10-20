@@ -1,0 +1,2135 @@
+Java EE Exercise 
+
+Part A: Basic JavaEE Multi-Project Structure
+
+* Objectives
+
+    * Create and deploy an EAR with a bare bones EJB.
+
+        * {{{Create_the_root_Maven_project}
+            Create the root Maven project
+            }}
+
+        * {{{Create_the_EJB_Maven_project}
+            Create the EJB Maven project
+            }}
+
+        * {{{Create_the_EAR_Maven_project}
+            Create the EAR Maven project
+            }}
+
+    * Create and run an RMI Test that will locate the JNDI tree,
+    lookup the EJBs remote interface, and invoke a simple method.
+
+        * {{{Create_the_RMI_Test_Maven_project}
+            Create the RMI Test Maven project
+            }}
+
+        * {{{Start_JBoss_Application_Server}
+            Start JBoss Application Server
+            }}
+
+        * {{{Deploy_the_Application}
+            Deploy the Application
+            }}
+
+        * {{{Setup_JNDI_access_to_Remote_interface}
+            Setup JNDI access to @Remote interface
+            }}
+
+        * {{{Invoke_EJB_method_through_Remote_interface}
+            Invoke EJB method through @Remote interface
+            }}
+
+        * {{{Add_a_few_finishing_touches}
+            Add a few finishing touches
+            }}
+
+
+* {Create the root Maven project}
+
+    Each component of the Java EE application will be developed as 
+    as a separate Maven module. Each module will be placed in a 
+    flat structure under a common parent project. This parent project
+    will be used to coordinate goals involved of the entire application.
+    The order in which it builds things can be influenced by the 
+    configuration you supply, however, maven will analyze dependencies
+    at build time and either honor the actual dependency ordering or fail
+    if you have expressed a circular dependency.
+
+    [[1]] Create a root directory for the exercise. This will host
+    the root project and sub-projects for the Impl, EJB, WAR, EAR,
+    and RMI Test modules.
+
+---
+$pwd
+/cygdrive/c/proj
+$ mkdir javaeeEx
+---
+
+    [[1]] Create a root project pom.xml file. This project will 
+    will not have an associated artifact and is termed a "reactor"
+    project. It uses a special packaging type called "pom".
+
+    [Note:] It is very important that you realize that the packaging
+    type is "pom" in this case. If you leave out this specification,
+    Maven will default to packaging=jar type and attempt to build a
+    Java-based artifact and ignore its responsibility in this 
+    project to be the root project to delegate to the child 
+    projects that build artifacts.
+
+    []
+
+    [[1]] This project will also be used as a parent project
+    of all implementation modules so we can define re-usable
+    definitions. Not that the definitions within this project
+    are passive. They will not actively add any dependencies
+    or plugins to inheriting child modules unless the child
+    specifically references the defined artifact. Details for
+    the potentially used artifact can be placed here (and 
+    consistently reused) and briefly referenced in the child
+    poms or inherently referenced by the child modules 
+    packaging type (i.e., packaging=jar projects automatically
+    bring in the maven-compiler-plugin)
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.javaee</groupId>
+    <artifactId>javaeeEx</artifactId>
+    <packaging>pom</packaging>
+    <name>Java EE Exercise</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This project is the root project for the example Java EE
+        Application.
+    </description>
+    <modules>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+    </repositories>
+    <pluginRepositories>
+    </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <!-- defines configuration - not use -->
+    	<pluginManagement>
+            <plugins>
+            </plugins>
+    	</pluginManagement>
+    </build>
+
+    <profiles>
+    </profiles>
+</project>
+---
+
+    [[1]] Test your root project by building it at this time.
+
+---
+$ mvn clean install
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ javaeeEx ---
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeEx ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/pom.xml to /home/jcstaff/.m2/repository3/myorg/javaee/javaeeEx/1.0-SNAPSHOT/javaeeEx-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1.807s
+[INFO] Finished at: Mon Feb 28 20:43:32 EST 2011
+[INFO] Final Memory: 2M/57M
+[INFO] ------------------------------------------------------------------------
+
+---
+
+    [[1]] Add in the maven-compiler-plugin specification to the parent 
+    pom to make sure JDK 1.6 is used and we use an up to date version.
+
+---
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+    </properties>
+...
+
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                    </configuration>	                
+                </plugin>
+...
+---
+
+* {Create the EJB Maven project}
+
+    The EJB project will be used to develop one of the EJB components. The
+    term "EJB" gets a little overloaded at times.  There are EJB
+    classes, EJB components, and an EJB tier.  EJB classes break out
+    into the business-remote (aka @Remote) and business-local (aka
+    @Local) interfaces, the EJB implementation class (either @Stateless,
+    @Stateful, @Singleton, or @MessageDriven), and support classes. It is common to
+    think of each cohesive pairing of @Remote, @Local, and implementation
+    class as "an EJB".  You can have many EJBs (the sets of classes)
+    within an EJB component. An EJB component is a materialized as a .jar
+    and there can be many EJB components within your EJB tier. For this
+    exercise we will have only one EJB component and start out with only
+    one EJB.  A second EJB will be added to the single EJB component in
+    a later excercise to help support testing.  A single Maven project
+    can build a single EJB component.
+
+
+    [[1]] Add an EJB project directory to your project tree.
+
+---
+$ pwd
+/cygdrive/c/proj/javaeeEx
+
+$ mkdir javaeeExEJB
+---
+
+    [[1]] Add the outer shell of the EJB module's pom.xml. 
+
+    [Note:] It is important to note that the packaging type is "ejb" in this
+    case. If you leave out the packaging type, Maven will default to "jar"
+    and not handle your module appropriately within the context of a Java EE
+    application.
+
+    []
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>javaeeExEJB</artifactId>
+    <packaging>ejb</packaging>
+    <name>Java EE Exercise EJB</name>
+    <description>
+        This project provides example usages of an EJB tier.
+    </description>
+
+    <dependencies>
+    </dependencies>
+
+    <build>
+        <plugins>
+        </plugins>
+    </build>
+</project>
+---
+
+
+    [[1]] Add in the maven-ejb-plugin definition to the parent pom.xml
+        with all properties and constructs that would be common across
+        all EJB modules.
+
+        * tell maven explicitly to use EJB 3.1
+    
+        * tell maven to add all dependencies with scope=compile 
+        to the Class-Path in the META-INF/MANIFEST.MF. This is a 
+        pure Java construct that JavaEE takes advantage of in 
+        order to resolve dependencies on the server. 
+
+---
+# javaeeEx/pom.xml
+
+    <properties>
+...
+        <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
+    </properties>
+
+
+    	<pluginManagement>
+...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ejb-plugin</artifactId>
+                    <version>${maven-ejb-plugin.version}</version>
+                    <configuration>
+                        <ejbVersion>3.1</ejbVersion>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+---
+
+
+    [[1]] Add in the maven-ejb-plugin specification to the EJB/pom.xml.
+        This will contain pertions of the plugin definition that 
+        could be unique per EJB module. 
+
+        * tell it to create a ejb-client.jar file for remote clients.
+        This will be populated using a set of include and exclude 
+        paths. In this case, we are telling it not to include any
+        of our deployment descriptors in the META-INF directory as
+        well as leaving out our EJB implemenation class. This will
+        produce an extra jar in the target directory called
+        ${project.artifactId}-${project.version}-client.jar
+        and can be brought in with a dependency on the EJB module
+        using a type element set to "ejb-client". We will do this
+        in the RMI Test module.
+
+---
+# javaeeEx/javaeeExEJB/pom.xml
+
+          <!-- tell the EJB plugin to build a client-jar -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-ejb-plugin</artifactId>
+            <configuration>
+                <generateClient>true</generateClient>
+                <clientExcludes>
+                    <clientExclude>**/META-INF/*.xml</clientExclude>
+                    <clientExclude>**/ejb/*EJB.class</clientExclude>
+                </clientExcludes>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+---
+
+
+    [Note:] Since the packaging type is "ejb" for this module, the
+    maven-ejb-plugin is brought in (according to our pluginManagement
+    definition) automatically. We are just extending the definition
+    to include the ejb-client. If the plugin was not automatically
+    brought in because of the packaging type -- the above specification
+    in the build.plugins section of the EJB/pom.xml would have been 
+    enough to activate the plugin.
+
+    []
+
+    [[1]] Add several dependencies to the EJB/pom.xml account for use 
+    of logging, annotations, and EJB constructs. Since we will be instantiating
+    this code only on the server and not in a 2-tier approach,
+    the pure JavaEE API from Sun/Oracle will do fine. Otherwise we
+    should use the dependencies from Hibernate/JBoss.
+
+    [Note:] You should always declare a scope=provided dependency
+    on the JavaEE API artifacts so that downstream clients of the
+    module are free to supply their own version/provider of the 
+    API.
+
+    []
+
+---
+# javaeeEx/javaeeExEJB/pom.xml
+
+    <dependencies>
+        <!-- core dependencies -->
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+---
+
+    [[1]] Attempt to validate the EJB module at the child level 
+        without futher specification. This will fail because
+        we are missing version information for the two dependency
+        artifacts we just added.
+
+---
+$ mvn validate
+
+[ERROR]   The project myorg.javaee:javaeeExEJB:1.0-SNAPSHOT (/home/jcstaff/proj/exercises/javaeeEx/javaeeExEJB/pom.xml) has 2 errors
+[ERROR]     'dependencies.dependency.version' for commons-logging:commons-logging:jar is missing. @ line 23, column 21
+[ERROR]     'dependencies.dependency.version' for javax:javaee-api:jar is missing. @ line 28, column 21
+---
+
+    [[1]] Update the parent pom.xml with the version specifications
+    for these artifacts.
+
+---
+# javaeeEx/javaeeExEJB/pom.xml
+
+    <properties>
+        ...
+        <commons-logging.version>1.1.1</commons-logging.version>
+        <javaee-api.version>6.0</javaee-api.version>
+...
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax</groupId>
+                <artifactId>javaee-api</artifactId>
+                <version>${javaee-api.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+---
+
+    [[1]] Validate that maven can now resolve the new dependencies.
+
+---
+$ mvn validate
+
+[INFO] BUILD SUCCESS
+---
+
+    [Note:] We are using only the maven validate phase at this point
+    because we only want to validate whether maven can resolve all
+    artifacts and not fully build an EJB component.  The build will fail
+    if you use a more advanced maven phase prior to adding the EJB source
+    code in the following steps.
+
+    []
+
+    [[1]] Create the src tree for the EJB.
+
+---
+$ pwd
+/cygdrive/c/proj/javaeeEx
+
+$ mkdir -p javaeeExEJB/src/main/java/myorg/javaeeex/ejb/
+---
+
+
+    [[1]] Add the beginning @Remote and @Local interfaces. Place 
+    a simple ping() method in the @Remote interface for use as an
+    end-to-end sanity check at the end of this exercise.
+
+---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarRemote.java
+package myorg.javaeeex.ejb;
+
+import javax.ejb.Remote;
+
+@Remote
+public interface RegistrarRemote {
+    void ping();
+}
+---
+---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarLocal.java
+package myorg.javaeeex.ejb;
+
+import javax.ejb.Local;
+
+@Local
+public interface RegistrarLocal {
+}
+---
+
+    [[1]] Add the beginning of a @Stateless EJB that will implement
+    the provided @Remote and @Local interfaces. Implement @PostConstruct
+    @PreDestroy callbacks to intercept EJB lifecycle events. Add a 
+    logger and log statements to the methods so we can observe activity
+    within the EJB during the test at the end of this exercise.
+
+---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
+package myorg.javaeeex.ejb;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.Stateless;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+
+@Stateless
+public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
+    private static final Log log = LogFactory.getLog(RegistrarEJB.class);
+
+
+    @PostConstruct
+    public void init() {
+        log.debug("**** init ****");
+    }
+
+    @PreDestroy
+    public void close() {
+        log.debug("*** close() ***");
+    }
+
+    public void ping() {
+        log.debug("ping called");
+    }
+}
+---
+
+
+    [[1]] The EJB can be built at this time. You will notice the following
+    in the output.
+
+        * Our 3 Java files (@Remote, @Local, and @Stateless) were compiled
+
+        * EJB 3 processing was performed on the target. This largely 
+        consisted only of MANIFEST Class-Path processing and the construction
+        of an ejb-client.jar file at this point.
+
+
+---
+$ (cd javaeeExEJB/; mvn clean install)
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise EJB 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+...
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] --- maven-ejb-plugin:2.3:ejb (default-ejb) @ javaeeExEJB ---
+[INFO] Building EJB javaeeExEJB-1.0-SNAPSHOT with EJB version 3.0
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT.jar
+[INFO] Building EJB client javaeeExEJB-1.0-SNAPSHOT-client
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT-client.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExEJB ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEJB/1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT.jar
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEJB/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEJB/1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT.pom
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT-client.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEJB/1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT-client.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 10.853s
+[INFO] Finished at: Mon Feb 28 21:30:35 EST 2011
+[INFO] Final Memory: 8M/128M
+[INFO] ------------------------------------------------------------------------
+---
+---
+javaeeExEJB/target/
+|-- classes
+|   `-- myorg
+|       `-- javaeeex
+|           `-- ejb
+|               |-- RegistrarEJB.class
+|               |-- RegistrarLocal.class
+|               `-- RegistrarRemote.class
+|-- javaeeExEJB-1.0-SNAPSHOT-client.jar
+|-- javaeeExEJB-1.0-SNAPSHOT.jar
+---
+---
+$ jar tf javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT.jar
+
+META-INF/MANIFEST.MF
+myorg/javaeeex/ejb/RegistrarEJB.class
+myorg/javaeeex/ejb/RegistrarRemote.class
+myorg/javaeeex/ejb/RegistrarLocal.class
+...
+---
+---
+$ jar tf javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT-client.jar
+
+META-INF/MANIFEST.MF
+myorg/javaeeex/ejb/RegistrarRemote.class
+myorg/javaeeex/ejb/RegistrarLocal.class
+...
+---
+
+    [[1]] Add the EJB module to the root pom.xml.
+
+---
+    <modules>
+        <module>javaeeExEJB</module>
+    </modules>
+---
+
+    [[1]] Retest the build from the root.
+
+---
+$ mvn clean install
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise
+[INFO] Java EE Exercise EJB
+...
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [1.405s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [9.130s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 10.898s
+[INFO] Finished at: Mon Feb 28 21:34:41 EST 2011
+[INFO] Final Memory: 8M/128M
+---
+
+    [[1]] Verify this is what you have so far.
+
+---
+javaeeEx/
+|-- javaeeExEJB
+|   |-- pom.xml
+|   `-- src
+|       `-- main
+|           `-- java
+|               `-- myorg
+|                   `-- javaeeex
+|                       `-- ejb
+|                           |-- RegistrarEJB.java
+|                           |-- RegistrarLocal.java
+|                           `-- RegistrarRemote.java
+`-- pom.xml
+---
+
+* {Create the EAR Maven project}
+
+    EARs are Java archives that are used to house the overall application,
+    with all of its components. The EAR can contain many EJB and WAR
+    components as well as their dependencies (and a little-used Java EE
+    Client type).  A single Maven project can house the development of
+    a single EAR. The bulk of the project is solely within the pom.xml
+    as nearly all of its contents are brought in through dependencies.
+
+    [[1]] Create the sub-project directory for the EAR.
+
+---
+$ pwd
+/cygdrive/c/proj/javaeeEx
+
+$ mkdir javaeeExEAR
+---
+
+    [[1]] Add the initial entries for the EAR pom.xml.
+
+    [Note:] It is important to note that the packaging type is "ear"
+    in this case. If you leave this out, Maven will default to a 
+    standard "jar" packaging type and not build the EAR correctly.
+
+    []
+
+---
+$ cat javaeeExEAR/pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>javaeeExEAR</artifactId>
+    <packaging>ear</packaging>
+    <name>Java EE Exercise EAR</name>
+    <description>
+        This project provides a sample EAR for the Java EE components
+        associated with the overall project.
+    </description>
+
+    <dependencies>
+    </dependencies>
+</project>
+---
+
+    [[1]] Add the EJB dependency to the EAR. Use exclusions to keep
+    any unwanted 3rd party .jars from being brought along.
+
+---
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExEJB</artifactId>
+            <version>${project.version}</version>
+            <type>ejb</type>
+            <exclusions>
+                <!-- server doesn't want to see already provided jars -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    ...
+---
+
+    [[1]] Verify the EAR builds.
+
+---
+$ (cd javaeeExEAR/; mvn clean install)
+[INFO] Scanning for projects...                                                                                                  
+[INFO]                                                                                                                           
+[INFO] ------------------------------------------------------------------------                                                  
+[INFO] Building Java EE Exercise EAR 1.0-SNAPSHOT                                                                                
+[INFO] ------------------------------------------------------------------------                                                  
+Downloading: http://download.java.net/maven/2/myorg/javaee/javaeeEx/1.0-SNAPSHOT/maven-metadata.xml                              
+[INFO]                                                                                                                           
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ javaeeExEAR ---                                                      
+[INFO] Deleting /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target                                                              
+[INFO]                                                                                                                           
+[INFO] --- maven-ear-plugin:2.4.2:generate-application-xml (default-generate-application-xml) @ javaeeExEAR ---                  
+[INFO] Generating application.xml                                                                                                
+[INFO]                                                                                                                           
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ javaeeExEAR ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/jcstaff/solutions/javaeeEx/javaeeExEAR/src/main/resources
+[INFO] 
+[INFO] --- maven-ear-plugin:2.4.2:ear (default-ear) @ javaeeExEAR ---
+[INFO] Copying artifact[ejb:myorg.javaee:javaeeExEJB:1.0-SNAPSHOT] to[javaeeExEJB-1.0-SNAPSHOT.jar]
+[INFO] Could not find manifest file: /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT/META-INF/MANIFEST.MF - Generating one
+[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExEAR ---
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEAR/1.0-SNAPSHOT/javaeeExEAR-1.0-SNAPSHOT.ear
+[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExEAR/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExEAR/1.0-SNAPSHOT/javaeeExEAR-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.413s
+[INFO] Finished at: Tue Mar 01 22:33:15 EST 2011
+[INFO] Final Memory: 4M/82M
+[INFO] ------------------------------------------------------------------------
+---
+
+    [[1]] Verify the contents of the EAR has what you expect. EARs are required to
+    have a META-INF/application.xml file that describes deployment details of
+    the housed components. The Maven ear plugin will automatically generate this
+    for you.
+
+---
+$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear 
+...
+META-INF/application.xml
+javaeeExEJB-1.0-SNAPSHOT.jar
+...
+---
+---
+$ cat javaeeExEAR/target/application.xml 
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC
+        "-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN"
+        "http://java.sun.com/dtd/application_1_3.dtd">
+<application>
+  <display-name>javaeeExEAR</display-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <module>
+    <ejb>javaeeExEJB-1.0-SNAPSHOT.jar</ejb>
+  </module>
+---
+
+    [[1]] Add the EAR to the root level project and verify everything builds 
+    from the root.
+
+---
+    <modules>
+        <module>javaeeExEJB</module>
+        <module>javaeeExEAR</module>
+    </modules>
+---
+---
+$ mvn clean install
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise
+[INFO] Java EE Exercise EJB
+[INFO] Java EE Exercise EAR
+[INFO]                                                                         
+
+...
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.644s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.099s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.661s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5.597s
+[INFO] Finished at: Tue Mar 01 22:37:59 EST 2011
+[INFO] Final Memory: 8M/128M
+[INFO] ------------------------------------------------------------------------
+---
+
+    [[1]] This is what our project looks like so far.
+
+---
+javaeeEx/
+|-- javaeeExEAR
+|   `-- pom.xml
+|-- javaeeExEJB
+|   |-- pom.xml
+|   `-- src
+|       `-- main
+|           `-- java
+|               `-- myorg
+|                   `-- javaeeex
+|                       `-- ejb
+|                           |-- RegistrarEJB.java
+|                           |-- RegistrarLocal.java
+|                           `-- RegistrarRemote.java
+`-- pom.xml
+---
+
+* {Create the RMI Test Maven project}
+
+    Any tests we implement within the EJB module itself would likely
+    be a POJO-level unit test. EJB 3.1 does provide a means to create
+    a lightweight EJB container to be used as a test harness, but 
+    does not substitue for honest end-to-end testing using a 
+    server deployment of the EJB/EAR and external test clients.
+    We will create an additional module to deploy the EAR, locate
+    the server and EJB remote interface, and test the EJB through
+    that interface. We can reuse tests from lower levels, but
+    that will not be shown as a part of this exercise.
+    This module will have no target artifact that we care about. One 
+    could do some tweeking of the pom.xml to keep that from being 
+    generated, but I have found that to only confuse Eclipse so we'll
+    just live with and empty, unused RMI Test.jar.
+
+    [[1]] Create the sub-project directory for the RMI Test.
+
+---
+$ pwd
+/cygdrive/c/proj/javaeeEx
+
+$ mkdir javaeeExTest
+---
+
+    [[1]] Create the pom.xml for the RMI Test module.
+
+---
+$ cat javaeeExTest/pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>javaeeExTest</artifactId>
+    <packaging>jar</packaging>
+    <name>Java EE Exercise Remote Test</name>
+    <description>
+        This project provides an example RMI Test project.
+    </description>
+
+    <dependencies>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+        </plugins>
+    </build>
+</project>
+---
+
+    [[1]] Add the dependencies to the Test/pom.xml 
+    required to use logging and JUnit.
+
+---
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+---
+
+    [[1]] Like before, the maven pom.xml will not validate until
+        we populate the parent pom with version information for the
+        new dependencies added. 
+
+---
+$ mvn validate
+...
+[ERROR]     'dependencies.dependency.version' for junit:junit:jar is missing. @ line 30, column 21
+[ERROR]     'dependencies.dependency.version' for log4j:log4j:jar is missing. @ line 35, column 21
+---
+
+    [Note:] Notice we only received an error for two of the dependencies added. 
+    The definition for commons-logging was added back when we implemented the EJB.
+    This begins to show how work we do at the parent pom.xml can be used to 
+    keep child modules consistent and allow child modules the flexibility to 
+    determine whether they should or should not include a particular dependency.
+
+    [Note:] Notice we will silently also inherit the maven-compiler-plugin
+    definition from the parent. We don't have to repeat any work to get a 
+    properly configured compiler.
+
+    []
+
+    [[1]] Add the version definitions for the two dependencies to the parent pom.xml
+
+---
+$ cat pom.xml
+
+    <properties>
+...
+        <junit.version>4.10</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+...
+    <dependencyManagement>
+        <dependencies>
+            ...
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>    
+...
+---
+
+---
+$ (cd javaeeExTest; mvn validate)
+...
+[INFO] BUILD SUCCESS
+---
+
+    [[1]] Add the dependencies required to be an RMI client of JBoss. This
+    is not as clean or simple as it sounds. There are many APIs in JavaEE
+    and many layered jars that implement them. If we use something that 
+    includes everything -- we get a dependency tree that is very bloated.
+    I have attempted to cut the list down to a set we need for class and 
+    have included it in the following project.
+
+---
+            <groupId>ejava.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <type>pom</type>
+---
+
+    [[1]] Add the following dependency to the Test/pom.xml
+
+---
+        <!-- brings in JBoss RMI client dependencies -->
+        <dependency>
+            <groupId>ejava.common</groupId>
+            <artifactId>jboss-rmi-client</artifactId>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>    
+---
+
+    [[1]] Add a definition of the above dependency to your parent pom
+
+---
+# pom.xml
+
+
+    <properties>
+        ...
+        <ejava.version>3.0.2012.2-SNAPSHOT</ejava.version>
+...
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>ejava.common</groupId>
+                <artifactId>jboss-rmi-client</artifactId>
+                <version>${ejava.version}</version>
+                <type>pom</type>
+            </dependency>    
+---
+
+    [[1]] Attempt to resolve all dependencies at this point. If you don't 
+    yet have a copy of the ejava.common#jboss-rmi-client in your repository
+    this will fail. You can use the dependency:go-offline to make sure you
+    have everything your project needs.
+
+---
+$ (cd javaeeExTest; mvn dependency:go-offline)
+...
+[ERROR] Failed to execute goal on project javaeeExTest: Could not resolve dependencies for project myorg.javaee:javaeeExTest:jar:1.0-SNAPSHOT: Could not find artifact ejava.common:jboss-rmi-client:pom:3.0.2012.2-SNAPSHOT -> [Help 1]
+---
+
+    [[1]] Add the repository information required to resolve 
+    ejava.common#jboss-rmi-client and its dependencies from the Internet.
+    We need one entry for the SNAPSHOT release we directly depend on and
+    a second for the release repository it depends on.
+
+---
+# pom.xml
+
+    <repositories>
+        <repository>
+            <id>webdev</id>
+            <name>ejava webdev repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>webdev-snapshot</id>
+            <name>ejava webdev snapshot repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+---
+
+---
+$ (cd javaeeExTest; mvn dependency:go-offline)
+...
+[INFO] BUILD SUCCESS
+---
+
+    [Note:] Please retry the command if you get a connection refused from webdev.
+    If that fails to work, add a -U to the command line to cause SNAPSHOT updates.
+
+    []
+
+
+    [[1]] Create a JNDI configuration for JBoss remoting. Use variable references to 
+    the server to better support different configurations.
+
+---
+$ mkdir -p javaeeExTest/src/test/resources
+
+...
+
+$ cat javaeeExTest/src/test/resources/jndi.properties
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+jboss.naming.client.ejb.context=true
+---
+
+    [[1]] Add resource filtering to test resources in the pom.xml. This
+    will cause the jndi.properties file to have variables replaces with 
+    physical values when copied to the target tree.
+
+---
+    <build>
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+---
+
+    [[1]] If you attempt to build at this point the build will 
+    appear to succeed. You can see the two testResource declarations 
+    being operated on.
+
+---
+$ (cd javaeeExTest/; mvn install)
+...
+
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ javaeeExTest ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+...
+[INFO] BUILD SUCCESS
+---
+
+    [[1]] However, if you look at the result in the target tree, you
+    will see that the variables were not expanded because we have not
+    yet assigned values to them.
+
+---
+javaeeExTest
+|-- pom.xml
+|-- src
+|   `-- test
+|       `-- resources
+|           `-- jndi.properties
+`-- target
+    ...
+    `-- test-classes
+        `-- jndi.properties
+
+$ cat javaeeExTest/target/test-classes/jndi.properties
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+jboss.naming.client.ejb.context=true
+---
+
+    [[1]] Add definitions for the variables in your parent pom
+
+---
+# pom.xml
+
+    <properties>
+        ...
+        <jboss.host>localhost</jboss.host>
+        <jboss.naming.port>4447</jboss.naming.port>
+        <jboss.user>admin</jboss.user>
+        <jboss.password>password</jboss.password>
+        <jndi.user>known</jndi.user>
+        <jndi.password>password</jndi.password>
+
+        <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
+        <jboss.remoting.java.naming.provider.url>remote://${jboss.host}:${jboss.naming.port}</jboss.remoting.java.naming.provider.url>
+        <jboss.remoting.java.naming.factory.url.pkgs/>
+        <jboss.remoting.java.naming.security.principal>${jndi.user}</jboss.remoting.java.naming.security.principal>
+        <jboss.remoting.java.naming.security.credentials>${jndi.password}</jboss.remoting.java.naming.security.credentials>
+---
+
+    [[1]] Test the build of your RMI Test project so far. Note the values 
+    for the jndi.properties file within the target/test-classes directory.
+    If yours still has variable references check your configuration steps.
+
+---
+$ (cd javaeeExTest/; mvn clean install)
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise Remote Test 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[WARNING] The POM for woodstox:wstx-asl:jar:3.2.1 is missing, no dependency information available
+[WARNING] The POM for ws-commons:policy:jar:1.0 is missing, no dependency information available
+
+...
+
+ -------------------------------------------------------
+ T E S T S
+ -------------------------------------------------------
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 12.913s
+[INFO] Finished at: Tue Mar 01 23:08:33 EST 2011
+[INFO] Final Memory: 25M/269M
+[INFO] ------------------------------------------------------------------------
+---
+---
+$ cat javaeeExTest/target/test-classes/jndi.properties
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.factory.url.pkgs=
+java.naming.provider.url=remote://localhost:4447
+java.naming.security.principal=known
+java.naming.security.credentials=password
+jboss.naming.client.ejb.context=true
+---
+
+        * java.naming.factory.initial - defines a bootstrap class that 
+        the javax.naming.InitialContext will use for its core implementation.
+
+        * java.naming.factory.url.pkgs - is a list of java packages to search
+        for well-named classes that can be used to resolve specific naming
+        prefixes. This is not required in this case since ince we specified 
+        org.jboss.naming... as the factory.initial and that class knows what to
+        do without a configuration.
+
+        * java.naming.provider.url - a URL to the JNDI tree within the JBoss
+        server
+
+        * java.naming.security.principal - a username to use when binding to
+        JNDI (and nothing more). This is required once certain security options
+        have been configured on the server.
+
+        * java.naming.security.credentials - password credentials to pass in 
+        the bind to JNDI.
+
+        * jboss.naming.client.ejb.context=true - a flag to the JBoss 
+        implementation. I can only guess its purpose, but it is required.
+
+        []
+
+    [[1]] Create the JUnit test that will lookup the EJB and invoke the
+    ping method. You will be tempted to directly reuse your business logic
+    tests as implementation for the RMI Test. With proper refactoring and
+    design, this can be done. However, realize that a remote interface must 
+    have special design considerations addressed and may not always (even
+    rarely) be the same as a local interface. Remote interfaces pass by value,
+    are used in different JVMs with potentially different classpaths, and
+    may have clients with different concerns. Technically, Java EE has allowed
+    them to be the same, but that ends up biting you in the end.
+
+---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
+package myorg.javaeeex.ejbclient;
+
+import javax.naming.InitialContext;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
+public class RegistrarIT {
+    private static final Log log = LogFactory.getLog(RegistrarIT.class);
+    private InitialContext jndi;
+
+    @Before
+    public void setUp() throws Exception {
+
+        log.debug("getting jndi initial context");
+        jndi = new InitialContext();
+        log.debug("jndi=" + jndi.getEnvironment());
+        jndi.lookup("/"); //do a quick comms check of JNDI
+    }
+
+    @Test
+    public void testPing() {
+    }
+}
+---
+
+    [Note:] The above JUnit test has been purposely ended with the 
+    capital letters "IT" to represent integration test. This 
+    will be treated special from JUnit test cases ending with *Test
+    in that it runs during a later set of phases that account for
+    server startup, testing, server teardown, and results verification
+    in separate phases instead of the single test phase used by *Test
+    test cases. *Test JUnit test cases are used for in-process unit tests.
+    *IT test cases are used for integration tests that could span 
+    multiple processes requiring extra work. Unit tests are handled
+    by the maven-surefire-plugin. Integration tests are handled by 
+    the maven-failsafe-plugin. More in a moment...
+
+    []
+
+    [[1]] Put a log4j.xml configuration in place.
+
+---
+$ cat javaeeExTest/src/test/resources/log4j.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+   <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+         <param name="Target" value="System.out"/>
+
+         <layout class="org.apache.log4j.PatternLayout">
+            <!-- The default pattern: Date Priority [Category] Messagen -->
+            <!--
+            <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+            -->
+            <param name="ConversionPattern" value=" -%m%n"/>
+         </layout>
+   </appender>
+
+   <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+      <param name="File" value="target/log4j-out.txt"/>
+      <param name="Append" value="false"/>
+      <param name="MaxFileSize" value="100KB"/>
+      <param name="MaxBackupIndex" value="1"/>
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+      </layout>
+
+   </appender>
+
+   <logger name="myorg">
+      <level value="debug"/>
+   </logger>
+   <root>
+      <priority value="fatal"/>
+      <appender-ref ref="CONSOLE"/>
+   </root>
+
+</log4j:configuration>
+---
+
+    [[1]] Try building the Test module at this point. Notice how no tests
+    attempted to run. That is because the Tests run reported are surefire
+    unit tests and we have no unit tests in this module. All our tests (1)
+    are integration tests. Okay...why didn't our integration test run? 
+    The failsafe plugin, unlike the surefire plugin does not run automatically.
+    We must wire it into the build.
+
+---
+$ (cd javaeeExTest/; mvn install)
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] BUILD SUCCESS
+---
+
+    [[1]] Add the failsafe plugin to your Test/pom.xml to cause our unit
+    test to be attempted.
+
+---
+# javaeeExTest/pom.xml
+
+        <plugins>
+            <!-- adds IT integration tests to the build -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+...
+---
+
+    [[1]] Add a reusable definition for the failsafe plugin to our
+    parent project. This definition 
+
+        * adds a required version number
+
+        * defines which goals of the failsafe plugin should be executed
+        during the different maven build phases. failsafe is not autmatically
+        wired into phases, but comes with goals that are a 1:1 match with 
+        the standard maven integration phases. The phases we care about
+        during integration are:
+
+            * pre-integration-test - phase to setup required external resources
+            for the integration test cases.
+
+            * integration-test - 
+
+            * post-integration-test - phase to teardown required external resources
+            used during the integration test cases.
+
+            * verify - phase to evaluate the integration test results and 
+            optionally fail the build. This is a key difference between 
+            integration tests and unit tests. For integration tests -- we cannot
+            fail the build until there is a chance to teardown. For unit tests --
+            everything is designed to be local, within the target directory and 
+            in-process memory, so there is no extra effort required to teardown
+            after the unit tests complete.
+
+        * adds optional command line option that can be used for remote debugging.
+
+---
+# pom.xml
+
+
+    <properties>
+        ...
+        <maven-failsafe-plugin.version>2.12.2</maven-failsafe-plugin.version>
+...
+    	<pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                    <executions>
+                        <execution> <!-- run the tests here -->
+                           <id>integration-test</id> 
+                               <phase>integration-test</phase>
+                           <goals>
+                               <goal>integration-test</goal>
+                           </goals>
+                        </execution>
+                        <execution> <!--  delay failures to after undeploy -->
+                            <id>verify</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+---
+
+    [[1]] Add a profile that can be used to activate the remote debugging thru the
+    substitution of the surefire.argLine. The name of the variable does not matter as
+    long as it is used consistently.
+
+---
+    <profiles>
+        <profile> <!-- tells surefire/failsafe to run JUnit tests with remote debug -->
+            <id>debugger</id>
+            <activation>
+                <property>
+                    <name>debugger</name>
+                </property>
+            </activation>
+            <properties>
+                <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
+            </properties>                                  
+        </profile>        
+        ...
+---
+
+
+    [[1]] Try building again now that the integration tests should be 
+    wired into the build. We expect them to fail at least until JBoss is either
+    configured to start (in pre-integration-test) or has been manually started.
+
+---
+$ (cd javaeeExTest/; mvn clean install)
+...
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] --- maven-failsafe-plugin:2.12.2:integration-test (integration-test) @ javaeeExTest ---
+[INFO] Failsafe report directory: /home/jcstaff/proj/exercises/javaeeEx/javaeeExTest/target/failsafe-reports
+
+ -------------------------------------------------------
+ T E S T S
+ -------------------------------------------------------
+Running myorg.javaeeex.ejbclient.RegistrarIT
+ -getting jndi initial context
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 5.622 sec <<< FAILURE!
+
+Results :
+
+Tests in error: 
+  testPing(myorg.javaeeex.ejbclient.RegistrarIT): Failed to create remoting connection
+
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+
+...
+[INFO] --- maven-failsafe-plugin:2.12.2:verify (verify) @ javaeeExTest ---
+[INFO] Failsafe report directory: /home/jcstaff/proj/exercises/javaeeEx/javaeeExTest/target/failsafe-reports
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+...
+---
+---
+$ more javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt 
+ -------------------------------------------------------------------------------
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
+ -------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 5.622 sec <<< FAILURE!
+testPing(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 5.352 sec  <<< ERROR!
+javax.naming.NamingException: Failed to create remoting connection [Root exception is java.lang.RuntimeException: Operation failed with status WAITING]
+        at org.jboss.naming.remote.client.ClientUtil.namingException(ClientUtil.java:36)
+        at org.jboss.naming.remote.client.InitialContextFactory.getInitialContext(InitialContextFactory.java:121)
+        at javax.naming.spi.NamingManager.getInitialContext(NamingManager.java:684)
+        at javax.naming.InitialContext.getDefaultInitCtx(InitialContext.java:305)
+        at javax.naming.InitialContext.init(InitialContext.java:240)
+        at javax.naming.InitialContext.<init>(InitialContext.java:192)
+        at myorg.javaeeex.ejbclient.RegistrarIT.setUp(RegistrarIT.java:20)
+...
+---
+
+* {Start JBoss Application Server}
+
+    [Note:] In the previous section we did a lot of work to allow our IT 
+    integration test extra phases to setup and teardown required resources 
+    (like JBoss). However, this section asks you to manually start/stop your
+    JBoss server outside the scope of the build. This is being done for simplicity.
+    If you wish to have JBoss start/stop with each build you can find the 
+    cargo plugin configuration within ejava-build/dependencies/pom.xml#cargo-startstop
+    profile. There are also other things that must be addressed within the
+    jboss.server.base.dir to make this happen and is currently outside the 
+    scope of this exercise.
+    
+    []
+
+    The EAR and its contents will be deployed to an application server to 
+    provide a container with thread managemement, resource management,
+    security, remote interfaces, etc. 
+
+    [[1]] Make the following edits to the jboss-log4j.xml file before
+    we start the server. These edits will allow debug from our 
+    EJB to be logged in the server output.
+
+        * verify the CONSOLE logger does not have a Threshold set 
+        to restrict DEBUG
+
+        * add a logger for org and com, with a level=INFO so that the 
+        change to CONSOLE does not cause org.* class output to
+        overwhelm the console.
+
+        * add logger entries for myorg and the ejava class examples.
+        Search the file before adding. They may already be defined.
+
+---
+$ cat $JBOSS_HOME/standalone/configuration/standalone.xml
+
+    <profile>
+        <subsystem xmlns="urn:jboss:domain:logging:1.1">
+            ...
+---
+---
+            ...
+            <logger category="myorg">
+                <level name="DEBUG"/>
+            </logger>
+            ...
+---
+---
+            ...
+            <root-logger>
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="CONSOLE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </root-logger>
+---
+
+
+    [[1]] Start the JBoss server. In the command shown below
+
+        * -Djboss.server.base.dir - used to point to the root of the 
+        profile. If you create other profiles (by copying the standalone
+        directory) you can point the script to that directory using this
+        java property flag. This flag is not needed if you use the 
+        default standalone directory.
+
+        * -c standalone.xml - used to point to a specific profile 
+        configuration file within the ${jboss.server.base.dir}/configuration
+        directory. If you create alternate configurations (by copying 
+        the standalone.xml file) you can point the script to that configuration
+        using this argument. This is useful to switch between alternate 
+        configurations but not required if you use the default standalone.xml
+        configuration file.
+
+---
+$ ./bin/standalone.sh -Djboss.server.base.dir=standalone -c standalone.xml
+---
+
+---
+=========================================================================
+
+  JBoss Bootstrap Environment
+
+  JBOSS_HOME: /opt/jboss-as-7.1.1.Final
+
+  JAVA: /usr/lib/jvm/java-6-openjdk/bin/java
+
+  JAVA_OPTS:  -server -XX:+TieredCompilation -Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -Djboss.server.default.config=standalone.xml -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
+
+=========================================================================
+
+Listening for transport dt_socket at address: 8787
+16:15:34,821 INFO  [org.jboss.modules] JBoss Modules version 1.1.1.GA
+16:15:35,164 INFO  [org.jboss.msc] JBoss MSC version 1.0.2.GA
+16:15:35,254 INFO  [org.jboss.as] JBAS015899: JBoss AS 7.1.1.Final "Brontes" starting
+16:15:37,292 INFO  [org.xnio] XNIO Version 3.0.3.GA
+16:15:37,320 INFO  [org.jboss.as.server] JBAS015888: Creating http management service using socket-binding (management-http)
+16:15:37,348 INFO  [org.xnio.nio] XNIO NIO Implementation Version 3.0.3.GA
+16:15:37,410 INFO  [org.jboss.remoting] JBoss Remoting version 3.2.3.GA
+16:15:37,492 INFO  [org.jboss.as.logging] JBAS011502: Removing bootstrap log handlers
+16:15:37,508 INFO  [org.jboss.as.configadmin] (ServerService Thread Pool -- 26) JBAS016200: Activating ConfigAdmin Subsystem
+16:15:37,777 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 31) JBAS010280: Activating Infinispan subsystem.
+16:15:37,787 INFO  [org.jboss.as.webservices] (ServerService Thread Pool -- 48) JBAS015537: Activating WebServices Extension
+16:15:37,808 INFO  [org.jboss.as.naming] (ServerService Thread Pool -- 38) JBAS011800: Activating Naming Subsystem
+16:15:37,849 INFO  [org.jboss.as.security] (ServerService Thread Pool -- 44) JBAS013101: Activating Security Subsystem
+16:15:37,854 INFO  [org.jboss.as.osgi] (ServerService Thread Pool -- 39) JBAS011940: Activating OSGi Subsystem
+16:15:37,890 INFO  [org.jboss.as.security] (MSC service thread 1-1) JBAS013100: Current PicketBox version=4.0.7.Final
+16:15:37,908 INFO  [org.jboss.as.connector] (MSC service thread 1-2) JBAS010408: Starting JCA Subsystem (JBoss IronJacamar 1.0.9.Final)
+16:15:38,176 INFO  [org.jboss.as.naming] (MSC service thread 1-3) JBAS011802: Starting Naming Service
+16:15:38,261 INFO  [org.jboss.as.mail.extension] (MSC service thread 1-2) JBAS015400: Bound mail session [java:jboss/mail/Default]
+16:15:38,297 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 27) JBAS010403: Deploying JDBC-compliant driver class org.h2.Driver (version 1.3)
+16:15:38,487 INFO  [org.jboss.ws.common.management.AbstractServerConfig] (MSC service thread 1-3) JBoss Web Services - Stack CXF Server 4.0.2.GA
+16:15:38,676 INFO  [org.apache.coyote.http11.Http11Protocol] (MSC service thread 1-2) Starting Coyote HTTP/1.1 on http--127.0.0.1-8080
+16:15:39,625 INFO  [org.jboss.as.remoting] (MSC service thread 1-2) JBAS017100: Listening on /127.0.0.1:4447
+16:15:39,641 INFO  [org.jboss.as.server.deployment.scanner] (MSC service thread 1-1) JBAS015012: Started FileSystemDeploymentService for directory /opt/jboss-as-7.1.1.Final/standalone/deployments
+16:15:39,668 INFO  [org.jboss.as.remoting] (MSC service thread 1-1) JBAS017100: Listening on /127.0.0.1:9999
+16:15:40,047 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-2) JBAS010400: Bound data source [java:jboss/datasources/ExampleDS]
+16:15:40,094 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
+16:15:40,095 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss AS 7.1.1.Final "Brontes" started in 5718ms - Started 134 of 209 services (74 services are passive or on-demand)
+---
+
+    [[1]] Re-run the RMI integration test (with just the JNDI bind) again. It should succeed this time.
+
+---
+$ (cd javaeeExTest/; mvn clean install)
+...
+Running myorg.javaeeex.ejbclient.RegistrarIT
+ -getting jndi initial context
+ -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password}
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.031 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+* {Deploy the Application}
+
+    We want tests to run as automated as possible. This allows us to
+    simplify testing as well as leverage continous integration techniques
+    (e.g., CruiseControl, Hudson, Jenkins; i.e., nightly builds/tests). To
+    help automate this we are going to leverage the Maven cargo
+    plugin. Cargo, itself, is a Java library that is used to manage Java
+    EE containers. The maven cargo plugin just makes it callable from
+    within Maven. We will add the cargo plugin to the RMI Test project
+    (to deploy the application) since the application isn't ready to be
+    deployed until after the EAR is built.
+
+    [[1]] Add the cargo plugin to the RMI Test to deploy the EAR
+    to JBoss. Like always, We will only put what is specific to this 
+    module in the module's pom.xml.
+
+---
+# javaeeExTest/pom.xml
+
+    <build>
+        <plugins>
+            <!-- artifacts to deploy to server -->
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>javaeeExEAR</artifactId>
+                            <type>ear</type>
+                        </deployable>
+                    </deployables>
+                </configuration>
+            </plugin>
+            ...
+---
+
+    [[1]] Cargo requires the module to be deployed to also be a scope=compile
+    dependency of the local module. Since this is a Test module with not
+    dependents -- we can add that without concern.
+
+---
+# javaeeExTest/pom.xml
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExEAR</artifactId>
+            <type>ear</type>
+            <version>${project.version}</version>
+        </dependency>
+---
+
+    [[1]] Add a reusable cargo definition to the parent pom that will complete
+    our cargo specification. The details are a mouthful but, in short, this
+    tells cargo to deploy our artifacts to a running JBoss server (of a specific
+    version), listening on a specific admin address:port, and where to place
+    the runtime logs from this activity.
+
+---
+# pom.xml
+
+    <properties>
+        ...
+        <cargo-maven2-plugin.version>1.2.3</cargo-maven2-plugin.version>
+        <cargo.containerId>jboss71x</cargo.containerId>
+        ...
+        <jboss.version>7.1.1.Final</jboss.version>
+        ...
+        <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
+        <jboss.mgmt.port>9999</jboss.mgmt.port>
+...
+
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>${cargo-maven2-plugin.version}</version>
+                    <configuration>
+                        <container>
+                            <containerId>${cargo.containerId}</containerId>
+                            <type>remote</type>
+                            <log>target/server.log</log>
+                            <output>target/output.log</output>
+                        </container>
+                        <configuration>
+                            <type>runtime</type>
+                            <properties>
+                                <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                                <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
+                            </properties>
+                        </configuration>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jboss.as</groupId>
+                            <artifactId>jboss-as-controller-client</artifactId>
+                            <version>${jboss.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                       <execution>
+                           <id>cargo-prep</id> 
+                               <phase>pre-integration-test</phase>
+                           <goals>
+                                <goal>redeploy</goal>
+                           </goals>
+                       </execution>
+                        <execution>
+                            <id>cargo-post</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>undeploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+...
+---
+
+    [[1]] Rebuild the RMI Test and note the deployment of the EAR to the JBoss
+    server prior to running the integration tests with failsafe and undeployed
+    after finishing.
+
+---
+$ (cd javaeeExTest/; mvn clean install)
+
+...
+[INFO] --- cargo-maven2-plugin:1.2.3:redeploy (cargo-prep) @ javaeeExTest ---
+Oct 20, 2012 4:42:24 PM org.xnio.Xnio <clinit>
+INFO: XNIO Version 3.0.3.GA
+Oct 20, 2012 4:42:24 PM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.0.3.GA
+Oct 20, 2012 4:42:24 PM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 3.2.3.GA
+[INFO] 
+[INFO] --- maven-failsafe-plugin:2.12.2:integration-test (integration-test) @ javaeeExTest ---
+[INFO] Failsafe report directory: /home/jcstaff/proj/exercises/javaeeEx/javaeeExTest/target/failsafe-reports
+
+ -------------------------------------------------------
+ T E S T S
+ -------------------------------------------------------
+Running myorg.javaeeex.ejbclient.RegistrarIT
+ -getting jndi initial context
+ -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password}
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.078 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] --- cargo-maven2-plugin:1.2.3:undeploy (cargo-post) @ javaeeExTest ---
+[INFO] 
+[INFO] --- maven-failsafe-plugin:2.12.2:verify (verify) @ javaeeExTest ---
+[INFO] Failsafe report directory: /home/jcstaff/proj/exercises/javaeeEx/javaeeExTest/target/failsafe-reports
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+...
+---
+
+    [[1]] The following should have been output at the JBoss console. The "java:" names
+    are JNDI names that can be used to locate the local and remote interfaces of our 
+    RegistryEJB. The only one that is available to our external RMI client starts with
+    "java:jboss/exported/".
+
+---
+16:42:25,095 INFO  [org.jboss.as.repository] (management-handler-thread - 2) JBAS014900: Content added at location /opt/jboss-as-7.1.1.Final/standalone/data/content/64/7b3ccd61a033a4424f791042d7ca5fefc6e03c/content
+16:42:25,125 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015876: Starting deployment of "javaeeExEAR-1.0-SNAPSHOT.ear"
+16:42:25,216 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-1) JBAS015876: Starting deployment of "javaeeExEJB-1.0-SNAPSHOT.jar"
+16:42:25,472 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-3) JNDI bindings for session bean named RegistrarEJB in deployment unit subdeployment "javaeeExEJB-1.0-SNAPSHOT.jar" of deployment "javaeeExEAR-1.0-SNAPSHOT.ear" are as follows:
+
+        java:global/javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarLocal
+        java:app/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarLocal
+        java:module/RegistrarEJB!myorg.javaeeex.ejb.RegistrarLocal
+        java:global/javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+        java:app/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+        java:module/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+        java:jboss/exported/javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+
+16:42:26,012 INFO  [org.jboss.as.server] (management-handler-thread - 2) JBAS018559: Deployed "javaeeExEAR-1.0-SNAPSHOT.ear"
+16:42:29,082 INFO  [org.jboss.as.naming] (Remoting "ubuntu" task-4) JBAS011806: Channel end notification received, closing channel Channel ID 4aa11363 (inbound) of Remoting connection 007d83e6 to null
+16:42:29,626 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015877: Stopped deployment javaeeExEJB-1.0-SNAPSHOT.jar in 68ms
+16:42:29,631 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015877: Stopped deployment javaeeExEAR-1.0-SNAPSHOT.ear in 75ms
+16:42:29,692 INFO  [org.jboss.as.repository] (management-handler-thread - 3) JBAS014901: Content removed from location /opt/jboss-as-7.1.1.Final/standalone/data/content/64/7b3ccd61a033a4424f791042d7ca5fefc6e03c/content
+16:42:29,695 INFO  [org.jboss.as.server] (management-handler-thread - 3) JBAS018558: Undeployed "javaeeExEAR-1.0-SNAPSHOT.ear"
+---
+
+    [[1]] The other place to check for output is in the JBOSS
+    server.log. This log is designed to contain more verbose information
+    from our application logic. Since we have not yet called our EJB --
+    the server.log and console output should be nearly identical.
+
+---
+$ cat $JBOSS_HOME/standalone/log/server.log
+---
+
+    [Note:] When you application does not correctly deploy, the most 
+    valuable information is typically in the server.log and not in the 
+    cargo client log. Applications usually fail to deploy because of
+    a missing or mis-configured dependency/resource and the server.log
+    will be necessary to determine what to correct.
+
+
+    [[1]] Register the RMI Test module with the parent pom and re-run the 
+    build from the root.
+
+---
+    <modules>
+        <module>javaeeExEJB</module>
+        <module>javaeeExEAR</module>
+        <module>javaeeExTest</module>
+    </modules>
+---
+
+---
+$ mvn clean install
+
+...
+[INFO] Java EE Exercise .................................. SUCCESS [1.131s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.597s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.725s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [12.950s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+* {Setup JNDI access to Remote interface}
+
+    Each EJB interface will have an entres in the JNDI tree. Clients will use
+    the JNDI tree to locate the interface object they need based on 
+    a hierarchical name. The names available locally within the server
+    have been recently standardized by JavaEE 6. However that specification
+    did not cover external references -- so we have to peek at what 
+    JBoss is telling for the exported name.
+
+---
+java:jboss/exported/javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+---
+
+        * java: - JNDI naming prefix used to determine which implementation
+        is used to lookup the name.
+
+        * jboss/exported/ - names below this context are available outside
+        the server and exclude this portion of the name.
+
+        * javaeeExEAR-1.0-SNAPSHOT/ - name of the deployable artifact. In
+        this case the EAR was deployed and the name included the maven
+        full artifact and version name.
+
+        * javaeeExEJB-1.0-SNAPSHOT/ - name of the EJB component. It too
+        has its full artifact name and version number applied by maven.
+
+        * RegistrarEJB! - name of the EJB. If not changed by the @Stateless
+        annotation or deployment descriptor -- this will be the same name
+        as the POJO class name.
+
+        * myorg.javaeeex.ejb.RegistrarRemote - fully qualified name of 
+        the remote interface.
+
+
+    [[1]] Add the above JNDI name for the @Remote interface in the 
+    RMI Test failsafe configuration.
+
+---
+# javaeeExTest/pom.xml
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+                <systemPropertyVariables>
+                    <jndi.name.registrar>javaeeExEAR-${project.version}/javaeeExEJB-${project.version}/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote</jndi.name.registrar>
+                </systemPropertyVariables>
+            </configuration>
+        </plugin>
+---
+
+    [[1]] Add the dependency on the ejb-client.jar to the RMI Test.
+    This will go in the root dependency area.
+
+---
+        <!-- brings in the EJB-client jar file w/o the EJB -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExEJB</artifactId>
+            <version>${project.version}</version>
+            <type>ejb-client</type>
+            <scope>test</scope>
+        </dependency>
+---
+
+    [[1]] Add the handling of the JNDI name property and the testing
+    of the lookup to the JUnit test.
+
+---
+cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+
+...
+import myorg.javaeeex.ejb.RegistrarRemote;
+...
+public class RegistrarIT {
+    ...
+
+    private static final String registrarJNDI = System.getProperty("jndi.name.registrar");
+    private RegistrarRemote registrar;
+
+    @Before
+    public void setUp() throws Exception {
+        assertNotNull("jndi.name.registrar not supplied", registrarJNDI);
+
+        log.debug("getting jndi initial context");
+        jndi = new InitialContext();
+        log.debug("jndi=" + jndi.getEnvironment());
+        jndi.lookup("/"); //do a quick comms check of JNDI
+
+        log.debug("jndi name:" + registrarJNDI);
+        registrar = (RegistrarRemote)jndi.lookup(registrarJNDI);
+        log.debug("registrar=" + registrar);
+    }
+---
+
+    [[1]] Rebuild the RMI Test and note the attempt and status of 
+    the JNDI lookup of the EJB. 
+
+---
+$ (cd javaeeExTest/; mvn clean install)
+...
+Running myorg.javaeeex.ejbclient.RegistrarIT
+ -getting jndi initial context
+ -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password}
+ -jndi name:javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+ -registrar=Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR-1.0-SNAPSHOT', moduleName='javaeeExEJB-1.0-SNAPSHOT', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.237 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+* {Invoke EJB method through Remote interface}
+
+    [[1]] Enhance the testPing() method to invoke the ping() method
+    of the EJB.
+
+---
+    @Test
+    public void testPing() {
+        log.info("*** testPing ***");
+        registrar.ping();
+    }
+---
+
+    [[1]] Rebuild the RMI Test. Note the processing and status of the 
+    testPing() method as well as the output from the server-side EJB.
+
+---
+$ (cd javaeeExTest/; mvn clean install)
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise Remote Test
+
+...
+
+ -*** testPing ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.876 sec
+...
+---
+---
+//server.log
+18:06:46,712 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) **** init ****
+18:06:46,713 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) ping called
+---
+
+* {Add a few finishing touches}
+
+    Now that we have our full application source tree assembled lets work on
+    a few development lifecycle commands.
+
+    [[1]] In the event you have not changed the EJB or EAR and have only
+    modified your integration test -- you can start the build at a point 
+    that skips rebuilding modules that have not been touched.
+
+---
+mvn clean install -rf :javaeeExEAR
+...
+[INFO] Java EE Exercise EAR .............................. SUCCESS [3.175s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [17.588s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+---
+mvn clean install -rf :javaeeExTest
+...
+[INFO] BUILD SUCCESS
+---
+
+
+    [[1]] If you are running the integration test from within Eclipse
+    and need to application deployed to the server -- you can do a partial 
+    build and leave the application deployed by specifying a phase prior to 
+    post-integration-test. Note in the output below that cargo deploys the
+    application (as a part of pre-integration-test) but the integration 
+    tests are not run and the application is not undeployed. At this point
+    you can run your integration test from within Eclipse.
+
+---
+$ mvn clean pre-integration-test
+---
+---
+[INFO] --- cargo-maven2-plugin:1.2.3:redeploy (cargo-prep) @ javaeeExTest ---
+Oct 20, 2012 6:28:44 PM org.xnio.Xnio <clinit>
+INFO: XNIO Version 3.0.3.GA
+Oct 20, 2012 6:28:44 PM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.0.3.GA
+Oct 20, 2012 6:28:44 PM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 3.2.3.GA
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.524s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.295s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [2.067s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [12.357s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+    [Note:] Since we are currently using a JNDI name supplied via the Test/pom.xml,
+    you will need to provide that JNDI name within Eclipse prior to successfully
+    running the test from the IDE.
+
+    []
+
+* Summary
+
+    * In this exercise, we created a shell of an EJB, EAR, RMI Test, and
+    Maven infrastructure that can be used as the basis for adding the 
+    details of our application. Some things that we did were
+
+        * created maven modules for each module (EJB, EAR, and integration
+        test) in our application.
+
+        * created a parent pom to coordinate root level builds and help
+        assure consistency across leaf modules.
+
+        * created a @Stateless EJB with a @Remote and @Local interface,
+        @PostConstruct and @PreDestroy callbacks, and a single ping()
+        method.
+
+        * created an EAR to house the EJB.
+
+        * created an RMI Test project to deploy and test the EJB. The
+        RMI Test was configured with the cargo plugin for the deployment.
+        It contained a jndi.properties file to locate the JBoss JNDI
+        tree. It contained a failsafe configuration to locate the @Remote
+        interface of the EJB in the JNDI tree and ultimately invoked the
+        ping() method of the EJB.
+
+
+    * This is what we ended up with in the source tree
+
+---
+javaeeEx/
+|-- javaeeExEAR
+|   `-- pom.xml
+|-- javaeeExEJB
+|   |-- pom.xml
+|   `-- src
+|       `-- main
+|           `-- java
+|               `-- myorg
+|                   `-- javaeeex
+|                       `-- ejb
+|                           |-- RegistrarEJB.java
+|                           |-- RegistrarLocal.java
+|                           `-- RegistrarRemote.java
+|-- javaeeExTest
+|   |-- pom.xml
+|   `-- src
+|       `-- test
+|           |-- java
+|           |   `-- myorg
+|           |       `-- javaeeex
+|           |           `-- ejbclient
+|           |               `-- RegistrarIT.java
+|           `-- resources
+|               |-- jndi.properties
+|               `-- log4j.xml
+`-- pom.xml
