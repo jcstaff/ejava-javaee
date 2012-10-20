@@ -110,6 +110,18 @@
         </contributor>
     </contributors>
 
+    <repositories>
+        <!-- needed to resolve released parents -->
+        <repository>
+            <id>webdev</id>
+            <name>ejava webdev repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin> 
