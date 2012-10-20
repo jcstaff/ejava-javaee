@@ -47,15 +47,15 @@ public class TellerRemoteITBase {
     @BeforeClass
     public static void setUpClass() throws Exception {
     	log.info("*** setUpClass() ***");
-		//give application time to fully deploy
-		if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
-			long waitTime=15000;
-	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
-	    	Thread.sleep(waitTime);
-		}
-		else {
-	    	log.info(String.format("startstop not set"));
-		}
+        //give application time to fully deploy
+        if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+                long waitTime=15000;
+        log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+        Thread.sleep(waitTime);
+        }
+        else {
+        log.info(String.format("startstop not set"));
+        }
     }
     
         
