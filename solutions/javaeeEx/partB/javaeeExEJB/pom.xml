@@ -8,75 +8,44 @@
         <groupId>myorg.javaee</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>javaeeExEJB</artifactId>
     <packaging>ejb</packaging>
-
     <name>Java EE Exercise EJB</name>
     <description>
         This project provides example usages of an EJB tier.
     </description>
 
-    <!-- this repository holds many of the javaee jar files -->
-    <repositories>
-        <repository>
-            <id>java.net-repo</id>
-            <name>Java.net Maven Repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <!-- core dependencies -->
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>6.0</version>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-          <version>1.0.4</version>
-          <scope>provided</scope>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- make sure we are building jdk5 or jdk6 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-
-            <!-- tell the EJB plugin we are using EJB3  and configure client-jar -->
-            <plugin>            
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-ejb-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <ejbVersion>3.0</ejbVersion>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
-                    <generateClient>true</generateClient>
-                    <clientExcludes>
-                        <clientExclude>**/META-INF/*.xml</clientExclude>
-                        <clientExclude>**/ejb/*EJB.class</clientExclude>
-                    </clientExcludes>
-                </configuration>
-            </plugin>
+          <!-- tell the EJB plugin to build a client-jar -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-ejb-plugin</artifactId>
+            <configuration>
+                <generateClient>true</generateClient>
+                <clientExcludes>
+                    <clientExclude>**/META-INF/*.xml</clientExclude>
+                    <clientExclude>**/ejb/*EJB.class</clientExclude>
+                </clientExcludes>
+            </configuration>
+        </plugin>
 
         </plugins>
     </build>
 </project>
-

@@ -6,3 +6,4 @@ import javax.ejb.Remote;
 public interface RegistrarRemote {
     void ping();
 }
+
