@@ -50,9 +50,9 @@ public class RegistrarImpl implements Registrar {
 	public Person createPerson(String firstName, String lastName)
 			throws RegistrarException {
         try {
-        	Person person = new Person();
-        	person.setFirstName(firstName);
-        	person.setLastName(lastName);
+            Person person = new Person();
+            person.setFirstName(firstName);
+            person.setLastName(lastName);
             return dao.createPerson(person);
         }
         catch (Throwable ex) {

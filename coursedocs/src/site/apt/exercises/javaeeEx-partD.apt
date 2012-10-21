@@ -21,19 +21,6 @@ Part D: Handle Remote Interface Issues
         }}
 
 
-    [Note:] You can avoid unecessary builds of the javaExImpl
-    project by adding an extra set of parameters to the build that
-    names the module you wish to resume the build from.
-
----
-$ mvn clean install -rf :javaeeExEJB
----
-
-    The above command will begin execution of the build at the EJB
-    and skip the Impl project.
-
-    []
-
 * {Controlling the Test Environment for RMI Tests}
 
     In the single-JVM environment, we had all resources within reach; 
@@ -111,14 +98,13 @@ import java.util.Collection;
 ...
     @Test
     public void testLazy() throws Exception {
-        log.info("*** testLazys ***");
+        log.info("*** testLazy ***");
 
         for(int i=0; i<10; i++) {
             Person person = makePerson();
             person.setLastName("smith" + i);
             registrar.createPerson(person);
         }
-
 
             //the first time we are going to get people straight from the DAO,
             //without cleaning the managed object or creating a new DTO.
@@ -129,47 +115,38 @@ import java.util.Collection;
 
     [[1]] Attempt to build and run the application from the root level. Note how the
     test fails because we have residue left over from the first test when running the
-    second test.
+    second test. 
 
 ---
-$ mvn clean install
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Build Order:
-[INFO] 
-[INFO] Java EE Exercise
-[INFO] Java EE Exercise Impl
-[INFO] Java EE Exercise EJB
-[INFO] Java EE Exercise EAR
-[INFO] Java EE Exercise Remote Test
+$ mvn clean install -rf :javaeeExEJB
+
+ -*** testLazy ***
+Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 2.704 sec <<< FAILURE!
+
+Results :
+
+Failed tests:   testLazy(myorg.javaeeex.ejbclient.RegistrarIT): unexpected number of lazy people expected:<10> but was:<11>
+
+Tests run: 3, Failures: 1, Errors: 0, Skipped: 0
 
 ...
-
- -*** testLazys ***
- Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 3.98 sec <<< FAILURE!
-
- Results :
-
- Failed tests: 
-   testLazy(myorg.javaeeex.ejbclient.RegistrarTest)
-...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [7.366s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.416s]
+[INFO] Java EE Exercise Remote Test ...................... FAILURE [15.709s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 ---
 ---
-./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
-::::::::::::::
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
  -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
- -------------------------------------------------------------------------------
-Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 3.984 sec <<< FAILURE!
-testLazy(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.226 sec  <<< FAILURE!
+Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 2.704 sec <<< FAILURE!
+testLazy(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 0.503 sec  <<< FAILURE!
 java.lang.AssertionError: unexpected number of lazy people expected:<10> but was:<11>
-        at org.junit.Assert.fail(Assert.java:92)
-        at org.junit.Assert.failNotEquals(Assert.java:689)
-        at org.junit.Assert.assertEquals(Assert.java:127)
-        at org.junit.Assert.assertEquals(Assert.java:514)
-        at myorg.javaeeex.ejbclient.RegistrarTest.testLazy(RegistrarTest.java:92)
+        at org.junit.Assert.fail(Assert.java:93)
+        at org.junit.Assert.failNotEquals(Assert.java:647)
+        at org.junit.Assert.assertEquals(Assert.java:128)
+        at org.junit.Assert.assertEquals(Assert.java:472)
+        at myorg.javaeeex.ejbclient.RegistrarIT.testLazy(RegistrarIT.java:85)
 ---
 
 *** Add the ability to control testing environment
@@ -177,11 +154,26 @@ java.lang.AssertionError: unexpected number of lazy people expected:<10> but was
 
     [[1]] Add a TestUtilEJB and @Remote interface that can be used to reset the 
     database to a clean state. In a production system, we would place this in a 
-    separate EJB module. However, for simplicity, lets place it in our existing
+    separate EJB module so we could prevent it from being deployed in the operational
+    system. However, for simplicity, lets place it in our existing
     EJB module right next to the RegistrarEJB. Since the business interface has
     a simple interface that is safe for use for a remote client, have the @Remote 
     interface just extend the business logic interface -- rather than refine it. 
+    The business interface is located in the Impl module.
 
+---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilRemote.java
+
+package myorg.javaeeex.ejb;
+
+import javax.ejb.Remote;
+
+import myorg.javaeeex.bl.TestUtil;
+
+@Remote
+public interface TestUtilRemote extends TestUtil {
+}
+---
 ---
 $ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilEJB.java
 
@@ -225,19 +217,6 @@ public class TestUtilEJB implements TestUtilRemote {
     }
 }
 ---
----
-$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilRemote.java
-
-package myorg.javaeeex.ejb;
-
-import javax.ejb.Remote;
-
-import myorg.javaeeex.bl.TestUtil;
-
-@Remote
-public interface TestUtilRemote extends TestUtil {
-}
----
 
     [[1]] This is what your EJB should look like at this point.
 
@@ -258,39 +237,11 @@ javaeeEx
 |           |               `-- TestUtilRemote.java 
 |           `-- resources                           
 |               `-- META-INF                        
-|                   |-- jboss.xml                   
 |                   `-- persistence.xml       
 ---
 
-    [[1]] Add a custom JNDI name definition for the TestUtilEJB. This is
-    done within META-INF/jboss.xml.
 
----
-$ cat ./javaeeExEJB/src/main/resources/META-INF/jboss.xml
-
-    <enterprise-beans>
-        ...
-        <session>
-            <ejb-name>TestUtilEJB</ejb-name>
-            <jndi-name>/myorg/javaeeEx/TestUtilEJB/remote</jndi-name>
-        </session>
-    </enterprise-beans>
-</jboss>
----
-
-    [[1]] Provide the JNDI name to the RMI Test surefire configuration.
-
----
-$ cat javaeeExTest/pom.xml
-                     ...
-                    <systemPropertyVariables>
-                        ...
-                        <jndi.name.testUtil>myorg/javaeeEx/TestUtilEJB/remote</jndi.name.testUtil>
-                    </systemPropertyVariables>
-                </configuration>
----
-
-    [[1]] Lookup the JNDI name inside the unit test.
+    [[1]] Lookup the JNDI name TestUtilRemote inside the unit test.
 
 ---
 $ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
@@ -299,16 +250,15 @@ $ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
 import myorg.javaeeex.bl.TestUtil;
 import myorg.javaeeex.ejb.TestUtilRemote;
 ...
-    String testUtilJNDI = System.getProperty("jndi.name.testUtil");
-    TestUtil testUtil;
+    private static final String testUtilJNDI = System.getProperty("jndi.name.testUtil",
+        "javaeeExEAR/javaeeExEJB/TestUtilEJB!myorg.javaeeex.ejb.TestUtilRemote");
+    private TestUtil testUtil;
 
     public void setUp() throws Exception {
         ...
-        assertNotNull("jndi.name.testUtil not supplied", testUtilJNDI);
-
-        ...
         log.debug("jndi name:" + testUtilJNDI);
         testUtil = (TestUtilRemote)jndi.lookup(testUtilJNDI);
+        log.debug("testUtil=" + testUtil);
     }
 ---
 
@@ -338,38 +288,44 @@ $ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
     being used to reset the database and the test now passes.
 
 ---
-[INFO] Reactor Summary:
+...
+ -testUtil=Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='TestUtilEJB', view='interface myorg.javaeeex.ejb.TestUtilRemote'}
+ -calling testUtil.resetAll()
+ -testUtil.resetAll() complete
+ -*** testLazy ***
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.419 sec
+
+Results :
+
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.074s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.098s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [12.943s]
 [INFO] ------------------------------------------------------------------------
-[INFO] Java EE Exercise ...................................... SUCCESS [2.359s]
-[INFO] Java EE Exercise Impl ................................. SUCCESS [7.391s]
-[INFO] Java EE Exercise EJB .................................. SUCCESS [0.734s]
-[INFO] Java EE Exercise EAR .................................. SUCCESS [0.469s]
-[INFO] Java EE Exercise Remote Test .......................... SUCCESS [3.219s]
-[INFO] ------------------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESSFUL
+[INFO] BUILD SUCCESS
 ---
 ---
 //SERVER LOG
-22:33:44,504 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] **** init ****
-22:33:44,504 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] em=org.jboss.jpa.tx.TransactionScopedEntityManager@1333e3f
-22:33:44,504 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1e8500a
-22:33:44,505 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] *** getPersonById(1) ***
-22:33:44,588 INFO  [myorg.javaeeex.ejb.TestUtilEJB]  *** TestUtilEJB:init() ***
-22:33:44,591 DEBUG [myorg.javaeeex.jpa.DBUtil] found 4 statements
-22:33:44,591 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+02:48:09,757 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 6) **** init ****
+02:48:09,758 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 6) em=org.jboss.as.jpa.container.TransactionScopedEntityManager@19e2011
+02:48:09,761 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 6) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1734643
+02:48:09,762 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 6) ping called
+02:48:09,860 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) found 4 statements
+02:48:09,861 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) executing:
     alter table JAVAEEEX_ADDRESS 
         drop constraint FKEB70B40A6E18CE38
-22:33:44,594 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+02:48:09,864 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) executing:
 
     drop table JAVAEEEX_ADDRESS if exists
-22:33:44,594 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+02:48:09,890 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) executing:
 
     drop table JAVAEEEX_PERSON if exists
-22:33:44,595 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+02:48:09,892 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) executing:
 
-22:33:44,596 DEBUG [myorg.javaeeex.jpa.DBUtil] found 4 statements
-22:33:44,596 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+02:48:09,895 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) found 4 statements
+02:48:09,898 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) executing:
     create table JAVAEEEX_ADDRESS (
         id bigint generated by default as identity (start with 1),
         city varchar(255),
@@ -379,7 +335,7 @@ $ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
         PERSON_ID bigint,
         primary key (id)
     )
-22:33:44,598 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+02:48:09,902 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) executing:
 
     create table JAVAEEEX_PERSON (
         id bigint generated by default as identity (start with 1),
@@ -388,15 +344,16 @@ $ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
         ssn varchar(255),
         primary key (id)
     )
-22:33:44,599 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+02:48:09,913 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) executing:
 
     alter table JAVAEEEX_ADDRESS 
         add constraint FKEB70B40A6E18CE38 
         foreign key (PERSON_ID) 
         references JAVAEEEX_PERSON
-22:33:44,600 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+02:48:09,924 DEBUG [myorg.javaeeex.jpa.DBUtil] (EJB default - 7) executing:
 
-22:33:44,610 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] *** createPerson() ***
+
+02:48:09,948 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) *** createPerson() ***
 ...
 ---
 
@@ -417,7 +374,7 @@ $ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
     same JVM as the EntityManager and the resources to access the database
     are still in place when a lazily loaded object is inspected. This is a 
     problem when you pass one of these objects outside of the scope of the
-    entity manager -- ala RMI clients.
+    entity manager -- aka RMI clients.
 
 ** Demonstrate Lazy Load Problem
 
@@ -445,39 +402,36 @@ $ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
     actually retrieved.
 
 ---
- -*** testLazys ***
-Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.448 sec <<< FAILURE!
+ -*** testLazy ***
+Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.693 sec <<< FAILURE!
 
 Results :
 
 Tests in error: 
-  testLazy(myorg.javaeeex.ejbclient.RegistrarTest)
+  testLazy(myorg.javaeeex.ejbclient.RegistrarIT): failed to lazily initialize a collection of role: 
+        myorg.javaeeex.bo.Person.addresses, no session or session was closed
 
 Tests run: 3, Failures: 0, Errors: 1, Skipped: 0
 
 ...
-[INFO] Java EE Exercise Remote Test ...................... FAILURE [19.995s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.687s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.837s]
+[INFO] Java EE Exercise Remote Test ...................... FAILURE [15.746s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 ---
 ---
 ./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
 ::::::::::::::
- -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
- -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.449 sec <<< FAILURE!
-testLazy(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.285 sec  <<< ERROR!
-org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.addr
-esses, no session or session was closed
-        at org.hibernate.collection.AbstractPersistentCollection.throwLazyInitializationException(AbstractPersistentCollec
-tion.java:383)
-        at org.hibernate.collection.AbstractPersistentCollection.throwLazyInitializationExceptionIfNotConnected(AbstractPe
-rsistentCollection.java:375)
-        at org.hibernate.collection.AbstractPersistentCollection.initialize(AbstractPersistentCollection.java:368)
-        at org.hibernate.collection.AbstractPersistentCollection.read(AbstractPersistentCollection.java:111)
-        at org.hibernate.collection.PersistentBag.iterator(PersistentBag.java:272)
-        at myorg.javaeeex.ejbclient.RegistrarTest.testLazy(RegistrarTest.java:110)
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.692 sec <<< FAILURE!
+testLazy(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 0.484 sec  <<< ERROR!
+org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.addresses, no session or session 
+was closed
+    ...
+        at org.hibernate.collection.internal.PersistentBag.iterator(PersistentBag.java:266)
+        at myorg.javaeeex.ejbclient.RegistrarIT.testLazy(RegistrarIT.java:105)
 ---
 
 ** Demonstrate a solution to Lazy Load Problem
@@ -491,9 +445,6 @@ $ cat ./javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarRemote.java
 
 ...
 public interface RegistrarRemote {
-    ...
-    Collection<Person> getPeopleByName(String firstName, String lastName)
-        throws RegistrarException;
     Collection<Person> getPeopleByNameHydrated(String firstName, String lastName)
         throws RegistrarException;
 }
@@ -572,13 +523,21 @@ $ mvn clean install
 
 ...
 
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise .................................. SUCCESS [0.428s]
-[INFO] Java EE Exercise Impl ............................. SUCCESS [11.351s]
-[INFO] Java EE Exercise EJB .............................. SUCCESS [4.327s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [0.988s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [19.357s]
+ -*** testLazy ***
+ -got expected lazy instantiation exception:org.hibernate.LazyInitializationException: 
+    failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.addresses, no session or session was closed
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.477 sec
+
+Results :
+
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] Java EE Exercise .................................. SUCCESS [0.658s]
+[INFO] Java EE Exercise Impl ............................. SUCCESS [15.167s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [3.415s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [2.034s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [14.965s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
@@ -940,7 +899,6 @@ javaeeEx
 |           |               `-- TestUtilRemote.java                                           
 |           `-- resources                                                                     
 |               `-- META-INF                                                                  
-|                   |-- jboss.xml                                                             
 |                   `-- persistence.xml      
 ---
 
@@ -1051,37 +1009,25 @@ import myorg.javaeeex.dto.PersonDTO;
     }
 ---
 
-    [[1]] Rebuild and test your application from the root.
-
+    [[1]] Rebuild and test your application from the root. We now are passing
+    information to the RMI client using DTO classes instead of the 
+    persisted entity classes.
 
 ---
-$ mvn clean install
+$ mvn clean install -rf :javaeeExEJB
 
 ...
-
  -*** testDTOs ***
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.974 sec
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.817 sec
 
 Results :
 
 Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] 
-[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
-[WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] 
-[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
-[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise .................................. SUCCESS [0.481s]
-[INFO] Java EE Exercise Impl ............................. SUCCESS [12.046s]
-[INFO] Java EE Exercise EJB .............................. SUCCESS [4.618s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [1.039s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [21.035s]
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.273s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.059s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [13.384s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---

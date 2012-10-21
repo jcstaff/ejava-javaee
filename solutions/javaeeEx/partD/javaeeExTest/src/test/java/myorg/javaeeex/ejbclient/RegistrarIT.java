@@ -1,45 +1,39 @@
 package myorg.javaeeex.ejbclient;
 
 import java.util.Collection;
-
 import javax.naming.InitialContext;
-import org.hibernate.LazyInitializationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import myorg.javaeeex.ejb.RegistrarRemote;
+import org.hibernate.LazyInitializationException;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import myorg.javaeeex.bo.Address;
+import myorg.javaeeex.ejb.RegistrarRemote;
 import myorg.javaeeex.bo.Person;
+import myorg.javaeeex.bo.Address;
 import myorg.javaeeex.bl.TestUtil;
+import myorg.javaeeex.ejb.TestUtilRemote;
 import myorg.javaeeex.dto.AddressDTO;
 import myorg.javaeeex.dto.PersonDTO;
-import myorg.javaeeex.ejb.TestUtilRemote;
 
-public class RegistrarTest {
-    Log log = LogFactory.getLog(RegistrarTest.class);
-    InitialContext jndi;
+public class RegistrarIT {
+    private static final Log log = LogFactory.getLog(RegistrarIT.class);
+    private InitialContext jndi;
 
-    String registrarJNDI = System.getProperty("jndi.name.registrar");
-    String testUtilJNDI = System.getProperty("jndi.name.testUtil");
-    RegistrarRemote registrar;
-    TestUtil testUtil;
+    private static final String registrarJNDI = System.getProperty("jndi.name.registrar",
+        "javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote");
+    private RegistrarRemote registrar;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    	Thread.sleep(3000);
-    }
-    
+    private static final String testUtilJNDI = System.getProperty("jndi.name.testUtil",
+        "javaeeExEAR/javaeeExEJB/TestUtilEJB!myorg.javaeeex.ejb.TestUtilRemote");
+    private TestUtil testUtil;
+
     @Before
     public void setUp() throws Exception {
         assertNotNull("jndi.name.registrar not supplied", registrarJNDI);
-        assertNotNull("jndi.name.testUtil not supplied", testUtilJNDI);
 
         log.debug("getting jndi initial context");
         jndi = new InitialContext();
@@ -48,9 +42,11 @@ public class RegistrarTest {
 
         log.debug("jndi name:" + registrarJNDI);
         registrar = (RegistrarRemote)jndi.lookup(registrarJNDI);
+        log.debug("registrar=" + registrar);
 
         log.debug("jndi name:" + testUtilJNDI);
         testUtil = (TestUtilRemote)jndi.lookup(testUtilJNDI);
+        log.debug("testUtil=" + testUtil);
 
         cleanup();
     }
@@ -60,7 +56,6 @@ public class RegistrarTest {
         testUtil.resetAll();
         log.info("testUtil.resetAll() complete");
     }
-
 
     @Test
     public void testPing() {
@@ -97,14 +92,13 @@ public class RegistrarTest {
 
     @Test
     public void testLazy() throws Exception {
-        log.info("*** testLazys ***");
+        log.info("*** testLazy ***");
 
         for(int i=0; i<10; i++) {
             Person person = makePerson();
             person.setLastName("smith" + i);
             registrar.createPerson(person);
         }
-
 
             //the first time we are going to get people straight from the DAO,
             //without cleaning the managed object or creating a new DTO.

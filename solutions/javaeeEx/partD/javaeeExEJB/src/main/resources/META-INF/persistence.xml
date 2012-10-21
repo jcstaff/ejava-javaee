@@ -5,14 +5,14 @@
 
     <persistence-unit name="javaeeEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <jta-data-source>java:/ejavaDS</jta-data-source>
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
         <mapping-file>META-INF/orm.xml</mapping-file>
         <jar-file>javaeeExImpl-${project.version}.jar</jar-file>
         <properties>
             <property name="hibernate.dialect" value="${hibernate.dialect}"/>
-            <property name="hibernate.show_sql" value="false"/>            
+            <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.hbm2ddl.auto" value="create"/>
         </properties>
-    </persistence-unit>            
+    </persistence-unit>
     
 </persistence>

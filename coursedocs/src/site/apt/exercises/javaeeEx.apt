@@ -71,8 +71,7 @@ JavaEE EJB, EAR, and RMI Client Exercise
     * {{{./javaeeEx-partC.html}Part C}}: Integrate Business Logic,
         Data Access Tier, and the Persistence Unit within the EJB
 
-    * Part D: Handling Remote Interface Issues
-~~    * {{{./javaeeEx-partD.html}Part D}}: Handling Remote Interface Issues
+    * {{{./javaeeEx-partD.html}Part D}}: Handling Remote Interface Issues
 
     * Part E: Create a WAR Project Shell
 ~~    * {{{./javaeeEx-partE.html}Part E}}: Create a WAR Project Shell
@@ -113,34 +112,33 @@ javaeeEx
 |               |   `-- persistence.xml
 |               |-- roles.properties
 |               `-- users.properties
-|-- javaeeExImpl                                    
-|   |-- pom.xml                                     
-|   `-- src                                         
-|       |-- main                                    
-|       |   |-- java                                
-|       |   |   `-- myorg                           
-|       |   |       `-- javaeeex                    
-|       |   |           |-- bl                      
-|       |   |           |   |-- Registrar.java      
+|-- javaeeExImpl
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   |-- java
+|       |   |   `-- myorg
+|       |   |       `-- javaeeex
+|       |   |           |-- bl
 |       |   |           |   |-- RegistrarException.java
-|       |   |           |   `-- TestUtil.java          
-|       |   |           |-- blimpl                     
-|       |   |           |   |-- RegistrarImpl.java     
-|       |   |           |   `-- TestUtilImpl.java      
-|       |   |           |-- bo                         
-|       |   |           |   |-- Address.java           
-|       |   |           |   `-- Person.java            
-|       |   |           |-- dao                        
-|       |   |           |   |-- PersonDAO.java         
-|       |   |           |   `-- PersonDAOException.java
-|       |   |           `-- jpa                        
-|       |   |               |-- DBUtil.java            
-|       |   |               `-- JPAPersonDAO.java      
-|       |   `-- resources                              
-|       |       `-- META-INF                           
-|       |           |-- orm.xml                        
-|       |           `-- persistence.xml                
-|       `-- test                                       
+|       |   |           |   |-- Registrar.java
+|       |   |           |   `-- TestUtil.java
+|       |   |           |-- blimpl
+|       |   |           |   |-- RegistrarImpl.java
+|       |   |           |   `-- TestUtilImpl.java
+|       |   |           |-- bo
+|       |   |           |   |-- Address.java
+|       |   |           |   `-- Person.java
+|       |   |           |-- dao
+|       |   |           |   |-- PersonDAOException.java
+|       |   |           |   `-- PersonDAO.java
+|       |   |           `-- jpa
+|       |   |               |-- DBUtil.java
+|       |   |               `-- JPAPersonDAO.java
+|       |   `-- resources
+|       |       `-- META-INF
+|       |           `-- orm.xml
+|       `-- test
 |           |-- java
 |           |   `-- myorg
 |           |       `-- javaeeex
@@ -154,8 +152,10 @@ javaeeEx
 |           |               |-- DemoBase.java
 |           |               `-- JPAPersonDAOTest.java
 |           `-- resources
-|               `-- log4j.xml
-|-- javaeeExTest
+|               |-- log4j.xml
+|               `-- META-INF
+|                   `-- persistence.xml
+-- javaeeExTest
 |   |-- pom.xml
 |   `-- src
 |       `-- test
@@ -163,7 +163,7 @@ javaeeEx
 |           |   `-- myorg
 |           |       `-- javaeeex
 |           |           `-- ejbclient
-|           |               `-- RegistrarTest.java
+|           |               `-- RegistrarIT.java
 |           `-- resources
 |               |-- jndi.properties
 |               |-- log4j.xml

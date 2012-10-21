@@ -52,6 +52,7 @@ public class AddressDTO implements Serializable {
     public void setZip(String zip) {
         this.zip = zip;
     }
+
     public String toString() {
         StringBuilder text = new StringBuilder();
 
@@ -62,4 +63,3 @@ public class AddressDTO implements Serializable {
         return text.toString();
     }
 }
-

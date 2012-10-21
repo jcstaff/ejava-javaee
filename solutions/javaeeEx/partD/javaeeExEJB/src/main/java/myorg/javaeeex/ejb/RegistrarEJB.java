@@ -1,23 +1,21 @@
 package myorg.javaeeex.ejb;
 
-import java.util.Collection;
 import java.util.ArrayList;
-
+import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.Stateless;
 import javax.ejb.EJBException;
-
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import myorg.javaeeex.bl.Registrar;
 import myorg.javaeeex.blimpl.RegistrarImpl;
 import myorg.javaeeex.dao.PersonDAO;
 import myorg.javaeeex.jpa.JPAPersonDAO;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import myorg.javaeeex.bl.RegistrarException;
 import myorg.javaeeex.bo.Person;
 import myorg.javaeeex.bo.Address;
@@ -151,7 +149,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
         }
     }
 
-    public Collection<PersonDTO> getPeopleByNameDTO(
+   public Collection<PersonDTO> getPeopleByNameDTO(
            String firstName, String lastName)
            throws RegistrarException {
        log.debug("*** getPeopleByNameDTO() ***");
@@ -170,9 +168,9 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
            log.error(ex);
            throw new RegistrarException(ex.toString());
        }
-    }
+   }
 
-    private PersonDTO makeDTO(Person personBO) {
+   private PersonDTO makeDTO(Person personBO) {
        PersonDTO personDTO = new PersonDTO(personBO.getId());
        personDTO.setFirstName(personBO.getFirstName());
        personDTO.setLastName(personBO.getLastName());

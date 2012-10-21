@@ -37,4 +37,3 @@ public class TestUtilEJB implements TestUtilRemote {
         }
     }
 }
-
