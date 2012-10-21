@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>myorg.javaee</groupId>
     <artifactId>javaeeEx</artifactId>
     <packaging>pom</packaging>
@@ -17,127 +17,364 @@
         <module>javaeeExImpl</module>
         <module>javaeeExEJB</module>
         <module>javaeeExEAR</module>
+        <module>javaeeExTest</module>
     </modules>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+        <maven-ear-plugin.version>2.7</maven-ear-plugin.version>
+        <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
+        <maven-failsafe-plugin.version>2.12.2</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
+        <cargo-maven2-plugin.version>1.2.3</cargo-maven2-plugin.version>
+        <cargo.containerId>jboss71x</cargo.containerId>
+        <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
+        <hibernate3.version>3.6.0.Final</hibernate3.version>
+        <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
+
+        <commons-logging.version>1.1.1</commons-logging.version>
+        <ejava.version>3.0.2012.2-SNAPSHOT</ejava.version>
+        <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
+        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
+        <h2db.version>1.3.168</h2db.version>
+        <javaee-api.version>6.0</javaee-api.version>
+        <junit.version>4.10</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+        <slf4j.version>1.6.1</slf4j.version>
+
+        <jboss.version>7.1.1.Final</jboss.version>
+        <jboss.host>localhost</jboss.host>
+        <jboss.naming.port>4447</jboss.naming.port>
+        <jboss.user>admin</jboss.user>
+        <jboss.password>password</jboss.password>
+        <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
+        <jboss.mgmt.port>9999</jboss.mgmt.port>
+        <jndi.user>known</jndi.user>
+        <jndi.password>password</jndi.password>
+
+        <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
+        <jboss.remoting.java.naming.provider.url>remote://${jboss.host}:${jboss.naming.port}</jboss.remoting.java.naming.provider.url>
+        <jboss.remoting.java.naming.factory.url.pkgs/>
+        <jboss.remoting.java.naming.security.principal>${jndi.user}</jboss.remoting.java.naming.security.principal>
+        <jboss.remoting.java.naming.security.credentials>${jndi.password}</jboss.remoting.java.naming.security.credentials>
+
+        <jdbc.driver>org.h2.Driver</jdbc.driver>
+        <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
+        <jdbc.user>sa</jdbc.user>
+        <jdbc.password/>
+        <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
+    </properties>
+
     <repositories>
-        <repository> <!--  this is needed to keep the build from trying to 
-                resolve artifacts from the deprecated repository.jboss.org repo -->
-            <id>maven-nuxeo</id>
-            <name>Maven Nuxeo Repository</name>
-            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
+        <repository>
+            <id>webdev</id>
+            <name>ejava webdev repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
             <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <enabled>false</enabled>
             </snapshots>
-        </repository>    
+        </repository>
+        <repository>
+            <id>webdev-snapshot</id>
+            <name>ejava webdev snapshot repository</name>
+            <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
     </repositories>
     <pluginRepositories>
-        <pluginRepository> <!--  this is needed to keep the build from trying to 
-                resolve artifacts from the deprecated repository.jboss.org repo -->
-            <id>maven-nuxeo</id>
-            <name>Maven Nuxeo Repository</name>
-            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </pluginRepository>    
     </pluginRepositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax</groupId>
+                <artifactId>javaee-api</artifactId>
+                <version>${javaee-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>    
+            <dependency>
+                <groupId>ejava.common</groupId>
+                <artifactId>jboss-rmi-client</artifactId>
+                <version>${ejava.version}</version>
+                <type>pom</type>
+            </dependency>    
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.0-api</artifactId>
+                <version>${hibernate-jpa-2.0-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate-entitymanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2db.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <!-- defines configuration - not use -->
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                    </configuration>	                
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ejb-plugin</artifactId>
+                    <version>${maven-ejb-plugin.version}</version>
+                    <configuration>
+                        <ejbVersion>3.1</ejbVersion>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ear-plugin</artifactId>
+                    <version>${maven-ear-plugin.version}</version>
+                    <configuration>
+                       <version>6</version>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                </plugin>
+
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                    <executions>
+                        <execution> <!-- run the tests here -->
+                           <id>integration-test</id> 
+                               <phase>integration-test</phase>
+                           <goals>
+                               <goal>integration-test</goal>
+                           </goals>
+                        </execution>
+                        <execution> <!--  delay failures to after undeploy -->
+                            <id>verify</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>hibernate3-maven-plugin</artifactId>
+                    <version>${hibernate3-maven-plugin.version}</version>
+                    <extensions>true</extensions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-entitymanager</artifactId>
+                            <version>${hibernate3.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>generate-drop-ddl</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="false" drop="true" format="true" 
+                                        outputfilename="${project.artifactId}-dropJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>generate-create-ddl</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="true" drop="false" format="true" 
+                                        outputfilename="${project.artifactId}-createJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>        
+                    <version>${sql-maven-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>${cargo-maven2-plugin.version}</version>
+                    <configuration>
+                        <container>
+                            <containerId>${cargo.containerId}</containerId>
+                            <type>remote</type>
+                            <log>target/server.log</log>
+                            <output>target/output.log</output>
+                        </container>
+                        <configuration>
+                            <type>runtime</type>
+                            <properties>
+                                <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+                                <cargo.jboss.management.port>${jboss.mgmt.port}</cargo.jboss.management.port>
+                            </properties>
+                        </configuration>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jboss.as</groupId>
+                            <artifactId>jboss-as-controller-client</artifactId>
+                            <version>${jboss.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                       <execution>
+                           <id>cargo-prep</id> 
+                               <phase>pre-integration-test</phase>
+                           <goals>
+                                <goal>redeploy</goal>
+                           </goals>
+                       </execution>
+                        <execution>
+                            <id>cargo-post</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>undeploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+    	</pluginManagement>
+    </build>
+
     <profiles>
-        <profile>
-            <id>functional-tests</id>
+        <profile> <!-- tells surefire/failsafe to run JUnit tests with remote debug -->
+            <id>debugger</id>
             <activation>
                 <property>
-                    <name>!maven.test.skip</name>
+                    <name>debugger</name>
                 </property>
             </activation>
-            <modules>
-                <module>javaeeExTest</module>
-            </modules>
-        </profile>
+            <properties>
+                <surefire.argLine>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE</surefire.argLine>
+            </properties>                                  
+        </profile>        
 
-    	<!--  tell Eclipse what to do with some of the plugins -->
+        <!--  tell Eclipse what to do with some of the plugins -->
         <profile>
-	      <id>m2e</id>
-	      <activation>
-	        <property>
-	          <name>m2e.version</name>
-	        </property>
-	      </activation>
-	      <build>
-	      	<pluginManagement>
+            <id>m2e</id>
+            <activation>
+                <property>
+                <name>m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
                     <plugins>
+                       <plugin>
+                          <groupId>org.eclipse.m2e</groupId>
+                          <artifactId>lifecycle-mapping</artifactId>
+                          <version>1.0.0</version>
+                          <configuration>
+                            <lifecycleMappingMetadata>
+                              <pluginExecutions>
 
-	               <plugin>
-	                  <groupId>org.eclipse.m2e</groupId>
-	                  <artifactId>lifecycle-mapping</artifactId>
-	                  <version>1.0.0</version>
-	                  <configuration>
-	                    <lifecycleMappingMetadata>
-	                      <pluginExecutions>
+                                  <pluginExecution>
+                                      <pluginExecutionFilter>
+                                          <groupId>org.codehaus.mojo</groupId>
+                                          <artifactId>hibernate3-maven-plugin</artifactId>
+                                          <versionRange>[3.0,)</versionRange>
+                                          <goals>
+                                              <goal>run</goal>
+                                          </goals>
+                                      </pluginExecutionFilter>
+                                      <action>
+                                          <ignore/>
+                                      </action>
+                                  </pluginExecution>
 
-	                        <pluginExecution>
-	                          <pluginExecutionFilter>
-	                            <groupId>org.codehaus.cargo</groupId>
-	                            <artifactId>cargo-maven2-plugin</artifactId>
-	                            <versionRange>[1.0.4,)</versionRange>
-	                            <goals>
-	                              <goal>deploy</goal>
-	                              <goal>undeploy</goal>
-	                              <goal>redeploy</goal>
-	                            </goals>
-	                          </pluginExecutionFilter>
-	                          <action>
-	                            <ignore/>
-	                          </action>
-	                        </pluginExecution>
+                                  <pluginExecution>
+                                      <pluginExecutionFilter>
+                                          <groupId>org.codehaus.mojo</groupId>
+                                          <artifactId>sql-maven-plugin</artifactId>
+                                          <versionRange>[1.0.0,)</versionRange>
+                                          <goals>
+                                              <goal>execute</goal>
+                                          </goals>
+                                      </pluginExecutionFilter>
+                                      <action>
+                                          <ignore/>
+                                      </action>
+                                  </pluginExecution>
 
-	                        <pluginExecution>
-	                          <pluginExecutionFilter>
-	                            <groupId>org.codehaus.mojo</groupId>
-	                            <artifactId>hibernate3-maven-plugin</artifactId>
-	                            <versionRange>[2.2,)</versionRange>
-	                            <goals>
-	                              <goal>hbm2ddl</goal>
-	                            </goals>
-	                          </pluginExecutionFilter>
-	                          <action>
-	                            <ignore/>
-	                          </action>
-	                        </pluginExecution>
-	                        <pluginExecution>
-	                          <pluginExecutionFilter>
-	                            <groupId>org.codehaus.mojo</groupId>
-	                            <artifactId>sql-maven-plugin</artifactId>
-	                            <versionRange>[1.0.0,)</versionRange>
-	                            <goals>
-	                              <goal>execute</goal>
-	                            </goals>
-	                          </pluginExecutionFilter>
-	                          <action>
-	                            <ignore/>
-	                          </action>
-	                        </pluginExecution>
-	                      </pluginExecutions>
-	                    </lifecycleMappingMetadata>
-	                  </configuration>
-	                </plugin>
+                              </pluginExecutions>
+                            </lifecycleMappingMetadata>
+                          </configuration>
+                        </plugin>
 
                     </plugins>
-	      	</pluginManagement>
-           </build>
+                </pluginManagement>
+            </build>
         </profile>
     </profiles>
 </project>
-

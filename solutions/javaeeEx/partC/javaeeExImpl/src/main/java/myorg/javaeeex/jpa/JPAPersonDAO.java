@@ -15,7 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class JPAPersonDAO implements PersonDAO {
-    private static Log log = LogFactory.getLog(JPAPersonDAO.class);
+    private static final Log log = LogFactory.getLog(JPAPersonDAO.class);
     
     private EntityManager em;
     

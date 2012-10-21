@@ -1,0 +1,1106 @@
+Java EE Exercise 
+
+Part C: Integrate Business Logic, Data Access Tier, and the
+Persistence Unit within the EJB
+
+* Objectives
+
+    * Bring in a separate module of code within the EJB. We will
+    be happy to successfully compile and resolve classes at
+    runtime within the EJB. However, we won't be ready to do 
+    anything with them just yet. 
+
+        * {{{Integrate_Business_Logic_Classes_into_EJB}
+            Integrate Business Logic Classes into EJB}}
+
+    * Add the necessary Persistence Unit to be able to fully
+    initialize the DAO and begin to make use of the business
+    logic and data access tier.
+
+        * {{{Integrate_EntityManager_into_EJB}
+            Integrate EntityManager into EJB}}
+
+    * Add a few sample business methods and test end-to-end.
+
+        * {{{End_to_End_Test_EJB}
+            End to End Test EJB}}
+
+* {Integrate Business Logic Classes into EJB}
+
+    No matter how much or little code you place within the EJB,
+    sooner or later you will need to use external logic with
+    the EJB component. In this part, we will integrate in the 
+    classes of the pre-built business logic implementation. 
+    We are only concerned with resolving artifacts and classes
+    at this point. 
+
+    [[1]] Copy the javaeeExImpl solution from the class examples.
+    You will find a copy within solutions/javaeeEx/partC. 
+    
+---
+$ cd javaeeEx
+cp -r (class examples root)/solutions/javaeeEx/partC/javaeeExImpl .
+---
+    
+    Your directory will look like the following when you are complete.
+
+---
+javaeeEx                                   
+|-- javaeeExEAR                         
+|   `-- ...
+|-- javaeeExEJB                         
+|   |-- ...
+|-- javaeeExImpl
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   |-- java
+|       |   |   `-- myorg
+|       |   |       `-- javaeeex
+|       |   |           |-- bl
+|       |   |           |   |-- RegistrarException.java
+|       |   |           |   |-- Registrar.java
+|       |   |           |   `-- TestUtil.java
+|       |   |           |-- blimpl
+|       |   |           |   |-- RegistrarImpl.java
+|       |   |           |   `-- TestUtilImpl.java
+|       |   |           |-- bo
+|       |   |           |   |-- Address.java
+|       |   |           |   `-- Person.java
+|       |   |           |-- dao
+|       |   |           |   |-- PersonDAOException.java
+|       |   |           |   `-- PersonDAO.java
+|       |   |           `-- jpa
+|       |   |               |-- DBUtil.java
+|       |   |               `-- JPAPersonDAO.java
+|       |   `-- resources
+|       |       `-- META-INF
+|       |           `-- orm.xml
+|       `-- test
+|           |-- java
+|           |   `-- myorg
+|           |       `-- javaeeex
+|           |           |-- blimpl
+|           |           |   |-- RegistrarImplTest.java
+|           |           |   `-- TestUtilTest.java
+|           |           |-- bo
+|           |           |   `-- PersonTest.java
+|           |           `-- jpa
+|           |               |-- DBUtilTest.java
+|           |               |-- DemoBase.java
+|           |               `-- JPAPersonDAOTest.java
+|           `-- resources
+|               |-- log4j.xml
+|               `-- META-INF
+|                   `-- persistence.xml
+|-- javaeeExTest
+|   |-- ...
+`-- pom.xml
+---
+
+    [[1]] Add the new child module to the list of modules being built by the 
+    parent.
+
+---
+# pom.xml
+
+    <modules>
+        <module>javaeeExImpl</module>
+        <module>javaeeExEJB</module>
+        <module>javaeeExEAR</module>
+        <module>javaeeExTest</module>
+    </modules>
+---
+
+    [[1]] Add the following dependencyManagement to your parent pom to 
+    account for certain dependencies used by the Impl project.
+
+---
+    <properties>
+        ...
+        <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
+        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
+        <h2db.version>1.3.168</h2db.version>
+        <slf4j.version>1.6.1</slf4j.version>
+...
+    <dependencyManagement>
+        <dependencies>
+            ...
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.0-api</artifactId>
+                <version>${hibernate-jpa-2.0-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate-entitymanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupid>org.slf4j</groupid>
+                <artifactid>slf4j-log4j12</artifactid>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2db.version}</version>
+            </dependency>
+---
+
+    [[1]] Add the following pluginManagement to your parent pom to 
+    account for certain plugins used by the Impl project.
+
+---
+    <properties>
+        ...
+        <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
+        <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
+        <hibernate3.version>3.6.0.Final</hibernate3.version>
+        <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
+...
+    	<pluginManagement>
+            <plugins>
+            ...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>hibernate3-maven-plugin</artifactId>
+                    <version>${hibernate3-maven-plugin.version}</version>
+                    <extensions>true</extensions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-entitymanager</artifactId>
+                            <version>${hibernate3.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>generate-drop-ddl</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="false" drop="true" format="true" 
+                                        outputfilename="${project.artifactId}-dropJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>generate-create-ddl</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="true" drop="false" format="true" 
+                                        outputfilename="${project.artifactId}-createJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>        
+                    <version>${sql-maven-plugin.version}</version>
+                </plugin>
+---
+
+    [Note] The new Impl module will add two plugins that may
+    trigger an error within Eclipse. If that is the case, add the following
+    lifecycle mapping plugin definition to the root pom to tell Eclipse
+    to ignore the unrecognized plugins. We can latch it within a profile
+    that only activates the profile while within Eclipse.
+
+---
+# pom.xml
+
+        <!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+              <id>m2e</id>
+              <activation>
+                <property>
+                  <name>m2e.version</name>
+                </property>
+              </activation>
+              <build>
+                <pluginManagement>
+                    <plugins>
+
+                       <plugin>
+                          <groupId>org.eclipse.m2e</groupId>
+                          <artifactId>lifecycle-mapping</artifactId>
+                          <version>1.0.0</version>
+                          <configuration>
+                            <lifecycleMappingMetadata>
+                              <pluginExecutions>
+
+                                  <pluginExecution>
+                                      <pluginExecutionFilter>
+                                          <groupId>org.codehaus.mojo</groupId>
+                                          <artifactId>hibernate3-maven-plugin</artifactId>
+                                          <versionRange>[3.0,)</versionRange>
+                                          <goals>
+                                              <goal>run</goal>
+                                          </goals>
+                                      </pluginExecutionFilter>
+                                      <action>
+                                          <ignore/>
+                                      </action>
+                                  </pluginExecution>
+
+                                  <pluginExecution>
+                                      <pluginExecutionFilter>
+                                          <groupId>org.codehaus.mojo</groupId>
+                                          <artifactId>sql-maven-plugin</artifactId>
+                                          <versionRange>[1.0.0,)</versionRange>
+                                          <goals>
+                                              <goal>execute</goal>
+                                          </goals>
+                                      </pluginExecutionFilter>
+                                      <action>
+                                          <ignore/>
+                                      </action>
+                                  </pluginExecution>
+
+                              </pluginExecutions>
+                            </lifecycleMappingMetadata>
+                          </configuration>
+                        </plugin>
+
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
+---
+
+    []
+
+    [[1]] Verify that the Impl and the entire application compiles and deploys from 
+    the root.
+
+---
+$ mvn clean install
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise
+[INFO] Java EE Exercise Impl
+[INFO] Java EE Exercise EJB
+[INFO] Java EE Exercise EAR
+[INFO] Java EE Exercise Remote Test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+...
+
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.395s]
+[INFO] Java EE Exercise Impl ............................. SUCCESS [11.150s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [3.877s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.057s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [25.080s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+    [Note:] You can avoid unecessary builds of the javaExImpl
+    project by adding an extra set of parameters to the build that
+    names the module you wish to resume the build from.
+
+---
+$ mvn clean install -rf :javaeeExEJB
+---
+
+    The above command will begin execution of the build at the EJB
+    and skip the Impl project.
+
+    []
+
+    [[1]] Add a dependency from the EJB to the Impl project. This edit is done
+    within the EJB/pom.xml. 
+
+---
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExImpl</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+---
+
+    [[1]] You should rebuild the application to verify that the Impl is 
+    correctly located by the EJB project at this time.
+
+---
+$ mvn clean install -rf :javaeeExEJB
+
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.617s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.823s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [12.768s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+...
+---
+
+    [[1]] Integerate the business logic and DAO classes for the Impl 
+    partially into our stateless session bean.
+
+---
+...
+
+import javax.ejb.EJBException;
+
+import myorg.javaeeex.bl.Registrar;
+import myorg.javaeeex.blimpl.RegistrarImpl;
+import myorg.javaeeex.dao.PersonDAO;
+import myorg.javaeeex.jpa.JPAPersonDAO;
+
+@Stateless
+public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
+    private static Log log = LogFactory.getLog(RegistrarEJB.class);
+    private Registrar registrar;
+
+    @PostConstruct
+    public void init() {
+        try {
+            log.debug("**** init ****");
+            PersonDAO dao = new JPAPersonDAO();
+            //still missing the EntityManager at this point
+
+            registrar = new RegistrarImpl();
+            ((RegistrarImpl)registrar).setDAO(dao);
+            log.debug("init complete, registrar=" + registrar);
+        }
+        catch (Throwable ex) {
+            log.error("error in init", ex);
+            throw new EJBException("error in init" + ex);
+        }
+    }
+
+---
+
+    [[1]] Build your application from the root and look at the output 
+    on the server.
+
+---
+$ mvn clean install -rf :javaeeExEJB
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.219s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.136s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [11.197s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+---
+//SERVER LOG
+
+23:49:52,128 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) **** init ****
+23:49:52,136 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@d7a5e2
+23:49:52,137 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) ping called
+---
+
+    [[1]] Look at the contents of the EAR that was deployed. Notice the the 
+    Impl dependency was added to the root directory of the war.
+
+---
+$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
+
+javaeeExEJB.jar
+META-INF/application.xml
+javaeeExImpl-1.0-SNAPSHOT.jar
+...
+---
+
+    [[1]] Look at the EJB.jar/META-INF/MANIFEST.MF#Class-Path. You will
+    have to extract it first from the EJB.jar. Notice the EJB lists the
+    Impl in the classpath at the root. This is because the dependency
+    scope=compile.
+
+---
+$ cd javaeeExEJB/target/
+$ mkdir tmp
+$ cd tmp
+$ unzip ../javaeeExEJB-1.0-SNAPSHOT.jar META-INF/MANIFEST.MF
+Archive:  ../javaeeExEJB-1.0-SNAPSHOT.jar
+  inflating: META-INF/MANIFEST.MF    
+
+$ cat META-INF/MANIFEST.MF 
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: jcstaff
+Build-Jdk: 1.6.0_24
+Class-Path: javaeeExImpl-1.0-SNAPSHOT.jar
+---
+
+    [Note:] You may be asking yourself - "I already have a working application.
+    Why do I need to break it and modify it to work again?". If the application
+    is all it is going to be -- then you might be right. However, there are
+    going to be many times when unwanted artifacts make its way into your
+    EAR's dependency tree and you need to apply some of the techniques that 
+    follow to understand why they exist and how they can be removed.
+
+    []
+
+    [[1]] Replace the scope=compile dependency on the Impl project with
+    a scope=provided. This will temporarily cause the artifact to be
+    left out of the deployment and the deployment to fail.
+
+---
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExImpl</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+---
+---
+$ mvn clean install -rf :javaeeExEJB
+
+[INFO] Java EE Exercise EJB .............................. SUCCESS [7.391s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.024s]
+[INFO] Java EE Exercise Remote Test ...................... FAILURE [10.923s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+...
+[ERROR] Failed to execute goal org.codehaus.cargo:cargo-maven2-plugin:1.2.3:redeploy 
+(cargo-prep) on project javaeeExTest: Execution cargo-prep of goal org.codehaus.cargo:cargo-maven2-plugin:1.2.3:redeploy 
+failed: Cannot deploy deployable org.codehaus.cargo.container.deployable.EAR[javaeeExEAR-1.0-SNA
+---
+---
+# SERVER CONSOLE
+
+00:04:02,474 ERROR [org.jboss.msc.service.fail] (MSC service thread 1-3) MSC00001: Failed to start service jboss.deployment.subunit."javaeeExEAR-1.0-SNAPSHOT.ear"."javaeeExEJB.jar".POST_MODULE: org.jboss.msc.service.StartException in service jboss.deployment.subunit."javaeeExEAR-1.0-SNAPSHOT.ear"."javaeeExEJB.jar".POST_MODULE: Failed to process phase POST_MODULE of subdeployment "javaeeExEJB.jar" of deployment "javaeeExEAR-1.0-SNAPSHOT.ear"
+...
+Caused by: java.lang.NoClassDefFoundError: myorg/javaeeex/bl/Registrar
+...
+00:04:02,726 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015877: Stopped deployment javaeeExEJB.jar in 14ms
+00:04:02,736 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015877: Stopped deployment javaeeExEAR-1.0-SNAPSHOT.ear in 25ms
+00:04:02,744 INFO  [org.jboss.as.controller] (management-handler-thread - 47) JBAS014774: Service status report
+JBAS014777:   Services which failed to start:      service jboss.deployment.subunit."javaeeExEAR-1.0-SNAPSHOT.ear"."javaeeExEJB.jar".POST_MODULE: org.jboss.msc.service.StartException in service jboss.deployment.subunit."javaeeExEAR-1.0-SNAPSHOT.ear"."javaeeExEJB.jar".POST_MODULE: Failed to process phase POST_MODULE of subdeployment "javaeeExEJB.jar" of deployment "javaeeExEAR-1.0-SNAPSHOT.ear"
+
+---
+
+    [[1]] Verify the EAR no longer contains the Impl project.
+
+---
+$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
+
+javaeeExEJB.jar
+META-INF/application.xml                                                                                                                               
+...
+---
+
+    [[1]] Define a direct dependency from the EJB to the Impl project.
+    Make the scope=compile (the default).
+
+---
+# javaeeExEAR/pom.xml
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+---
+
+    [[1]] Define an application.xml#library-directory for the EAR to
+    place common artifacts.  All artifacts placed into this directory
+    will be globally shared across all components within the EAR.
+
+---
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <applicationName>${project.artifactId}</applicationName>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <modules>
+                    ...
+                </configuration>
+            </plugin>
+---
+
+    [[1]] Rebuild the EAR and verify the new archive contains the 
+    specified lib directory.
+
+---
+$ (cd javaeeExEAR; mvn clean install)
+
+...
+[INFO] BUILD SUCCESS
+---
+---
+$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
+
+javaeeExEJB.jar
+META-INF/application.xml
+lib/commons-logging-1.1.1.jar
+lib/javaeeExImpl-1.0-SNAPSHOT.jar
+...
+---
+
+    [[1]] Remove the unwanted copy of commons-logging that came in with
+    the direct dependency from the EAR to Impl module.
+
+---
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExImpl</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <!-- server doesn't want to see already provided jars -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+---
+
+    [[1]] Rebuild the EAR and verify the new archive contains the 
+    no longer has the commons-logging artifact that showed up earlier.
+
+---
+$ (cd javaeeExEAR; mvn clean install)
+
+...
+[INFO] BUILD SUCCESS
+---
+---
+$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
+
+javaeeExEJB.jar
+META-INF/application.xml
+lib/javaeeExImpl-1.0-SNAPSHOT.jar
+...
+---
+
+    [[1]] Verify the maven-built application.xml references the lib directory
+    as the library-directory.
+
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_6.xsd" version="6">
+  <application-name>javaeeExEAR</application-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <display-name>javaeeExEAR</display-name>
+  <module>
+    <ejb>javaeeExEJB.jar</ejb>
+  </module>
+  <library-directory>lib</library-directory>
+</application>
+---
+
+    [[1]] Verify the contents EJB.jar/META-INF/MANIFEST.MF#Class-Path is missing 
+    a Class-Path reference to to Impl project.
+
+---
+$ cd javaeeExEJB/target/
+$ mkdir tmp
+$ cd tmp
+$ unzip ../javaeeExEJB-1.0-SNAPSHOT.jar META-INF/MANIFEST.MF
+Archive:  ../javaeeExEJB-1.0-SNAPSHOT.jar
+  inflating: META-INF/MANIFEST.MF    
+
+$ cat META-INF/MANIFEST.MF 
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: jcstaff
+Build-Jdk: 1.6.0_24
+---
+
+    [[1]] Re-deploy and re-test the application using the new configuration.
+
+---
+$ mvn clean install -rf :javaeeExTest
+
+...
+[INFO] BUILD SUCCESS
+---
+
+    Feel in control of your EAR yet?
+
+    [Note:] It is good practice to keep your EARs thin -- containing only
+    artifacts not already known to the application server or other applications
+    deployed to the same server. For example, you should not deploy the 
+    EJB component for a dependency application within your application.
+    That is what the ejb-client is for.
+
+* {Integrate EntityManager into EJB}
+
+    The business logic was developed and tested outside of the EJB using
+    JUnit and an extended PersistanceContext -- but with an eye towards
+    portability to the EJB tier. That means that this reused logic
+    attempts no direct control of the transaction. All transaction 
+    decisions are handled external to the core business logic. In this
+    case, we will use an EntityManager injected by the container and
+    integrated into the JTA tranactions going on within the application
+    server.
+
+
+    [[1]] Update your EJB implementation to add the PersistenceUnit.
+    You have already added the dependencyManagement for this dependency
+    when you added in the Impl project.
+
+---
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+...
+
+@Stateless
+public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
+    @PersistenceContext(unitName="javaeeEx")
+    private EntityManager em;
+---
+
+    [[1]] Update your @PostConstruct to make use of the PersistenceUnit.
+
+---
+            log.debug("**** init ****");
+            log.debug("em=" + em);
+            PersonDAO dao = new JPAPersonDAO();
+            ((JPAPersonDAO)dao).setEntityManager(em);
+---
+
+    [[1]] Copy the persistence.xml file from the Impl project into the EJB
+    project.
+
+---
+$ mkdir -p javaeeExEJB/src/main/resources/META-INF
+$ cp javaeeExImpl/src/test/resources/META-INF/persistence.xml javaeeExEJB/src/main/resources/META-INF/
+---
+
+    [[1]] Update the definition of the persistence.xml file to provide a jta-data-source
+    and a reference to the entity jar-file. Since we are now using a DataSource from the
+    JNDI tree, we no longer need the connection information. It can be deleted from the
+    EJB's copy. The "-test" suffix can be removed at this time since this will be what
+    we plan to use in operaton (except for the auto schema create).
+
+---
+# javaeeExEJB/src/main/resources/META-INF/persistence.xml
+
+    <persistence-unit name="javaeeEx">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        <mapping-file>META-INF/orm.xml</mapping-file>
+        <jar-file>javaeeExImpl-${project.version}.jar</jar-file>
+        <properties>
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+        </properties>
+    </persistence-unit>
+---
+    
+    [Note:] This exercise makes use of the provider automatically creating DB schema
+    and supplies the hibernate.hbm2ddl.auto=true property. A real, non-demo
+    project would not set that property and would design in when schema was created.
+
+    []
+
+    [[1]] Update your EJB/pom.xml to expand the variables defined within the persistence.xml
+    file. The variable values have already been defined in the parent pom.xml when
+    you integrated the Impl project earlier.
+
+---
+    <build>
+         <!--tell the resource plugin to perform filtering on resources
+             to fill in dialect, etc. -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+---
+
+    [Note:] Be wary of blind resource filtering such as what was defined above
+    if you have binary resource files or files containing variables that need to
+    get resolved at runtime and not compile time. We are safe here because neither
+    condition exosts. If it did exist, we could safely include/exclude sets of
+    files from filtering using includes/excludes clauses.
+
+    []
+
+
+    [[1]] Rebuild your application and note that the EntityManager was resolved.
+
+---
+# server.log
+
+01:06:40,850 INFO  [org.jboss.as.jpa] (MSC service thread 1-3) JBAS011402: Starting Persistence Unit Service 'javaeeExEAR-1.0-SNAPSHOT.ear/javaeeExEJB.jar#javaeeEx'
+...
+01:06:41,149 INFO  [org.hibernate.ejb.Ejb3Configuration] (MSC service thread 1-3) HHH000204: Processing PersistenceUnitInfo [
+        name: javaeeEx
+        ...]
+...
+01:06:42,310 INFO  [org.hibernate.dialect.Dialect] (MSC service thread 1-3) HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+...
+01:06:42,907 INFO  [org.hibernate.tool.hbm2ddl.SchemaExport] (MSC service thread 1-3) HHH000227: Running hbm2ddl schema export
+01:06:42,922 ERROR [org.hibernate.tool.hbm2ddl.SchemaExport] (MSC service thread 1-3) HHH000389: Unsuccessful: alter table JAVAEEEX_ADDRESS drop constraint FKEB70B40A6E18CE38
+01:06:42,923 ERROR [org.hibernate.tool.hbm2ddl.SchemaExport] (MSC service thread 1-3) Table "JAVAEEEX_ADDRESS" not found; SQL statement:
+alter table JAVAEEEX_ADDRESS drop constraint FKEB70B40A6E18CE38 [42102-161]
+01:06:43,359 INFO  [org.hibernate.tool.hbm2ddl.SchemaExport] (MSC service thread 1-3) HHH000230: Schema export complete
+01:06:43,597 INFO  [org.jboss.as.server] (management-handler-thread - 62) JBAS018559: Deployed "javaeeExEAR-1.0-SNAPSHOT.ear"
+01:06:46,117 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) **** init ****
+01:06:46,117 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) em=org.jboss.as.jpa.container.TransactionScopedEntityManager@10fb78e
+01:06:46,133 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1d548e3
+01:06:46,133 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) ping called
+...
+01:06:46,596 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (MSC service thread 1-3) *** close() ***
+---
+
+    If the server-side looks fine and you are now encountering a name
+    not found problem locating the interface from the previous exercise,
+    place a Thread.sleep() in the @BeforeClass of the integration test
+    to allow the EJB a little extra time to deploy. The cargo plugin
+    seems to get a handshake from JBoss and then turn things over to
+    failsafe/JUnit before the application has fully deployed.
+
+---
+$ cat ./javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+...
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        Thread.sleep(3000);
+    }
+...
+---
+
+    [Note:] The above is only necessary if you are encounting timing issues
+    deploying a complex application prior to doing a JNDI lookup for an EJB 
+    deployed from that application. You do not need to do the above if that is
+    not the case. The code above will perform a single wait prior to running
+    any of the testMethods of the test case.
+
+    []
+
+    [[1]] Note too that the persistence.xml file gets expanded to the following. If you see
+    unexpanded variables in your target copy, check that the variable is declared, that
+    filtering of that directory and file type are enabled, and everything is spelled 
+    correctly.
+
+---
+$ cat javaeeExEJB/target/classes/META-INF/persistence.xml 
+...
+    <persistence-unit name="javaeeEx">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        <mapping-file>META-INF/orm.xml</mapping-file>
+        <jar-file>javaeeExImpl-1.0-SNAPSHOT.jar</jar-file>
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+        </properties>
+    </persistence-unit>
+    ...
+---
+
+* {End to End Test EJB}
+
+    Lets add additional EJB and RMI Test logic that will leverage the
+    EntityManager and the integated business logic.
+
+    [[1]] Add the ability to add and get a Person to your @Remote interface.
+
+---
+package myorg.javaeeex.ejb;
+
+import javax.ejb.Remote;
+
+import myorg.javaeeex.bl.RegistrarException;
+import myorg.javaeeex.bo.Person;
+
+@Remote
+public interface RegistrarRemote {
+    void ping();
+    Person createPerson(Person person)
+        throws RegistrarException;
+
+    Person getPersonById(long id)
+        throws RegistrarException;
+}
+---
+
+    [[1]] Add the implementation of createPerson() to the EJB class.
+
+---
+import myorg.javaeeex.bl.RegistrarException;
+import myorg.javaeeex.bo.Person;
+---
+---
+    public Person createPerson(Person person)
+        throws RegistrarException {
+        log.debug("*** createPerson() ***");
+
+        //the person we return will have the PK set
+        try {
+            return registrar.createPerson(person);
+        }
+        catch (Throwable ex) {
+            log.error(ex);
+            throw new RegistrarException(ex.toString());
+        }
+    }
+---
+
+    [[1]] Add the implementation of getPersonById() to the EJB class.
+
+---
+    public Person getPersonById(long id)
+        throws RegistrarException {
+        log.debug("*** getPersonById(" + id + ") ***");
+        return registrar.getPersonById(id);
+    }
+---
+
+    [[1]] Add a dependency from the Test/pom.xml to the Impl
+    module artifact. We need to do this if our EJB declared its
+    dependency on the Impl project as scope=provided.
+
+---
+# javaeeExTest/pom.xml
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExImpl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+---
+
+    [[1]] Add a testCreatePerson() to the RMI Test.
+
+---
+import myorg.javaeeex.bo.Person;
+---
+---
+    protected Person makePerson() {
+        Person person = new Person();
+        person.setFirstName("joe");
+        person.setLastName("smith");
+        person.setSsn("123");
+        return person;
+    }
+
+    @Test
+    public void testCreatePerson() throws Exception {
+        log.info("*** testCreatePerson ***");
+
+        Person person = makePerson();
+        Person person2 = registrar.createPerson(person);
+            //note that our original Person does not have an ID
+        assertEquals("unexpected id", 0, person.getId());
+            //it is separate from the one returned
+        assertFalse("unexpected id:" + person2.getId(), person2.getId()==0);
+
+        Person person3 = registrar.getPersonById(person2.getId());
+        assertEquals("unexpected name",
+            person.getFirstName(),
+            person3.getFirstName());
+    }
+---
+
+    [[1]] Rebuild the application. It will fail because of a validation rule in the
+    business logic.
+
+---
+$ mvn clean install -rf :javaeeExEJB 
+
+...
+Running myorg.javaeeex.ejbclient.RegistrarIT
+...
+ -*** testPing ***
+...
+ -*** testCreatePerson ***
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.477 sec <<< FAILURE!
+
+Results :
+
+Tests in error: 
+  testCreatePerson(myorg.javaeeex.ejbclient.RegistrarIT): myorg.javaeeex.bl.RegistrarException: Person must have 1 address
+
+
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
+
+...
+[INFO] --- cargo-maven2-plugin:1.2.3:undeploy (cargo-post) @ javaeeExTest ---
+[INFO] 
+[INFO] --- maven-failsafe-plugin:2.12.2:verify (verify) @ javaeeExTest ---
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.920s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.876s]
+[INFO] Java EE Exercise Remote Test ...................... FAILURE [10.989s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+---
+---
+./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarIT.txt
+::::::::::::::
+ -------------------------------------------------------------------------------
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
+ -------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.477 sec <<< FAILURE!
+testCreatePerson(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 0.107 sec  <<< ERROR!
+myorg.javaeeex.bl.RegistrarException: myorg.javaeeex.bl.RegistrarException: Person must have 1 address
+        at myorg.javaeeex.ejb.RegistrarEJB.createPerson(RegistrarEJB.java:65)
+---
+
+    [[1]] Add an Address to the makePerson() in the RMI Test.
+
+---
+import myorg.javaeeex.bo.Address;
+---
+---
+    protected Person makePerson() {
+        Person person = new Person();
+        person.setFirstName("joe");
+        person.setLastName("smith");
+        person.setSsn("123");
+        Address address = new Address(0,"street1","city1", "state1", "zip1");
+        person.getAddresses().add(address);
+        return person;
+    }
+---
+
+    [[1]] Rebuild the application. This may fail for another reason. The failure below
+    is the topic of Part D and we happen to encounter it a bit early. The problem is that
+    we received a hibernate class from the server and our RMI client has not knowledge
+    of hibernate.
+
+---
+$ mvn clean install -rf :javaeeExTest
+
+...
+ -*** testCreatePerson ***
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.283 sec <<< FAILURE!
+
+Results :
+
+Tests in error: 
+  testCreatePerson(myorg.javaeeex.ejbclient.RegistrarIT)
+
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0
+
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.650s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.752s]
+[INFO] Java EE Exercise Remote Test ...................... FAILURE [13.345s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+---
+---
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
+ -------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.283 sec <<< FAILURE!
+testCreatePerson(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 0.507 sec  <<< ERROR!
+java.lang.reflect.UndeclaredThrowableException
+        at $Proxy5.createPerson(Unknown Source)
+        at myorg.javaeeex.ejbclient.RegistrarIT.testCreatePerson(RegistrarIT.java:59)
+...
+Caused by: java.lang.ClassNotFoundException: org.hibernate.collection.internal.PersistentBag
+---
+
+    [[1]] Add hibernate dependencies required to get beyond this error before we learn
+    other ways to get rid of the issue. We won't bother to add the 
+    dependencyManagement to the parent project since we do not expect to add this
+    dependency to other projects. We alterantively make use of the parent-defined
+    hibernate-entitymanager.version variable -- which is almost as good as defining
+    the dependencyManagement.
+
+---
+# javaeeExTest/pom.xml
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate-entitymanager.version}</version>
+            <scope>test</scope>
+        </dependency>
+---
+
+    [[1]] Rebuild the application. 
+
+---
+$ mvn clean install -rf :javaeeExTest
+
+ -*** testCreatePerson ***
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.272 sec
+
+Results :
+
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.591s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.883s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [8.478s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+    [[1]] Note the extra output in the server for the call to getPersonById().
+
+---
+//SERVER LOG
+
+01:45:08,029 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 3) **** init ****
+01:45:08,029 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 3) em=org.jboss.as.jpa.container.TransactionScopedEntityManager@e4c437
+01:45:08,032 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 3) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@14c3824
+01:45:08,033 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 3) ping called
+01:45:08,100 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 4) *** createPerson() ***
+01:45:08,101 DEBUG [myorg.javaeeex.jpa.JPAPersonDAO] (EJB default - 4) creating person:id=0:joe smith 123, addresses={{street1 city1, state1 zip1},}
+01:45:08,102 DEBUG [myorg.javaeeex.jpa.JPAPersonDAO] (EJB default - 4) em=org.jboss.as.jpa.container.TransactionScopedEntityManager@e4c437
+01:45:08,125 DEBUG [myorg.javaeeex.jpa.JPAPersonDAO] (EJB default - 4) person created:id=1:joe smith 123, addresses={{street1 city1, state1 zip1},}
+01:45:08,214 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 5) *** getPersonById(1) ***
+...
+01:45:08,716 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (MSC service thread 1-3) *** close() ***
+---
+
+    []
+
+
+* Summary
+
+    * In this exercise, we put many of the end-to-end pieces together
+    and we are left to add beef to the EJB implementation. Specifically
+    we addressed:
+
+        * adding the Impl classes to the EJB.
+
+        * adding the Persistence Unit to the EJB and completing
+        the initialization of the DAO and business logic.
+
+        * adding a a few sample business methods that used the
+        business logic and DAO to update the database. We first
+        encountered a business rule exception defined within 
+        the impoted business logic.
+
+    * In one of the EJB methods you may have encountered a ClassNotFoundException
+    that is the focus of the next part of the exercise. In this part we 
+    solved it by adding an extra dependency.
+    

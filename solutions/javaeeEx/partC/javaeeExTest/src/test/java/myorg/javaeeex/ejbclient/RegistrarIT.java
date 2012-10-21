@@ -5,28 +5,22 @@ import javax.naming.InitialContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import myorg.javaeeex.ejb.RegistrarRemote;
-
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import myorg.javaeeex.bo.Address;
+import myorg.javaeeex.ejb.RegistrarRemote;
 import myorg.javaeeex.bo.Person;
+import myorg.javaeeex.bo.Address;
 
-public class RegistrarTest {
-    Log log = LogFactory.getLog(RegistrarTest.class);
-    InitialContext jndi;
+public class RegistrarIT {
+    private static final Log log = LogFactory.getLog(RegistrarIT.class);
+    private InitialContext jndi;
 
-    String registrarJNDI = System.getProperty("jndi.name.registrar");
-    RegistrarRemote registrar;
+    private static final String registrarJNDI = System.getProperty("jndi.name.registrar",
+        "javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote");
+    private RegistrarRemote registrar;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    	Thread.sleep(2000);
-    }
-    
     @Before
     public void setUp() throws Exception {
         assertNotNull("jndi.name.registrar not supplied", registrarJNDI);
@@ -38,6 +32,7 @@ public class RegistrarTest {
 
         log.debug("jndi name:" + registrarJNDI);
         registrar = (RegistrarRemote)jndi.lookup(registrarJNDI);
+        log.debug("registrar=" + registrar);
     }
 
     @Test

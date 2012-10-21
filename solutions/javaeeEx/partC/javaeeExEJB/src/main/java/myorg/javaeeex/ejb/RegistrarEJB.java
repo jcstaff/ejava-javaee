@@ -2,19 +2,18 @@ package myorg.javaeeex.ejb;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.Stateless;
 import javax.ejb.EJBException;
-
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import myorg.javaeeex.bl.Registrar;
 import myorg.javaeeex.blimpl.RegistrarImpl;
 import myorg.javaeeex.dao.PersonDAO;
 import myorg.javaeeex.jpa.JPAPersonDAO;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import myorg.javaeeex.bl.RegistrarException;
 import myorg.javaeeex.bo.Person;
 
