@@ -1,0 +1,517 @@
+Java EE Exercise 
+
+* Create Custom JNDI Name and Client/Server Debugging
+
+* Objectives
+
+    * {{{Control_the_JNDI_name_used_for_an_EJBs}
+        Control the JNDI name used for an EJB}}
+        by removing version numbers and making the name more 
+        deterministic within hard-coded Java classes.
+
+    * {{{Import_and_Run_Integration_Test_from_Eclipse} 
+        Import and Run Integration Test from Eclipse}}
+        without having to modify the JUnit configuration.
+
+    * {{{Debug_EJB_on_Server_from_Eclipse} 
+        Debug EJB on Server from Eclipse}}
+        to track down errors on the server-side code.
+
+* {Control the JNDI name used for an EJB}
+
+    JavaEE 6 standardized JNDI naming for EJB local interfaces so there
+    is less guess-work creating local references to other EJBs. However,
+    this spec did not attempt to address remote names. In JavaEE 5, the
+    local and remote JNDI names were vendor-specific but could be overridden
+    with a deployment descriptor to supply a project-specific name. JBoss
+    has removed that custom naming capability and implements a remote 
+    name that is based off the local naming standard. The standard uses
+
+        * deployed artifact name (e.g., the name of the EAR)
+
+        * hosting component name within the deployed artifact (e.g., the
+        EJB.jar with the EJB(s))
+
+        * bean name (e.g., defaults to EJB class name)
+
+        * remote interface
+
+    The only thing we can change is the name of the items above. In the 
+    previous exercise you saw how our default remote JNDI name was as 
+    follows.
+
+---
+javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+---
+
+    The was pretty easy to form within the pom using the following 
+    specification in the remote test module.
+
+---
+<!-- adds IT integration tests to the build -->
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <configuration>
+        <systemPropertyVariables>
+            <jndi.name.registrar>javaeeExEAR-${project.version}/javaeeExEJB-${project.version}/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote</jndi.name.registrar>
+        </systemPropertyVariables>
+    </configuration>
+</plugin>
+---
+
+    There are two issues I have with the above approach.
+
+        [[#]] it requires knowledge of the application's version
+
+        [[#]] the application version cannot easily be obtained from within 
+        a raw Eclipse JUnit environment -- forcing you to configure
+        Eclipse JUnit JVM arguments in order to successfully run the
+        integration tests from within Eclipse.
+
+    This exercise is geared at fixing that so that the integration test 
+    client code can default to a value like the following.
+
+---
+            <jndi.name.registrar>javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote</jndi.name.registrar>
+---
+
+    [[1]] Re-build an initial version of your application's EAR.
+
+---
+$ mvn clean install -DskipTests
+...
+[INFO] Java EE Exercise .................................. SUCCESS [0.997s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.217s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.909s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [6.535s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+    [[1]] Take a look at the JAR produced. Both the EAR and EJB use versions.
+
+---
+$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
+...
+META-INF/application.xml
+javaeeExEJB-1.0-SNAPSHOT.jar
+...
+---
+
+    [[1]] Take a further look at the JavaEE EAR/application.xml. See 
+    how the EJB is being references using its version number.
+
+---
+$ jar tf javaeeExEAR/target/javaeeExEAR-1.0-SNAPSHOT.ear
+...
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC
+        "-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN"
+        "http://java.sun.com/dtd/application_1_3.dtd">
+<application>
+  <display-name>javaeeExEAR</display-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <module>
+    <ejb>javaeeExEJB-1.0-SNAPSHOT.jar</ejb>
+  </module>
+</application>
+---
+
+    [[1]] Add a declaration of the maven-ear-plugin to the EAR/pom.xml.
+    Include an override of the applicationName in that declaration.
+
+---
+# javaeeExEAR/pom.xml
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <!-- eliminates use of version in EAR JNDI name portion -->
+                    <applicationName>${project.artifactId}</applicationName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+---
+
+    [[1]] Add a pluginManagement definition to the parent pom for the 
+    maven-ear-plugin to control which version is used. Also included
+    is a property required for the plugin to work with EAR and EJB
+    constructs unique to JavaEE 6 (such as no web.xml deployment
+    descriptor WARs)
+    
+---
+# pom.xml
+
+    <properties>
+        ...
+        <maven-ear-plugin.version>2.7</maven-ear-plugin.version>
+...
+    <build>
+    	<pluginManagement>
+            ...
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ear-plugin</artifactId>
+                    <version>${maven-ear-plugin.version}</version>
+                    <configuration>
+                       <version>6</version>
+                    </configuration>
+                </plugin>
+---
+
+    [[1]] Rebuild and re-deploy the application. We are not ready to test with
+    the current change, so stop the build at deployment using the pre-integration-test
+    phase.
+
+---
+$ mvn clean pre-integration-test -rf :javaeeExEAR
+...
+[INFO] Java EE Exercise EAR .............................. SUCCESS [3.519s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [11.825s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+    [[1]] Take note of the JNDI name output on the server console. The EAR portion
+    of the JNDI name is what we specified for the application.xml.
+
+---
+# SERVER CONSOLE
+java:jboss/exported/javaeeExEAR/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+---
+
+    [[1]] This, of course, is the result of the application.xml#application-name element.
+
+---
+# javaeeExEAR/target/application.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_6.xsd" version="6">
+  <application-name>javaeeExEAR</application-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <display-name>javaeeExEAR</display-name>
+  <module>
+    <ejb>javaeeExEJB-1.0-SNAPSHOT.jar</ejb>
+  </module>
+</application>
+---
+
+    [[1]] Add a bundleFileName specification for the EJB to define module.ejb
+    name used in the application.xml.
+
+---
+# javaeeExEAR/pom.xml
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <!-- eliminates use of version in EAR JNDI name portion -->
+                    <applicationName>${project.artifactId}</applicationName>
+                    <modules>
+                        <!-- eliminates use of the version in the EJB JNDI name -->
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>javaeeExEJB</artifactId>
+                            <bundleFileName>javaeeExEJB.jar</bundleFileName>
+                        </ejbModule>
+                    </modules>
+                </configuration>
+            </plugin>
+---
+---
+# javaeeExEAR/target/application.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_6.xsd" version="6">
+  <application-name>javaeeExEAR</application-name>
+  <description>This project provides a sample EAR for the Java EE components
+        associated with the overall project.</description>
+  <display-name>javaeeExEAR</display-name>
+  <module>
+    <ejb>javaeeExEJB.jar</ejb>
+  </module>
+</application>
+---
+---
+# SERVER CONSOLE
+java:jboss/exported/javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+---
+
+    [[1]] Add the (version-less) JNDI name as a default value in the integration test
+    jndiName. We could have also leveraged RegistrarEJB.class.getSimpleName() and
+    RegistrarRemote.class.getName() in making this name more type-safe.
+    
+---
+    private static final String registrarJNDI = System.getProperty("jndi.name.registrar",
+        "javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote");
+---
+
+    [[1]] Remove the old jndi.name.registrar system property from the Test/pom.xml
+    (or fix it) so that we can use the updated name.
+
+---
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+---
+
+    [[1]] Rebuild from the root. The application should deploy with the new 
+    JNDI name and our integration test should be able to locate the EJB using
+    the new, simpler default value that does not rely on the version number
+    of the application passed in. We could do one better and register this
+    string with a Java interface so that no-one has to re-calculate the value.
+
+---
+Running myorg.javaeeex.ejbclient.RegistrarIT
+ -getting jndi initial context
+ -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password}
+
+ -jndi name:javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
+
+ -registrar=Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+ -*** testPing ***
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.086 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] 
+[INFO] --- cargo-maven2-plugin:1.2.3:undeploy (cargo-post) @ javaeeExTest ---
+[INFO] 
+[INFO] --- maven-failsafe-plugin:2.12.2:verify (verify) @ javaeeExTest ---
+[INFO] Failsafe report directory: /home/jcstaff/proj/exercises/javaeeEx/javaeeExTest/target/failsafe-reports
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [1.005s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.544s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.372s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [10.647s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+
+    [[1]] We have the same structure that we ended with in partA. We have added 
+    no new files.
+
+---
+.
+|-- javaeeExEAR
+|   `-- pom.xml
+|-- javaeeExEJB
+|   |-- pom.xml
+|   `-- src
+|       `-- main
+|           `-- java
+|               `-- myorg
+|                   `-- javaeeex
+|                       `-- ejb
+|                           |-- RegistrarEJB.java
+|                           |-- RegistrarLocal.java
+|                           `-- RegistrarRemote.java
+|-- javaeeExTest
+|   |-- pom.xml
+|   `-- src
+|       `-- test
+|           |-- java
+|           |   `-- myorg
+|           |       `-- javaeeex
+|           |           `-- ejbclient
+|           |               `-- RegistrarIT.java
+|           `-- resources
+|               |-- jndi.properties
+|               `-- log4j.xml
+`-- pom.xml
+---
+
+    []
+
+* {Import and Run Integration Test from Eclipse} 
+
+    Now that we have a reasonable default value configured into the integration
+    test, we can easily import the project into Eclipse and run the JUnit 
+    test in straight Eclipse JUnit.
+
+    [[1]] If you have not leady done so -- import the root and all sub-modules
+    into Eclipse using Import as an Existing Maven Project.
+
+    [[1]] Deploy the application to JBoss using the pre-integration-test maven
+    phase. Remember that you can skip early modules using the -rf :moduleName 
+    flag if appropriate.
+
+---
+$ mvn clean pre-integration-test
+
+[INFO] --- cargo-maven2-plugin:1.2.3:redeploy (cargo-prep) @ javaeeExTest ---
+Oct 20, 2012 8:59:04 PM org.xnio.Xnio <clinit>
+INFO: XNIO Version 3.0.3.GA
+Oct 20, 2012 8:59:04 PM org.xnio.nio.NioXnio <clinit>
+INFO: XNIO NIO Implementation Version 3.0.3.GA
+Oct 20, 2012 8:59:04 PM org.jboss.remoting3.EndpointImpl <clinit>
+INFO: JBoss Remoting version 3.2.3.GA
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise .................................. SUCCESS [0.519s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.862s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.609s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [8.883s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+    [[1]] Right-click on myorg.javaeeex.ejbclient.RegistrarIT in the 
+    Package Browser and request RunAs JUnit Test. Ouch -- life is not
+    as good as we thought. Eclipse seems to have an issue resolving
+    classes from ejb-client artifacts.
+
+---
+java.lang.NoClassDefFoundError: Lmyorg/javaeeex/ejb/RegistrarRemote;
+    at java.lang.Class.getDeclaredFields0(Native Method)
+...
+---
+
+    [[1]] Replace the ejb-client dependency definition in the Test/pom.xml
+    with a jar value. type=ejb would have worked as well but type=jar
+    is more descriptive of how the client will use it.
+
+---
+# javaeeExTest/pom.xml
+
+        <!-- brings in the EJB-client jar file w/o the EJB -->
+        <dependency>    
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExEJB</artifactId>
+            <!-- Eclipse/JUnit cannot resolve types within ejb-client
+            <type>ejb-client</type>
+            -->
+            <type>jar</type>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>    
+---
+
+    [[1]] Refresh the Test module within Eclipse and re-run as 
+    a JUnit Test. The test should work at this point. Now you can
+    set breakpoints and debug the RMI client just like any other 
+    Eclipse project. 
+
+* {Debug EJB on Server from Eclipse} 
+
+    Since we are so close to this topic I figured I would toss it in 
+    as well. Since we can now develop, run, and debug the client inside
+    of Eclipse -- why not the server as well. 
+
+    [[1]] Update your $JBOSS_HOME/bin/standalone.conf or conf.bat script
+    by un-commenting the following line towards the bottom.
+
+---
+# .bin/standalone.conf 
+
+# Sample JPDA settings for remote socket debugging
+JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
+---
+---
+# .bin/standalone.conf.bat 
+
+rem # Sample JPDA settings for remote socket debugging
+set "JAVA_OPTS=%JAVA_OPTS% -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
+---
+
+    [[1]] Restart JBoss. You should see the following output right after the
+    initial banner page.
+
+---
+# SERVER CONSOLE
+=========================================================================
+
+Listening for transport dt_socket at address: 8787
+17:27:09,991 INFO  [org.jboss.modules] JBoss Modules version 1.1.1.GA
+---
+
+    [[1]] Create a remote debugging configuration and session with JBoss.
+
+        * Click on the integration/JUnit test to make it the active
+        Eclipse context.
+
+        * Pull down the debug (bug) icon at the top of the display
+        and select Debug Configurations...
+
+        * Double-click the Remote Java Application type. 
+
+        * Change the port number from 8000 to 8787 to match the value
+        from bin/standalone.conf.
+
+        * Click on Source->Add...->Java Project->Select All as the
+        simplest way to make sure all code deployed to the server
+        is included in the source path of the debugging session.
+
+        * Click on Debug
+
+    [[1]] Set a breakpoint within the RegistrarEJB.ping() method.
+
+---
+# javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
+
+    public void ping() {
+        log.debug("ping called");
+    }   
+---
+
+    [[1]] Re-run the integration test as a JUnit test and verify that
+    the debugger stops at the breakpoint you defined in the EJB deployed
+    to the server-side.
+
+    [[1]] Step thru or continue through execution on the server using
+    the controls at the top of the Eclipse debugger.
+
+    [[1]] Detach from the server using the red detach option -- also 
+    at the top of the debugger. You should notice the following printed
+    at the server console.
+
+---
+# SERVER CONSOLE
+Listening for transport dt_socket at address: 8787
+---
+    
+    [Note:] In the above steps we used a JBoss server launched external
+    to Eclipse. If you used the JBoss Eclipse Tools to launch the server
+    within Eclipse -- the tooling would have created the debugging session
+    automatically without some of the steps we took above. Some people
+    like it configured that way but there are some +/- to both approaches
+    and I will limit the discussion to just this one for now.
+
+* Summary
+
+    * In this exercise, we configured the EAR deployed to the server
+    to use names for artifacts that were easier to determine without
+    having a version number. This allows the hard-coding of a reasonable
+    amount of data to form a well-known JNDI name. This solution would
+    not be as attractive if we needed to distinguish versions of the 
+    application for clients. We made this change using the application.xml
+    properties of:
+
+        * application-name
+
+        * module.ejb
+
+    We configured these values using the maven-ear-plugin -- which 
+    ultimately created the application.xml according to our definition.
+
+    We also tacked on some ease-of-use issues aspects with importing
+    and running the JUnit test within Eclipse as well as performing
+    a remote debugging session to complete the Eclipse topic.
