@@ -3,6 +3,7 @@ package ejava.examples.jndidemo.ejbclient;
 import java.io.InputStream;
 
 
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -22,7 +23,6 @@ import ejava.examples.jndidemo.ejb.AidSchedulerRemote;
 import ejava.examples.jndidemo.ejb.BakeSchedulerRemote;
 import ejava.examples.jndidemo.ejb.TrainSchedulerRemote;
 import ejava.util.ejb.EJBClient;
-import ejava.util.jndi.JNDIUtil;
 
 /**
  * Performs a basic set of calls in the EJBs deployed to demonstrate 
@@ -36,16 +36,16 @@ public class JndiIT  {
     static final String EJB_MODULE=System.getProperty("ejb.module", "jndiDemoEJB");
     static final String aidName = System.getProperty("jndi.name.aid",
     	EJBClient.getEJBClientLookupName(
-    			EAR_NAME, EJB_MODULE, "","AidScheduler",
-        		AidSchedulerRemote.class.getName(), false));
+			EAR_NAME, EJB_MODULE, "","AidScheduler",
+    		AidSchedulerRemote.class.getName(), false));
     static final String bakeName = System.getProperty("jndi.name.bake",
     	EJBClient.getEJBClientLookupName(
-    			EAR_NAME, EJB_MODULE, "","BakeScheduler",
-        		BakeSchedulerRemote.class.getName(), true));
+			EAR_NAME, EJB_MODULE, "","BakeScheduler",
+    		BakeSchedulerRemote.class.getName(), true));
     static final String trainName = System.getProperty("jndi.name.train",
-        	EJBClient.getEJBClientLookupName(
-    			EAR_NAME, EJB_MODULE, "","TrainSchedulerEJB",
-        		TrainSchedulerRemote.class.getName(), false));
+       	EJBClient.getEJBClientLookupName(
+			EAR_NAME, EJB_MODULE, "","TrainSchedulerEJB",
+    		TrainSchedulerRemote.class.getName(), false));
     
     @BeforeClass
     public static void setUpClass() throws Exception {
