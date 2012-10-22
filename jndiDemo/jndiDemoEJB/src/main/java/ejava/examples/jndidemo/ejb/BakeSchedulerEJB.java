@@ -100,7 +100,7 @@ public class BakeSchedulerEJB
         log.info("******************* BakeScheduler Created ******************");
         log.debug("ctx=" + ctx);
         log.debug("em=" + em);
-        log.debug("em=" + em2);
+        log.debug("em2=" + em2);
         log.debug("ds=" + ds);
         //log.debug("persistence/jndidemo=" + ctx.lookup("persistence/jndidemo"));
         log.debug("message=" + message);
