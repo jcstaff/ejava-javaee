@@ -1,0 +1,71 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="cdi-concepts">
+    <title>Bean Types</title>
+
+        <section id="cdi-concepts-beantypes">
+        <title>Bean Type</title>
+        <itemizedlist>
+            <listitem><para>Client-visible type of bean</para></listitem>
+            <listitem><para>POJO Beans may have multiple bean types</para>
+        <programlisting language="java"><![CDATA[
+public class JPASchedulerDAOImpl 
+    extends JPADAOBase<Task> 
+    implements SchedulerDAO {
+...    
+        ]]></programlisting>
+                <orderedlist>
+                    <listitem><para>JPASchedulerDAOImpl -- the class</para></listitem>
+                    <listitem><para>JPADAOBase&lt;Task&gt; -- any base classes</para></listitem>
+                    <listitem><para>SchedulerDAO -- any implemented interfaces</para></listitem>
+                    <listitem><para>Object</para></listitem>
+                </orderedlist>
+
+            </listitem>
+
+            <listitem><para>Session Beans only have interface types</para>
+        <programlisting language="java"><![CDATA[
+@Stateless
+public class CookEJB 
+    extends SchedulerBase 
+    implements CookLocal {
+...    
+        ]]></programlisting>
+                <orderedlist>
+                    <listitem><para>CookLocal -- the EJB @Local</para></listitem>
+                    <listitem><para>Object</para></listitem>
+                </orderedlist>
+
+            </listitem>
+
+            <listitem><para>We can restrict the number of types a bean has</para>
+        <programlisting language="java"><![CDATA[
+import javax.enterprise.inject.Typed;
+
+@Typed(SchedulerDAO.class)
+public class JPASchedulerDAOImpl 
+    extends JPADAOBase<Task> 
+    implements SchedulerDAO {
+        ]]></programlisting>
+                <orderedlist>
+                    <listitem><para>SchedulerDAO -- any implemented interfaces</para></listitem>
+                    <listitem><para>Object</para></listitem>
+                </orderedlist>
+
+            </listitem>
+
+
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[
+        ]]></programlisting>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>                   
+    </section>
+
+</chapter>
+  

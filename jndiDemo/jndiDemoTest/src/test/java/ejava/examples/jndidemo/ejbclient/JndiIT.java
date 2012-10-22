@@ -20,6 +20,7 @@ import org.junit.Test;
 import ejava.examples.jndidemo.Scheduler;
 import ejava.examples.jndidemo.ejb.AidSchedulerRemote;
 import ejava.examples.jndidemo.ejb.BakeSchedulerRemote;
+import ejava.examples.jndidemo.ejb.TrainSchedulerRemote;
 import ejava.util.ejb.EJBClient;
 import ejava.util.jndi.JNDIUtil;
 
@@ -31,14 +32,20 @@ public class JndiIT  {
     private static final Log log = LogFactory.getLog(JndiIT.class);
     private InitialContext jndi;
     
-    static String aidName = System.getProperty("jndi.name.aid",
+    static final String EAR_NAME=System.getProperty("ear.name","jndiDemoEAR");
+    static final String EJB_MODULE=System.getProperty("ejb.module", "jndiDemoEJB");
+    static final String aidName = System.getProperty("jndi.name.aid",
     	EJBClient.getEJBClientLookupName(
-    			"jndiDemoEAR", "jndiDemoEJB", "","AidScheduler",
+    			EAR_NAME, EJB_MODULE, "","AidScheduler",
         		AidSchedulerRemote.class.getName(), false));
-    static String bakeName = System.getProperty("jndi.name.bake",
+    static final String bakeName = System.getProperty("jndi.name.bake",
     	EJBClient.getEJBClientLookupName(
-    			"jndiDemoEAR", "jndiDemoEJB", "","BakeScheduler",
+    			EAR_NAME, EJB_MODULE, "","BakeScheduler",
         		BakeSchedulerRemote.class.getName(), true));
+    static final String trainName = System.getProperty("jndi.name.train",
+        	EJBClient.getEJBClientLookupName(
+    			EAR_NAME, EJB_MODULE, "","TrainSchedulerEJB",
+        		TrainSchedulerRemote.class.getName(), false));
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -72,9 +79,9 @@ public class JndiIT  {
         log.debug("jboss-ejb-client.properties\n" + IOUtils.toString(is));
         is.close();
         
-        
         log.debug("aidName=" + aidName);
         log.debug("bakeName=" + bakeName);
+        log.debug("trainName=" + trainName);
     }
     
     @After
@@ -140,5 +147,19 @@ public class JndiIT  {
         log.debug("ctx : " + encname + "=" + s.getCtxProperty(encname));
         
         log.debug("java:comp/env=" + s.getEnv());
+    }
+    
+    @Test
+    public void testCDIPopulation() throws Exception {
+        log.info("*** testCDIPopulation ***");
+        
+        Object object = jndi.lookup(trainName);
+        log.debug(trainName + "=" + object);
+        
+        Scheduler s = (Scheduler)object;        
+        log.debug("got scheduler:" + s);
+        String name = s.getName();
+        log.debug("scheduler.name:" + name);
+        assertEquals("", "TrainSchedulerEJB", name);
     }
 }
