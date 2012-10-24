@@ -90,18 +90,18 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
     }
     
     public void closeBidding(long itemId) throws MarketException {
-        AuctionItem item=null;
+        AuctionItem item = auctionItemDAO.getItem(itemId);
+        if (item == null) {
+            throw new MarketException("itemId not found:" + itemId);
+        }
+
         try {
-            item = auctionItemDAO.getItem(itemId);
             item.closeBids();
             log.debug("closed bidding for item:" + item);
         }
         catch (Exception ex) {
             log.error("error closing bid", ex);
             throw new MarketException("error closing bid:" + ex);
-        }
-        if (item == null) {
-            throw new MarketException("itemId not found:" + itemId);
         }
     }
 
