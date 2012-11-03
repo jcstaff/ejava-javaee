@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+    <bookinfo>
+        <title>JAX-RS EJB</title>
+        <subtitle>Web-centric EJB deployment</subtitle>
+    </bookinfo>
+    <preface id="webejb-purpose">
+        <title>Purpose</title>
+
+        <section id="webejb-goals">
+            <title>Goals</title>
+            <itemizedlist>
+                <listitem><para>Introduce key technology for exposing resources
+                    to the web (JAX-RS and JAXB)</para></listitem>
+                <listitem><para>Introduce flexible EJB deployment (WAR-based)</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="webejb-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist>
+                <listitem><para>have more understanding of:</para>
+                    <itemizedlist>
+                        <listitem><para>flexibility of EJB deployment</para></listitem>
+                        <listitem><para>exposing resources using web-friendly HTTP facades</para></listitem>
+                        <listitem><para>marshaling DTOs using web-friendly representations (XML)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist>
+                        <listitem><para>Deploy an EJB within a WAR</para></listitem>
+                        <listitem><para>Expose an asset or functionality through a (web) resource and URI using JAX-RS</para></listitem>
+                        <listitem><para>Use HTTP methods to interact with resources using JAX-RS</para></listitem>
+                        <listitem><para>Implement representations with XML, JAXB, and JAX-RS</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="webejb-wardeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="webejb-resource.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="webejb-xmlrep.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

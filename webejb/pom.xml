@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <parent>
+        <groupId>ejava</groupId>
+        <artifactId>ejava-root</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ejava.webejb</groupId>
+    <artifactId>webejb</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Web-oriented EJB Root</name>
+    <description>
+        This project is the root project for an example that
+        deployes an EJB in a WAR and exposes remote API thru
+        JAX-RS and JAXB.
+    </description>
+    <modules>
+        <module>jaxrsInventoryWAR</module>
+    </modules>
+    <profiles>
+        <profile>
+            <id>docs</id>
+            <modules>
+                <module>webejb-docbook</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>

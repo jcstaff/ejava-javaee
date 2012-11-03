@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.webejb</groupId>
+        <artifactId>webejb</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jaxrsInventoryWAR</artifactId>
+    <packaging>war</packaging>
+    <name>JAX-RS Inventory WAR</name>
+    <description>
+        This project provides a demonstration of flexible EJB
+        deployment of EJBs within a WAR and the exposure of 
+        those EJBs through the web as resources using JAX-RS
+        and JAXB.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>jaxrsInventoryWAR</finalName>
+
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>jetty</id>
+            <!--
+            Jetty does not use log4j by default. Use the following command line options to force 
+            Jetty to use log4j and your verbosity settings.
+
+            mvn -Dslf4j=true -Dlog4j.configuration=file:./target/test-classes/log4j.xml jetty:run -Pjetty
+            -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>maven-jetty-plugin</artifactId>
+                        <configuration>
+                            <scanIntervalSeconds>10</scanIntervalSeconds>
+                            <useTestClasspath>true</useTestClasspath>
+                            <connectors>
+                                <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                                    <port>9090</port>
+                                    <maxIdleTime>60000</maxIdleTime>
+                                </connector>
+                            </connectors>
+                        </configuration>       
+                    </plugin>          
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>ejbsessionBankEJB</artifactId>
+                    <version>${project.version}</version>
+                </dependency>        
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>ejbsessionBankImpl</artifactId>
+                    <version>${project.version}</version>
+                </dependency>        
+                <dependency>
+                    <groupId>ejava.common</groupId>
+                    <artifactId>ejava-util</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>ejava.common</groupId>
+                    <artifactId>jboss-rmi-client</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type>
+                </dependency>    
+                <dependency>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </dependency>    
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>
