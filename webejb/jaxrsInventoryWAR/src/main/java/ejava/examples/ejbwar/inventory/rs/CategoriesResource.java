@@ -3,6 +3,7 @@ package ejava.examples.ejbwar.inventory.rs;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ejava.examples.ejbwar.inventory.bo.Categories;
 import ejava.examples.ejbwar.inventory.bo.Category;
 import ejava.examples.ejbwar.inventory.ejb.InventoryMgmtEJB;
 
@@ -35,24 +37,19 @@ public class CategoriesResource {
 	
 	@GET @Path("")
 	@Produces(MediaType.APPLICATION_XML)
-	public Response getCategories(
-			@QueryParam("offset")@DefaultValue("0") int offset,
-			@QueryParam("limit")@DefaultValue("0") int limit) {
+	public Response findCategoriesByName(
+			@QueryParam("name") @DefaultValue("") String name,
+			@QueryParam("offset") @DefaultValue("0") int offset,
+			@QueryParam("limit") @DefaultValue("0") int limit) {
 		log.debug(String.format("%s %s", request.getMethod(), uriInfo.getAbsolutePath()));
 
 		try {
-			List<Category> categories = ejb.getCategories(offset, limit);
+			Categories categories = ejb.findCategoryByName(name, offset, limit);
 				//wrap java.lang.List in object that preserves type for marshalling
-			return Response.ok(new GenericEntity<List<Category>>(categories){})
+			return Response.ok(categories)
 					.build();
 		} catch (Exception ex) {
-			String message = String.format("unexpected error getting categories:%s", 
-					ex.getLocalizedMessage());
-			log.warn(message, ex);
-			return Response.serverError()
-					.entity(message)
-					.type(MediaType.TEXT_PLAIN)
-					.build();
+			return ResourceHelper.serverError(log, "get categories", ex).build();
 		}
 	}
 	
@@ -75,13 +72,20 @@ public class CategoriesResource {
 						.build();
 			}
 		} catch (Exception ex) {
-			String message = String.format("unexpected error getting category:%s", 
-					ex.getLocalizedMessage());
-			log.warn(message, ex);
-			return Response.serverError()
-					.entity(message)
-					.type(MediaType.TEXT_PLAIN)
-					.build();
+			return ResourceHelper.serverError(log, "get category", ex).build();
 		}
 	}
+
+	@DELETE @Path("{id}")
+	public Response deleteCategory(@PathParam("id")int id) {
+		log.debug(String.format("%s %s", request.getMethod(), uriInfo.getAbsolutePath()));
+
+		try {
+			ejb.deleteCategory(id);
+			return Response.noContent().build();
+		} catch (Exception ex) {
+			return ResourceHelper.serverError(log, "delete category", ex).build();
+		}
+	}
+
 }

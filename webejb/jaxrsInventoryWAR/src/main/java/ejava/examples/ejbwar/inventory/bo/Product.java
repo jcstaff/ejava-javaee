@@ -55,6 +55,9 @@ public class Product extends InventoryRepresentation {
 		this.quantity=quantity;
 		this.price=price;
 	}
+	public Product(String name) {
+		this(name, null, null);
+	}
 	
 	@XmlAttribute(required=true)
 	public int getId() { return id;}

@@ -7,8 +7,10 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
+import ejava.examples.ejbwar.inventory.bo.Categories;
 import ejava.examples.ejbwar.inventory.bo.Category;
 import ejava.examples.ejbwar.inventory.bo.Product;
+import ejava.examples.ejbwar.inventory.bo.Products;
 import ejava.examples.ejbwar.inventory.dao.InventoryDAO;
 
 @Stateless
@@ -17,35 +19,22 @@ public class InventoryMgmtEJB {
 	private InventoryDAO dao;
 	
 	/**
-	 * Returns the name and identity of a category without the associated 
-	 * products.
-	 * @param offset
-	 * @param limit
+	 * Returns a list of categories that match the name provided
+	 * @param name
 	 * @return
 	 */
-	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-	public List<Category> getCategories(int offset, int limit) {
-		List<Category> categories = dao.findCategoryByName("%", offset, limit);
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Categories findCategoryByName(String name, int offset, int limit) {
+		List<Category> categories = dao.findCategoryByName("%" + name + "%", offset, limit);
 		for (Category category : categories) {
 			category.setProductCount(categories.size());
 			dao.detachCategory(category); //detach before manipulating collection 
 			category.setProducts(null);
 		}
-		return categories;
+		return new Categories(categories, 0, 0);
 	}
+	
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Product addProduct(Product product, String categoryName) {
-		dao.addProduct(product);
-		Category category = createOrGetCategory(categoryName);
-		category.getProducts().add(product);
-		return product;
-	}
-	
-	public Product updateProduct(Product product) {
-		return dao.updateProduct(product);
-	}
-	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Category createOrGetCategory(String name) {
 		List<Category> categories = dao.findCategoryByName(name, 0, 1); 
@@ -64,14 +53,36 @@ public class InventoryMgmtEJB {
 		return dao.getCategory(id);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void deleteCategory(int id) {
+		Category category = dao.getCategory(id);
+		if (category != null) {
+			dao.deleteCategory(category);
+		}
+	}
+
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Product addProduct(Product product, String categoryName) {
+		dao.addProduct(product);
+		Category category = createOrGetCategory(categoryName);
+		category.getProducts().add(product);
+		return product;
+	}
+	
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Product updateProduct(Product product) {
+		return dao.updateProduct(product);
+	}
+	
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Product getProduct(int id) {
-		return dao.getProduct(id);
+	public Products findProductByName(String name, int offset, int limit) {
+		return new Products(dao.findProductsByName("%" + name + "%", offset, limit), offset, limit);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Product> findProductByName(String name) {
-		return dao.findProductsByName(name, 0, 5);
+	public Product getProduct(int id) {
+		return dao.getProduct(id);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)

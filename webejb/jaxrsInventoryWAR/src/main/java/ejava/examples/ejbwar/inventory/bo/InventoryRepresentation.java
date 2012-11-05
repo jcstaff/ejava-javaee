@@ -48,11 +48,19 @@ public class InventoryRepresentation {
 		}
 	}
 	
-	public static <T> Object unmarshall(Class<T> clazz, InputStream is) {
+	/**
+	 * This method will unmarshall the specified class from the provided 
+	 * XML input stream.
+	 * @param clazz
+	 * @param is
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T unmarshall(Class<T> clazz, InputStream is) {
 		try {
 			JAXBContext jbx = JAXBContext.newInstance(clazz);
 			Unmarshaller marshaller = jbx.createUnmarshaller();
-			return marshaller.unmarshal(is);
+			return (T) marshaller.unmarshal(is);
 		} catch (JAXBException ex) {
 			throw new RuntimeException("unexpected JAXB error marshalling object:", ex);
 		}

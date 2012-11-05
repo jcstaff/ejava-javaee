@@ -1,9 +1,18 @@
 package ejava.examples.ejbwar.inventory.client;
 
-import java.util.List;
-
+import ejava.examples.ejbwar.inventory.bo.Categories;
 import ejava.examples.ejbwar.inventory.bo.Category;
+import ejava.examples.ejbwar.inventory.bo.Product;
+import ejava.examples.ejbwar.inventory.bo.Products;
 
 public interface InventoryClient {
-	List<Category> getCategories(int offset, int limit) throws Exception;
+	Categories findCategoryByName(String name, int offset, int limit) throws Exception;
+	Category getCategory(int id) throws Exception;
+	boolean deleteCategory(int id) throws Exception;
+	
+	Product createProduct(Product product, String string) throws Exception;
+	Products findProductByName(String name, int offset, int limit) throws Exception;
+	Product getProduct(int id) throws Exception;
+	Product updateProduct(Product product) throws Exception;
+	boolean deleteProduct(int id) throws Exception;
 }

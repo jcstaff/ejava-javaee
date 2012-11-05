@@ -1,8 +1,10 @@
 package ejava.examples.ejbwar.inventory.rs;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Qualifier;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -19,12 +21,14 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ejava.examples.ejbwar.inventory.bo.Product;
+import ejava.examples.ejbwar.inventory.bo.Products;
 import ejava.examples.ejbwar.inventory.ejb.InventoryMgmtEJB;
 
 @Path("/products")
@@ -56,9 +60,14 @@ public class ProductsResource {
 		try {
 			Product product = new Product(name, quantity, price);
 			Product p = ejb.addProduct(product, category);
-			return Response.ok(p)
-				.tag("" + p.getVersion())
-				.build();
+			//build URI that can be used to get this product
+			URI uri = UriBuilder.fromUri(uriInfo.getAbsolutePath())
+						.path(ProductsResource.class, "getProduct")
+						.build(p.getId());
+			return Response.created(uri)
+					.entity(p)
+  				    .tag("" + p.getVersion())
+				    .build();
 		} catch (Exception ex) {
 			return ResourceHelper.serverError(log, "creating product", ex).build();
 		}
@@ -145,23 +154,18 @@ public class ProductsResource {
 	 */
 	@GET @Path("")
 	@Produces(MediaType.APPLICATION_XML)
-	public Response findProductsByName(@QueryParam("name")String name) {
+	public Response findProductsByName(
+			@QueryParam("name")String name,
+			@QueryParam("offset") @DefaultValue("0") int offset,
+			@QueryParam("limit") @DefaultValue("0") int limit) {
 		log.debug(String.format("%s %s", request.getMethod(), uriInfo.getAbsolutePath()));
 
 		try {
-			List<Product> products = ejb.findProductByName(name);
-			if (products.size() > 0) {
-				return Response.ok(new GenericEntity<List<Product>>(products){})
-						.build();
-			}
-			else {
-				return Response.status(Response.Status.NOT_FOUND)
-						.entity(String.format("unable to locate product %s", name))
-						.type(MediaType.TEXT_PLAIN)
-						.build();
-			}
+			Products products = ejb.findProductByName(name, offset, limit);
+			return Response.ok(products)
+					.build();
 		} catch (Exception ex) {
-			return ResourceHelper.serverError(log, "getting product", ex).build();
+			return ResourceHelper.serverError(log, "getting products", ex).build();
 		}
 	}
 	
