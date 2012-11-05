@@ -1,7 +1,5 @@
 package ejava.examples.ejbwar.inventory.rs;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -11,7 +9,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -24,7 +21,12 @@ import ejava.examples.ejbwar.inventory.bo.Categories;
 import ejava.examples.ejbwar.inventory.bo.Category;
 import ejava.examples.ejbwar.inventory.ejb.InventoryMgmtEJB;
 
-@Path("categories")
+/**
+ * This class implements a web facade for the product catageories in the 
+ * inventory management. It uses JAX-RS to implement the server-side HTTP
+ * communications.
+ */
+@Path("categories") //part of the method's final URI
 public class CategoriesResource {
 	private static final Log log = LogFactory.getLog(CategoriesResource.class);
 	
@@ -35,6 +37,14 @@ public class CategoriesResource {
 	@Context 
 	private UriInfo uriInfo;
 	
+	/**
+	 * This method will respond to a GET of the base resource URI to 
+	 * return categories based on query parameters.
+	 * @param name
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
 	@GET @Path("")
 	@Produces(MediaType.APPLICATION_XML)
 	public Response findCategoriesByName(
@@ -53,6 +63,13 @@ public class CategoriesResource {
 		}
 	}
 	
+	/**
+	 * This method will respond to a GET method for (root)/{id} URIs to get 
+	 * a specific category.
+	 *  
+	 * @param id
+	 * @return
+	 */
 	@GET @Path("{id}")
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getCategory(@PathParam("id")int id) {
@@ -76,6 +93,12 @@ public class CategoriesResource {
 		}
 	}
 
+	/**
+	 * This method responds to DELETE method calls to (root)/{id} URIs to
+	 * delete a specific category.
+	 * @param id
+	 * @return
+	 */
 	@DELETE @Path("{id}")
 	public Response deleteCategory(@PathParam("id")int id) {
 		log.debug(String.format("%s %s", request.getMethod(), uriInfo.getAbsolutePath()));

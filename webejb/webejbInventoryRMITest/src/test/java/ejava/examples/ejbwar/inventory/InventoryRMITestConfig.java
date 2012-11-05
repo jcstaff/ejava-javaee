@@ -17,9 +17,14 @@ import ejava.util.ejb.EJBClient;
  */
 public class InventoryRMITestConfig {
 	private String inventoryJNDIName;
-	private InventoryMgmtRemote inventoryClient;
+	private InventoryMgmtRemote inventoryClient;	
+	private Properties props = new Properties();
 	
-	private Properties props = new Properties(); 
+	/**
+	 * Load in overrides for hard-coded defaults.
+	 * @param resource
+	 * @throws IOException
+	 */
 	public InventoryRMITestConfig(String resource) throws IOException {
 		InputStream is = getClass().getResourceAsStream(resource);
 		if (is!=null) {
@@ -31,6 +36,10 @@ public class InventoryRMITestConfig {
 		}
 	}
 	
+	/**
+	 * Return the JNDI name for the inventory management EJB RMI facade.
+	 * @return
+	 */
 	public String inventoryJNDIName() {
 		if (inventoryJNDIName==null) {
 			String warName = props.getProperty("war.name", "jaxrsInventoryWAR");
@@ -41,6 +50,12 @@ public class InventoryRMITestConfig {
 		return inventoryJNDIName;
 	}
 	
+	/**
+	 * Return the RMI stub that can be used to communicate directly with the 
+	 * inventory management application.
+	 * @return
+	 * @throws NamingException
+	 */
 	public InventoryMgmtRemote inventoryClient() throws NamingException {
 		if (inventoryClient==null) {
 			InitialContext jndi = null;
@@ -48,7 +63,7 @@ public class InventoryRMITestConfig {
 				jndi=new InitialContext();
 				inventoryClient = (InventoryMgmtRemote)jndi.lookup(inventoryJNDIName());
 			} finally {
-				//jndi.close();
+				//jndi.close(); CAN'T closed this or stub will fail!!!
 			}
 			 
 		}

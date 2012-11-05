@@ -12,7 +12,7 @@ import ejava.examples.ejbwar.inventory.bo.Categories;
 import ejava.examples.ejbwar.inventory.bo.Category;
 import ejava.examples.ejbwar.inventory.bo.Product;
 import ejava.examples.ejbwar.inventory.bo.Products;
-import ejava.examples.ejbwar.inventory.rmi.InventoryMgmtRemote;
+import ejava.examples.ejbwar.inventory.client.InventoryClient;
 
 /**
  * This class provides a test of the RMI interface for the InventoryMgmt
@@ -20,7 +20,7 @@ import ejava.examples.ejbwar.inventory.rmi.InventoryMgmtRemote;
  */
 public class InventoryRMIIT {
 	private static final Log log = LogFactory.getLog(InventoryRMIIT.class);
-	private InventoryMgmtRemote inventoryClient;
+	private InventoryClient inventoryClient;
 	
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -29,9 +29,6 @@ public class InventoryRMIIT {
 			long waitTime=15000;
 	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
 	    	Thread.sleep(waitTime);
-		}
-		else {
-	    	Thread.sleep(5000);
 		}
 	}
 

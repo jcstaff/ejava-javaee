@@ -2,8 +2,6 @@ package ejava.examples.ejbwar.inventory;
 
 import static org.junit.Assert.*;
 
-import java.net.URI;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -15,7 +13,10 @@ import ejava.examples.ejbwar.inventory.bo.Product;
 import ejava.examples.ejbwar.inventory.bo.Products;
 import ejava.examples.ejbwar.inventory.client.InventoryClient;
 
-
+/**
+ * This class implements a JAX-RS based integration test with the 
+ * inventory application deployed to the server.
+ */
 public class InventoryIT {
 	private static final Log log = LogFactory.getLog(InventoryIT.class);
 	private InventoryClient inventoryClient;

@@ -1,10 +1,8 @@
 package ejava.examples.ejbwar.inventory.rs;
 
 import java.net.URI;
-import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Qualifier;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -17,7 +15,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -31,6 +28,10 @@ import ejava.examples.ejbwar.inventory.bo.Product;
 import ejava.examples.ejbwar.inventory.bo.Products;
 import ejava.examples.ejbwar.inventory.ejb.InventoryMgmtEJB;
 
+/**
+ * This class implements the JAX-RS interface for the injected inventory 
+ * management EJB logic.
+ */
 @Path("/products")
 public class ProductsResource {
 	private static final Log log = LogFactory.getLog(ProductsResource.class);
@@ -101,6 +102,12 @@ public class ProductsResource {
 		}
 	}
 
+	/**
+	 * Updates a product with the values of the object passed in
+	 * @param id
+	 * @param product
+	 * @return
+	 */
 	@PUT @Path("{id}")
 	@Consumes(MediaType.APPLICATION_XML)
 	@Produces(MediaType.APPLICATION_XML)
@@ -167,6 +174,5 @@ public class ProductsResource {
 		} catch (Exception ex) {
 			return ResourceHelper.serverError(log, "getting products", ex).build();
 		}
-	}
-	
+	}	
 }

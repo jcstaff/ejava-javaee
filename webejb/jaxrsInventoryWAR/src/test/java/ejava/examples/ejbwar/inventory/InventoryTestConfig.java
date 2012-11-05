@@ -1,6 +1,7 @@
 package ejava.examples.ejbwar.inventory;
 
 import java.io.IOException;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -8,22 +9,28 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import ejava.examples.ejbwar.inventory.bo.Product;
 import ejava.examples.ejbwar.inventory.client.InventoryClient;
 import ejava.examples.ejbwar.inventory.client.InventoryClientImpl;
-import ejava.examples.ejbwar.inventory.rs.ProductsResource;
 
+/**
+ * This class implements the details of the test configuration and 
+ * objects required to operate the test.
+ */
 public class InventoryTestConfig {
 	private HttpClient httpClient;
 	private URI appURI;
 	private InventoryClient inventoryClient;
+	private Properties props = new Properties();
 	
-	private Properties props = new Properties(); 
+	/**
+	 * Accept an optional property file resource from the classpath
+	 * so that we can override hard-coded defaults with a property file.
+	 * @param resource
+	 * @throws IOException
+	 */
 	public InventoryTestConfig(String resource) throws IOException {
 		InputStream is = getClass().getResourceAsStream(resource);
 		if (is!=null) {
@@ -35,6 +42,11 @@ public class InventoryTestConfig {
 		}
 	}
 	
+	/**
+	 * Returns a singleton connection manager for use with HttpClient
+	 * HTTP client library.
+	 * @return
+	 */
 	public HttpClient httpClient() {
 		if (httpClient==null) {
 			httpClient = new DefaultHttpClient();
@@ -63,6 +75,11 @@ public class InventoryTestConfig {
 		return appURI;
 	}
 	
+	/**
+	 * Returns a remote stub (implemented with JAX-RS) to the 
+	 * inventory management application.
+	 * @return
+	 */
 	public InventoryClient inventoryClient() {
 		if (inventoryClient==null) {
 			InventoryClient client = new InventoryClientImpl();

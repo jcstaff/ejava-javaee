@@ -13,6 +13,12 @@ import ejava.examples.ejbwar.inventory.bo.Product;
 import ejava.examples.ejbwar.inventory.bo.Products;
 import ejava.examples.ejbwar.inventory.dao.InventoryDAO;
 
+/**
+ * This class implements the core transactional business logic for the 
+ * inventory management. It is implemented as a no interface @Stateless
+ * session bean and has JAX-RS and RMI facades that deal with technology-
+ * specific communications with remote clients.
+ */
 @Stateless
 public class InventoryMgmtEJB {
 	@Inject

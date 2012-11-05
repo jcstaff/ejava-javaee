@@ -1,6 +1,7 @@
 package ejava.examples.ejbwar.inventory.client;
 
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,11 +60,18 @@ public class InventoryClientImpl implements InventoryClient {
 	 * @return
 	 */
 	protected <T> UriBuilder buildURI(Class<T> resourceClass, String method) {
-		//start with the URI for the WAR deployed to the server
+		//start with the URI for the WAR deployed to the server 
+		//that ends with the context-root
 		return UriBuilder.fromUri(appURI)
+				//add path info from the 
+				//javax.ws.rs.core.Application @ApplicationPath
 				.path("rest")
+				//add in @Path added by resource class
 				.path(resourceClass)
+				//add in @Path added by resource class' method
 				.path(resourceClass,method);
+				//the result will be a URI template that 
+				//must be passed arguments by the caller during build()
 	}
 	
 	@Override
@@ -72,9 +80,12 @@ public class InventoryClientImpl implements InventoryClient {
 		URI uri = buildURI(CategoriesResource.class,"findCategoriesByName")
 				//marshall @PathParms into the URI
 				.build(name, offset, limit);
-			
+		
+		//build the overall request 
 		HttpGet get = new HttpGet(uri);
 		get.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML);
+		
+		//issue request and look for an OK response with entity
 		HttpResponse response = client.execute(get);
 		log.info(String.format("%s %s", get.getURI(), response));
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
@@ -89,9 +100,12 @@ public class InventoryClientImpl implements InventoryClient {
 		URI uri = buildURI(CategoriesResource.class,"getCategory")
 				//marshall @PathParm into the URI
 				.build(id);
-			
+		
+		//build the overall request
 		HttpGet get = new HttpGet(uri);
 		get.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML);
+		
+		//execute request and look for an OK response with entity
 		HttpResponse response = client.execute(get);
 		log.info(String.format("%s %s", get.getURI(), response));
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
@@ -106,8 +120,11 @@ public class InventoryClientImpl implements InventoryClient {
 		URI uri = buildURI(CategoriesResource.class,"deleteCategory")
 				//marshall @PathParm into the URI
 				.build(id);
-			
+		
+		//build the overall request
 		HttpDelete delete = new HttpDelete(uri);
+
+		//execute request and look for an OK response without an entity
 		HttpResponse response = client.execute(delete);
 		log.info(String.format("%s %s", delete.getURI(), response));
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
@@ -116,6 +133,10 @@ public class InventoryClientImpl implements InventoryClient {
 		return false;
 	}
 	
+	/**
+	 * This method uses HTML FORM mechanism to POST a new product in the
+	 * inventory. 
+	 */
 	@Override
 	public Product createProduct(Product product, String categoryName) 
 		throws Exception {
@@ -155,8 +176,11 @@ public class InventoryClientImpl implements InventoryClient {
 				//marshall @PathParms into the URI
 				.build(name, offset, limit);
 			
+		//build the overall request
 		HttpGet get = new HttpGet(uri);
 		get.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML);
+		
+		//issue request and look for OK response with entity
 		HttpResponse response = client.execute(get);
 		log.info(String.format("%s %s", get.getURI(), response));
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
@@ -172,8 +196,11 @@ public class InventoryClientImpl implements InventoryClient {
 				//marshall @PathParm into the URI
 				.build(id);
 			
+		//build overall request
 		HttpGet get = new HttpGet(uri);
-		get.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML);		
+		get.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML);
+		
+		//issue request and look for OK response with entity
 		HttpResponse response = client.execute(get);
 		log.info(String.format("%s %s", get.getURI(), response));
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
@@ -189,9 +216,12 @@ public class InventoryClientImpl implements InventoryClient {
 				//marshall @PathParm into the URI
 				.build(product.getId());
 			
+		//build overall request
 		HttpPut put = new HttpPut(uri);
 		put.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML);
 		put.setEntity(new StringEntity(product.toString(), "UTF-8"));
+		
+		//issue request and look for OK with entity
 		HttpResponse response = client.execute(put);
 		log.info(String.format("%s %s", put.getURI(), response));
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
@@ -207,7 +237,10 @@ public class InventoryClientImpl implements InventoryClient {
 				//marshall @PathParm into the URI
 				.build(id);
 			
+		//build overall request
 		HttpDelete delete = new HttpDelete(uri);
+		
+		//issue request and look for OK respose without and entity
 		HttpResponse response = client.execute(delete);
 		log.info(String.format("%s %s", delete.getURI(), response));
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {

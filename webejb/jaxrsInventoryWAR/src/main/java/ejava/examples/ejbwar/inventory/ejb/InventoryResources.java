@@ -6,7 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 /**
- * This class is used to provide resources required by the application
+ * This class is used to provide resources required by the application.
+ * We must have a Web-INF/beans.xml file in place in the WAR to enable CDI.
  */
 public class InventoryResources {
 	@Produces @Named("inventory")

@@ -2,16 +2,8 @@ package ejava.examples.ejbwar.inventory.rs;
 
 import java.io.IOException;
 
-import java.util.Enumeration;
-import java.util.Properties;
 
 import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
