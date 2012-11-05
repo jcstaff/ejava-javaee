@@ -40,6 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 				"where :product member of c.products" )
 })
 public class Category extends InventoryRepresentation {
+	private static final long serialVersionUID = 2367549577678745828L;
 	public static final String FIND_BY_NAME = "Inventory.findCategoryByName";
 	public static final String FIND_BY_PRODUCT = "Inventory.findCategoryByProduct";;
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)

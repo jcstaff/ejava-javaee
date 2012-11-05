@@ -22,6 +22,7 @@ import ejava.examples.ejbwar.inventory.bo.InventoryRepresentation;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 
 public class Products extends InventoryRepresentation {
+	private static final long serialVersionUID = 8409120005599383060L;
 	private int offset;
 	private int limit;
 	private List<Product> products=new ArrayList<Product>();

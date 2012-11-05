@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.XmlType;
 			query="select p from Product p where name like :criteria")
 })
 public class Product extends InventoryRepresentation {
+	private static final long serialVersionUID = -4058695470696405277L;
 	public static final String FIND_BY_NAME = "Inventory.findProductByName";
 
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)

@@ -1,6 +1,7 @@
 package ejava.examples.ejbwar.inventory.bo;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 
 import javax.persistence.Column;
@@ -16,8 +17,9 @@ import javax.xml.bind.annotation.XmlAttribute;
  * This class provides base definition and helper methods for representations
  * within the inventory domain.
  */
+@SuppressWarnings("serial")
 @MappedSuperclass
-public class InventoryRepresentation {
+public abstract class InventoryRepresentation implements Serializable {
 	public static final String NAMESPACE = "http://webejb.ejava.info/inventory";
 	
 	@Version

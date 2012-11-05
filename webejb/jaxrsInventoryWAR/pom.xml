@@ -24,6 +24,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- HTTP web client is implemented in HttpClient -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>provided</scope>
+        </dependency>        
+
         <!-- JPA provider for annotations -->        
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
@@ -36,11 +43,6 @@
             <artifactId>resteasy-jaxrs</artifactId>
             <scope>test</scope>
         </dependency>                
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <scope>test</scope>
-        </dependency>        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -83,6 +85,29 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+
+            <!-- create an archive for external clients to use -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>client</classifier>
+                            <includes>
+                                <include>**/bo/*</include>
+                                <include>**/rs/*Resource.class</include>
+                                <include>**/client/**/*</include>
+                                <include>**/rmi/*Remote.class</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
