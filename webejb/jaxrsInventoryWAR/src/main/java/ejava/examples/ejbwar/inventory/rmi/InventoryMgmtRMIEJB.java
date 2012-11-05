@@ -29,24 +29,26 @@ public class InventoryMgmtRMIEJB implements InventoryMgmtRemote {
 	}
 
 	@Override
-	public void deleteCategory(int id) {
+	public boolean deleteCategory(int id) {
 		log.debug(String.format("deleteCategory(%d)", id));
 		ejb.deleteCategory(id);
+		return true;
 	}
 
 	@Override
-	public Products findProductByName(String name, int offset, int limit) {
+	public Products findProductsByName(String name, int offset, int limit) {
 		log.debug(String.format("findProductByName(%s)", name));
 		return ejb.findProductByName(name, offset, limit);
 	}
 
 	@Override
-	public void deleteProduct(int id) {
+	public boolean deleteProduct(int id) {
 		log.debug(String.format("deleteProduct(%d)", id));
 		Product p = ejb.getProduct(id);
 		if (p!=null) {
 			ejb.deleteProduct(p);
 		}
+		return true;
 	}
 
 	@Override

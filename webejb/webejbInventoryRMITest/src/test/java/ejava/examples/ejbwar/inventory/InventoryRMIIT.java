@@ -31,7 +31,7 @@ public class InventoryRMIIT {
 	    	Thread.sleep(waitTime);
 		}
 		else {
-	    	log.info(String.format("startstop not set"));
+	    	Thread.sleep(5000);
 		}
 	}
 
@@ -56,7 +56,7 @@ public class InventoryRMIIT {
 				0, 
 				inventoryClient.findCategoryByName("", 0, 0).getCategories().size());
 		
-		Products products = inventoryClient.findProductByName("", 0, 0);
+		Products products = inventoryClient.findProductsByName("", 0, 0);
 		assertNotNull("error getting products", categories);
 		log.info(String.format("deleting %d products", products.getProducts().size()));
 		for (Product p: products.getProducts()) {
@@ -64,7 +64,7 @@ public class InventoryRMIIT {
 		}
 		assertEquals("unexpected products after cleanup", 
 				0, 
-				inventoryClient.findProductByName("", 0, 0).getProducts().size());
+				inventoryClient.findProductsByName("", 0, 0).getProducts().size());
 	}
 
 	@Test

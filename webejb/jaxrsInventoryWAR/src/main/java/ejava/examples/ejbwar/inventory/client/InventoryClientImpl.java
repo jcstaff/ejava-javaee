@@ -38,6 +38,9 @@ import ejava.examples.ejbwar.inventory.rs.ProductsResource;
 public class InventoryClientImpl implements InventoryClient {
 	private static final Log log = LogFactory.getLog(InventoryClientImpl.class);
 	private HttpClient client;
+	/**
+	 * Defines the HTTP URL for the WAR that hosts the JAX-RS resources.
+	 */
 	private URI appURI;
 
 	public void setHttpClient(HttpClient client) {
@@ -47,12 +50,27 @@ public class InventoryClientImpl implements InventoryClient {
 		this.appURI = appURI;
 	}	
 	
+	/**
+	 * Helper method that returns a URIBuilder fully initialized to point
+	 * to the URI that will reach the specified method within the inventory
+	 * resource classes.
+	 * @param resourceClass
+	 * @param method
+	 * @return
+	 */
+	protected <T> UriBuilder buildURI(Class<T> resourceClass, String method) {
+		//start with the URI for the WAR deployed to the server
+		return UriBuilder.fromUri(appURI)
+				.path("rest")
+				.path(resourceClass)
+				.path(resourceClass,method);
+	}
+	
 	@Override
 	public Categories findCategoryByName(String name, int offset, int limit) throws Exception {
-		URI uri = UriBuilder.fromUri(appURI)
-				.path("rest")
-				.path(CategoriesResource.class)
-				.path(CategoriesResource.class,"findCategoriesByName")
+		//build a URI to the specific method that is hosted within the app
+		URI uri = buildURI(CategoriesResource.class,"findCategoriesByName")
+				//marshall @PathParms into the URI
 				.build(name, offset, limit);
 			
 		HttpGet get = new HttpGet(uri);
@@ -68,10 +86,8 @@ public class InventoryClientImpl implements InventoryClient {
 	
 	@Override
 	public Category getCategory(int id) throws Exception {
-		URI uri = UriBuilder.fromUri(appURI)
-				.path("rest")
-				.path(CategoriesResource.class)
-				.path(CategoriesResource.class,"getCategory")
+		URI uri = buildURI(CategoriesResource.class,"getCategory")
+				//marshall @PathParm into the URI
 				.build(id);
 			
 		HttpGet get = new HttpGet(uri);
@@ -87,10 +103,8 @@ public class InventoryClientImpl implements InventoryClient {
 	
 	@Override
 	public boolean deleteCategory(int id) throws Exception {
-		URI uri = UriBuilder.fromUri(appURI)
-				.path("rest")
-				.path(CategoriesResource.class)
-				.path(CategoriesResource.class,"deleteCategory")
+		URI uri = buildURI(CategoriesResource.class,"deleteCategory")
+				//marshall @PathParm into the URI
 				.build(id);
 			
 		HttpDelete delete = new HttpDelete(uri);
@@ -105,10 +119,8 @@ public class InventoryClientImpl implements InventoryClient {
 	@Override
 	public Product createProduct(Product product, String categoryName) 
 		throws Exception {
-		URI uri = UriBuilder.fromUri(appURI)
-				.path("rest")
-				.path(ProductsResource.class)
-				.path(ProductsResource.class,"createProduct")
+		URI uri = buildURI(ProductsResource.class,"createProduct")
+				//no @PathParams here
 				.build();
 
 		//build the form data with the request parameters
@@ -138,11 +150,9 @@ public class InventoryClientImpl implements InventoryClient {
 	}
 	
 	@Override
-	public Products findProductByName(String name, int offset, int limit) throws Exception {
-		URI uri = UriBuilder.fromUri(appURI)
-				.path("rest")
-				.path(ProductsResource.class)
-				.path(ProductsResource.class,"findProductsByName")
+	public Products findProductsByName(String name, int offset, int limit) throws Exception {
+		URI uri = buildURI(ProductsResource.class,"findProductsByName")
+				//marshall @PathParms into the URI
 				.build(name, offset, limit);
 			
 		HttpGet get = new HttpGet(uri);
@@ -158,10 +168,8 @@ public class InventoryClientImpl implements InventoryClient {
 	
 	@Override
 	public Product getProduct(int id) throws Exception {
-		URI uri = UriBuilder.fromUri(appURI)
-				.path("rest")
-				.path(ProductsResource.class)
-				.path(ProductsResource.class,"getProduct")
+		URI uri = buildURI(ProductsResource.class,"getProduct")
+				//marshall @PathParm into the URI
 				.build(id);
 			
 		HttpGet get = new HttpGet(uri);
@@ -177,10 +185,8 @@ public class InventoryClientImpl implements InventoryClient {
 	
 	@Override
 	public Product updateProduct(Product product) throws Exception {
-		URI uri = UriBuilder.fromUri(appURI)
-				.path("rest")
-				.path(ProductsResource.class)
-				.path(ProductsResource.class,"updateProduct")
+		URI uri = buildURI(ProductsResource.class,"updateProduct")
+				//marshall @PathParm into the URI
 				.build(product.getId());
 			
 		HttpPut put = new HttpPut(uri);
@@ -197,10 +203,8 @@ public class InventoryClientImpl implements InventoryClient {
 
 	@Override
 	public boolean deleteProduct(int id) throws Exception {
-		URI uri = UriBuilder.fromUri(appURI)
-				.path("rest")
-				.path(ProductsResource.class)
-				.path(ProductsResource.class,"deleteProduct")
+		URI uri = buildURI(ProductsResource.class,"deleteProduct")
+				//marshall @PathParm into the URI
 				.build(id);
 			
 		HttpDelete delete = new HttpDelete(uri);

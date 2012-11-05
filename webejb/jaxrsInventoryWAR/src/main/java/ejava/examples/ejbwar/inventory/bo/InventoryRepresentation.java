@@ -26,6 +26,11 @@ public abstract class InventoryRepresentation implements Serializable {
 	@Column(name="VERSION")
 	private int version;
 	
+	/**
+	 * This property is added to each entity so that we can have better 
+	 * control over concurrent updates
+	 * @return
+	 */
 	@XmlAttribute(required=true)
 	public int getVersion() { return version; }
 	public void setVersion(int version) {
