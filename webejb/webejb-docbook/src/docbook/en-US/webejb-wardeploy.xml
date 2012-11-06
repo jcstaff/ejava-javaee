@@ -4,83 +4,202 @@
 <chapter id="webejb-wardeploy">
     <title>EJB WAR Deployment</title>
     <subtitle>Flexible EJB Deployment</subtitle>
+    <itemizedlist>
+        <listitem><para>Prior to JavaEE 6</para>
+            <itemizedlist>
+                <listitem><para>EJB beans could only be deployed in EJB modules</para></listitem>
+                <listitem><para>EJB modules integrated with WARs using common EAR</para></listitem>
+            </itemizedlist>                   
+        </listitem>
+        <listitem><para>Starting with JavaEE 6</para>
+            <itemizedlist>
+                <listitem><para>EJB beans can be embedded within WAR</para></listitem>
+                <listitem><para>EJB modules can be deployed within WAR</para></listitem>
+            </itemizedlist>                   
+        </listitem>
+    </itemizedlist>
 
     <section id="webejb-warstructure">
         <title>WAR Structure</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language=""><![CDATA[
+<programlisting language=""><![CDATA[
+|-- index.html                                                                                                                                                        
+`-- WEB-INF                                                                                                                                                           
+    ...
+    |-- jboss-web.xml
+    |-- lib
+    `-- web.xml
         ]]></programlisting>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>index.html - example static web resource</para></listitem>
+            <listitem><para>WEB-INF/jboss-web.xml - container-specific configuration. Used here to control name of WAR</para></listitem>
+            <listitem><para>WEB-INF/lib - directory to place jars for classpath</para></listitem>
+            <listitem><para>WEB-INF/web.xml - standard WAR deployment descriptor</para></listitem>
         </itemizedlist>
                            
         <section id="webejb-warstructure-external">
             <title>Deploying External EJB JARs</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>EJB beans developed external to WAR</para></listitem>
+                <listitem><para>Integrated using WEB-INF/lib</para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-	        ]]></programlisting>
+<programlisting language=""><![CDATA[
+	WEB-INF/lib/
+	`-- webejbCustomerEJB-3.0.2012.2-SNAPSHOT.jar
+]]></programlisting>
+
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>example EJB module contents</para>
+<programlisting language=""><![CDATA[
+$ jar tf WEB-INF/lib/webejbCustomerEJB-3.0.2012.2-SNAPSHOT.jar | sort
+ejava/examples/ejbwar/customer/bo/Customer.class
+ejava/examples/ejbwar/customer/bo/CustomerRepresentation.class
+ejava/examples/ejbwar/customer/bo/Customers.class
+ejava/examples/ejbwar/customer/client/
+ejava/examples/ejbwar/customer/client/CustomerClient.class
+ejava/examples/ejbwar/customer/client/CustomerClientImpl.class
+ejava/examples/ejbwar/customer/CustomerResources.class
+ejava/examples/ejbwar/customer/Customers.class
+ejava/examples/ejbwar/customer/dao/
+ejava/examples/ejbwar/customer/dao/CustomerDAO.class
+ejava/examples/ejbwar/customer/dao/CustomerDAOImpl.class
+ejava/examples/ejbwar/customer/ejb/
+ejava/examples/ejbwar/customer/ejb/CustomerMgmt.class
+ejava/examples/ejbwar/customer/ejb/CustomerMgmtEJB.class
+ejava/examples/ejbwar/customer/ejb/CustomerMgmtLocal.class
+ejava/examples/ejbwar/customer/ejb/CustomerMgmtRemote.class
+ejava/examples/ejbwar/customer/rs/
+ejava/examples/ejbwar/customer/rs/CustomersResource.class
+META-INF/beans.xml
+META-INF/MANIFEST.MF
+META-INF/persistence.xml
+]]></programlisting>
+                </listitem>
+
+                <listitem><para>JNDI name uses WAR name (minus.war)</para>
+<programlisting language=""><![CDATA[
+java:global/jaxrsInventoryWAR/CustomerMgmtEJB!ejava.examples.ejbwar.customer.ejb.CustomerMgmtRemote
+java:app/jaxrsInventoryWAR/CustomerMgmtEJB!ejava.examples.ejbwar.customer.ejb.CustomerMgmtRemote
+java:module/CustomerMgmtEJB!ejava.examples.ejbwar.customer.ejb.CustomerMgmtRemote
+
+java:jboss/exported/jaxrsInventoryWAR/CustomerMgmtEJB!ejava.examples.ejbwar.customer.ejb.CustomerMgmtRemote
+
+java:global/jaxrsInventoryWAR/CustomerMgmtEJB!ejava.examples.ejbwar.customer.ejb.CustomerMgmtLocal
+java:app/jaxrsInventoryWAR/CustomerMgmtEJB!ejava.examples.ejbwar.customer.ejb.CustomerMgmtLocal
+java:module/CustomerMgmtEJB!ejava.examples.ejbwar.customer.ejb.CustomerMgmtLocal
+]]></programlisting>
+                </listitem>
+                <listitem><para>jboss-web.xml used to express WAR name without version#</para>
+<programlisting language=""><![CDATA[
+$ cat WEB-INF/jboss-web.xml 
+<jboss-web>
+    <!-- needed to always assure that version# does not get into JNDI name -->
+    <context-root>jaxrsInventoryWAR</context-root>
+</jboss-web>
+]]></programlisting>
+                </listitem>
+                <listitem><para>EJB module contains persistence.xml and CDI beans.xml</para>
+<programlisting language=""><![CDATA[
+META-INF/beans.xml
+META-INF/persistence.xml
+]]></programlisting>
+                </listitem>
+
             </itemizedlist>                   
         </section>
 
         <section id="webejb-warstructure-embedded">
             <title>Deploying Embedded EJBs</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>EJB beans developed as part of WAR</para></listitem>
+                <listitem><para>No need to declare new EJB module just to get EJB bean functionality</para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-            ]]></programlisting>
+<programlisting language=""><![CDATA[
+WEB-INF
+|-- beans.xml                                                                                                                                                     
+|-- classes
+|   |-- ejava
+|   |   `-- examples
+|   |       `-- ejbwar
+|   |           `-- inventory
+|   |               |-- bo
+|   |               |   |-- Categories.class
+|   |               |   |-- Category.class
+|   |               |   |-- InventoryRepresentation.class
+|   |               |   |-- Product.class
+|   |               |   `-- Products.class
+|   |               |-- client
+|   |               |   |-- InventoryClient.class
+|   |               |   `-- InventoryClientImpl.class
+|   |               |-- dao
+|   |               |   |-- InventoryDAO.class
+|   |               |   `-- InventoryDAOImpl.class
+|   |               |-- ejb
+|   |               |   |-- InventoryMgmtEJB.class
+|   |               |   `-- InventoryResources.class
+|   |               |-- rmi
+|   |               |   |-- InventoryMgmtRemote.class
+|   |               |   `-- InventoryMgmtRMIEJB.class
+|   |               `-- rs
+|   |                   |-- Application.class
+|   |                   |-- CategoriesResource.class
+|   |                   |-- PrettyPrinter.class
+|   |                   |-- ProductsResource.class
+|   |                   |-- ResourceHelper.class
+|   |                   `-- TxFilter.class
+|   `-- META-INF
+|       `-- persistence.xml
+...
+        ]]></programlisting>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>CDI descriptor hosted in WEB-INF/beans.xml</para></listitem>
+                <listitem><para>persistence unit hosted in WEB-INF/classes/META-INF/persistence.xml</para></listitem>
+                <listitem><para>JNDI name uses WAR name (minus.war)</para>
+<programlisting language=""><![CDATA[
+java:global/jaxrsInventoryWAR/InventoryMgmtRMIEJB!ejava.examples.ejbwar.inventory.rmi.InventoryMgmtRemote
+java:app/jaxrsInventoryWAR/InventoryMgmtRMIEJB!ejava.examples.ejbwar.inventory.rmi.InventoryMgmtRemote
+java:module/InventoryMgmtRMIEJB!ejava.examples.ejbwar.inventory.rmi.InventoryMgmtRemote
+
+java:jboss/exported/jaxrsInventoryWAR/InventoryMgmtRMIEJB!ejava.examples.ejbwar.inventory.rmi.InventoryMgmtRemote
+
+java:global/jaxrsInventoryWAR/InventoryMgmtRMIEJB
+java:app/jaxrsInventoryWAR/InventoryMgmtRMIEJB
+java:module/InventoryMgmtRMIEJB
+]]></programlisting>
+                </listitem>
             </itemizedlist>                   
         </section>
     </section>
 
     <section id="webejb-warclients">
-        <title>Accessing HTTP Resources</title>
+        <title>WAR Clients</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-        ]]></programlisting>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
+            <listitem><para>Alternative: Use traditional RMI interface (specific to Java)</para></listitem>
+            <listitem><para>Alternative: Use Web-oriented HTTP interface (open to all platforms)</para></listitem>
+        </itemizedlist>
 
         <section id="webejb-warclients-httpclient">
             <title>Accessing HTTP Resources</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-	        ]]></programlisting>
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>JAX-RS 1.x only addresses server side</para></listitem>
+                <listitem><para>Many vendor-specific client libraries (e.g., RESTEasy, Jersey, HttpClient)</para></listitem>
+                <listitem><para>HTTP/REST Client API will be part of JAX-RS 2.0</para></listitem>
+                <listitem><para>Class examples implements with Apache HttpClient</para></listitem>
+                <listitem><para>Notional example accessing /index.html</para>
+<programlisting language="java"><![CDATA[
+HttpClient client = new DefaultHttpClient();
+URI appURI = "http://127.0.0.1:8080/jaxrsInventoryWAR";
+URI uri = UriBuilder.fromUri(appURI).path("index.html").build();
+
+//build the overall request 
+HttpGet get = new HttpGet(uri);
+get.addHeader(HttpHeaders.ACCEPT, MediaType.TEXT_HTML);
+
+HttpResponse response = client.execute(get);
+if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
+    return ...
+}
+]]></programlisting>
+                </listitem>
             </itemizedlist>                   
         </section>
     </section>
