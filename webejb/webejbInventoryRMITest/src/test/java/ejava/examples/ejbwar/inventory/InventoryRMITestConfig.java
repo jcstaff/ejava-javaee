@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import ejava.examples.ejbwar.customer.ejb.CustomerMgmtRemote;
 import ejava.examples.ejbwar.inventory.rmi.InventoryMgmtRemote;
 import ejava.util.ejb.EJBClient;
 
@@ -17,7 +19,10 @@ import ejava.util.ejb.EJBClient;
  */
 public class InventoryRMITestConfig {
 	private String inventoryJNDIName;
+	private String customerJNDIName;
+	private Context jndi;
 	private InventoryMgmtRemote inventoryClient;	
+	private CustomerMgmtRemote customerClient;
 	private Properties props = new Properties();
 	
 	/**
@@ -37,6 +42,18 @@ public class InventoryRMITestConfig {
 	}
 	
 	/**
+	 * Return an initial context to use for lookups.
+	 * @return
+	 * @throws NamingException
+	 */
+	public Context jndi() throws NamingException {
+		if (jndi==null) {
+			jndi=new InitialContext();
+		}
+		return jndi;
+	}
+	
+	/**
 	 * Return the JNDI name for the inventory management EJB RMI facade.
 	 * @return
 	 */
@@ -51,6 +68,22 @@ public class InventoryRMITestConfig {
 	}
 	
 	/**
+	 * Return the JNDI name for the inventory management EJB RMI facade.
+	 * @return
+	 */
+	public String customerJNDIName() {
+		if (customerJNDIName==null) {
+			String warName = props.getProperty("war.name", "jaxrsInventoryWAR");
+			String ejbName = props.getProperty("ejb.name", "CustomerMgmtEJB");
+			String remoteName = props.getProperty("remote.name", CustomerMgmtRemote.class.getName());
+			customerJNDIName = EJBClient.getRemoteLookupName(warName, ejbName, remoteName);
+		}
+		return customerJNDIName;
+	}
+	
+	
+	
+	/**
 	 * Return the RMI stub that can be used to communicate directly with the 
 	 * inventory management application.
 	 * @return
@@ -58,15 +91,21 @@ public class InventoryRMITestConfig {
 	 */
 	public InventoryMgmtRemote inventoryClient() throws NamingException {
 		if (inventoryClient==null) {
-			InitialContext jndi = null;
-			try {
-				jndi=new InitialContext();
-				inventoryClient = (InventoryMgmtRemote)jndi.lookup(inventoryJNDIName());
-			} finally {
-				//jndi.close(); CAN'T closed this or stub will fail!!!
-			}
-			 
+			inventoryClient = (InventoryMgmtRemote)jndi().lookup(inventoryJNDIName());
 		}
 		return inventoryClient;
 	}
+	
+	/**
+	 * Returns an RMI stub used to communicate withthe integrated
+	 * external EJB module.
+	 * @return
+	 */
+	public CustomerMgmtRemote customerClient() throws NamingException {
+		if (customerClient == null) {
+			customerClient = (CustomerMgmtRemote)jndi().lookup(customerJNDIName());
+		}
+		return customerClient;
+	}
+	
 }

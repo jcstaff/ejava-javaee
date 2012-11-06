@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 import ejava.examples.ejbwar.inventory.bo.Categories;
 import ejava.examples.ejbwar.inventory.bo.Category;
@@ -78,8 +79,11 @@ public class InventoryClientImpl implements InventoryClient {
 	public Categories findCategoryByName(String name, int offset, int limit) throws Exception {
 		//build a URI to the specific method that is hosted within the app
 		URI uri = buildURI(CategoriesResource.class,"findCategoriesByName")
-				//marshall @PathParms into the URI
-				.build(name, offset, limit);
+				//marshall @QueryParams into URI
+				.queryParam("name", name)
+				.queryParam("offset", offset)
+				.queryParam("limit", limit)
+				.build();
 		
 		//build the overall request 
 		HttpGet get = new HttpGet(uri);
@@ -130,6 +134,7 @@ public class InventoryClientImpl implements InventoryClient {
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
 			return true;
 		}
+		EntityUtils.consume(response.getEntity()); //must read returned data to release conn
 		return false;
 	}
 	
@@ -173,8 +178,11 @@ public class InventoryClientImpl implements InventoryClient {
 	@Override
 	public Products findProductsByName(String name, int offset, int limit) throws Exception {
 		URI uri = buildURI(ProductsResource.class,"findProductsByName")
-				//marshall @PathParms into the URI
-				.build(name, offset, limit);
+				//marshall @QueryParams into URI
+				.queryParam("name", name)
+				.queryParam("offset", offset)
+				.queryParam("limit", limit)
+				.build();
 			
 		//build the overall request
 		HttpGet get = new HttpGet(uri);
@@ -246,6 +254,7 @@ public class InventoryClientImpl implements InventoryClient {
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
 			return true;
 		}
+		EntityUtils.consume(response.getEntity()); //must read returned data to release conn
 		return false;
 	}
 }

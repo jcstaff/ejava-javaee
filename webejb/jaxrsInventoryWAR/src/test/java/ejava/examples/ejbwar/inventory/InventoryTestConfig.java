@@ -12,6 +12,8 @@ import java.util.Properties;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import ejava.examples.ejbwar.customer.client.CustomerClient;
+import ejava.examples.ejbwar.customer.client.CustomerClientImpl;
 import ejava.examples.ejbwar.inventory.client.InventoryClient;
 import ejava.examples.ejbwar.inventory.client.InventoryClientImpl;
 
@@ -23,6 +25,7 @@ public class InventoryTestConfig {
 	private HttpClient httpClient;
 	private URI appURI;
 	private InventoryClient inventoryClient;
+	private CustomerClient customerClient;
 	private Properties props = new Properties();
 	
 	/**
@@ -88,5 +91,20 @@ public class InventoryTestConfig {
 			inventoryClient = client;
 		}
 		return inventoryClient;
+	}
+	
+	/**
+	 * Returns a remote stub (implemented with JAX-RS) to the integrated
+	 * external EJB module.
+	 * @return
+	 */
+	public CustomerClient customerClient() {
+		if (customerClient == null) {
+			CustomerClient client = new CustomerClientImpl();
+			((CustomerClientImpl)client).setHttpClient(httpClient());
+			((CustomerClientImpl)client).setAppURI(appURI());
+			customerClient = client;
+		}
+		return customerClient;
 	}
 }

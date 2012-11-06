@@ -8,6 +8,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ejava.examples.ejbwar.customer.bo.Customer;
+import ejava.examples.ejbwar.customer.bo.Customers;
+import ejava.examples.ejbwar.customer.ejb.CustomerMgmtRemote;
 import ejava.examples.ejbwar.inventory.bo.Categories;
 import ejava.examples.ejbwar.inventory.bo.Category;
 import ejava.examples.ejbwar.inventory.bo.Product;
@@ -21,6 +24,7 @@ import ejava.examples.ejbwar.inventory.client.InventoryClient;
 public class InventoryRMIIT {
 	private static final Log log = LogFactory.getLog(InventoryRMIIT.class);
 	private InventoryClient inventoryClient;
+	private CustomerMgmtRemote customerClient;
 	
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -36,6 +40,7 @@ public class InventoryRMIIT {
 	public void setUp() throws Exception {
 		InventoryRMITestConfig config = new InventoryRMITestConfig("/it.properties");
 		inventoryClient = config.inventoryClient();
+		customerClient = config.customerClient();
 		cleanup();
 	}
 	
@@ -62,6 +67,17 @@ public class InventoryRMIIT {
 		assertEquals("unexpected products after cleanup", 
 				0, 
 				inventoryClient.findProductsByName("", 0, 0).getProducts().size());
+		
+		Customers customers = customerClient.findCustomersByName("", "", 0, 0);
+		assertNotNull("error getting customers", customers);
+		log.info(String.format("deleting %d customers", customers.getCustomers().size()));
+		for (Customer c: customers.getCustomers()) {
+			customerClient.deleteCustomer(c.getId());
+		}
+		assertEquals("unexpected customers after cleanup", 
+				0, 
+				customerClient.findCustomersByName("", "", 0, 0).getCustomers().size());
+		
 	}
 
 	@Test
@@ -116,4 +132,33 @@ public class InventoryRMIIT {
 		assertEquals("unexpected price", product.getPrice(), p2.getPrice(), .01);
 	}
 
+	@Test
+	public void testManageCustomer() throws Exception {
+		log.info("*** testManageCustomer ***");
+	
+		//create customer
+		Customer customer = new Customer("cat", "inhat");
+		customer = customerClient.addCustomer(customer);
+		
+		//find the customer
+		Customers customers = customerClient.findCustomersByName("cat", "", 0, 0);
+		assertEquals("unexpected customer", 1, customers.getCustomers().size());
+		
+		//get the customer
+		Customer c2 = customerClient.getCustomer(customers.getCustomers().get(0).getId());
+		assertEquals("unexpected firstName", customer.getFirstName(), c2.getFirstName());
+		assertEquals("unexpected lastName", customer.getLastName(), c2.getLastName());
+		
+		//create additional customers
+		customerClient.addCustomer(new Customer("thing","one"));
+		customerClient.addCustomer(new Customer("thing","two"));
+		
+		//verify they can be found
+		assertEquals("unexpected customer", 2, 
+			customerClient.findCustomersByName("thing", "", 0, 0).getCustomers().size());
+		assertEquals("unexpected customer", 1, 
+			customerClient.findCustomersByName("thing", "one", 0, 0).getCustomers().size());
+		assertEquals("unexpected customer", 1, 
+			customerClient.findCustomersByName("", "two", 0, 0).getCustomers().size());
+	}
 }

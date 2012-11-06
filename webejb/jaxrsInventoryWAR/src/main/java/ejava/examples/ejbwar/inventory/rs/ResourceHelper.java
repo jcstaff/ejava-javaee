@@ -11,7 +11,7 @@ import org.apache.commons.logging.Log;
  */
 public class ResourceHelper {
 	public static ResponseBuilder serverError(Log log, String context, Exception ex) {
-		String message = String.format("unexpected error %: %s",context, ex.getLocalizedMessage());
+		String message = String.format("unexpected error %s: %s",context, ex.getLocalizedMessage());
 		log.warn(message, ex);
 		return Response.serverError()
 				.entity(message)

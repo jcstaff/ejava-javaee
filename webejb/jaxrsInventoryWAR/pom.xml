@@ -18,6 +18,14 @@
     </description>
 
     <dependencies>
+        <!-- integrate self-contained external EJB module -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>webejbCustomerEJB</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>

@@ -56,6 +56,13 @@
             <classifier>client</classifier>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>webejbCustomerEJB</artifactId>
+            <version>${project.version}</version>
+            <type>ejb-client</type>
+            <scope>test</scope>
+        </dependency>
 
         <!-- JPA provider for annotations in DTO/BO classes -->        
         <dependency>
