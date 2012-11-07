@@ -1,6 +1,6 @@
 Project2: eDataShare N-Tier Application
 
-    2011-02-01 - DRAFT
+    2012-11-07 - DRAFT
 
 * Goals
 
@@ -8,20 +8,26 @@ Project2: eDataShare N-Tier Application
     implemented data access tier and initial business logic.
 
     * Deploy data access tier and business logic as an EJB component
+    
+    * Deploy EJBs using EAR and WAR approaches
 
     * Provide a remote interface and client to business logic
-
-    * Provide a local interface and Web client to business logic
 
     * Provide a Web tier 
 
 * Objectives
 
     * Expand the current project development architecture to include EJB,
-    WAR, EAR, and remote Test sub-projects for eDmv.
+    WAR, EAR, and remote Test sub-projects for eDmv. For eDmv you will have 
+    separate EJB, WAR, EAR, and rmi Test modules. This is being done to 
+    simulate a complex project option.
 
     * Expand the current project development architecture to include EJB,
-    WAR, EAR, and remote Test sub-projects for eMayberry.
+    WAR, EAR, and remote Test sub-projects for eMayberry. For eMayberry
+    you will have a single WAR for your EJBs and rmi tests. You may also 
+    merge this with your project 1 Impl and migrate the project 1 business
+    logic module to a WAR type module. This is being done to simulate 
+    a simple project option. 
 
     * Re-host the data access tiers and initial business logic from 
     Project 1 within the new EJB and WEB tiers.
@@ -29,7 +35,7 @@ Project2: eDataShare N-Tier Application
     * Design the data transfer objects (DTOs) to be used to communicate
     with clients using the remote interface.
 
-    * Create the EAR sub-project to host the Java EE components.
+    * Create the EAR and WAR sub-projects to host/deploy the Java EE components.
 
     * Create the remote Test sub-project to deploy and run tests using the
     remote EJB interface.
@@ -52,9 +58,14 @@ Project2: eDataShare N-Tier Application
 
     The project will continue along two parallel paths; eDmv and eMayberry.
     However, this time we will add several new project types; EJB, EAR,
-    WAR, and Test. These new sub-projects will become siblings to your
-    existing Impl -or- BO, DAO, and BLImpl sub-projects. The new projects
-    will depend on your legacy work. The remote interface of the EJB
+    WAR, and Test. We will add all new project types to eDmv. We will add
+    (or migrate to) the WAR type to eMayberry. 
+    These new sub-projects will become siblings to your
+    existing Dmv Impl -or- BO, DAO, and BLImpl sub-projects. 
+    For eMayberry, you have the option of making the WAR a sibling project
+    or migrating the existing Impl project to be a WAR project (and remain with
+    a single module for eMayberry).    
+    The new projects will depend on your legacy work. The remote interface of the EJB
     will also require specific design of what gets externalized to the
     client. The remote clients do not share the same address space we had
     in Project 1 and we cannot afford to serialize the entire contents
@@ -69,16 +80,14 @@ Project2: eDataShare N-Tier Application
     Web Tier, and a RMI interface for remote clients. Security will be
     addressed in the next project. To limit the scope of the project, the
     Web UI requirements will be constrained to a limited number of
-    use cases. The EJB and WAR will be deployed as a part of an
-    EAR by a Test project. The Test project will host RMI testing of the
-    EJB methods that are to be used by eDmv remote clients, including
-    eMayberry business logic. 
+    use cases. You are to deploy eDmv using an EAR and eMayberry using
+    only a WAR. 
 
     eMayberry will require additional work as well. With a remote interface
     for eDmv in hand and the ability to either simulate or operate with a
     live instance, we can now complete the rest of the the business logic
     that will also be hosted within an EJB tier. We'll try to keep the Web-UI
-    minimal at this time as well. 
+    minimal. 
 
     You may develop your Web tier in an alternate environment, such as
     Jetty. However, it must be submitted as part of the application that
@@ -189,7 +198,8 @@ Project2: eDataShare N-Tier Application
 ===
 
     [[1]] Create an EJB tier to host your eMayberry business logic and
-    data access tiers. The EJB(s) provided will provide the
+    data access tiers. However, host this EJB tier within your eMayberry WAR. 
+    The EJB(s) provided will have the
     necessary dependency injection and initialization for the business
     objects. Transaction scope will be added as a part of a separate
     requirement. Security will be added in the next project. The main
@@ -198,11 +208,14 @@ Project2: eDataShare N-Tier Application
     that gets serialized to the client in a set of Data Transfer Objects
     (DTOs).
 
+        [[A]] WAR - Create an WAR module to host the eMayberry server-side
+        components and the remote tests for the WAR/EJB components.
+
         [[A]] EJBs - The EJBs will be used to inject and initialize
         implementation objects and provide a remote interface. Refer to
         the previous diagram for a view of the EJBs within the context
-        of the business logic, DAOs, and eDmv remote interface.
-
+        of the business logic, DAOs, and eDmv remote interface. These 
+        EJB classes should be hosted in the WAR module.
 
             [[a]] PoiMgmtEJB - this EJB will primarily host the
             PoiMgmtImpl business logic. A remote interface, local
@@ -222,13 +235,6 @@ Project2: eDataShare N-Tier Application
         The EJB Tier will create new instances of the classes to clear
         them of any persistence provider classes before serializing them
         to the client. 
-
-        [[A]] EAR - Create an EAR to host the eMayberry server-side
-        components; including the EJB component just developed.
-
-        [[A]] Test - Create a Test project that will deploy the EAR to the
-        application server and run through a set of JUnit test using the
-        remote interface of the EJB. 
 
 ===
 
@@ -268,9 +274,10 @@ Project2: eDataShare N-Tier Application
 
 ===
 
-    [[1]] Add a Web UI to the eMayberry application. This may use
+    [[1]] Add a Web UI to the eMayberry application (i.e., to the WAR
+    you have already created for the EJBs). This may use
     the EJB local or remote interfaces. The WAR for the Web UI must
-    be deployed as part of the eMayberry EAR. The Web UI must have the
+    be deployed solo -- containing the EJBs and Impls. The Web UI must have the
     following functionality.
 
         * Test Admin
@@ -433,46 +440,28 @@ Project2: eDataShare N-Tier Application
     |   |               `-- jndi.properties
     |   `-- pom.xml
     |-- eMayberry
-    |   |-- eMayberryBO
-    |   |-- eMayberryDAO
-    |   |-- eMayberryBLImpl
-    |   |-- eMayberryEJB
-    |   |   |-- pom.xml
-    |   |   `-- src
-    |   |       `-- main
-    |   |           |-- java
-    |   |           |   `-- emayberry
-    |   |           |       `-- ejb
-    |   |           `-- resources
-    |   |               |-- META-INF
-    |   |               |   `-- persistence.xml
-    |   |               |-- ejb-jar.xml
-    |   |               `-- jboss.xml
+    |   |-- eMayberryImpl
     |   |-- eMayberryWAR
     |   |   |-- pom.xml
     |   |   `-- src
-    |   |       `-- main
-    |   |           |-- java
-    |   |           |   `-- emayberry
-    |   |           |       `-- web
-    |   |           |-- resources
-    |   |           `-- webapp
-    |   |               |-- WEB-INF
-    |   |               |   |-- content
-    |   |               |   `-- web.xml
-    |   |               `-- index.jsp
-    |   |-- eMayberryEAR
-    |   |   `-- pom.xml
-    |   |-- eMayberryTest
-    |   |   |-- pom.xml
-    |   |   `-- src
+    |   |       +-- main
+    |   |       |   |-- java
+    |   |       |   |   `-- emayberry
+    |   |       |   |       +-- ejb
+    |   |       |   |       `-- web
+    |   |       |   |-- resources
+    |   |       |   |   `-- META-INF
+    |   |       |   |       `-- persistence.xml
+    |   |       |   `-- webapp
+    |   |       |       |-- WEB-INF
+    |   |       |       |   |-- content
+    |   |       |       |   `-- web.xml
+    |   |       |       `-- index.jsp
     |   |       `-- test
     |   |           |-- java
     |   |           |   `-- emayberry
-    |   |           |       `-- ejbclient
+    |   |           |       `-- ejbclient (*IT.java)
     |   |           `-- resources
-    |   |               |-- eMayberry-ant.xml (optional)
-    |   |               |-- eMayberry.properties (optional)
     |   |               `-- jndi.properties
     |   `-- pom.xml
     `-- pom.xml
@@ -492,9 +481,11 @@ Project2: eDataShare N-Tier Application
 
         * Project 1 functionality: 10pts
 
-        * EJB Tier, remote interface, and EAR deployment: 30pts
+        * EJB Tier, remote interface, and EAR deployment: 25pts
 
-        * Web UI integration: 25pts
+        * WAR/EJB deployment: 15pts
+
+        * Web UI integration: 15pts
 
         * Transactions: 10pts
 
