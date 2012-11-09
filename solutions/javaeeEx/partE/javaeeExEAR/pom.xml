@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>javaeeExEAR</artifactId>
+    <packaging>ear</packaging>
+    <name>Java EE Exercise EAR</name>
+    <description>
+        This project provides a sample EAR for the Java EE components
+        associated with the overall project.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExEJB</artifactId>
+            <version>${project.version}</version>
+            <type>ejb</type>
+            <exclusions>
+                <!-- server doesn't want to see already provided jars -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExImpl</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <!-- server doesn't want to see already provided jars -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <!-- eliminates use of version in EAR JNDI name portion -->
+                    <applicationName>${project.artifactId}</applicationName>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <modules>
+                        <!-- eliminates use of the version in the EJB JNDI name -->
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>javaeeExEJB</artifactId>
+                            <bundleFileName>javaeeExEJB.jar</bundleFileName>
+                        </ejbModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
