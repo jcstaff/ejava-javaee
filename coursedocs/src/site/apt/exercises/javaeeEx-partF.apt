@@ -45,7 +45,7 @@ Part E: Create WAR Project Shell
 
 * {Create the WAR Maven project}
 
-    The WAR project will be used to develop one WAR within our application.
+    We will use a maven war project type to host the web tier for the application.
 
     [[1]] Add a WAR project directory to your project tree.
 
@@ -56,22 +56,41 @@ javaeeExEAR  javaeeExEJB  javaeeExImpl  javaeeExTest  pom.xml
 $ mkdir javaeeExWAR
 ---
 
-    [[1]] Add a minimal version of the required web.xml descriptor 
+    [[1]] Add a minimal version of the web.xml descriptor 
     for the WAR.
 
 ---
-$ cd javaeeExWAR
-$ mkdir -p src/main/webapp/WEB-INF
+$ mkdir -p javaeeExWAR/src/main/webapp/WEB-INF
 ---
 ---
-$ cat src/main/webapp/WEB-INF/web.xml
-<web-app
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+<web-app 
     xmlns="http://java.sun.com/xml/ns/javaee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-    version="2.5">
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
 
   <display-name>Web Tier Exercise Web Application</display-name>
+
+</web-app>
+---
+
+    [[1]] Add a minimal version of the web.xml override. Contents of this
+    web.xml will be used during local jetty environment development/testing
+    and not deployed to the server.
+
+---
+$ mkdir -p javaeeExWAR/src/test/webapp/WEB-INF
+---
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+<web-app 
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+    <!-- place elements specific to development/test here -->
 
 </web-app>
 ---
@@ -80,22 +99,23 @@ $ cat src/main/webapp/WEB-INF/web.xml
     project.
 
 ---
-$ cat pom.xml
+$ cat javaeeExWAR/pom.xml
+
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>javaeeEx</artifactId>
         <groupId>myorg.javaee</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
     <groupId>myorg.javaee</groupId>
     <artifactId>javaeeExWAR</artifactId>
     <packaging>war</packaging>
+
     <name>Java EE Exercise WAR</name>
 
     <dependencies>
@@ -112,82 +132,43 @@ $ cat pom.xml
     [[1]] Build your minimal version of a WAR.
 
 ---
-$ mvn clean install -o
-[INFO] Scanning for projects...
-[INFO]                                                                         
+$ (cd javaeeExWAR; mvn clean install)
+...
+[INFO] 
+[INFO] --- maven-war-plugin:2.1.1:war (default-war) @ javaeeExWAR ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [javaeeExWAR] in [/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT]
+[INFO] Processing war project
+[INFO] Copying webapp resources [/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp]
+[INFO] Webapp assembled in [134 msecs]
+[INFO] Building war: /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT.war
+[INFO] WEB-INF/web.xml already added, skipping
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExWAR ---
+...
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise WAR 1.0-SNAPSHOT
-[INFO] ------------------------------------------------------------------------
-[INFO] 
-[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ javaeeExWAR ---
-[INFO] Deleting /home/jcstaff/solutions/javaeeEx/javaeeExWAR/target
-[INFO] 
-[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ javaeeExWAR ---
-[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] skip non existing resourceDirectory /home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/main/resources
-[INFO] 
-[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ javaeeExWAR ---
-[INFO] No sources to compile
-[INFO] 
-[INFO] --- maven-resources-plugin:2.4.3:testResources (default-testResources) @ javaeeExWAR ---
-[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] skip non existing resourceDirectory /home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/test/resources
-[INFO] 
-[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ javaeeExWAR ---
-[INFO] No sources to compile
-[INFO] 
-[INFO] --- maven-surefire-plugin:2.7.1:test (default-test) @ javaeeExWAR ---
-[INFO] No tests to run.
-[INFO] Surefire report directory: /home/jcstaff/solutions/javaeeEx/javaeeExWAR/target/surefire-reports
-
- -------------------------------------------------------
- T E S T S
- -------------------------------------------------------
- There are no tests to run.
-
- Results :
-
- Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
-
- [INFO] 
- [INFO] --- maven-war-plugin:2.1.1:war (default-war) @ javaeeExWAR ---
- [INFO] Packaging webapp
- [INFO] Assembling webapp [javaeeExWAR] in
- [/home/jcstaff/solutions/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT]
- [INFO] Processing war project
- [INFO] Copying webapp resources [/home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/main/webapp]
- [INFO] Webapp assembled in [35 msecs]
- [INFO] Building war: /home/jcstaff/solutions/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT.war
- [INFO] WEB-INF/web.xml already added, skipping
- [INFO] 
- [INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExWAR ---
- [INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT.war to
- /home/jcstaff/.m2/repository/myorg/javaee/javaeeExWAR/1.0-SNAPSHOT/javaeeExWAR-1.0-SNAPSHOT.war
- [INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExWAR/pom.xml to
- /home/jcstaff/.m2/repository/myorg/javaee/javaeeExWAR/1.0-SNAPSHOT/javaeeExWAR-1.0-SNAPSHOT.pom
- [INFO] ------------------------------------------------------------------------
- [INFO] BUILD SUCCESS
- [INFO] ------------------------------------------------------------------------
- [INFO] Total time: 4.280s
- [INFO] Finished at: Tue Apr 12 22:51:22 EDT 2011
- [INFO] Final Memory: 6M/130M
- [INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
 ---
 ---
+...
 javaeeExWAR/
 |-- pom.xml
 |-- src
-|   `-- main
+|   |-- main
+|   |   `-- webapp
+|   |       `-- WEB-INF
+|   |           `-- web.xml
+|   `-- test
 |       `-- webapp
 |           `-- WEB-INF
 |               `-- web.xml
 `-- target
     |-- javaeeExWAR-1.0-SNAPSHOT
-        |   |-- META-INF
-            |   `-- WEB-INF
-                |       |-- classes
-                    |       `-- web.xml
-                        |-- javaeeExWAR-1.0-SNAPSHOT.war
+    |   |-- META-INF
+    |   `-- WEB-INF
+    |       |-- classes
+    |       `-- web.xml
+    |-- javaeeExWAR-1.0-SNAPSHOT.war
 ...
 ---
 
@@ -198,56 +179,100 @@ javaeeExWAR/
     and repeat. We will want to cut the time it takes to complete that
     cycle as much as possible and use the lightweight Jetty Servlet
     engine and maven plugin to help do that for us and saving some of
-    the significant build and deploy time to server.
+    the significant build and deploy time to server. Refer to the 
+    {{{http://docs.codehaus.org/display/JETTY/Maven+Jetty+Plugin}
+    Jetty Plugin Documentation}} for more details.
 
-    [[1]] Add the Jetty maven plugin configuration to your pom.xml. 
+    [[1]] Add the Jetty maven plugin configuration to your pom.xml. Since
+        most of the configuration is generic, you can define it within
+        the parent to make it reusable for the next WAR down the line.
 
-        * Do this within a profile so that the configuration is only
-        active during special development scenarios.
+        * Add property definitions for port number (9080) and scan
+        interval (10).  The port number is the listen port for the server
+        and the scan interval is how often jetty will restart when there
+        are changes within the classes within the project. By making these
+        properties instead of hard-coding them into the pluginManagement
+        definition -- you get a chance to override them on the command
+        line or child pom.
 
-        * Assign a unique port number (9080) that does not conflict with
-        the JBoss server (8080).
-
-        * Specify the number of seconds (10) that it will sleep 
-        before re-checking for changes to the Java classes. The newly
-        compiled classes within Eclipse will be seen and reloaded by
-        Jetty within a 10 second delay. The JSP saves will be seen 
-        by the next refresh (without a delay).
+        []
 
 ---
-$ cat javaeeExWAR/pom.xml
+    <properties>
+        <jetty.reload>automatic</jetty.reload>
+        <jetty.scanIntervalSeconds>10</jetty.scanIntervalSeconds>
+        <jetty.port>9080</jetty.port>
+---
+
+        * Add the following plugin definition to the pluginManagement
+        in the parent pom. Note how none of this is specific to any
+        WAR but does define a reusable configuration and use of the 
+        plugin across WARs.
+
+            * reload - set to manual if you want to manually control when 
+            jetty reloads. Set to automatic to use the scanIntervalSecs 
+            option.
+
+            * scanIntervalSeconds - the time Jetty will wait before restarting
+            and reloading when implementation classes change. A low number 
+            will result in seeing changes quicker. I higher number will keep 
+            the server from thrashing when you save your in-progress changes.
+
+            * overrideWebXml - will be used to host jetty/development-specific
+            configuration elements for the WAR. Items within this file are 
+            not part of the WAR deployed to the server.
+
+            * useTestClasspath -- this allows any helper classes you create
+            in your src/test tree to be available within the jetty server.
+
+---
+$ cat pom.xml
 ...
-<profile>
-    <id>jetty</id>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.26</version>
-                <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <connectors>
-                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-                            <port>9080</port>
-                            <maxIdleTime>60000</maxIdleTime>
-                        </connector>
-                    </connectors>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <dependencies>
-    </dependencies>
-</profile>
+    	</pluginManagement>
+            </plugins>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    <configuration>
+                        <jetty.reload>${jetty.reload}</jetty.reload>
+                        <scanIntervalSeconds>${jetty.scanIntervalSeconds}</scanIntervalSeconds>
+                        <overrideWebXml>${basedir}/src/test/webapp/WEB-INF/web.xml</overrideWebXml>
+                        <useTestClasspath>true</useTestClasspath>
+                        <systemProperties>
+
+                        </systemProperties>
+                        <connectors>
+                            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                                <port>${jetty.port}</port>
+                                <maxIdleTime>60000</maxIdleTime>
+                            </connector>
+                        </connectors>
+                    </configuration>
+                </plugin>          
 ...
+---
+
+        * Add system properties to the jetty configuration for integrating the servlet logging
+        with the log4j.xml we will later place in the module source tree.
+
+---
+                        <systemProperties>
+                            <systemProperty>
+                                <name>slf4j</name>
+                                <value>true</value>
+                            </systemProperty>
+                            <systemProperty>
+                                <name>log4j.configuration</name>
+                                <value>file:./target/test-classes/log4j.xml</value>
+                            </systemProperty>
+                        </systemProperties>
 ---
 
     [[1]] Activate the application using the Jetty maven plugin.
 
 ---
-$ cd javaeeExWAR
-$ mvn jetty:run -Pjetty
+$ (cd javaeeExWAR; mvn jetty:run -Pjetty)
+
 [INFO] Scanning for projects...
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
@@ -292,26 +317,59 @@ $ mvn jetty:run -Pjetty
 [INFO] Starting scanner at interval of 10 seconds.
 ---
 
+    [[1]] Terminate (with Control-C) and rerun with manual reload option. Using this feature you can
+    specifically control when new class changes are used.
+
+---
+ (cd javaeeExWAR/; mvn jetty:run -Djetty.reload=manual)
+...
+[INFO] Started Jetty Server
+[WARNING] scanIntervalSeconds is set to 10 but will be IGNORED due to manual reloading
+[INFO] Console reloading is ENABLED. Hit ENTER on the console to restart the context.
+
+
+[INFO] restarting org.mortbay.jetty.plugin.Jetty6PluginWebAppContext@8d5a91{/javaeeExWAR,/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp}
+[INFO] Webapp source directory = /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp
+[INFO] Reload Mechanic: manual
+[INFO] Classes directory /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/classes does not exist
+[INFO] Context path = /javaeeExWAR
+[INFO] Tmp directory =  determined at runtime
+[INFO] Web defaults = org/mortbay/jetty/webapp/webdefault.xml
+[INFO] Web overrides = /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/test/webapp/WEB-INF/web.xml
+[INFO] web.xml file = /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+[INFO] Webapp directory = /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp
+2012-11-10 10:09:45.960:INFO::No Transaction manager found - if your webapp requires one, please configure one.
+[INFO] Restart completed at Sat Nov 10 10:09:46 EST 2012
+---
+
+    [Note:] Notice that we were able to accomplish the above without yet 
+    placing anything within a specific WAR. The definition of the jetty:run
+    goal was provided in the reusable pluginManagement of the parent and 
+    this plugin does *not* automatically wire itself into any phases of the build.
+    By manually specifying the jetty:run goal on the Maven command line, 
+    we are asking that the goal be run with how we have defined it to run.
+
+    []
+
+
     [[1]] Navigate to the root URL within the Jetty server. Use the 
     Jetty provided link to locate the root of our application.
 
 ---
 http://localhost:9080/
 
-
 Error 404 - Not Found.
 
 No context on this server matched or handled this request.
 Contexts known to this server are:
-/javaeeExWAR --->
-org.mortbay.jetty.plugin.Jetty6PluginWebAppContext@160e069{/javaeeExWAR,/home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/main/webapp}
+/javaeeExWAR ---> org.mortbay.jetty.plugin.Jetty6PluginWebAppContext@1cc5d23{/javaeeExWAR,/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp}
 ---
 ---
 http://localhost:9080/javaeeExWAR/
 
 Directory: /javaeeExWAR/
 
-WEB-INF/        4096 bytes      Apr 12, 2011 10:49:49 PM
+WEB-INF/        4096 bytes      Nov 9, 2012 9:31:27 PM
 ---
 
     [[1]] Add the following index.jsp to the root of your 
@@ -341,12 +399,15 @@ http://localhost:9080/javaeeExWAR/
 Hello
 ---
 
+    [Note:] Resource file changes (i.e., jsp, html, txt files
+    are seen right away. The reload/scan interval is only for the
+    container/class changes.
+
 * {Configure the WAR into your EAR and test within JBoss}
 
     [[1]] Add the WAR module to the parent pom.
 
 ---
-$ cd ..
 $ cat pom.xml
 ...
     <modules>
@@ -381,23 +442,21 @@ $ cat javaeeExEAR/pom.xml
 
 ...
     <build>
-        <finalName>javaeeEx</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-ear-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <modules>
-                        <webModule>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>javaeeExWAR</artifactId>
-                            <contextRoot>javaeeEx</contextRoot>
-                        </webModule>
-                    </modules>
-                </configuration>
-            </plugin>
-        </plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-ear-plugin</artifactId>
+            <configuration>
+                ...
+                <modules>
+                    ...
+                    <webModule>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>javaeeExWAR</artifactId>
+                        <contextRoot>javaeeEx</contextRoot>
+                    </webModule>
+                </modules>
+            </configuration>
+        </plugin>
     </build>
 ...
 ---
@@ -405,55 +464,21 @@ $ cat javaeeExEAR/pom.xml
     [[1]] Build and deploy the EAR from the parent project.
 
 ---
-$ mvn clean install
-[INFO] Scanning for projects...
-[INFO] Reactor build order:
-[INFO]   Java EE Exercise
-[INFO]   Java EE Exercise Impl
-[INFO]   Java EE Exercise EJB
-[INFO]   Java EE Exercise WAR
-[INFO]   Java EE Exercise EAR
-[INFO]   Java EE Exercise Remote Test
-[INFO] ------------------------------------------------------------------------
-[INFO] Building Java EE Exercise
+$ mvn clean pre-integration-test
+mvn clean pre-integration-test -rf :javaeeExWAR
 
 ...
-
-[INFO] Building Java EE Exercise Remote Test
-[INFO]    task-segment: [clean, install]
-[INFO] ------------------------------------------------------------------------
-[INFO] [clean:clean]
-[INFO] Deleting directory C:\proj\javaeeEx\javaeeExTest\target
-[INFO] [resources:resources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [compiler:compile]
-[INFO] No sources to compile
-[INFO] [resources:testResources]
-[INFO] Using default encoding to copy filtered resources.
-[INFO] [compiler:testCompile]
-[INFO] Compiling 1 source file to C:\proj\javaeeEx\javaeeExTest\target\test-classes
-[INFO] [cargo:undeploy {execution: deploy-component}]
-[INFO] [cargo:deploy {execution: deploy-component}]
-
-...
-
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise .................................. SUCCESS [0.327s]
-[INFO] Java EE Exercise Impl ............................. SUCCESS [20.366s]
-[INFO] Java EE Exercise EJB .............................. SUCCESS [3.724s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [1.630s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [0.860s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [26.688s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [4.244s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [25.545s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [9.800s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 54.913s
 ---
 ---
 //SERVER LOG
 
-23:15:14,036 INFO  [org.jboss.web.tomcat.service.deployers.TomcatDeployment] deploy, ctxPath=/javaeeEx
+10:22:39,454 INFO  [org.jboss.web] (MSC service thread 1-1) JBAS018210: Registering web context: /javaeeEx
+10:22:39,467 INFO  [org.jboss.as.server] (management-handler-thread - 65) JBAS018559: Deployed "javaeeExEAR-1.0-SNAPSHOT.ear"
 ...
 ---
 
@@ -467,12 +492,47 @@ http://localhost:8080/javaeeEx/
 Hello
 ---
 
+    This is what the solution should look like so far.
+
+---
+javaeeExWAR/
+|-- pom.xml
+|-- src
+|   |-- main
+|   |   `-- webapp
+|   |       |-- index.jsp
+|   |       `-- WEB-INF
+|   |           `-- web.xml
+|   `-- test
+|       `-- webapp
+|           `-- WEB-INF
+|               `-- web.xml
+`-- target
+    |-- javaeeExWAR-1.0-SNAPSHOT
+    |   |-- index.jsp
+    |   |-- META-INF
+    |   `-- WEB-INF
+    |       |-- classes
+    |       `-- web.xml
+    |-- javaeeExWAR-1.0-SNAPSHOT.war
+...
+---
+---
+$ jar tf javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT.war | sort
+index.jsp
+...
+WEB-INF/
+WEB-INF/classes/
+WEB-INF/web.xml
+---
+
 * {Add Servlet}
 
     [[1]] Add a dependency on the Servlet API and commons logging
     to support the code written specifically for the servlet class.
     Define the scope to be scope=provided so they are not included
-    in the WEB-INF/lib at deployment.
+    in the WEB-INF/lib at deployment. Reuse the dependencyManagement
+    dependency definitions from the parent pom.
 
 ---
 $ cat javaeeExWAR/pom.xml
@@ -480,68 +540,83 @@ $ cat javaeeExWAR/pom.xml
 ...
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
 ---
 
-    [[1]] Repeat the dependency configuration for the commons logging
-    within the Jetty profile, except make it scope=compile in that
-    section. We will be maintaining a global and a Jetty profile-specific
-    configuration within the pom.xml. Jetty will provide the necessary
-    Servlet classes so we don't have to repeat the servlet-api 
-    dependency. However, we will have to provide a dependency on
-    log4j to leverage this logging framework.
+    [[1]] The dependency artifacts we defined above are not necessary when deployed
+    to the application server but are necessary when we runnin jetty locally. 
+    Define dependences for the logging capability within the parent jetty 
+    pluginManagement section. We can do this as long as all of our WARs use
+    the same logging framework. We do not have to repeat the servlet API jar
+    file since the jetty plugin will automatically supply that.
 
 ---
-<profile>
-    <id>jetty</id>
+    	<pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    <configuration>
+                    ...
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                            <version>${commons-logging.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>log4j</groupId>
+                            <artifactId>log4j</artifactId>
+                            <version>${log4j.version}</version>
+                        </dependency>
+                    </dependencies>       
+---
+
+    [Note] Since the default scope is scope=compile, we do not have to specify a 
+    scope value above. We do need to re-specify the version#. The version and other
+    dependency information does not carry over from the dependencyManagement section
+    to plugin.dependencies.
+
+    []
+
+
+    [[1]] We will need to make sure the Java compiler compiling the WAR is 
+    compliant with at least Java 1.6. Luckily we already took care of that 
+    in the parent pluginManagement section in an earlier part of the exercises.
+    You need to do nothing for this step except understand the WAR module will
+    be inheriting the Java compiler definition of the parent pom.
+
+---
+# javaeeEx/pom.xml
 ...
-            <dependencies>
-                <dependency>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                    <version>1.0.4</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>1.2.13</version>
-                    <scope>compile</scope>
-                </dependency>
-            </dependencies>
-</profile>
----
-
-
-    [[1]] Configure the maven compiler plugin to use at least Java 5 when
-    building the WAR Java classes.
-
----
+    <properties>
+        ...
+        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+        ...
     <build>
-        <plugins>
-              <!-- make sure we are building at least java5 -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>2.3.2</version>
-            <configuration>
-              <source>1.6</source>
-              <target>1.6</target>
-            </configuration>
-          </plugin>
-        </plugins>
-    </build>
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                    </configuration>	                
+                </plugin>
+               ...
 ---
 
     [[1]] Add the following shell of a Servlet class to the WAR.
@@ -566,7 +641,7 @@ import org.apache.commons.logging.LogFactory;
 
 @SuppressWarnings("serial")
 public class RegistrarHandlerServlet extends HttpServlet {
-    private static Log log = LogFactory.getLog(RegistrarHandlerServlet.class);
+    private static final Log log = LogFactory.getLog(RegistrarHandlerServlet.class);
 
     public void init() throws ServletException {
         log.debug("init() called ");
@@ -674,20 +749,13 @@ $ cat javaeeExWAR/src/test/resources/log4j.xml
 </log4j:configuration>
 ---
 
-    [[1]] Test your new artifacts using Jetty first. However, when you
-    launch it, you will need to specifically tell Jetty to use
-    log4j and a configuration you provide.
+    [[1]] Test your new artifacts using Jetty first. If you do not see log4j
+    output, check your placement of the log4j.xml file and the system properties
+    registered in the parent pom pluginManagement section.
 
 ---
-$ (cd javaeeExWAR; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
+$ (cd javaeeExWAR; mvn clean jetty:run)
 ---
-
-    [Note] I have found it helpful to write the above command within
-    a commented out section within the pom.xml, use grep mvn, copy,
-    and paste to be able to quickly find and execute the commend in 
-    the future.
-
-    []
 
     [[1]] Access your servlet hosted within Jetty
 
@@ -709,7 +777,7 @@ $ (cd javaeeExWAR; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resour
     will need to rebuild and re-deploy your application to do so.
 
 ---
-$ mvn clean install -rf :javaeeExWAR
+$ mvn clean pre-integration-test -rf :javaeeExWAR
 [INFO] Scanning for projects...
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Build Order:
@@ -729,111 +797,132 @@ $ mvn clean install -rf :javaeeExWAR
 ---
 //SERVER LOG
 
-[INFO] Starting scanner at interval of 10 seconds.
- -init() called
- -doGet() called
+16:35:20,789 INFO  [org.jboss.web] (MSC service thread 1-4) JBAS018210: Registering web context: /javaeeEx
+16:35:20,834 INFO  [org.jboss.as.server] (management-handler-thread - 4) JBAS018559: Deployed "javaeeExEAR-1.0-SNAPSHOT.ear"
+16:36:00,669 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) init() called 
+16:36:00,680 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) doGet() called
 ---
 
 * {Add JNDI InitialContext to Servlet}
 
-    [[1]] Add the dependences within the Jetty profile dependencies
-    required to be a JBoss client.
+    Your WAR contains all the UI constructs but delegates all business
+    logic to the EJB tier. The EJBs are deployed to the server and now
+    we need to make the Web tier an RMI client of the EJB tier to perform
+    end-to-end functionality.
+
+    [[1]] Add RMI dependencies for JBoss to the jetty pluginManagement 
+    definition in the parent pom. This dependency will pull in a host
+    of JBoss dependencies used to communicate with the server using RMI.
+    Since this is not WAR-dependent, we can add this to the global
+    jetty definition for easy reuse. These steps should look familiar. 
+    They are the same type of steps taken when setting on the RMI Test 
+    client module.
 
 ---
-$ cat javaeeExWAR/pom.xml
-
-//jetty profile dependencies
-
-    <repositories>
-        <repository>
-            <id>jboss-nexus</id>
-            <name>JBoss Nexus Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-    </repositories>
-
-...
-                <dependency>
-                    <groupId>org.jboss.jbossas</groupId>
-                    <artifactId>jboss-as-client</artifactId>
-                    <version>6.1.0.Final</version>            
-                    <type>pom</type>
-                    <scope>compile</scope>
-                    <exclusions>
-                        <exclusion> <!-- troubles finding this artifact -->
-                            <groupId>com.sun.istack</groupId>
-                            <artifactId>istack-commons-runtime</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <version>1.5.6</version>
-                    <scope>compile</scope>
-                </dependency>
-...
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    ...
+                    <dependencies>
+                        ...
+                        <dependency>
+                            <groupId>ejava.common</groupId>
+                            <artifactId>jboss-rmi-client</artifactId>
+                            <version>${ejava.version}</version>
+                            <type>pom</type>
+                        </dependency>    
+                    </dependencies>       
+                </plugin>          
 ---
 
-    [[1]] Define the properties required to access the JNDI tree within 
-    JBoss. A jndi.properties file will not work in this case. We will
-    have to provide the properties manually -- mostly for the Jetty case.
-    Add the following to your web.xml servlet config
+    [Note] We need to add type=pom for this artifact because it is not
+    a jar module. It is a parent module with the sole purpose of defining
+    transitive dependencies on other modules so that the dependency section
+    for this module can be scaled down to a single line item.
+
+    []
+
+    [[1]] Define the jndi.properties required to access the JNDI tree within 
+    JBoss. Place the following jndi.properties file in your src/test tree
+    so that it does not get deployed with the WAR. We can do this because
+    jetty was configured to use the test classpath and can see this property 
+    in the build environment. Some of these properties will get overwritten
+    by Jetty, but the key one we need filtered is the java.naming.factory.url.
 
 ---
-$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+$ cat javaeeExWAR/src/test/resources/jndi.propeties
 
-...
-    <context-param>
-        <param-name>java.naming.factory.initial</param-name>
-        <param-value>org.jnp.interfaces.NamingContextFactory</param-value>
-    </context-param>
-    <context-param>
-        <param-name>java.naming.provider.url</param-name>
-        <param-value>jnp://localhost:1099</param-value>
-    </context-param>
-    <context-param>
-        <param-name>java.naming.factory.url.pkgs</param-name> 
-        <param-value>org.jboss.naming:org.jnp.interfaces</param-value>
-    </context-param>
-
-    <servlet>
-        <servlet-name>AdminHandler</servlet-name>
-        <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
-    </servlet>
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+jboss.naming.client.ejb.context=true
 ---
 
-    [[1]] One of the properties above hard codes the hostname to localhost.
-    Unfortunately jetty evaluates the source of the web.xml before it can
-    be filtered so standard maven expansion of variables only used by jetty
-    cannot be used.
+    [[1]] Add a testResource filtering specification to the WAR's pom.xml.
+    This will allow the variables from the file be replaced with property 
+    values you put in place when setting up the RMI Test client.
+
+---
+    <build>
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+---
+---
+$ (cd javaeeExWAR; mvn clean process-test-resources)
+$ cat javaeeExWAR/target/test-classes/jndi.propeties
+
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.provider.url=remote://127.0.0.1:4447
+java.naming.factory.url.pkgs=
+java.naming.security.principal=known
+java.naming.security.credentials=password
+jboss.naming.client.ejb.context=true
+---
+
+    [Note:] The above definition will filter anything while copying the
+    src/test/resources directory to target/test-classes. Keep that in 
+    mind if you even have files with variables you want exanded at runtime
+    and not compile time. The above also will modify binary files like
+    PKI certs. If you have any of these conditions, you will need to 
+    add and includes/excludes section to the definition.
+
+    []
 
     [[1]] Add a helper method to the servlet that will resolve the
-    Registrar; starting with the JNDI tree.
+    Registrar; starting with the JNDI tree. Account for the fact that
+    Jetty will overwrite the java.naming.factory.initial property and
+    allow the specific option to use be specified at runtime.
 
 ---
 $ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
 
-import java.util.Enumeration;
 import java.util.Properties;
-
+...
 import javax.naming.InitialContext;
 import javax.servlet.ServletConfig;
 ...
-    private void initRegistrar(ServletConfig config) throws Exception {        
-        //build an InitialContext from Servlet.init properties in web.xml
-        Properties jndiProperties = new Properties();
-        for(Enumeration<?> e=config.getServletContext().getInitParameterNames();
-            e.hasMoreElements(); ) {
-            String key = (String)e.nextElement();
-            String value=(String)config.getServletContext().getInitParameter(key);
-            if (key.startsWith("java.naming")) {
-                jndiProperties.put(key, value);
-            }                    
-        }
-        log.debug("jndiProperties=" + jndiProperties);
-        InitialContext jndi = new InitialContext(jndiProperties);
-        jndi.lookup("/");  //do a quick sanity check
+    private void initRegistrar(ServletConfig config) throws Exception {
+    	InitialContext jndi = null;
+    	String ctxFactory = config.getServletContext()
+                                  .getInitParameter(Context.INITIAL_CONTEXT_FACTORY);
+    	log.debug(Context.INITIAL_CONTEXT_FACTORY + "=" + ctxFactory);
+    	if (ctxFactory!=null) {
+        	Properties env = new Properties();
+        	env.put(Context.INITIAL_CONTEXT_FACTORY, ctxFactory);
+        	jndi = new InitialContext(env);
+    	}
+    	else {
+    		jndi = new InitialContext();
+    	}
     }
 ---
 
@@ -853,21 +942,33 @@ import javax.servlet.ServletConfig;
     }
 ---
 
-    [[1]] Test your implementation from Jetty.
+    [[1]] Add a context parameter to the override web.xml file in src/test. Be sure to place this
+    in src/test and not src/main. This specific factory will not work within JBoss and must
+    be exclusively used by RMI clients.
 
-        * http://localhost:9080/javaeeExWAR/
+---
+$ cat javaeeExWAR/src/test/webapp/WEB-INF/web.xml
+...
+    <!-- place elements specific to development/test here -->
+    <context-param>
+        <param-name>java.naming.factory.initial</param-name>
+        <param-value>org.jboss.naming.remote.client.InitialContextFactory</param-value>
+    </context-param>
+</web-app>
+---
+
+    [[1]] Retest your jetty environment and notice our org.jboss.naming.remote.client.InitialContextFactory
+    is now again put in place. The values for java.naming.factory.url.pkgs do not matter once the 
+    proper java.naming.factory.initial is specified.
+
+        * http://localhost:9080/javaeeExWAR
 
         * click on "invoke servlet"
 
 ---
-$ (cd javaeeExWAR; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
-
-...
-[INFO] Starting scanner at interval of 10 seconds.
- -init() called
- -initTeller()
- -jndiProperties={java.naming.provider.url=jnp://localhost:1099, java.naming.factory.initial=org.jnp.interfaces.NamingCo
-ntextFactory, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
+[INFO] Restart completed at Sat Nov 10 15:43:35 EST 2012
+ -init() called 
+ -java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
  -doGet() called
 ---
 
@@ -879,16 +980,15 @@ ntextFactory, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
         * click on "invoke servlet"
 
 ---
-$ mvn clean install -rf :javaeeExWAR
+$ mvn clean pre-integration-test -rf :javaeeExWAR
 ...
 ---
 ---
 //SERVER LOG
 
-13:47:35,203 DEBUG [RegistrarHandlerServlet] init() called
-13:47:35,203 DEBUG [RegistrarHandlerServlet] initTeller()
-13:47:35,203 DEBUG [RegistrarHandlerServlet] jndiProperties={java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=jnp://localhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
-13:47:35,218 DEBUG [RegistrarHandlerServlet] doGet() called
+16:36:00,669 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) init() called 
+16:36:00,670 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) java.naming.factory.initial=null
+16:36:00,680 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) doGet() called
 ---
 
 * {Add EJB to Servlet}
