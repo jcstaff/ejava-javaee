@@ -993,33 +993,14 @@ $ mvn clean pre-integration-test -rf :javaeeExWAR
 
 * {Add EJB to Servlet}
 
-    [[1]] Add a dependency on the EJB API to define @EJB annotation
-    classes used for injection.
+    [[1]] Add a dependency on the EJB and Impl module within the
+    WAR/pom.xml.  The root level dependency within the pom will be on
+    the EJB itself (scope=provided) since they will be sitting side by
+    side in the same EAR.
 
 ---
 $ cat javaeeExWAR/pom.xml
 
-//root level dependency
-...
-    <dependencies>
-        <!-- used for @EJB injection -->
-        <dependency>
-            <groupId>javax.ejb</groupId>
-            <artifactId>ejb-api</artifactId>
-            <version>3.0</version>
-            <scope>provided</scope>
-        </dependency>
----
-
-    [[1]] Add a dependency on the EJB within the WAR/pom.xml. The root
-    level dependency will be on the EJB itself (scope=provided) since they
-    will be sitting side by side in the same EAR.  The Jetty configuration
-    will be depenent on the ejb-client; same as the external RMI clients.
-
----
-$ cat javaeeExWAR/pom.xml
-
-//root level dependency
 ...
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -1027,44 +1008,70 @@ $ cat javaeeExWAR/pom.xml
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExImpl</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
 ---
+
+    [[1]] The Jetty configuration will depend on the ejb-client; same as the 
+    external RMI clients. However, up until now, we have been adding everything
+    to the parent jetty pluginManagement section. We have finally hit something
+    that could be unique to this WAR. Declare the jetty plugin in the WAR pom
+    and add a scope=compile dependency on the ejb-client.
+
 ---
 $ cat javaeeExWAR/pom.xml
 
-//jetty profile dependency
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>javaeeExEJB</artifactId>
-            <version>${project.version}</version>
-            <type>ejb-client</type>
-            <scope>compile</scope>
-        </dependency>
+    <build>
+        ...
+        <plugins>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>javaeeExEJB</artifactId>
+                        <version>${project.version}</version>
+                        <type>ejb-client</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>javaeeExImpl</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>       
+            </plugin>          
+        </plugins>
+    </build>
 ---
 
     [[1]] Add the JNDI names for the Registrar interfaces to 
-    the ServletConfig within web.xml. This will be used to support
+    the ServletConfig within the test web.xml. This will be used to support
     the Jetty configuration and will not be needed for the EAR-based
     configuration.
 
 ---
-$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+$ cat javaeeExWAR/src/test/webapp/WEB-INF/web.xml
 
 ...
     <context-param>
-        <param-name>registrar.local</param-name> 
-        <param-value>/myorg/javaeeEx/RegistrarEJB/local</param-value>
-    </context-param>
-    <context-param>
         <param-name>registrar.remote</param-name> 
-        <param-value>/myorg/javaeeEx/RegistrarEJB/remote</param-value>
+        <param-value>javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote</param-value>
     </context-param>
 ...
 ---
 
     [[1]] Add an object-level reference for the Registrar. Start
     off by using the remote interface for both Jetty and the 
-    EAR deployment.
+    EAR deployment. Use the javax.ejb.EJB annotation to signal the
+    injection. We could have used the JSR-3300 javax.inject.Inject annotation
+    but that would have required some unecessary work to get things finally
+    wired up. The pre-JSR-330 technique will work until we decide to 
+    not use an EJB.
 
 ---
 $ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
@@ -1079,17 +1086,18 @@ public class RegistrarHandlerServlet extends HttpServlet {
     private RegistrarRemote registrar;
 ---
 
-    [[1]] Update the helper method to also lookup the Registrar
-    EJB in the JNDI tree using the remote interface.
+    [[1]] Update the initRegistrar() helper method to also lookup the Registrar
+    EJB in the JNDI tree using the remote interface. We should only
+    need this code in the Jetty environment since the JBoss environment
+    will being fulfilling the @Inject requirement.
 
 ---
-    private void initRegistrar(ServletConfig config) throws Exception {        
-        log.debug("initTeller(), registrar=" + registrar);
+    private void initRegistrar(ServletConfig config) throws Exception {
+        log.debug("initRegistrar(), registrar=" + registrar);
         if (registrar == null) {
             //build an InitialContext from Servlet.init properties in web.xml
+            InitialContext jndi = null;
             ...
-            jndi.lookup("/");  //do a quick sanity check
-            
             String jndiName = config.getServletContext().getInitParameter("registrar.remote");
             registrar = (RegistrarRemote)jndi.lookup(jndiName);
             log.debug("registrar initialized:" + registrar);
@@ -1107,11 +1115,10 @@ public class RegistrarHandlerServlet extends HttpServlet {
 (cd javaeeExWAR; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
 ---
 ---
- -init() called
- -initTeller(), registrar=null
- -jndiProperties={java.naming.provider.url=jnp://localhost:1099, java.naming.factory.initial=org.jnp.interfaces.NamingCo
-ntextFactory, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
- -registrar initialized:jboss.j2ee:ear=javaeeEx.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3
+ -init() called 
+ -initRegistrar(), registrar=null
+ -java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+ -registrar initialized:Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
  -doGet() called
 ---
 
@@ -1123,15 +1130,13 @@ ntextFactory, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
         * click on "invoke servlet"
 
 ---
-$ mvn clean install -rf :javaeeExWAR
+$ mvn clean pre-integration-test -rf :javaeeExWAR
 ...
 ---
 ---
-06:30,562 DEBUG [RegistrarHandlerServlet] init() called
-06:30,562 DEBUG [RegistrarHandlerServlet] initTeller(), registrar=null
-06:30,562 DEBUG [RegistrarHandlerServlet] jndiProperties={java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=jnp://localhost:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
-06:30,609 DEBUG [RegistrarHandlerServlet] registrar initialized:jboss.j2ee:ear=javaeeEx.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3
-06:30,609 DEBUG [RegistrarHandlerServlet] doGet() called
+17:29:30,960 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) init() called 
+17:29:30,961 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) initRegistrar(), registrar=Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+17:29:30,963 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
 ---
 
 * {Add Controller Servlet to invoke EJB}
