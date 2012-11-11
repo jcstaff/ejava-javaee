@@ -318,14 +318,11 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ---
 
----
-
     [[1]] Add the getPersonById() for the next phase of the 
     Web UI use case. Do this after the paging tests.
 
 ---
 $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
-
 
         ...
         assertEquals("unexpected number of people", TOTAL, count);
@@ -743,14 +740,14 @@ java.lang.reflect.UndeclaredThrowableException
 Caused by: java.lang.ClassNotFoundException: org.hibernate.collection.internal.PersistentBag
 ---
 
-        [[1]] The same error occured in an earlier part of the RMI Test exercise. The problem is
-        the List returned comes straight from Hibernate and Hibernate is not brought in as a 
-        dependency in the ejava.common jboss-rmi-client. We could have fixed the problem for all
-        clients if we took the time to create a vanilla POJO DTO -- but instead we chose to 
-        take the shortcut and add hibernate to the client's classpath. We will take that
-        same lazy workaround here as well. Add the following dependency to the WAR's jetty
-        plugin dependency definition. It could also go in the parent jetty pluginManagement
-        if we wanted to take this same work-around for all WARs we create.
+    [[1]] The same error occured in an earlier part of the RMI Test exercise. The problem is
+    the List returned comes straight from Hibernate and Hibernate is not brought in as a 
+    dependency in the ejava.common jboss-rmi-client. We could have fixed the problem for all
+    clients if we took the time to create a vanilla POJO DTO -- but instead we chose to 
+    take the shortcut and add hibernate to the client's classpath. We will take that
+    same lazy workaround here as well. Add the following dependency to the WAR's jetty
+    plugin dependency definition. It could also go in the parent jetty pluginManagement
+    if we wanted to take this same work-around for all WARs we create.
 
 ---
 $ cat javaeeExWAR/pom.xml
@@ -1303,14 +1300,17 @@ public interface RegistrarLocal {
     should be thought of as independent.
 
     [[1]] Generalize the type of the variable used to hold the 
-    Registrar reference in the Web UI.
+    Registrar reference in the Web UI. Change the @Inject back
+    to an @EJB specification to take easy advantage of the 
+    beanInterface property that can be used to define the 
+    type of specification.
 
 ---
 $ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
 
 ...
+import javax.ejb.EJB;
 import myorg.javaeeex.ejb.RegistrarLocal;
-import myorg.javaeeex.ejb.RegistrarRemote;
 ...
 
 public class RegistrarHandlerServlet extends HttpServlet {
@@ -1349,47 +1349,21 @@ public class RegistrarHandlerServlet extends HttpServlet {
                 ((RegistrarLocal)registrar).changeAddress(person, address);
 ---
 
-    [[1]] Update the initRegistrar() helper method to attempt Local
-    and revert to Remote.
-
----
-$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
-
-...
-        String jndiName = config.getServletContext().getInitParameter("registrar.local");
-        try {
-            registrar = (RegistrarLocal)jndi.lookup(jndiName);
-            ((RegistrarLocal)registrar).ping(); //check capability
-        }
-        catch (Throwable ex) {
-            log.debug("local failed, trying remote:" + ex);
-            jndiName = config.getServletContext().getInitParameter("registrar.remote");
-            registrar = (RegistrarRemote)jndi.lookup(jndiName);
-            ((RegistrarRemote)registrar).ping(); //check capability
-        }
-        log.debug("registrar initialized:" + registrar);
-        log.debug("jndiName used:" + jndiName);
----
 
     [[1]] Test within the Jetty container. Note the use of the Remote
     interface outside of the application server.
 
 ---
-$ (cd javaeeExWAR/; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
+$ mvn clean install -DskipTests
+$ mvn pre-integration-test -rf javaeeExTest; (cd javaeeExWAR; mvn clean jetty:run)
 
 ...
 
 [INFO] Starting scanner at interval of 10 seconds.
- -init() called
+
  -initRegistrar(), registrar=null
- -jndiProperties={java.naming.provider.url=jnp://localhost:1099, java.naming.factory.initial=org.jnp.interfaces.NamingCo
-ntextFactory, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
- -Container jboss.j2ee:ear=javaeeEx.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3,VMID=4f07cb0974c
-59358:1b2a4e1c:12078cc62d4:-7ffb is not yet available
- -local failed, trying remote:javax.ejb.EJBException: Invalid (i.e. remote) invocation of local interface (null containe
-r)
- -registrar initialized:jboss.j2ee:ear=javaeeEx.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3
- -jndiName used:/myorg/javaeeEx/RegistrarEJB/remote
+ -java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+ -registrar initialized:Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
 ---
 
     [[1]] Build, deploy, and test within the application server. Note the
@@ -1398,20 +1372,11 @@ r)
 ---
 //SERVER LOG
 
-
-22:07:30,656 DEBUG [RegistrarHandlerServlet] init() called
-22:07:30,656 DEBUG [RegistrarHandlerServlet] initTeller(), registrar=null
-22:07:30,656 DEBUG [RegistrarHandlerServlet] jndiProperties={java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=jnp://localhost:1099, java.naming.factory.url
-.pkgs=org.jboss.naming:org.jnp.interfaces}
-22:07:30,687 DEBUG [RegistrarEJB] **** init ****
-22:07:30,687 DEBUG [RegistrarEJB] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@e31c79
-22:07:30,687 DEBUG [RegistrarEJB] ping called
-22:07:30,703 DEBUG [RegistrarHandlerServlet] registrar initialized:RegistrarEJB
-22:07:30,703 DEBUG [RegistrarHandlerServlet] jndiName used:/myorg/javaeeEx/RegistrarEJB/local
+22:51:03,551 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) initRegistrar(), registrar=Proxy for view class: myorg.javaeeex.ejb.RegistrarLocal of EJB: RegistrarEJB
 ---
 
     [[1]] Now lets try to take advantage of a Local interface by 
-    relaxing the hydration in one of the methods.
+    relaxing the hydration on a method.
 
 ---
 $ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarLocal.java
@@ -1444,11 +1409,19 @@ $ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
 
     [[1]] Rebuild, deploy, and request a person. Notice that we still do
     not have the ability to access the Lazy-Loaded objects with the 
-    Local interface.
+    Local interface. The problem is that even though we are using the 
+    local interface, the transaction and session with the DB has closed.
+    We either need to hydrate the objects before returning (we already did 
+    that) or we need to get the transaction to last longer.
 
         * http://localhost:8080/javaeeEx/model/admin/handler?id=1&command=Get+Person
 
 ---
+$ mvn clean integration-test -rf :javaeeExEJB
+---
+---
+http://localhost:8080/javaeeEx/model/admin/handler?id=1&command=Get+Person
+
 General Exception Page
 
 An error was reported by the application. More detailed information may follow.
@@ -1483,7 +1456,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class JPAFilter implements Filter {
-    private static Log log = LogFactory.getLog(JPAFilter.class);
+    private static final Log log = LogFactory.getLog(JPAFilter.class);
 
     public void init(FilterConfig config) throws ServletException {
         log.debug("*** JPAFilter.init() ***");
@@ -1503,7 +1476,7 @@ public class JPAFilter implements Filter {
 ---
 
     [[1]] Register the filter to fire for the Controller
-    Servlet(s).
+    Servlet(s) using the web.xml in the src/main tree.
 
 ---
 $ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
@@ -1528,114 +1501,80 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
 2009-04-05 23:00:46.573::INFO:  No Transaction manager found - if your webapp requires one, please configure one.
  -*** JPAFilter.init() ***
 [INFO] Restart completed at Sun Apr 05 23:00:47 EDT 2009
+
+...
  -*** JPAFilter.doFilter() ENTER ***
- -init() called
- -initRegistrar(), registrar=null
- -jndiProperties={java.naming.provider.url=jnp://localhost:1099, java.naming.factory.initial=org.jnp.interfaces.NamingCo
-ntextFactory, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
- -Container jboss.j2ee:ear=javaeeEx.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3,VMID=4f07cb0974c
-59358:1b2a4e1c:12078cc62d4:-7ffb is not yet available
- -local failed, trying remote:javax.ejb.EJBException: Invalid (i.e. remote) invocation of local interface (null containe
-r)
- -registrar initialized:jboss.j2ee:ear=javaeeEx.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3
- -jndiName used:/myorg/javaeeEx/RegistrarEJB/remote
- -configured handler type:admin with {Change Address=myorg.javaeeex.web.RegistrarHandlerServlet$ChangeAddress@1984f7d, G
-et All People=myorg.javaeeex.web.RegistrarHandlerServlet$GetAllPeople@8aaff4, Get Person=myorg.javaeeex.web.RegistrarHan
-dlerServlet$GetPerson@125d92c}
  -doGet() called
- -command=Get All People
+ -command=Get Person
  -*** JPAFilter.doFilter() EXIT ***
+
 ---
 
-    [[1]] Configure the filter with JNDI properties. Note that this will
+    [[1]] Inject an instance of a UserTransaction into the Filter. This will
     only work within the application server the way it is designed here.
 
 ---
-$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/JPAFilter.java
 
 ...
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
+import javax.transaction.UserTransaction;
 ...
-    private InitialContext jndi;
-    public void init(FilterConfig config) throws ServletException {
-        log.debug("*** JPAFilter.init() ***");
-        try {
-            jndi = new InitialContext();
-        }
-        catch (NamingException ex) {
-            log.error("error in Filter JNDI:", ex);
-            config.getServletContext().log("error in Filter JNDI" + ex);
-        }
-    }    
----
-
-    [[1]] Add the transaction and naming APIs to the WAR dependencies.
-
----
-$ cat javaeeExWAR/pom.xml 
-
+public class JPAFilter implements Filter {
 ...
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>6.0</version>
-            <scope>provided</scope>
-        </dependency>
-
+    @Inject
+    private static UserTransaction tx;
+...
 ---
 
-    [[1]] Add the JNDI lookup and management of the UserTransaction object
+    [[1]] Add the transaction management with the UserTransaction.
 
 ---
 $ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/JPAFilter.java
 
 ...
 import javax.transaction.Status;
-import javax.transaction.UserTransaction;
 
 ...
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+            log.debug("*** JPAFilter.doFilter() ENTER ***");
 
-    public void doFilter(ServletRequest request, 
-            ServletResponse response, 
-            FilterChain chain) throws IOException, ServletException {
-        log.debug("*** JPAFilter.doFilter() ENTER ***");
-        
-        UserTransaction tx = null;
-        boolean ownTx = false;
-        
-        try {
-            tx = (UserTransaction)jndi.lookup("/UserTransaction");
-            if (tx.getStatus() != Status.STATUS_ACTIVE) {
-                tx.begin();
-                ownTx = true;
+            boolean ownTx = false;
+
+            if (tx != null) {
+                try {
+                    if (tx.getStatus() != Status.STATUS_ACTIVE) {
+                        tx.begin();
+                        ownTx = true;
+                    }
+                } catch (Exception ex) {
+                    log.error("error starting transaction:", ex);
+                    throw new ServletException("error starting transaction", ex);
+                }
+            } else {
+                    log.debug("no UserTransaction injected -- moving on without one");
             }
-        } catch (NamingException ex) {
-            log.info("no transaction available, moving on without it");
-        } catch (Exception ex) {
-            log.error("error starting transaction:", ex);
-            throw new ServletException("error starting transaction", ex);
-        }
+
+            chain.doFilter(request, response);
+
+            if (tx != null) {
+                try {
+                    if (ownTx) {
+                        if (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
+                            tx.rollback();
+                        } else if (tx.getStatus() == Status.STATUS_ACTIVE) {
+                            tx.commit();
+                        }
+                    }
+                } catch (Exception ex) {
+                    log.error("error ending transaction:", ex);
+                    throw new ServletException("error ending transaction", ex);
+                }
+            }
             
-        chain.doFilter(request, response);
+            log.debug("*** JPAFilter.doFilter() EXIT ***");
+	}
 
-        try {
-            if (ownTx) {
-                if (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
-                    tx.rollback();
-                }
-                else if (tx.getStatus() == Status.STATUS_ACTIVE) {
-                    tx.commit();
-                }
-            }
-        } catch (Exception ex) {
-            log.error("error ending transaction:", ex);
-            throw new ServletException("error ending transaction", ex);
-        }
-        
-        log.debug("*** JPAFilter.doFilter() EXIT ***");
-    }
 ---
 
     [[1]] Verify the Jetty configuration still works. Note that we have
@@ -1643,13 +1582,10 @@ import javax.transaction.UserTransaction;
     the hydrated form of the calls.
 
 ---
-[INFO] Restart completed at Mon Apr 06 00:10:05 EDT 2009
  -*** JPAFilter.doFilter() ENTER ***
- -no transaction available, moving on without it
- -init() called
+ -no UserTransaction injected -- moving on without one
 
 ...
-
 
  -doGet() called
  -command=Get All People
@@ -1659,6 +1595,12 @@ import javax.transaction.UserTransaction;
     [[1]] Test the configuration within the application server. We should
     now successfully be able to work with the non-hydrated form of the
     methods.
+
+    [Note:] If you are not seeing your changes on the server, make
+    sure to install the suspect artifact into the localRepository
+    using "mvn clean install".
+
+    []
 
 ---
 22:21:36,782 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] init() called 
