@@ -199,6 +199,8 @@ javaeeExWAR/
 
 ---
     <properties>
+        <maven-jetty-plugin.version>6.1.26</maven-jetty-plugin.version>
+        ...
         <jetty.reload>automatic</jetty.reload>
         <jetty.scanIntervalSeconds>10</jetty.scanIntervalSeconds>
         <jetty.port>9080</jetty.port>
@@ -233,6 +235,7 @@ $ cat pom.xml
                 <plugin>
                     <groupId>org.mortbay.jetty</groupId>
                     <artifactId>maven-jetty-plugin</artifactId>
+                    <version>${maven-jetty-plugin.version}</version>
                     <configuration>
                         <jetty.reload>${jetty.reload}</jetty.reload>
                         <scanIntervalSeconds>${jetty.scanIntervalSeconds}</scanIntervalSeconds>
@@ -1068,10 +1071,7 @@ $ cat javaeeExWAR/src/test/webapp/WEB-INF/web.xml
     [[1]] Add an object-level reference for the Registrar. Start
     off by using the remote interface for both Jetty and the 
     EAR deployment. Use the javax.ejb.EJB annotation to signal the
-    injection. We could have used the JSR-3300 javax.inject.Inject annotation
-    but that would have required some unecessary work to get things finally
-    wired up. The pre-JSR-330 technique will work until we decide to 
-    not use an EJB.
+    injection. 
 
 ---
 $ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
@@ -1139,6 +1139,79 @@ $ mvn clean pre-integration-test -rf :javaeeExWAR
 17:29:30,963 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
 ---
 
+    [[1]] Optionally update your @EJB injection into the servlet with
+    a JSR-330 javax.inject.Inject. The value in doing this is @Inject
+    does not require the solution to be an EJB.
+
+        * Change the @EJB to @Inject in the servlet class
+
+---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+import javax.inject.Inject;
+...
+    @Inject
+    private RegistrarRemote registrar;
+---
+
+        * Add a RegistrarWebConfig class to hold the mapping between
+        the injection requirement and the resource resource.
+
+---
+package myorg.javaeeex.web;
+
+import javax.ejb.EJB;
+import javax.enterprise.inject.Produces;
+
+import myorg.javaeeex.ejb.RegistrarRemote;
+
+/**
+ * This class is used to define the injection type for RegistrarRemote
+ * types
+ */
+public class RegistrarWebConfig {
+    @Produces 
+    @EJB 
+    public RegistrarRemote registrar;
+}       
+---
+
+        * Add a beans.xml to the WEB-INF directory of the WAR. This activates
+        CDI within the WAR.
+
+---
+$ touch javaeeExWAR/src/main/webapp/WEB-INF/beans.xml
+---
+
+    [[1]] Test your CDI lookup of of the EJB using your deployed EAR. You will
+    need to rebuild and redeploy first.
+
+        * http://localhost:8080/javaeeEx/
+
+        * click on "invoke servlet"
+
+---
+$ mvn clean pre-integration-test -rf :javaeeExWAR
+...
+---
+---
+18:40:19,395 INFO  [org.jboss.weld.deployer] (MSC service thread 1-1) JBAS016008: Starting weld service for deployment javaeeExEAR-1.0-SNAPSHOT.ear
+18:40:19,584 INFO  [org.jboss.web] (MSC service thread 1-1) JBAS018210: Registering web context: /javaeeEx
+18:40:19,602 INFO  [org.jboss.as.server] (management-handler-thread - 18) JBAS018559: Deployed "javaeeExEAR-1.0-SNAPSHOT.ear"
+...
+18:49:19,219 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) init() called 
+18:49:19,224 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) initRegistrar(), registrar=Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+18:49:19,227 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) configured handler type:anonymous with {Ping=myorg.javaeeex.web.RegistrarHandlerServlet$Ping@549a16}
+18:49:19,229 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+18:49:19,234 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) command=Ping
+18:49:19,252 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) **** init ****
+18:49:19,252 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@14316bd
+18:49:19,254 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) ping called
+---
+
+    At this point we now have a functional servlet/WAR with an injected EJB ready
+    to start adding methods.
+
 * {Add Controller Servlet to invoke EJB}
 
     In this step we are going to add some structure to the Web Tier. The
@@ -1150,9 +1223,13 @@ $ mvn clean pre-integration-test -rf :javaeeExWAR
 
     [[1]] Add a type=admin to the current servlet specification within
     web.xml. This will be used by the Servlet to determine which actions
-    are allowed within each context.
+    are allowed within each context. Be sure to do this in the web.xml 
+    file in src/main.
 
 ---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+
+...
     <servlet>
         <servlet-name>AdminHandler</servlet-name>
         <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
@@ -1160,7 +1237,6 @@ $ mvn clean pre-integration-test -rf :javaeeExWAR
             <param-name>type</param-name>
             <param-value>admin</param-value>
         </init-param>
-...
     </servlet>
     <servlet-mapping>
         <servlet-name>AdminHandler</servlet-name>
@@ -1174,6 +1250,9 @@ $ mvn clean pre-integration-test -rf :javaeeExWAR
     it to be just "Handler".
 
 ---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+
+...
     <servlet>
         <servlet-name>AnonymousHandler</servlet-name>
         <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
@@ -1181,7 +1260,6 @@ $ mvn clean pre-integration-test -rf :javaeeExWAR
             <param-name>type</param-name>
             <param-value>anonymous</param-value>
         </init-param>
-...
     </servlet>
     <servlet-mapping>
         <servlet-name>AnonymousHandler</servlet-name>
@@ -1271,12 +1349,12 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayException.jsp
 ---
 
 
-    [[1]] Add a Ping action that extands Handler. Have the handler
-    invoke ping() on the EJB and rse a RequestDispatcher to report
+    [[1]] Add a Ping action that extends Handler. Have the handler
+    invoke ping() on the EJB and invoke a RequestDispatcher to report
     the results to a JSP/View for display. 
 
 ---
-$ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
 
 ...
     private class Ping extends Handler {
@@ -1396,6 +1474,11 @@ import java.util.Map;
     Controller.
 
 ---
+$cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
+public class RegistrarHandlerServlet extends HttpServlet {
+...
     public static final String EXCEPTION_PARAM = "exception";
     private static final String UNKNOWN_COMMAND_URL = 
         "/WEB-INF/content/UnknownCommand.jsp";
@@ -1484,7 +1567,9 @@ $ cat javaeeExWAR/src/main/webapp/index.jsp
 </html>
 ---
 
-    [[1]] Test the configuration with Jetty.
+    [[1]] Test the configuration with Jetty. Notice that you should get 
+    output from the JBoss server as well as the Maven/Jetty console since
+    the WAR is now contacting the EJB via its remote/RMI interface.
 
         * http://localhost:9080/javaeeExWAR/
 
@@ -1493,17 +1578,17 @@ $ cat javaeeExWAR/src/main/webapp/index.jsp
         []
 
 ---
-(cd javaeeExWAR; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
+(cd javaeeExWAR; mvn clean jetty:run)
 
 ...
 
 [INFO] Starting scanner at interval of 10 seconds.
- -init() called
- -initTeller(), registrar=null
- -jndiProperties={java.naming.provider.url=jnp://localhost:1099, java.naming.factory.initial=org.jnp.interfaces.NamingCo
-ntextFactory, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
- -registrar initialized:jboss.j2ee:ear=javaeeEx.ear,jar=javaeeExEJB-1.0-SNAPSHOT.jar,name=RegistrarEJB,service=EJB3
- -configured handler type:anonymous with {Ping=myorg.javaeeex.web.RegistrarHandlerServlet$Ping@1ad0839}
+ -init() called 
+ -initRegistrar(), registrar=null
+ -java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+...
+ -registrar initialized:Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+ -configured handler type:anonymous with {Ping=myorg.javaeeex.web.RegistrarHandlerServlet$Ping@b0f0ae}
  -doGet() called
  -command=Ping
 ---
@@ -1516,14 +1601,19 @@ Result: ping() complete
 Go to Main Page 
 ---
 ---
-//SERVER LOG
+//JBoss SERVER LOG
 
-17:07:01,375 DEBUG [RegistrarEJB] **** init ****
-17:07:01,375 DEBUG [RegistrarEJB] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@527849
-17:07:01,375 DEBUG [RegistrarEJB] ping called
+18:10:03,283 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 1) **** init ****
+18:10:03,283 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 1) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@11c8d64
+18:10:03,295 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 1) ping called
+
 ---
 
-        * click "invoke admin EJB.ping()" and note the errors
+        * click "invoke admin EJB.ping()" and note the errors. There error in this
+        case is because we are contacting the servlet under the model/admin/handler
+        url-pattern, which is assigned a type=admin servlet initialization parameter.
+        That value was used to locate a map of commands appropriate for the user
+        type and none were found in the map.
 
         []
 
@@ -1536,7 +1626,10 @@ A request was made, but the command was not recognized. command=Ping
 Go to Main Page 
 ---
 
-        * click "invoke servlet" and note the errors
+        * click "invoke servlet" and note the errors. The error here is 
+        caused by there being no command parameter passed to the 
+        servlet. In our last enhancement of the servlet we made it a 
+        requirement that all incoming URIs provide a command query parameter.
 
         []
 
@@ -1554,7 +1647,7 @@ Go to Main Page
     will need to rebuild and redeploy the application.
 
 ---
-$ mvn clean install
+$ mvn clean pre-integration-test -rf :javaeeExWAR
 
 ...
 ---
@@ -1568,9 +1661,11 @@ Go to Main Page
 ---
 //SERVER LOG
 
-17:18:09,031 DEBUG [RegistrarEJB] **** init ****
-17:18:09,031 DEBUG [RegistrarEJB] em=org.jboss.ejb3.entity.TransactionScopedEntityManager@b2b9ec
-17:18:09,031 DEBUG [RegistrarEJB] ping called
+18:31:54,797 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+18:31:54,799 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) command=Ping
+18:31:54,823 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) **** init ****
+18:31:54,824 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1abc8dd
+18:31:54,825 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) ping called
 ---
 ---
 //http://localhost:8080/javaeeEx/model/admin/handler?command=Ping
@@ -1581,12 +1676,26 @@ A request was made, but the command was not recognized. command=Ping
 Go to Main Page 
 ---
 ---
+//SERVER LOG
+
+18:32:55,336 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+18:32:55,337 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) command=Ping
+---
+---
 //http://localhost:8080/javaeeEx/model/admin/handler
 
 Command Error
 A request was made, but the command was not recognized. command=null
 
 Go to Main Page 
+---
+---
+//SERVER LOG
+
+18:34:30,421 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+18:34:30,422 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) command=null
+18:34:30,423 ERROR [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) error within GET: java.lang.Exception: no command supplied
+        at myorg.javaeeex.web.RegistrarHandlerServlet.doGet(RegistrarHandlerServlet.java:104) [classes:]
 ---
 
 * Final configuration
@@ -1595,10 +1704,8 @@ Go to Main Page
 
 ---
 javaeeEx                                                                                                                     
-|-- javaeeExEAR                                                                                                              
-|-- javaeeExEJB                                                                                                              
 |-- javaeeExImpl                                                                                                             
-|-- javaeeExTest
+|-- javaeeExEJB                                                                                                              
 |-- javaeeExWAR
 |   |-- pom.xml
 |   `-- src
@@ -1607,19 +1714,27 @@ javaeeEx
 |       |   |   `-- myorg
 |       |   |       `-- javaeeex
 |       |   |           `-- web
-|       |   |               `-- RegistrarHandlerServlet.java
+|       |   |               |-- RegistrarHandlerServlet.java
+|       |   |               `-- RegistrarWebConfig.java
 |       |   `-- webapp
-|       |       |-- WEB-INF
-|       |       |   |-- content
-|       |       |   |   |-- DisplayException.jsp
-|       |       |   |   |-- DisplayResult.jsp
-|       |       |   |   |-- ErrorPage.jsp
-|       |       |   |   `-- UnknownCommand.jsp
-|       |       |   `-- web.xml
-|       |       `-- index.jsp
+|       |       |-- index.jsp
+|       |       `-- WEB-INF
+|       |           |-- beans.xml
+|       |           |-- content
+|       |           |   |-- DisplayException.jsp
+|       |           |   |-- DisplayResult.jsp
+|       |           |   |-- ErrorPage.jsp
+|       |           |   `-- UnknownCommand.jsp
+|       |           `-- web.xml
 |       `-- test
-|           `-- resources
-|               `-- log4j.xml
+|           |-- resources
+|           |   |-- jndi.properties
+|           |   `-- log4j.xml
+|           `-- webapp
+|               `-- WEB-INF
+|                   `-- web.xml
+|-- javaeeExEAR                                                                                                              
+|-- javaeeExTest
 `-- pom.xml
 ---
 
@@ -1627,24 +1742,25 @@ javaeeEx
 
 ---
 javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT
+|-- index.jsp
 |-- META-INF
-|-- WEB-INF
-|   |-- classes
-|   |   `-- myorg
-|   |       `-- javaeeex
-|   |           `-- web
-|   |               |-- RegistrarHandlerServlet$1.class
-|   |               |-- RegistrarHandlerServlet$Handler.class
-|   |               |-- RegistrarHandlerServlet$Ping.class
-|   |               `-- RegistrarHandlerServlet.class
-|   |-- content
-|   |   |-- DisplayException.jsp
-|   |   |-- DisplayResult.jsp
-|   |   |-- ErrorPage.jsp
-|   |   `-- UnknownCommand.jsp
-|   `-- web.xml
-`-- index.jsp
-
+`-- WEB-INF
+    |-- beans.xml
+    |-- classes
+    |   `-- myorg
+    |       `-- javaeeex
+    |           `-- web
+    |               |-- RegistrarHandlerServlet$1.class
+    |               |-- RegistrarHandlerServlet.class
+    |               |-- RegistrarHandlerServlet$Handler.class
+    |               |-- RegistrarHandlerServlet$Ping.class
+    |               `-- RegistrarWebConfig.class
+    |-- content
+    |   |-- DisplayException.jsp
+    |   |-- DisplayResult.jsp
+    |   |-- ErrorPage.jsp
+    |   `-- UnknownCommand.jsp
+    `-- web.xml
 ---
 
 
@@ -1655,7 +1771,10 @@ javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT
     * In this exercise, we created the shell of a Web UI. Our 
     implementation started out with a simple WAR. We then added
     JNDI, and EJB lookup, an MVC approach, and an end-to-end
-    call to the EJB's ping() method.
+    call to the EJB's ping() method. 
+
+    * CDI was demonstrated to better separate the @Inject
+    requirement of the servlet from the implementation choice.
 
     * We used the @Remote interface that was developed for 
     an earlier exercise. Next we will add the @Local interface

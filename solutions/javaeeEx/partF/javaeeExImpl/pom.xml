@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>javaeeExImpl</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Java EE Exercise Impl</name>
+    <description>
+        This project provides a sample implementation
+        component, with business logic, business object,
+        DAO, and JPA DAO Implementation.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- core project testing dependencies -->
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>        
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <scope>test</scope>
+        </dependency>    
+    </dependencies>
+
+    <build>
+        <!--tell the resource plugin to perform filtering on resources 
+            to fill in JDBC URL, etc. -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+        <plugins>
+              <!-- pass in driver information to JUnit -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <dropPath>ddl/javaeeExImpl-dropJPA.ddl</dropPath>
+                        <createPath>ddl/javaeeExImpl-createJPA.ddl</createPath>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>            
+        </plugins>    
+    </build>
+
+    <profiles>
+        <profile> <!-- defines our default persistence provider -->
+            <id>hibernate</id>
+            <activation>
+                <property> <!-- use this property to name alt persistence provider -->
+                    <name>!jpa</name>
+                </property>
+            </activation>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <!-- generates a DDL file for persistence unit -->
+                    <plugin>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <configuration>
+                            <hibernatetool destdir="target/classes/ddl">
+                                <classpath>
+                                    <path location="${project.build.directory}/classes"/>
+                                    <path location="${project.build.directory}/test-classes"/>
+                                </classpath>
+                                <jpaconfiguration persistenceunit="javaeeEx-test"/>
+                            </hibernatetool>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+          <id>schema</id>
+          <activation>
+            <property>
+              <name>!skipTests</name>
+            </property>
+          </activation>
+          
+          <build>
+            <plugins>
+              <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>        
+
+                <dependencies>
+                    <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>${h2db.version}</version>
+                    </dependency>
+                </dependencies>
+                
+                <configuration>
+                    <username>${jdbc.user}</username>
+                    <password>${jdbc.password}</password>
+                    <driver>${jdbc.driver}</driver>
+                    <url>${jdbc.url}</url>          
+                </configuration>
+                
+                <executions>
+                  <execution>
+                      <id>drop-db-before-test</id>
+                      <phase>process-test-resources</phase>
+                      <goals>
+                          <goal>execute</goal>
+                      </goals>    
+                      <configuration>              
+                          <autocommit>true</autocommit>
+                          <fileset>
+                              <basedir>${basedir}/target</basedir>
+                              <includes>
+                                  <include>classes/ddl/*dropJPA.ddl</include>                  
+                              </includes>
+                          </fileset>
+                          <!-- the tables may not exist when tests are run -->
+                          <onError>continue</onError>
+                      </configuration>        
+                  </execution>
+                  
+                  <execution>
+                      <id>create-db-before-test</id>
+                      <phase>process-test-resources</phase>
+                      <goals>
+                          <goal>execute</goal>
+                      </goals>    
+                      <configuration>              
+                          <autocommit>true</autocommit>
+                          <fileset>
+                          <basedir>${basedir}/target</basedir>
+                              <includes>
+                                  <include>classes/ddl/*createJPA.ddl</include>                  
+                              </includes>
+                          </fileset>
+                          <print>true</print>
+                      </configuration>        
+                  </execution>
+                  
+                </executions>
+              </plugin>          
+            </plugins>        
+          </build>
+        </profile>
+    </profiles>
+</project>
