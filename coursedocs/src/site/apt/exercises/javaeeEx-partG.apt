@@ -27,8 +27,7 @@ Part F: Handling WAR/EJB Interface Issues
 
 * {Add Web UI Use Case to EJB}
 
-    We will want to add a use case to the Web UI that allows us
-    to 
+    We will want to add a use case to the Web UI that allows us to 
 
         * getAllPeople in page-sized quantities
 
@@ -65,8 +64,7 @@ $ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
 ...
     public Collection<Person> getAllPeople(int index, int count)
             throws RegistrarException {
-        log.debug("*** getAllPeople(index=" + index + 
-                ", count=" + count + ") ***");
+        log.debug(String.format("*** getAllPeople(index=%d, count=%d) ***", index, count));
 
         try {
             return registrar.getAllPeople(index, count);
@@ -79,7 +77,10 @@ $ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
 ---
 
     [[1]] Add a test of the getAllPeople to the RMI Test before
-    we attempt to make use of it within the WAR.
+    we attempt to make use of it within the WAR. This test will create PAGES*PAGE_SIZE
+    count of people and then request the EJB get thos people a page at a time.
+    The final count of all people retrieved is evaluated against the expected
+    count.
 
 ---
 $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
@@ -120,15 +121,6 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
 
 ---
 $ mvn clean install -rf :javaeeExEJB
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Build Order:
-[INFO] 
-[INFO] Java EE Exercise EJB
-[INFO] Java EE Exercise WAR
-[INFO] Java EE Exercise EAR
-[INFO] Java EE Exercise Remote Test
-
 ...
 
  -*** testWebUserCase ***
@@ -138,17 +130,7 @@ Results :
 
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] 
-[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
-[WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] 
-[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
-[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
+...
 [INFO] Java EE Exercise EJB .............................. SUCCESS [5.481s]
 [INFO] Java EE Exercise WAR .............................. SUCCESS [2.841s]
 [INFO] Java EE Exercise EAR .............................. SUCCESS [1.530s]
@@ -166,9 +148,8 @@ $cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
 
             loops += 1;
             for (Person person : people) {
-                log.debug("person: (" + person.getId() +
-                        ") " + person.getFirstName() +
-                        " " + person.getLastName());
+                log.debug(String.format("person: (%d) %s %s", 
+                    person.getId(), person.getFirstName(), person.getLastName()));
             }
         } while (!people.isEmpty() && loops <= PAGES + 1);
 ---
@@ -204,32 +185,54 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
             log.debug("people=" + people);
         } while (!people.isEmpty() && loops <= PAGES + 1);   
 ---
+
+    [[1]] Re-run the deployment
+
 ---
-./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
-::::::::::::::
- -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
- -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.313 sec FAILURE!
-testWebUseCase(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.547 sec  <<< ERROR!
-org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.ad
-dresses, no session or session was closed
-        at org.hibernate.collection.AbstractPersistentCollection.throwLazyInitializationException(AbstractPersistentColl
-ection.java:358)
-        at org.hibernate.collection.AbstractPersistentCollection.throwLazyInitializationExceptionIfNotConnected(Abstract
-PersistentCollection.java:350)
-        at org.hibernate.collection.AbstractPersistentCollection.initialize(AbstractPersistentCollection.java:343)
-        at org.hibernate.collection.AbstractPersistentCollection.read(AbstractPersistentCollection.java:86)
-        at org.hibernate.collection.PersistentBag.iterator(PersistentBag.java:249)
-        at myorg.javaeeex.bo.Person.toString(Person.java:55)
-        at java.lang.String.valueOf(String.java:2615)
-        at java.util.AbstractCollection.toString(AbstractCollection.java:454)
-        at java.lang.String.valueOf(String.java:2615)
-        at java.lang.StringBuilder.append(StringBuilder.java:116)
-        at myorg.javaeeex.ejbclient.RegistrarTest.testWebUseCase(RegistrarTest.java:231)
+ -person: (24) first23 last23
+ Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.359 sec <<< FAILURE!
+
+ Results :
+
+ Tests in error: 
+   testWebUseCase(myorg.javaeeex.ejbclient.RegistrarIT): failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.addresses, no
+   session or session was closed
+
+   Tests run: 6, Failures: 0, Errors: 1, Skipped: 0
+
+   ...
+   [INFO] Java EE Exercise EJB .............................. SUCCESS [6.483s]
+   [INFO] Java EE Exercise WAR .............................. SUCCESS [2.300s]
+   [INFO] Java EE Exercise EAR .............................. SUCCESS [1.392s]
+   [INFO] Java EE Exercise Remote Test ...................... FAILURE [12.783s]
+   [INFO] ------------------------------------------------------------------------
+   [INFO] BUILD FAILURE
 ---
 
-    [[1]] Add a hydrated form of the getAllPeople.
+   [[1]] Take a look at the fasilsafe results.
+
+
+---
+./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
+ -------------------------------------------------------------------------------
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
+ -------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.359 sec <<< FAILURE!
+testWebUseCase(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 0.98 sec  <<< ERROR!
+org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.addresses, no session or session 
+was closed
+        at org.hibernate.collection.internal.AbstractPersistentCollection.throwLazyInitializationException(AbstractPersistentCollection.java:393)
+        ...
+        at org.hibernate.collection.internal.PersistentBag.iterator(PersistentBag.java:266)
+        at myorg.javaeeex.bo.Person.toString(Person.java:55)
+        at java.lang.String.valueOf(String.java:2838)
+        ...
+        at java.lang.StringBuilder.append(StringBuilder.java:132)
+        at myorg.javaeeex.ejbclient.RegistrarIT.testWebUseCase(RegistrarIT.java:215)
+---
+
+    [[1]] Add a hydrated form of the getAllPeople. Leverage the hydratePerson(Person) helper
+    method that was implemented in a previous part of this overall exercise.
 
 ---
 $ cat ./javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarRemote.java
@@ -254,8 +257,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
 
     public Collection<Person> getAllPeopleHydrated(int index, int count)
         throws RegistrarException {
-        log.debug("*** getAllPeopleHydrated(index=" + index + 
-                ", count=" + count + ") ***");
+        log.debug(String.format("*** getAllPeopleHydrated(index=%d, count=%d) ***", index, count));
 
         try {
             Collection<Person> people = registrar.getAllPeople(index, count);
@@ -280,6 +282,11 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
         do {
             people = registrar.getAllPeopleHydrated(index, PAGE_SIZE);
 ---
+
+    [[1]] Rebuild/test the new version of the application. Notice how the 
+    objects returned from the EJB tier are now fully hydrated and do not
+    cause a lazy load exception.
+
 ---
 $ mvn clean install -rf :javaeeExEJB
 
@@ -302,17 +309,7 @@ Results :
 
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] 
-[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
-[WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] 
-[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
-[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
+...
 [INFO] Java EE Exercise EJB .............................. SUCCESS [5.259s]
 [INFO] Java EE Exercise WAR .............................. SUCCESS [2.834s]
 [INFO] Java EE Exercise EAR .............................. SUCCESS [1.138s]
@@ -336,27 +333,30 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
         //view a specific user
         long id = registrar.getAllPeople(0, PAGE_SIZE).iterator().next().getId();
         Person person = registrar.getPersonById(id);
-        log.debug("person: (" + person.getId() +
-                ") " + person.getFirstName() +
-                " " + person.getLastName());
+        log.debug(String.format("person: (%d) %s %s", 
+            person.getId(), person.getFirstName(), person.getLastName()));
         Address address = person.getAddresses().iterator().next();
-        log.debug("address: (" + address.getId() +
-                ") " + address.getStreet() + 
-                " " + address.getCity() +
-                ", " + address.getState() +
-                " " + address.getZip());
+        log.debug(String.format("address: (%d) %s %s, %s %s", 
+            address.getId(), 
+            address.getStreet(),
+            address.getCity(), address.getState(), address.getZip()));
 ---
 
     [[1]] Build and run the new getPersonById() functionality within
-    the overall Web UI usecase.
+    the overall Web UI usecase. Expect a lazy load exception to occur for accessing
+    the address returned.
 
 ---
+$ mvn clean install -rf :javaeeExTest
+
+...
 Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.437 sec FAILURE!
 
 Results :
 
 Tests in error:
-  testGetAllPeople(myorg.javaeeex.ejbclient.RegistrarTest)
+  testWebUseCase(myorg.javaeeex.ejbclient.RegistrarIT): failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.addresses, no session or session was closed
+
 
 Tests run: 6, Failures: 0, Errors: 1, Skipped: 0
 
@@ -366,23 +366,20 @@ Tests run: 6, Failures: 0, Errors: 1, Skipped: 0
 [INFO] There are test failures.
 ---
 ---
-./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
+./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
 ::::::::::::::
  -------------------------------------------------------------------------------
 Test set: myorg.javaeeex.ejbclient.RegistrarTest
  -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.437 sec <<< FAILURE!
-testGetAllPeople(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.656 sec  <<< ERROR!
-org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.ad
-dresses, no session or session was closed
-        at org.hibernate.collection.AbstractPersistentCollection.throwLazyInitializationException(AbstractPersistentColl
-ection.java:358)
-        at org.hibernate.collection.AbstractPersistentCollection.throwLazyInitializationExceptionIfNotConnected(Abstract
-PersistentCollection.java:350)
-        at org.hibernate.collection.AbstractPersistentCollection.initialize(AbstractPersistentCollection.java:343)
-        at org.hibernate.collection.AbstractPersistentCollection.read(AbstractPersistentCollection.java:86)
-        at org.hibernate.collection.PersistentBag.iterator(PersistentBag.java:249)
-        at myorg.javaeeex.ejbclient.RegistrarTest.testGetAllPeople(RegistrarTest.java:237)
+Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.356 sec <<< FAILURE!
+testWebUseCase(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 1.111 sec  <<< ERROR!
+org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: myorg.javaeeex.bo.Person.addresses, no session or session 
+was closed
+        at org.hibernate.collection.internal.AbstractPersistentCollection.throwLazyInitializationException(AbstractPersistentCollection.java:393)
+    ...
+        at org.hibernate.collection.internal.PersistentBag.iterator(PersistentBag.java:266)
+        at myorg.javaeeex.ejbclient.RegistrarIT.testWebUseCase(RegistrarIT.java:226)
+
 ---
 
     [[1]] Add a new form of the getPersonById() that hydrates the
@@ -447,17 +444,7 @@ Results :
 
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 
-[INFO] 
-[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ javaeeExTest ---
-[WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] 
-[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExTest ---
-[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/target/javaeeExTest-1.0-SNAPSHOT.jar to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.jar
-[INFO] Installing /home/jcstaff/solutions/javaeeEx/javaeeExTest/pom.xml to /home/jcstaff/.m2/repository/myorg/javaee/javaeeExTest/1.0-SNAPSHOT/javaeeExTest-1.0-SNAPSHOT.pom
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
+...
 [INFO] Java EE Exercise EJB .............................. SUCCESS [4.890s]
 [INFO] Java EE Exercise WAR .............................. SUCCESS [2.655s]
 [INFO] Java EE Exercise EAR .............................. SUCCESS [1.114s]
@@ -507,7 +494,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     }
 ---
 
-    [[1]] Update the RMI Test method to change the address of the
+    [[1]] Update the testWebUseCase() RMI Test method to change the address of the
     person.
 
 ---
@@ -536,15 +523,13 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
 ...
         //view user again
         person = registrar.getPersonByIdHydrated(id);
-        log.debug("person: (" + person.getId() +
-                ") " + person.getFirstName() +
-                " " + person.getLastName());
+        log.debug(String.format("person: (%d) %s %s", 
+            person.getId(), person.getFirstName(), person.getLastName()));
         address = person.getAddresses().iterator().next();
-        log.debug("address: (" + address.getId() +
-                ") " + address.getStreet() + 
-                " " + address.getCity() +
-                ", " + address.getState() +
-                " " + address.getZip());
+        log.debug(String.format("address: (%d) %s %s, %s %s", 
+            address.getId(), 
+            address.getStreet(),
+            address.getCity(), address.getState(), address.getZip()));
 ---
 
     [[1]] Build and deploy the new implementation.
@@ -555,7 +540,22 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
  -person: (1) first0 last0
  -address: (97) street12 city12, state12 zip12
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.313 sec
+
+Results :
+
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.834s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.136s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.946s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [13.410s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
 ---
+
+    We now are at a point where we now have new methods needed by
+    the web-tier that have been tested by the RMI integration tests.
 
 * {Add the Web UI Use Case to the WAR using Remote interface}
 
@@ -565,7 +565,9 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.313 sec
     Jetty framework.
 
     [[1]] Add an action/handler class to provide the getAllPeople()
-    functionality.
+    functionality. Since the RMI methods are defined to throw Exception
+    we need to also update the doHandle() method to allow Exception
+    to also be thrown from derived classes.
 
 ---
 $ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
@@ -578,7 +580,8 @@ $ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
         ...
         public abstract void doHandle(HttpServletRequest request, 
                 HttpServletResponse response) 
-                throws Exception;
+                throws ServletException, IOException, Exception;
+        ...
 ---
 ---
 $ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
@@ -634,7 +637,7 @@ public class RegistrarHandlerServlet extends HttpServlet {
     Please this request in an admin-specific sub-menu.
 
 ---
-$ mkdir mkdir -p javaeeExWAR/src/main/webapp/admin
+$ mkdir -p javaeeExWAR/src/main/webapp/admin
 $ cat javaeeExWAR/src/main/webapp/admin/admin_menu.jsp
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -692,7 +695,7 @@ $ cat javaeeExWAR/src/main/webapp/index.jsp
         * click Get All People
 
 ---
-$ (cd javaeeExWAR/; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
+$ (cd javaeeExWAR; mvn clean jetty:run)
 ---
 ---
 HTTP ERROR: 404
