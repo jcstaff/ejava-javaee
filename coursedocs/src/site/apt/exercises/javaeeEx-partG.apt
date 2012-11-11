@@ -659,6 +659,8 @@ $ cat javaeeExWAR/src/main/webapp/admin/admin_menu.jsp
     [[1]] Add navigation to the admin_menu from the root menu.
 
     [Note:] admin_menu.jsp is mis-typed as admin-menu.jsp on purpose.
+    It is being done to show you one of the errors you might encounter
+    when building your web tier.
 
     []
 
@@ -684,7 +686,9 @@ $ cat javaeeExWAR/src/main/webapp/index.jsp
 </html>
 ---
 
-    [[1]] Test your local implementation using the Jetty container.
+    [[1]] Test your local implementation using the Jetty container. Make sure the 
+    EAR has been deployed to the server and the integration tests have run at least
+    once to provide data.
 
         * http://localhost:9080
 
@@ -694,6 +698,9 @@ $ cat javaeeExWAR/src/main/webapp/index.jsp
 
         * click Get All People
 
+---
+$ mvn clean integration-test -rf :javaeeExTest)
+---
 ---
 $ (cd javaeeExWAR; mvn clean jetty:run)
 ---
@@ -707,7 +714,8 @@ RequestURI=/javaeeExWAR/admin/admin-menu.jsp
 Powered by Jetty://
 ---
 
-    [[1]] Correct the error with the URI in the main menu. 
+    [[1]] Correct the error with the URI in the main menu. This will fail for a separate
+    reason.
 
         * Hit save for the main menu in the editor.
 
@@ -722,6 +730,58 @@ Powered by Jetty://
 Hello JavaEE Admin User
 
     * Get All People
+---
+---
+ -error in EJB.getAllPeople
+java.lang.reflect.UndeclaredThrowableException
+        at $Proxy16.getAllPeopleHydrated(Unknown Source)
+        at myorg.javaeeex.web.RegistrarHandlerServlet$GetAllPeople.doHandle(RegistrarHandlerServlet.java:186)
+        at myorg.javaeeex.web.RegistrarHandlerServlet$Handler.handle(RegistrarHandlerServlet.java:145)
+        at myorg.javaeeex.web.RegistrarHandlerServlet.doGet(RegistrarHandlerServlet.java:98)
+...
+        at org.mortbay.thread.QueuedThreadPool$PoolThread.run(QueuedThreadPool.java:582)
+Caused by: java.lang.ClassNotFoundException: org.hibernate.collection.internal.PersistentBag
+---
+
+        [[1]] The same error occured in an earlier part of the RMI Test exercise. The problem is
+        the List returned comes straight from Hibernate and Hibernate is not brought in as a 
+        dependency in the ejava.common jboss-rmi-client. We could have fixed the problem for all
+        clients if we took the time to create a vanilla POJO DTO -- but instead we chose to 
+        take the shortcut and add hibernate to the client's classpath. We will take that
+        same lazy workaround here as well. Add the following dependency to the WAR's jetty
+        plugin dependency definition. It could also go in the parent jetty pluginManagement
+        if we wanted to take this same work-around for all WARs we create.
+
+---
+$ cat javaeeExWAR/pom.xml
+
+        <plugins>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <dependencies>
+                    ...
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-core</artifactId>
+                        <version>${hibernate-entitymanager.version}</version>
+                    </dependency>
+---
+
+    [[1]] Re-test your local implementation using Jetty. Kill and restart the Maven
+    process since we have changed the plugin dependency definition. The call should 
+    work this time.
+
+        * http://localhost:9080
+
+        * click on /javaeeExWAR
+
+        * click on Admin
+
+        * click Get All People
+
+---
+$ (cd javaeeExWAR; mvn clean jetty:run)
 ---
 ---
 Result: [id=1:first0 last0 123, addresses={{street12 city12, state12 zip12},}, id=2:first1 last1 123, addresses={{street1 city1, state1 zip1},}, id=3:first2 last2 123, addresses={{street1 city1, state1 zip1},}, id=4:first3 last3 123, addresses={{street1 city1, state1 zip1},}, id=5:first4 last4 123, addresses={{street1 city1, state1 zip1},}, id=6:first5 last5 123, addresses={{street1 city1, state1 zip1},}, id=7:first6 last6 123, addresses={{street1 city1, state1 zip1},}, id=8:first7 last7 123, addresses={{street1 city1, state1 zip1},}, id=9:first8 last8 123, addresses={{street1 city1, state1 zip1},}, id=10:first9 last9 123, addresses={{street1 city1, state1 zip1},}]
@@ -781,7 +841,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPeople.jsp
 </html>
 ---
 
-    [[1]] Update the Handler to re-direct the output to the new JSP.
+    [[1]] Update the Handler in the servlet to re-direct the output to the new JSP.
 
 ---
     private abstract class Handler {
@@ -796,6 +856,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPeople.jsp
                 throws Exception {
 ...
 
+            Collection<Person> people = registrar.getAllPeopleHydrated(index, count);
             int nextIndex = (people.size()==0) ?
                 index : index + people.size();
 
@@ -811,6 +872,11 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPeople.jsp
               getServletContext().getRequestDispatcher(DISPLAY_PEOPLE_URL);
             rd.forward(request, response);
 ---
+
+    [[1]] Re-request "Get All People" from the Admin menu. The following,
+    more domain-specific display should be displaying all returned names
+    for each page.
+    
 ---
 People Display
 
@@ -832,6 +898,15 @@ Count: 10
 
 Go to Main Page 
 ---
+
+    [Note:] I ran into a repeatable error if I used the browser refresh 
+    instead of a new menu navigation to start the next wave of tests. My
+    first call would work, but each browser refresh after that resulted
+    in a faulty EJB stub. The fix was to navigate to the menu and restart
+    the navigation. I do not currently know what the issue is. I could 
+    not re-create the issue using the JBoss-deployed WAR.
+
+    []
 
     [[1]] Continue to press "Get All People" until last page 
     is reached.
@@ -860,13 +935,14 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayPeople.jsp
                     Person p = (Person)o;
                     String firstName = p.getFirstName();
                     String lastName = p.getLastName();
-                    String url = "?id=" + p.getId() + "&command=Get+Person";
+                    String url = "?id=" + p.getId() + "&amp;command=Get+Person";
             </jsp:scriptlet>
                 <li><a href="<%= url %>"><%= firstName %> <%= lastName %> </a></li>
 ---
 
     [[1]] Hit refresh and you should see the new HREFS, but clicking on
-    then result in the following error.
+    then result in the following error. This is because our servlet has
+    not yet been updated to process the issued "Get Person" command.
 
 ---
 Command Error
