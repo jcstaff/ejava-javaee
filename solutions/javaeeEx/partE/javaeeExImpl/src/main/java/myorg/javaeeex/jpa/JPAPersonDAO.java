@@ -3,11 +3,13 @@ package myorg.javaeeex.jpa;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import myorg.javaeeex.bo.Address;
 import myorg.javaeeex.bo.Person;
+import myorg.javaeeex.cdi.JavaeeEx;
 import myorg.javaeeex.dao.PersonDAO;
 import myorg.javaeeex.dao.PersonDAOException;
 
@@ -15,10 +17,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class JPAPersonDAO implements PersonDAO {
-    private static Log log = LogFactory.getLog(JPAPersonDAO.class);
+    private static final Log log = LogFactory.getLog(JPAPersonDAO.class);
     
     private EntityManager em;
     
+    @Inject @JavaeeEx
     public void setEntityManager(EntityManager em) {
         this.em = em;
     }

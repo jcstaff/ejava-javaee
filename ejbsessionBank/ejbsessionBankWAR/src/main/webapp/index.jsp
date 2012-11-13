@@ -3,7 +3,7 @@
 <html>
     <title>Session Bank</title>
 <body>
-    <h2>Session Bank Main Menu</h2>
+    <h2>Session Bank Main Menu -- HELLO!!!!</h2>
     
     <ul>
         <li><a href="admin/CreateAccount.jsp">Create Account</a></li>

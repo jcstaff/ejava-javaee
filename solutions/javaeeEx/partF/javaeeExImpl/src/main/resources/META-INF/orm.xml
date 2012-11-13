@@ -4,21 +4,21 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
 
     <entity class="myorg.javaeeex.bo.Person" 
-            access="PROPERTY"
+            access="FIELD"
             metadata-complete="false">
 	    <table name="JAVAEEEX_PERSON"/>
-	    <named-query name="getPeopleLikeName">
+	    <named-query name="Registrar.getPeopleLikeName">
 	       <query>select p from Person p
 	              where p.firstName like :firstName and
 	                    p.lastName like :lastName
 	       </query>
 	    </named-query>
-	    <named-query name="getAllPeople">
+	    <named-query name="Registrar.getAllPeople">
 	       <query>select p from Person p</query>
 	    </named-query>
 	    <attributes>
 	        <id name="id">
-	            <generated-value/>
+                <generated-value strategy="IDENTITY"/>
 	        </id>
 	        <one-to-many name="addresses">
 	            <join-column name="PERSON_ID"/>
@@ -30,12 +30,12 @@
     </entity>        
     
     <entity class="myorg.javaeeex.bo.Address" 
-            access="PROPERTY"
+            access="FIELD"
             metadata-complete="false">
             <table name="JAVAEEEX_ADDRESS"/>
 	    <attributes>
 	        <id name="id">
-	            <generated-value/>
+	            <generated-value strategy="IDENTITY"/>
 	        </id>
 	    </attributes>
     </entity>        

@@ -7,3 +7,4 @@ import myorg.javaeeex.bl.TestUtil;
 @Remote
 public interface TestUtilRemote extends TestUtil {
 }
+

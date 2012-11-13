@@ -23,7 +23,7 @@
                     Person p = (Person)o;
                     String firstName = p.getFirstName();
                     String lastName = p.getLastName();
-                    String url = "?id=" + p.getId() + "&command=Get+Person";
+                    String url = "?id=" + p.getId() + "&amp;command=Get+Person";
             </jsp:scriptlet>
                 <li><a href="<%= url %>"><%= firstName %> <%= lastName %> </a></li>
             <jsp:scriptlet>

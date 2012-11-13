@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
+
+    <entity class="myorg.javaeeex.bo.Person" 
+            access="PROPERTY"
+            metadata-complete="false">
+	    <table name="JAVAEEEX_PERSON"/>
+	    <named-query name="getPeopleLikeName">
+	       <query>select p from Person p
+	              where p.firstName like :firstName and
+	                    p.lastName like :lastName
+	       </query>
+	    </named-query>
+	    <named-query name="getAllPeople">
+	       <query>select p from Person p</query>
+	    </named-query>
+	    <attributes>
+	        <id name="id">
+	            <generated-value/>
+	        </id>
+	        <one-to-many name="addresses">
+	            <join-column name="PERSON_ID"/>
+	            <cascade>
+	                <cascade-all/>
+	            </cascade>
+	        </one-to-many>
+	    </attributes>
+    </entity>        
+    
+    <entity class="myorg.javaeeex.bo.Address" 
+            access="PROPERTY"
+            metadata-complete="false">
+            <table name="JAVAEEEX_ADDRESS"/>
+	    <attributes>
+	        <id name="id">
+	            <generated-value/>
+	        </id>
+	    </attributes>
+    </entity>        
+</entity-mappings>
+    
+    

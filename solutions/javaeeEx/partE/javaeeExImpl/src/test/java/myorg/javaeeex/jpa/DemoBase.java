@@ -48,7 +48,6 @@ public abstract class DemoBase {
             else                              { tx.commit(); }
         }
         em.close();
-        emf.close();
     }
     
     @AfterClass
@@ -63,7 +62,7 @@ public abstract class DemoBase {
         log.info("cleaning up database");
         em.getTransaction().begin();
         @SuppressWarnings("unchecked")
-		List<Person> people = 
+        List<Person> people = 
             em.createQuery("select p from Person p").getResultList();
         for(Person p: people) {
             em.remove(p);

@@ -73,17 +73,17 @@ JavaEE EJB, EAR, and RMI Client Exercise
 
     * {{{./javaeeEx-partD.html}Part D}}: Handling Remote Interface Issues
 
-    * Part E: Create a WAR Project Shell
-~~    * {{{./javaeeEx-partE.html}Part E}}: Create a WAR Project Shell
+    * {{{./javaeeEx-partE.html}Part E}}: Implementing CDI Injection
 
-    * Part F: Handling WAR/EJB Interface Issues
-~~    * {{{./javaeeEx-partF.html}Part F}}: Handling WAR/EJB Interface Issues
+    * {{{./javaeeEx-partF.html}Part F}}: Create a WAR Project Shell
 
-    * Part G: Securing the EJB Tier and RMI Interface
-~~    * {{{./javaeeEx-partG.html}Part G}}: Securing the EJB Tier and RMI Interface
+    * {{{./javaeeEx-partG.html}Part G}}: Handling WAR/EJB Interface Issues
 
-    * Part H: Securing the Web Tier
-~~    * {{{./javaeeEx-partH.html}Part H}}: Securing the Web Tier
+    * Part H: Securing the EJB Tier and RMI Interface
+~~    * {{{./javaeeEx-partH.html}Part H}}: Securing the EJB Tier and RMI Interface
+
+    * Part I: Securing the Web Tier
+~~    * {{{./javaeeEx-partI.html}Part I}}: Securing the Web Tier
 
     Your final source tree will look like the following.
 
@@ -98,6 +98,8 @@ javaeeEx
 |           |-- java                   
 |           |   `-- myorg              
 |           |       `-- javaeeex       
+|           |           |-- cdi
+|           |           |   `-- ResourceConfig.java
 |           |           |-- dto        
 |           |           |   |-- AddressDTO.java
 |           |           |   `-- PersonDTO.java 
@@ -109,6 +111,7 @@ javaeeEx
 |           |               `-- TestUtilRemote.java 
 |           `-- resources
 |               |-- META-INF
+|                   |-- beans.xml
 |               |   `-- persistence.xml
 |               |-- roles.properties
 |               `-- users.properties
@@ -145,6 +148,8 @@ javaeeEx
 |           |           |-- blimpl
 |           |           |   |-- RegistrarImplTest.java
 |           |           |   `-- TestUtilTest.java
+|           |           |-- cdi
+|           |           |   `-- JavaeeEx.java
 |           |           |-- bo
 |           |           |   `-- PersonTest.java
 |           |           `-- jpa
@@ -154,6 +159,7 @@ javaeeEx
 |           `-- resources
 |               |-- log4j.xml
 |               `-- META-INF
+|                   |-- beans.xml
 |                   `-- persistence.xml
 -- javaeeExTest
 |   |-- pom.xml
@@ -177,12 +183,14 @@ javaeeEx
 |       |   |       `-- javaeeex
 |       |   |           `-- web
 |       |   |               |-- JPAFilter.java
-|       |   |               `-- RegistrarHandlerServlet.java
+|       |   |               |-- RegistrarHandlerServlet.java
+|       |   |               `-- RegistrarWebConfig.java
 |       |   `-- webapp
 |       |       |-- admin
 |       |       |   `-- admin_menu.jsp
 |       |       |-- index.jsp
 |       |       `-- WEB-INF
+|       |           |-- beans.xml
 |       |           |-- content
 |       |           |   |-- DisplayException.jsp
 |       |           |   |-- DisplayPeople.jsp
@@ -195,8 +203,12 @@ javaeeEx
 |       |           |-- jboss-web.xml
 |       |           `-- web.xml
 |       `-- test
-|           `-- resources
-|               `-- log4j.xml
+|           |-- resources
+|           |   |-- jndi.properties
+|           |   `-- log4j.xml
+|           `-- webapp
+|               `-- WEB-INF
+|                   `-- web.xml
 `-- pom.xml
 ---
 

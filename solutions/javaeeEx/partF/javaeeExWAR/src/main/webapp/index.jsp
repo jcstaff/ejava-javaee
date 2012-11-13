@@ -10,8 +10,6 @@
         <li><a href="model/admin/handler">invoke servlet</a></li>
         <li><a href="model/admin/handler?command=Ping">invoke admin EJB.ping()</a></li>
         <li><a href="model/handler?command=Ping">invoke anonymous EJB.ping()</a></li>
-        <li><a href="admin/admin_menu.jsp">Admin</a></li>
     </ul>
 </body>
 </html>
-

@@ -5,8 +5,8 @@ import java.util.Collection;
 import javax.ejb.Local;
 
 import myorg.javaeeex.bl.RegistrarException;
-import myorg.javaeeex.bo.Person;
 import myorg.javaeeex.bo.Address;
+import myorg.javaeeex.bo.Person;
 
 @Local
 public interface RegistrarLocal {
@@ -25,4 +25,3 @@ public interface RegistrarLocal {
     Collection<Person> getAllPeopleHydrated(int index, int count)
                 throws RegistrarException;
 }
-

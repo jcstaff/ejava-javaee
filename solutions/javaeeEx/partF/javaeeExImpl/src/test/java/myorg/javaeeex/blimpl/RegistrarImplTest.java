@@ -122,4 +122,5 @@ public class RegistrarImplTest extends DemoBase {
         log.info("registrar returned expected person after address change:" + 
                 person);
     }
+
 }

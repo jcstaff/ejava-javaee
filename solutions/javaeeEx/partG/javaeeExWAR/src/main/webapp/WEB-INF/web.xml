@@ -1,31 +1,10 @@
-<web-app
+<web-app 
     xmlns="http://java.sun.com/xml/ns/javaee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-    version="2.5">
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
 
   <display-name>Web Tier Exercise Web Application</display-name>
-
-    <context-param>
-        <param-name>java.naming.factory.initial</param-name>
-        <param-value>org.jnp.interfaces.NamingContextFactory</param-value>
-    </context-param>
-    <context-param>
-        <param-name>java.naming.provider.url</param-name>
-        <param-value>jnp://127.0.0.4:1099</param-value>
-    </context-param>
-    <context-param>
-        <param-name>java.naming.factory.url.pkgs</param-name>
-        <param-value>org.jboss.naming:org.jnp.interfaces</param-value>
-    </context-param>
-    <context-param>
-        <param-name>registrar.local</param-name> 
-        <param-value>/myorg/javaeeEx/RegistrarEJB/local</param-value>
-    </context-param>
-    <context-param>
-        <param-name>registrar.remote</param-name> 
-        <param-value>/myorg/javaeeEx/RegistrarEJB/remote</param-value>
-    </context-param>
 
     <servlet>
         <servlet-name>AdminHandler</servlet-name>
@@ -41,7 +20,7 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Handler</servlet-name>
+        <servlet-name>AnonymousHandler</servlet-name>
         <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
         <init-param>
             <param-name>type</param-name>
@@ -49,7 +28,7 @@
         </init-param>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Handler</servlet-name>
+        <servlet-name>AnonymousHandler</servlet-name>
         <url-pattern>/model/handler</url-pattern>
     </servlet-mapping>
 
@@ -63,4 +42,3 @@
         <url-pattern>/model/handler</url-pattern>
     </filter-mapping>
 </web-app>
-

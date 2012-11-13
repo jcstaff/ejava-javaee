@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ejava.examples.ejbwar.customer.bo.Customer;
@@ -25,6 +26,16 @@ public class InventoryIT {
 	private InventoryClient inventoryClient;
 	private CustomerClient customerClient;
 	
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		//give application time to fully deploy
+		if (Boolean.parseBoolean(System.getProperty("cargo.startstop", "false"))) {
+			long waitTime=15000;
+	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
+	    	Thread.sleep(waitTime);
+		}
+	}
+
 	@Before
 	public void setUp() throws Exception {
 		InventoryTestConfig config = new InventoryTestConfig("/it.properties");

@@ -93,6 +93,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemProperties>
+                        <cargo.startstop>${cargo-startstop}</cargo.startstop>
+                    </systemProperties>
+                </configuration>
             </plugin>
 
             <!-- create an archive for external clients to use -->

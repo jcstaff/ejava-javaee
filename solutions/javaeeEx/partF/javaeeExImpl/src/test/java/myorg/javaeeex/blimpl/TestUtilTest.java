@@ -24,8 +24,7 @@ public class TestUtilTest extends DemoBase {
     public void testResetAll() throws Exception {
         log.info("*** testResetAll");
 
-        if (em.createQuery("select p from Person p").getResultList().size() 
-            == 0) {
+        if (em.createQuery("select p from Person p").getResultList().size() == 0) {
             Person person = new Person();
             person.setFirstName("joe");
             Address address = new Address();

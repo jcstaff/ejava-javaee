@@ -7,9 +7,9 @@ import myorg.javaeeex.bo.Address;
 import myorg.javaeeex.bo.Person;
 
 public interface PersonDAO {
-    public static final String GET_ALL_PEOPLE_QUERY = "getAllPeople";
-    public static final String GET_PEOPLE_LIKE_NAME_QUERY = "getPeopleLikeName";
-    public static final int MAX_RESULTS = 100;
+    static final String GET_ALL_PEOPLE_QUERY = "Registrar.getAllPeople";
+    static final String GET_PEOPLE_LIKE_NAME_QUERY = "Registrar.getPeopleLikeName";
+    static final int MAX_RESULTS = 100;
     Person createPerson(Person person);
     Person getPerson(long id);
     void removePerson(Person person);

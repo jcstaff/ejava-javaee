@@ -1,0 +1,612 @@
+Java EE Exercise 
+
+Part E: Implementing CDI Dependency Injection
+
+    In previous sections we created EJB classes that were not quite 
+    POJOs -- in that they defined resource injections that were very
+    specific to EJB. We also burdned the EJB @PostConstruct methods
+    with a lot of setup code that is no longer necessary with JSR-299
+    Context and Dependency Injection (CDI). We will only touch on a 
+    small portion of CDI in this exercise but it will lay the ground
+    work to add more features later as necessary.
+
+* Objectives
+
+    * {{{Activate_CDI_Injection}
+         Activate CDI Injection
+        }} 
+
+    * {{{Qualify_Injection_Choices}
+         Qualify Injection Choices
+        }} 
+
+    * {{{Creating_Type-safe_Qualifiers}
+         Creating Type-safe Qualifiers
+        }} 
+
+    * {{{Inject_DAO_with_Resources}
+         Inject DAO with Resources
+        }}
+
+
+* {Activate CDI Injection}
+
+    [[1]] Create a ResourceConfig class in your EJB module.
+
+---
+$cat javaeeExEJB/src/main/java/myorg/javaeeex/cdi/ResourceConfig.java
+
+package myorg.javaeeex.cdi;
+
+/**
+ * This class will be used to define a mapping between the dependency 
+ * injection solutions and their source within the container.
+ */
+public class ResourceConfig {
+
+}
+---
+
+    [[1]] Define a @Produces field for the persistence context used by 
+    the RegistrarEJB.
+
+---
+import javax.enterprise.inject.Produces;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+public class ResourceConfig {
+
+    @Produces
+    @PersistenceContext(unitName="javaeeEx")
+    public EntityManager em;
+
+}
+---
+
+    [[1]] Replace the @PersistenceUnit specification in the RegistrarEJB
+    with an @javax.inject.Inject specification. This will eliminate 
+    the need for the EJB to know the persistence unit name and be tied
+    to an annotation type that can only be fullfilled within a JavaEE
+    container. @Inject is part of JSR-330 and is portable to Spring and
+    Google AppEngine frameworks. It also can be implemented in JSE 
+    environments outside of EJB, Spring, etc.
+
+---
+$cat javaeeEx/javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
+
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+
+...
+@Stateless
+public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
+    ...
+    @Inject
+    private EntityManager em;
+---
+    
+    [[1]] Attempt to redeploy and test your current solution. Only run the testPing IT test
+    since we are not yet ready for full functionality. Notice in the debug output in the 
+    server.log that the EntityManager is not being injected. CDI is a JavaEE standard but
+    is not injected by default. It requires a beans.xml file to be present in the 
+    META-INF directory for EJBs.
+
+---
+$ mvn clean install -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testPing
+...
+---
+---
+# server.log
+
+22:10:15,404 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) **** init ****
+22:10:15,405 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) em=null
+22:10:15,428 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@2be20e
+22:10:15,429 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 2) ping called
+---
+
+    [[1]]  Place an emtpy beans.xml file in the META-INF directory of the EJB.
+    This is all that is required to activate CDI processiong. The beans.xml can 
+    be empty or we can populate it with information when there are conflicts 
+    between injection choices that cannot be resolved at the class level.
+
+---
+$ touch javaeeExEJB/src/main/resources/META-INF/beans.xml
+
+$ tree javaeeExEJB/src/main/resources/META-INF
+javaeeExEJB/src/main/resources/META-INF
+|-- beans.xml
+`-- persistence.xml
+---
+
+    [[1]] Redeploy the application. Note the persistence context is now injected 
+    into the EJB and we can run all tests to completion again.
+
+---
+$ mvn clean install -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testPing
+...
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.373s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.744s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [48.418s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+---
+# server.log
+...
+22:25:38,021 INFO  [org.jboss.weld.deployer] (MSC service thread 1-4) JBAS016008: Starting weld service for deployment javaeeExEAR-1.0-SNAPSHOT.ear
+...
+22:25:55,652 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) **** init ****
+22:25:56,418 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) em=org.jboss.as.jpa.container.TransactionScopedEntityManager@1cae20a
+22:26:20,423 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1d7dfda
+22:26:24,952 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 8) ping called                                                             
+---
+
+
+* {Qualify Injection Choices}
+
+    In the previous section we needed an EntityManager injected and were successful
+    only because there was a single EntityManager declared. This is not always the 
+    case -- so lets create an injection ambiguity by creating a second EntityManager
+    using a @Produces method this time.
+
+
+    [[1]] Define a @Produces method in the ResourceConfig class to compete with the 
+    @Produces field. Simply return the value of the field.
+
+---
+    //this is a second option for an EntityManager to create an ambiguity
+    //when selecting on type alone
+    @Produces
+    public EntityManager getEntityManager() {
+    	return em;
+    }
+---
+
+    [[1]] Attempt to redeploy the application and note the error produced. @Default is a built-in qualifier that applies
+    to any injection point without a qualifier. @Any is also a built-in qualifier automatically applied to a @Produces
+    and permits the option to be part of a choice selection which includes any/all choices.
+
+---
+...WeldService: org.jboss.weld.exceptions.DeploymentException: WELD-001409 Ambiguous dependencies for type [EntityManager] 
+with qualifiers [@Default] at injection point [[field] @Inject private myorg.javaeeex.ejb.RegistrarEJB.em].  Possible dependencies [[Resource 
+Producer Field [EntityManager] with qualifiers [@Any @Default] declared as [[field] @Produces @PersistenceContext public myorg.javaeeex.cdi.ResourceConfig.em], 
+Producer Method [EntityManager] with qualifiers [@Any @Default] declared as [[method] @Produces public myorg.javaeeex.cdi.ResourceConfig.getEntityManager()]]]
+---
+
+    [[1]] Add a @Named qualifier to the @Produces field. The @Named qualifier is a built-in
+    string-based qualifier. It's primary function is to support JSPs where Java types are
+    not as easily applied.
+
+---
+$cat javaeeExEJB/src/main/java/myorg/javaeeex/cdi/ResourceConfig.java
+...
+import javax.inject.Named;
+...
+    @Produces @Named("javaeeEx")
+    @PersistenceContext(unitName="javaeeEx")
+    public EntityManager em;
+---
+
+    [[1]] If you re-deploy again you will see that the error has not yet been fixed but 
+    the field choice has been annotated with our string-based name qualifier.
+
+---
+...WeldService: org.jboss.weld.exceptions.DeploymentException: WELD-001409 Ambiguous dependencies for type [EntityManager] with qualifiers [@Default]
+at injection point [[field] @Inject private myorg.javaeeex.ejb.RegistrarEJB.em]. Possible dependencies 
+[[Resource Producer Field [EntityManager] with qualifiers [@Any @Default @Named] declared as [[field] @Produces @PersistenceContext @Named public myorg.javaeeex.cdi.ResourceConfig.em],
+Producer Method [EntityManager] with qualifiers [@Any @Default] declared as [[method] @Produces public myorg.javaeeex.cdi.ResourceConfig.getEntityManager()]]]
+---
+
+    [[1]] Add the string-based @Named qualifier to the injection point in the RegistrarEJB.
+
+---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
+...
+import javax.inject.Named;
+...
+    @Inject @Named("javaeeEx")
+    private EntityManager em;
+---
+
+    [[1]] Redeploy your application and re-run all tests. They should now pass again.
+
+---
+$ mvn clean install -rf :javaeeExEJB
+...
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.959s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [0.797s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [11.967s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+* {Creating Type-safe Qualifiers}
+
+    In the previous section we leveraged a string-based injection qualifier to 
+    distinguish between multiple injection options. In this section we will 
+    demonstrate a key deficiency with using an untyped string-qualifier and 
+    replace it with a type-safe alternateive approach.
+
+    [[1]] Update the persistence context injection in the TestUtilEJB but make 
+    a small typo with the string-based qualifier.
+
+---
+$ cat javaeeEx/javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilEJB.java
+...
+import javax.inject.Inject;
+import javax.inject.Named;
+...
+
+@Stateless
+public class TestUtilEJB implements TestUtilRemote {
+    ....
+    @Inject @Named("javaeeExx")
+    private EntityManager em;
+---
+
+    [[1]] Redeploy the application and note the error.
+
+---
+WELD-001408 Unsatisfied dependencies for type [EntityManager] with qualifiers [@Named] at injection point 
+[[field] @Inject @Named private myorg.javaeeex.ejb.TestUtilEJB.em]
+---
+
+    [[1]] Create a type-safe qualifier using a Java annotation construct.
+
+---
+$cat javaeeEx/javaeeExEJB/src/main/java/myorg/javaeeex/cdi/JavaeeEx.java
+
+package myorg.javaeeex.cdi;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+/**
+ * This is a type-safe qualifier that is used to  distinguish between 
+ * ambiguous injection choices or place more stringent requirements. 
+ */
+@Qualifier
+@Target({ TYPE, METHOD, PARAMETER, FIELD })
+@Retention(RUNTIME)
+@Documented
+public @interface JavaeeEx {
+}
+---
+
+    [[1]] Replace the @Named qualifier annotation in TestUtilEJB with
+    this new type-safe qualifier annotation.
+
+---
+$cat javaeeEx/javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilEJB.java
+...
+import myorg.javaeeex.cdi.JavaeeEx;
+
+@Stateless
+public class TestUtilEJB implements TestUtilRemote {
+    private static Log log = LogFactory.getLog(TestUtilEJB.class);
+
+    @Inject @JavaeeEx
+    private EntityManager em;
+---
+
+    [[1]] Attempt to redeploy the half-completed solution. Note the error contains the type for
+    the missing qualifier. However, we can at least be assured that all was supplied connectly
+    because the Java compiler would not allow us to make a slight typo like we could have
+    done in the string-based approach.
+
+---
+WELD-001408 Unsatisfied dependencies for type [EntityManager] with qualifiers [@JavaeeEx] at injection point 
+[[field] @JavaeeEx @Inject private myorg.javaeeex.ejb.TestUtilEJB.em]
+---
+
+    [[1]] Add the @JavaeeEx type-safe qualifier to the ResourceConfig @Produces
+    method.
+
+---
+$ cat javaeeEx/javaeeExEJB/src/main/java/myorg/javaeeex/cdi/ResourceConfig.java
+    ...
+    @Produces @JavaeeEx
+    public EntityManager getEntityManager() {
+    ...
+---
+
+    [[1]] Redeploy and retest the application at this time. The application should
+    deploy now that all mising injections have been satsified and resolved 
+    correctly.
+
+---
+$ mvn clean install -rf :javaeeExEJB
+...
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.912s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.227s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [11.756s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+
+* {Inject DAO with Resources}
+
+    In the previous sections we injected resources into EJBs. You may not have
+    been that impressed with that capability since we were already injecting
+    EJBs without CDI. Well lets now go one step further and inject the persistence
+    context directly into the DAOs that need the EntityManagers.
+
+    [[1]] Refactory the project and move the @JavaeeEx qualifier annotation to 
+    the javaeeExImpl project.
+
+---
+---
+
+    [[1]] Since the Impl project has no dependency on javax:javaee-api or javax.inject:inject
+    we need to define a dependency in the Impl project on javax.inject:inject and a 
+    dependencyManagement in the parent pom.
+
+---
+$ cat javaeeEx/pom.xml
+
+    <properties>
+        ...
+        <inject.version>1</inject.version>
+    ...
+
+    <dependencyManagement>
+        <dependencies>
+            ...
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${inject.version}</version>
+            </dependency>
+---
+---
+$ cat javaeeEx/javaeeExImpl/pom.xml
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
+        </dependency>
+---
+
+    [[1]] Declare an injection of the persistence context directly into 
+    the JPAPersonDAO. Use method injection.
+
+---
+$ cat javaeeExImpl/src/main/java/myorg/javaeeex/jpa/JPAPersonDAO.java
+
+...
+import javax.inject.Inject;
+...
+public class JPAPersonDAO implements PersonDAO {
+    ...
+    private EntityManager em;
+    
+    @Inject @JavaeeEx
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+    }
+---
+
+    [[1]] Inject the JPAPersonDAO into the business logic class that 
+    uses it. This is important because only injected CDI beans are 
+    themselves injected. If a java methods directly new()s a class, that
+    class will not be managed and will not be injected by CDI. Note that
+    we do not need the @JavaeeEx annotation. We did not apply the qualifier
+    to the JPAPersonDAO and there is only one implementation of the 
+    PersonDAO interface.
+
+---
+$cat javaeeExImpl/src/main/java/myorg/javaeeex/blimpl/RegistrarImpl.java
+
+...
+import javax.inject.Inject;
+...
+public class RegistrarImpl implements Registrar {
+    protected PersonDAO dao;
+    
+    @Inject
+    public void setDAO(PersonDAO dao) {
+---
+
+    [[1]] Inject the persistence context directly into the TestUtilImpl
+    class. This class was designed a bit differently than some of the others
+    and this approach is our easiest way through this demo with out refactoring
+    the code.
+
+---
+$ cat javaeeExImpl/src/main/java/myorg/javaeeex/blimpl/TestUtilImpl.java
+
+...
+import javax.inject.Inject;
+...
+import myorg.javaeeex.cdi.JavaeeEx;
+...
+public class TestUtilImpl implements TestUtil {
+   ...
+
+    @Inject @JavaeeEx
+    protected EntityManager em;
+---
+
+    [[1]] Inject the business logic classes directly into the EJBs and
+    remove all the setup code in the @PostConstruct methods. You also no 
+    longer need the EntityManager injected directly into the EJBs since
+    they do not access it and it is being injected directly into the DAOs
+    by CDI -- nice!!
+
+---
+$ cat javaeeExImpl/src/main/java/myorg/javaeeex/blimpl/TestUtilImpl.java
+
+...
+@Stateless
+public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
+    ...
+    @Inject
+    private Registrar registrar;
+
+    //@Inject @Named("javaeeEx")
+    //private EntityManager em;
+
+    @PostConstruct
+    public void init() {
+        try {
+            log.debug("**** init ****");
+            //log.debug("em=" + em);
+            //PersonDAO dao = new JPAPersonDAO();
+            //((JPAPersonDAO)dao).setEntityManager(em);
+
+            //registrar = new RegistrarImpl();
+            //((RegistrarImpl)registrar).setDAO(dao);
+            log.debug("init complete, registrar=" + registrar);
+        }
+---
+---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilEJB.java
+
+...
+@Stateless
+public class TestUtilEJB implements TestUtilRemote {
+     ...
+    //@Inject @JavaeeEx
+    //private EntityManager em;
+
+    @Inject
+    private TestUtil testUtil;
+
+    @PostConstruct
+    public void init() {
+        log.info(" *** TestUtilEJB:init() ***");
+        //testUtil = new TestUtilImpl();
+        //((TestUtilImpl)testUtil).setEntityManager(em);
+    }
+---
+
+    [[1]] Attempt to build, deploy and test your solution. Remember to
+    include the javaeeExImpl module as part of the build. Unfortunately it
+    will fail.  The reason it fails to locate the business logic classes
+    to inject into the EJB is because we have no @Produces factory in
+    the EJB and we have no beans.xml in the javaeeExImpl module for the
+    module promote its classes to beans by itself.
+
+---
+$ mvn clean install
+...
+---
+---
+WELD-001408 Unsatisfied dependencies for type [TestUtil] with qualifiers [@Default] at injection point 
+[[field] @Inject private myorg.javaeeex.ejb.TestUtilEJB.testUtil]
+
+WELD-001408 Unsatisfied dependencies for type [Registrar] with qualifiers [@Default] at injection point 
+[[field] @Inject private myorg.javaeeex.ejb.RegistrarEJB.registrar]
+---
+
+    [[1]] Add a beans.xml to the javaeeExImpl module.
+
+---
+$ touch javaeeExImpl/src/main/resources/META-INF/beans.xml
+jcstaff@ubuntu:~/proj/exercises/javaeeEx$ tree javaeeExImpl/src/main/resources
+javaeeExImpl/src/main/resources
+`-- META-INF
+    |-- beans.xml
+        `-- orm.xml
+---
+
+    [[1]] Rebuild the Impl module and redeploy the application. All tests should 
+    run successfully.
+
+---
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+
+...
+[INFO] Java EE Exercise .................................. SUCCESS [0.589s]
+[INFO] Java EE Exercise Impl ............................. SUCCESS [15.685s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.647s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.876s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [11.196s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+
+* Summary
+
+    * In this exercise, we demonstrated and worked through the transition
+    from an EJB-centric and limited injection framework to a more generic
+    and much more capable framework using CDI. This exercise only touched 
+    the surface of what we can do with CDI, but hopfully it showed how 
+    true POJO classes can be easily made to be CDI beans, injected with
+    required resources, and have the needs of lower level helper classes
+    hidden from containing classes.
+
+    * At the conclusion of this exercise your tree should look like the following
+
+---
+|-- javaeeExEJB                                                                                                                                        
+|   |-- pom.xml
+|   |-- src
+|   |   `-- main
+|   |       |-- java
+|   |       |   `-- myorg
+|   |       |       `-- javaeeex
+|   |       |           |-- cdi
+|   |       |           |   `-- ResourceConfig.java
+...
+|   |       |           `-- ejb
+|   |       |               |-- RegistrarEJB.java
+|   |       |               |-- RegistrarLocal.java
+|   |       |               |-- RegistrarRemote.java
+|   |       |               |-- TestUtilEJB.java
+|   |       |               `-- TestUtilRemote.java
+|   |       `-- resources
+|   |           `-- META-INF
+|   |               |-- beans.xml
+|   |               `-- persistence.xml
+|-- javaeeExImpl
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   |-- java
+|       |   |   `-- myorg
+|       |   |       `-- javaeeex
+...
+|       |   |           |-- blimpl
+|       |   |           |   |-- RegistrarImpl.java
+|       |   |           |   `-- TestUtilImpl.java
+...
+|       |   |           |-- cdi
+|       |   |           |   `-- JavaeeEx.java
+...
+|       |   |           `-- jpa
+|       |   |               |-- DBUtil.java
+|       |   |               `-- JPAPersonDAO.java
+|       |   `-- resources
+|       |       `-- META-INF
+|       |           |-- beans.xml
+|       |           `-- orm.xml
+...
+---

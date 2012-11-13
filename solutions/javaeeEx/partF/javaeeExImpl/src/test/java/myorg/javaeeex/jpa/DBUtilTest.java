@@ -6,9 +6,9 @@ import org.junit.Test;
 
 public class DBUtilTest extends DemoBase {
     private String dropPath = 
-    	System.getProperty("dropPath", "ddl/javaeeExImpl-drop.ddl");
+    	System.getProperty("dropPath", "ddl/javaeeExImpl-dropJPA.ddl");
     private String createPath = 
-    	System.getProperty("createPath", "ddl/javaeeExImpl-create.ddl");
+    	System.getProperty("createPath", "ddl/javaeeExImpl-createJPA.ddl");
     private DBUtil dbUtil;
     
     @Override
