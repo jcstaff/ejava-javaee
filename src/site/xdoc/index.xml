@@ -29,8 +29,8 @@
       <!--
           <li>2012-05-02: Posted Async TODOs</li>
           <li>2012-04-25: Posted JMS materials</li>
-          <li>2012-04-17: Posted Security Updates</li>
           -->
+          <li>2012-11-14: Posted Security Updates</li>
           <li>2012-11-10: Added javaeeEx.partG - Handling WAR/EJB Interface Issues exercise</li>
           <li>2012-11-10: Added javaeeEx.partF - WAR Project exercise</li>
           <li>2012-11-08: Added javaeeEx.partE - CDI exercise</li>
@@ -83,31 +83,55 @@
           The Ant script can be part of either the BLImpl or RMI Test
           project. See class examples on how write the Ant script.</li>
       </ul></li>
+      -->
       <li><ul>
           <li>Complete your project 2, finish testing, and turn in.</li>
-
           <li>Start project 3</li>
-          <li>Add user.properties and roles.properties to eLeague project</li>
-          <li>Assign EJB to security-domain "other".
-          The RMI Tests should fail access at this point.</li>
-
-          <li>Specify required roles to access each EJB method</li>
-          <li>Add a java.security.auth.login.config to the RMI Test client</li>
-          <li>Add a LoginContext with a CallbackHandler. The RMI Tests should 
-          be able to access the EJB methods they are authorized to access.
-          You should have at least one test that verifies an unauthorized
-          user is refused access.</li>
-          <li>Assign WAR to security-domain "java:/jaas/other"</li>
-          <li>Add security-constraint elements to the WAR web.xml. The 
-          user should be prompted for a login at this point and be able to
-          access web pages and EJB methods that they are authorized for
-          and be refused access to what they are un-authorized to access</li>
-          <li>Eliminate access to any information or option the user does
-          not have access to see or use</li>
-          <li>Eliminate the passing of userId information when the appropriate
-          means is to obtain through the EJB or WARs security context.</li>
+          <li>EJB
+              <ul>
+                  <li>Assign EJB to security-domain "other".
+                  The RMI Tests should fail access at this point.</li>
+                  <li>Specify required roles to access each EJB method</li>
+              </ul>
+          </li>
+          <li>Application Server
+              <ul>
+                  <li>Add the necessary users and roles to your application server.
+                  (This will likely be made available in a later update to the class 
+                  example repository)</li>
+              </ul>
+          </li>
+          <li>Integration Tests
+              <ul>
+                  <li>Add the necessary logins to your existing integration tests
+                  to allow them to pass again.</li>
+                  <li>Author at least one new test to demonstrate you have security
+                  enabled</li>
+              </ul>
+          </li>
+          <li>WAR
+              <ul>
+                  <li>Assign WAR to security-domain "other"</li>
+                  <li>Add security-constraint elements to the WAR web.xml. The 
+                  user should be prompted for a login at this point and be able to
+                  access web pages and EJB methods that they are authorized for
+                  and be refused access to what they are un-authorized to access</li>
+                  <li>Eliminate access to any information or option the user does
+                  not have access to see or use</li>
+              </ul>
+          </li>
+          <li>Overall
+              <ul>
+                  <li>Eliminate the passing of userId information when the appropriate
+                  means is to obtain through the EJB or WARs security context.</li>
+              </ul>
+          </li>
       </ul></li>
-      -->
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
       <li><ul>
           <li>Look over Web UI parts of the ejbsessionBank.</li>
           <li>Go through Web UI parts of the JavaEE exercise (will post by weekend).</li>
@@ -126,11 +150,6 @@
           being used as a remote facade. You may use either technique 
           for eMayberry. eDmv should use RMI.</li>
       </ul></li>
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
       <li><ul>
           <li>Begin adding the other session beans, remote interfaces,
           business logic integration, and RMI tests for project 2.</li>
