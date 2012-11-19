@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<jboss:ejb-jar
+    xmlns:jboss="urn:jboss:domain:ejb3:1.2"
+    xmlns:sec="urn:security"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd
+        urn:security urn:security"
+    version="3.1"
+    impl-version="2.0">
+    <assembly-descriptor>
+        <sec:security>
+            <ejb-name>*</ejb-name>
+            <sec:security-domain>other</sec:security-domain>
+        </sec:security>
+    </assembly-descriptor>
+</jboss:ejb-jar>

@@ -1,32 +1,31 @@
 Java EE Exercise 
 
-Part F: Securing the EJB Tier and RMI Interface
+Part H: Securing the EJB Tier and RMI Interface
 
     This exercise will step through the setup of security authentication
     and authorization for the EJB Tier and access through an RMI client.
     We will use simple credentials (username and password) and a simple
-    credential and role store (property file). Once we have the application
-    updated, integrated, and working with the simple approach -- more 
-    advance techniques (e.g., PKI certs, RDBMS or LDAP for credential 
-    storage) can be added without impacting the core of the application.
+    credential and role store (property files) for the duration of the
+    exercise. Once we have the application updated, integrated, and
+    working with the simple approach -- more advance techniques (e.g.,
+    PKI certs, RDBMS or LDAP for credential storage) can be added without
+    impacting the core of the application.
 
 * Objectives
 
-    * Lock down the EJB
+    * Poke around the Application Server
 
-        * {{{Associate_the_EJB_with_a_Security_Domain}
-            Associate the EJB with a Security Domain
+        * {Verify_Server_has_Required_Users_and_Roles}
+           Verify Server has Required Users and Roles
         }}
+
+    * Lock down the EJB
 
         * {{{Define_Role_Access_Restrictions}
             Define Role Access Restrictions
         }}
 
     * Enable access from the RMI Client
-
-        * {{{Configure_Client_Login_Module}
-            Configure Client Login Module
-        }}
 
         * {{{Implement_Client_Login}
             Implement Client Login
@@ -39,203 +38,281 @@ Part F: Securing the EJB Tier and RMI Interface
         }}
 
         
+* {Verify Server has Required Users and Roles}
 
-* {Associate the EJB with a Security Domain}
+    We will be using a built-in security domain that comes with
+    the application server by default. The security domain 
+    is powered by a set of property files witin the JBOSS_HOME/standalone/configuration
+    directory. Your server should already be setup with the required
+    accounts and roles but look through the following steps
+    for how that was done or if you ever want to create new
+    accounts for your project(s).
 
-    In order to associate our application with a security domain, we need
-    to define an application policy within the server and configure it
-    for the users and roles we expect to encounter. Roles are typically
-    known up front during the design of the application. Users are
-    typically added by an administration task during the lifetime of
-    the application.
+    [[1]] Verify if your application server has required users/roles
+    defined that are required to complete the exercise.
 
-    To start things out simple, we will leverage a built-in application
-    policy within JBoss called "other". The fact that it is built-in
-    to the factory JBoss configuration will make our project very
-    portable to other development environments. The "other" security
-    domain also happens to be the default security domain name with
-    JBoss. If you specify no security domain, your application will
-    not use security. If you specify "other" or specificy an incorrect
-    security domain, "other" will be used.  (i.e., whether you define
-    it right or wrong -- you will default to "other")
+---
+$ cat .../standalone/configuration/application-users.properties
+...
+known=3745b3f6973383c9c11810c7b200b1f4
+user1=2dc3eacfed8cf95a4a31159167b936fc
+admin1=2ae76a0e3f0b615a6229c880555273b5
+...
+---
 
-    The factory definition for the "other" application policy is based
-    on a set of property files. This is fine for roles, but will be
-    very static for users. The administrative steps for adding a user
-    will require a re-deploy of the property files and we will 
-    design this exercise to provide the property files within the 
-    EAR we deploy to the server. This is not ideal for production,
-    but is enough to get beyond the server-specifics and move on
-    to the JavaEE aspects of securing the application.
+    [[1]] If the above users (known, user1, and admin1) are missing,
+    add them with the following command.
+
+        * known - role: (no roles)
+
+        * user1 - role: user
+
+        * admin1 - role: admin,user (no space)
+
+---
+$ /opt/jboss-as-7.1.1.Final/bin/add-user.sh 
+
+What type of user do you wish to add? 
+ a) Management User (mgmt-users.properties) 
+ b) Application User (application-users.properties)
+(a): b
+
+Enter the details of the new user to add.
+Realm (ApplicationRealm) : 
+Username : admin1
+Password : 
+Re-enter Password : 
+What roles do you want this user to belong to? (Please enter a comma separated list, or leave blank for none) : admin,user
+About to add user 'admin1' for realm 'ApplicationRealm'
+Is this correct yes/no? yes
+Added user 'admin1' to file '/opt/jboss-as-7.1.1.Final/standalone/configuration/application-users.properties'
+Added user 'admin1' to file '/opt/jboss-as-7.1.1.Final/domain/configuration/application-users.properties'
+Added user 'admin1' with roles admin,user to file '/opt/jboss-as-7.1.1.Final/standalone/configuration/application-roles.properties'
+Added user 'admin1' with roles admin,user to file '/opt/jboss-as-7.1.1.Final/domain/configuration/application-roles.properties'
+---
 
     [[1]] Look at the definition for the "other" security domain within 
-    the login-config.xml for your server. Notice the following
+    the standalone.xml for your server. Notice the following. 
 
-        * the users will be authenticated against a property file
-        called users.properties
-        * roles will be checked against a property file called
-        roles.properties
-        * there is no unauthenticatedIdentity defined at the 
-        application policy level, so we can specify this value as 
-        a part of our deployed application.
+        * authentication - contain login-modules used to authenticate
+        users
+
+        * login-module(s) - contain a specific strategy for 
+        authentication and a flag property about its significance to 
+        the overall authentication
+    
+            * optional - module is not required to succeed.
+
+            * sufficient - module not required to succeed but if it does
+            the authentication process will stop.
+
+            * required - must succeed for authentication to be successful.
+            Continues through other modules whether successful or not.
+            This means that a downstream authenticator may overrule a 
+            success here with a later faliure (e.g., revocation).
+
+            * requisite - must succeed for authentication to be successful.
+            Stops going through other modules on failue.
+
+        * RealmUsersRoles login-module
+
+            * the users will be authenticated against a property file
+            called application-users.properties
+
+            * roles will be checked against a property file called
+            application-roles.properties
+
+            * there is no unauthenticatedIdentity defined at the 
+            application policy level, so we can specify this value as 
+            a part of our deployed application.
+
+        * code - The code attribute in the login-module element is
+        either the fully qualified class name of a custom login module
+        or a short name for a LoginModule usually with the picketbox
+        {{{http://anonsvn.jboss.org/repos/picketbox/tags/4.0.7.Final/security-jboss-sx/jbosssx/src/main/java/org/jboss/security/auth/spi/}
+        org.jboss.security.auth.spi}} package or jboss-as
+        {{{https://github.com/jbossas/jboss-as/tree/master/security/src/main/java/org/jboss/as/security}
+        jboss.as.security}} extensions. Picketbox is a security 
+        project within JBoss who's use extends beyond JavaEE and
+        use within JBoss.
+
+        * (other information is harder to track down...) 
 
 ---
-$ cd $JBOSS_HOME/server
-$ cat ejava-jboss6/conf/login-config.xml
+$ cd $JBOSS_HOME
+$ cat standalone/configuration/standalone.xml
 
 ...
-  <!-- The default login configuration used by any security domain that
-  does not have a application-policy entry with a matching name
-  -->
-  <application-policy name="other">
-    <!-- A simple server login module, which can be used when the number
-    of users is relatively small. It uses two properties files:
-    users.properties, which holds users (key) and their password (value).
-    roles.properties, which holds users (key) and a comma-separated list of
-    their roles (value).
-    The unauthenticatedIdentity property defines the name of the principal
-    that will be used when a null username and password are presented as is
-    the case for an unuathenticated web client or MDB. If you want to
-    allow such users to be authenticated add the property, e.g.,
-    unauthenticatedIdentity="nobody"
-    -->
+<security-domain name="other" cache-type="default">
     <authentication>
-      <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule"
-        flag="required"/>
+        <login-module code="Remoting" flag="optional">
+            <module-option name="password-stacking" value="useFirstPass"/>
+        </login-module>
+        <login-module code="RealmUsersRoles" flag="required">
+            <module-option name="usersProperties" value="${jboss.server.config.dir}/application-users.properties"/>
+            <module-option name="rolesProperties" value="${jboss.server.config.dir}/application-roles.properties"/>
+            <module-option name="realm" value="ApplicationRealm"/>
+            <module-option name="password-stacking" value="useFirstPass"/>
+        </login-module>
     </authentication>
-  </application-policy>
+</security-domain>
 ---
 
-    [[1]] Notice at this point the "other" application policy is not in use
-    and is not listed in the JNDI tree under "jaas"
-
-        * open {{http://localhost:8080/jmx-console/}} in a browser
-
-        * click on service=JNDIView
-
-        * click on list->Invoke
-
----
-java: Namespace
-
-  +- securityManagement (class: org.jboss.security.integration.JNDIBasedSecurityManagement)
-...
-  +- ejavaDS (class: org.jboss.resource.adapter.jdbc.WrapperDataSource)
-...
-  +- DefaultDS (class: org.jboss.resource.adapter.jdbc.WrapperDataSource)
-...
-  +- jaas (class: javax.naming.Context)
-  |   +- hornetq (class: org.jboss.security.plugins.SecurityDomainContext)
-...
----
-
-    [[1]] Associate the EJB with the "other" application policy using
-    a security-domain element within META-INF/jboss.xml
+    [Note:] The 
+    {{{https://access.redhat.com/knowledge/docs/en-US/JBoss_Enterprise_Application_Platform/5/html/Security_Guide/Security_Domain_Authorization.html}
+    JBoss AS 5 authentication documentation}}
+    states that in the absence of a specified security-domain, the
+    jboss-web-policy and ejb-ejb-policy will be used as a default. Notice
+    they factory-provided defaults to not include authentication as a
+    part of these two defaults. That is why your earlier EJB-RMI and
+    Web-based accesses have been able to operate using anonymous access
+    to the application so far.
 
 ---
-$ cat javaeeExEJB/src/main/resources/META-INF/jboss.xml
+                <security-domain name="jboss-web-policy" cache-type="default">
+                    <authorization>
+                        <policy-module code="Delegating" flag="required"/>
+                    </authorization>
+                </security-domain>
+                <security-domain name="jboss-ejb-policy" cache-type="default">
+                    <authorization>
+                        <policy-module code="Delegating" flag="required"/>
+                    </authorization>
+                </security-domain>
+---
 
-ss
-    xmlns="http://www.jboss.com/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation ="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss_5_1.xsd"
-    version="5.1">
+    [Note:] The application-users.properties is used in two or more places. In addition
+    to being used to authenticate a user accessing out application as addressed above,
+    the server comes configured to use the same application-users.properties file to 
+    define authentication into the ApplicationRealm.
 
-    <security-domain>other</security-domain>
+---
+    <management>
+        <security-realms>
+            <security-realm name="ManagementRealm">
+                <authentication>
+                    <properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/>
+                </authentication>
+            </security-realm>
+            <security-realm name="ApplicationRealm">
+                <authentication>
+                    <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
+                </authentication>
+            </security-realm>
+        </security-realms>
+        ...
+    </management>
+---
 
-    <enterprise-beans>
-        <session>
-            <ejb-name>RegistrarEJB</ejb-name>
+    That ApplicationRealm is the assigned security-realm of the
+    remoting-connector which we use for the RMI communications we have
+    used to date.
+
+---
+        <subsystem xmlns="urn:jboss:domain:remoting:1.1">
+            <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
+        </subsystem>
+---
+
+    That is why you needed to add a valid username/password to your
+    jndi.properties file. This allowed you to authenticate access
+    to the server prior to advancing to the individual application.
+
+---
+$ cat javaeeextest/src/test/resources/jndi.properties
+...
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
 ...
 ---
 
-    [[1]] Build and deploy your application. The RMI Tests will fail at this
-    point because we have enabled security but have not allowed any accessors.
+---
+$ cat javaeeextest/target/test-classes/jndi.properties
+...
+java.naming.security.principal=known
+java.naming.security.credentials=password
+...
+---
+
+    []
+
+
+    [[1]] As an optional experiment with security-realm option --
+    comment out the principal and credentials properties within
+    jndi.properties.
 
 ---
-$ mvn clean install -rf :javaeeExEJB
-
+$ cat javaeeextest/src/test/resources/jndi.properties
 ...
- tests run: 6, Failures: 0, Errors: 6, Skipped: 0
+#java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+#java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+...
+---
 
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [15.752s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [7.492s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [2.363s]
-[INFO] Java EE Exercise Remote Test ...................... FAILURE [45.424s]
+    [[1]] Re-deploy and re-test your application. This will fail because of the 
+    assigned security-realm for the remoting-connector. 
+
+---
+$ mvn clean verify -rf :javaeeExTest
+
+Tests in error: 
+  testPing(myorg.javaeeex.ejbclient.RegistrarIT): Failed to create remoting connection
+  testCreatePerson(myorg.javaeeex.ejbclient.RegistrarIT): Failed to create remoting connection
+  testLazy(myorg.javaeeex.ejbclient.RegistrarIT): Failed to create remoting connection
+  testPOJO(myorg.javaeeex.ejbclient.RegistrarIT): Failed to create remoting connection
+  testDTOs(myorg.javaeeex.ejbclient.RegistrarIT): Failed to create remoting connection
+  testWebUseCase(myorg.javaeeex.ejbclient.RegistrarIT): Failed to create remoting connection
+
+Tests run: 6, Failures: 0, Errors: 6, Skipped: 0
+...
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
+---
+---
+./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarIT.txt
+::::::::::::::
+ -------------------------------------------------------------------------------
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
+ -------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 6, Skipped: 0, Time elapsed: 0.934 sec <<< FAILURE!
+testPing(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 0.472 sec  <<< ERROR!
+javax.naming.NamingException: Failed to create remoting connection [Root exception is java.lang.RuntimeException: javax.security.sasl.SaslException: Au
+thentication failed: all available authentication mechanisms failed]
+        at org.jboss.naming.remote.client.ClientUtil.namingException(ClientUtil.java:36)
+        at org.jboss.naming.remote.client.InitialContextFactory.getInitialContext(InitialContextFactory.java:121)
+        at javax.naming.spi.NamingManager.getInitialContext(NamingManager.java:684)
+        at javax.naming.InitialContext.getDefaultInitCtx(InitialContext.java:305)
+        at javax.naming.InitialContext.init(InitialContext.java:240)
+        at javax.naming.InitialContext.<init>(InitialContext.java:192)
+        at myorg.javaeeex.ejbclient.RegistrarIT.setUp(RegistrarIT.java:39)
+---
 
+    [[1]] Remove the security-realm attribute from the remoting-connector and re-run your
+    tests. They should now pass again without the principal and credentials since
+    neither the remoting-connector and your application require authentication at this
+    time.
+
+---
+$ cat standalone/configuration/standalone.xml
 ...
- ------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
- ------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 6, Skipped: 0, Time elapsed: 6.596 sec <<< FAILURE!                                
-testPing(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 2.466 sec  <<< ERROR!                                 
-javax.ejb.EJBAccessException: Invalid User
-...
-        at $Proxy13.invoke(Unknown Source)
-        at org.jboss.ejb3.proxy.impl.handler.session.SessionProxyInvocationHandlerBase.invoke(SessionProxyInvocationHa
-ndlerBase.java:193)
-        at $Proxy12.resetAll(Unknown Source)
-        at myorg.javaeeex.ejbclient.RegistrarTest.cleanup(RegistrarTest.java:60)
-
----
-
-    [[1]] If you Re-Invoke the MBean Operation for the JNDI list
-    operation, you should now see the "other" security domain
-    showing up under the "jaas" naming context. This helps us know
-    that we have specified the security domain and partially tells us
-    what is in use.
-
----
-+- jaas (class: javax.naming.Context)
-  |   +- HsqlDbRealm (class: org.jboss.security.plugins.SecurityDomainContext)
-  |   +- hornetq (class: org.jboss.security.plugins.SecurityDomainContext)
-  |   +- other (class: org.jboss.security.plugins.SecurityDomainContext)
----
-
-
-    [[1]] Lets get back to a working application before we add some
-    granularity to the application. The problem with our application at the
-    moment is that our EJBs have no client identity to work from. Lets 
-    enable anonymous access through the jboss.xml deployment descriptor.
-
----
-$ cat javaeeExEJB/src/main/resources/META-INF/jboss.xml
-
-...
-    <security-domain>other</security-domain>
-    <unauthenticated-principal>anonymous</unauthenticated-principal>
+        <subsystem xmlns="urn:jboss:domain:remoting:1.1">
+            <connector name="remoting-connector" socket-binding="remoting"/>
+        </subsystem>
 ...
 ---
-
-    [[1]] Build and deploy the application again. The container should now
-    assign the unauthenticated-principal identity to any client that does
-    not present a client credential.
-
 ---
-$ mvn clean install -rf :javaeeExEJB
+$ mvn verify -rf :javaeeExTest
 
 ...
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
-
 ...
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [11.366s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [6.848s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [2.656s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [48.375s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
 
-    [[1]] Verify the client identity by adding a query of the caller ID
-    within the first EJB invoked -- the TestUtilEJB.
+    [[1]] Observe the unauthenticated identity your application is
+    receiving without supplying credentials. Add a query of the caller
+    ID within the first EJB invoked -- the TestUtilEJB.
 
 ---
 $ cat ./javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilEJB.java
@@ -268,21 +345,83 @@ $ mvn clean install -rf :javaeeExEJB
 
 ...
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
-
 ...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.169s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.553s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.302s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [19.988s]
+[INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
 ---
 //SERVER log
-13:00:00,455 DEBUG [myorg.javaeeex.ejb.TestUtilEJB] caller=guest
-13:00:00,456 DEBUG [myorg.javaeeex.jpa.DBUtil] found 4 statements
-13:00:00,456 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
+20:21:25,024  *** TestUtilEJB:init() ***
+20:21:25,052 caller=anonymous
+20:21:25,061 found 4 statements
+20:21:25,062 executing:
     alter table JAVAEEEX_ADDRESS 
-        drop constraint FKEB70B40A6E18CE38
-13:00:00,458 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
-
-    drop table JAVAEEEX_ADDRESS if exists
+...
 ---
+
+    [Note:] If your server.log output is missing the debug statement
+    above, check that your standalone.xml file has the following set in the
+    logging section.
+
+---
+            <logger category="myorg">
+                <level name="DEBUG"/>
+            </logger>
+---
+
+    []
+
+    [[1]] Put back the security-realm specification and uncomment the principal
+    and credentials in the jndi.properties file. We will use the principal within
+    the jndi.properties file as our default user that can access the application
+    but without assigned roles to do anything.
+
+---
+$ cat .../standalone/configuration/standalone.xml
+
+...
+        <subsystem xmlns="urn:jboss:domain:remoting:1.1">
+            <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
+        </subsystem>
+...
+---
+---
+$ cat javaeeExTest/src/test/resources/jndi.properties
+...
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+...
+---
+
+    [[1]] Rebuild and re-deploy your application to make sure all is 
+    functional before moving on.
+
+---
+$ mvn clean install
+
+...
+[INFO] Java EE Exercise .................................. SUCCESS [0.669s]
+[INFO] Java EE Exercise Impl ............................. SUCCESS [15.644s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.093s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.876s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [2.317s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [15.629s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+    At this point we are a bit more familiar with the security-domains within
+    the application server and how our application has been interacting
+    with these domains in a default way. We know there is an additional
+    security-domain called "other" that can perform authentication based
+    on username and password credentials and we verified that domain 
+    has the accounst we require to continue with the exercise. Now we 
+    need to do some things on our application and client sides.
+
 
 * {Define Role Access Restrictions}
     
@@ -304,434 +443,453 @@ import javax.annotation.security.RolesAllowed;
     @RolesAllowed({"admin"})
     public void resetAll() throws Exception {
 ---
+
+    [[1]] Rebuild and re-test your application. It should still 
+    pass even though the anonymous user is not in the admin role.
+
+---
+$ mvn clean verify -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testCreatePerson
+...
+---
+---
+//SERVER log
+20:31:55,006  *** TestUtilEJB:init() ***
+20:31:55,012 caller=anonymous
+20:31:55,014 found 4 statements
+20:31:55,014 executing:
+    alter table JAVAEEEX_ADDRESS 
+        drop constraint FKEB70B40A6E18CE38
+...
+---
+
+    [[1]] The above still passed because we have not activated security
+    for the application yet. To activate security features, assign your
+    EJB tier to the "other" security domain by adding the following
+    jboss-ejb3.xml file to the META-INF directory.
+
+---
+$ cat javaeeExEJB/src/main/resources/META-INF/jboss-ejb3.xml
+
+<?xml version="1.0"?>
+<jboss:ejb-jar
+    xmlns:jboss="urn:jboss:domain:ejb3:1.2"
+    xmlns:sec="urn:security"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd
+        urn:security urn:security"
+    version="3.1"
+    impl-version="2.0">
+    <assembly-descriptor>
+        <sec:security>
+            <ejb-name>*</ejb-name>
+            <sec:security-domain>other</sec:security-domain>
+        </sec:security>
+    </assembly-descriptor>
+</jboss:ejb-jar>
+---
     
     [[1]] Rebuild and re-deploy your application. It should now
-    fail again. This time not because of an Invalid User -- but
-    an Unauthorized Caller.
+    fail because of an authorization (not authentication -- yet) failure.
 
 ---
-$ mvn clean install -rf :javaeeExEJB
+$ mvn clean verify -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testPing
 
 ...
-Tests run: 6, Failures: 0, Errors: 6, Skipped: 0
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.088 sec <<< FAILURE!
+
+Results :
+
+Tests in error: 
+  testPing(myorg.javaeeex.ejbclient.RegistrarIT): JBAS014502: Invocation on method: public abstract void myorg.javaeeex.bl.TestUtil.resetAll() throws java.lang.Exception of bean: TestUtilEJB is not allowed
+
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
 
 ...
-[INFO] Java EE Exercise Remote Test ...................... FAILURE [37.762s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.888s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.293s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.234s]
+[INFO] Java EE Exercise Remote Test ...................... FAILURE [10.527s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
+---
 
+---
+./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarIT.txt
+::::::::::::::
  -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
  -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 6, Skipped: 0, Time elapsed: 6.545 sec <<< FAILURE!
-testPing(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 2.559 sec  <<< ERROR!
-javax.ejb.EJBAccessException: Caller unauthorized
-...
-        at $Proxy12.resetAll(Unknown Source)
-        at myorg.javaeeex.ejbclient.RegistrarTest.cleanup(RegistrarTest.java:60)
-        at myorg.javaeeex.ejbclient.RegistrarTest.setUp(RegistrarTest.java:55)
+Tests run: 6, Failures: 0, Errors: 6, Skipped: 0, Time elapsed: 1.803 sec <<< FAILURE!
+testPing(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 1.107 sec  <<< ERROR!
+javax.ejb.EJBAccessException: JBAS014502: Invocation on method: public abstract void myorg.javaeeex.bl.TestUtil.resetAll() throws java.lang.Exception o
+f bean: TestUtilEJB is not allowed
+        at org.jboss.as.ejb3.security.AuthorizationInterceptor.processInvocation(AuthorizationInterceptor.java:101)
 ---
 
-    [[1]] Define a user for this application. Since we are using the simple,
-    factory-defined "other" application policy and it is defined to use a set 
-    of propery files, we will add a users.properties with the users of our
-    system. This needs to be in the classpath of the application server. You
-    will find many of these types of files in the config/props directory. We
-    will be placing this one at the root level of the EJB so that it can
-    be conveniently deployed with our application.
-
----
-$ cat javaeeExEJB/src/main/resources/users.properties
-
-#users.properties
-#userId=password
-
-admin1=password
----
-
-    [[1]] Define a mapping of roles to users for this application. Again, since
-    we are using the simple, factory-defined "other" application policy and it
-    is defined to use a set of property files, we will add a roles.properties 
-    with the role mappings for our users. This needs to be in the classpath of 
-    our server and could be placed in the config/props directory, but it will
-    be easier to manage for a prototype if we use the root directory of our EJB.
-
----
-$ cat javaeeExEJB/src/main/resources/roles.properties
-
-#roles.properties
-#user=role1,role2
-
-admin1=admin
----
-
-    Your source tree should look like the following at this point.
-
----
-javaeeExEJB/
-|-- pom.xml
-`-- src
-    `-- main
-        |-- java
-        |   `-- myorg
-        |       `-- javaeeex
-        |           |-- dto
-        |           |   |-- AddressDTO.java
-        |           |   `-- PersonDTO.java
-        |           `-- ejb
-        |               |-- RegistrarEJB.java
-        |               |-- RegistrarLocal.java
-        |               |-- RegistrarRemote.java
-        |               |-- TestUtilEJB.java
-        |               `-- TestUtilRemote.java
-        `-- resources
-            |-- META-INF
-            |   |-- jboss.xml
-            |   `-- persistence.xml
-            |-- roles.properties
-            `-- users.properties
----
-
-    The built EJB .jar file should look like the following, with the 
-    users and roles.properties files in the root of the archive.
-
----
-$ jar tf javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT.jar 
-META-INF/
-META-INF/MANIFEST.MF
-...
-roles.properties
-myorg/javaeeex/ejb/RegistrarEJB.class
-myorg/javaeeex/ejb/TestUtilRemote.class
-myorg/javaeeex/ejb/TestUtilEJB.class
-myorg/javaeeex/ejb/RegistrarRemote.class
-myorg/javaeeex/ejb/RegistrarLocal.class
-myorg/javaeeex/dto/PersonDTO.class
-myorg/javaeeex/dto/AddressDTO.class
-META-INF/persistence.xml
-META-INF/jboss.xml
-users.properties
-...
----
-
-    [Note:] One important point to bring up by placing the security files
-    at the root lovel -- they also end up in your EJB-client.jar file as 
-    well with the current configuration.
-
----
-$ cat javaeeExEJB/pom.xml
-
-...
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-ejb-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    ...
-                    <generateClient>true</generateClient>
-                    <clientExcludes>
-                        <clientExclude>**/META-INF/*.xml</clientExclude>
-                        <clientExclude>**/ejb/*EJB.class</clientExclude>
-                    </clientExcludes>
-                </configuration>
-            </plugin>
-...
----
----
-$ jar tf javaeeExEJB/target/javaeeExEJB-1.0-SNAPSHOT-client.jar 
-...
-roles.properties
-myorg/javaeeex/ejb/TestUtilRemote.class
-myorg/javaeeex/ejb/RegistrarRemote.class
-myorg/javaeeex/ejb/RegistrarLocal.class
-myorg/javaeeex/dto/PersonDTO.class
-myorg/javaeeex/dto/AddressDTO.class
-users.properties
-...
----
-
-    This means that a .jar archive that is meant for your client's 
-    to use contains all roles, users, and their credentials. This 
-    will end up playing in our favor for the class project when 
-    all applications end up deployed to the same server -- so we 
-    will leave it that way for simplicity. However,
-
-        * if you were to use the property file approach, one would
-        normally place the property files at the server level in 
-        config/props and not in the deployed application.
-
-        * if you did want to place the files in the deployed 
-        application but not in the client.jar then you can
-        change the clientExcludes defined for the ejb-plugin.
-
-    []
-
-    If you rebuild and redeploy at this point, the RMI Client will
-    still fail because it is still not authenticating with the 
-    server. However, in this last section, we provided a means
-    for the client to authenticate with the server and be 
-    authorized to access specific resources. In the next section
-    we will setup the client side of the authentication.
-
-* {Configure Client Login Module}
-
-    Our server is setup or the clients to use username/password
-    authentication so now we will setup the client to do the same.
-
-    [[1]] Configure the SecurityManager for the JVM to use a 
-    login module that will provider username and password. This
-    can be done either by straight Java code or by a configuration
-    file.
-
-    The following shows the creation of a javax.security.auth.login.Configuration
-    within the RMI Test Client. The test within @BeforeClass is done just so 
-    we can easily switch between the two configuration methods shown.
-
----
-...
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
-import javax.security.auth.login.Configuration;
-...
-    static Log log = LogFactory.getLog(RegistrarTest.class);
-...
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        ...
-        if (System.getProperty("java.security.auth.login.config")==null) {
-            log.debug("defining security configuration within JVM");
-            Configuration.setConfiguration(new SecurityConfig());
-        }
-        else {
-            log.debug("defining security configuration outside JVM");
-        }
-    }
-
-    public static class SecurityConfig extends Configuration {
-        @Override
-        public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
-            AppConfigurationEntry entry = new AppConfigurationEntry(
-                    "org.jboss.security.ClientLoginModule",
-                    LoginModuleControlFlag.REQUIRED,
-                    new HashMap<String, String>());
-            return new AppConfigurationEntry[] { entry };
-        }
-    }
----
-
-    If you want to setup the Configuration at the JVM level without writing
-    code, you can provide a definition file and set a Java system property
-    to read that configuration file. 
-
-    The property file is defined within the src/test/resources directory of 
-    the RMI Client.
-
----
-$ cat javaeeExTest/src/test/resources/security-config.conf
-
-mySecurityConfig {
-    org.jboss.security.ClientLoginModule  required;
-};
----
-
-    The system property is defined within the surefire configuration.
-
----
-$ cat javaeeExTest/pom.xml
-
-...
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <systemPropertyVariables>
-                        <jndi.name.registrar>myorg/javaeeEx/RegistrarEJB/remote</jndi.name.registrar>
-                        <jndi.name.testUtil>myorg/javaeeEx/TestUtilEJB/remote</jndi.name.testUtil>
-                        <java.security.auth.login.config>
-                           file://${basedir}/target/test-classes/security-config.conf
-                        </java.security.auth.login.config>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-...
----
-
-    [[1]] Define a class that will accept the Java Security Callbacks
-    for credential information during login.
-
----
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/BasicCallbackHandler.java
-
-package myorg.javaeeex.ejbclient;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
-import org.apache.log4j.Logger;
-
-public class BasicCallbackHandler implements CallbackHandler {
-    Logger log = Logger.getLogger(BasicCallbackHandler.class);
-    private String name;
-    private char[] password;
-
-    public BasicCallbackHandler() {}
-    public BasicCallbackHandler(String name, char[] password) {
-        setName(name);
-        setPassword(password);
-    }
-    public BasicCallbackHandler(String name, String password) {
-        setName(name);
-        setPassword(password);
-    }
-    public void setName(String name) { this.name = name; }
-    public void setPassword(String password) {
-        this.password = new char[password.length()];
-        password.getChars(0,this.password.length, this.password,0);
-    }
-    public void setPassword(char[] password) {
-        this.password = new char[password.length];
-        System.arraycopy(password,0,this.password,0,this.password.length);
-    }
-
-    public void handle(Callback[] callbacks)
-        throws UnsupportedCallbackException {
-
-        for (Callback cb : callbacks) {
-            if (cb instanceof NameCallback) {
-                log.debug("name callback:" + name);
-                ((NameCallback)cb).setName(name);
-            }
-            else if (cb instanceof PasswordCallback) {
-                log.debug("password callback:" + new String(password));
-                ((PasswordCallback)cb).setPassword(password);
-            }
-            else {
-                log.debug("unknown callback");
-                throw new UnsupportedCallbackException(cb);
-            }
-        }
-    }
-}
----
-
-    [[1]] Define the admin user credentials for the project.
-
----
-$ cat javaeeExTest/pom.xml
-
-...
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <systemPropertyVariables>
-                        <jndi.name.registrar>myorg/javaeeEx/RegistrarEJB/remote</jndi.name.registrar>
-                        <jndi.name.testUtil>myorg/javaeeEx/TestUtilEJB/remote</jndi.name.testUtil>
-                        <java.security.auth.login.config>
-                           file://${basedir}/target/test-classes/security-config.conf
-                        </java.security.auth.login.config>
-
-                        <admin.user>admin1</admin.user>
-                        <admin.password>password</admin.password>
-
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-...
----
-
-    [[1]] Read in the admin user credentials into the client program
-
----
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
-
-...
-public class RegistrarTest {
-    
-...
-    static final String adminUser = System.getProperty("admin.user");
-    static final String adminPassword = System.getProperty("admin.password");
-...
-
-    @Before
-    public void setUp() throws Exception {
-...
-        assertNotNull("admin.user not supplied", adminUser);
-        assertNotNull("admin.password not supplied", adminPassword);
-    }
----
-
-    At this point, the client JVM is configured to authenticate. Next we will
-    implement the client login.
+    At this point we can now protect our methods from being accessed
+    by unauthorized callers. Next we will provide a means to authenticate
+    authorized users.
 
 * {Implement Client Login}
 
-    [[1]] Create a LoginContext within the RMI Test for the admin methods to 
-    use. 
+    [[1]] Define the admin user credentials for the client to use. We can pass them thru the 
+    failsafe (not surefire -- this in an integration test) plugin as follows.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/pom.xml
 
 ...
-import javax.security.auth.login.LoginContext;
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.argLine}</argLine>
+                    <systemPropertyVariables>
+                        <admin.user>admin1</admin.user>
+                        <admin.password>password</admin.password>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+...
+---
 
+    [[1]] Read in the admin user credentials into the client program but also 
+    define a reasonable default within the JUnit test so that we can run the 
+    integration test within Eclipse -- outside of maven during development.
+    Although maven can create a very robust testbed, you will want to the ability
+    to do something by default right within Eclipse without maven.
+
+---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
+
+public class RegistrarIT {
 ...
-public class RegistrarTest {
+    private static final String adminUser = System.getProperty("admin.user", "admin1");
+    private static final String adminPassword = System.getProperty("admin.password", "password");
 ...
-    LoginContext adminCtx;
-...
+
     @Before
     public void setUp() throws Exception {
-    ...
-        adminCtx = new LoginContext("mySecurityConfig", 
-                new BasicCallbackHandler(adminUser, adminPassword));
-
-        cleanup();
+...
+        log.debug(String.format("admin= %s/%s", adminUser, adminPassword));
+...
     }
 ---
-    
-    [[1]] Login as the admin prior to calling resetAll().
+
+    [[1]] Add a helper method that will perform login with JNDI and return a 
+    JNDI Context associated with the provided credentials. Note that the 
+    Context.SECURITY_PRINCIPAL and CREDENTIALS are the properties we worked
+    with earlier in the jndi.properties file.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+import java.util.Properties;
+import javax.naming.NamingException;
+...
+
+    private Context runAs(String username, String password) throws NamingException {
+        if (jndi!=null) {
+        	jndi.close();
+        }
+        Properties env = new Properties();
+        if (username != null) {
+            env.put(Context.SECURITY_PRINCIPAL, username);
+            env.put(Context.SECURITY_CREDENTIALS, password);
+        }
+        log.debug(String.format("%s env=%s", username==null?"anonymous":username, env));
+        jndi=new InitialContext(env);
+        return jndi;
+    }
+---
+
+    [[1]] Change the object-level jndi variable from an InitialContext to a 
+    Context type so that we do not run into type issues when using the 
+    runAs() helper method.
+
+---
+import javax.naming.Context;
+...
+    private Context jndi;
+---
+
+    [[1]] Replace all existing "new InitialContext()" calls with 
+    "runAs(null, null)".
+
+---
+        log.debug("getting jndi initial context");
+        jndi = runAs(null, null);
+        log.debug("jndi=" + jndi.getEnvironment());
+        jndi.lookup("/"); //do a quick comms check of JNDI
+---
+
+    [[1]] Add an @After method to close the InitialContext that 
+    may be open at the end of the test. I have found that if I do
+    not do that -- the threaded aspect of JBoss remoting seems to
+    get a little lost and erratic.
+
+---
+    /**
+     * It is important to close the JNDI context in between tests
+     */
+    @After
+    public void tearDown() throws NamingException {
+    	if (jndi != null) {
+    		jndi.close();
+    		jndi=null;
+    	}
+    }
+---
+
+    [[1]] Authenticate as admin1 just prior to calling
+    resetAll() and then revert the identity back to the 
+    default before leaving the cleanup method. 
+
+---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
     protected void cleanup() throws Exception {
-        adminCtx.login();
-        try {
-            log.info("calling testUtil.resetAll()");
-            testUtil.resetAll();
-            log.info("testUtil.resetAll() complete");
-        }
-        finally {
-            adminCtx.logout();
-        }
-        
+        log.info("calling testUtil.resetAll()");
+        runAs(adminUser, adminPassword);
+        testUtil.resetAll();
+        runAs(null, null);
+        log.info("testUtil.resetAll() complete");
     }
 ...
+---
+
+    [[1]] If you rebuild and re-deploy your solution at this 
+    point it will continue to fail. We will work to figure
+    out the problem and fix.
+
+---
+$ mvn clean verify -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testPing
+
+...
+Tests in error: 
+  testPing(myorg.javaeeex.ejbclient.RegistrarIT): JBAS014502: Invocation on method: public abstract void myorg.javaeeex.bl.TestUtil.resetAll() throws java.lang.Exception of bean: TestUtilEJB is not allowed
+
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [5.868s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.353s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.426s]
+[INFO] Java EE Exercise Remote Test ...................... FAILURE [12.136s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+---
+
+    [[1]] Temporarily comment out the @RolesAllowed restriction on
+    resetAll() to view the caller identity calling the EJB. Notice that the 
+    admin1 credential did not get passed or used by the server. We still
+    have the principal from the jndi.properties being used.
+
+---
+$ mvn clean verify -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testPing
+...
+---
+---
+//SERVER log
+12:21:44,265  *** TestUtilEJB:init() ***
+12:21:44,272 caller=known
+12:21:44,274 found 4 statements
+---
+
+    [[1]] Perminently comment out the principal and credentials from the
+    jndi.properties file.
+
+---
+...
+#java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+#java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+...
+---
+
+    [[1]] Add the known credentials to the pom failsafe configuration.
+
+---
+$ cat javaeeExTest/pom.xml
+
+...
+                    <systemPropertyVariables>
+                        <known.user>known</known.user>
+                        <known.password>password</known.password>
+                        <admin.user>admin1</admin.user>
+                        <admin.password>password</admin.password>
+                    </systemPropertyVariables>
+...
+---
+
+    [[1]] Add the assignment of the known credentials to java variables
+    within the integration test. Go ahead and define a defaul value
+    that should work in most development cases so that the integration
+    test can be launched outside of maven.
+
+---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
+...
+    private static final String knownUser = System.getProperty("known.user", "known");
+    private static final String knownPassword = System.getProperty("known.password", "password");
+...
+---
+
+    [[1]] Create a second helper method called "runAs()" that will revert to 
+    the default/known user.
+
+---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
+
+...
+    private Context runAs() throws NamingException {
+        return runAs(knownUser, knownPassword);
+    }
+...
+---
+
+    [[1]] Replace all calls to "runAs(null, null)" to "runAs()".
+
+---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
+
+...
+        log.debug("getting jndi initial context");
+        jndi = runAs();
+        log.debug("jndi=" + jndi.getEnvironment());
+        jndi.lookup("/"); //do a quick comms check of JNDI
+...
+    protected void cleanup() throws Exception {
+        log.info("calling testUtil.resetAll()");
+        runAs(adminUser, adminPassword);
+        testUtil.resetAll();
+        runAs();
+        log.info("testUtil.resetAll() complete");
+    }
+---
+
+    [[1]] Rebuild and re-test your application. Notice that the TestUtilEJB
+    should now report the caller is admin1.
+
+---
+$ mvn clean verify -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testPing
+
+...
+---
+//SERVER log
+12:44:54,229  *** TestUtilEJB:init() ***
+12:44:54,232 caller=admin1
+12:44:54,233 found 4 statements
+---
+
+    [[1]] Re-add the @RolesAllowed restriction to TestUtilEJB.
+
+---
+$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilEJB.java
+
+...
+    @RolesAllowed({"admin"})
+    public void resetAll() throws Exception {
+---
+
+    [[1]] If you rebuild, re-deploy, and retest your application
+    it should correctly authenticate and authorize the call to 
+    resetAll().
+
+---
+$ mvn clean install -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testPing
+
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.067s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.389s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.692s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [12.944s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+
+    [Note:] After each change to the EJB I am changing the command
+    from an "verify -rf :javaeeExTest" or "install -rf :javaExEJB" to
+    go all the way back and rebuild the EJB and EAR as well as to 
+    place their implementation in the local repository for future
+    commands where I simply issue a "verify -rf :javaeeExTest" and
+    deploy the previous EAR and EJB to the server. If you are not 
+    careful to install the latest EJB/EAR change into the repository
+    you could be working with an older implementation.
+
+    []
+
+
+    [[1]] Temporarily munge the admin password to verify our security setup
+    is working.
+
+---
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
+
+...
+    protected void cleanup() throws Exception {
+        ...
+        runAs(adminUser, "badpass");
+        ...
+    }
+...
+---
+
+    [[1]] Observe that in the details of the error message it states that we failed to
+    authenticate. Great! that's what we wanted.
+
+---
+$ mvn clean verify -rf :javaeeExEJB -Dit.test=myorg.javaeeex.ejbclient.RegistrarIT#testPing
+
+...
+ -admin1 env={java.naming.security.principal=admin1, java.naming.security.credentials=badpass}
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.06 sec <<< FAILURE!
+
+Results :
+
+Tests in error: 
+  testPing(myorg.javaeeex.ejbclient.RegistrarIT): Failed to create remoting connection
+
+...
+[INFO] BUILD FAILURE
+---
+---
+./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarIT.txt
+::::::::::::::
+-------------------------------------------------------------------------------
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.06 sec <<< FAILURE!
+testPing(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 0.771 sec  <<< ERROR!
+javax.naming.NamingException: Failed to create remoting connection [Root exception is java.lang.RuntimeException: javax.security.sasl.SaslException: Au
+thentication failed: all available authentication mechanisms failed]
+        at org.jboss.naming.remote.client.ClientUtil.namingException(ClientUtil.java:36)
+        at org.jboss.naming.remote.client.InitialContextFactory.getInitialContext(InitialContextFactory.java:121)
+        at javax.naming.spi.NamingManager.getInitialContext(NamingManager.java:684)
+        at javax.naming.InitialContext.getDefaultInitCtx(InitialContext.java:305)
+        at javax.naming.InitialContext.init(InitialContext.java:240)
+        at javax.naming.InitialContext.<init>(InitialContext.java:214)
+        at myorg.javaeeex.ejbclient.RegistrarIT.runAs(RegistrarIT.java:82)
+        at myorg.javaeeex.ejbclient.RegistrarIT.cleanup(RegistrarIT.java:66)
+---
+
+    [[1]] Un-munge the admin password for the cleanup method.
+
+---
+    protected void cleanup() throws Exception {
+        ...
+        runAs(adminUser, adminPassword);
+        ...
+    }
 ---
 
     [[1]] Rebuild and re-deploy the application. If everything is setup correctly
 
-        * the security configuration should be registered with the JVM
+        * the credentials should be passed into the JVM from the failsafe configuration
 
-        * the credentials should be passed into the JVM from the surefire configuration
-
-        * the test setup should be taking the credentials and turning them into
-        a LoginContext
+        * the test setup should be taking the credentials and using them to authenticate
+        with the server
 
         * the cleanup() method is logging in as the admin
-
-        * the callback handler is bring queried for the credentials
-
-        * the credentials are being passed to the server
 
         * the credentials provided by the client match the credentials registered on the
         server an do not reject the user as an unknown user.
@@ -740,49 +898,29 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
         method and allow the resetAll() to be invoked.
 
 ---
-$ mvn install -rf :javaeeExEJB
+$ mvn clean install
 
 ...
- -------------------------------------------------------
- T E S T S
- -------------------------------------------------------
-Running myorg.javaeeex.ejbclient.RegistrarTest
- -defining security configuration outside JVM
- -getting jndi initial context
- -jndi={jnp.parsedName=, java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory, java.naming.provider.url=127.0.0.4:1099, java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces}
- -jndi name:myorg/javaeeEx/RegistrarEJB/remote
- -jndi name:myorg/javaeeEx/TestUtilEJB/remote
- -name callback:admin1
- -password callback:password
- -calling testUtil.resetAll()
- -testUtil.resetAll() complete
-...
-
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.765 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.505 sec
 
 Results :
 
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 
-...
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
 [INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [3.779s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [2.112s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [1.042s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [24.476s]
+[INFO] --- cargo-maven2-plugin:1.2.3:undeploy (cargo-post) @ javaeeExTest ---
+[INFO] 
+[INFO] --- maven-failsafe-plugin:2.12.2:verify (verify) @ javaeeExTest ---
+...
+[INFO] Java EE Exercise .................................. SUCCESS [0.761s]
+[INFO] Java EE Exercise Impl ............................. SUCCESS [17.815s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [4.466s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [3.088s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.159s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [16.695s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
----
----
-//SERVER CONSOLE
-11:32:18,526 INFO  [myorg.javaeeex.ejb.TestUtilEJB]  *** TestUtilEJB:init() ***
-11:32:18,527 DEBUG [myorg.javaeeex.ejb.TestUtilEJB] caller=admin1
-11:32:18,527 DEBUG [myorg.javaeeex.jpa.DBUtil] found 4 statements
-11:32:18,528 DEBUG [myorg.javaeeex.jpa.DBUtil] executing:
-    alter table JAVAEEEX_ADDRESS 
-        drop constraint FKEB70B40A6E18CE38
 ---
         
 * {Define Remaining Access Restrictions}
@@ -792,36 +930,6 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
     and application. In this section we will just add breadth to the overall
     implementation.
 
-    [[1]] Define the remaining users used in the application.
-
----
-$ cat javaeeExEJB/src/main/resources/users.properties
-
-#users.properties
-#userId=password
-
-admin1=password
-admin2=password
-user1=password
-user2=password
-known1=password
----
-
-    [[1]] Define the remaining roles used in the application.
-
----
-$ cat javaeeExEJB/src/main/resources/roles.properties
-
-#roles.properties
-#user=role1,role2
-
-admin1=admin
-admin2=admin,user
-user1=user
-user2=user
-known1=
----
-        
     [[1]] Add a default restriction for all methods in the RegistrarEJB by
     defining a RolesAllowed at the class level.
 
@@ -829,7 +937,7 @@ known1=
 $ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
 
 ...
-javax.annotation.security.RolesAllowed
+import javax.annotation.security.RolesAllowed;
 ...
 @Stateless
 @RolesAllowed({"user"})
@@ -838,48 +946,28 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
 
     [[1]] Rebuild and redeploy the application to verify the new restrictions
     are in place. At this point all business methods in the RegistrarEJB 
-    should report an Unauthorized User.
+    should indicate we have authorization issues.
 
 ---
 $ mvn install -rf :javaeeExEJB
 
-Tests run: 6, Failures: 0, Errors: 6, Skipped: 0, Time elapsed: 6.672 sec <<< FAILURE!
+Tests run: 6, Failures: 0, Errors: 6, Skipped: 0, Time elapsed: 2.959 sec <<< FAILURE!
 
 Results :
 
 Tests in error: 
-  testPing(myorg.javaeeex.ejbclient.RegistrarTest)
-  testCreatePerson(myorg.javaeeex.ejbclient.RegistrarTest)
-  testLazy(myorg.javaeeex.ejbclient.RegistrarTest)
-  testPOJO(myorg.javaeeex.ejbclient.RegistrarTest)
-  testDTOs(myorg.javaeeex.ejbclient.RegistrarTest)
-  testWebUseCase(myorg.javaeeex.ejbclient.RegistrarTest)
+  testPing(myorg.javaeeex.ejbclient.RegistrarIT): JBAS014502: Invocation on method: public abstract void myorg.javaeeex.ejb.RegistrarRemote.ping() of bean: RegistrarEJB is not allowed
 
+...
 Tests run: 6, Failures: 0, Errors: 6, Skipped: 0
 
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise .................................. SUCCESS [0.741s]
-[INFO] Java EE Exercise Impl ............................. SUCCESS [22.466s]
-[INFO] Java EE Exercise EJB .............................. SUCCESS [8.791s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [6.747s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [2.054s]
-[INFO] Java EE Exercise Remote Test ...................... FAILURE [1:23.596s]
+...
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.078s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.523s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [2.165s]
+[INFO] Java EE Exercise Remote Test ...................... FAILURE [14.380s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
----
----
-./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
-::::::::::::::
- -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
- -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 6, Skipped: 0, Time elapsed: 6.667 sec <<< FAILURE!
-testPing(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 1.427 sec  <<< ERROR!
-javax.ejb.EJBAccessException: Caller unauthorized
-...
-        at myorg.javaeeex.ejbclient.RegistrarTest.testPing(RegistrarTest.java:110)
 ---
 
     [[1]] Allow anyone to invoke ping() by assigning PermitAll specifically to the 
@@ -890,6 +978,7 @@ $ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
 
 ...
 import javax.annotation.security.PermitAll;
+import javax.annotation.Resource;
 import javax.ejb.SessionContext;
 ...
     @Resource
@@ -904,44 +993,31 @@ import javax.ejb.SessionContext;
 
     [[1]] Rebuild and redeploy the application to verify the new restrictions
     are in place. At this point the ping() method should allow anonymous clients
-    to invoke it.
+    to invoke it so we should have one less failure.
 
 ---
 $ mvn install -rf :javaeeExEJB
 
 ...
-Tests run: 6, Failures: 0, Errors: 5, Skipped: 0, Time elapsed: 6.624 sec <<< FAILURE!
+Tests run: 6, Failures: 0, Errors: 5, Skipped: 0, Time elapsed: 3.216 sec <<< FAILURE!
 
 Results :
 
 Tests in error: 
-  testCreatePerson(myorg.javaeeex.ejbclient.RegistrarTest)
-  testLazy(myorg.javaeeex.ejbclient.RegistrarTest)
-  testPOJO(myorg.javaeeex.ejbclient.RegistrarTest)
-  testDTOs(myorg.javaeeex.ejbclient.RegistrarTest)
-  testWebUseCase(myorg.javaeeex.ejbclient.RegistrarTest)
-...
----
----
-./javaeeExTest/target/surefire-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
-::::::::::::::
- -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
- -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 5, Skipped: 0, Time elapsed: 6.624 sec <<< FAILURE!
-testCreatePerson(myorg.javaeeex.ejbclient.RegistrarTest)  Time elapsed: 0.172 sec  <<< ERROR!
-javax.ejb.EJBAccessException: Caller unauthorized
-...
-at myorg.javaeeex.ejbclient.RegistrarTest.testCreatePerson(RegistrarTest.java:128)
-...
+  testCreatePerson(myorg.javaeeex.ejbclient.RegistrarIT): JBAS014502: Invocation on method: public abstract myorg.javaeeex.bo.Person myorg.javaeeex.ejb.RegistrarRemote.createPerson(myorg.javaeeex.bo.Person) throws myorg.javaeeex.bl.RegistrarException of bean: RegistrarEJB is not allowed
+  testLazy(myorg.javaeeex.ejbclient.RegistrarIT): JBAS014502: Invocation on method: public abstract myorg.javaeeex.bo.Person myorg.javaeeex.ejb.RegistrarRemote.createPerson(myorg.javaeeex.bo.Person) throws myorg.javaeeex.bl.RegistrarException of bean: RegistrarEJB is not allowed
+  testPOJO(myorg.javaeeex.ejbclient.RegistrarIT): JBAS014502: Invocation on method: public abstract myorg.javaeeex.bo.Person myorg.javaeeex.ejb.RegistrarRemote.createPerson(myorg.javaeeex.bo.Person) throws myorg.javaeeex.bl.RegistrarException of bean: RegistrarEJB is not allowed
+  testDTOs(myorg.javaeeex.ejbclient.RegistrarIT): JBAS014502: Invocation on method: public abstract myorg.javaeeex.bo.Person myorg.javaeeex.ejb.RegistrarRemote.createPerson(myorg.javaeeex.bo.Person) throws myorg.javaeeex.bl.RegistrarException of bean: RegistrarEJB is not allowed
+  testWebUseCase(myorg.javaeeex.ejbclient.RegistrarIT): JBAS014502: Invocation on method: public abstract myorg.javaeeex.bo.Person myorg.javaeeex.ejb.RegistrarRemote.createPerson(myorg.javaeeex.bo.Person) throws myorg.javaeeex.bl.RegistrarException of bean: RegistrarEJB is not allowed
+
+Tests run: 6, Failures: 0, Errors: 5, Skipped: 0
 ---
 ---
 //SERVER LOG
-19:23:47,328 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] **** init ****
-19:23:47,334 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] em=org.jboss.jpa.tx.TransactionScopedEntityManager@1261322
-19:23:47,334 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@d42ff4
-19:23:47,337 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] ping called
-19:23:47,342 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] caller=guest
+19:16:32,007 **** init ****
+19:16:32,007 init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@15e6726
+19:16:32,008 ping called
+19:16:32,008 caller=known
 ---
 
     [[1]] Define user credentials in the RMI Test
@@ -951,49 +1027,35 @@ $ cat javaeeExTest/pom.xml
 ...
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+                <artifactId>maven-failsafe-plugin</artifactId>
 ...
-                        <admin.user>admin1</admin.user>
-                        <admin.password>password</admin.password>
                         <user.user>user1</user.user>
                         <user.password>password</user.password>
 ...  
 ---
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
-    static final String userUser = System.getProperty("user.user");
-    static final String userPassword = System.getProperty("user.password");
+    private static final String userUser = System.getProperty("user.user","user1");
+    private static final String userPassword = System.getProperty("user.password", "password");
 ...
-    LoginContext userCtx;
-...
-    @Before
-    public void setUp() throws Exception {
-        ...
-        userCtx = new LoginContext("mySecurityConfig", 
-                new BasicCallbackHandler(userUser, userPassword));
-    }
 ---
 
-    [[1]] Apply the user role credentials across the RMI Test. This
-    will allow for a default user and then overrides (logout/login) can 
-    be done within specific testMethods.
+    [[1]] Change the "runAs()" at the end of the @Before method to use the
+    user1 account. This will be the default user for each test and then 
+    the specific tests can perform surgical logout/login around certain
+    functionality.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
     @Before
     public void setUp() throws Exception {
         ...
         cleanup();
-        userCtx.login();
-    }
-    
-    @After
-    public void tearDown() throws LoginException {
-        userCtx.logout();
+        runAs(userUser, userPassword);
     }
 ...
 ---
@@ -1006,17 +1068,13 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
 $ mvn install -rf :javaeeExEJB
 
 ...
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.247 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 
 ...
-
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [7.404s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [4.539s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [2.129s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [43.413s]
+[INFO] Java EE Exercise EJB .............................. SUCCESS [6.313s]
+[INFO] Java EE Exercise WAR .............................. SUCCESS [2.219s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [1.766s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [18.469s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
@@ -1036,8 +1094,6 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.247 sec
 
         * Associated an EJB application with a specific application policy
 
-        * Re-enabled anonymous access to the application
-
         * Defined roles required to access an EJB method or the entire EJB
 
         * Defined the users, user credentials, and role assignment to the 
@@ -1054,6 +1110,7 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.247 sec
     The following is an overview of the primary modules accessed during this exercise.
 
 ---
+|-- javaeeExImpl
 |-- javaeeExEJB
 |   |-- pom.xml
 |   `-- src
@@ -1061,6 +1118,8 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.247 sec
 |           |-- java
 |           |   `-- myorg
 |           |       `-- javaeeex
+|           |           |-- cdi
+|           |           |   `-- ResourceConfig.java
 |           |           |-- dto
 |           |           |   |-- AddressDTO.java
 |           |           |   `-- PersonDTO.java
@@ -1071,12 +1130,12 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.247 sec
 |           |               |-- TestUtilEJB.java
 |           |               `-- TestUtilRemote.java
 |           `-- resources
-|               |-- META-INF
-|               |   |-- jboss.xml
-|               |   `-- persistence.xml
-|               |-- roles.properties
-|               `-- users.properties
-...
+|               `-- META-INF
+|                   |-- beans.xml
+|                   |-- jboss-ejb3.xml
+|                   `-- persistence.xml
+|-- javaeeExWAR
+|-- javaeeExEAR
 |-- javaeeExTest
 |   |-- pom.xml
 |   `-- src
@@ -1085,10 +1144,9 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.247 sec
 |           |   `-- myorg
 |           |       `-- javaeeex
 |           |           `-- ejbclient
-|           |               |-- BasicCallbackHandler.java
-|           |               `-- RegistrarTest.java
+|           |               `-- RegistrarIT.java
 |           `-- resources
 |               |-- jndi.properties
-|               |-- log4j.xml
-|               `-- security-config.conf
+|               `-- log4j.xml
+`-- pom.xml
 ---

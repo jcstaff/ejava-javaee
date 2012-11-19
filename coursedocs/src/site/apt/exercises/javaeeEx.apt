@@ -79,8 +79,7 @@ JavaEE EJB, EAR, and RMI Client Exercise
 
     * {{{./javaeeEx-partG.html}Part G}}: Handling WAR/EJB Interface Issues
 
-    * Part H: Securing the EJB Tier and RMI Interface
-~~    * {{{./javaeeEx-partH.html}Part H}}: Securing the EJB Tier and RMI Interface
+    * {{{./javaeeEx-partH.html}Part H}}: Securing the EJB Tier and RMI Interface
 
     * Part I: Securing the Web Tier
 ~~    * {{{./javaeeEx-partI.html}Part I}}: Securing the Web Tier
@@ -100,21 +99,20 @@ javaeeEx
 |           |       `-- javaeeex       
 |           |           |-- cdi
 |           |           |   `-- ResourceConfig.java
-|           |           |-- dto        
+|           |           |-- dto
 |           |           |   |-- AddressDTO.java
-|           |           |   `-- PersonDTO.java 
-|           |           `-- ejb                
+|           |           |   `-- PersonDTO.java
+|           |           `-- ejb
 |           |               |-- RegistrarEJB.java
 |           |               |-- RegistrarLocal.java
 |           |               |-- RegistrarRemote.java
-|           |               |-- TestUtilEJB.java    
-|           |               `-- TestUtilRemote.java 
+|           |               |-- TestUtilEJB.java
+|           |               `-- TestUtilRemote.java
 |           `-- resources
-|               |-- META-INF
+|               `-- META-INF
 |                   |-- beans.xml
-|               |   `-- persistence.xml
-|               |-- roles.properties
-|               `-- users.properties
+|                   |-- persistence.xml
+|                   `-- jboss-ejb3.xml
 |-- javaeeExImpl
 |   |-- pom.xml
 |   `-- src
@@ -172,8 +170,7 @@ javaeeEx
 |           |               `-- RegistrarIT.java
 |           `-- resources
 |               |-- jndi.properties
-|               |-- log4j.xml
-|               `-- security-config.conf
+|               `-- log4j.xml
 |-- javaeeExWAR
 |   |-- pom.xml
 |   `-- src

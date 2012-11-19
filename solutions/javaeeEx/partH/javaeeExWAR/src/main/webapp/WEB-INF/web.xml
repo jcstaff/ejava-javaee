@@ -1,0 +1,44 @@
+<web-app 
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+  <display-name>Web Tier Exercise Web Application</display-name>
+
+    <servlet>
+        <servlet-name>AdminHandler</servlet-name>
+        <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
+        <init-param>
+            <param-name>type</param-name>
+            <param-value>admin</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminHandler</servlet-name>
+        <url-pattern>/model/admin/handler</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AnonymousHandler</servlet-name>
+        <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
+        <init-param>
+            <param-name>type</param-name>
+            <param-value>anonymous</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnonymousHandler</servlet-name>
+        <url-pattern>/model/handler</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>JPAFilter</filter-name>
+        <filter-class>myorg.javaeeex.web.JPAFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>JPAFilter</filter-name>
+        <url-pattern>/model/admin/handler</url-pattern>
+        <url-pattern>/model/handler</url-pattern>
+    </filter-mapping>
+</web-app>
