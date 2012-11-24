@@ -2,14 +2,23 @@ Java EE Exercise
 
 Part F: Securing the Web Tier
 
-    This exercise will step you through the setup of security within 
-    the web tier. We will re-integrate the web tier with the newly
-    secured EJB tier and then add some layers of security on the web tier
-    itself. Although it is very critical to have the EJB tier ensure
-    security policies are being applied. The web tier also has a duty
-    to aid in implementing the business rules of the application and
-    extend the security protections to users intergrated through the web
-    tier.
+    This exercise will step you through the setup of security within the
+    web tier. We will re-integrate the web tier with the newly secured
+    EJB tier and then add some layers of security on the web tier
+    itself. It is very critical to have the EJB tier ensure security
+    policies are being applied. The web tier also has a duty to aid in
+    implementing the business rules of the application and extend the
+    security protections to users integrated through the web UI.
+
+    [Note:] Unfortunately, now that EJB security has been enabled you will
+    not be able to leverage the local Maven/Jetty development environment
+    (without adding remote authentication to your WAR). You can, however,
+    implement a course-grain login during the InitialContext/JNDI lookups
+    or create a proxy that implements the EJB @Remote and performs
+    fine-grain server login for the current jetty user. This will not
+    be part of the exercise.
+
+    []
 
 * Objectives
 
@@ -54,93 +63,33 @@ Part F: Securing the Web Tier
         * select {{{http://localhost:8080/javaeeEx/model/admin/handler?command=Get+All+People&index=0&count=10}
         Get All People}}
 
-        []
-
-        [Note:] The web application may display a confusing error at this point
-        due to an error in a URL reference to ErrorPage.jsp. We will fix that next.
-
----
-Command Error
-
-A request was made, but the command was not recognized
-. command=Get All People
-Go to Main Page
----
-
-        []
-
-        * review the server output
-
-        []
----
-...
-16:20:06,223 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] command=Get All People
-16:21:12,993 ERROR [myorg.javaeeex.web.RegistrarHandlerServlet] error in EJB.getAllPeople: javax.ejb.EJBAccessException: Caller unauthorized
-        at org.jboss.ejb3.security.RoleBasedAuthorizationInterceptorv2.invoke(RoleBasedAuthorizationInterceptorv2.java:199) [:1.7.17]
-...
----
-
-        You can see from the server output that the call from the 
-        servlet was not authorized but the exception was not properly 
-        handled by the logic. Our definition of DISPLAY_EXCEPTION_URL
-        was incorrectly set to ErrorPage.jsp, which expected an 
-        exception variable to be set. Since it was not set, a 
-        NullPointerException was thrown and the outter doGet went into
-        page not found error logic.
+        * review the server output You can see from the server output
+        that the call from the servlet was not authorized and was 
+        detected by the EJB.
 
 ---
-$ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
-...
-    private abstract class Handler {
-        ...
-        protected static final String DISPLAY_EXCEPTION_URL =
-            "/WEB-INF/content/ErrorPage.jsp";
-        ...
-        public void handle(HttpServletRequest request,
-                HttpServletResponse response)
-                throws ServletException, IOException {
-            try {
-                doHandle(request, response);
-            }
-            catch (Exception ex) {
-                log.error("error in " + action, ex);
-                request.setAttribute(EXCEPTION_PARAM, ex);
-                RequestDispatcher rd = getServletContext().getRequestDispatcher(
-                    DISPLAY_EXCEPTION_URL);
-                rd.forward(request, response);
-            }
-        }
----
+//web page response
 
-        []
-
-        []
-
-    [[1]] Update the definition of DISPLAY_EXCEPTION_URL to reference
-    the DisplayException.jsp
-
----
-$ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
-...
-        protected static final String DISPLAY_EXCEPTION_URL =
-            "/WEB-INF/content/DisplayException.jsp";
----
-
-    [[1]] Rebuild and redeploy the application and refresh the page in
-    error in the browser.
-
----
-$ mvn clean install -rf :javaeeExEJB
-...
----
----
-//web page after refresh
 General Exception Page
 
 An error was reported by the application. More detailed information may follow.
 
 .
-javax.ejb.EJBAccessException: Caller unauthorized at org.jboss.ejb3.security.RoleBasedAuthorizationInterceptorv2.invoke(RoleBasedAuthorizationInterceptorv2.java:199) at 
+javax.ejb.EJBAccessException: JBAS014502: Invocation on method: public abstract java.util.Collection myorg.javaeeex.ejb.RegistrarLocal.getAllPeople(int,int) throws myorg.javaeeex.bl.RegistrarException of bean: RegistrarEJB is not allowed
+...
+---
+
+---
+//server log
+
+...
+10:37:30,660 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet:99] command=Get All People
+10:37:30,749 ERROR [org.jboss.as.ejb3.component.interceptors.LoggingInterceptor:66] JBAS014134: EJB Invocation failed on component RegistrarEJB 
+for method public abstract java.util.Collection myorg.javaeeex.ejb.RegistrarLocal.getAllPeople(int,int) throws myorg.javaeeex.bl.RegistrarException: 
+javax.ejb.EJBAccessException: JBAS014502: Invocation on method: 
+public abstract java.util.Collection myorg.javaeeex.ejb.RegistrarLocal.getAllPeople(int,int) throws myorg.javaeeex.bl.RegistrarException of bean: 
+RegistrarEJB is not allowed
+...
 ---
 
     Notice how we were immediately rejected with no chance to login. This
@@ -150,10 +99,15 @@ javax.ejb.EJBAccessException: Caller unauthorized at org.jboss.ejb3.security.Rol
     effort.
 
 ---
-$ cat javaeeExEJB/src/main/resources/META-INF/jboss.xml
+$ cat javaeeExEJB/src/main/resources/META-INF/jboss-ejb3.xml
 ...
-    <security-domain>other</security-domain>
-    <unauthenticated-principal>guest</unauthenticated-principal>
+    <assembly-descriptor>
+        <sec:security>
+            <ejb-name>*</ejb-name>
+            <sec:security-domain>other</sec:security-domain>
+        </sec:security>
+    </assembly-descriptor>
+...
 ---
 ---
 $ cat 
@@ -191,13 +145,6 @@ Go to Main Page
     [[1]] Associate the WAR with the "other" application policy using a 
     WEB-INF/jboss-web.xml
 
-    [Note:] This is the same domain used by the EJB. However, for some
-    reason, the web tier uses a full JNDI reference and the EJB tier
-    uses just the name.  The application policy will not be displayed
-    in the JNDI tree of the JMX console until used.
-
-    []
-
 ---
 $ cat javaeeExWAR/src/main/webapp/WEB-INF/jboss-web.xml
 
@@ -207,7 +154,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/jboss-web.xml
   "http://www.jboss.org/j2ee/dtd/jboss-web_4_0.dtd">
   
 <jboss-web>
-      <security-domain>java:/jaas/other</security-domain>      
+      <security-domain>other</security-domain>      
 </jboss-web>
 ---
 
@@ -264,18 +211,17 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
 ...
 ---
 
-    [[1]] Rebuild and deploy the application.
+    [[1]] Rebuild and deploy the application. Note in the command below I am 
+    making sure to install the current implementation of the WAR and WAR 
+    before leveraging the pre-integration-test goal. That way I am sure
+    that the deployment will pick up my current version (from either the target
+    directory or localRepository) without accidentally using the previous
+    version. Since unit and integration tests are not my current focus -- I 
+    turned on JUnit tests during the install using -DskipTests.
 
 ---
-$ mvn clean install -rf :javaeeExEJB
+$ mvn clean install -rf :javaeeExWAR -DskipTests; mvn pre-integration-test -rf :javaeeExTest
 ...
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [5.469s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [2.917s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [1.551s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [35.084s]
-[INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
 
@@ -287,12 +233,25 @@ $ mvn clean install -rf :javaeeExEJB
 
         * Click on {{{http://localhost:8080/javaeeEx/model/admin/handler?command=Get+All+People&index=0&count=10}Get All People}}. You should get a browser pop-up requesting User Name and Password for the javaeeEx Realm.
 
-        * Log in with credentials admin2/password. This user was assigned both 
+        * Log in with credentials admin1/password. This user was assigned both 
         the user role (required by the EJB) and the admin role (required
         by the web tier). You should see the People Display
 
-    [[1]] Attempt to get all people as an unauthorized user. This should fail
-    shortly after logging in.
+    [[1]] Verify that you have an admin2 user that is assigned only the
+    admin (and not user) role. If you are missing the admin2 user 
+    please update your server configuration with the latest ejava-jboss711
+    configuration files and restart the server.
+
+---
+$ cat JBOSS_HOME/standalone/configuration/application-roles.properties
+...
+admin2=admin
+---
+
+    [[1]] Attempt to get all people as a valid user that is authorized 
+    by the web tier by unauthorized by the EJB tier. The mis-match is 
+    caused by the web tier not accurately checking the right roles for
+    the user. This should fail shortly after logging in at the EJB tier.
 
         * Exit and restart the browser.
 
@@ -323,19 +282,16 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
     [[1]] Rebuild and deploy the application.
 
 ---
-$ mvn clean install -rf :javaeeExEJB
+$ mvn clean install -rf :javaeeExWAR -DskipTests; mvn pre-integration-test -rf :javaeeExTest
+
 ...
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [5.469s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [2.917s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [1.551s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [35.084s]
-[INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
 
     [[1]] Attempt to access the Admin JSP page as you did prior to this step.
+
+        * Restart your browser to logout of the BASIC login. We will fix this
+        in the next section.
 
         * Access the {{{http://localhost:8080/javaeeEx/}Main Page}}
 
@@ -371,6 +327,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/Login.jsp
   <head><title>JavaEE Exercise Login Form</title></head>
   <body>
     <h1>Login Required</h1>
+
     <form action="j_security_check" method="POST">
        <table border="0" width="30%" cellspacing="3" cellpadding="2">
           <tr>
@@ -386,6 +343,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/Login.jsp
           </tr>
        </table>
     </form>
+
   </body>
 </html>
 ---
@@ -404,6 +362,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/LoginFailure.jsp
   <head><title>SecurePing Login Form</title></head>
   <body>
     <h1>Login Failure</h1>
+
     <form action="j_security_check" method="POST">
        <table border="0" width="30%" cellspacing="3" cellpadding="2">
           <tr>
@@ -419,6 +378,7 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/LoginFailure.jsp
           </tr>
        </table>
     </form>
+
     <p/>
     Test accounts:
      <ul>
@@ -454,15 +414,8 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
     [[1]] Rebuild and deploy the application.
 
 ---
-$ mvn clean install -rf :javaeeExEJB
+$ mvn clean install -rf :javaeeExWAR -DskipTests; mvn pre-integration-test -rf :javaeeExTest
 ...
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [5.469s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [2.917s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [1.551s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [35.084s]
-[INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
 
@@ -541,15 +494,8 @@ $ cat javaeeExWAR/src/main/webapp/index.jsp
     [[1]] Rebuild and deploy the application.
 
 ---
-$ mvn clean install -rf :javaeeExEJB
+$ mvn clean install -rf :javaeeExWAR -DskipTests; mvn pre-integration-test -rf :javaeeExTest
 ...
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [5.469s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [2.917s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [1.551s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [35.084s]
-[INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
 
@@ -559,7 +505,7 @@ $ mvn clean install -rf :javaeeExEJB
 
         * Click on {{{http://localhost:8080/javaeeEx/admin/admin_menu.jsp}Admin Page}}. 
 
-        * Login as admin1. 
+        * Login as admin2. 
 
         * Click on the {{{http://localhost:8080/javaeeEx/admin/admin_menu.jsp}Admin Page}}.
         You should see an exception page showing you are unauthorized.
@@ -572,7 +518,7 @@ $ mvn clean install -rf :javaeeExEJB
         * Click on {{{http://localhost:8080/javaeeEx/admin/admin_menu.jsp}Admin Page}} again. 
         You should again see the login form since you have previously logged out.
 
-        * Login as admin2. 
+        * Login as admin1. 
 
         * Click on the {{{http://localhost:8080/javaeeEx/admin/admin_menu.jsp}Admin Page}}.
         The action should successfully complete.
@@ -604,15 +550,8 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
     [[1]] Rebuild and deploy the application.
 
 ---
-$ mvn clean install -rf :javaeeExEJB
+$ mvn clean install -rf :javaeeExWAR -DskipTests; mvn pre-integration-test -rf :javaeeExTest
 ...
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] Java EE Exercise EJB .............................. SUCCESS [5.469s]
-[INFO] Java EE Exercise WAR .............................. SUCCESS [2.917s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [1.551s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [35.084s]
-[INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 ---
 
@@ -626,10 +565,74 @@ $ mvn clean install -rf :javaeeExEJB
         do not have HTTPS configured for the server, you are seeing an error page
         reporting a connection was refused by the server for port 8443.
 
-    [[1]] If you have not yet configured your server for HTTPS do so now using the
-    following {{{./jboss-https.html} instructions}}. After restarting JBoss, redeploy
-    the application and re-navigate to the protected URL. You should now see the 
-    successful shift to SSH for the admin pages.
+    [[1]] If you have not yet configured your server for HTTPS do so now by updating 
+    your server files to the latest ejava-jboss711 server baseline. The following is  
+    a summary of how that was setup. If configured properly -- you do not need to 
+    do these steps. They have already been done for you.
+
+        * Shutdown JBoss
+
+        * Generate a server key and keystore
+
+---
+$ cd jboss-as-7.1.1.Final/standalone/configuration
+$ keytool -genkey -alias server -keyalg RSA -keystore server.keystore -storepass password -keypass password -dname "CN=127.0.0.1" -validity 365
+$ ls                                                                                                                            
+... server.keystore ...
+---
+
+        * Export server certificate to register in client trust stores
+
+---
+$ keytool -export -alias server -keystore server.keystore -storepass password -file server.cer 
+Certificate stored in file <server.cer> 
+$ ls
+... server.cer  server.keystore ...
+---
+
+        * Open standalone/config/standalone.xml in an editor.  
+
+---
+<subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
+    <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
+    <virtual-server name="default-host" enable-welcome-root="true">
+        <alias name="localhost"/>
+        <alias name="example.com"/>
+    </virtual-server>
+</subsystem>
+---
+
+        * Add an https connector definition to standalone.xml.
+
+---
+    <connector name="https" protocol="HTTP/1.1" scheme="https" socket-binding="https" secure="true" enable-lookups="false">
+        <ssl password="password" certificate-key-file="${jboss.server.config.dir}/server.keystore" 
+                             protocol="TLSv2" verify-client="false"/>
+    </connector>
+---
+        * Add an https redirect-port to the http connector in standalone.xml.
+
+---
+    <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http" redirect-port="8443"/>
+---
+
+        * The result will look like the following.
+
+---
+<subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
+    <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http" redirect-port="8443"/>
+    <connector name="https" protocol="HTTP/1.1" scheme="https" socket-binding="https" secure="true" enable-lookups="false">
+        <ssl password="password" certificate-key-file="${jboss.server.config.dir}/server.keystore" 
+                             protocol="TLSv2" verify-client="false"/>
+    </connector>
+    <virtual-server name="default-host" enable-welcome-root="true">
+        <alias name="localhost"/>
+        <alias name="example.com"/>
+    </virtual-server>
+</subsystem>
+---
+
+        * Restart JBoss
 
     [[1]] Update the Logout Handler to redirect the user to a straight http://
     URL to turn off use of SSL after logging out.
@@ -637,14 +640,17 @@ $ mvn clean install -rf :javaeeExEJB
 ---
 $ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
 
+import javax.annotation.Resource;
 ...
 public class RegistrarHandlerServlet extends HttpServlet {
     ...
     @Resource(name="httpPort")
-    Integer httpPort = 8080;
+    Integer httpPort;
 ...
     private class Logout extends Handler {
     ...
+            request.getSession().invalidate();
+
             //switch back to straight HTTP            
             String contextPath = new StringBuilder()
                 .append("http://")
@@ -657,10 +663,130 @@ public class RegistrarHandlerServlet extends HttpServlet {
             response.sendRedirect(contextPath + MAIN_MENU_URL);
 ...
 ---
+    
+    [[1]] Add a substitutable env-entry definition for httpPort in 
+    WEB-INF/web.xml so that we know what port# to use at build time.    
+
+---
+    <env-entry>
+        <env-entry-name>httpPort</env-entry-name>
+        <env-entry-type>java.lang.Integer</env-entry-type>
+        <env-entry-value>${jboss.servlet.port}</env-entry-value>
+    </env-entry>    
+---
+
+    [[1]] Add a filter rule to the war plugin in the WAR/pom.xml 
+    to substitute the env-entry value.
+
+---
+$ cat javaeeExWAR/pom.xml
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                  <webResources>
+                    <resource>
+                        <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                        <filtering>true</filtering>
+                        <targetPath>WEB-INF</targetPath>
+                        <includes>
+                            <include>web.xml</include>
+                        </includes>
+                    </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+---
+
+    [[1]] Add a definition of the jboss.servlet.port to the parent
+    pom.
+
+---
+$ cat pom.xml
+
+    <properties>
+    ...
+
+        <jboss.servlet.port>8080</jboss.servlet.port>
+---
+
+    [[1]] Specify the version of the war plugin since we need to 
+    specifically configure it.
+
+---
+$ cat pom.xml
+
+    <properties>
+    ...
+        <maven-war-plugin.version>2.2</maven-war-plugin.version>
+---
+---
+$ cat pom.xml
+
+    <build>
+    	<pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>${maven-war-plugin.version}</version>
+                </plugin>
+
+---
+
+    [[1]] Re-build the application and note the output during the build 
+    of the WAR. Notice how the filtered copy of the WEB-INF/web.xml gets copied
+    first and then the unfiltered (default processing) gets ignored.
+
+---
+$ mvn clean install -rf :javaeeExWAR -DskipTests
+...
+
+] --- maven-war-plugin:2.2:war (default-war) @ javaeeExWAR ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [javaeeExWAR] in [/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT]
+[INFO] Processing war project
+[INFO] Copying webapp webResources [/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp/WEB-INF] to [/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT]
+[INFO] Copying webapp resources [/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp]
+[INFO] Webapp assembled in [114 msecs]
+[INFO] Building war: /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT.war
+[INFO] WEB-INF/web.xml already added, skipping
+---
+
+    [[1]] Verify your web.xml was filtered
+
+---
+$ cat javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT/WEB-INF/web.xml
+
+...
+    <env-entry>
+        <env-entry-name>httpPort</env-entry-name>
+        <env-entry-type>java.lang.Integer</env-entry-type>
+        <env-entry-value>8080</env-entry-value>
+    </env-entry>
+</web-app>
+---
+
+    [Note:] Of course the purpose of not simply hard-coding the 8080 value into
+    the servlet is when another envirment used a different port or the 
+    deployment environment uses the standard port 80. We want to change the
+    HTTP port# without changing the code. We can do so with a settings.xml or
+    -DsystemProperty value.
+
+    []
+
+    [[1]] Redeploy the application
+
+---
+$ mvn clean install -rf :javaeeExWAR -DskipTests; mvn pre-integration-test -rf :javaeeExTest
+
+...
+BUILD SUCCESS
+---
 
     [[1]] Verify that navigation reverts back to HTTP when you click on
     logout at this point.
-
 
 * Summary
 
@@ -693,6 +819,7 @@ javaeeExWAR/
     |       |   `-- admin_menu.jsp
     |       |-- index.jsp
     |       `-- WEB-INF
+    |           |-- beans.xml
     |           |-- content
     |           |   |-- DisplayException.jsp
     |           |   |-- DisplayPeople.jsp
