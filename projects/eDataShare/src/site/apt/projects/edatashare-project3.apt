@@ -1,6 +1,6 @@
 Project3: eDataShare Secure and Asynchronous N-Tier Application
 
-    2011-02-01 - DRAFT
+    2012-11-24 - DRAFT
 
 * Goals
 
@@ -31,106 +31,88 @@ Project3: eDataShare Secure and Asynchronous N-Tier Application
     2. We will mostly extend existing projects with security and
     asynchronous logic. 
 
-    Although logically independent, the eDmv and eMayberry EARs are
-    expected to be deployed to the same application server for the project
-    implementation and testing. This may require us to define and deploy a
-    resource within the eDmv application rather than have a
-    duplicate/independent copy in eMayberry. If they were physically
-    separate, this would not be an issue.
+    Java EE defines authentication and authorization to be independent
+    of the overall API and capability. JBoss and other application
+    servers provide simple, "hello world", mechanisms that are easy to
+    demonstrate and more sophisticated mechanisms that are realistic for
+    deployments.  We will use the simple "other" security-domain defined
+    within the standard JBoss installation. This uses the RealmUsersRoles
+    login-module -- which is powered by two property files supplied and
+    pre-populated by the class server files from ejava-jboss711.
 
-    Java EE defines authentication and authorization to be independent of
-    the overall API and capability. JBoss and other application servers
-    provide simple, "hello world", mechanisms that are easy to demonstrate
-    and more sophisticated mechanisms that are realistic for deployments.
-    We will use the simple "other" authentication application policy 
-    defined within the standard JBoss installation. This method takes two
-    files: 
-
-        * users.properties - defines username=password lines that list the
-        login username and plain-text password
-
-        * roles.properties - defines username=role1,role2 lines that list
-        the login username and assigned roles.
-
-    These two files must be available in the root package within the
-    classloader classpath. This means that they would be at the root
-    directory of an EJB or WEB-INF/classes. Knowing our environment, we'll
-    create a single set to be shared between eDmv and eMayberry and place
-    this in the eDmvEJB.
+*----------+-----------------+
+| <<File>> | <<Description>> |
+*----------+-----------------+
+${jboss.server.config.dir}/application-users.properties | defines username=password lines that list the login username and hashed password
+*-------+--------+
+${jboss.server.config.dir}/application-roles.properties | defines username=role1,role2 lines that list the login username and assigned roles
+*-------+--------+
 
     We are going to have a couple types of users. Some of the users will
     have zero, one, or more of these roles. Because of the static nature of
-    our authentication, all users will have a login configured long before
-    they register for an account.
+    our authentication, all users will have a login configured before
+    the application is even deployed to the server.
 
-        * dmv-admin - these users can reset and populate the eDmv database
-
-        * dmv-tactical - these users can read/write information in eDmv
-
-        * dmv-federated - these users can only read information from
-        eDmv.
-
-        * mayberry-admin - these users can reset and populate the eMayberry
-        database
-
-        * mayberry-tactical - these users can read/write information in
-        eMayberry (and read information from eDmv through eMayberry).
-
-        * mayberry-analytical - these users can only read information from
-        mayberry (and eDmv through eMayberry)
+*----------+-----------------+
+| <<Role>> | <<Description>> |
+*----------+-----------------+
+dmv-admin | these users can reset and populate the eDmv database
+*-------+--------+
+dmv-tactical | these users can read/write information in eDmv
+*-------+--------+
+dmv-federated | these users can only read information from eDmv.
+*-------+--------+
+mayberry-admin | these users can reset and populate the eMayberry database
+*-------+--------+
+mayberry-tactical | these users can read/write information in eMayberry (and read information from eDmv through eMayberry).
+*-------+--------+
+mayberry-analytical | these users can only read information from mayberry (and eDmv through eMayberry)
+*-------+--------+
 
     If a user has a login for one application, they will use the same
     account to access the other application (e.g., user1 might have
     both dmv-federated and mayberry-tactical roles).
 
+*-----------+------------+
+| <<Login>> | <<Roles>>  |
+*-----------+------------+
+admin1 | dmv-admin,mayberry-admin
+*-------+--------+
+known | (no roles)
+*-------+--------+
+kathy | dmv-tactical
+*-------+--------+
+sherri | dmv-tactical
+*-------+--------+
+sysRaleigh | dmv-tactical
+*-------+--------+
+sysMayberry | dmv-federated,mayberry-tactical,mayberry-analytical
+*-------+--------+
+andy | mayberry-tactical,mayberry-analytical
+*-------+--------+
+barney | mayberry-tactical
+*-------+--------+
+gomer | mayberry-analytical
+*-------+--------+
+
     Some actions are open to any users; authenticated or not.
-    Authenticate will be performed using a JAAS configuration and
-    login logic.  RMI Tests will be updated with JAAS configuration and
-    login logic.
+    Authentication will be performed using a JNDI login.  All users
+    will have a password of "password".
 
     For some asynchronous activity, we will implement a Topic within
     eDmv that will be used to provide updates to any of the driver or
     owner information. eMayberry will listen to this topic. We will also
     implement a separate Topic where eMayberry will publish messages
-    related to persons of interest when they change.  These topics will
-    have to be added to your JMS Server within JBoss. You will have
-    to design the type, structure, and payload of the messages sent on
-    the topics.
+    related to persons of interest when they change.  These topics
+    will be pre-defined in your application server along with the users
+    and roles.  However, you will have to design the type, structure,
+    and payload of the messages sent on the topics.
 
     eMayberry will use EJB Timers to send out person of interest re-caps.
 
 * Technical Details
 
     [[1]] Provide all functionality from Projects 1 and 2.
-
-===
-
-    [[1]] Add a users/roles.properties set of files to eDmvEJB that 
-    defines the combined set of users and roles between the two
-    applications. The files should define the following usernames and
-    roles (all users should have a password of "password").
-
-        * admin1=dmv-admin,mayberry-admin
-
-        * known=(no roles)
-
-        * kathy=dmv-tactical
-
-        * sherri=dmv-tactical
-
-        * sysRaleigh=dmv-tactical
-
-        * sysMayberry=dmv-federated,mayberry-tactical,mayberry-analytical
-
-        * andy=mayberry-tactical,mayberry-analytical
-
-        * barney=mayberry-tactical
-
-        * gomer=mayberry-analytical
-
-        * ...
-
-        []
 
 ===
 
@@ -156,14 +138,15 @@ Project3: eDataShare Secure and Asynchronous N-Tier Application
     [[1]] Extend your existing eDmv RMI Test project and any RMI client(s) to
     address new authentication requirements.
 
-        * Add JAAS Configuration for JBoss the ClientLoginModule.
-
-        * Add a new unit test that verifies the access controls of the
-        protected and open methods.
-    
         * Add a valid login to your existing tests to re-enable them under
         the new secure environment.
 
+        * Add a new unit test that verifies the access controls of the
+        protected and open methods. This means that -- after fixing access
+        issues in the previous bullet -- you purposely attempt to violate
+        access restrictions from a new JUnit test to show a test of 
+        access control.
+    
 ===
 
     [[1]] Enhance eMayberry with access restrictions.
@@ -189,36 +172,39 @@ Project3: eDataShare Secure and Asynchronous N-Tier Application
     [[1]] Extend your existing eMayberry RMI Test project and any RMI
     client(s) to address new authentication requirements.
 
-        * Add JAAS Configuration for JBoss the ClientLoginModule.
-
-        * Add a new unit test that verifies the access controls of the
-        protected and open methods.
-
         * Add a valid login to your existing tests to re-enable them under 
         the new secure environment.
+
+        * Add a new unit test that verifies the access controls of the
+        protected and open methods. Same comment as above -- after
+        fixing proper access to Mayberry you should have at least
+        one test that demonstrates how the application is preventing
+        unauthorized access.
 
 ===
 
     [[1]] Enhance eDmvWAR with access restrictions.
 
-        * Assign the WAR to the "java:jass/other" security domain.
+        * Assign the WAR to the "other" security-domain.
 
         * Restrict access beyond the main page to users with
         the appropriate roles. You may use FORM or BASIC authentication.
+        (I suggest FORM for easy logout).
 
         * Permit only users to only ask the EJB tier for
         information that is associated with their login. For example,
-        a federated user should not be given a prompt to create a 
-        driver.
+        a federated-user should not be given the option to create
+        a driver.
 
 ===
 
     [[1]] Enhance eMayberryWAR with access restrictions.
 
-        * Assign the WAR to the "java:jass/other" security domain.
+        * Assign the WAR to the "other" security domain.
 
         * Restrict access beyond the main page to users with
         the appropriate roles. You may use FORM or BASIC authentication.
+        (I suggest FORM for easy logout).
 
         * Permit only users to only ask the EJB tier for information that
         is associated with their login. For example, a eMayberry
@@ -232,7 +218,7 @@ Project3: eDataShare Secure and Asynchronous N-Tier Application
     [[1]] Extend your eMayberry implementations to publish a JMS message
     to a topic whenever information for a person of interest changes.
 
-        * Add the JMS topic to your JBoss server.
+        * Use the datashare-mayberry-poi topic (JNDI name: topic/ejava/projects/datashare/mayberry-poi)
 
         * Design your JMS Message. You can use any JMS Type and JMS/custom
         properties you wish.  However, know that some subscribers will
@@ -261,7 +247,7 @@ Project3: eDataShare Secure and Asynchronous N-Tier Application
     [[1]] Extend your eDmv EJB implementations to publish changes to 
     People.
 
-        * Add the JMS topic to your JBoss server.
+        * Use the datashare-dmv topic (JNDI name: topic/ejava/projects/datashare/dmv)
 
         * Design your JMS Message. You can use any JMS Type and JMS/custom
         properties you wish.  
@@ -296,7 +282,7 @@ Project3: eDataShare Secure and Asynchronous N-Tier Application
     [[1]] Perform the following scripted use case.  All command
     line implementations must be wrapped in an Ant runtime script to
     encapsulate the classpath details in a portable manner (see the
-    class jdbcDAO project for an example of using an Ant runtime script).
+    class jmsNotifier project for an example of using an Ant runtime script).
     Although an automated JUnit test is not required here, developing one
     can be quite helpful.
 
@@ -398,7 +384,7 @@ Project3: eDataShare Secure and Asynchronous N-Tier Application
 
         * EJB Security: 10pts
 
-        * JAAS Client Security: 10pts
+        * Client Security Login: 10pts
 
         * WAR Security: 10pts
 

@@ -62,7 +62,7 @@
             </console-handler>
             <periodic-rotating-file-handler name="FILE">
                 <formatter>
-                    <pattern-formatter pattern="%d{HH:mm:ss,SSS} %s%E%n"/>
+                    <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%C:%L] %s%E%n"/>
                 </formatter>
                 <file relative-to="jboss.server.log.dir" path="server.log"/>
                 <suffix value=".yyyy-MM-dd"/>
@@ -270,6 +270,18 @@
                     <security-setting match="jms.queue.hornetq.management">
                         <permission type="manage" roles="admin"/>
                     </security-setting>
+                    <security-setting match="jms.topic.datashare-dmv">
+                        <permission type="send" roles="dmv-tactical"/>
+                        <permission type="consume" roles="dmv-tactical dmv-federated mayberry-tactical mayberry-analytical"/>
+                        <permission type="createDurableQueue" roles="dmv-tactical dmv-federated mayberry-tactical mayberry-analytical"/>
+                        <permission type="createNonDurableQueue" roles="dmv-tactical dmv-federated mayberry-tactical mayberry-analytical"/>
+                    </security-setting>
+                    <security-setting match="jms.topic.datashare-mayberry-poi">
+                        <permission type="send" roles="mayberry-tactical"/>
+                        <permission type="consume" roles="mayberry-tactical mayberry-analytical"/>
+                        <permission type="createDurableQueue" roles="mayberry-tactical mayberry-analytical"/>
+                        <permission type="createNonDurableQueue" roles="mayberry-tactical mayberry-analytical"/>
+                    </security-setting>
                 </security-settings>
 
                 <address-settings>
@@ -333,6 +345,14 @@
                     <jms-topic name="asyncMarket-topic1">
                         <entry name="java:/topic/ejava/examples/asyncMarket/topic1"/>
                         <entry name="java:jboss/exported/topic/ejava/examples/asyncMarket/topic1"/>
+                    </jms-topic>
+                    <jms-topic name="datashare-dmv">
+                        <entry name="java:/topic/ejava/projects/datashare/dmv"/>
+                        <entry name="java:jboss/exported/topic/ejava/projects/datashare/dmv"/>
+                    </jms-topic>
+                    <jms-topic name="datashare-mayberry-poi">
+                        <entry name="java:/topic/ejava/projects/datashare/mayberry-poi"/>
+                        <entry name="java:jboss/exported/topic/ejava/projects/datashare/mayberry-poi"/>
                     </jms-topic>
                 </jms-destinations>
             </hornetq-server>
@@ -449,4 +469,9 @@
         </outbound-socket-binding>
     </socket-binding-group>
 
+    <deployments>
+        <deployment name="javaeeExEAR-1.0-SNAPSHOT.ear" runtime-name="javaeeExEAR-1.0-SNAPSHOT.ear">
+            <content sha1="b326dbfa7f2555cd52d5d6005c6fd43a570a9769"/>
+        </deployment>
+    </deployments>
 </server>
