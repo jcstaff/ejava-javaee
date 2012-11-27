@@ -240,7 +240,7 @@
 
                 <security-settings>
                     <security-setting match="#">
-                        <permission type="send" roles="user publisher"/>
+                        <permission type="send" roles="publisher user"/>
                         <permission type="consume" roles="subscriber user"/>
                         <permission type="createDurableQueue" roles="subscriber user"/>
                         <permission type="deleteDurableQueue" roles="user"/>
@@ -263,24 +263,25 @@
                         <permission type="consume" roles="admin"/>
                     </security-setting>
                     <security-setting match="jms.tempqueue.#">
-                        <permission type="send" roles="worker"/>
-                        <permission type="consume" roles="requestor"/>
-                        <permission type="createNonDurableQueue" roles="requestor"/>
+                        <permission type="send" roles="worker admin user"/>
+                        <permission type="consume" roles="requestor admin user"/>
+                        <permission type="createNonDurableQueue" roles="requestor admin user"/>
+                        <permission type="deleteNonDurableQueue" roles="admin"/>
                     </security-setting>
                     <security-setting match="jms.queue.hornetq.management">
                         <permission type="manage" roles="admin"/>
                     </security-setting>
                     <security-setting match="jms.topic.datashare-dmv">
                         <permission type="send" roles="dmv-tactical"/>
-                        <permission type="consume" roles="dmv-tactical dmv-federated mayberry-tactical mayberry-analytical"/>
-                        <permission type="createDurableQueue" roles="dmv-tactical dmv-federated mayberry-tactical mayberry-analytical"/>
-                        <permission type="createNonDurableQueue" roles="dmv-tactical dmv-federated mayberry-tactical mayberry-analytical"/>
+                        <permission type="consume" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
+                        <permission type="createDurableQueue" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
+                        <permission type="createNonDurableQueue" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
                     </security-setting>
                     <security-setting match="jms.topic.datashare-mayberry-poi">
                         <permission type="send" roles="mayberry-tactical"/>
-                        <permission type="consume" roles="mayberry-tactical mayberry-analytical"/>
-                        <permission type="createDurableQueue" roles="mayberry-tactical mayberry-analytical"/>
-                        <permission type="createNonDurableQueue" roles="mayberry-tactical mayberry-analytical"/>
+                        <permission type="consume" roles="mayberry-analytical mayberry-tactical"/>
+                        <permission type="createDurableQueue" roles="mayberry-analytical mayberry-tactical"/>
+                        <permission type="createNonDurableQueue" roles="mayberry-analytical mayberry-tactical"/>
                     </security-setting>
                 </security-settings>
 
@@ -470,8 +471,5 @@
     </socket-binding-group>
 
     <deployments>
-        <deployment name="javaeeExEAR-1.0-SNAPSHOT.ear" runtime-name="javaeeExEAR-1.0-SNAPSHOT.ear">
-            <content sha1="b326dbfa7f2555cd52d5d6005c6fd43a570a9769"/>
-        </deployment>
     </deployments>
 </server>

@@ -205,54 +205,69 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- start/stop the JMS server during IT tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>start-jms-server</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <java classname="org.hornetq.integration.bootstrap.HornetQBootstrapServer"
-                                     fork="true"
-                                     spawn="${jms.spawn}">
-                                     <classpath>
-                                         <path location="${project.build.directory}/test-classes/hornetq"/>
-                                         <path refid="maven.runtime.classpath"/>
-                                     </classpath>
-                                     <!--
-                                     <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent"/>
-                                     <sysproperty key="java.compiler" value="NONE"/>
-                                     -->
-                                     <sysproperty key="hornetq.config.dir" value="${project.build.directory}/test-classes/hornetq"/>
-                                     <arg value="${project.build.directory}/test-classes/hornetq/hornetq-beans.xml"/>
-                                </java>
-                                <echo>started JMS Server</echo>
-                            </target>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop-jms-server</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <echo>stopping JMS Server</echo>
-                                <echo file="${project.build.directory}/test-classes/hornetq/STOP_ME"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>      
     </build>
 
+    <profiles>
+        <!-- hide this plugin from Eclipse running it. It causes JMS servers to get spawned -->
+        <profile>
+	      <id>jms-server</id>
+	      <activation>
+	        <property>
+	          <name>!m2e.version</name>
+	        </property>
+	      </activation>
+	      <build>
+                <plugins>
+
+                    <!-- start/stop the JMS server during IT tests -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start-jms-server</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <java classname="org.hornetq.integration.bootstrap.HornetQBootstrapServer"
+                                             fork="true"
+                                             spawn="${jms.spawn}">
+                                             <classpath>
+                                                 <path location="${project.build.directory}/test-classes/hornetq"/>
+                                                 <path refid="maven.runtime.classpath"/>
+                                             </classpath>
+                                             <!--
+                                             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent"/>
+                                             <sysproperty key="java.compiler" value="NONE"/>
+                                             -->
+                                             <sysproperty key="hornetq.config.dir" value="${project.build.directory}/test-classes/hornetq"/>
+                                             <arg value="${project.build.directory}/test-classes/hornetq/hornetq-beans.xml"/>
+                                        </java>
+                                        <echo>started JMS Server</echo>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>stop-jms-server</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <echo>stopping JMS Server</echo>
+                                        <echo file="${project.build.directory}/test-classes/hornetq/STOP_ME"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

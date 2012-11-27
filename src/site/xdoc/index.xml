@@ -28,8 +28,8 @@
       <ul>
       <!--
           <li>2012-05-02: Posted Async TODOs</li>
-          <li>2012-04-25: Posted JMS materials</li>
           -->
+          <li>2012-11-27: Posted JMS materials</li>
           <li>2012-11-24: Posted Project 3 Draft Spec</li>
           <li>2012-11-24: Added javaeeEx.partI - Securing the Web Tier</li>
           <li>2012-11-23: Added javaeeEx.partH - Securing the EJB Tier and RMI Interface</li>
@@ -68,25 +68,46 @@
           eLeague.</li>
           <li>Test, cleanup, document, and turn in project 3</li> 
       </ul></li>
-      <li><ul>
-          <li>Finish security configuration, implementation, and testing</li>
-
-          <li>Edit the deploy/hornetq/hornetq-jms.xml file on your JBoss
-          server to add your project destinations. Include a copy of this
-          file in your project and reference
-          to this file in your project README.</li>
-          <li>Design your JMS message type(s). Write and test a utility
-          class that publishes the messages. This class ideally
-          would be placed in with the BLImpl classes. However, if
-          it publishes DTO classes, the DTOs may have to get moved in
-          with the BO project to satisfy dependency constraints.</li>
-          <li>Implement a Java SE Client to receive and log the JMS
-          messages. This client can be placed in BLImpl, must use a
-          selector, and be launchable by the grader using an Ant script.
-          The Ant script can be part of either the BLImpl or RMI Test
-          project. See class examples on how write the Ant script.</li>
-      </ul></li>
       -->
+      <li><ul>
+          <li>Security
+              <ul>
+                  <li>Finish security configuration, implementation, and testing</li>
+              </ul>
+          </li>
+
+          <li>JMS Message Design
+              <ul>
+                  <li>Design your JMS message type(s)</li>
+
+                  <li>Write a utility class that publishes the messages.
+                  This class ideally would be placed in with the BLImpl
+                  classes.  However, if it publishes DTO classes, the
+                  DTOs may have to get moved in with the BO module to
+                  satisfy dependency constraints.</li>
+
+                  <li>Write an integration-test for the publishing and 
+                  subscribing of the message types designed above. The
+                  integration-test should use the topic(s) pre-configured
+                  in the class server.</li>
+              </ul>
+          </li>
+
+          <li>JSE JMS Client
+              <ul>
+                  <li>Implement a Java SE Client to receive and log the JMS
+                  messages. This client can be placed in BLImpl, must use a
+                  selector, and be launchable by the grader using an Ant script.
+                  The Ant script can be part of either the BLImpl or RMI Test
+                  project. See class examples on how write the Ant script.</li>
+              </ul>
+          </li>
+      </ul></li>
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
       <li><ul>
           <li>Start project 3</li>
           <li>EJB
@@ -129,11 +150,6 @@
               </ul>
           </li>
       </ul></li>
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
       <li><ul>
           <li>Complete your project 2, finish testing, and turn in.</li>
       </ul></li>

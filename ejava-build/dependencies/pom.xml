@@ -936,6 +936,7 @@
 	                  <configuration>
 	                    <lifecycleMappingMetadata>
 	                      <pluginExecutions>
+
 	                        <pluginExecution>
 	                          <pluginExecutionFilter>
 	                            <groupId>org.apache.maven.plugins</groupId>
@@ -963,6 +964,7 @@
 	                            <ignore />
 	                          </action>
 	                        </pluginExecution>
+                            
 	                        <pluginExecution>
 	                          <pluginExecutionFilter>
 	                            <groupId>org.codehaus.cargo</groupId>
@@ -977,6 +979,7 @@
 	                            <ignore />
 	                          </action>
 	                        </pluginExecution>
+                            
 	                        <pluginExecution>
 	                          <pluginExecutionFilter>
 	                            <groupId>org.codehaus.mojo</groupId>
@@ -1032,21 +1035,7 @@
                                 <execute />
                               </action>
                             </pluginExecution>
-	                        
-                            <pluginExecution>
-                              <pluginExecutionFilter>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>build-helper-maven-plugin</artifactId>
-                                <versionRange>[1.7,)</versionRange>
-                                <goals>
-                                  <goal>>reserve-network-port</goal>
-                                </goals>
-                              </pluginExecutionFilter>
-                              <action>
-                                <execute />
-                              </action>
-                            </pluginExecution>
-                            
+
 	                      </pluginExecutions>
 	                    </lifecycleMappingMetadata>
 	                  </configuration>
@@ -1056,5 +1045,47 @@
 	      	</pluginManagement>
 		   </build>
 	    </profile>
+
+        <!--  for some reason - Eclipse would not ignore this plugin when grouped with larger set above -->
+        <profile>
+          <id>ignore-reserve-port</id>
+          <activation>
+            <property>
+              <name>m2e.version</name>
+            </property>
+          </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.eclipse.m2e</groupId>
+                            <artifactId>lifecycle-mapping</artifactId>
+                            <version>1.0.0</version>
+                            <configuration>
+                                <lifecycleMappingMetadata>
+                                    <pluginExecutions>
+                            
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.codehaus.mojo</groupId>
+                                                <artifactId>build-helper-maven-plugin</artifactId>
+                                                <versionRange>[1.7,)</versionRange>
+                                                <goals>
+                                                    <goal>reserve-network-port</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <execute/>
+                                            </action>
+                                        </pluginExecution>                            
+                                        
+                                    </pluginExecutions>
+                                </lifecycleMappingMetadata>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
     </profiles>
 </project>
