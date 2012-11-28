@@ -2,13 +2,11 @@ package ejava.examples.jmsmechanics;
 
 import static org.junit.Assert.*;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;

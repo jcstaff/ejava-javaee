@@ -1,10 +1,10 @@
 package ejava.examples.jmsmechanics;
 
 import java.util.HashMap;
+
 import java.util.LinkedList;
 import java.util.Map;
 
-import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.MapMessage;

@@ -23,7 +23,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ejava.examples.jmsmechanics.JMSAdminJMX;
 import ejava.examples.jmsscheduler.Requestor;
 import ejava.examples.jmsscheduler.Worker;
 import ejava.util.jndi.JNDIUtil;

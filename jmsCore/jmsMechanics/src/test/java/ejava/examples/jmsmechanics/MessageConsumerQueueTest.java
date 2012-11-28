@@ -2,12 +2,11 @@ package ejava.examples.jmsmechanics;
 
 import static org.junit.Assert.*;
 
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -16,9 +15,6 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
-import javax.naming.InitialContext;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
