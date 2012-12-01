@@ -81,12 +81,13 @@ ejb:(ear)/(module)/(distinctName)/(ejbClass)!(remoteInterface)?stateful
     }
 
     /**
-     * This method returns a JNDI name usable with JBoss remote-naming.<p/>
+     * This method returns a JNDI name usable with JBoss remote-naming
+     * for EJBs deployed within an EAR.<p/>
      * org.jboss.naming.remote.client.InitialContextFactory<p/>
      * The physical JNDI name will be listed as:<p/>
      * <pre>
 java:jboss/exported/(ear)/(module)/(ejbClass)!(remoteInterface)
-     * </pre></p>
+     </pre></p>
      * The name returned will have the following form:<p/>
      * <pre>
 (ear)/(module)/(ejbClass)!(remoteInterface)
@@ -106,6 +107,34 @@ java:jboss/exported/(ear)/(module)/(ejbClass)!(remoteInterface)
     	return new StringBuilder()
     		.append(earNameVersion).append("/")
     		.append(ejbModuleNameVersion).append("/")
+    		.append(ejbClassName).append("!")
+    		.append(remoteInterface)
+    		.toString();
+    }
+    
+    /**
+     * This method returns a JNDI name usable with JBoss remote-naming for
+     * EJBs deployed within a WAR (i.e., no EAR).<p/>
+     * The physical JNDI name will be listed as:<p/>
+     * <pre>
+java:jboss/exported/(war)/(ejbClass)!(remoteInterface)
+     </pre>
+     * The name returned will have the following form:<p/>
+     * <pre>
+(war)/(ejbClass)!(remoteInterface)
+     * </pre>
+     * @param moduleNameVersion
+     * @param ejbClassName
+     * @param remoteInterface
+     * @return
+     */
+    public static String getRemoteLookupName(
+    		String moduleNameVersion,
+    		String ejbClassName,
+    		String remoteInterface) {
+
+    	return new StringBuilder()
+    		.append(moduleNameVersion).append("/")
     		.append(ejbClassName).append("!")
     		.append(remoteInterface)
     		.toString();

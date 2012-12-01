@@ -1,13 +1,16 @@
 package myorg.javaeeex.jpa;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
+
+import myorg.javaeeex.cdi.JavaeeEx;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,11 +90,9 @@ public class DBUtil {
     protected List<String> getStatements(String contents) throws Exception {
         List<String> statements = new ArrayList<String>();
 
-        for (StringTokenizer tok = new StringTokenizer(contents,";");
-             tok.hasMoreTokens(); ) {            
-            statements.add(tok.nextToken());
+        for (String tok: contents.split(";")) {
+            statements.add(tok);
         }
-        
         return statements;
     }
     

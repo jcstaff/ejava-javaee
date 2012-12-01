@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import myorg.javaeeex.bl.Registrar;
 import myorg.javaeeex.bl.RegistrarException;
 import myorg.javaeeex.bo.Address;
@@ -12,6 +14,8 @@ import myorg.javaeeex.dao.PersonDAO;
 
 public class RegistrarImpl implements Registrar {
     protected PersonDAO dao;
+    
+    @Inject
     public void setDAO(PersonDAO dao) {
         this.dao = dao;
     }
@@ -50,9 +54,9 @@ public class RegistrarImpl implements Registrar {
 	public Person createPerson(String firstName, String lastName)
 			throws RegistrarException {
         try {
-        	Person person = new Person();
-        	person.setFirstName(firstName);
-        	person.setLastName(lastName);
+            Person person = new Person();
+            person.setFirstName(firstName);
+            person.setLastName(lastName);
             return dao.createPerson(person);
         }
         catch (Throwable ex) {

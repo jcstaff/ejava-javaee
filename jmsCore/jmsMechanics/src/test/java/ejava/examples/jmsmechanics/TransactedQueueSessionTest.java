@@ -2,8 +2,6 @@ package ejava.examples.jmsmechanics;
 
 import static org.junit.Assert.*;
 
-
-import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;

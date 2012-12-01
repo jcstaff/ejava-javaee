@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+    <!-- place elements specific to development/test here -->
+    <context-param>
+        <param-name>java.naming.factory.initial</param-name>
+        <param-value>org.jboss.naming.remote.client.InitialContextFactory</param-value>
+    </context-param>
+    <context-param>
+        <param-name>registrar.remote</param-name> 
+        <param-value>javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote</param-value>
+    </context-param>
+</web-app>

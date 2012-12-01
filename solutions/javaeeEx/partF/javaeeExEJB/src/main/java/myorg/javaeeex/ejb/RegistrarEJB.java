@@ -1,23 +1,18 @@
 package myorg.javaeeex.ejb;
 
-import java.util.Collection;
 import java.util.ArrayList;
 
+import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.Stateless;
 import javax.ejb.EJBException;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import myorg.javaeeex.bl.Registrar;
-import myorg.javaeeex.blimpl.RegistrarImpl;
-import myorg.javaeeex.dao.PersonDAO;
-import myorg.javaeeex.jpa.JPAPersonDAO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import myorg.javaeeex.bl.Registrar;
 import myorg.javaeeex.bl.RegistrarException;
 import myorg.javaeeex.bo.Person;
 import myorg.javaeeex.bo.Address;
@@ -27,21 +22,22 @@ import myorg.javaeeex.dto.PersonDTO;
 @Stateless
 public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     private static Log log = LogFactory.getLog(RegistrarEJB.class);
+    @Inject
     private Registrar registrar;
 
-    @PersistenceContext(unitName="javaeeEx")
-    private EntityManager em;
+    //@Inject @Named("javaeeEx")
+    //private EntityManager em;
 
     @PostConstruct
     public void init() {
         try {
             log.debug("**** init ****");
-            log.debug("em=" + em);
-            PersonDAO dao = new JPAPersonDAO();
-            ((JPAPersonDAO)dao).setEntityManager(em);
+            //log.debug("em=" + em);
+            //PersonDAO dao = new JPAPersonDAO();
+            //((JPAPersonDAO)dao).setEntityManager(em);
 
-            registrar = new RegistrarImpl();
-            ((RegistrarImpl)registrar).setDAO(dao);
+            //registrar = new RegistrarImpl();
+            //((RegistrarImpl)registrar).setDAO(dao);
             log.debug("init complete, registrar=" + registrar);
         }
         catch (Throwable ex) {
@@ -151,7 +147,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
         }
     }
 
-    public Collection<PersonDTO> getPeopleByNameDTO(
+   public Collection<PersonDTO> getPeopleByNameDTO(
            String firstName, String lastName)
            throws RegistrarException {
        log.debug("*** getPeopleByNameDTO() ***");
@@ -170,9 +166,9 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
            log.error(ex);
            throw new RegistrarException(ex.toString());
        }
-    }
+   }
 
-    private PersonDTO makeDTO(Person personBO) {
+   private PersonDTO makeDTO(Person personBO) {
        PersonDTO personDTO = new PersonDTO(personBO.getId());
        personDTO.setFirstName(personBO.getFirstName());
        personDTO.setLastName(personBO.getLastName());
@@ -188,63 +184,4 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
        }
        return personDTO;
    }
-
-    public Collection<Person> getAllPeople(int index, int count)
-            throws RegistrarException {
-        log.debug("*** getAllPeople(index=" + index +
-                ", count=" + count + ") ***");
-
-        try {
-            return registrar.getAllPeople(index, count);
-        }
-        catch (Throwable ex) {
-            log.error(ex);
-            throw new RegistrarException(ex.toString());
-        }
-    }
-
-    public Collection<Person> getAllPeopleHydrated(int index, int count)
-        throws RegistrarException {
-        log.debug("*** getAllPeopleHydrated(index=" + index +
-                ", count=" + count + ") ***");
-
-        try {
-            Collection<Person> people = registrar.getAllPeople(index, count);
-            for (Person person : people) {
-                hydratePerson(person);
-            }
-            return people;
-        }
-        catch (Throwable ex) {
-            log.error(ex);
-            throw new RegistrarException(ex.toString());
-        }
-    }
-
-    public Person getPersonByIdHydrated(long id) throws RegistrarException {
-        log.debug("*** getPersonByIdHydrated() ***");
-
-        try {
-            Person person = registrar.getPersonById(id);
-            hydratePerson(person);
-            return person;
-        }
-        catch (Throwable ex) {
-            log.error(ex);
-            throw new RegistrarException(ex.toString());
-        }
-    }
-
-    public Person changeAddress(Person person, Address address)
-            throws RegistrarException {
-        log.debug("*** changeAddress() ***");
-
-        try {
-            return registrar.changeAddress(person, address);
-        }
-        catch (Throwable ex) {
-            log.error(ex);
-            throw new RegistrarException(ex.toString());
-        }
-    }
 }

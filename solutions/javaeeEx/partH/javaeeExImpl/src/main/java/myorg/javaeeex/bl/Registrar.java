@@ -10,8 +10,8 @@ public interface Registrar {
         throws RegistrarException;
     Person createPerson(Person person) 
         throws RegistrarException;
-	Person createPerson(String firstName, String lastName)
-	    throws RegistrarException;
+    Person createPerson(String firstName, String lastName)
+        throws RegistrarException;
     Person changeAddress(Person person, Address address) 
         throws RegistrarException;    
     Collection<Person> getPeopleByName(String firstName, String lastName)

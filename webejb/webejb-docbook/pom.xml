@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.webejb</groupId>
+        <artifactId>webejb</artifactId>
+        <version>3.0.2012.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>webejb-docbook</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Web-oriented EJB Docbook Project</name>
+    <description>
+        This project contains the documentation for the 
+        deployment of EJBs in the web tier and exposing them
+        to the web using JAX-RS and JAX-B
+    </description>
+    
+    <properties>
+       <doc.base>webejb</doc.base>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

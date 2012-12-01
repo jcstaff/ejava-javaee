@@ -205,7 +205,7 @@ Listening for transport dt_socket at address: 8787
                 <para>
                     Provide a specification to maven where your JBoss server
                     has been installed in the <code>.m2/settings.xml</code>
-                    file using the <code>jboss.home</code> property. If you 
+                    file using the <code>jboss.home</code> property. *If* you 
                     have changed the address -- you can specify that using
                     the <code>jboss.host</code> property. 
                 </para>
@@ -213,7 +213,7 @@ Listening for transport dt_socket at address: 8787
         <profile>
             <id>jboss7</id>
             <properties>
-                <jboss.host>127.0.0.5</jboss.host>
+                <jboss.host>127.0.0.1</jboss.host>
                 <jboss.home>/opt/jboss-as-7.1.1.Final</jboss.home>
             </properties>
         </profile>

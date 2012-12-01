@@ -1,0 +1,1781 @@
+Java EE Exercise 
+
+Part F: Create WAR Project Shell
+
+    This exercise will add a user interface for our application using 
+    a Web UI. The Web UI will demonstrate how to leverage MVC architecture
+    with Servlets, JSPs, and integration with the EJB Tieri and EAR. The
+    development environment will also be a focus of this exercise.
+
+* Objectives
+
+    * Create and deploy a bare bones WAR within our application.
+
+        * {{{Create_the_WAR_Maven_project}
+            Create the WAR Maven project
+            }}
+
+        * {{{Configure_and_Test_WAR_using_Jetty}
+            Configure and Test WAR using Jetty
+            }}
+
+        * {{{Configure_the_WAR_into_your_EAR_and_test_within_JBoss}
+            Configure the WAR into your EAR and test within JBoss
+            }}
+
+        * {{{Add_Servlet}
+            Add Servlet
+            }}
+
+    * Integrate your WAR with and end-to-end call to the EJB.
+
+        * {{{Add_JNDI_InitialContext_to_Servlet}
+            Add JNDI InitialContext to Servlet
+            }}
+
+        * {{{Add_EJB_to_Servlet}
+            Add EJB to Servlet
+            }}
+
+        * {{{Add_Controller_Servlet_to_invoke_EJB}
+            Add Controller Servlet to invoke EJB
+            }}
+
+
+
+* {Create the WAR Maven project}
+
+    We will use a maven war project type to host the web tier for the application.
+
+    [[1]] Add a WAR project directory to your project tree.
+
+---
+$ ls
+javaeeExEAR  javaeeExEJB  javaeeExImpl  javaeeExTest  pom.xml
+
+$ mkdir javaeeExWAR
+---
+
+    [[1]] Add a minimal version of the web.xml descriptor 
+    for the WAR.
+
+---
+$ mkdir -p javaeeExWAR/src/main/webapp/WEB-INF
+---
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+<web-app 
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+  <display-name>Web Tier Exercise Web Application</display-name>
+
+</web-app>
+---
+
+    [[1]] Add a minimal version of the web.xml override. Contents of this
+    web.xml will be used during local jetty environment development/testing
+    and not deployed to the server.
+
+---
+$ mkdir -p javaeeExWAR/src/test/webapp/WEB-INF
+---
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+<web-app 
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+    <!-- place elements specific to development/test here -->
+
+</web-app>
+---
+
+    [[1]] Add a minimal version of the maven pom.xml to the WAR
+    project.
+
+---
+$ cat javaeeExWAR/pom.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>javaeeEx</artifactId>
+        <groupId>myorg.javaee</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>myorg.javaee</groupId>
+    <artifactId>javaeeExWAR</artifactId>
+    <packaging>war</packaging>
+
+    <name>Java EE Exercise WAR</name>
+
+    <dependencies>
+    </dependencies>
+
+    <build>
+    </build>
+
+    <profiles>
+    </profiles>
+</project>
+---
+
+    [[1]] Build your minimal version of a WAR.
+
+---
+$ (cd javaeeExWAR; mvn clean install)
+...
+[INFO] 
+[INFO] --- maven-war-plugin:2.1.1:war (default-war) @ javaeeExWAR ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [javaeeExWAR] in [/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT]
+[INFO] Processing war project
+[INFO] Copying webapp resources [/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp]
+[INFO] Webapp assembled in [134 msecs]
+[INFO] Building war: /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT.war
+[INFO] WEB-INF/web.xml already added, skipping
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ javaeeExWAR ---
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+---
+...
+javaeeExWAR/
+|-- pom.xml
+|-- src
+|   |-- main
+|   |   `-- webapp
+|   |       `-- WEB-INF
+|   |           `-- web.xml
+|   `-- test
+|       `-- webapp
+|           `-- WEB-INF
+|               `-- web.xml
+`-- target
+    |-- javaeeExWAR-1.0-SNAPSHOT
+    |   |-- META-INF
+    |   `-- WEB-INF
+    |       |-- classes
+    |       `-- web.xml
+    |-- javaeeExWAR-1.0-SNAPSHOT.war
+...
+---
+
+    
+* {Configure and Test WAR using Jetty}
+
+    Web UI development requires a great deal of change, save, view,
+    and repeat. We will want to cut the time it takes to complete that
+    cycle as much as possible and use the lightweight Jetty Servlet
+    engine and maven plugin to help do that for us and saving some of
+    the significant build and deploy time to server. Refer to the 
+    {{{http://docs.codehaus.org/display/JETTY/Maven+Jetty+Plugin}
+    Jetty Plugin Documentation}} for more details.
+
+    [[1]] Add the Jetty maven plugin configuration to your pom.xml. Since
+        most of the configuration is generic, you can define it within
+        the parent to make it reusable for the next WAR down the line.
+
+        * Add property definitions for port number (9080) and scan
+        interval (10).  The port number is the listen port for the server
+        and the scan interval is how often jetty will restart when there
+        are changes within the classes within the project. By making these
+        properties instead of hard-coding them into the pluginManagement
+        definition -- you get a chance to override them on the command
+        line or child pom.
+
+        []
+
+---
+    <properties>
+        <maven-jetty-plugin.version>6.1.26</maven-jetty-plugin.version>
+        ...
+        <jetty.reload>automatic</jetty.reload>
+        <jetty.scanIntervalSeconds>10</jetty.scanIntervalSeconds>
+        <jetty.port>9080</jetty.port>
+---
+
+        * Add the following plugin definition to the pluginManagement
+        in the parent pom. Note how none of this is specific to any
+        WAR but does define a reusable configuration and use of the 
+        plugin across WARs.
+
+            * reload - set to manual if you want to manually control when 
+            jetty reloads. Set to automatic to use the scanIntervalSecs 
+            option.
+
+            * scanIntervalSeconds - the time Jetty will wait before restarting
+            and reloading when implementation classes change. A low number 
+            will result in seeing changes quicker. I higher number will keep 
+            the server from thrashing when you save your in-progress changes.
+
+            * overrideWebXml - will be used to host jetty/development-specific
+            configuration elements for the WAR. Items within this file are 
+            not part of the WAR deployed to the server.
+
+            * useTestClasspath -- this allows any helper classes you create
+            in your src/test tree to be available within the jetty server.
+
+---
+$ cat pom.xml
+...
+    	</pluginManagement>
+            </plugins>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    <version>${maven-jetty-plugin.version}</version>
+                    <configuration>
+                        <jetty.reload>${jetty.reload}</jetty.reload>
+                        <scanIntervalSeconds>${jetty.scanIntervalSeconds}</scanIntervalSeconds>
+                        <overrideWebXml>${basedir}/src/test/webapp/WEB-INF/web.xml</overrideWebXml>
+                        <useTestClasspath>true</useTestClasspath>
+                        <systemProperties>
+
+                        </systemProperties>
+                        <connectors>
+                            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                                <port>${jetty.port}</port>
+                                <maxIdleTime>60000</maxIdleTime>
+                            </connector>
+                        </connectors>
+                    </configuration>
+                </plugin>          
+...
+---
+
+        * Add system properties to the jetty configuration for integrating the servlet logging
+        with the log4j.xml we will later place in the module source tree.
+
+---
+                        <systemProperties>
+                            <systemProperty>
+                                <name>slf4j</name>
+                                <value>true</value>
+                            </systemProperty>
+                            <systemProperty>
+                                <name>log4j.configuration</name>
+                                <value>file:./target/test-classes/log4j.xml</value>
+                            </systemProperty>
+                        </systemProperties>
+---
+
+    [[1]] Activate the application using the Jetty maven plugin.
+
+---
+$ (cd javaeeExWAR; mvn jetty:run -Pjetty)
+
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java EE Exercise WAR 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] >>> maven-jetty-plugin:6.1.26:run (default-cli) @ javaeeExWAR >>>
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ javaeeExWAR ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ javaeeExWAR ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:testResources (default-testResources) @ javaeeExWAR ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ javaeeExWAR ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< maven-jetty-plugin:6.1.26:run (default-cli) @ javaeeExWAR <<<
+[INFO] 
+[INFO] --- maven-jetty-plugin:6.1.26:run (default-cli) @ javaeeExWAR ---
+[INFO] Configuring Jetty for project: Java EE Exercise WAR
+[INFO] Webapp source directory = /home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/main/webapp
+[INFO] Reload Mechanic: automatic
+[INFO] Classes directory /home/jcstaff/solutions/javaeeEx/javaeeExWAR/target/classes does not exist
+2011-04-12 23:00:49.304:INFO::Logging to STDERR via org.mortbay.log.StdErrLog
+[INFO] Context path = /javaeeExWAR
+[INFO] Tmp directory =  determined at runtime
+[INFO] Web defaults = org/mortbay/jetty/webapp/webdefault.xml
+[INFO] Web overrides =  none
+[INFO] web.xml file = /home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+[INFO] Webapp directory = /home/jcstaff/solutions/javaeeEx/javaeeExWAR/src/main/webapp
+[INFO] Starting jetty 6.1.26 ...
+2011-04-12 23:00:49.511:INFO::jetty-6.1.26
+2011-04-12 23:00:49.663:INFO::No Transaction manager found - if your webapp requires one, please configure one.
+2011-04-12 23:00:50.049:INFO::Started SelectChannelConnector@0.0.0.0:9080
+[INFO] Started Jetty Server
+[INFO] Starting scanner at interval of 10 seconds.
+---
+
+    [[1]] Terminate (with Control-C) and rerun with manual reload option. Using this feature you can
+    specifically control when new class changes are used.
+
+---
+ (cd javaeeExWAR/; mvn jetty:run -Djetty.reload=manual)
+...
+[INFO] Started Jetty Server
+[WARNING] scanIntervalSeconds is set to 10 but will be IGNORED due to manual reloading
+[INFO] Console reloading is ENABLED. Hit ENTER on the console to restart the context.
+
+
+[INFO] restarting org.mortbay.jetty.plugin.Jetty6PluginWebAppContext@8d5a91{/javaeeExWAR,/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp}
+[INFO] Webapp source directory = /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp
+[INFO] Reload Mechanic: manual
+[INFO] Classes directory /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/target/classes does not exist
+[INFO] Context path = /javaeeExWAR
+[INFO] Tmp directory =  determined at runtime
+[INFO] Web defaults = org/mortbay/jetty/webapp/webdefault.xml
+[INFO] Web overrides = /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/test/webapp/WEB-INF/web.xml
+[INFO] web.xml file = /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+[INFO] Webapp directory = /home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp
+2012-11-10 10:09:45.960:INFO::No Transaction manager found - if your webapp requires one, please configure one.
+[INFO] Restart completed at Sat Nov 10 10:09:46 EST 2012
+---
+
+    [Note:] Notice that we were able to accomplish the above without yet 
+    placing anything within a specific WAR. The definition of the jetty:run
+    goal was provided in the reusable pluginManagement of the parent and 
+    this plugin does *not* automatically wire itself into any phases of the build.
+    By manually specifying the jetty:run goal on the Maven command line, 
+    we are asking that the goal be run with how we have defined it to run.
+
+    []
+
+
+    [[1]] Navigate to the root URL within the Jetty server. Use the 
+    Jetty provided link to locate the root of our application.
+
+---
+http://localhost:9080/
+
+Error 404 - Not Found.
+
+No context on this server matched or handled this request.
+Contexts known to this server are:
+/javaeeExWAR ---> org.mortbay.jetty.plugin.Jetty6PluginWebAppContext@1cc5d23{/javaeeExWAR,/home/jcstaff/proj/exercises/javaeeEx/javaeeExWAR/src/main/webapp}
+---
+---
+http://localhost:9080/javaeeExWAR/
+
+Directory: /javaeeExWAR/
+
+WEB-INF/        4096 bytes      Nov 9, 2012 9:31:27 PM
+---
+
+    [[1]] Add the following index.jsp to the root of your 
+    application. Place this in javaeeExWAR/src/main/webapp/index.jsp
+
+---
+$ cat src/main/webapp/index.jsp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>JavaEE Exercise Main Page</title>
+</head>
+<body>
+    <h2>Hello</h2>
+</body>
+</html>
+---
+
+    [[1]] Hit refresh on the browser to see your new index.jsp.
+
+---
+http://localhost:9080/javaeeExWAR/
+
+
+Hello
+---
+
+    [Note:] Resource file changes (i.e., jsp, html, txt files
+    are seen right away. The reload/scan interval is only for the
+    container/class changes.
+
+* {Configure the WAR into your EAR and test within JBoss}
+
+    [[1]] Add the WAR module to the parent pom.
+
+---
+$ cat pom.xml
+...
+    <modules>
+        <module>javaeeExImpl</module>
+        <module>javaeeExEJB</module>
+        <module>javaeeExWAR</module>
+        <module>javaeeExEAR</module>
+    </modules>
+...
+---
+
+    [[1]] Add a dependency from the EAR project to the WAR.
+
+---
+$ cat javaeeExEAR/pom.xml
+
+...
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExWAR</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+...
+---
+
+    [[1]] Add an optional configuration to supply a custom context
+    root for the WAR when deployed to the application server.
+
+---
+$ cat javaeeExEAR/pom.xml
+
+...
+    <build>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-ear-plugin</artifactId>
+            <configuration>
+                ...
+                <modules>
+                    ...
+                    <webModule>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>javaeeExWAR</artifactId>
+                        <contextRoot>javaeeEx</contextRoot>
+                    </webModule>
+                </modules>
+            </configuration>
+        </plugin>
+    </build>
+...
+---
+
+    [[1]] Build and deploy the EAR from the parent project.
+
+---
+$ mvn clean pre-integration-test
+mvn clean pre-integration-test -rf :javaeeExWAR
+
+...
+[INFO] Java EE Exercise WAR .............................. SUCCESS [4.244s]
+[INFO] Java EE Exercise EAR .............................. SUCCESS [25.545s]
+[INFO] Java EE Exercise Remote Test ...................... SUCCESS [9.800s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+---
+---
+//SERVER LOG
+
+10:22:39,454 INFO  [org.jboss.web] (MSC service thread 1-1) JBAS018210: Registering web context: /javaeeEx
+10:22:39,467 INFO  [org.jboss.as.server] (management-handler-thread - 65) JBAS018559: Deployed "javaeeExEAR-1.0-SNAPSHOT.ear"
+...
+---
+
+    [[1]] Test the deployment of the application by using the assigned
+    URL and context root.
+
+---
+http://localhost:8080/javaeeEx/
+
+
+Hello
+---
+
+    This is what the solution should look like so far.
+
+---
+javaeeExWAR/
+|-- pom.xml
+|-- src
+|   |-- main
+|   |   `-- webapp
+|   |       |-- index.jsp
+|   |       `-- WEB-INF
+|   |           `-- web.xml
+|   `-- test
+|       `-- webapp
+|           `-- WEB-INF
+|               `-- web.xml
+`-- target
+    |-- javaeeExWAR-1.0-SNAPSHOT
+    |   |-- index.jsp
+    |   |-- META-INF
+    |   `-- WEB-INF
+    |       |-- classes
+    |       `-- web.xml
+    |-- javaeeExWAR-1.0-SNAPSHOT.war
+...
+---
+---
+$ jar tf javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT.war | sort
+index.jsp
+...
+WEB-INF/
+WEB-INF/classes/
+WEB-INF/web.xml
+---
+
+* {Add Servlet}
+
+    [[1]] Add a dependency on the Servlet API and commons logging
+    to support the code written specifically for the servlet class.
+    Define the scope to be scope=provided so they are not included
+    in the WEB-INF/lib at deployment. Reuse the dependencyManagement
+    dependency definitions from the parent pom.
+
+---
+$ cat javaeeExWAR/pom.xml
+
+...
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+---
+
+    [[1]] The dependency artifacts we defined above are not necessary when deployed
+    to the application server but are necessary when we runnin jetty locally. 
+    Define dependences for the logging capability within the parent jetty 
+    pluginManagement section. We can do this as long as all of our WARs use
+    the same logging framework. We do not have to repeat the servlet API jar
+    file since the jetty plugin will automatically supply that.
+
+---
+    	<pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    <configuration>
+                    ...
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                            <version>${commons-logging.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>log4j</groupId>
+                            <artifactId>log4j</artifactId>
+                            <version>${log4j.version}</version>
+                        </dependency>
+                    </dependencies>       
+---
+
+    [Note] Since the default scope is scope=compile, we do not have to specify a 
+    scope value above. We do need to re-specify the version#. The version and other
+    dependency information does not carry over from the dependencyManagement section
+    to plugin.dependencies.
+
+    []
+
+
+    [[1]] We will need to make sure the Java compiler compiling the WAR is 
+    compliant with at least Java 1.6. Luckily we already took care of that 
+    in the parent pluginManagement section in an earlier part of the exercises.
+    You need to do nothing for this step except understand the WAR module will
+    be inheriting the Java compiler definition of the parent pom.
+
+---
+# javaeeEx/pom.xml
+...
+    <properties>
+        ...
+        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+        ...
+    <build>
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                    </configuration>	                
+                </plugin>
+               ...
+---
+
+    [[1]] Add the following shell of a Servlet class to the WAR.
+
+---
+$ mkdir -p javaeeExWAR/src/main/java/myorg/javaeeex/web
+---
+---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+package myorg.javaeeex.web;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+@SuppressWarnings("serial")
+public class RegistrarHandlerServlet extends HttpServlet {
+    private static final Log log = LogFactory.getLog(RegistrarHandlerServlet.class);
+
+    public void init() throws ServletException {
+        log.debug("init() called ");
+    }
+
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
+        throws ServletException, IOException {
+        log.debug("doGet() called");    
+    }
+
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
+        throws ServletException, IOException {
+        log.debug("doPost() called, calling doGet()");
+        doGet(request, response);
+    }
+
+    public void destroy() {
+        log.debug("destroy() called");
+    }
+}
+---
+
+    [[1]] Register the servlet within the WEB-INF/web.xml. Map the
+    servlet to the "/model/admin/handler" url-pattern.
+
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+
+<web-app
+   ...
+
+
+    <servlet>
+        <servlet-name>AdminHandler</servlet-name>
+        <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminHandler</servlet-name>
+        <url-pattern>/model/admin/handler</url-pattern>
+    </servlet-mapping>
+</web-app>
+---
+
+    [[1]] Add a list of menu entries to the root index.jsp and 
+    a menu entry to invoke the servlet.
+
+---
+$ cat javaeeExWAR/src/main/webapp/index.jsp
+
+...
+<body>
+    <h2>Hello</h2>
+    <ul>
+        <li><a href="model/admin/handler">invoke servlet</a></li>
+    </ul>
+</body>
+</html>
+---
+
+    [[1]] Add a log4j.xml to be used for local debugging.
+
+---
+$ mkdir -p javaeeExWAR/src/test/resources
+---
+---
+$ cat javaeeExWAR/src/test/resources/log4j.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+   <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+         <param name="Target" value="System.out"/>
+
+         <layout class="org.apache.log4j.PatternLayout">
+            <!-- The default pattern: Date Priority [Category] Messagen -->
+            <!--
+            <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+            -->
+            <param name="ConversionPattern" value=" -%m%n"/>
+         </layout>
+   </appender>
+
+   <appender name="logfile" class="org.apache.log4j.RollingFileAppender">
+      <param name="File" value="/tmp/log4j-out.txt"/>
+      <param name="Append" value="false"/>
+      <param name="MaxFileSize" value="100KB"/>
+      <param name="MaxBackupIndex" value="1"/>
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+      </layout>
+   </appender>
+
+   <logger name="myorg">
+      <level value="debug"/>
+   </logger>
+   <root>
+      <priority value="info"/>
+      <appender-ref ref="CONSOLE"/>
+   </root>
+
+</log4j:configuration>
+---
+
+    [[1]] Test your new artifacts using Jetty first. If you do not see log4j
+    output, check your placement of the log4j.xml file and the system properties
+    registered in the parent pom pluginManagement section.
+
+---
+$ (cd javaeeExWAR; mvn clean jetty:run)
+---
+
+    [[1]] Access your servlet hosted within Jetty
+
+        * http://localhost:9080/javaeeExWAR/
+
+        * click on "invoke servlet"
+
+        []
+
+---
+//CONSOLE
+
+[INFO] Starting scanner at interval of 10 seconds.
+ -init() called
+ -doGet() called
+---
+
+    [[1]] Access your servlet hosted within the application server. You
+    will need to rebuild and re-deploy your application to do so.
+
+---
+$ mvn clean pre-integration-test -rf :javaeeExWAR
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java EE Exercise WAR
+[INFO] Java EE Exercise EAR
+[INFO] Java EE Exercise Remote Test
+...
+---
+    
+        * http://localhost:8080/javaeeEx/
+
+        * click on "invoke servlet"
+
+        []
+
+---
+//SERVER LOG
+
+16:35:20,789 INFO  [org.jboss.web] (MSC service thread 1-4) JBAS018210: Registering web context: /javaeeEx
+16:35:20,834 INFO  [org.jboss.as.server] (management-handler-thread - 4) JBAS018559: Deployed "javaeeExEAR-1.0-SNAPSHOT.ear"
+16:36:00,669 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) init() called 
+16:36:00,680 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) doGet() called
+---
+
+* {Add JNDI InitialContext to Servlet}
+
+    Your WAR contains all the UI constructs but delegates all business
+    logic to the EJB tier. The EJBs are deployed to the server and now
+    we need to make the Web tier an RMI client of the EJB tier to perform
+    end-to-end functionality.
+
+    [[1]] Add RMI dependencies for JBoss to the jetty pluginManagement 
+    definition in the parent pom. This dependency will pull in a host
+    of JBoss dependencies used to communicate with the server using RMI.
+    Since this is not WAR-dependent, we can add this to the global
+    jetty definition for easy reuse. These steps should look familiar. 
+    They are the same type of steps taken when setting on the RMI Test 
+    client module.
+
+---
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    ...
+                    <dependencies>
+                        ...
+                        <dependency>
+                            <groupId>ejava.common</groupId>
+                            <artifactId>jboss-rmi-client</artifactId>
+                            <version>${ejava.version}</version>
+                            <type>pom</type>
+                        </dependency>    
+                    </dependencies>       
+                </plugin>          
+---
+
+    [Note] We need to add type=pom for this artifact because it is not
+    a jar module. It is a parent module with the sole purpose of defining
+    transitive dependencies on other modules so that the dependency section
+    for this module can be scaled down to a single line item.
+
+    []
+
+    [[1]] Define the jndi.properties required to access the JNDI tree within 
+    JBoss. Place the following jndi.properties file in your src/test tree
+    so that it does not get deployed with the WAR. We can do this because
+    jetty was configured to use the test classpath and can see this property 
+    in the build environment. Some of these properties will get overwritten
+    by Jetty, but the key one we need filtered is the java.naming.factory.url.
+
+---
+$ cat javaeeExWAR/src/test/resources/jndi.propeties
+
+java.naming.factory.initial=${jboss.remoting.java.naming.factory.initial}
+java.naming.provider.url=${jboss.remoting.java.naming.provider.url}
+java.naming.factory.url.pkgs=${jboss.remoting.java.naming.factory.url.pkgs}
+java.naming.security.principal=${jboss.remoting.java.naming.security.principal}
+java.naming.security.credentials=${jboss.remoting.java.naming.security.credentials}
+jboss.naming.client.ejb.context=true
+---
+
+    [[1]] Add a testResource filtering specification to the WAR's pom.xml.
+    This will allow the variables from the file be replaced with property 
+    values you put in place when setting up the RMI Test client.
+
+---
+    <build>
+        <!-- filter test/resource files for profile-specific valies -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+---
+---
+$ (cd javaeeExWAR; mvn clean process-test-resources)
+$ cat javaeeExWAR/target/test-classes/jndi.propeties
+
+java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+java.naming.provider.url=remote://127.0.0.1:4447
+java.naming.factory.url.pkgs=
+java.naming.security.principal=known
+java.naming.security.credentials=password
+jboss.naming.client.ejb.context=true
+---
+
+    [Note:] The above definition will filter anything while copying the
+    src/test/resources directory to target/test-classes. Keep that in 
+    mind if you even have files with variables you want exanded at runtime
+    and not compile time. The above also will modify binary files like
+    PKI certs. If you have any of these conditions, you will need to 
+    add and includes/excludes section to the definition.
+
+    []
+
+    [[1]] Add a helper method to the servlet that will resolve the
+    Registrar; starting with the JNDI tree. Account for the fact that
+    Jetty will overwrite the java.naming.factory.initial property and
+    allow the specific option to use be specified at runtime.
+
+---
+$ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+import java.util.Properties;
+...
+import javax.naming.InitialContext;
+import javax.servlet.ServletConfig;
+...
+    private void initRegistrar(ServletConfig config) throws Exception {
+    	InitialContext jndi = null;
+    	String ctxFactory = config.getServletContext()
+                                  .getInitParameter(Context.INITIAL_CONTEXT_FACTORY);
+    	log.debug(Context.INITIAL_CONTEXT_FACTORY + "=" + ctxFactory);
+    	if (ctxFactory!=null) {
+        	Properties env = new Properties();
+        	env.put(Context.INITIAL_CONTEXT_FACTORY, ctxFactory);
+        	jndi = new InitialContext(env);
+    	}
+    	else {
+    		jndi = new InitialContext();
+    	}
+    }
+---
+
+    [[1]] Call the helper method from the Servlet.init() method.
+
+---
+    public void init() throws ServletException {
+        log.debug("init() called ");
+        try {
+            ServletConfig config = getServletConfig();
+            initRegistrar(config);
+        }
+        catch (Exception ex) {
+            log.fatal("error initializing handler", ex);
+            throw new ServletException("error initializing handler", ex);
+        }
+    }
+---
+
+    [[1]] Add a context parameter to the override web.xml file in src/test. Be sure to place this
+    in src/test and not src/main. This specific factory will not work within JBoss and must
+    be exclusively used by RMI clients.
+
+---
+$ cat javaeeExWAR/src/test/webapp/WEB-INF/web.xml
+...
+    <!-- place elements specific to development/test here -->
+    <context-param>
+        <param-name>java.naming.factory.initial</param-name>
+        <param-value>org.jboss.naming.remote.client.InitialContextFactory</param-value>
+    </context-param>
+</web-app>
+---
+
+    [[1]] Retest your jetty environment and notice our org.jboss.naming.remote.client.InitialContextFactory
+    is now again put in place. The values for java.naming.factory.url.pkgs do not matter once the 
+    proper java.naming.factory.initial is specified.
+
+        * http://localhost:9080/javaeeExWAR
+
+        * click on "invoke servlet"
+
+---
+[INFO] Restart completed at Sat Nov 10 15:43:35 EST 2012
+ -init() called 
+ -java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+ -doGet() called
+---
+
+    [[1]] Test your implementation from the application server. You will 
+    need to rebuild and redeploy the application.
+
+        * http://localhost:8080/javaeeEx/
+
+        * click on "invoke servlet"
+
+---
+$ mvn clean pre-integration-test -rf :javaeeExWAR
+...
+---
+---
+//SERVER LOG
+
+16:36:00,669 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) init() called 
+16:36:00,670 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) java.naming.factory.initial=null
+16:36:00,680 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-1) doGet() called
+---
+
+* {Add EJB to Servlet}
+
+    [[1]] Add a dependency on the EJB and Impl module within the
+    WAR/pom.xml.  The root level dependency within the pom will be on
+    the EJB itself (scope=provided) since they will be sitting side by
+    side in the same EAR.
+
+---
+$ cat javaeeExWAR/pom.xml
+
+...
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExEJB</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javaeeExImpl</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+---
+
+    [[1]] The Jetty configuration will depend on the ejb-client; same as the 
+    external RMI clients. However, up until now, we have been adding everything
+    to the parent jetty pluginManagement section. We have finally hit something
+    that could be unique to this WAR. Declare the jetty plugin in the WAR pom
+    and add a scope=compile dependency on the ejb-client.
+
+---
+$ cat javaeeExWAR/pom.xml
+
+    <build>
+        ...
+        <plugins>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>javaeeExEJB</artifactId>
+                        <version>${project.version}</version>
+                        <type>ejb-client</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>javaeeExImpl</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>       
+            </plugin>          
+        </plugins>
+    </build>
+---
+
+    [[1]] Add the JNDI names for the Registrar interfaces to 
+    the ServletConfig within the test web.xml. This will be used to support
+    the Jetty configuration and will not be needed for the EAR-based
+    configuration.
+
+---
+$ cat javaeeExWAR/src/test/webapp/WEB-INF/web.xml
+
+...
+    <context-param>
+        <param-name>registrar.remote</param-name> 
+        <param-value>javaeeExEAR/javaeeExEJB/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote</param-value>
+    </context-param>
+...
+---
+
+    [[1]] Add an object-level reference for the Registrar. Start
+    off by using the remote interface for both Jetty and the 
+    EAR deployment. Use the javax.ejb.EJB annotation to signal the
+    injection. 
+
+---
+$ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+import javax.ejb.EJB;
+...
+import myorg.javaeeex.ejb.RegistrarRemote;
+...
+public class RegistrarHandlerServlet extends HttpServlet {
+...
+    @EJB
+    private RegistrarRemote registrar;
+---
+
+    [[1]] Update the initRegistrar() helper method to also lookup the Registrar
+    EJB in the JNDI tree using the remote interface. We should only
+    need this code in the Jetty environment since the JBoss environment
+    will being fulfilling the @Inject requirement.
+
+---
+    private void initRegistrar(ServletConfig config) throws Exception {
+        log.debug("initRegistrar(), registrar=" + registrar);
+        if (registrar == null) {
+            //build an InitialContext from Servlet.init properties in web.xml
+            InitialContext jndi = null;
+            ...
+            String jndiName = config.getServletContext().getInitParameter("registrar.remote");
+            registrar = (RegistrarRemote)jndi.lookup(jndiName);
+            log.debug("registrar initialized:" + registrar);
+        }        
+    }
+---
+
+    [[1]] Test your lookup of the EJB using your Jetty configuration.
+
+        * http://localhost:9080/javaeeExWAR/
+
+        * click on "invoke servlet"
+
+---
+(cd javaeeExWAR; mvn -Dslf4j=true -Dlog4j.configuration=file:./src/test/resources/log4j.xml jetty:run -Pjetty)
+---
+---
+ -init() called 
+ -initRegistrar(), registrar=null
+ -java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+ -registrar initialized:Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+ -doGet() called
+---
+
+    [[1]] Test your lookup of of the EJB using your deployed EAR. You will
+    need to rebuild and redeploy first.
+
+        * http://localhost:8080/javaeeEx/
+
+        * click on "invoke servlet"
+
+---
+$ mvn clean pre-integration-test -rf :javaeeExWAR
+...
+---
+---
+17:29:30,960 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) init() called 
+17:29:30,961 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) initRegistrar(), registrar=Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+17:29:30,963 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+---
+
+    [[1]] Optionally update your @EJB injection into the servlet with
+    a JSR-330 javax.inject.Inject. The value in doing this is @Inject
+    does not require the solution to be an EJB.
+
+        * Change the @EJB to @Inject in the servlet class
+
+---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+import javax.inject.Inject;
+...
+    @Inject
+    private RegistrarRemote registrar;
+---
+
+        * Add a RegistrarWebConfig class to hold the mapping between
+        the injection requirement and the resource resource.
+
+---
+package myorg.javaeeex.web;
+
+import javax.ejb.EJB;
+import javax.enterprise.inject.Produces;
+
+import myorg.javaeeex.ejb.RegistrarRemote;
+
+/**
+ * This class is used to define the injection type for RegistrarRemote
+ * types
+ */
+public class RegistrarWebConfig {
+    @Produces 
+    @EJB 
+    public RegistrarRemote registrar;
+}       
+---
+
+        * Add a beans.xml to the WEB-INF directory of the WAR. This activates
+        CDI within the WAR.
+
+---
+$ touch javaeeExWAR/src/main/webapp/WEB-INF/beans.xml
+---
+
+    [[1]] Test your CDI lookup of of the EJB using your deployed EAR. You will
+    need to rebuild and redeploy first.
+
+        * http://localhost:8080/javaeeEx/
+
+        * click on "invoke servlet"
+
+---
+$ mvn clean pre-integration-test -rf :javaeeExWAR
+...
+---
+---
+18:40:19,395 INFO  [org.jboss.weld.deployer] (MSC service thread 1-1) JBAS016008: Starting weld service for deployment javaeeExEAR-1.0-SNAPSHOT.ear
+18:40:19,584 INFO  [org.jboss.web] (MSC service thread 1-1) JBAS018210: Registering web context: /javaeeEx
+18:40:19,602 INFO  [org.jboss.as.server] (management-handler-thread - 18) JBAS018559: Deployed "javaeeExEAR-1.0-SNAPSHOT.ear"
+...
+18:49:19,219 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) init() called 
+18:49:19,224 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) initRegistrar(), registrar=Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+18:49:19,227 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) configured handler type:anonymous with {Ping=myorg.javaeeex.web.RegistrarHandlerServlet$Ping@549a16}
+18:49:19,229 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+18:49:19,234 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) command=Ping
+18:49:19,252 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) **** init ****
+18:49:19,252 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@14316bd
+18:49:19,254 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) ping called
+---
+
+    At this point we now have a functional servlet/WAR with an injected EJB ready
+    to start adding methods.
+
+* {Add Controller Servlet to invoke EJB}
+
+    In this step we are going to add some structure to the Web Tier. The
+    structure will be consistent with the ideas of Model View Controller 
+    (MVC), but we will make a few shortcuts to keep this simple. We are
+    going to deploy two instances of the Controller Servlet; one for 
+    anonymous users and another for admin users. We can leverage this
+    separation later when security is added.
+
+    [[1]] Add a type=admin to the current servlet specification within
+    web.xml. This will be used by the Servlet to determine which actions
+    are allowed within each context. Be sure to do this in the web.xml 
+    file in src/main.
+
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+
+...
+    <servlet>
+        <servlet-name>AdminHandler</servlet-name>
+        <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
+        <init-param>
+            <param-name>type</param-name>
+            <param-value>admin</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminHandler</servlet-name>
+        <url-pattern>/model/admin/handler</url-pattern>
+    </servlet-mapping>
+---
+
+    [[1]] Create a duplicate of the existing servlet entry except
+    this time, change the type=admin to type=anonymous. Also make 
+    this servlet-mapping be url-pattern=/model/handler and rename
+    it to be just "Handler".
+
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/web.xml
+
+...
+    <servlet>
+        <servlet-name>AnonymousHandler</servlet-name>
+        <servlet-class>myorg.javaeeex.web.RegistrarHandlerServlet</servlet-class>
+        <init-param>
+            <param-name>type</param-name>
+            <param-value>anonymous</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnonymousHandler</servlet-name>
+        <url-pattern>/model/handler</url-pattern>
+    </servlet-mapping>
+---
+
+    [[1]] Add an abstract Handler class within the web tier. This can
+    be a sparate, public Java class or a private class as shown in
+    the example solution. This class will be used to implement 
+    common behavior of an action/handler class. It will use a 
+    RequestDispatcher to forward any exceptions thrown to a JSP/View
+    to display the error.
+
+---
+$ cat ./javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+import javax.servlet.RequestDispatcher;
+...
+
+    private abstract class Handler {
+        protected static final String RESULT_PARAM = "result";
+        protected static final String EXCEPTION_PARAM = "exception";
+        protected static final String DISPLAY_EXCEPTION_URL = 
+            "/WEB-INF/content/DisplayException.jsp";
+        protected static final String DISPLAY_RESULT_URL = 
+            "/WEB-INF/content/DisplayResult.jsp";
+        protected String action;
+        public void handle(HttpServletRequest request, 
+                HttpServletResponse response) 
+                throws ServletException, IOException {
+            try {
+                doHandle(request, response);
+            }
+            catch (Exception ex) {
+                log.error("error in " + action, ex);
+                request.setAttribute(EXCEPTION_PARAM, ex);                
+                RequestDispatcher rd = getServletContext().getRequestDispatcher(
+                    DISPLAY_EXCEPTION_URL);
+                rd.forward(request, response);
+            }
+        }
+        
+        public abstract void doHandle(HttpServletRequest request, 
+                HttpServletResponse response) 
+                throws ServletException, IOException;
+    }
+---
+
+    [[1]] Create the JSP that will display a generic exception.
+    Since this JSP requires a specific contract from the Controller,
+    it should not be placed in a public area. Place any protected
+    resource within WEB-INF. In this case, we will place it within
+    WEB-INF/content.
+
+---
+$ mkdir -p javaeeExWAR/src/main/webapp/WEB-INF/content
+---
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayException.jsp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+   <title>General Exception Page</title>
+</head>
+<body>
+   <center><h1>General Exception Page</h1></center>
+   <p>An error was reported by the application. More detailed information
+   may follow.</p>.
+
+   <p>
+   <jsp:scriptlet>
+      Exception ex = (Exception)request.getAttribute("exception");
+      if (ex != null) {
+          java.io.PrintWriter writer = new java.io.PrintWriter(out);
+          ex.printStackTrace(writer);
+      }
+   </jsp:scriptlet>
+   </p>
+
+   <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
+</body>
+</html>
+---
+
+
+    [[1]] Add a Ping action that extends Handler. Have the handler
+    invoke ping() on the EJB and invoke a RequestDispatcher to report
+    the results to a JSP/View for display. 
+
+---
+$ cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
+    private class Ping extends Handler {
+        public void doHandle(HttpServletRequest request, 
+                HttpServletResponse response) 
+                throws ServletException, IOException {
+            action = "EJB.ping"; //describe action in case of exception
+            registrar.ping();
+                
+            request.setAttribute(RESULT_PARAM, "ping() complete");                
+            RequestDispatcher rd = 
+              getServletContext().getRequestDispatcher(DISPLAY_RESULT_URL);
+            rd.forward(request, response);                
+        }
+    }
+---
+
+    [[1]] Add an ErrorPage.jsp to handle any unhandled exceptions with
+    JSPs.
+
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/content/ErrorPage.jsp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+
+<%-- ErrorPage.jsp
+     This page is registered to handle errors in JSP files.
+     --%>
+<%@ page isErrorPage="true" %>
+<html>
+<head>
+   <title>General Exception Page</title>
+</head>
+<body>
+   <center><h1>General Exception Page</h1></center>
+   <p>An error was reported by the application. More detailed information
+   may follow.</p>.
+
+   <p><%
+      java.io.PrintWriter writer = new java.io.PrintWriter(out);
+      exception.printStackTrace(writer);
+   %></p>
+
+   <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
+</body>
+</html>
+---
+
+    [[1]] Create the JSP that will display a generic result. This also
+    has a specific contract with the Controller and should not be allowed
+    to be publically invoked.
+
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/content/DisplayResult.jsp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+
+<jsp:directive.page errorPage="/WEB-INF/content/ErrorPage.jsp"/>
+<jsp:directive.page import="myorg.javaeeex.bo.*"/>
+<html>
+    <title>Result</title>
+    <body>
+
+        <jsp:scriptlet>
+            Object result = request.getAttribute("result");
+        </jsp:scriptlet>
+        Result: <%= result %>
+
+        <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
+    </body>
+</html>
+---
+
+
+    [[1]] Add admin and annonymous handlers to the Controller, depending
+    on which instance we are. This should go in the Controller's init()
+    method. Place the Ping command within the commands allowed for 
+    anonymous.
+
+---
+import java.util.HashMap;
+import java.util.Map;
+...
+    private Map<String, Handler> handlers = new HashMap<String, Handler>();
+...
+    public static final String ADMIN_TYPE = "admin";
+    public static final String ANONYMOUS_TYPE = "anonymous";
+    public static final String PING_COMMAND = "Ping";
+
+    public void init() throws ServletException {
+        log.debug("init() called ");
+        try {
+            ServletConfig config = getServletConfig();
+            initRegistrar(config);
+            
+            //build a list of handlers for individual commands
+            String handlerType = config.getInitParameter(HANDLER_TYPE_KEY);
+            if (ADMIN_TYPE.equals(handlerType)) {               
+                //adminHandlers.put(XXX_COMMAND, new XXX());    
+            } 
+            else if (ANONYMOUS_TYPE.equals(handlerType)) {
+                handlers.put(PING_COMMAND, new Ping());    
+            }
+            log.debug("configured handler type:" + handlerType +
+                    " with " + handlers);
+        }
+        catch (Exception ex) {
+            log.fatal("error initializing handler", ex);
+            throw new ServletException("error initializing handler", ex);
+        }
+    }
+---
+
+    [[1]] Add usage of the handlers with the doGet() of the 
+    Controller.
+
+---
+$cat javaeeExWAR/src/main/java/myorg/javaeeex/web/RegistrarHandlerServlet.java
+
+...
+public class RegistrarHandlerServlet extends HttpServlet {
+...
+    public static final String EXCEPTION_PARAM = "exception";
+    private static final String UNKNOWN_COMMAND_URL = 
+        "/WEB-INF/content/UnknownCommand.jsp";
+    public static final String COMMAND_PARAM = "command";
+    public static final String HANDLER_TYPE_KEY = "type";
+
+...
+
+    protected void doGet(HttpServletRequest request, 
+                         HttpServletResponse response) 
+        throws ServletException, IOException {
+        log.debug("doGet() called");
+        String command = request.getParameter(COMMAND_PARAM);
+        log.debug("command=" + command);
+        try {
+            if (command != null) {
+                Handler handler = handlers.get(command);
+                if (handler != null) {
+                    handler.handle(request, response);
+                }
+                else {
+                    RequestDispatcher rd = 
+                        getServletContext().getRequestDispatcher(
+                            UNKNOWN_COMMAND_URL);
+                            rd.forward(request, response);
+                }
+            }
+            else {
+                throw new Exception("no " + COMMAND_PARAM + " supplied"); 
+            }
+        }
+        catch (Exception ex) {
+            log.error("error within GET", ex);
+            request.setAttribute(EXCEPTION_PARAM, ex);
+            RequestDispatcher rd = getServletContext().getRequestDispatcher(
+                    UNKNOWN_COMMAND_URL);
+                    rd.forward(request, response);
+        }
+    }
+---
+
+    [[1]] Create the JSP/View that will handle the case where
+    the command is unknown. This also has a contract with the Controller
+    and should not be publically accessible.
+
+---
+$ cat javaeeExWAR/src/main/webapp/WEB-INF/content/UnknownCommand.jsp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<jsp:directive.page errorPage="/WEB-INF/content/ErrorPage.jsp"/>
+<html>
+   <head>
+      <title>Unknown Command</title>
+   </head>
+<body>
+   <center><h1>Command Error</h1></center>
+   A request was made, but the command was not recognized<p/>.
+   command=<%=request.getParameter("command")%>
+   <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
+</body>
+</html>
+---
+
+    [[1]] Add a menu entry to the main main. Leave the former 
+    "invoke servlet" in place to test our error handling.
+
+---
+$ cat javaeeExWAR/src/main/webapp/index.jsp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>JavaEE Exercise Main Page</title>
+</head>
+<body>
+    <h2>Hello JavaEE Controller</h2>
+
+    <ul>
+        <li><a href="model/admin/handler">invoke servlet</a></li>
+        <li><a href="model/admin/handler?command=Ping">invoke admin EJB.ping()</a></li>
+        <li><a href="model/handler?command=Ping">invoke anonymous EJB.ping()</a></li>
+    </ul>
+</body>
+</html>
+---
+
+    [[1]] Test the configuration with Jetty. Notice that you should get 
+    output from the JBoss server as well as the Maven/Jetty console since
+    the WAR is now contacting the EJB via its remote/RMI interface.
+
+        * http://localhost:9080/javaeeExWAR/
+
+        * click "invoke anonymous EJB.ping"
+
+        []
+
+---
+(cd javaeeExWAR; mvn clean jetty:run)
+
+...
+
+[INFO] Starting scanner at interval of 10 seconds.
+ -init() called 
+ -initRegistrar(), registrar=null
+ -java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+...
+ -registrar initialized:Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR', moduleName='javaeeExEJB', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
+ -configured handler type:anonymous with {Ping=myorg.javaeeex.web.RegistrarHandlerServlet$Ping@b0f0ae}
+ -doGet() called
+ -command=Ping
+---
+---
+//http://localhost:9080/javaeeExWAR/model/handler?command=Ping
+
+
+Result: ping() complete
+
+Go to Main Page 
+---
+---
+//JBoss SERVER LOG
+
+18:10:03,283 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 1) **** init ****
+18:10:03,283 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 1) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@11c8d64
+18:10:03,295 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (EJB default - 1) ping called
+
+---
+
+        * click "invoke admin EJB.ping()" and note the errors. There error in this
+        case is because we are contacting the servlet under the model/admin/handler
+        url-pattern, which is assigned a type=admin servlet initialization parameter.
+        That value was used to locate a map of commands appropriate for the user
+        type and none were found in the map.
+
+        []
+
+---
+//http://localhost:9080/javaeeExWAR/model/admin/handler?command=Ping
+
+Command Error
+A request was made, but the command was not recognized. command=Ping
+
+Go to Main Page 
+---
+
+        * click "invoke servlet" and note the errors. The error here is 
+        caused by there being no command parameter passed to the 
+        servlet. In our last enhancement of the servlet we made it a 
+        requirement that all incoming URIs provide a command query parameter.
+
+        []
+
+---
+//http://localhost:9080/javaeeExWAR/model/admin/handler
+
+
+Command Error
+A request was made, but the command was not recognized. command=null
+
+Go to Main Page 
+---
+
+    [[1]] Test the configuration within the application server. You
+    will need to rebuild and redeploy the application.
+
+---
+$ mvn clean pre-integration-test -rf :javaeeExWAR
+
+...
+---
+---
+//http://localhost:8080/javaeeEx/model/handler?command=Ping
+
+Result: ping() complete
+
+Go to Main Page 
+---
+---
+//SERVER LOG
+
+18:31:54,797 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+18:31:54,799 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) command=Ping
+18:31:54,823 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) **** init ****
+18:31:54,824 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) init complete, registrar=myorg.javaeeex.blimpl.RegistrarImpl@1abc8dd
+18:31:54,825 DEBUG [myorg.javaeeex.ejb.RegistrarEJB] (http--127.0.0.1-8080-2) ping called
+---
+---
+//http://localhost:8080/javaeeEx/model/admin/handler?command=Ping
+
+Command Error
+A request was made, but the command was not recognized. command=Ping
+
+Go to Main Page 
+---
+---
+//SERVER LOG
+
+18:32:55,336 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+18:32:55,337 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) command=Ping
+---
+---
+//http://localhost:8080/javaeeEx/model/admin/handler
+
+Command Error
+A request was made, but the command was not recognized. command=null
+
+Go to Main Page 
+---
+---
+//SERVER LOG
+
+18:34:30,421 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) doGet() called
+18:34:30,422 DEBUG [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) command=null
+18:34:30,423 ERROR [myorg.javaeeex.web.RegistrarHandlerServlet] (http--127.0.0.1-8080-2) error within GET: java.lang.Exception: no command supplied
+        at myorg.javaeeex.web.RegistrarHandlerServlet.doGet(RegistrarHandlerServlet.java:104) [classes:]
+---
+
+* Final configuration
+
+    This is what your configuration should look like when complete.
+
+---
+javaeeEx                                                                                                                     
+|-- javaeeExImpl                                                                                                             
+|-- javaeeExEJB                                                                                                              
+|-- javaeeExWAR
+|   |-- pom.xml
+|   `-- src
+|       |-- main
+|       |   |-- java
+|       |   |   `-- myorg
+|       |   |       `-- javaeeex
+|       |   |           `-- web
+|       |   |               |-- RegistrarHandlerServlet.java
+|       |   |               `-- RegistrarWebConfig.java
+|       |   `-- webapp
+|       |       |-- index.jsp
+|       |       `-- WEB-INF
+|       |           |-- beans.xml
+|       |           |-- content
+|       |           |   |-- DisplayException.jsp
+|       |           |   |-- DisplayResult.jsp
+|       |           |   |-- ErrorPage.jsp
+|       |           |   `-- UnknownCommand.jsp
+|       |           `-- web.xml
+|       `-- test
+|           |-- resources
+|           |   |-- jndi.properties
+|           |   `-- log4j.xml
+|           `-- webapp
+|               `-- WEB-INF
+|                   `-- web.xml
+|-- javaeeExEAR                                                                                                              
+|-- javaeeExTest
+`-- pom.xml
+---
+
+    The built WAR looks as follows.
+
+---
+javaeeExWAR/target/javaeeExWAR-1.0-SNAPSHOT
+|-- index.jsp
+|-- META-INF
+`-- WEB-INF
+    |-- beans.xml
+    |-- classes
+    |   `-- myorg
+    |       `-- javaeeex
+    |           `-- web
+    |               |-- RegistrarHandlerServlet$1.class
+    |               |-- RegistrarHandlerServlet.class
+    |               |-- RegistrarHandlerServlet$Handler.class
+    |               |-- RegistrarHandlerServlet$Ping.class
+    |               `-- RegistrarWebConfig.class
+    |-- content
+    |   |-- DisplayException.jsp
+    |   |-- DisplayResult.jsp
+    |   |-- ErrorPage.jsp
+    |   `-- UnknownCommand.jsp
+    `-- web.xml
+---
+
+
+    []
+
+* Summary
+
+    * In this exercise, we created the shell of a Web UI. Our 
+    implementation started out with a simple WAR. We then added
+    JNDI, and EJB lookup, an MVC approach, and an end-to-end
+    call to the EJB's ping() method. 
+
+    * CDI was demonstrated to better separate the @Inject
+    requirement of the servlet from the implementation choice.
+
+    * We used the @Remote interface that was developed for 
+    an earlier exercise. Next we will add the @Local interface
+    and a few more complex uses of the Web UI and EJB.

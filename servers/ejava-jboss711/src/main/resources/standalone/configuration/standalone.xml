@@ -62,7 +62,7 @@
             </console-handler>
             <periodic-rotating-file-handler name="FILE">
                 <formatter>
-                    <pattern-formatter pattern="%d{HH:mm:ss,SSS} %s%E%n"/>
+                    <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%C:%L] %s%E%n"/>
                 </formatter>
                 <file relative-to="jboss.server.log.dir" path="server.log"/>
                 <suffix value=".yyyy-MM-dd"/>
@@ -84,6 +84,9 @@
                 <level name="ERROR"/>
             </logger>
             <logger category="ejava">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="myorg">
                 <level name="DEBUG"/>
             </logger>
             <logger category="org.jboss.security">
@@ -237,7 +240,7 @@
 
                 <security-settings>
                     <security-setting match="#">
-                        <permission type="send" roles="user publisher"/>
+                        <permission type="send" roles="publisher user"/>
                         <permission type="consume" roles="subscriber user"/>
                         <permission type="createDurableQueue" roles="subscriber user"/>
                         <permission type="deleteDurableQueue" roles="user"/>
@@ -260,12 +263,25 @@
                         <permission type="consume" roles="admin"/>
                     </security-setting>
                     <security-setting match="jms.tempqueue.#">
-                        <permission type="send" roles="worker"/>
-                        <permission type="consume" roles="requestor"/>
-                        <permission type="createNonDurableQueue" roles="requestor"/>
+                        <permission type="send" roles="worker admin user"/>
+                        <permission type="consume" roles="requestor admin user"/>
+                        <permission type="createNonDurableQueue" roles="requestor admin user"/>
+                        <permission type="deleteNonDurableQueue" roles="admin"/>
                     </security-setting>
                     <security-setting match="jms.queue.hornetq.management">
                         <permission type="manage" roles="admin"/>
+                    </security-setting>
+                    <security-setting match="jms.topic.datashare-dmv">
+                        <permission type="send" roles="dmv-tactical"/>
+                        <permission type="consume" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
+                        <permission type="createDurableQueue" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
+                        <permission type="createNonDurableQueue" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
+                    </security-setting>
+                    <security-setting match="jms.topic.datashare-mayberry-poi">
+                        <permission type="send" roles="mayberry-tactical"/>
+                        <permission type="consume" roles="mayberry-analytical mayberry-tactical"/>
+                        <permission type="createDurableQueue" roles="mayberry-analytical mayberry-tactical"/>
+                        <permission type="createNonDurableQueue" roles="mayberry-analytical mayberry-tactical"/>
                     </security-setting>
                 </security-settings>
 
@@ -330,6 +346,14 @@
                     <jms-topic name="asyncMarket-topic1">
                         <entry name="java:/topic/ejava/examples/asyncMarket/topic1"/>
                         <entry name="java:jboss/exported/topic/ejava/examples/asyncMarket/topic1"/>
+                    </jms-topic>
+                    <jms-topic name="datashare-dmv">
+                        <entry name="java:/topic/ejava/projects/datashare/dmv"/>
+                        <entry name="java:jboss/exported/topic/ejava/projects/datashare/dmv"/>
+                    </jms-topic>
+                    <jms-topic name="datashare-mayberry-poi">
+                        <entry name="java:/topic/ejava/projects/datashare/mayberry-poi"/>
+                        <entry name="java:jboss/exported/topic/ejava/projects/datashare/mayberry-poi"/>
                     </jms-topic>
                 </jms-destinations>
             </hornetq-server>
@@ -446,4 +470,6 @@
         </outbound-socket-binding>
     </socket-binding-group>
 
+    <deployments>
+    </deployments>
 </server>

@@ -3,6 +3,7 @@ package ejava.examples.secureping.ejbclient;
 
 import static org.junit.Assert.*;
 
+
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -11,13 +12,10 @@ import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import ejava.examples.secureping.ejb.SecurePingClient;
-import ejava.examples.secureping.ejb.SecurePingClientRemote;
-import ejava.util.ejb.EJBClient;
 
 /**
  * This class peforms a check of the SecurePingClientEJB using RMI Calls.
@@ -29,7 +27,6 @@ import ejava.util.ejb.EJBClient;
  */
 public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
     static final Log log = LogFactory.getLog(SecurePingInitialContextClientIT.class);
-    private InitialContext jndi;
     
     /**
      * This method will add the caller credentials to the credentials 

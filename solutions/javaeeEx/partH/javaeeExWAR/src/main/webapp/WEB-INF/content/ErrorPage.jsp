@@ -16,13 +16,9 @@
 
    <p><%
       java.io.PrintWriter writer = new java.io.PrintWriter(out);
-      /*if (exception == null) { //check if this is a redirect versus errorPage
-    	  exception = (Exception)request.getAttribute("exception");
-      }*/
       exception.printStackTrace(writer);
    %></p>
 
    <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
 </body>
 </html>
-

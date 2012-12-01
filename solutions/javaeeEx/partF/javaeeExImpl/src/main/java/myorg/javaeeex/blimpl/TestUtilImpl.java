@@ -1,15 +1,19 @@
 package myorg.javaeeex.blimpl;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import myorg.javaeeex.bl.TestUtil;
+import myorg.javaeeex.cdi.JavaeeEx;
 import myorg.javaeeex.jpa.DBUtil;
 
 public class TestUtilImpl implements TestUtil {
     protected static final String DROP_SCRIPT = 
-        "ddl/javaeeExImpl-drop.ddl";  
+        "ddl/javaeeExImpl-dropJPA.ddl";  
     protected static final String CREATE_SCRIPT = 
-        "ddl/javaeeExImpl-create.ddl";  
+        "ddl/javaeeExImpl-createJPA.ddl";
+    
+    @Inject @JavaeeEx
     protected EntityManager em;
 
     public void setEntityManager(EntityManager em) {

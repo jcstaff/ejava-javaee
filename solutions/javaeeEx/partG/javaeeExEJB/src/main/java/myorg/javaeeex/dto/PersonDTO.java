@@ -34,6 +34,7 @@ public class PersonDTO implements Serializable {
     }
     public Collection<AddressDTO> getAddresses() {
         return addresses;
+
     }
     public void setAddresses(Collection<AddressDTO> addresses) {
         this.addresses = addresses;

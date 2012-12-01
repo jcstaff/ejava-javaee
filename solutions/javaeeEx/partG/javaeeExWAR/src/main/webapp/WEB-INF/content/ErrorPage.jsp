@@ -22,4 +22,3 @@
    <p/><a href="<%=request.getContextPath()%>/index.jsp">Go to Main Page</a>
 </body>
 </html>
-
