@@ -1,12 +1,22 @@
 package ejava.examples.asyncmarket.ejb;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.AsyncResult;
+import javax.ejb.EJB;
+import javax.ejb.EJBException;
+import javax.ejb.Schedule;
+import javax.ejb.ScheduleExpression;
 import javax.ejb.Stateless;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
@@ -44,6 +54,8 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
     @PersistenceContext(unitName="asyncMarket")
     private EntityManager em;
     
+    private @EJB AuctionMgmtActionEJB actions;
+    
     private AuctionItemDAO auctionItemDAO;
     private PersonDAO userDAO;
     
@@ -53,6 +65,7 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
     long checkItemInterval;
     
     @Resource(mappedName="java:/JmsXA")
+    //@Resource(name="jms/ConnectionFactory")
     private ConnectionFactory connFactory;
     @Resource(mappedName="java:/topic/ejava/examples/asyncMarket/topic1", type=Topic.class)
     private Destination sellTopic;
@@ -78,15 +91,15 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
             timer.cancel();
         }
     }
-    public void initTimers() {
-        cancelTimers();
-        log.debug("initializing timers, checkItemInterval="+checkItemInterval);
-        timerService.createTimer(0,checkItemInterval, "checkAuctionTimer");
-    }
     public void initTimers(long delay) {
         cancelTimers();
         log.debug("initializing timers, checkItemInterval="+delay);
         timerService.createTimer(0,delay, "checkAuctionTimer");
+    }
+    public void initTimers(ScheduleExpression schedule) {
+    	cancelTimers();
+        log.debug("initializing timers, schedule="+schedule);
+    	timerService.createCalendarTimer(schedule);
     }
     
     public void closeBidding(long itemId) throws MarketException {
@@ -151,6 +164,7 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
 
     
     @Timeout
+    @Schedule(second="*/10", minute ="*", hour="*", dayOfMonth="*", month="*", year="*")
     public void execute(Timer timer) {
         log.info("timer fired:" + timer);
         try {
@@ -281,5 +295,53 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
             dtos.add(dto);
         }
         return dtos;
-    }    
+    }
+
+    /**
+     * Perform action synchronously while caller waits.
+     */
+	@Override
+	public void workSync(int count, long delay) {
+        DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+        
+        long startTime = System.currentTimeMillis();
+        for (int i=0; i<count; i++) {
+        	log.info(String.format("%s issuing sync request, delay=%d", df.format(new Date()), delay));
+        	@SuppressWarnings("unused")
+			Date date= actions.doWorkSync(delay);
+        	log.info(String.format("sync waitTime=%d msecs", System.currentTimeMillis()-startTime));
+        }
+    	long syncTime = System.currentTimeMillis() - startTime;
+    	log.info(String.format("workSync time=%d msecs", syncTime));
+	}    
+
+	/**
+	 * Perform action async from caller.
+	 */
+	@Override
+	public void workAsync(int count, long delay) {
+        DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+        
+        long startTime = System.currentTimeMillis();
+        List<Future<Date>> results = new ArrayList<Future<Date>>();
+        for (int i=0; i<count; i++) {
+        	log.info(String.format("%s issuing async request, delay=%d", df.format(new Date()), delay));
+        	Future<Date> date = actions.doWorkAsync(delay);
+        	results.add(date);
+        	log.info(String.format("async waitTime=%d msecs", System.currentTimeMillis()-startTime));
+        }
+        for (Future<Date> f: results) {
+        	log.info(String.format("%s getting async response", df.format(new Date())));
+        	try {
+				@SuppressWarnings("unused")
+				Date date = f.get();
+			} catch (Exception ex) {
+				log.error("unexpected error on future.get()", ex);
+				throw new EJBException("unexpected error during future.get():"+ex);
+			}
+        	log.info(String.format("%s got async response", df.format(new Date())));
+        }
+    	long asyncTime = System.currentTimeMillis() - startTime;
+    	log.info(String.format("workAsync time=%d msecs", asyncTime));
+	}    
 }
