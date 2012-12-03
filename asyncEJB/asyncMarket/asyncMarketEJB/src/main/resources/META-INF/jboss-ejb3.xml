@@ -11,12 +11,12 @@
     <enterprise-beans>
         <session>
             <ejb-name>AuctionMgmtEJB</ejb-name>
-            <!--  used when injecting JNDI name from XML
+            <!--  used when injecting JNDI name from XML 
             <resource-ref>
                 <res-ref-name>jms/ConnectionFactory</res-ref-name>
-                <jndi-name>java:JmsXA</jndi-name>
+                <jndi-name>java:/JmsXA</jndi-name>
             </resource-ref>
-            -->
+            --> 
         </session>
         
         <session>
@@ -24,7 +24,7 @@
             <!--  used when injecting JNDI name from XML
             <resource-ref>
                 <res-ref-name>jms/ConnectionFactory</res-ref-name>
-                <jndi-name>java:JmsXA</jndi-name>
+                <jndi-name>java:/JmsXA</jndi-name>
             </resource-ref>
              -->
         </session>

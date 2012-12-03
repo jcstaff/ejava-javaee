@@ -1,6 +1,7 @@
 package ejava.examples.asyncmarket.web;
 
 import javax.ejb.EJB;
+import javax.ejb.ScheduleExpression;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -25,7 +26,14 @@ public class InitServlet extends HttpServlet {
         	}
         	else {
         		log.debug("calling initTimers");
-        		auctionMgmt.initTimers();
+        		ScheduleExpression schedule = new ScheduleExpression();
+        		schedule.second("*/10");
+        		schedule.minute("*");
+        		schedule.hour("*");
+        		schedule.dayOfMonth("*");
+        		schedule.month("*");
+        		schedule.year("*");
+        		auctionMgmt.initTimers(schedule);
         	}
         }
         catch (Exception ex) {

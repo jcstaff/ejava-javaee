@@ -58,10 +58,11 @@
                     </injection-target-name>
                 </injection-target>
             </env-entry>
-            <!-- example of how could be mapped in XML
+            <!-- example of how could be mapped in XML 
             <resource-ref>
                 <res-ref-name>jms/ConnectionFactory</res-ref-name>
                 <res-type>javax.jms.ConnectionFactory</res-type>
+                <mapped-name>topic/asyncMarketTopic1</mapped-name>                
                 <injection-target>
                     <injection-target-class>
                         ejava.examples.asyncmarket.ejb.AuctionMgmtEJB
@@ -74,9 +75,7 @@
             <resource-env-ref>
                 <resource-env-ref-name>jms/sellTopic</resource-env-ref-name>
                 <resource-env-ref-type>javax.jms.Topic</resource-env-ref-type>
-                <mapped-name>
-                    topic/asyncMarketTopic1
-                </mapped-name>                
+                <mapped-name>topic/asyncMarketTopic1</mapped-name>                
                 <injection-target>
                     <injection-target-class>
                         ejava.examples.asyncmarket.ejb.AuctionMgmtEJB

@@ -2,6 +2,8 @@ package ejava.examples.asyncmarket;
 
 import java.util.List;
 
+import javax.ejb.ScheduleExpression;
+
 import ejava.examples.asyncmarket.bo.AuctionItem;
 import ejava.examples.asyncmarket.bo.Bid;
 
@@ -17,7 +19,7 @@ public interface AuctionMgmt {
 
     
     //infrastructure functions
-    void initTimers();
     void initTimers(long delay);
+    void initTimers(ScheduleExpression schedule);
     void cancelTimers();
 }
