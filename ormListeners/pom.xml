@@ -3,7 +3,7 @@
   <parent>
         <groupId>ejava</groupId>
         <artifactId>ejava-root</artifactId>
-        <version>3.0.2012.2-SNAPSHOT</version>
+        <version>3.0.2012.2</version>
         <relativePath>..</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -104,10 +104,9 @@
                         <configuration>
                             <hibernatetool destdir="target/classes/ddl">
                                 <classpath>
-                                    <path location="${project.build.directory}/test-classes"/>
+                                    <path location="${project.build.directory}/test-classes" />
                                 </classpath>
-                                <jpaconfiguration persistenceunit="ormListeners"
-                                     propertyfile="${basedir}/target/test-classes/hibernate.properties"/>
+                                <jpaconfiguration persistenceunit="ormListeners" propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                             </hibernatetool>
                         </configuration>
                     </plugin>

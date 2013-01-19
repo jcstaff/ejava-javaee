@@ -10,7 +10,7 @@
 
     <groupId>ejava</groupId>
     <artifactId>ejava-root</artifactId>
-    <version>3.0.2012.2-SNAPSHOT</version>
+    <version>3.0.2012.2</version>
     <packaging>pom</packaging>
 
     <name>Enterprise Java</name>
@@ -587,7 +587,7 @@
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
                   <hibernate.dialect>
                       org.hibernate.dialect.H2Dialect
                   </hibernate.dialect>
@@ -608,7 +608,7 @@
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
                   <hibernate.dialect>
                       org.hibernate.dialect.H2Dialect
                   </hibernate.dialect>
