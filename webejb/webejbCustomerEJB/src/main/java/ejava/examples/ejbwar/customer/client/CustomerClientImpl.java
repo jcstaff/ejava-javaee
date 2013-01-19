@@ -146,6 +146,7 @@ public class CustomerClientImpl implements CustomerClient {
 		HttpResponse response = client.execute(delete);
 		log.info(String.format("%s %s", delete.getURI(), response));
 		if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
+			EntityUtils.consume(response.getEntity());
 			return true;
 		}
 		log.warn(EntityUtils.toString(response.getEntity()));
