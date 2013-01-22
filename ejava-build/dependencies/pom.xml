@@ -14,9 +14,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.source.version>1.6</java.source.version>
+        <java.target.version>1.7</java.target.version>
         
         <maven-clean-plugin.version>2.5</maven-clean-plugin.version>
-        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-deploy-plugin.version>2.7</maven-deploy-plugin.version>
         <maven-failsafe-plugin.version>2.12.2</maven-failsafe-plugin.version>
         <maven-install-plugin.version>2.3.1</maven-install-plugin.version>
@@ -493,8 +495,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
-                            <source>1.6</source>
-                            <target>1.6</target>
+                            <source>${java.source.version}</source>
+                            <target>${java.target.version}</target>
                     </configuration>	                
                 </plugin>
                 <plugin>

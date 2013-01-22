@@ -2,18 +2,9 @@ package ejava.projects.esales.jpa;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import ejava.projects.esales.bo.Account;
@@ -28,52 +19,17 @@ import ejava.projects.esales.dao.AccountDAO;
  * @author jcstaff
  *
  */
-public class JPAAccountDAOTest {
+public class JPAAccountDAOTest extends JPADAOTestBase {
 	private static Log log = LogFactory.getLog(JPAAccountDAO.class);
-	//this code assumes all the JDBC properties were placed in 
-	//META-INF/persistence.xml when the file was copied from src to the 
-	//target tree
-	
-	private EntityManagerFactory emf;
-	private EntityManager em;
 	private AccountDAO dao;
 	
-	@Before
+	@Override
 	public void setUp() throws Exception {
-		emf = Persistence.createEntityManagerFactory("eSalesBO");
-		em = emf.createEntityManager();
-		
+		super.setUp();
 	    dao = new JPAAccountDAO();
 	    ((JPAAccountDAO)dao).setEntityManager(em);
 		
-		cleanup();
-		
 		em.getTransaction().begin();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		if (em != null) {
-			EntityTransaction tx = em.getTransaction();
-			if (tx.isActive()) {
-				if (tx.getRollbackOnly()) { tx.rollback(); }
-				else                      { tx.commit(); }
-			}
-			em.close();
-		}
-		if (emf != null) {
-			emf.close();
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	private void cleanup() throws Exception {
-		Query query = em.createQuery("select a from Account a");
-		for (Account account : (List<Account>)query.getResultList()) {
-			//the Account entity declared cascade=All to the Address
-			//so this should delete the address as well
-			em.remove(account);
-		}
 	}
 
 	/**

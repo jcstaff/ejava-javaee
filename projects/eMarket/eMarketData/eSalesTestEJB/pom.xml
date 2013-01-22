@@ -22,11 +22,16 @@
           <artifactId>commons-logging</artifactId>
           <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
           <groupId>${project.groupId}</groupId>
           <artifactId>eSalesTestUtil</artifactId>
-          <version>2.0.2011.2</version>
+          <version>3.0.2013.1</version>
           <scope>compile</scope>
             <exclusions>
             <!-- these won't be needed on server -->
@@ -85,12 +90,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ejb-plugin</artifactId>
                 <configuration>
-                    <ejbVersion>3.0</ejbVersion>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
                     <generateClient>true</generateClient>
                     <clientExcludes>
                         <clientExclude>**/ejb/*Local.class</clientExclude>
@@ -100,64 +99,4 @@
             </plugin>      
         </plugins>      
     </build>
-
-    <profiles>
-        <profile> <!-- defines our persistence.xml dialect -->
-            <id>hsql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>hsql</value>
-                </property>
-            </activation>
-            <properties>
-                  <hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
-            </properties>
-        </profile>
-        <profile>
-            <id>mysql</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>jdbcdb</name>
-                    <value>mysql</value>
-                </property>
-            </activation>
-            <properties>
-                  <hibernate.dialect>org.hibernate.dialect.MySQLDialect</hibernate.dialect>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>jsr250-api</artifactId>
-                  <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>javax.ejb</groupId>
-                    <artifactId>ejb-api</artifactId>
-                  <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <!-- this is fine to compile with -->
-                <dependency>
-                    <groupId>javax</groupId>
-                    <artifactId>javaee-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

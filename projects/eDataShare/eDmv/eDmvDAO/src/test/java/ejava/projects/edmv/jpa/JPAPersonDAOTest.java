@@ -2,14 +2,8 @@ package ejava.projects.edmv.jpa;
 
 import static org.junit.Assert.*;
 
-import javax.persistence.Persistence;
-
-
-
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
 import org.junit.Test;
 
 import ejava.projects.edmv.bo.Person;

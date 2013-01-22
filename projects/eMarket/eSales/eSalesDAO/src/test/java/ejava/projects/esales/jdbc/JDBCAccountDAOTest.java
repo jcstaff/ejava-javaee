@@ -2,16 +2,11 @@ package ejava.projects.esales.jdbc;
 
 import static org.junit.Assert.*;
 
-
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import ejava.projects.esales.bo.Account;
@@ -27,64 +22,25 @@ import ejava.projects.esales.dao.AccountDAO;
  * @author jcstaff
  *
  */
-public class JDBCAccountDAOTest {
+public class JDBCAccountDAOTest extends JDBCDAOTestBase {
 	private static Log log = LogFactory.getLog(JDBCAccountDAO.class);
-	private static String jdbcURL = 
-			System.getProperty("jdbc.url", "jdbc:hsqldb:hsql://localhost:9001");	
-	private static String jdbcDriver = System.getProperty("jdbc.driver", "org.hsqldb.jdbcDriver");
-	private static String jdbcUser = System.getProperty("jdbc.user", "sa");
-	private static String jdbcPassword = System.getProperty("jdbc.password","");
-	
-	private Connection connection;
+
 	private AccountDAO dao;
 	
-	@Before
+	@Override
 	public void setUp() throws Exception {
-		assertNotNull("jdbc.driver not supplied", jdbcDriver);
-		assertNotNull("jdbc.url not supplied", jdbcURL);
-		assertNotNull("jdbc.user not supplied", jdbcUser);
-		assertNotNull("jdbc.password not supplied", jdbcPassword);
-		
-		log.debug("loading JDBC driver:" + jdbcDriver);
-		Thread.currentThread()
-		      .getContextClassLoader()
-		      .loadClass(jdbcDriver)
-		      .newInstance();
-		
-		log.debug("getting connection(" + jdbcURL +
-				", user=" + jdbcUser + ", password=" + jdbcPassword + ")");
-		connection = 
-			DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPassword);
-		
-	    dao = new JDBCAccountDAO();
+		super.setUp();
+
+		dao = new JDBCAccountDAO();
 	    ((JDBCAccountDAO)dao).setConnection(connection);
-		
-		connection.setAutoCommit(false);
-		cleanup();
 	}
 
-	@After
+	@Override
 	public void tearDown() throws Exception {
-		if (connection != null) {
-			connection.commit();
-		    ((JDBCAccountDAO)dao).setConnection(null);
-			connection.close();
-		}
+		super.tearDown();
+	    ((JDBCAccountDAO)dao).setConnection(null);
 	}
 	
-	private void cleanup() throws Exception {
-		Statement statement=null;
-		try {
-			statement = connection.createStatement();
-			statement.execute("DELETE FROM ESALES_ACCT_ADDRESS_LINK");
-			statement.execute("DELETE FROM ESALES_ADDRESS");
-			statement.execute("DELETE FROM ESALES_ACCT");
-		}
-		finally {
-            if (statement != null) { statement.close(); }			
-		}
-	}
-
 	/**
 	 * This method tests a single create into the database using the DAO. 
 	 * This tests some core functionality, but clearly more types of inserts

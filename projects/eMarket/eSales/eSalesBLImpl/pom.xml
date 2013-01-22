@@ -17,6 +17,12 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>eSalesBO</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>eSalesDAO</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -40,6 +46,21 @@
         </dependency>
         
         <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -49,18 +70,21 @@
             <artifactId>log4j</artifactId>
             <scope>test</scope>
         </dependency>        
+
+        <!-- we specifically created this in the DAO to hold reusable
+             test artifacts -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>eSalesDAO</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
          <!--tell the resource plugin to perform filtering on resources 
              to fill in JDBC URL, etc. -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-        <!-- filter resource files for profile-specific values -->
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
@@ -84,94 +108,52 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>                                
-                        <property>
-                          <name>jdbc.driver</name>
-                          <value>${jdbc.driver}</value>
-                        </property>
-                        <property>
-                          <name>jdbc.url</name>
-                          <value>${jdbc.url}</value>          
-                        </property>
-                        <property>
-                          <name>jdbc.user</name>
-                          <value>${jdbc.user}</value>          
-                        </property>
-                        <property>
-                          <name>jdbc.password</name>
-                          <value>${jdbc.password}</value>          
-                        </property>
-                    </systemProperties>                                
+                    <systemPropertyVariables>
+                        <jdbc.driver>${jdbc.driver}</jdbc.driver>
+                        <jdbc.url>${jdbc.url}</jdbc.url>
+                        <jdbc.user>${jdbc.user}</jdbc.user>
+                        <jdbc.password>${jdbc.password}</jdbc.password>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
+
+            <!-- create a classpath for our JSE clients to run -->
+            <!-- used only for the Ant script -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-jars</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>test</includeScope>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-ddl</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>eSalesDAO</artifactId>
+                                    <version>${project.version}</version>
+                                    <includes>ddl/*</includes>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>      
         </plugins>
     </build>
 
-    <profiles>
-        <profile> <!-- defines our default database -->
-            <id>hsqldb</id>
-            <activation>
-                <property> <!-- use this property to name another db -->
-                    <name>!jdbcdb</name>
-                </property>
-            </activation>
-            <properties>
-                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                  <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
-                  <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <scope>test</scope>
-                </dependency>       
-            </dependencies>
-        </profile>
-
-
-        <profile> <!-- defines our default persistence provider -->
-            <id>hibernate</id>
-            <activation>
-                <property> <!-- use this property to name alt persistence provider -->
-                    <name>!jpa</name>
-                </property>
-            </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate.javax.persistence</groupId>
-                    <artifactId>hibernate-jpa-2.0-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

@@ -26,6 +26,7 @@ public class ESalesIngestCommand {
 	private static final String inputFile = 
 		System.getProperty("inputFile");
 	
+	@SuppressWarnings("resource")
 	private static InputStream getInputStream() throws Exception {
 		InputStream is = null;
 
