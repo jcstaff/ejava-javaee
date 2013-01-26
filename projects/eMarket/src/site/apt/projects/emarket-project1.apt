@@ -1,6 +1,6 @@
 Project1: eMarket Data Access Tier and Initial Business Logic
 
-    2013-01-xx
+    2013-01-25
 
 * Goals
 
@@ -99,12 +99,12 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     that it takes to implement the end-to-end scenarios specified later
     within this specification.
 
-    The test acceptance for the first eSales project will be a set of
-    unit tests and at least one functional test that takes the business
-    logic, data access tier, and business objects through an end-to-end
-    eSales use case; starting from the seller initiating an auction and
-    ending with a buyer placing a winning bid. The test acceptance for 
-    eBidbot will be restricted to unit tests.
+    The test acceptance for the first project will be a set of unit
+    tests and at least one functional test that takes the business logic,
+    data access tier, and business objects through an end-to-end eSales
+    and eBidbot use case; starting from the seller initiating an auction
+    and ending with a buyer or eBidbot placing a winning bid. The test
+    acceptance for eBidbot will require some stubs prior to project 2.
 
 * Assembly Overview
 
@@ -118,18 +118,18 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     suggested project layouts at the bottom of this specification.  A
     {{{https://github.com/jcstaff/ejava-javaee/tree/master/projects/eMarket}
     sample set of projects}} that implements a thin eSales thread has
-    been made available. Please ignore the TestData sub-project when
+    been made available. Please <<ignore>> the <<eMarketData>> sub-project when
     using the example to craft your source tree. You will depend on
-    projects within that tree -- not reimplement them and not copy
+    projects within that tree -- <<not>> reimplement them and not copy
     them.
     
         [Note:] You will likely copy significant portions of the thin thread
         example and other class examples into your project. Be aware that
-        the thin thread and othet example pom.xml files inherit from 
+        the thin thread and other example pom.xml files inherit from 
         a few root projects that provide dependencyManagement and 
         pluginManagement duties. You will either need to also inherit from
         the dependencies/pom.xml or compensate by re-defining the management
-        sections in the root pom.xml of your project.
+        sections in your project.
 
     See the Getting Started section towards the end of this specification
     for a more detailed sample project layout.
@@ -549,6 +549,7 @@ Project1: eMarket Data Access Tier and Initial Business Logic
         []
 
 ===
+
     [Note:] Please ignore references in the diagrams that call out use of 
     JDBC. All DAOs can be implemented exclusively with JPA for this assignment.
 
@@ -605,7 +606,7 @@ Project1: eMarket Data Access Tier and Initial Business Logic
 ===
 
     [[1]] Design an initial business interface and business logic for
-    the eSales application. The core O/R mapping work will be done
+    the applications. The core O/R mapping work will be done
     by the DAOs.  However, it is the ultimate responsibility of these
     business logic implementations that either it or the business objects
     enforce the business rules of the application. The DAOs only perform
@@ -617,67 +618,93 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     required to implement the end-to-end use case listed in the testing
     section. Some of the anticipated methods are listed below.
 
+        [[A]] eSales Candidate Business Logic
+
 [../images/esales-business-logic.jpg] eSales Business Logic
 
-        [[a]] AccountMgmt/AccountMgmtImpl - encapsulates the actions
-        required to create, get, update and close an account.
+            [[a]] AccountMgmt/AccountMgmtImpl - encapsulates the actions
+            required to create, get, update and close an account.
 
-            * createAccount - you will need to at least create a seller and
-            two or more buyer accounts. 
+                * createAccount - you will need to at least create a seller and
+                two or more buyer accounts. 
 
-        [[a]] SellerMgmt/SellerMgmtImpl - encapsulates the actions required
-        to create and get auctions for a seller.
+            [[a]] SellerMgmt/SellerMgmtImpl - encapsulates the actions required
+            to create and get auctions for a seller.
 
-            * createAuction  - creates a new auction for a seller. All
-            dates and properties of the auction need to be of consistent
-            and legal values.
+                * createAuction  - creates a new auction for a seller. All
+                dates and properties of the auction need to be of consistent
+                and legal values.
 
-            * getUserAuctions - returns a collection of auctions associated
-            with a seller. This can be used to determine if the auction has
-            been added.
+                * getUserAuctions - returns a collection of auctions associated
+                with a seller. This can be used to determine if the auction has
+                been added.
 
-            * getAuction - returns a specific auction by ID. This can
-            be used to track the state of a specific auction for a seller.
+                * getAuction - returns a specific auction by ID. This can
+                be used to track the state of a specific auction for a seller.
 
-        [[a]] BuyerMgmt/BuyerMgmtImpl - encapsulates the actions required
-        to get and bid on auctions. 
+            [[a]] BuyerMgmt/BuyerMgmtImpl - encapsulates the actions required
+            to get and bid on auctions. 
 
-            * getOpenAuctions - returns a collection of auctions that 
-            have not ended. This can be used to pick a specific auction
-            to bid on.
+                * getOpenAuctions - returns a collection of auctions that 
+                have not ended. This can be used to pick a specific auction
+                to bid on.
 
-            * placeBid - creates a bid for a specific user and auction. The
-            auction must be open, the user must exist, and the bid amount 
-            must be greater than any pre-existing bid.
+                * placeBid - creates a bid for a specific user and auction. The
+                auction must be open, the user must exist, and the bid amount 
+                must be greater than any pre-existing bid.
 
-            * getAuction - returns a specific auction by ID. This can be
-            used to track the state of a specific auction for a buyer.
+                * getAuction - returns a specific auction by ID. This can be
+                used to track the state of a specific auction for a buyer.
 
-        [[a]] TestSupport/TestSupport - a useful tool during testing that
-        encapsulates how to get the application back into a known state
-        prior to running a test or to inspect values not normally exposed
-        through the normal business interfaces.
+            [[a]] TestSupport/TestSupport - a useful tool during testing that
+            encapsulates how to get the application back into a known state
+            prior to running a test or to inspect values not normally exposed
+            through the normal business interfaces.
 
-            * getAccounts - get all accounts in the system.
+                * getAccounts - get all accounts in the system.
 
-            * removeAccount - sanely remove an account from the system.
-            This may require removing the account from any current bids,
-            etc. in order to satisfy referential integrity.
+                * removeAccount - sanely remove an account from the system.
+                This may require removing the account from any current bids,
+                etc. in order to satisfy referential integrity.
 
-            * getAuctions - get all auctions in the system.
+                * getAuctions - get all auctions in the system.
 
-            * removeAuction - sanely remove an auction from the system.
-            This may require removing bids, images, and other objects that
-            may have references to this object.
+                * removeAuction - sanely remove an auction from the system.
+                This may require removing bids, images, and other objects that
+                may have references to this object.
 
-            * clearAll -  sanely take the state of the system down to a
-            coldstart.
+                * clearAll -  sanely take the state of the system down to a
+                coldstart.
 
-        [[a]] Ingestor - the Ingestor written as a part of a separate
-        requirement is also logically considered part of this tier.
-        
-            * ingest - point an externally provided parser at a set of test 
-            data and use the DAOs to populate the system to a known state.
+            [[a]] Ingestor - the Ingestor written as a part of a separate
+            requirement is also logically considered part of this tier.
+            
+                * ingest - point an externally provided parser at a set of test 
+                data and use the DAOs to populate the system to a known state.
+
+        [[A]] eBidbot Candidate Business Logic
+
+            [[a]] OrderMgmt/OrderMgmtImpl
+
+                * createOrder - create a record
+                    within bidbot that indicates the sale and maximum bid.
+                    This may require some stubbing in project 1.
+
+                * placeBid - place a bid
+                    that is higher than the current bid for an open
+                    auction but less than the order maximum. This will
+                    require some stubbing for project1.
+
+                * endOrder - complete order
+                    processing once auction has closed and note if won.
+                    This will require some stubbing in project1.
+
+                * getOrderStatus - did user win or not.
+
+            [[a]] BidbotTestUtil/BidbotTestUtilImpl
+
+                * reset - reset the bidbot database to an initial 
+                    starting state.
 
 ===
 
