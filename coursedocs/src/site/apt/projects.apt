@@ -1,5 +1,35 @@
 Projects
 
+* {Project 0}: Sanity Check
+
+    Project 0 will require construction of your development tree and
+    early implemementation of technical requirements for class projects.
+    The intent of this short/skeletal project is to get the student
+    to a concrete starting point for course topics, eliminate wrong
+    assumptions, and to generate early discussions about the development
+    and development options/trade-offs. Grading will be primarily a 
+    done/not-done grade with unsatisfactory starts given feedback and
+    a request to re-submit.
+
+    Specific Goals:
+
+        * Instantiate a Maven development tree for projects 1 thru 3.
+
+        * Setup database instances (embedded and server).
+
+        * Setup (skeletal) database schema generation.
+
+        * Setup JUnit test case(s).
+
+        * Setup JPA entity manager and communications with database.
+
+        * Develop business logic interfaces and method signatures
+            for end-to-end scenario.
+
+        * Develop an early JUnit test that demonstrates understanding
+            of the end-to-end requirements for project 1. 
+
+
 * {Project 1}: Data Access Tier 
 
     Project 1 will require the development of the business objects
@@ -16,13 +46,11 @@ Projects
 
         * Design a relational database schema
 
-        * Develop and test a DAO using JDBC and SQL
+        * Develop and test a DAO using EJB3.x Entities
 
-        * Develop and test a DAO using EJB3 Entities
+        * Ingest test data into database
 
-        * Ingest test data into database using JDBC DAO
-
-        * Manipulate data in database using EJB3 Entity DAO
+        * Manipulate data in database using DAO
 
 * {Project 2}: N-Tier Application
 
@@ -41,9 +69,11 @@ Projects
 
         * Deploy business logic within an EJB application using Session Beans
 
-        * Access EJB business logic using RMI
+        * Configure applications using JNDI and CDI.
 
         * Integrate application with JTA
+
+        * Access EJB business logic using RMI
 
 * {Project 3}: Secure and Asynchronous Application
 
@@ -69,9 +99,9 @@ Projects
 
 * {General Requirements}
 
-    * Projects must build using {{{http://maven.apache.org/}Maven 2}}. 
-    {{{http://ant.apache.org/}Ant}} must be used to wrap any interactive
-    commands (e.g., load/clean database)
+    * Projects must build using {{{http://maven.apache.org/}Maven 3}}. 
+    {{{http://ant.apache.org/}Ant}} will be used late in the semester 
+    to wrap any interactive commands (e.g., launch JavaSE JMS subscriber)
 
     * All projects must be portable to build and deploy within grader and
     intructor environments. You may submit partial projects early to get portability
@@ -94,9 +124,11 @@ Projects
 
         * projects cleanly builds (with Maven): 15pts
 
-        * functionality X: 25pts
+        * functionality X: ?? pts
 
-        * functionality Y: 35pts
+        * functionality Y: ?? pts
+
+        * functionality Z: ?? pts
 
     Each area will be judged according to the following breakdown. For
     areas where testing does not apply (e.g., README and build), those 
@@ -112,25 +144,27 @@ Projects
 
     You should test your application prior to submission by 
 
-        * running the clean targets before zipping up the source code. This
-        will make sure you don't have any old .class files hanging around.
+        * coldstart your database instance(s) and run mvn clean
+        install from the root of your project.  This will make sure you
+        are not depending on any old .class files within your target
+        directory and are not depending on any residue schema or data
+        in your database.
 
-        * removing (or moving) your M2_REPO. This will make sure that
-        you are not depending on any manually installed archives -or- 
-        remind you of the ones that you did install so that they can be
-        either corrected or documented for the grader. 
-
-        * deleting your database files (rm
-        $JBOSS_HOME/server/default/data/hypersonic/ejava.*). This makes
-        sure your population scripts actually create your database schema
-        and that you are not relying on local changes made manually during
-        development.
+        * run maven clean, zip your project from the root, and unzip
+        in a new location. Move your localRepository (or set your
+        settings.xml#localRepository value to a new location -- don't
+        delete your primary localRepository) and run mvn clean install
+        from the root of your project. This will make sure you do not
+        have dependencies on older versions of your modules or manually
+        installed artifacts. This, of course, will download all project
+        dependencies and help verify that the project will build in
+        other environments.  This will also simulate what the grader
+        will see when they unzip your project.
         
-        * unzipping your source code into a new directory. This will
-        simulate what the grader will see when they unzip your project.
-        
-        * building and running the tests for your application(s) from scratch.
-        Much of this can help populate the README file.
+        * make sure the README documents all information required to 
+        navigate your application (primarily a project 2 and 3 requirement)
+        and point out issues that would be important for the grader/instructor
+        to know (e.g., "the instructor said...")
 
     You will e-mail the projects to the grader and me with the following
     subject line
@@ -138,8 +172,9 @@ Projects
         * (your name) project #; revision 0; part # of #
 
     Your submission will include source zip, README (could be in source
-    zip), and built project artifact(s) (e.g., jar, war, ear, etc.).
-
+    zip), and built project artifact(s) (e.g., jar, war, ear, etc.). The
+    easiest way to do this is to zip up the project from the root after
+    completing a build.
     
     If you need to make a correction, the correction should have the
     following e-mail subject. The body should describe what you wish to 
