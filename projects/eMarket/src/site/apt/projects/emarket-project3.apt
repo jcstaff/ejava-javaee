@@ -58,7 +58,9 @@ ${jboss.server.config.dir}/application-roles.properties | defines username=role1
 *-------+--------+
 esales-admin | these users will be able to perform management and test functions on eSales.
 *-------+--------+
-esales-user | these users can create and auction, and bid on auctions.
+esales-user | these users can create and auction, and bid on auctions. This role is also required to subscribe to JMS auction events.
+*-------+--------+
+esales-sys | role required to perform internal auction actions like JMS publishing.
 *-------+--------+
 esales-trusted | these users can bid on auctions on behalf of a specified user.
 *-------+--------+
@@ -79,6 +81,8 @@ known | (no roles)
 admin1 | esales-admin
 *-------+--------+
 admin2 | ebidbot-admin
+*-------+--------+
+syssales1 | esales-sys
 *-------+--------+
 sysbidbot1 | esales-trusted
 *-------+--------+
