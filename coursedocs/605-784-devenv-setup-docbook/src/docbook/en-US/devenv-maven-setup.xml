@@ -42,13 +42,23 @@ set PATH=%MAVEN_HOME%\bin;%PATH%
             <listitem>
                 <para>Verify maven is installed and in the path</para>
                 <programlisting><![CDATA[
+//my fedora system
 $ mvn --version
-Apache Maven 3.0.4 (r1232337; 2012-01-17 00:44:56-0800)
+Apache Maven 3.0.4 (r1232337; 2012-01-17 03:44:56-0500)
 Maven home: /opt/apache-maven-3.0.4
-Java version: 1.6.0_20, vendor: Sun Microsystems Inc.
-Java home: /usr/lib/jvm/java-6-openjdk/jre
+Java version: 1.7.0_09-icedtea, vendor: Oracle Corporation
+Java home: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.9.x86_64/jre
 Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "2.6.32-40-generic", arch: "i386", family: "unix"    
+OS name: "linux", version: "3.7.3-101.fc17.x86_64", arch: "amd64", family: "unix"                       
+
+//my windows xp system
+> mvn --version
+Apache Maven 3.0.4 (r1232337; 2012-01-17 03:44:56-0500)
+Maven home: C:\apps\apache-maven-3.0.4\bin\..
+Java version: 1.7.0_11, vendor: Oracle Corporation
+Java home: C:\apps\Java\jdk1.7.0_11\jre
+Default locale: en_US, platform encoding: Cp1252
+OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
 ]]></programlisting>
             </listitem>
         </orderedlist>

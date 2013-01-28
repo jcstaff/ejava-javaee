@@ -11,13 +11,13 @@
         client already installed using the following simple command.
     </para>
     <programlisting><![CDATA[
-//my ubuntu system
+//my fedora system
 $ git --version
-git version 1.7.0.4
+git version 1.7.11.7
 
-//my win7/msysGit system
+//my win8/msysGit system
 $ git --version
-git version 1.7.5.GIT
+git version 1.8.0.msysgit.0
 ]]></programlisting>
 
     <section id="devenv-gitclient-install">
@@ -43,8 +43,7 @@ git version 1.7.5.GIT
                 <para>
                     Windows Command-Line Users: Git comes in a core
                     layer and then OS-layer add-ons. The core layer is
-                    sufficient for class
-                    and can be found at
+                    sufficient for class and can be found at
                     <ulink url="http://msysgit.github.com/">http://msysgit.github.com/</ulink>
                 </para>
                 <orderedlist>
@@ -107,8 +106,7 @@ git version 1.7.5.GIT
             </listitem>
             <listitem>
                 <para>
-                    Clone the class repository using the following
-                    URL
+                    Clone the class repository using the following URL
                     <ulink url="git://github.com/jcstaff/ejava-javaee.git">git://github.com/jcstaff/ejava-javaee.git</ulink>
                 </para>
                 <programlisting><![CDATA[
@@ -120,8 +118,21 @@ $ ls ejava-javaee/
 
 $ cd ejava-javaee
 $ git branch -a    //list all branches -- local and remote
-...
+* master
+  ...
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/working
 ]]></programlisting>
+                <note>
+                    <para>Git leaves you with all branches fetched and a local master
+                        branch referencing the class' master branch on github. You will
+                        be using the master branch for the duration of the semester. The 
+                        other branch of interest is 'working'. This contains my in-progress
+                        daily changes. The master branch is usually updated the evening 
+                        before or the day of class and should always be stable.
+                    </para>
+                </note>
             </listitem>
             
             <listitem>
@@ -137,8 +148,8 @@ Already up-to-date.
                 <note>
                     <para>
                         There are many modules within the class repository.
-                        Some are ready for use, some are still being ported 
-                        to JBoss 7, and some are not for use this semester.
+                        Some are ready for use, some are still being worked,
+                        and some are not for use this semester.
                         The ones ready for your use will be wired into the 
                         build and will be compiled during a follow-on section.
                         The list will increase as the semester moves forward. 
