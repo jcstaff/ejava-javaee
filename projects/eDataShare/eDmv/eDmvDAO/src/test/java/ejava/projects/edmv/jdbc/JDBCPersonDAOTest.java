@@ -8,7 +8,6 @@ import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
 import org.junit.Test;
 
 import ejava.projects.edmv.bo.Person;

@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ejava.build</groupId>
         <artifactId>ejava-build</artifactId>
-        <version>3.0.2012.2-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -98,14 +96,12 @@
                     </goals>
                     <configuration>
                         <target>
-                            <move todir="${basedir}/target/classes/ejava/docs/xslt"
-                                  flatten="true">
+                            <move todir="${basedir}/target/classes/ejava/docs/xslt" flatten="true">
                                 <fileset dir="${basedir}/target/dependency/xslt/org/jboss">
-                                    <exclude name="xhtml-common.xsl"/>
+                                    <exclude name="xhtml-common.xsl" />
                                 </fileset>
                             </move>
-                            <replace dir="${basedir}/target/classes/ejava/docs/xslt"
-                                token="xhtml-common.xsl" value="${style.resource}">
+                            <replace dir="${basedir}/target/classes/ejava/docs/xslt" token="xhtml-common.xsl" value="${style.resource}">
                             </replace>
                         </target>
                     </configuration>

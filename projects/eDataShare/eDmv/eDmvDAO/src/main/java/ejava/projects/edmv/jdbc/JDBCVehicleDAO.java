@@ -36,7 +36,6 @@ public class JDBCVehicleDAO implements VehicleDAO {
 		PreparedStatement statement1 = null;
 		Statement statement2 = null;
 		PreparedStatement statement3 = null;
-		ResultSet rs = null;
 				
 		try {
             statement1 = connection.prepareStatement(
@@ -46,6 +45,7 @@ public class JDBCVehicleDAO implements VehicleDAO {
             statement1.setString(1, registration.getVin());
 		    statement1.execute();
 		 
+			ResultSet rs = null;
 		    try {
                 Method setId = VehicleRegistration.class.getDeclaredMethod(
     	                    "setId", new Class[]{long.class});
@@ -62,6 +62,8 @@ public class JDBCVehicleDAO implements VehicleDAO {
 		    catch (Exception ex) {
 	            log.error("SQL error getting registration id:" + ex, ex);
 	            throw new DAOException("error getting registration id:"+ex, ex);
+		    } finally {
+				try { rs.close(); } catch (Exception ignored) {}
 		    }
             
             for (Person owner : registration.getOwners()) {
@@ -82,7 +84,6 @@ public class JDBCVehicleDAO implements VehicleDAO {
 		    throw new DAOException("error creating registration:"+ex, ex);
 		}
 		finally {
-			try { rs.close(); } catch (Exception ignored) {}
 			try { statement1.close(); } catch (Exception ignored) {}
 			try { statement2.close(); } catch (Exception ignored) {}
 			try { statement3.close(); } catch (Exception ignored) {}

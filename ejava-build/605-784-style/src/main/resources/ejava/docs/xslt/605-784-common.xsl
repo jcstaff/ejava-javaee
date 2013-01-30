@@ -27,7 +27,7 @@
   <xsl:param name="siteHref" select="'http://webdev.apl.jhu.edu/~jcs/ejava-javaee'"/>
   <xsl:param name="docHref" select="'http://webdev.apl.jhu.edu/~jcs/ejava-javaee'"/>
   <xsl:param name="siteLinkText" select="'Enterprise Java Development'"/>
-  <xsl:param name="docLinkText" select="'@Topic@'"/>
+  <xsl:param name="docLinkText" select="'@TOPIC@'"/>
 
    <xsl:param name="graphicsize.extension">0</xsl:param>
    

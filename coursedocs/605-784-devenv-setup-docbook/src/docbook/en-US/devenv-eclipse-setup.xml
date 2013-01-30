@@ -4,28 +4,33 @@
 
 <chapter id="devenv-eclipse-setup">
     <title>Eclipse Setup</title>
-    <para/>
-    
+    <para>
+        The most current version of Eclipse is Juno, Service Release 1.
+        The Juno SR1 release has some significant performance issues that
+        makes it undesirable over the Eclipse Indigo SR2 release. However,
+        Eclipse recently released a performance patch for Juno SR1 and 
+        has plans to release SR2 with those patches in the Feb 2013 timeframe.
+        The instructions below will ask you to download the Juno SR1 release 
+        and apply the performance patches. If Juno SR2 is released within the 
+        first few weeks of class -- please feel free to use that version. If 
+        either Juno SR1+patch or SR2 have issues -- please feel free to drop 
+        back to Indigo SR2 
+        <ulink url="http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigosr2">http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigosr2</ulink>
+        - look to the right side of the page).   
+    </para>
+
     <section id="devenv-eclipse-install">
-        <title>Download and Install Eclipse Indigo Service Release 2</title>
-        <warning>
-            <para>
-                I found the new Eclipse Juno (4.2) to have horrible performance
-                for even the simplest tasks. I strongly recommend against using 
-                it and go with the Indigo SR2 version instead.
-            </para>
-        </warning>
+        <title>Download and Install Eclipse Juno Service Release 1 (SR2 if available)</title>
         <orderedlist>
             <listitem>
                 <para>
                     Download Eclipse IDE for JavaEE Developers 
-                    <ulink url="http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigosr2">http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigosr2</ulink>
-                    (look to the right side of the page)
+                    <ulink url="http://eclipse.org/downloads">http://eclipse.org/downloads</ulink>
                 </para>
             </listitem>
             <listitem><para>Unzip the downloaded archive.</para>
-                <programlisting><![CDATA[
-$ tar xzf ~/Downloads/eclipse-jee-indigo-SR2-linux-gtk.tar.gz 
+<programlisting><![CDATA[
+$ tar xzf ~/Downloads/eclipse-jee-juno-SR1-linux-gtk.tar.gz
 
 $ ls eclipse
 about_files  artifacts.xml  dropins  eclipse.ini   features  libcairo-swt.so  p2       readme
@@ -34,10 +39,30 @@ about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      pl
             </listitem>
             <listitem><para>Create a shortcut for starting Eclipse</para></listitem>
             <listitem><para>Start Eclipse</para></listitem>
+            
+            <listitem>
+                <para>
+                    Follow the resolution instructions documented at the following site
+                    <ulink url="http://wiki.eclipse.org/Platform_UI/Juno_Performance_Investigation">http://wiki.eclipse.org/Platform_UI/Juno_Performance_Investigation</ulink>.
+                </para>
+            </listitem>
+            
         </orderedlist>
     </section>
     
-    <section id="setup-m2e">
+    <section id="devenv-eclipse-jdk">
+        <title>Define JDK location</title>
+        <para>Eclipse will default to the JRE when launching most tools/applications.
+            Sometimes this can be an issue and requires a JDK. Add the JDK and make it 
+            your default JRE.</para>
+        <orderedlist>
+            <listitem><para>Window-&gt;Preferences-&gt;Java-&gt;Installed JREs</para></listitem>
+            <listitem><para>press Add..-&gt;Standard VM and reference the JDK instance you installed earlier</para></listitem>
+            <listitem><para>Make the new JDK VM your default</para></listitem>
+        </orderedlist>
+    </section>
+    
+    <section id="devenv-eclipse-setup-m2e">
         <title>Setup Maven Eclipse Integration (m2e)</title>
         <para>m2e is a plugin installed into Eclipse that configures Eclipse
         based on the Maven pom.xml configuration. When adjusting your builds,
@@ -72,7 +97,7 @@ about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      pl
                     <listitem><para>Right click on "class-examples" in the Package 
                         Explorer and select Import...-&gt;Maven-&gt;Existing Maven Projects</para></listitem>
                     <listitem><para>Browse to the project area where you performed 
-                        the Git checkout earlier and select the class-examples folder.</para></listitem>
+                        the Git checkout earlier and select the javase5Enhancements folder.</para></listitem>
                     <listitem><para>Select Next to have the current project(s)
                         added to the selected working set.</para>
                     <note>
@@ -91,6 +116,29 @@ about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      pl
                             Run As-&gt;Maven Install by right clicking on any of the 
                             project folders.
                        </para>
+                       <note>
+                            <para>If you receive the following error</para>
+<programlisting language=""><![CDATA[
+[ERROR] No compiler is provided in this environment. Perhaps you are running on a JRE rather than a JDK?
+]]></programlisting>          
+                            <para>
+                                add the following '-vm' option to your eclipse.ini file -- pointing to your
+                                javaw executable in the JDK directory, restart Eclipse, and retry.
+                            </para>
+<programlisting language=""><![CDATA[
+-vm C:\apps\Java\jdk1.7.0_11/bin/javaw.exe
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+--launcher.defaultAction
+openFile
+-vm C:\apps\Java\jdk1.7.0_11/bin/javaw.exe
+-vmargs
+-Dosgi.requiredJavaVersion=1.5
+-Dhelp.lucene.tokenizer=standard
+-Xms40m
+-Xmx512m
+]]></programlisting>                        
+                       </note>
                     </listitem>
                     <listitem>
                         <para>
@@ -103,7 +151,7 @@ about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      pl
     </section>
     
     
-    <section id="setup-egit">
+    <section id="devenv-eclipse-setup-egit">
         <title>Setup EGit Eclipse Team Provider</title>
         <para>You can use the command line Git to functionally clone the 
             remote repository and update your local copy. However, having
@@ -129,31 +177,27 @@ about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      pl
             </orderedlist>
     </section>
     
-    <section id="setup-jbosstools">
+    <section id="devenv-eclipse-setup-jbosstools">
         <title>Setup JBoss Eclipse Integration</title>
         <para>Add the following repository to your Eclipse instance and
            install the plugin</para>
         <orderedlist>
-            <listitem><para><code>Help-&gt;Install New Software->Add...</code></para></listitem>
-            <listitem><para>Enter</para>
-                <itemizedlist>
-                    <listitem><para>Name: jboss-tools</para></listitem>
-                    <listitem><para>URL: <ulink url="http://download.jboss.org/jbosstools/updates/development/indigo/">http://download.jboss.org/jbosstools/updates/development/indigo/</ulink></para></listitem>
-                </itemizedlist>
+            <listitem><para>Open the Eclipse Marketplace panel using 
+                <code>Help-&gt;Eclipse Marketplace</code></para>
             </listitem>
+            <listitem><para>Type JBoss into the seach field and press Go</para></listitem>
+            <listitem><para>Click Install for the <code>JBoss Tools (Juno)</code></para></listitem>
             <listitem><para>Complete the installation steps for JBoss Tools. There
                 are a lot of tools in the repository. Not all of them are
-                needed for class and some do not yet seem functional or obvious 
-                how to use them without more investigation. You can opt for 
-                installing all or choose the following minimal set.</para>
+                needed for class or obvious how to use them without more investigation. 
+                Choose the following minimal set.</para>
                 <itemizedlist>
-                    <listitem><para>JBoss Web and JavaEE Development</para>
-                        <itemizedlist>
-                            <listitem><para>JBoss AS Tools</para></listitem>
-                            <listitem><para>JBoss JAX-RS Tools</para></listitem>
-                            <listitem><para>JBoss WebServices Tools</para></listitem>
-                        </itemizedlist>
-                    </listitem>
+                <!-- 
+                    <listitem><para>Context and Dependency Injection Tools</para></listitem>
+                 -->
+                    <listitem><para>JBoss JAX-RS Tools</para></listitem>
+                    <listitem><para>JBoss AS Tools</para></listitem>
+                    <listitem><para>JBoss WebServices Tools</para></listitem>
                 </itemizedlist>
                 <note>
                     <para>You will receive a warning about the content within the 
@@ -169,7 +213,7 @@ about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      pl
                        using the Browse button on the next panel</para></listitem>
                     <listitem><para>Name the server "standalone" and leave the 
                        to match the default "standalone.xml" configuration file.</para></listitem>
-                    <listitem><para>Set the JRE to the JDK instance you installed earlier</para></listitem>
+                    <listitem><para>Set the JRE to the default 'real' JRE</para></listitem>
                     <listitem><para>Review options. Note that I generally start my 
                         server externally so that standard output does not compete 
                         with my other actions within Eclipse. However, there are

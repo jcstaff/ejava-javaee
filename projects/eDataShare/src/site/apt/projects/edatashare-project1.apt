@@ -143,7 +143,7 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
         a few root projects that provide dependencyManagement and 
         pluginManagement duties. You will either need to also inherit from
         the dependencies/pom.xml or compensate by re-defining the management
-        sections in the grandparent pom.xml of your project.
+        sections in the root pom.xml of your project.
 
     See the Getting Started section towards the end of this specification
     for a more detailed sample project layout.
@@ -154,10 +154,10 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
     be done by replacing the "e" in eDataShare, eDmv, and eMayberry with a
     unique name that corresponds to your newsgroup or college login
     (ex. ejavaguyDataShare, ejavaguyDmv, ejavaguyMayberry -or-
-    jcstaffDataShare,
-    jcstaffDmv, jcstaffMayberry). You should also use this same pattern for
+    jcsDataShare,
+    jcsDmv, jcsMayberry). You should also use this same pattern for
     java packages (ex. ejavaguy.dmv, ejavaguy.mayberry -or-
-    jcstaff.dmv, jcstaff.mayberry), DB tables, etc.
+    jcs.dmv, jcs.mayberry), DB tables, etc.
 
     [Note:] There should be no use of System.out.println() in the code and all
     implementations must use the jakarta commons logging API with the 
@@ -551,8 +551,7 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
 
         [[b]] Design and implement an Ingestor that will use an externally
         provided parser to obtain business data for eDmv and use the 
-        Ingest DAO to populate the database. You will be provided the
-        parser when the test data and sample project thread is posted.
+        Ingest DAO to populate the database. 
 
         []
 
@@ -718,7 +717,7 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
 * Testing
 
     [[1]] Provide a JUnit test for your business objects (BOs) that test
-    the manipulation of the structure. An example test might be to try
+    the manipulation of the data. An example test might be to try
     adding a residence to a Person without a start date.  These tests
     should be packaged with the BOs.
     
@@ -788,11 +787,13 @@ Project1: eDataShare Data Access Tier and Initial Business Logic
         modification needs to occur for the java package names.
 
         [Note:] Other than a README, it is not anticipated that you
-        will have any artifacts at the eDataShare layer. It should be
+        will have any artifacts at the root layer. It should be
         used only as a convenience wrapper to perform goals across both
-        projects. All details will be specified at the eDmv and eMayberry
-        levels and below; with the leaf-level projects being your default
-        choice for detailed information (e.g., DB drivers, etc.)
+        projects. The root project can also be used for common property, 
+        dependencyManagement, and pluginManagement defintions. All 
+        concrete dependency and plugins should be defined in the leaf-level
+        poms to avoid unwanted dependencies from the root or mid-level
+        parents.
 
         []
 
@@ -809,13 +810,10 @@ eDataShare
 |   |       |   |   `-- edmv
 |   |       |   |       |-- bo
 |   |       |   |       |-- dao
-|   |       |   |       |-- jdbc
 |   |       |   |       |-- jpa
 |   |       |   |       |-- bl
 |   |       |   |       |-- blimpl
 |   |       |   `-- resources
-|   |       |       |-- META-INF
-|   |       |       |   `-- persistence.xml
 |   |       |       `-- ddl
 |   |       |           |-- eDmv-create.ddl
 |   |       |           `-- eDmv-drop.ddl
@@ -823,11 +821,12 @@ eDataShare
 |   |           |-- java
 |   |           |   `-- edmv
 |   |           |       |-- bo
-|   |           |       |-- jdbc
-|   |           |       |-- jpa
-|   |           |       |-- blimpl
+|   |           |       |-- dao
+|   |           |       `-- bl
 |   |           `-- resources
-|   |               `log4j.xml
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
 |   `-- pom.xml
 |-- eMayberry
 |   +--eMayberryImpl
@@ -842,8 +841,6 @@ eDataShare
 |   |       |   |       |-- bl
 |   |       |   |       |-- blimpl
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |       |   `-- persistence.xml
 |   |       |       `-- ddl
 |   |       |           |-- eMayberry-create.ddl
 |   |       |           `-- eMayberry-drop.ddl
@@ -851,10 +848,12 @@ eDataShare
 |   |           |-- java
 |   |           |   `-- emayberry
 |   |           |       |-- bo
-|   |           |       |-- jpa
-|   |           |       |-- blimpl
+|   |           |       |-- dao
+|   |           |       |-- bl
 |   |           `-- resources
-|   |               `log4j.xml
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
 |   `-- pom.xml
 `-- pom.xml
 ---
@@ -865,10 +864,10 @@ eDataShare
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- edmv
-|   |       |   |       |-- bo
-|   |       |   |       `-- bl
+|   |       |   `-- java
+|   |       |       `-- edmv
+|   |       |           |-- bo
+|   |       |           `-- bl
 |   |       `-- test
 |   |           |-- java
 |   |           |   `-- edmv
@@ -882,53 +881,48 @@ eDataShare
 |   |       |   |-- java
 |   |       |   |   `-- edmv
 |   |       |   |       |-- dao
-|   |       |   |       |-- jdbc
 |   |       |   |       `-- jpa
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |       |   `-- persistence.xml
 |   |       |       `-- ddl
 |   |       |           |-- eDmv-create.ddl
 |   |       |           `-- eDmv-drop.ddl
-|   |       |-- test
+|   |       `-- test
 |   |           |-- java
 |   |           |   `-- edmv
-|   |           |       |-- jdbc
-|   |           |       `-- jpa
+|   |           |       `-- dao
 |   |           `-- resources
-|   |               `log4j.xml
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
 |   +--eDmvBLImpl
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- edmv
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
-|   |       |-- test
+|   |       |   `-- java
+|   |       |       `-- edmv
+|   |       |           `-- blimpl
+|   |       `-- test
 |   |           |-- java
 |   |           |   `-- edmv
-|   |           |       |-- blimpl
+|   |           |       `-- bl
 |   |           `-- resources
-|   |               `log4j.xml
+|   |               `-- log4j.xml
 |   `-- pom.xml
 |-- eMayberry
 |   +--eMayberryBO
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- emayberry
-|   |       |   |       |-- bo
-|   |       |   |       `-- bl
+|   |       |   `-- java
+|   |       |       `-- emayberry
+|   |       |           |-- bo
+|   |       |           `-- bl
 |   |       `-- test
 |   |           |-- java
 |   |           |   `-- emayberry
 |   |           |       `-- bo
 |   |           `-- resources
-|   |               `log4j.xml
+|   |               `-- log4j.xml
 |   +--eMayberryDAO
 |   |   |-- pom.xml
 |   |   `-- src
@@ -938,33 +932,30 @@ eDataShare
 |   |       |   |       |-- dao
 |   |       |   |       |-- jpa
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |       |   `-- persistence.xml
 |   |       |       `-- ddl
 |   |       |           |-- eMayberry-create.ddl
 |   |       |           `-- eMayberry-drop.ddl
 |   |       `-- test
 |   |           |-- java
 |   |           |   `-- emayberry
-|   |           |       `-- jpa
+|   |           |       `-- dao
 |   |           `-- resources
-|   |               `log4j.xml
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
 |   +--eMayberryBLImpl
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- emayberry
-|   |       |   |       `-- blimpl
-|   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
+|   |       |   `-- java
+|   |       |       `-- emayberry
+|   |       |           `-- blimpl
 |   |       `-- test
 |   |           |-- java
 |   |           |   `-- emayberry
-|   |           |       `-- blimpl
+|   |           |       `-- bl
 |   |           `-- resources
-|   |               `log4j.xml
+|   |               `-- log4j.xml
 |   `-- pom.xml
 `-- pom.xml
 ---
@@ -1006,7 +997,7 @@ eDataShare
 * Submission Guidelines
 
     Please follow the 
-    {{{../../../course-docs/projects.html#Submission_Guidelines}
+    {{{../../../coursedocs/projects.html#Submission_Guidelines}
     project submission guidelines}}
     posted in the course overview.
 

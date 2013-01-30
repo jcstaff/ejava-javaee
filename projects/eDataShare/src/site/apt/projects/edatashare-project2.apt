@@ -1,6 +1,6 @@
 Project2: eDataShare N-Tier Application
 
-    2012-11-07 - DRAFT
+    2013-01-26 - DRAFT
 
 * Goals
 
@@ -23,27 +23,25 @@ Project2: eDataShare N-Tier Application
     simulate a complex project option.
 
     * Expand the current project development architecture to include EJB,
-    WAR, EAR, and remote Test sub-projects for eMayberry. For eMayberry
-    you will have a single WAR for your EJBs and rmi tests. You may also 
-    merge this with your project 1 Impl and migrate the project 1 business
-    logic module to a WAR type module. This is being done to simulate 
-    a simple project option. 
+    WAR, and remote Tests for eMayberry. For eMayberry you will have a
+    single WAR for deployment. You may merge all architectural levels
+    into a single WAR module. This is being done to simulate a simple
+    project option.
 
     * Re-host the data access tiers and initial business logic from 
-    Project 1 within the new EJB and WEB tiers.
+    Project 1 within the new EJB and WEB tiers at component/runtime.
 
     * Design the data transfer objects (DTOs) to be used to communicate
     with clients using the remote interface.
 
     * Create the EAR and WAR sub-projects to host/deploy the Java EE components.
 
-    * Create the remote Test sub-project to deploy and run tests using the
+    * Create the remote Test sub-project(s) to deploy and run tests using the
     remote EJB interface.
 
     * Create and test the WAR sub-project to host the user interface.
-    This component will ultimately be deployed within the EAR to 
-    the application server and use local interfaces of the EJB to
-    access business logic. 
+    This component will ultimately be deployed the application server 
+    and may use local interfaces of the EJB to access business logic. 
 
 * Technical Overview
 
@@ -208,7 +206,7 @@ Project2: eDataShare N-Tier Application
     that gets serialized to the client in a set of Data Transfer Objects
     (DTOs).
 
-        [[A]] WAR - Create an WAR module to host the eMayberry server-side
+        [[A]] WAR - Create a WAR module to host the eMayberry server-side
         components and the remote tests for the WAR/EJB components.
 
         [[A]] EJBs - The EJBs will be used to inject and initialize
@@ -241,8 +239,7 @@ Project2: eDataShare N-Tier Application
     [[1]] Add a Web UI to the eDmv application. This may use EJB local
     or remote interfaces. The WAR for the Web UI must be deployed
     as part of the eDmv EAR. The Web UI must have the following
-    functionality. Note that the test data will already have a significant
-    amount of information. We will just be adding a few additional objects.
+    functionality. 
 
         * Test Admin
 
@@ -274,11 +271,11 @@ Project2: eDataShare N-Tier Application
 
 ===
 
-    [[1]] Add a Web UI to the eMayberry application (i.e., to the WAR
-    you have already created for the EJBs). This may use
-    the EJB local or remote interfaces. The WAR for the Web UI must
-    be deployed solo -- containing the EJBs and Impls. The Web UI must have the
-    following functionality.
+    [[1]] Add a Web UI to the eMayberry application (i.e., to the WAR you
+    have already created for the EJBs). This may use the EJB local or
+    remote interfaces. The WAR for the Web UI must be deployed solo --
+    containing the EJBs and Impls. The Web UI must have the following
+    functionality.
 
         * Test Admin
 
@@ -313,8 +310,24 @@ Project2: eDataShare N-Tier Application
         EJBs that detect a move date for a residence is prior to the move-in 
         date.
 
-        [[A]] Test - update the test project(s) to verify the transaction
-        logic.
+        [[A]] Create a demonstration of
+        transactions and the capability of rollback by implementing a
+        scenario that adds something to the database and then a *follow-on*
+        rollback causes the changes to be undone.
+
+        [Note] To satisfy the transaction demonstration requirement, you
+        must actually store something in the database and then later in
+        the transaction roll it back based on some decision. If you make
+        the decision before you store the information -- you are not
+        satisfying the requirement. It is common for students to
+        implement a wrapper around an existing method that takes a
+        collection and populate the collection with good data up front
+        and bad data at the end. The good data that got successfully
+        processed should get rolled back once the bad data is
+        processed. Create remote methods that can tell your RMI client
+        that this actually occured.
+
+        []
 
 ===
 * Testing
@@ -325,26 +338,18 @@ Project2: eDataShare N-Tier Application
 
     [[1]] Provide JUnit tests that verify the extra business logic
     functionality of eMayberry interfacing with eDmv. These tests may
-    be placed in either with the business logic project or the RMI Test
-    project for eMayberry.
+    be placed either with the business logic project or where you 
+    test the remote interfaces.
 
     [[1]] Provide JUnit tests that verify the EJB functionality of
     eMayberry accessed through its remote interface. This will also test
     its use of DTOs. Theses tests should be packaged in the eMayberry
-    RMI Test project.
+    WAR (or optional RMI Test) project.
 
     [[1]] Perform an end-to-end use case to do the following. This must be 
     demonstrated in an automated JUnit test and then be manually
-    implementable using the Web UI and any implemented command line
-    interfaces.
+    implementable using the Web UI.
     
-    [Note:]Any actions, including the ingest, that must be executed from
-    the command line must be wrapped inside a <<RUN>> script similar
-    to ones demonstrated in class (see the class jdbcDAO project for an 
-    example of using an Ant script to encapsulate command-line details).
-
-    []
-
         [[a]] reset all eDmv tables (using the DmvTestUtilEJB)
 
         [[a]] populate the eDmv tables (using the DmvIngestor)
@@ -408,10 +413,11 @@ Project2: eDataShare N-Tier Application
     |   |           |   `-- emdv
     |   |           |       `-- ejb
     |   |           `-- resources
-    |   |               |-- META-INF
-    |   |               |   `-- persistence.xml
-    |   |               |-- ejb-jar.xml
-    |   |               `-- jboss.xml
+    |   |               `-- META-INF
+    |   |                   |-- beans.xml
+    |   |                   |-- persistence.xml
+    |   |                   |-- (ejb-jar.xml)
+    |   |                   `-- (jboss-ejb3.xml)
     |   |-- eDmvWAR
     |   |   |-- pom.xml
     |   |   `-- src
@@ -422,8 +428,10 @@ Project2: eDataShare N-Tier Application
     |   |           |-- resources
     |   |           `-- webapp
     |   |               |-- WEB-INF
-    |   |               |   |-- content
-    |   |               |   `-- web.xml
+    |   |               |   |-- beans.xml
+    |   |               |   |-- web.xml
+    |   |               |   |-- (jboss-web.xml)
+    |   |               |   `-- content
     |   |               `-- index.jsp
     |   |-- eDmvEAR
     |   |   `-- pom.xml
@@ -435,12 +443,10 @@ Project2: eDataShare N-Tier Application
     |   |           |   `-- emdv
     |   |           |       `-- ejbclient
     |   |           `-- resources
-    |   |               |-- eDmv-ant.xml (optional)
-    |   |               |-- eDmv.properties (optional)
     |   |               `-- jndi.properties
     |   `-- pom.xml
     |-- eMayberry
-    |   |-- eMayberryImpl
+    |   |-- (eMayberryImpl -- could be merged with WAR)
     |   |-- eMayberryWAR
     |   |   |-- pom.xml
     |   |   `-- src
@@ -451,11 +457,15 @@ Project2: eDataShare N-Tier Application
     |   |       |   |       `-- web
     |   |       |   |-- resources
     |   |       |   |   `-- META-INF
-    |   |       |   |       `-- persistence.xml
+    |   |       |   |       |-- persistence.xml
+    |   |       |   |       `-- (ejb-jar.xml)
     |   |       |   `-- webapp
     |   |       |       |-- WEB-INF
-    |   |       |       |   |-- content
-    |   |       |       |   `-- web.xml
+    |   |       |       |   |-- beans.xml
+    |   |       |       |   |-- web.xml
+    |   |       |       |   |-- (jboss-web.xml)
+    |   |       |       |   |-- (jboss-ejb3.xml)
+    |   |       |       |   `-- content
     |   |       |       `-- index.jsp
     |   |       `-- test
     |   |           |-- java
@@ -502,6 +512,6 @@ Project2: eDataShare N-Tier Application
 * Submission Guidelines
 
     Please follow the 
-    {{{../../../course-docs/projects.html#Submission_Guidelines}
+    {{{../../../coursedocs/projects.html#Submission_Guidelines}
     project submission guidelines}}
     posted in the course overview.

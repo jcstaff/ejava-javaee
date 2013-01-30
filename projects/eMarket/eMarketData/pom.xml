@@ -2,7 +2,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eMarket</groupId>
         <artifactId>eMarket</artifactId>
-        <version>2.0.2012.1-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -40,6 +40,14 @@
         </profile>
         <profile>
             <id>serverTest</id>
+            <modules>
+                <module>eSalesTestEJB</module>
+                <module>eSalesTestEAR</module>
+                <module>eSalesRMITest</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>all-modules</id>
             <modules>
                 <module>eSalesTestEJB</module>
                 <module>eSalesTestEAR</module>

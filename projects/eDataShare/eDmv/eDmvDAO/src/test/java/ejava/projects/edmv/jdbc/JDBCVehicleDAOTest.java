@@ -2,13 +2,12 @@ package ejava.projects.edmv.jdbc;
 
 import static org.junit.Assert.*;
 
+
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import ejava.projects.edmv.bo.Person;
@@ -30,7 +29,7 @@ public class JDBCVehicleDAOTest extends JDBCDAOTestBase {
 	private VehicleDAO vehicleDAO;
 	private PersonDAO personDAO;
 	
-	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		
@@ -40,7 +39,7 @@ public class JDBCVehicleDAOTest extends JDBCDAOTestBase {
 	    ((JDBCPersonDAO)personDAO).setConnection(connection);
 	}
 
-	@After
+	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
 	    ((JDBCVehicleDAO)vehicleDAO).setConnection(null);

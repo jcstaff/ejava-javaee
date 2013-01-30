@@ -1,32 +1,38 @@
 Project1: eMarket Data Access Tier and Initial Business Logic
 
-    01/25/2010
+    2013-01-25
 
 * Goals
 
     * Build the data access tier and initial business logic for an
     application.
 
-    * Gain experience with JDBC and Java Persistence API technologies.
+    * Gain experience with database schema and Java Persistence API technologies.
 
     * Gain experience designing and testing project implementations around
     layered boundaries.
 
 * Objectives
 
-    * Design a relational schema for your project.
+    * Design and implement a set of business logic interfaces that address
+    the functional requirements of the external users.
 
-    * Design a set of business objects to represent the data in the system.
+    * Design and implement a set of business objects to represent the 
+    data requirements in the system.
 
-    * Incorporate JDBC technology for bulk database operations.
+    * Design and implement a relational database schema that will store the 
+    state of the business objects.
 
-    * Incorporate the Java Persistence API for mapping objects to 
-    the database schema.
+    * Design and implement a data access tier that will handle mapping the 
+    business objects to the database using the Java Persistence API.
 
-    * Provide a layer of business logic that coordinates interaction with
-    the data access objects.
+    * Design and implement the business logic classes that realize the 
+    business logic interfaces and leverage the data access objects to 
+    implement the scenario logic. 
 
-    * Test our implementations.
+    * Unit test the different levels of the architecture.
+    
+    * Integration test the end-to-end solution.
 
 * Business Description
 
@@ -47,46 +53,37 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     actual buyer.
 
     Both eSales and eBidbot have come to you to develop the initial phase
-    of their applications. They are expecting the core capability of their
-    applications as a final output, but are willing to accept some command
-    line and initial proof-of-concept user interfaces in that time-frame.
-    There will be a specific set of use cases to implement and you will be
-    informed as to which can be done in command line or Web UI form.
+    of their applications.  You are tasked with implementing a low-cost
+    prototype, based on current standards, to automate much of this
+    activity. At this point in the project we are primarily looking to
+    build the data access tiers for both the eSales and eBidbot (two
+    separate systems). We will also add a minor amount of business
+    logic to coordinate the data access between the individual data
+    access objects.
 
 * Technical Overview
 
-    The work done during this project will focus on the business objects
-    (BOs), the data access objects (DAOs) of the data access tier,
-    and some initial business logic (BL). There will be two sets of DAO
-    implementations; one based on the JDBC API and a second based the one
-    the Java Persistence API (JPA). There will only be a single version
-    of the business logic implementation (BLImpl). How you partition the
-    implementations into separate physical sub-projects is up to you.
-    A suggested starting point is provided at the end of this project 
-    description.
+    The work done during this project will focus on the business
+    objects (BOs), the data access objects (DAOs) of the data access
+    tier, and some initial business logic interfaces (BL) and business
+    logic implementations (BLImpl). The DAOs will be based on the Java
+    Persistence API (JPA).  How you partition the implementations into
+    separate physical sub-projects is up to you.  A suggested starting
+    point is provided at the end of this project description.
 
     The business objects encapsulate the core business data and
     rules of the applications. You will design the business objects
-    and then map them to the database using JDBC (for eSales) and JPA
-    (for both eSales and eBidbot). You will only be asked to implement
-    a create capability with JDBC to be used with ingest. You will
-    be required to implement full CRUD (Create, Read, Update, and
+    and then map them to the database.
+    You are required to implement full CRUD (Create, Read, Update, and
     Delete), capability with JPA. You will be required to encapsulate
     all object to relational (O/R) mapping within the DAOs, descriptor
     files, and business object annotations.  You will be given a set of
     {{{https://github.com/jcstaff/ejava-javaee/blob/master/projects/eMarket/eMarketData/eSalesTestUtil/src/main/resources/xml/}
-    test data}} to initially populate your applications as a part
-    of testing.
-
-    [Note:] Its is expected/required that you implement and maintain
-    both a set of JDBC and JPA DAOs in order to develop and demonstrate an
-    understanding of how database table and Java class designs can
-    impact your JPA implementations.  You will always use the JDBC DAO
-    to implement the eDmv ingest and you will always use the JPA
-    implementation for general CRUD operations in this and follow-on
-    projects.
-
-    []
+    test data}} to initially populate your applications and be the source
+    of data for the ingest requirement. To use the data, you will ingest 
+    using a parser supplied by the instructor. There is a sample thread
+    in the projects/eMarket/eSales directory that shows how to use the 
+    parser as well as other aspects technology within the project.  
 
     The business logic will provide a set of classes with concise methods
     that map easily to use cases. The business logic will ensure proper
@@ -102,12 +99,12 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     that it takes to implement the end-to-end scenarios specified later
     within this specification.
 
-    The test acceptance for the first eSales project will be a set of
-    unit tests and at least one functional test that takes the business
-    logic, data access tier, and business objects through an end-to-end
-    eSales use case; starting from the seller initiating an auction and
-    ending with a buyer placing a winning bid. The test acceptance for 
-    eBidbot will be restricted to unit tests.
+    The test acceptance for the first project will be a set of unit
+    tests and at least one functional test that takes the business logic,
+    data access tier, and business objects through an end-to-end eSales
+    and eBidbot use case; starting from the seller initiating an auction
+    and ending with a buyer or eBidbot placing a winning bid. The test
+    acceptance for eBidbot will require some stubs prior to project 2.
 
 * Assembly Overview
 
@@ -121,15 +118,18 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     suggested project layouts at the bottom of this specification.  A
     {{{https://github.com/jcstaff/ejava-javaee/tree/master/projects/eMarket}
     sample set of projects}} that implements a thin eSales thread has
-    been made available. Please ignore the TestData sub-project when
+    been made available. Please <<ignore>> the <<eMarketData>> sub-project when
     using the example to craft your source tree. You will depend on
-    projects within that tree -- not reimplement them and not copy
+    projects within that tree -- <<not>> reimplement them and not copy
     them.
     
-        [Note:] The root eMarket project should be very thin and should
-        not have a dependency on the instructor's class examples. Doing
-        so will add unnecessary web site publishing complications to your
-        project that are only needed by posted class examples.
+        [Note:] You will likely copy significant portions of the thin thread
+        example and other class examples into your project. Be aware that
+        the thin thread and other example pom.xml files inherit from 
+        a few root projects that provide dependencyManagement and 
+        pluginManagement duties. You will either need to also inherit from
+        the dependencies/pom.xml or compensate by re-defining the management
+        sections in your project.
 
     See the Getting Started section towards the end of this specification
     for a more detailed sample project layout.
@@ -138,16 +138,18 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     the applications and submitting them for evaluation, it is asked
     that you replace the "e" in eMarket, eSales, and eBidbot with a
     unique name that corresponds to your newsgroup or college login
-    (ex. ejavaguyMarket, ejavaguySales, ejavaguyBidbot -or- jcstaffMarket,
-    jcstaffSales, jcstaffBidbot). You should also use this same pattern for
+    (ex. ejavaguyMarket, ejavaguySales, ejavaguyBidbot -or- jcsMarket,
+    jcsSales, jcsBidbot). You should also use this same pattern for
     java packages (ex. ejavaguy.sales, ejavaguy.bidbot -or-
-    jcstaff.sales, jcstaff.bidbot), JNDI names, DB tables, etc.
+    jcs.sales, jcs.bidbot), JNDI names, DB tables, etc. 
 
     [Note:] There should be no use of System.out.println() in the code and all
     implementations must use the jakarta commons logging API with the 
     log4j logging provider.  You may leave debug in your code, but this 
     should be able to be turned on/off with the proper logging priority
     changes in the log4j.xml configuration.
+
+    []
 
 * Technical Details
 
@@ -167,8 +169,12 @@ Project1: eMarket Data Access Tier and Initial Business Logic
 
     []
 
-    [[1]] Design a database schema that accounts for the following
-    information. 
+    [[1]] Design 2 sets of database schema that account for the following
+    information. Although we will deploy the 2 database schemas to
+    the same database for the project, they should be designed to be
+    independently deployed to separate databases. eSales and eBidbot are
+    two independent applications. This will primarily affect your attempt
+    re-use tables or to make primary key assumptions between the two.
 
         [[A]] eSales Database Schema 
 
@@ -543,25 +549,28 @@ Project1: eMarket Data Access Tier and Initial Business Logic
         []
 
 ===
+
+    [Note:] Please ignore references in the diagrams that call out use of 
+    JDBC. All DAOs can be implemented exclusively with JPA for this assignment.
+
+    []    
+    
     [[1]] Design and implement a mechanism to ingest a starting state for
     eSales based on a provided data file and parser.  You will implement
-    two primary classes to support this requirement; JDBC Ingest DAO
+    two primary classes to support this requirement; the DAO(s)
     and an Ingestor.
 
 [../images/esales-ingest-dao.jpg] eSales Ingest and JDBC DAO
 
         [[a]] Design and implement a set of DAOs that can be used to
-        ingest eSales business data into the database using the JDBC API
-        and the database schema you designed as a part of a separate
-        requirement. These DAOs can optionally implement a common
-        interface with the DAOs you implement in another requirement or
-        can be unique in how they achieve what can be thought of as a
-        performance goal (rather than working within business rules).
-        The JDBC Ingest DAO need only support create/insert operations.
+        ingest eSales business data into the database using 
+        the database schema you designed as a part of a separate
+        requirement. These DAOs can optionally be tuned for ingest 
+        or simply reused from your CRUD-style requirements.
 
         [[b]] Design and implement an Ingestor that will use an externally
-        provided parser to obtain business data for eSales and use the JDBC
-        Ingest DAO to populate the database.
+        provided parser to obtain business data for eSales and use the
+        Ingest DAO to populate the database. 
 
         []
 
@@ -574,12 +583,9 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     potential DAO implementations. The implementation can make liberal use
     of JPA @Annotations, descriptor files, or a combination of both. Your
     interface should encapsulate the fact that an EntityManager is being
-    used and the same EntityManager should be shared among other DAOs in
-    the same Thread. Using either (a crude form of) dependency injection
-    or ThreadLocal can be quite useful here. However, you will find
-    that dependency injection works easiest in most cases. Your DAOs
-    should not attempt to control the transaction or they will <NOT>
-    be portable to the EJB tier.
+    used and the same EntityManager should be shared among other DAOs
+    in the same Thread.  Your DAOs should not attempt to control the
+    transaction or they will <NOT> be portable to the EJB tier.
 
 [../images/emarket-daos.jpg] eMarket JPA DAOs
 
@@ -596,10 +602,11 @@ Project1: eMarket Data Access Tier and Initial Business Logic
         to/from the database.
 
         []
+
 ===
 
     [[1]] Design an initial business interface and business logic for
-    the eSales application. The core O/R mapping work will be done
+    the applications. The core O/R mapping work will be done
     by the DAOs.  However, it is the ultimate responsibility of these
     business logic implementations that either it or the business objects
     enforce the business rules of the application. The DAOs only perform
@@ -611,74 +618,100 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     required to implement the end-to-end use case listed in the testing
     section. Some of the anticipated methods are listed below.
 
+        [[A]] eSales Candidate Business Logic
+
 [../images/esales-business-logic.jpg] eSales Business Logic
 
-        [[a]] AccountMgmt/AccountMgmtImpl - encapsulates the actions
-        required to create, get, update and close an account.
+            [[a]] AccountMgmt/AccountMgmtImpl - encapsulates the actions
+            required to create, get, update and close an account.
 
-            * createAccount - you will need to at least create a seller and
-            two or more buyer accounts. 
+                * createAccount - you will need to at least create a seller and
+                two or more buyer accounts. 
 
-        [[a]] SellerMgmt/SellerMgmtImpl - encapsulates the actions required
-        to create and get auctions for a seller.
+            [[a]] SellerMgmt/SellerMgmtImpl - encapsulates the actions required
+            to create and get auctions for a seller.
 
-            * createAuction  - creates a new auction for a seller. All
-            dates and properties of the auction need to be of consistent
-            and legal values.
+                * createAuction  - creates a new auction for a seller. All
+                dates and properties of the auction need to be of consistent
+                and legal values.
 
-            * getUserAuctions - returns a collection of auctions associated
-            with a seller. This can be used to determine if the auction has
-            been added.
+                * getUserAuctions - returns a collection of auctions associated
+                with a seller. This can be used to determine if the auction has
+                been added.
 
-            * getAuction - returns a specific auction by ID. This can
-            be used to track the state of a specific auction for a seller.
+                * getAuction - returns a specific auction by ID. This can
+                be used to track the state of a specific auction for a seller.
 
-        [[a]] BuyerMgmt/BuyerMgmtImpl - encapsulates the actions required
-        to get and bid on auctions. 
+            [[a]] BuyerMgmt/BuyerMgmtImpl - encapsulates the actions required
+            to get and bid on auctions. 
 
-            * getOpenAuctions - returns a collection of auctions that 
-            have not ended. This can be used to pick a specific auction
-            to bid on.
+                * getOpenAuctions - returns a collection of auctions that 
+                have not ended. This can be used to pick a specific auction
+                to bid on.
 
-            * placeBid - creates a bid for a specific user and auction. The
-            auction must be open, the user must exist, and the bid amount 
-            must be greater than any pre-existing bid.
+                * placeBid - creates a bid for a specific user and auction. The
+                auction must be open, the user must exist, and the bid amount 
+                must be greater than any pre-existing bid.
 
-            * getAuction - returns a specific auction by ID. This can be
-            used to track the state of a specific auction for a buyer.
+                * getAuction - returns a specific auction by ID. This can be
+                used to track the state of a specific auction for a buyer.
 
-        [[a]] TestSupport/TestSupport - a useful tool during testing that
-        encapsulates how to get the application back into a known state
-        prior to running a test or to inspect values not normally exposed
-        through the normal business interfaces.
+            [[a]] TestSupport/TestSupport - a useful tool during testing that
+            encapsulates how to get the application back into a known state
+            prior to running a test or to inspect values not normally exposed
+            through the normal business interfaces.
 
-            * getAccounts - get all accounts in the system.
+                * getAccounts - get all accounts in the system.
 
-            * removeAccount - sanely remove an account from the system.
-            This may require removing the account from any current bids,
-            etc. in order to satisfy referential integrity.
+                * removeAccount - sanely remove an account from the system.
+                This may require removing the account from any current bids,
+                etc. in order to satisfy referential integrity.
 
-            * getAuctions - get all auctions in the system.
+                * getAuctions - get all auctions in the system.
 
-            * removeAuction - sanely remove an auction from the system.
-            This may require removing bids, images, and other objects that
-            may have references to this object.
+                * removeAuction - sanely remove an auction from the system.
+                This may require removing bids, images, and other objects that
+                may have references to this object.
 
-            * clearAll -  sanely take the state of the system down to a
-            coldstart.
+                * clearAll -  sanely take the state of the system down to a
+                coldstart.
 
-        [[a]] Ingestor - the Ingestor written as a part of a separate
-        requirement is also logically considered part of this tier.
-        
-            * ingest - point an externally provided parser at a set of test 
-            data and use the DAOs to populate the system to a known state.
+            [[a]] Ingestor - the Ingestor written as a part of a separate
+            requirement is also logically considered part of this tier.
+            
+                * ingest - point an externally provided parser at a set of test 
+                data and use the DAOs to populate the system to a known state.
+
+        [[A]] eBidbot Candidate Business Logic
+
+            [[a]] OrderMgmt/OrderMgmtImpl
+
+                * createOrder - create a record
+                    within bidbot that indicates the sale and maximum bid.
+                    This may require some stubbing in project 1.
+
+                * placeBid - place a bid
+                    that is higher than the current bid for an open
+                    auction but less than the order maximum. This will
+                    require some stubbing for project1.
+
+                * endOrder - complete order
+                    processing once auction has closed and note if won.
+                    This will require some stubbing in project1.
+
+                * getOrderStatus - did user win or not.
+
+            [[a]] BidbotTestUtil/BidbotTestUtilImpl
+
+                * reset - reset the bidbot database to an initial 
+                    starting state.
 
 ===
 
 * Testing
 
     [[1]] Provide a JUnit test for your business objects that test the 
-    manipulation of the structure. An example test might be the addition
+    manipulation of the data. An example test might be the addition
     of a bid for a closed auction. There should be a separate project 
     and test for both eSales and eBidbot. This test should be packaged with
     the business objects.
@@ -689,40 +722,69 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     cascades, so you might not have a set of methods handling each type of
     business object.  This test should be packaged with the DAOs.
 
-    [[1]] Provide a Junit test for the JDBC DAOs. Verify they can 
-    functionally create new objects within the eSales system. This test
-    should be packaged with the DAOs.
+    [[1]] Provide a JUnit test for your business logic to test the
+    basic functionality of your business logic design, including ingest.
+    The ingestor test should be able to reference a known data file and
+    ingest records into the database using the DAOs. These tests
+    should be packaged with the business logic implementation.
 
-    [[1]] Provide a JUnit test program for your Ingestor. This test should
-    be able to reference a known data file and ingest records into the
-    database using the JDBC DAOs. This test should be packaged with the 
-    business logic implementation.
+    [[1]] Provide a set of JUnit test programs to verify the following 
+    end-to-end functional scenario in eSales. This should be implemented 
+    as a JUnit test and packaged with the business logic implementation.
 
-    [[1]] Provide a set of JUnit test programs for the core business logic
-    implementation objects for eSales; AccountMgmtImpl, SellerMgmtImpl,
-    and BuyerMgmtImpl. You should test enough of their implementations to
-    be able to demonstrate a reasonable set of behavior for the following 
-    with a specific JUnit test. This test should be packaged with the
-    business logic implementation.
+        * reset (using SalesTestUtilImpl) -- reset the esales 
+            database to an initial starting state.
 
-        * ingest data (using Ingestor and JDBC DAOs)
+        * ingest data (using Ingestor) -- ingest the full XML test
+            data file.
 
         * createAccount for seller, buyer1, and buyer2 (using
-        AccountMgmtImpl and JPA DAOs)
+        AccountMgmtImpl)
 
-        * createAuction (using SellerMgmtImpl and JPA DAOs)
+        * createAuction for seller (using SellerMgmtImpl)
 
-        * getUserAuctions (using SellerMgmtImpl and JPA DAOs)
+        * getUserAuctions for seller (using SellerMgmtImpl)
 
-        * getAuction (using SellerMgmtImpl and JPA DAOs)
+        * getAuction using SellerMgmtImpl) -- i.e., for a specific 
+            auction.
 
-        * getOpenAuctions (using BuyerMgmtImpl and JPA DAOs)
+        * getOpenAuctions (using BuyerMgmtImpl) -- i.e., page
+            through open auctions.
 
-        * placeBid for buyer1 (using BuyerMgmtImpl and JPA DAOs)
+        * placeBid for buyer1 (using BuyerMgmtImpl)
 
-        * placeBid for buyer2 (using BuyerMgmtImpl and JPA DAOs)
+        * placeBid for buyer2 (using BuyerMgmtImpl)
 
-        * getAuction (using BuyerMgmtImpl and JPA DAOs)
+        * getAuction (using BuyerMgmtImpl) -- i.e., showing auction
+            has bids associated.
+
+        * closeAuction (using AuctionMgmtImpl) -- i.e., winner
+            declared and no more bids should be accepted.
+
+    [[1]] Provide a set of JUnit test programs to verify the following 
+    end-to-end functional scenario in eBidbot. This should be implemented 
+    as a JUnit test and packaged with the business logic implementation.
+    Some stubs may be required since eBidbot will not have a remote interface
+    to eSales in project 1.
+
+        * reset (using BidbotTestUtilImpl) -- reset the bidbot
+            database to an initial starting state.
+
+        * place order (using OrderMgmtImpl) -- i.e., create a record
+            within bidbot that indicates the sale and maximum bid.
+            This may require some stubbing in project 1.
+
+        * place bid (using OrderMgmtImpl) -- i.e., place a bid
+            that is higher than the current bid for an open auction but
+            less than the order maximum. This will require some stubbing
+            for project1.
+
+        * end order (using OrderMgmtImpl) -- i.e., complete order
+            processing once auction has closed and note if won.
+            This will require some stubbing in project1.
+
+        * get order status (using OrderMgmtImpl) -- i.e., did user win 
+            or not.
 
 * Getting Started
 
@@ -741,11 +803,13 @@ Project1: eMarket Data Access Tier and Initial Business Logic
         modification needs to occur for the java package names.
 
         [Note:] Other than a README, it is not anticipated that you
-        will have any artifacts at the eMarket layer. It should be
+        will have any artifacts at the root layer. It should be
         used only as a convenience wrapper to perform goals across both
-        projects. All details will be specified at the eSales and eBidbot
-        levels and below; with the leaf-level projects being your default
-        choice for detailed information (e.g., DB drivers, etc.)
+        projects. The root project can also be used for common property, 
+        dependencyManagement, and pluginManagement defintions. All 
+        concrete dependency and plugins should be defined in the leaf-level
+        poms to avoid unwanted dependencies from the root or mid-level
+        parents.
 
         []
 
@@ -756,20 +820,27 @@ eMarket/
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
-|   |       |   `-- ebidbot
-|   |       |       |-- blimpl
-|   |       |       |-- bl
-|   |       |       |-- bo
-|   |       |       |-- dao
-|   |       |       `-- jpa
+|   |       |   |-- java
+|   |       |   |   `-- ebidbot
+|   |       |   |       |-- bo
+|   |       |   |       |-- dao
+|   |       |   |       |-- jpa
+|   |       |   |       |-- bl
+|   |       |   |       |-- blimpl
+|   |       |   `-- resources
+|   |       |       `-- ddl
+|   |       |           |-- eBidbot-create.ddl
+|   |       |           `-- eBidbot-drop.ddl
 |   |       `-- test
-|   |           |-- ebidbot
-|   |           |   |-- blimpl
-|   |           |   |-- bo
-|   |           |   |-- jpa
+|   |           |-- java
+|   |           |   `-- ebidbot
+|   |           |       |-- bo
+|   |           |       |-- dao
+|   |           |       `-- bl
 |   |           `-- resources
+|   |               |-- log4j.xml
 |   |               `-- META-INF
-|   |                   `-- persistence.xml
+|   |                  `-- persistence.xml
 |   `-- pom.xml
 |-- eSales
 |   |-- eSalesImpl
@@ -778,50 +849,45 @@ eMarket/
 |   |       |-- main
 |   |       |   |-- java
 |   |       |   |   `-- esales
-|   |       |   |       |-- blimpl
-|   |       |           |-- bl
-|   |       |           |-- bo
+|   |       |   |       |-- bo
 |   |       |   |       |-- dao
-|   |       |   |       |-- jdbc
-|   |       |   |       `-- jpa
+|   |       |   |       |-- jpa
+|   |       |   |       |-- bl
+|   |       |   |       `-- blimpl
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
+|   |       |       `-- ddl
+|   |       |           |-- eSales-create.ddl
+|   |       |           `-- eSales-drop.ddl
 |   |       `-- test
-|   |           `-- java
-|   |               `-- esales
-|   |                   |-- blimpl
-|   |                   |-- bo
-|   |                   |-- jdbc
-|   |                   `-- jpa
+|   |           |-- java
+|   |           |   `-- esales
+|   |           |       |-- bo
+|   |           |       |-- dao
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                  `-- persistence.xml
 |   `-- pom.xml
 `-- pom.xml
 ---
 ---
 eMarket/
 |-- eBidbot
-|   |-- eBidbotBLImpl
-|   |   |-- pom.xml
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- ebidbot
-|   |       |   |       `-- blimpl
-|   |       |   `-- resources
-|   |       `-- test
-|   |           `-- java
-|   |               `-- ebidbot
-|   |                   `-- blimpl
 |   |-- eBidbotBO
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
-|   |       |   `-- ebidbot
-|   |       |       |-- bl
-|   |       |       `-- bo
+|   |       |   `-- java
+|   |       |      `-- ebidbot
+|   |       |          |-- bl
+|   |       |          `-- bo
 |   |       `-- test
-|   |           `-- ebidbot
-|   |               `-- bo
+|   |           |-- java
+|   |           |  `-- ebidbot
+|   |           |      `-- bo
+|   |           `-- resources
+|   |               `-- log4j.xml
 |   |-- eBidbotDAO
 |   |   |-- pom.xml
 |   |   `-- src
@@ -831,26 +897,32 @@ eMarket/
 |   |       |   |       |-- dao
 |   |       |   |       `-- jpa
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
+|   |       |       `-- ddl
+|   |       |           |-- eBidbot-create.ddl
+|   |       |           `-- eBidbot-drop.ddl
 |   |       `-- test
-|   |           `-- java
-|   |               `-- ebidbot
-|   |                   `-- jpa
-|   `-- pom.xml
-|-- eSales
-|   |-- eSalesBLImpl
+|   |           |-- java
+|   |           |   `-- ebidbot
+|   |           |       `-- dao
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                   `-- persistence.xml
+|   |-- eBidbotBLImpl
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- esales
-|   |       |   |       `-- blimpl
-|   |       |   `-- resources
+|   |       |   `-- java
+|   |       |       `-- ebidbot
+|   |       |           `-- blimpl
 |   |       `-- test
-|   |           `-- java
-|   |               `-- esales
-|   |                   `-- blimpl
+|   |           |-- java
+|   |           |   `-- ebidbot
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               `-- log4j.xml
+|   `-- pom.xml
+|-- eSales
 |   |-- eSalesBO
 |   |   |-- pom.xml
 |   |   `-- src
@@ -860,26 +932,45 @@ eMarket/
 |   |       |           |-- bl
 |   |       |           `-- bo
 |   |       `-- test
-|   |           `-- java
-|   |               `-- esales
-|   |                   `-- bo
-|   `-- eSalesDAO
+|   |           |-- java
+|   |           |   `-- esales
+|   |           |       `-- bo
+|   |           `-- resources
+|   |               `-- log4j.xml
+|   |-- eSalesDAO
 |   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
 |   |       |   |   `-- esales
 |   |       |   |       |-- dao
-|   |       |   |       |-- jdbc
 |   |       |   |       `-- jpa
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
+|   |       |       `-- ddl
+|   |       |           |-- eBidbot-create.ddl
+|   |       |           `-- eBidbot-drop.ddl
 |   |       `-- test
-|   |           `-- java
-|   |               `-- esales
-|   |                   |-- jdbc
-|   |                   `-- jpa
+|   |           |-- java
+|   |           |   `-- esales
+|   |           |       `-- dao
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                   `-- persistence.xml
+|   |-- eSalesBLImpl
+|   |   |-- pom.xml
+|   |   `-- src
+|   |       |-- main
+|   |       |   |-- java
+|   |       |   |   `-- esales
+|   |       |   |       `-- blimpl
+|   |       |   `-- resources
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- esales
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               `-- log4j.xml
 |   `-- pom.xml
 `-- pom.xml
 ---
@@ -893,17 +984,20 @@ eMarket/
 
         * README provided that describes where each requirement satisfied: 10pts
 
-        * projects cleanly builds with Maven or Ant: 15pts
+        * projects cleanly builds with Maven: 15pts
+
+        * managed schema (i.e., defined in a set of files and explicitly 
+        used to coldstart and initialize the database at defined times): 5pts
 
         * business objects: 15pts
 
-        * JDBC DAO: 15pts
-
         * JPA DAO and JPA O/R Mapping: 25pts
 
-        * Ingestor: 10pts
+        * Ingest: 10pts
 
         * Business Logic: 10pts
+        
+        * End-to-end Integration Test: 10pts
 
     Each area will be judged according to the following breakdown. For
     areas where testing does not apply (e.g., README and build), those 
@@ -918,7 +1012,7 @@ eMarket/
 * Submission Guidelines
 
     Please follow the 
-    {{{../../../course-docs/projects.html#Submission_Guidelines}
+    {{{../../../coursedocs/projects.html#Submission_Guidelines}
     project submission guidelines}}
     posted in the course overview.
 

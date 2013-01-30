@@ -283,6 +283,12 @@
                         <permission type="createDurableQueue" roles="mayberry-analytical mayberry-tactical"/>
                         <permission type="createNonDurableQueue" roles="mayberry-analytical mayberry-tactical"/>
                     </security-setting>
+                    <security-setting match="jms.topic.emarket-esales-auction">
+                        <permission type="send" roles="esales-sys"/>
+                        <permission type="consume" roles="esales-user"/>
+                        <permission type="createDurableQueue" roles="esales-user"/>
+                        <permission type="createNonDurableQueue" roles="esales-user"/>
+                    </jms-topic>
                 </security-settings>
 
                 <address-settings>
@@ -354,6 +360,10 @@
                     <jms-topic name="datashare-mayberry-poi">
                         <entry name="java:/topic/ejava/projects/datashare/mayberry-poi"/>
                         <entry name="java:jboss/exported/topic/ejava/projects/datashare/mayberry-poi"/>
+                    </jms-topic>
+                    <jms-topic name="emarket-esales-auction">
+                        <entry name="java:/topic/ejava/projects/emarket/esales-action"/>
+                        <entry name="java:jboss/exported/topic/ejava/projects/emarket/esales-auction"/>
                     </jms-topic>
                 </jms-destinations>
             </hornetq-server>

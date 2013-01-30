@@ -2,7 +2,7 @@
     <parent>
         <artifactId>asyncMarket</artifactId>
         <groupId>ejava.javaee.asyncejb</groupId>
-        <version>3.0.2012.2-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -52,6 +52,37 @@
                 <filtering>true</filtering>
             </testResource>
         </testResources>
+        <pluginManagement>
+        
+        
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>hibernate3-maven-plugin</artifactId>
+                                        <versionRange>[3.0,)</versionRange>
+                                        <goals>
+                                            <goal>run</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <profiles>
@@ -87,10 +118,9 @@
                         <configuration>
                             <hibernatetool destdir="target/classes/ddl">
                                 <classpath>
-                                    <path location="${project.build.directory}/test-classes"/>
+                                    <path location="${project.build.directory}/test-classes" />
                                 </classpath>
-                                <jpaconfiguration persistenceunit="asyncMarket-test"
-                                     propertyfile="${basedir}/target/test-classes/hibernate.properties"/>
+                                <jpaconfiguration persistenceunit="asyncMarket-test" propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                             </hibernatetool>
                         </configuration>
                     </plugin>

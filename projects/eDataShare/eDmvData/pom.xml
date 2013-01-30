@@ -2,7 +2,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eDataShare</groupId>
         <artifactId>eDataShare</artifactId>
-        <version>3.0.2012.2-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -40,6 +40,14 @@
         </profile>
         <profile>
             <id>serverTest</id>
+            <modules>
+                <module>eDmvTestEJB</module>
+                <module>eDmvTestEAR</module>
+                <module>eDmvRMITest</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>all-modules</id>
             <modules>
                 <module>eDmvTestEJB</module>
                 <module>eDmvTestEAR</module>

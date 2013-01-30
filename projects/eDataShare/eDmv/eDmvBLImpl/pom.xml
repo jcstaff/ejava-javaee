@@ -2,7 +2,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eDataShare.eDmv</groupId>
         <artifactId>eDmv</artifactId>
-        <version>3.0.2012.2-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -32,11 +32,6 @@
             <artifactId>commons-logging</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- THIS IS A REAL DEPENDENCY THAT YOU WOULD COPY INTO YOUR POM.XML 
             * use scope=provided if you want to prevent it from being a 
@@ -47,10 +42,15 @@
         <dependency>
             <groupId>ejava.javaee.projects.eDataShare</groupId>
             <artifactId>eDmvTestUtil</artifactId>
-            <version>3.0.2012.2</version>
+            <version>3.0.2013.1</version>
             <scope>provided</scope>
         </dependency>
         
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
@@ -154,5 +154,5 @@
                 </executions>
             </plugin>      
         </plugins>
-    </build>
+    </build>    
 </project>

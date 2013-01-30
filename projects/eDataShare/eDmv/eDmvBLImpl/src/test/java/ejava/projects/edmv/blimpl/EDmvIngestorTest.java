@@ -11,8 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
 import ejava.projects.edmv.blimpl.EDmvIngestor;
-import ejava.projects.edmv.bo.Person;
-import ejava.projects.edmv.bo.VehicleRegistration;
 import ejava.projects.edmv.dao.PersonDAO;
 import ejava.projects.edmv.dao.VehicleDAO;
 import ejava.projects.edmv.jpa.JPADAOTestBase;

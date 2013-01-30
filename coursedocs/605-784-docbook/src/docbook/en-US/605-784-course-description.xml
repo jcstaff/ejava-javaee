@@ -21,8 +21,8 @@
         technologies. The web access tier will focus on development using Servlets and JSP with an emphasis on
         integrating the web tier with enterprise applications. For the Business Logic Tier, session beans for
         synchronous business processing and message-driven beans and timers for asynchronous business processing
-        will be described. The Data Access tier discussion will focus on Java Database Connectivity (JDBC), data
-        access patterns, and the Java Persistence API. Finally, enterprise services will be described, including
+        will be described. The Data Access tier discussion will focus on data
+        access patterns and the Java Persistence API. Finally, enterprise services will be described, including
         the Java Naming and Directory Interface (JNDI), Dependency Injection for Java (JSR-330), 
         Context and Dependency Injection for JavaEE (CDI/JSR-299), Remote Method Invocation (RMI), 
         Java Transaction API (JTA), Java EE Security, and Java Message Service (JMS).
@@ -80,11 +80,13 @@
         
     <section id="cs-784-required-software">
         <title>Required Software</title>
-        <para>This course will make heavy use of development tools (Git, Maven 3, 
-            JUnit, Log4j, and Eclipse), databases (Hypersonic; comes with JBoss), 
-            persistence providers (Hibernate; comes with JBoss), and application 
-            servers (JBoss AS 7). Students are strongly encouraged to establish a 
-            local development environment. Detailed instructions for setup are 
+        <para>
+            This course will make heavy use of development tools
+            (Git, Maven 3, JUnit, Log4j, and Eclipse), databases (H2
+            Database Engine; comes with JBoss), persistence providers
+            (Hibernate; comes with JBoss), and application servers (JBoss
+            AS 7). Students are strongly encouraged to establish a local
+            development environment. Detailed instructions for setup are
             part of the first exercise (Development Environment Setup).
         </para>
     </section>
@@ -92,7 +94,7 @@
     <section id="cs-784-references">
         <title>References</title>
         <para>
-            The core of the EJB3 content is covered in the primary text for 
+            The core of the EJB 3.1 content is covered in the primary text for 
             the course (and competing texts as well as online). Associated 
             topics (database schema, JDBC, Web Tier, JMS, and tools) are not 
             covered in the course text, but documentation will be provided 
@@ -192,13 +194,13 @@
                     Late projects will be deducted 10pts/week late, starting after the due date/time, 
                     with one exception. A student may submit a single project up to 4 days late without 
                     receiving approval and still receive complete credit. Students taking advantage of 
-                    the free first pass should still submit an e-mail to the graders notifying them of 
-                    their intent.
+                    the free first pass should still submit an e-mail to the instructor and grader(s) 
+                    notifying them of their intent.
                 </para>
             </listitem>
             <listitem>
                 <para>
-                    Projects must be submitted via e-mail to the grader(s) and instructor with source code 
+                    Projects must be submitted via e-mail to the instructor and grader(s) with source code 
                     in a zip file with a README. Top level, pre-built artifacts (e.g., EARs) must also be 
                     included in the submission. All source code must be written to portably compile in the 
                     grader's environment using Maven 3. This will be clearly spelled out during the course.

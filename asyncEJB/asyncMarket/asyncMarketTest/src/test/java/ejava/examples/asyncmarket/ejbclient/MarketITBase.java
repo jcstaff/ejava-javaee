@@ -8,6 +8,7 @@ import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
@@ -39,7 +40,7 @@ public abstract class MarketITBase extends TestCase {
 		EJBClient.getRemoteLookupName("asyncMarketEAR", "asyncMarketEJB", 
 			"BuyerEJB", BuyerRemote.class.getName()));
 	protected static InitialContext jndi;
-	protected AuctionMgmt auctionmgmt;
+	protected AuctionMgmtRemote auctionmgmt;
 	protected UserMgmt usermgmt;
 	protected Seller seller;
 	protected Buyer buyer;
@@ -83,6 +84,14 @@ public abstract class MarketITBase extends TestCase {
             fail("" + ue.getUndeclaredThrowable());
         }
     }
+	
+	@After
+	public void tearDown() throws Exception {
+		if (jndi!=null) {
+			jndi.close();
+			jndi=null;
+		}
+	}
     
 	/**
 	 * Use remote interfaces to clear DB for next test.

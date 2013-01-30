@@ -3,7 +3,7 @@
     <parent>
         <artifactId>txAgent</artifactId>
         <groupId>ejava.javaee.txreservation</groupId>
-        <version>3.0.2012.2-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -106,10 +106,9 @@
                         <configuration>
                             <hibernatetool destdir="target/classes/ddl">
                                 <classpath>
-                                    <path location="${project.build.directory}/test-classes"/>
+                                    <path location="${project.build.directory}/test-classes" />
                                 </classpath>
-                                <jpaconfiguration persistenceunit="txagent-test"
-                                     propertyfile="${basedir}/target/test-classes/hibernate.properties"/>
+                                <jpaconfiguration persistenceunit="txagent-test" propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                             </hibernatetool>
                         </configuration>
                     </plugin>

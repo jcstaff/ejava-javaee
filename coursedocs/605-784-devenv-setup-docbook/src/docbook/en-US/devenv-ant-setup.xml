@@ -1,0 +1,35 @@
+<?xml version='1.0'?>
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="devenv-ant-setup">
+    <title>Ant Setup</title>
+    <para>
+        Ant is used in class to wrap command lines and encapsulate the 
+        building of classpaths for stand-alone applications. Just download
+        and add Ant to your PATH here.
+    </para>
+
+    <section id="devenv-ant-install">
+        <title>Install Ant</title>
+        <itemizedlist>
+            <listitem><para>Linux users - use your package installer</para>
+            </listitem>
+            <listitem><para>Windows users</para>
+                <orderedlist>
+                    <listitem><para>Download Apache Ant from <ulink url="http://ant.apache.org/">http://ant.apache.org/</ulink></para></listitem>
+                    <listitem><para>Unzip the archive to directory without spaces in its path</para></listitem>
+                    <listitem><para>Set ANT_HOME to the where you unzipped the archive</para></listitem>
+                    <listitem><para>Add ANT_HOME to your PATH</para></listitem>
+                </orderedlist>
+            </listitem>
+            <listitem>
+                <para>Verify Ant is in your PATH</para>
+<programlisting language=""><![CDATA[
+>ant -version
+Apache Ant(TM) version 1.8.4 compiled on May 22 2012
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>        
+</chapter>

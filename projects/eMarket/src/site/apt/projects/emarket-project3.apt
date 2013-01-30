@@ -1,6 +1,6 @@
 Project3: eMarket Secure and Asynchronous N-Tier Application
 
-    01/25/2010
+    2013-01-27 - DRAFT
 
 * Goals
 
@@ -15,18 +15,12 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     * Define users and roles for both applications.
 
     * Define access controls and implement authentication mechanisms for 
-    eSales.
-
-    * Define access controls and implement authentication mechanisms for
-    eBidbot.
-
-    * Configure JMS destinations used for applications.
+    applications.
 
     * Implement a publish/subscribe capability between the eSales, eBidbot
     and stand-alone client applications.
 
-    * Implement timers within eSales and eBidbot applications to 
-    handle scheduled actions.
+    * Trigger certain behaviors based on timers. 
 
 * Technical Overview
 
@@ -34,76 +28,97 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     2. We will mostly extend existing projects with security and
     asynchronous logic. 
 
-    Although logically independent, the eSales and eBidbot EARs are
-    expected to be deployed to the same application server for the project
-    implementation and testing. This may require us to define and deploy a
-    resource within the eSales application rather than have a
-    duplicate/independent copy in eBidbot. If they were physically
-    separate, this would not be an issue.
+    Java EE defines authentication and authorization to be independent
+    of the overall API and capability. JBoss and other application
+    servers provide simple, default mechanisms that are easy to
+    demonstrate and more sophisticated mechanisms that are realistic for
+    deployments that require no change to the JavaEE-compliant application code.
+    We will use the simple, default/"other" security-domain defined
+    within the standard JBoss installation. This uses the RealmUsersRoles
+    login-module -- which is powered by two property files supplied and
+    pre-populated by the class server files from ejava-jboss711.
 
-    Java EE defines authentication and authorization to be independent of
-    the overall API and capabaility. JBoss and other application servers
-    provide simple, "hello world", mechanisms that are easy to demonstrate
-    and more sophisticated mechanisms that are realistic for deployments.
-    We will use the simple "other" authentication application policy 
-    defined within the standard JBoss installation. This method takes two
-    files: 
-
-        * users.properties - defines username=password lines that list the
-        login username and plaintext password
-
-        * roles.properties - defines username=role1,role2 lines that list
-        the login username and assigned roles.
-
-    These two files must be available in the root package within the
-    classloader classpath. This means that they would be at the root
-    directory of an EJB or WEB-INF/classes. Knowing our environment, we'll
-    create a single set to be shared between eSales and eBidbot and place
-    this in the eSalesEJB.
+*----------+-----------------+
+| <<File>> | <<Description>> |
+*----------+-----------------+
+${jboss.server.config.dir}/application-users.properties | defines username=password lines that list the login username and hashed password
+*-------+--------+
+${jboss.server.config.dir}/application-roles.properties | defines username=role1,role2 lines that list the login username and assigned roles
+*-------+--------+
 
     We are going to have a couple types of users. Some of the users will
     have zero, one, or more of these roles. Because of the static nature of
-    our authentication, all users will have a login configured long before
-    they register for an account.
+    our authentication, all users will have a login configured before
+    the application is even deployed to the server.
 
-        * (anonymous) - these users can view auctions and create an account.
+*----------+-----------------+
+| <<Role>> | <<Description>> |
+*----------+-----------------+
+(anonymous) | these users can view auctions and create an account.
+*-------+--------+
+esales-admin | these users will be able to perform management and test functions on eSales.
+*-------+--------+
+esales-user | these users can create and auction, and bid on auctions. This role is also required to subscribe to JMS auction events.
+*-------+--------+
+esales-sys | role required to perform internal auction actions like JMS publishing.
+*-------+--------+
+esales-trusted | these users can bid on auctions on behalf of a specified user.
+*-------+--------+
+ebidbot-admin | these users will be able to perform management and test functions on eBidbot.
+*-------+--------+
+ebidbot-user | these users can and manage their orders.
+*-------+--------+
 
-        * esales-admin - these users will be able to perform management 
-        and test functions on eSales.
+    If a user has a login for one application, they will use the same
+    account to access the other application (e.g., user3 will have both
+    esales-user and ebidbot-user roles).
 
-        * esales-user - these users can create and auction, and bid on auctions.
+*-----------+------------+
+| <<Login>> | <<Roles>>  |
+*-----------+------------+
+known | (no roles)
+*-------+--------+
+admin1 | esales-admin
+*-------+--------+
+admin2 | ebidbot-admin
+*-------+--------+
+syssales1 | esales-sys
+*-------+--------+
+sysbidbot1 | esales-trusted
+*-------+--------+
+user1 | esales-user
+*-------+--------+
+user2 | esales-user
+*-------+--------+
+user3 | esales-user,ebidbot-user
+*-------+--------+
 
-        * esales-trusted - these users can bid on auctions on behalf of a 
-        specified user.
-
-        * ebidbot-admin - these users will be able to perform management 
-        and test functions on eBidbot.
-
-        * ebidbot-user - these users can and manage their orders.
-
-    [Note:] To clarify, your application will have a static set of logins
-    and will ingest a set of accounts. A user with a login and no account
-    can login, but won't be able to do anything meaningful. A user with an
-    account and no login won't be able to access the system. Normally the
-    login would be created at the same time as the account.  Except for
-    your JBoss configuration and your "Create Account" logic, no other
-    part of your project should be aware of this tradeoff made for class
-    project simplicity.
-
-    []
+    Some actions are open to any users; authenticated or not.
+    Authentication will be performed using a JNDI login.  All users
+    will have a password of "password".
 
     eBidbot will run-as an esales-trusted user and pass the userId
     for the eSales bidder with the placed bid.
 
-    RMI Tests will be updated with JAAS configuration and login logic.
+        [Note:] To clarify, your application will have a static set of logins
+        and will ingest a set of accounts. A user with a login and no account
+        can login, but won't be able to do anything meaningful. A user with an
+        account and no login won't be able to access the system. Normally the
+        login would be created at the same time as the account.  Except for
+        your JBoss configuration and your "Create Account" logic, no other
+        part of your project should be aware of this tradeoff made for class
+        project simplicity.
 
-    We will implement an AuctionTopic where eSales will publish messages
-    related to auctions. eBidbot will subscribe to the topic using a
-    Message Driven Bean to keep orders up to date and to specifically
-    know when they are closed. A stand-alone client will also be used
-    to subscribe to auction events. A topic will have to be added to your
-    JMS Server within JBoss. You will have to design the type, structure,
-    and payload of the messages sent on that topic.
+        []
+
+    For some asynchronous activity, we will implement ain Auction
+    Topic with eSales that will be used to provide updates to auction
+    information.  eBidbot will listen to this topic using a Message Driven
+    Bean to keep orders up to date and to specifically know when they
+    are closed.  A stand-alone client will also be used to subscribe to
+    auction events. The topic(s) will be pre-defined in your application
+    server along with users and roles. However, you will have to design
+    the type, structure, and payload of the messages on the topic(s).
 
     eSales and eBidbot will use EJB Timers to help perform periodic
     business logic, like checking for completed auctions or making bids.
@@ -111,25 +126,6 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
 * Technical Details
 
     [[1]] Provide all functionality from Projects 1 and 2.
-
-===
-
-    [[1]] Add a users/roles.properties set of files to eSalesEJB that 
-    defines the combined set of users and roles between the two
-    applications. The files should define the following usernames and
-    roles (all users should have a password of "password".
-
-        * user1=esales-user
-
-        * user2=esales-user
-
-        * user3=esales-user,ebidbot-user
-
-        * admin1=esales-admin
-
-        * admin2=ebidbot-admin
-
-        * bidbot=esales-trusted
 
 ===
 
@@ -151,14 +147,15 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     [[1]] Extend your existing RMI Test project and RMI client(s) to
     address new authentication requirements.
 
-        * Add JAAS Configuration for JBoss the ClientLoginModule.
+        * Add a valid login to your existsing tests to re-enable them under
+        the newly secured environment.
 
         * Add a new unit test that verifies the access controls of the
-        protected and open methods.
+        protected and open methods. This means that -- after fixing access
+        issues in the previous bullet -- you purposely attempt to violate
+        access restrictioons from a new JUnit test to show a test of 
+        access control.
     
-        * Add a valid login to your existing tests to re-enable them under
-        the new secure environment.
-
 ===
 
     [[1]] Enhance eBidbot with access restrictions and the ability
@@ -170,34 +167,37 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
         once they get beyond creating an account.
 
         * run-as an esales-trusted user when making bids on behalf of 
-        a user.
+        a user. This may require the use of a "helper" EJB to encapsulate
+        the scope of the run-as role/identity.
 
 ===
 
     [[1]] Extend your existing RMI Test project and RMI client(s) to
     address new authentication requirements.
 
-        * Add JAAS Configuration for JBoss the ClientLoginModule.
+        * Add a valid login to your existing tests to re-enable them under
+        the new secure environment.
 
         * Add a new unit test that verifies the access controls of the
-        protected and open methods.
-
-        * Add a valid login to your existing tests to re-enable them under 
-        the new secure environment.
+        protected and open methods. Same comment as above -- after
+        fixing proper access to Mayberry you should have at least
+        one test that demonstrates how the application is preventing
+        unauthorized access.
 
 ===
 
     [[1]] Enhance eSalesWAR with access restrictions.
 
-        * Assign the WAR to the "java:jass/other" security domain.
+        * Assign the WAR to the "other" security domain.
 
         * Restrict access beyond the main page to users with
         the esales role.  You may use FORM or BASIC authentication.
-        It is suggested that you use FORM authentication to make it easier
-        to logout/login as separate users.
+        (I suggest FORM for easy logout/login as new user).
 
         * Permit only users to only ask the EJB tier for account
-        information that is associated with their login.
+        information that is associated with their login. For example,
+        an esales-user/non esales-trusted user should only be allowed
+        to enter a bid for the account they authenticated against.
 
 ===
 
@@ -206,7 +206,7 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     [[1]] Extend your eSales EJB implementations to publish changes to 
     Auctions.
 
-        * Add the JMS topic to your JBoss server.
+        * Use the emarket-esales-auction topic (JNDI name: topic/ejava/projects/emarket/esales-auction)
 
         * Design your JMS Message. You can use any JMS Type and JMS/custom
         properties you wish.  However, you need to account for the fact
@@ -226,6 +226,9 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
         client-side Java logic. All this client has to do is log the
         information from the message.
 
+        * Simply print the fact that the process was called and the
+        contents reported in the message.
+
         * You should launch this subscriber using an Ant wrapper acript.
 
 ===
@@ -233,7 +236,7 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     [[1]] Implement a Message Driven Bean within eBidbot to subscribe to 
     auction closed events. 
 
-        * Use a JMS Selector for the MDB to limit the number of messages
+        * Use a JMS Selector for the MDB to limit the types of messages
         consumed.
 
         * Update any orders as being closed and with results based on the
@@ -259,12 +262,13 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     eBidbot using its new access control restrictions and ability to
     authenticate with eSales.
 
-    [[1]] Perform the following scripted use case with a fully
-    ingested eSales database and accounts created.  All command
+    [[1]] iImplement the scripted use case below as an automated JUnit
+    test and manually driven script through the Web UI. All command
     line implementations must be wrapped in an Ant runtime script to
     encapulsate the classpath details in a portable manner (see the
-    class example eSalesBLImpl project for an example of using an Ant
-    runtime script).
+    class jmsNotifier project for an example of using an Ant runtime script).
+    The <<full>> JSE subscriber need not be part of the automated end-to-end
+    JUnit test.
 
         [[1]] eSales initializes the EJB Timer to check for expired 
         auctions
@@ -334,13 +338,13 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
 
         * README provided that describes where each requirement satisfied: 10pts
 
-        * projects cleanly builds with Maven or Ant: 15pts
+        * projects cleanly builds with Maven: 15pts
 
         * Project 1 and 2 functionality: 5pts
 
         * EJB Security: 10pts
 
-        * JAAS Client Security: 10pts
+        * Client Security Login: 10pts
 
         * WAR Security: 10pts
 
@@ -365,6 +369,6 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
 * Submission Guidelines
 
     Please follow the 
-    {{{../../../course-docs/projects.html#Submission%20Guidelines}
+    {{{../../../coursedocs/projects.html#Submission_Guidelines}
     project submission guidelines}}
     posted in the course overview.

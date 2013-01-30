@@ -2,7 +2,7 @@
     <parent>
         <artifactId>jmsCore</artifactId>
         <groupId>ejava.javaee.jmscore</groupId>
-        <version>3.0.2012.2-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -243,19 +243,17 @@
                                 </goals>
                                 <configuration>
                                     <target>
-                                        <java classname="org.hornetq.integration.bootstrap.HornetQBootstrapServer"
-                                             fork="true"
-                                             spawn="${jms.spawn}">
+                                        <java classname="org.hornetq.integration.bootstrap.HornetQBootstrapServer" fork="true" spawn="${jms.spawn}">
                                              <classpath>
-                                                 <path location="${project.build.directory}/test-classes/hornetq"/>
-                                                 <path refid="maven.runtime.classpath"/>
+                                                 <path location="${project.build.directory}/test-classes/hornetq" />
+                                                 <path refid="maven.runtime.classpath" />
                                              </classpath>
                                              <!--
-                                             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent"/>
-                                             <sysproperty key="java.compiler" value="NONE"/>
+                                             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent" />
+                                             <sysproperty key="java.compiler" value="NONE" />
                                              -->
-                                             <sysproperty key="hornetq.config.dir" value="${project.build.directory}/test-classes/hornetq"/>
-                                             <arg value="${project.build.directory}/test-classes/hornetq/hornetq-beans.xml"/>
+                                             <sysproperty key="hornetq.config.dir" value="${project.build.directory}/test-classes/hornetq" />
+                                             <arg value="${project.build.directory}/test-classes/hornetq/hornetq-beans.xml" />
                                         </java>
                                         <echo>started JMS Server</echo>
                                     </target>
@@ -270,7 +268,7 @@
                                 <configuration>
                                     <target>
                                         <echo>stopping JMS Server</echo>
-                                        <echo file="${project.build.directory}/test-classes/hornetq/STOP_ME"/>
+                                        <echo file="${project.build.directory}/test-classes/hornetq/STOP_ME" />
                                     </target>
                                 </configuration>
                             </execution>

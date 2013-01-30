@@ -1,29 +1,24 @@
 Project3: eDataShare Secure and Asynchronous N-Tier Application
 
-    2012-11-24 - DRAFT
+    2013-01-27 - DRAFT
 
 * Goals
 
     * Secure access to EJB and Web applications
 
-    * Provide for asynchronous publish/subscribe processing.
+    * Provide for asynchronous processing.
 
 * Objectives
 
     * Re-use the eDmv and eMayberry implementations from projects 1 and 2.
 
-    * Define users and roles for both applications.
-
     * Define access controls and implement authentication mechanisms for 
-    eDmv.
-
-    * Define access controls and implement authentication mechanisms for
-    eMayberry.
-
-    * Configure JMS destinations used for applications.
+    applications.
 
     * Implement a publish/subscribe capability between the eMayberry
     and stand-alone client applications.
+
+    * Trigger certain behaviors based on timers.
 
 * Technical Overview
 
@@ -33,9 +28,10 @@ Project3: eDataShare Secure and Asynchronous N-Tier Application
 
     Java EE defines authentication and authorization to be independent
     of the overall API and capability. JBoss and other application
-    servers provide simple, "hello world", mechanisms that are easy to
+    servers provide simple, default mechanisms that are easy to
     demonstrate and more sophisticated mechanisms that are realistic for
-    deployments.  We will use the simple "other" security-domain defined
+    deployments that require no change to the JavaEE-compliant application code.  
+    We will use the simple, default/"other" security-domain defined
     within the standard JBoss installation. This uses the RealmUsersRoles
     login-module -- which is powered by two property files supplied and
     pre-populated by the class server files from ejava-jboss711.
@@ -101,7 +97,8 @@ gomer | mayberry-analytical
 
     For some asynchronous activity, we will implement a Topic within
     eDmv that will be used to provide updates to any of the driver or
-    owner information. eMayberry will listen to this topic. We will also
+    owner information. eMayberry will listen to this topic with a 
+    Message Driven Bean to keep up to date on POIs. We will also
     implement a separate Topic where eMayberry will publish messages
     related to persons of interest when they change.  These topics
     will be pre-defined in your application server along with the users
@@ -139,7 +136,7 @@ gomer | mayberry-analytical
     address new authentication requirements.
 
         * Add a valid login to your existing tests to re-enable them under
-        the new secure environment.
+        the newly secure environment.
 
         * Add a new unit test that verifies the access controls of the
         protected and open methods. This means that -- after fixing access
@@ -189,7 +186,7 @@ gomer | mayberry-analytical
 
         * Restrict access beyond the main page to users with
         the appropriate roles. You may use FORM or BASIC authentication.
-        (I suggest FORM for easy logout).
+        (I suggest FORM for easy logout/login as new user).
 
         * Permit only users to only ask the EJB tier for
         information that is associated with their login. For example,
@@ -277,14 +274,16 @@ gomer | mayberry-analytical
     access control restrictions.
 
     [[1]] Provide JUnit tests that verify the EJB functionality of 
-    eMayberry using its new access control restrictions.
+    eMayberry using its new access control restrictions and ability
+    to authenticate with eDmv.
 
-    [[1]] Perform the following scripted use case.  All command
+    [[1]] Implement the scripted use case below as an automated JUnit test and
+    manually accessed script through the Web UI. All command
     line implementations must be wrapped in an Ant runtime script to
     encapsulate the classpath details in a portable manner (see the
     class jmsNotifier project for an example of using an Ant runtime script).
-    Although an automated JUnit test is not required here, developing one
-    can be quite helpful.
+    The <<full>> JSE subscriber need not be part of the automated end-to-end
+    JUnit test.
 
         * admin1=dmv-admin,mayberry-admin
 
@@ -409,6 +408,6 @@ gomer | mayberry-analytical
 * Submission Guidelines
 
     Please follow the 
-    {{{../../../course-docs/projects.html#Submission_Guidelines}
+    {{{../../../coursedocs/projects.html#Submission_Guidelines}
     project submission guidelines}}
     posted in the course overview.
