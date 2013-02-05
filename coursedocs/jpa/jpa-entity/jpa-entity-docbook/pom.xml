@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.coursedocs.jpa</groupId>
+        <artifactId>jpa-entity</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jpa-entity-docbook</artifactId>
+    <packaging>pom</packaging>
+
+    <name>JPA Entity::Notes</name>
+    <description>
+        This project provides discussion notes for JPA Entities.
+    </description>
+    
+    <properties>
+       <doc.base>jpa-entity</doc.base>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

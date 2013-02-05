@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.coursedocs</groupId>
+        <artifactId>coursedocs</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>ejava.coursedocs.jpa</groupId>
+    <artifactId>jpa-root</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Java Persistence API</name>
+    <description>
+        This project provides the (FUTURE -- UNDER CONSTRUCTION) home
+        for all JPA materials.
+    </description>
+
+    <modules>
+        <module>jpa-entity</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>all-modules</id>
+            <modules>
+                <!--
+                <module>jpa-entitymgr</module>
+                <module>jpa-entity</module>
+                <module>jpa-relationship</module>
+                <module>jpa-query</module>
+                <module>jpa-inheritance</module>
+                <module>jpa-lifecycle</module>
+                <module>validation</module>
+                -->
+            </modules>
+        </profile>
+    </profiles>
+
+</project>
