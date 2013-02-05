@@ -434,11 +434,12 @@ java.lang.AssertionError: app didn't return 0
                 <listitem><para>Provide a means to define behavior of the build</para></listitem>
                 <listitem><para>Provide a means to define values onces and re-use acoss the build</para></listitem>
                 <listitem><para>Promotes consistency</para></listitem>
-                <listitem><para></para></listitem>
             </itemizedlist>                   
             <programlisting language="xml"><![CDATA[<properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+    <java.source.version>1.6</java.source.version>
+    <java.target.version>1.7</java.target.version>
 </properties>]]></programlisting>
             <itemizedlist>
                 <listitem><para>Properties can also be expressed using <code>-Dkey=value</code> system properties</para></listitem>
@@ -533,8 +534,8 @@ java.lang.AssertionError: app didn't return 0
             <artifactId>maven-compiler-plugin</artifactId>
             <version>2.5.1</version>
             <configuration>
-                <source>1.6</source>
-                <target>1.6</target>
+                <source>${java.source.version}</source>
+                <target>${java.target.version}</target>
             </configuration>
         </plugin>
          <!-- surefire.argLine is set in debugger profile -->
