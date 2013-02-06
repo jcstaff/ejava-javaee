@@ -2,11 +2,11 @@ package ejava.projects.esales.blimpl;
 
 import static org.junit.Assert.*;
 
+
 import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.metamodel.source.binder.JpaCallbackClass;
 import org.junit.Test;
 
 import ejava.projects.esales.dao.AccountDAO;
