@@ -1,17 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-        <groupId>ejava</groupId>
-        <artifactId>ejava-root</artifactId>
+        <groupId>ejava.jpa</groupId>
+        <artifactId>jpa-entitymgr</artifactId>
         <version>3.0.2013.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>ejava.jpa</groupId>
-  <artifactId>jpaDAO</artifactId>
+  <artifactId>jpa-entitymgr-example</artifactId>
   <packaging>jar</packaging>
 
-  <name>Java Persistance API</name>
+  <name>JPA EntityManager::Example</name>
   <description>
     This module provides an basic example of using the Java Persistence API
     to map a flat POJO to a database.
@@ -28,6 +27,18 @@
         <groupId>org.hibernate.javax.persistence</groupId>
         <artifactId>hibernate-jpa-2.0-api</artifactId>
         <scope>provided</scope>
+    </dependency>
+
+    <!-- JPA impl -->
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-entitymanager</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <scope>test</scope>
     </dependency>
 
     <!-- core project testing dependencies -->
@@ -59,28 +70,4 @@
         </testResource>
     </testResources>
   </build>
-
-    <profiles>
-        <profile> <!-- defines our default persistence provider -->
-            <id>hibernate</id>
-            <activation>
-                <property> <!-- use this property to name alt persistence provider -->
-                    <name>!jpa</name>
-                </property>
-            </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

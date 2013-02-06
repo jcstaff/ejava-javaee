@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.jpa</groupId>
+        <artifactId>jpa-root</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jpa-entity</artifactId>
+    <packaging>pom</packaging>
+
+    <name>JPA Entity</name>
+    <description>
+        This project provides the home for core JPA Entity materials
+        dealing with mapping simple Java objects to database tables
+        using JPA.
+    </description>
+
+    <modules>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>docs</id>
+            <modules>
+                <module>jpa-entity-docbook</module>
+                <module>jpa-entity-ex-docbook</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>all-modules</id>
+            <modules>
+                <module>jpa-entity-docbook</module>
+                <module>jpa-entity-ex-docbook</module>
+            </modules>
+        </profile>
+    </profiles>
+
+</project>

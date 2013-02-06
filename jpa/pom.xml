@@ -17,12 +17,23 @@
         This project is the root project for JPA materials.
     </description>
     <modules>
+        <module>jpa-entitymgr</module>
+        <module>jpa-entity</module>
     </modules>
+
     <profiles>
         <profile>
-            <id>docs</id>
+            <id>all-modules</id>
             <modules>
-                <module>entitymanager-docbook</module>
+                <!--
+                <module>jpa-entitymgr</module>
+                <module>jpa-entity</module>
+                <module>jpa-relationship</module>
+                <module>jpa-query</module>
+                <module>jpa-inheritance</module>
+                <module>jpa-lifecycle</module>
+                <module>validation</module>
+                -->
             </modules>
         </profile>
     </profiles>
