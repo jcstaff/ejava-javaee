@@ -1,0 +1,90 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entityex-setup">
+    <title>JPA Entity Exercise Setup</title>
+        
+    <section id="jpa-entityex-maven">
+        <title>Setup Maven Project</title>
+             
+        <itemizedlist>
+            <listitem><para>Use the ejava.jpa:jpa-archetype to setup a new Maven project for this exercise.</para>
+ <programlisting language=""><![CDATA[
+$ mvn archetype:generate -B \
+-DarchetypeGroupId=ejava.jpa -DarchetypeArtifactId=jpa-archetype \
+-DgroupId=myorg.entityex -DartifactId=entityEx
+
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JPA Entity 3.0.2013.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] >>> maven-archetype-plugin:2.2:generate (default-cli) @ jpa-entity >>>
+[INFO] 
+[INFO] <<< maven-archetype-plugin:2.2:generate (default-cli) @ jpa-entity <<<
+[INFO] 
+[INFO] --- maven-archetype-plugin:2.2:generate (default-cli) @ jpa-entity ---
+[INFO] Generating project in Batch mode
+[INFO] Archetype [ejava.jpa:jpa-archetype:3.0.2013.1-SNAPSHOT] found in catalog local
+[INFO] ----------------------------------------------------------------------------
+[INFO] Using following parameters for creating project from Archetype: jpa-archetype:3.0.2013.1-SNAPSHOT
+[INFO] ----------------------------------------------------------------------------
+[INFO] Parameter: groupId, Value: myorg.entityex
+[INFO] Parameter: artifactId, Value: entityEx
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: myorg.entityex
+[INFO] Parameter: packageInPathFormat, Value: myorg/entityex
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: myorg.entityex
+[INFO] Parameter: groupId, Value: myorg.entityex
+[INFO] Parameter: artifactId, Value: entityEx
+[INFO] Parent element not overwritten in /home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-entity/entityEx/pom.xml
+[INFO] project created from Archetype in dir: /home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-entity/entityEx
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5.535s
+[INFO] Finished at: Sat Feb 09 23:04:10 EST 2013
+[INFO] Final Memory: 15M/59M
+[INFO] ------------------------------------------------------------------------
+]]></programlisting>
+            </listitem>
+            <listitem><para>You should now have an instantiated template for a JPA project</para>
+<programlisting language=""><![CDATA[
+entityEx/
+├── pom.xml
+└── src
+    ├── main
+    │   └── java
+    │       └── myorg
+    │           └── entityex
+    │               └── Auto.java
+    └── test
+        ├── java
+        │   └── myorg
+        │       └── entityex
+        │           └── AutoTest.java
+        └── resources
+            ├── hibernate.properties
+            ├── log4j.xml
+            └── META-INF
+                └── persistence.xml
+]]></programlisting>                        
+            </listitem>        
+            <listitem><para>Verify the instantiated template builds in your environment</para>
+<programlisting language=""><![CDATA[
+$mvn clean install
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>You may now import the instantiated template into Eclipse as an "Existing Maven Project"</para>
+            </listitem>
+        </itemizedlist>
+
+    </section>
+</chapter>
+  

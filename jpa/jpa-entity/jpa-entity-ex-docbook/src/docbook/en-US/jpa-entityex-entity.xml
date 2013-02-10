@@ -1,12 +1,304 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-entityex-chapter">
-    <title>JPA Entity Exercise Chapter</title>
+<chapter id="jpa-entityex-entity">
+    <title>JPA Entity Class Basics</title>
+    <para>This chapter will take you through the steps to register a Java POJO with 
+        the JPA persistence unit using both orm.xml mapping-file descriptors and 
+        Java class annotations. It will also take you through the steps to define
+        a POJO class legal to be used as JPA entity class.</para>
+    <para>JPA Classes are required to ...</para>
+   <itemizedlist>
+        <listitem><para>Be identified as being a JPA entity class</para></listitem>
+        <listitem><para>Have a default constructor</para></listitem>
+        <listitem><para>At least have one property defined as the primary key</para></listitem>
+    </itemizedlist>
         
-    <section id="jpa-entityex-section">
-        <title>JPA Entity Exercise Section</title>
-        <para/>
+    <section id="jpa-entityex-entity-pojo">
+        <title>Create POJO Class using descriptor</title>
+
+        <orderedlist>
+            <listitem><para>Create a POJO Java class in the ...mapped Java package</para>
+<programlisting language="java"><![CDATA[
+package myorg.entityex.mapped;
+
+import java.util.Date;
+
+public class Animal {
+    private int id;
+    private String name;
+    private Date dob;
+    private double weight;
+    
+    public Animal(String name, Date dob, double weight) {
+        this.name = name;
+        this.dob = dob;
+        this.weight = weight;
+    }
+    
+    public int getId() { return id; }
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public Date getDob() { return dob; }
+    public void setDob(Date dob) {
+        this.dob = dob;
+    }
+    
+    public double getWeight() { return weight; }
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+}
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Attempt to persist the Animal by adding the following 
+                @Test method to the existing JUnit class.</para>
+ <programlisting language="java"><![CDATA[
+    @Test
+    public void testCreateAnimal() {
+        log.info("testCreateAnimal");
+        Animal animal = new Animal("bessie", 
+                new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
+        em.persist(animal);        
+        
+        assertNotNull("animal not found", em.find(Animal.class,animal.getId()));
+    }
+]]></programlisting>
+            </listitem>
+            
+            <listitem><para>Attempt to build and run your test. Your test should
+                fail with the following error message. This means that although your
+                class is a valid Java POJO, it has not been made known to the 
+                persistence unit as a JPA entity.</para>
+ <programlisting language=""><![CDATA[
+testCreateAnimal(myorg.entityex.AutoTest): Unknown entity: myorg.entityex.mapped.Animal
+...
+java.lang.IllegalArgumentException: Unknown entity: myorg.entityex.mapped.Animal
+        at org.hibernate.ejb.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:856)
+        at myorg.entityex.AutoTest.testCreateAnimal(AutoTest.java:100)
+]]></programlisting>
+            </listitem>
+                
+            <listitem><para>Add the POJO class to the persistence unit 
+                by adding an orm.xml JPA mapping file to your project. 
+                Place the file in the src/main/resources/orm directory. 
+                </para>
+ <programlisting language="xml"><![CDATA[
+# src/main/resources/orm/Animal-orm.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" version="1.0">
+
+    <entity class="myorg.entityex.mapped.Animal"/>
+
+</entity-mappings>
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Register the orm.xml file with the persistence unit
+                by adding a mapping-file element reference. 
+                </para>
+ <programlisting language="xml"><![CDATA[
+# src/test/resources/META-INF/persistence.xml
+
+    <persistence-unit name="entityEx-test">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+        <mapping-file>orm/Animal-orm.xml</mapping-file>
+        <class>myorg.entityex.Auto</class>
+        <properties>
+        ...
+]]></programlisting>
+            </listitem>
+
+
+            <listitem><para>Attempt to build and run your test. Your test should
+                fail with the following error message. The specifics of the error 
+                message will depend upon whether you are running just the JUnit 
+                test or building within Maven since the pom is configured to build
+                database schema from the JPA mappings prior to running the JUnit test. 
+                </para>
+ <programlisting language="xml"><![CDATA[
+PersistenceUnit: entityEx-test] Unable to configure EntityManagerFactory: No identifier specified for entity: myorg.entityex.mapped.Animal
+
+Caused by: org.hibernate.AnnotationException: No identifier specified for entity: myorg.entityex.mapped.Animal
+]]></programlisting>
+                <para>Although the class is a valid POJO and we followed the deployment 
+                    descriptor mechanism for registering it with the persistence unit,
+                    it is not a legal entity. The error message indicates it is lacking
+                    a primary key field.</para>
+            </listitem>
+
+            <listitem><para>Update the orm.xml file and define the "id" column
+                as the primary key property for the entity.  
+                </para>
+ <programlisting language="xml"><![CDATA[
+    <entity class="myorg.entityex.mapped.Animal">
+        <attributes>
+            <id name="id"/>
+        </attributes>
+    </entity>
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Rebuild your module and it should now persist the 
+                POJO as a JPA entity. The SQL should be printed in the debug
+                output.  
+                </para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test
+...
+Hibernate: 
+    insert 
+    into
+        Animal
+        (dob, name, weight, id) 
+    values
+        (?, ?, ?, ?)
+ -tearDown() complete, em=org.hibernate.ejb.EntityManagerImpl@12a80ea3
+ -closing entity manager factory
+ -HHH000030: Cleaning up connection pool [jdbc:h2:/home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-entity/entityEx/target/h2db/ejava]
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.94 sec
+
+Results :
+
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Update your JUnit test method to look like the following.
+                The unit test now clears the cache of entities and forces the entity
+                manager to instantiate a new instance for the value returned from the 
+                find().</para>
+ <programlisting language="java"><![CDATA[
+    @Test
+    public void testCreateAnimal() {
+        log.info("testCreateAnimal");
+        Animal animal = new Animal("bessie", 
+                new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
+        em.persist(animal);        
+        
+        assertNotNull("animal not found", em.find(Animal.class,animal.getId()));
+        
+        em.flush(); //make sure all writes were issued to DB
+        em.clear(); //purge the local entity manager entity cache to cause new instance
+        assertNotNull("animal not found", em.find(Animal.class,animal.getId()));
+    }
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Attempt to rebuild your module. It should fail because 
+                the entity class does not have a default constructor. Remember that
+                default constructors are provided for free in POJOs until you add the
+                first constructor. Once you add a custom constructor you are required
+                to add a default constructor to make it a legal entity class.</para>
+ <programlisting language=""><![CDATA[
+javax.persistence.PersistenceException: org.hibernate.InstantiationException: No default constructor for entity: myorg.entityex.mapped.Animal
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Update the POJO with a default constructor.</para>
+ <programlisting language="java"><![CDATA[
+    public Animal() {} //must have default ctor
+    public Animal(String name, Date dob, double weight) {
+        this.name = name;
+        this.dob = dob;
+        this.weight = weight;
+    }
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Rebuild the module. It should now pass because you have 
+                defined and registered a compliant entity class. The class was</para>
+                <itemizedlist>
+                    <listitem><para>Registered as an entity using and orm.xml deployment descriptor
+                       wired into the persistence unit through a mapping-file reference in the 
+                       persistence.xml</para></listitem>
+                    <listitem><para>Assigned an identity property to use for a primary 
+                       key. The Java "id" property existed from the start, but the property
+                       had to be identified to JPA.</para></listitem>
+                    <listitem><para>Provided with a default constructor. If we removed the 
+                       custom constructor -- we would get this constructor for free.</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </orderedlist>
     </section>
+    
+    <section id="jpa-entityex-entity-annotations">
+        <title>Create POJO Class using annotations</title>
+        
+        <orderedlist>
+            <listitem><para>Copy the POJO class to a new java package without changing the class name.</para>
+<programlisting language="java"><![CDATA[
+package myorg.entityex.annotated;
+
+import java.util.Date;
+
+public class Animal {
+    private int id;
+    private String name;
+    private Date dob;
+    private double weight;
+    
+    public Animal() {} //must have default ctor
+...
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add a javax.persistence.Entity annotation to the class</para>
+<programlisting language="java"><![CDATA[
+import javax.persistence.Entity;
+
+@Entity
+public class Animal {
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Register the new entity with the persistence.xml using a 
+                class element reference</para>
+<programlisting language="xml"><![CDATA[
+    <persistence-unit name="entityEx-test">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+        <mapping-file>orm/Animal-orm.xml</mapping-file>
+        <class>myorg.entityex.Auto</class>
+        <class>myorg.entityex.annotated.Animal</class>
+        <properties>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add a new test method to work with the new class added to the 
+                module.</para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+    </section>
+    
 </chapter>
   

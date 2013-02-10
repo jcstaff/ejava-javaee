@@ -5,7 +5,6 @@
         <groupId>ejava.jpa</groupId>
         <artifactId>jpa-parent</artifactId>
         <version>3.0.2013.1-SNAPSHOT</version>
-        <relativePath></relativePath>
     </parent>
 
     <groupId>${groupId}</groupId>
@@ -34,6 +33,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate-entitymanager.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -1,27 +1,27 @@
-#set( $symbol_pound = '#' )
-#set( $symbol_dollar = '$' )
-#set( $symbol_escape = '\' )
-package ${package};
+package myorg.entityex;
 
 import static org.junit.Assert.*;
 
-import static org.junit.Assert.*;
+import java.util.GregorianCalendar;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+
+import myorg.entityex.mapped.Animal;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
-
 
 public class AutoTest {
     private static Log log = LogFactory.getLog(Auto.class);
-    private static final String PERSISTENCE_UNIT = "${artifactId}-test";
+    private static final String PERSISTENCE_UNIT = "entityEx-test";
     private static EntityManagerFactory emf;
     private EntityManager em;    
 
@@ -91,5 +91,33 @@ public class AutoTest {
         em.persist(car);        
         
         assertNotNull("car not found", em.find(Auto.class,car.getId()));
+    }
+
+    @Test
+    public void testCreateAnimal() {
+        log.info("testCreateAnimal");
+    	Animal animal = new Animal("bessie", 
+    			new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
+        em.persist(animal);        
+        
+        assertNotNull("animal not found", em.find(Animal.class,animal.getId()));
+        
+        em.flush(); //make sure all writes were issued to DB
+        em.clear(); //purge the local entity manager entity cache to cause new instance
+        assertNotNull("animal not found", em.find(Animal.class,animal.getId()));
+    }
+
+    @Test @Ignore
+    public void testCreateAnimalAnnotated() {
+        log.info("testCreateAnimalAnnotated");
+    	myorg.entityex.annotated.Animal animal = new myorg.entityex.annotated.Animal("bessie", 
+    			new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
+        em.persist(animal);        
+        
+        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal.class,animal.getId()));
+        
+        em.flush(); //make sure all writes were issued to DB
+        em.clear(); //purge the local entity manager entity cache to cause new instance
+        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal.class,animal.getId()));
     }
 }
