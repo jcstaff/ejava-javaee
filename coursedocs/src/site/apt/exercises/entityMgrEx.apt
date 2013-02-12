@@ -25,6 +25,8 @@ Exercise: Entity Manager
     
     * {{{Part_H} Automatically Generate Schema}}
 
+    * {{{Part_I} Create JPA Parent POM}}
+
 * Steps
 
     [Note:] Although this exercise will show you how to create each file,
@@ -92,6 +94,7 @@ Password:
 ---
 
     * Define a remote repository to use to download hibernate artifacts
+
 ---
    <!-- needed to resolve some hibernate dependencies -->
     <repositories>
@@ -109,22 +112,106 @@ Password:
     
 ---
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.source.version>1.6</java.source.version>
+        <java.target.version>1.7</java.target.version>
+
         <jboss.host>localhost</jboss.host>
         <db.host>${jboss.host}</db.host>
+
         <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
         <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
         <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
+
         <commons-logging.version>1.0.4</commons-logging.version>
-        <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
-        <junit.version>4.10</junit.version>
-        <log4j.version>1.2.13</log4j.version>
-        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
-        <slf4j.version>1.6.1</slf4j.version>
         <h2db.version>1.3.168</h2db.version>
+        <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
+        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
         <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
         <hibernate3.version>3.6.0.Final</hibernate3.version>
+        <junit.version>4.10</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+        <slf4j.version>1.6.1</slf4j.version>
     </properties>
 ---    
+
+    * Add a dependencyManagement section to define and configure the 
+    dependencies we will be using to work with JPA. These are passive definitions
+    -- meaning they don't actually add any dependencies to your project. They
+    just define the version and possible exclusions for artifacts so all 
+    child/leaf projects stay consistent.
+
+    [Note:] Knowing this exercise will always be a single module -- we 
+    could do this simpler. However, it is assumed that you will soon take
+    the information you learn here to a real enterprise project and that 
+    will have many modules and could benefit from reusing a standard parent
+    configuration. All definitions will be housed in a single module during
+    the conduct of this exercise but the properties, dependencyManagement,
+    and pluginManagement sections we will build below can be lifted and moved
+    to a parent pom in a multi-module project. 
+
+    []
+
+---
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+              <groupId>commons-logging</groupId>
+              <artifactId>commons-logging</artifactId>
+              <version>${commons-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.0-api</artifactId>
+                <version>${hibernate-jpa-2.0-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate-entitymanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>log4j</groupId>
+              <artifactId>log4j</artifactId>
+              <version>${log4j.version}</version>
+            </dependency>    
+        </dependencies>
+    </dependencyManagement>
+---
+
+   * Add pluginManagement definitions for certain plugins we will use in 
+   this module. Like above -- these are passive definitions that define
+   the configuration for certain plugins when the child/leaf projects 
+   chose to use them. Lets start with a simple example and add a few more
+   complex ones later. In this example, we are making sure all uses
+   of the jar plugin are of a specific version.
+
+---
+    <build>
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+
+            </plugins>    
+        </pluginManagement>
+    </build>
+---
 
     * Add the src/main dependencies. This represents what your code depends
     upon at compile time and runtime. 
@@ -140,85 +227,112 @@ Password:
         be providing their own version of the API packaged with their
         provider.
 
+    [Note:] Notice how the definitions below are lacking a version element.
+    The dependency declaration actively brings the dependency into the 
+    project and inherits the definition specified by the dependencyManagement
+    section above.
+
+    []
+
 ---
     <dependencies>
         <dependency>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
-          <version>${commons-logging.version}</version>
           <scope>compile</scope>
         </dependency>
     
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>${hibernate-jpa-2.0-api.version}</version>
             <scope>provided</scope>
         </dependency>
         ...
     </dependencies>
 ---
 
+
     * Add the src/test standard dependencies. 
 
         * scope=test is used for anything that your src/test code
         depends upon (but not your src/main) or what your unit tests
         need at runtime to operate the test. For example, a module
-        may declare a scope=test dependency on hypersonic to do 
+        may declare a scope=test dependency on h2 database (later) to do 
         some local unit testing and then be ultimately deployed to
         a postgres server in a downstream client. In this case
-        we are picking JUnit4 as the testing framework and log4j
-        as the logging plugin for commons-logging.
+        we are picking JUnit4 as the testing framework, log4j
+        as the logging implementation for commons-logging, and 
+        hibernate as the JPA implementation for the jpa-api. We are
+        also adding an extra dependency to allow hibernate slf4j logging to
+        be integrated with log4j.
 
 ---
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
-          <version>${log4j.version}</version>
           <scope>test</scope>
         </dependency>    
 ---
 
-    * Add a build section and begin by specifying that test resource files should be 
-    filtered when copied into the target tree. We do this so we have a chance
-    to replace the variables in persistence.xml with our specific database profile.
+    * Add a testResources definition to the build section to get src/test/resource
+    files filtered when copied into the target tree. We do this so we have a chance
+    to replace the variables in the persistence.xml and hibernate.properties file.
 
 ---
     <build>
-        <!--tell the resource plugin to perform filtering on resources
-            to fill in JDBC URL, etc. -->
+        <!-- filtering will replace URLs, credentials, etc in the 
+             files copied to the target directory and used during testing.
+            -->
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
                 <filtering>true</filtering>
             </testResource>
         </testResources>
+
+        <pluginManagement>
+        ...
     </build>
 ---
 
-    * Add a plugin specification for Java 1.6. 
+    * Add a compiler specification to control the source and target
+    java versions. In this case we are picking up the specific value
+    from property variables set above and can be overridden in the 
+    developer's settings.xml or on the command line using system
+    properties.
 
 ---
     <build>
-        ...
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>${java.source.version}</source>
+                            <target>${java.target.version}</target>
+                    </configuration>	                
+                </plugin>      
             ...      
-        </plugins>
+            </plugins>
+        </pluginManagement>
     </build>
 ---
 
@@ -230,30 +344,67 @@ Password:
     plugin configuration.
 
 ---
+    <build>
+        <pluginManagement>
+            <plugins>
+                ...
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                </plugin>            
+
+            </plugins>    
+        </pluginManagement>
+    </build>
+---
+
+        [Note:] At this point, we are just allowing the argLine defined 
+        elsewhere to be optionally specified (for debugging).  We do not 
+        yet have a need for system properties, but if we did we would
+        add a plugin (not pluginManagement) definition in the child 
+        pom to include any necessary system properties to be passed to
+        the unit test. This won't hurt anything if you add this to 
+        your current pom except cause it to pass the extra system properties.
+
+---
+    <build>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>${surefire.argLine}</argLine>
                     <systemPropertyVariables>
-                    <!--
-                        <name>value</name>
-                        -->
+                        <name1>value1</name1>
+                        <name2>value2</name2>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>            
+        </plugins>    
+    </build>
 ---
 
+        []
+
     * Add a set of profiles that define H2 and Hibernate as our database and 
-    persistence provider.
+    persistence provider. In the example below we are adding two database
+    definitions (that happpen to both be the same vendor). Once requires the
+    server to be running and the other uses an embedded server and a local
+    filesystem. The embedded version can be easier to test with. The server
+    version can be easier to debug. Activate which one you want with either
+    your settings.xml#activeProfile settings or using a -Pprofile-name argument
+    on the command line. If you already have a settings.xml#activeProfile
+    setting, you can turn it off using -P\!deactivated-profile-name and
+    follow it up with -Pactivated-profile-name.
 
     [Note:] Profiles can be used to control which options are enabled at
     build time to make the module more portable. I also use them to help
     identify which dependencies are brought in for what reason -- especially
-    for profiles that are configure to always activate. Feel free
-    to declare these properties outside the scope of a profile since you will
-    not be asked to port this example to alternate platforms.
+    for profiles that are configure to always activate.
 
     []
 
@@ -261,19 +412,12 @@ Password:
     <profiles>
         <profile> <!-- H2 server-based DB -->
             <id>h2srv</id>
-            <activation>
-                <property> 
-                    <name>!jdbcdb</name>
-                </property>
-            </activation>
             <properties>
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
                   <jdbc.password/>
-                  <hibernate.dialect>
-                      org.hibernate.dialect.H2Dialect
-                  </hibernate.dialect>
+                  <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
             </properties>
             <dependencies>
                 <dependency>
@@ -285,30 +429,30 @@ Password:
             </dependencies>
         </profile>
 
-
-        <profile> <!-- defines our default persistence provider -->
-            <id>hibernate</id>
+        <profile> <!-- H2 file-based DB -->
+            <id>h2db</id>
             <activation>
-                <property> <!-- use this property to name alt persistence provider -->
-                    <name>!jpa</name>
+                <property> 
+                    <name>!jdbcdb</name>
                 </property>
             </activation>
-
+            <properties>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+                  <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
+            </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <version>${hibernate-entitymanager.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <version>${slf4j.version}</version>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2db.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
+    </profiles>
 ---
 
     * Perform a test of your pom.xml by issuing a sample build command.
@@ -379,58 +523,94 @@ DROP TABLE EM_AUTO if EXISTS;
     * Add the standard database setup and teardown scripts. This allows us
     to create a legacy database schema and write classes that map to that
     schema. We will later have the persistence provider create the schema
-    for us when we are in quick prototype mode.
+    for us when we are in quick prototype mode. First create the reusable
+    portion of the definition in the pluginManagement section. This will
+    define the version, database dependencies, and property information
+    for all to inherit.
 
 ---
+    <build>
+        <pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>        
+                    <version>${sql-maven-plugin.version}</version>        
+                
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.h2database</groupId>
+                            <artifactId>h2</artifactId>
+                            <version>${h2db.version}</version>
+                        </dependency>
+                    </dependencies>
+                
+                    <configuration>
+                        <username>${jdbc.user}</username>
+                        <password>${jdbc.password}</password>
+                        <driver>${jdbc.driver}</driver>
+                        <url>${jdbc.url}</url>          
+                    </configuration>
+                </plugin>          
+
+            </plugins>    
+        </pluginManagement>
+    </build>
+---
+
+    * Next add the potentially project-specific portion to a build-plugins-plugin
+    section that would normally be in the child module. However, we you add
+    this to the module -- do so within a profile that is wired to always run
+    except when the system property -DskipTests is defined. This is a standard
+    maven system property that builders use to build the module and bypass both
+    unit and integration testing. By honoring the property here -- our module
+    will only attempt to work with the database if we ware not skipping tests.
+    Note the !bang-not character means "the absence of this system property".
+
+---
+    <profiles>
+        ...
         <profile>
             <id>testing</id>
             <activation>
                 <property>
-                    <name>!maven.test.skip</name>
+                    <name>!skipTests</name>
                 </property>
             </activation>
-
+      
             <build>
                 <plugins>
                     <plugin>
+                        <!-- runs schema against the DB -->
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>sql-maven-plugin</artifactId>        
-                        <version>${sql-maven-plugin.version}</version>        
-                    
-                        <dependencies>
-                            <dependency>
-                                <groupId>com.h2database</groupId>
-                                <artifactId>h2</artifactId>
-                                <version>${h2db.version}</version>
-                            </dependency>
-                        </dependencies>
-                    
-                        <configuration>
-                            <username>${jdbc.user}</username>
-                            <password>${jdbc.password}</password>
-                            <driver>${jdbc.driver}</driver>
-                            <url>${jdbc.url}</url>          
-                        </configuration>
 
                         <executions>
 
-                        <!-- place execution elements here  -->
+                            <!-- place execution elements here  -->
 
                         </executions>
-                    </plugin>
-                </plugins>
-            </build>
+                    </plugin>          
+                </plugins>          
+            </build>          
         </profile>
     </profiles>
 ---
 
     * Configure the sql-maven-plugin executions element to run any drop 
-    scripts before running tests.
+    scripts in the source tree before running tests. 
+
+    [Note:] Note that we are controlling when the scripts are executed 
+    using the phase element. This is naming a well known Maven lifecycle
+    phase for the build.
+
+    []
 
 ---
         <execution>
             <id>drop-db-before-test</id>
-            <phase>process-test-resources</phase>
+            <phase>process-test-classes</phase>
             <goals>
                 <goal>execute</goal>
             </goals>
@@ -448,12 +628,12 @@ DROP TABLE EM_AUTO if EXISTS;
 ---
 
     * Configure the sql-maven-plugin executions element to run any scripts 
-    to create schema before running tests.
+    from the source tree to create schema before running tests.
 
 ---
         <execution>
             <id>create-db-before-test</id>
-            <phase>process-test-resources</phase>
+            <phase>process-test-classes</phase>
             <goals>
                 <goal>execute</goal>
             </goals>
@@ -472,12 +652,12 @@ DROP TABLE EM_AUTO if EXISTS;
 ---
 
     * Configure the sql-maven-plugin executions element to run any populate 
-    scripts to add rows to the database before running tests.
+    scripts from the source tree to add rows to the database before running tests.
 
 ---
         <execution>
             <id>populate-db-before-test</id>
-            <phase>process-test-resources</phase>
+            <phase>process-test-classes</phase>
             <goals>
                 <goal>execute</goal>
             </goals>
@@ -517,6 +697,17 @@ DROP TABLE EM_AUTO if EXISTS;
 ---
 
     * Build and run the tests. The schema should show up in the DB UI.
+
+    [Note:] Remember to turn off the embedded profile and turn on the 
+    server profile if you wish to use the server and DB UI while
+    the unit test is running. The DB UI can only inspect the embedded
+    file once all active clients close the file.
+
+---
+!mvn clean install -P\!h2db -Ph2srv
+---
+
+    []
     
 ** {Part D}: Setup JPA Persistence Unit
 
@@ -679,14 +870,15 @@ public class Auto implements Serializable {
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" version="1.0">
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
 
-    <persistence-unit name="entityMgrEx">
+    <persistence-unit name="entityEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
         <properties>
-            <!-- defined in src/test/resources/hibernate.properties -->
+           <!-- defined in src/test/resources/hibernate.properties -->
         </properties>
-    </persistence-unit>
+    </persistence-unit>            
 </persistence>
 ---
 
@@ -718,8 +910,82 @@ hibernate.format_sql=true
 #hibernate.jdbc.batch_size=0
 ---
 
+    * Make sure your project still builds. Your area should look something
+    like the following after the build.
 
+---
+$ mvn clean install -P\!h2db -Ph2srv
+
+├── pom.xml
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── myorg
+│   │   │       └── entitymgrex
+│   │   │           └── Auto.java
+│   │   └── resources
+│   │       ├── ddl
+│   │       │   ├── emauto_create.ddl
+│   │       │   ├── emauto_delete.ddl
+│   │       │   └── emauto_drop.ddl
+│   │       └── META-INF
+│   │           └── persistence.xml
+│   └── test
+│       └── resources
+│           └── hibernate.properties
+└── target
+    ├── classes
+    │   ├── ddl
+    │   │   ├── emauto_create.ddl
+    │   │   ├── emauto_delete.ddl
+    │   │   └── emauto_drop.ddl
+    │   ├── META-INF
+    │   │   └── persistence.xml
+    │   └── myorg
+    │       └── entitymgrex
+    │           └── Auto.class
+    ├── entityMgrEx-1.0-SNAPSHOT.jar
+    ├── generated-sources
+    │   └── annotations
+    ├── maven-archiver
+    │   └── pom.properties
+    └── test-classes
+        └── hibernate.properties
+---
     
+    * You should also check that your hibernate.properties file was filtered
+    by your build.testResources definition provided earlier. The variable definitions
+    within your src/test/resources source file(s) should be replaced with 
+    property values from your environment.
+
+---
+$ more src/test/resources/hibernate.properties target/test-classes/hibernate.properties 
+::::::::::::::
+src/test/resources/hibernate.properties
+::::::::::::::
+hibernate.dialect=${hibernate.dialect}
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.password=${jdbc.password}
+hibernate.connection.username=${jdbc.user}
+#hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
+
+::::::::::::::
+target/test-classes/hibernate.properties
+::::::::::::::
+hibernate.dialect=org.hibernate.dialect.H2Dialect
+hibernate.connection.url=jdbc:h2:tcp://127.0.0.1:9092/h2db/ejava
+hibernate.connection.driver_class=org.h2.Driver
+hibernate.connection.password=
+hibernate.connection.username=sa
+#hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
+---
 
 ** {Part E}: Setup JPA Test Project
 
@@ -745,12 +1011,23 @@ hibernate.format_sql=true
 ---
 package myorg.entitymgrex;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.junit.Assert.*;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
@@ -823,7 +1100,7 @@ public class EntityMgrTest {
     
 ---
     @AfterClass
-    public static void tesrDownClass() {
+    public static void tearDownClass() {
         log.debug("closing entity manager factory");
         emf.close();
     }
@@ -924,36 +1201,101 @@ public class EntityMgrTest {
 </log4j:configuration>
 ---
 
-    * Check that you have the following artifacts in your project src
-    tree.
+    * You should be able to build and test your module at this time.
 
 ---
-src/
-|-- main
-|   |-- java
-|   |   `-- myorg
-|   |       `-- entitymgrex
-|   |           `-- Auto.java
-|   `-- resources
-|       |-- META-INF
-|       |   `-- persistence.xml
-|       `-- ddl
-|           |-- emauto_create.ddl
-|           |-- emauto_delete.ddl
-|           `-- emauto_drop.ddl
-`-- test
-    |-- java
-    |   `-- myorg
-    |       `-- entitymgrex
-    |           `-- EntityMgrTest.java
-    `-- resources
-        |-- hibernate.properties
-        `-- log4j.xml
+$ mvn clean test
+
+Running myorg.entitymgrex.EntityMgrTest
+(EntityMgrTest.java:setUpClass:25)  -creating entity manager factory
+(EntityMgrTest.java:setUp:31)  -creating entity manager
+Hibernate: 
+    delete 
+    from
+        EM_AUTO
+(EntityMgrTest.java:cleanup:58)  -removed 0 rows
+(EntityMgrTest.java:testTemplate:75)  -testTemplate
+(EntityMgrTest.java:tearDown:39)  -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@3e52a475
+Hibernate: 
+    select
+        auto0_.id as id0_,
+        auto0_.color as color0_,
+        auto0_.make as make0_,
+        auto0_.mileage as mileage0_,
+        auto0_.model as model0_ 
+    from
+        EM_AUTO auto0_
+(EntityMgrTest.java:tearDown:45)  -tearDown() complete, em=org.hibernate.ejb.EntityManagerImpl@3e52a475
+(EntityMgrTest.java:tearDownClass:69)  -closing entity manager factory
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.337 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+...
+[INFO] BUILD SUCCESS
+---
+
+    * Check that you have the following artifacts in your project tree.
+
+---
+├── pom.xml
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── myorg
+│   │   │       └── entitymgrex
+│   │   │           └── Auto.java
+│   │   └── resources
+│   │       ├── ddl
+│   │       │   ├── emauto_create.ddl
+│   │       │   ├── emauto_delete.ddl
+│   │       │   └── emauto_drop.ddl
+│   │       └── META-INF
+│   │           └── persistence.xml
+│   └── test
+│       ├── java
+│       │   └── myorg
+│       │       └── entitymgrex
+│       │           └── EntityMgrTest.java
+│       └── resources
+│           ├── hibernate.properties
+│           └── log4j.xml
+└── target
+    ├── classes
+    │   ├── ddl
+    │   │   ├── emauto_create.ddl
+    │   │   ├── emauto_delete.ddl
+    │   │   └── emauto_drop.ddl
+    │   ├── META-INF
+    │   │   └── persistence.xml
+    │   └── myorg
+    │       └── entitymgrex
+    │           └── Auto.class
+    ├── entityMgrEx-1.0-SNAPSHOT.jar
+    ├── generated-sources
+    │   └── annotations
+    ├── generated-test-sources
+    │   └── test-annotations
+    ├── h2db
+    │   └── ejava.h2.db
+    ├── log4j-out.txt
+    ├── maven-archiver
+    │   └── pom.properties
+    ├── surefire-reports
+    │   ├── myorg.entitymgrex.EntityMgrTest.txt
+    │   └── TEST-myorg.entitymgrex.EntityMgrTest.xml
+    └── test-classes
+        ├── hibernate.properties
+        ├── log4j.xml
+        └── myorg
+            └── entitymgrex
+                └── EntityMgrTest.class
 ---
 
 ** {Part F}: Ready Project for Import Into Eclipse
 
-    Eclipse Indigo users will get a warning/error for the 
+    Eclipse Indigo and Juno users will get a warning/error for the 
     sql-maven-plugin. The error is related 
     to Eclipse trying to have a tighter integration with Maven by trying to 
     perform comparable tasks inside of Eclipse for what would happen in 
@@ -991,13 +1333,13 @@ src/
                               <pluginExecutionFilter>
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>sql-maven-plugin</artifactId>
-                                <versionRange>[1.4,)</versionRange>
+                                <versionRange>[1.0.0,)</versionRange>
                                 <goals>
                                   <goal>execute</goal>
                                 </goals>
                               </pluginExecutionFilter>
                               <action>
-                                <ignore/>
+                                <ignore />
                               </action>
                             </pluginExecution>
     
@@ -1363,64 +1705,120 @@ src/
 ---
 
     * compile-time schema generation can be added to your project with
-    the following plugin entry. Add the following to your pom.xml plugin
-    area, re-run your compilation, and look at the files generated
-    into target/classes/ddl
+    the following plugin entry. Add the following to your pluginManagement
+    section. The following passive definition defines the reusable details
+    for how we want to setup the hibernate plugin for generating database
+    schema. It will write a drop script in a file called ...dropJPA.ddl
+    and a create script called ...createJPA.ddl. It cannot create a delete
+    script.
 
 ---
-        <!-- generates a DDL file for persistence unit 
-        -->
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>hibernate3-maven-plugin</artifactId>
-            <version>${hibernate3-maven-plugin.version}</version>
-            <configuration>
-                <hibernatetool destdir="target/classes/ddl">
-                    <classpath>
-                        <path location="${project.build.directory}/test-classes"/>
-                    </classpath>
-                    <jpaconfiguration persistenceunit="entityMgrEx"
-                         propertyfile="${basedir}/target/test-classes/hibernate.properties"/>
-                </hibernatetool>
-            </configuration>
+    <build>
+        <pluginManagement>
+            <plugins>
+                ...
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>hibernate3-maven-plugin</artifactId>
+                    <version>${hibernate3-maven-plugin.version}</version>
+                    <extensions>true</extensions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-entitymanager</artifactId>
+                            <version>${hibernate3.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>generate-drop-ddl</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="false" drop="true" format="true" 
+                                        outputfilename="${project.artifactId}-dropJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>generate-create-ddl</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="true" drop="false" format="true" 
+                                        outputfilename="${project.artifactId}-createJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                ...
+            </plugins>
+        </pluginManagement>
+    </build>
+---
 
-            <extensions>true</extensions>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <version>${hibernate3.version}</version>
-                </dependency>
-            </dependencies>
-            <executions>
-                <execution>
-                    <id>generate-drop-ddl</id>
-                    <phase>process-test-resources</phase>
-                    <goals>
-                        <goal>run</goal>
-                    </goals>
-                    <configuration>
-                        <hibernatetool>
-                            <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                outputfilename="${project.artifactId}-dropJPA.ddl"/>
-                        </hibernatetool>
-                    </configuration>
-                </execution>
-                <execution>
-                    <id>generate-create-ddl</id>
-                    <phase>process-test-resources</phase>
-                    <goals>
-                        <goal>run</goal>
-                    </goals>
-                    <configuration>
-                        <hibernatetool>
-                            <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                outputfilename="${project.artifactId}-createJPA.ddl"/>
-                        </hibernatetool>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+    * Add the following active declaration to you pom to activate the
+    plugin and fill in the module-specifics. Since this plugin can operate 
+    without a database server -- add it to the global build.plugins section
+    and not within a profile.
+
+---
+    <build>
+        ...
+        <plugins>
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <configuration>
+                    <hibernatetool destdir="target/classes/ddl">
+                        <classpath>
+                            <path location="${project.build.directory}/classes" />
+                            <path location="${project.build.directory}/test-classes" />
+                        </classpath>
+                        <jpaconfiguration persistenceunit="entityMgrEx"
+                            propertyfile="${basedir}/target/test-classes/hibernate.properties" />
+                    </hibernatetool>
+                </configuration>
+            </plugin>
+        <plugins>
+---
+
+    * Build your module and notice the generated JPA.ddl files
+
+---
+$ mvn clean process-test-classes
+
+...
+[hibernatetool] Executing Hibernate Tool with a JPA Configuration
+[hibernatetool] 1. task: hbm2ddl (Generates database schema)
+(...SLF4J warnings...)
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- hibernate3-maven-plugin:3.0:run (generate-create-ddl) @ entityMgrEx ---
+[INFO] Executing tasks
+
+main:
+[hibernatetool] Executing Hibernate Tool with a JPA Configuration
+[hibernatetool] 1. task: hbm2ddl (Generates database schema)
+...
+---
+---
+└── target
+    ...
+    ├── classes
+    │   ├── ddl
+    │   │   ├── emauto_create.ddl
+    │   │   ├── emauto_delete.ddl
+    │   │   ├── emauto_drop.ddl
+    │   │   ├── entityMgrEx-createJPA.ddl
+    │   │   └── entityMgrEx-dropJPA.ddl
 ---
 
     * Add a lifecycle mapping for the hibernate3-maven-plugin to tell Eclipse
@@ -1443,17 +1841,359 @@ src/
                             </pluginExecution>
 ---    
 
-    * Run a maven build and observe the generated schema created in the 
-    target/classes tree.
-    
+** {Part I}: Create JPA Parent POM
+
+    Since you will likely have many JPA modules in your enterprise application,
+    lets take a moment to break the current module into a parent and child before
+    you quit. That way you can better visualize which parts are specific to the 
+    child module and which are reusable from a common parent.
+
+    * Create a sibling module called ../jpa-parent
+
 ---
-target/classes/
-...
-|-- ddl
-|   |-- emauto_create.ddl
-|   |-- emauto_delete.ddl
-|   |-- emauto_drop.ddl
-|   |-- entityMgrEx-createGEN.ddl
-|   `-- entityMgrEx-dropGEN.ddl
-...
+$ mkdir ../jpa-parent
+---
+
+    * Add the module definition (../jpa-parent/pom.xml)
+
+---
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.jpa</groupId>
+    <artifactId>jpa-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>JPA Parent POM</name>
+    <description>
+        This parent pom is intended to provide common and re-usable 
+        definitions and constructs across JPA projects.
+    </description>
+</project>
+---
+
+    * Add the following parent declaration to your existing module.
+    The relativePath is only useful if you find yourself changing the
+    parent pom on a frequent basis. Otherwise the parent module
+    can be found in the localRepository once it has been installed.
+
+---
+    <parent>
+        <groupId>myorg.jpa</groupId>
+        <artifactId>jpa-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../jpa-parent</relativePath>
+    </parent>
+
+    <groupId>myorg.jpa</groupId>
+    <artifactId>entityMgrEx-child</artifactId>
+    <name>Entity Manager Exercise</name>
+---
+
+    * Verify your project still builds. This will verify your relativePath 
+    is correct.
+
+---
+[INFO] BUILD SUCCESS
+---
+
+   * Move the following constructs from the entityMgrEx module to the 
+    jpa-parent module. Your child module should still have the same build
+    and test functionality except now it should look a little smaller.
+    One could also make a case for moving some of the SQL/DDL script 
+    execution definitions also to the parent -- which would make this
+    module almost of trivial size.
+
+        * properties
+
+        * repositories
+
+        * dependencyManagement
+
+        * pluginManagement
+
+        * select profiles
+
+---
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myorg.jpa</groupId>
+    <artifactId>jpa-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>JPA Parent POM</name>
+    <description>
+        This parent pom is intended to provide common and re-usable 
+        definitions and constructs across JPA projects.
+    </description>
+
+   <!-- needed to resolve some hibernate dependencies -->
+    <repositories>
+        <repository>
+            <id>jboss-nexus</id>
+            <name>JBoss Nexus Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+    </repositories>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.source.version>1.6</java.source.version>
+        <java.target.version>1.7</java.target.version>
+
+        <jboss.host>localhost</jboss.host>
+        <db.host>${jboss.host}</db.host>
+
+        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+        <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
+        <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
+
+        <commons-logging.version>1.0.4</commons-logging.version>
+        <h2db.version>1.3.168</h2db.version>
+        <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
+        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
+        <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
+        <hibernate3.version>3.6.0.Final</hibernate3.version>
+        <junit.version>4.10</junit.version>
+        <log4j.version>1.2.13</log4j.version>
+        <slf4j.version>1.6.1</slf4j.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+              <groupId>commons-logging</groupId>
+              <artifactId>commons-logging</artifactId>
+              <version>${commons-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.0-api</artifactId>
+                <version>${hibernate-jpa-2.0-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate-entitymanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>log4j</groupId>
+              <artifactId>log4j</artifactId>
+              <version>${log4j.version}</version>
+            </dependency>    
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                  <!-- make sure we are building java6 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                            <source>${java.source.version}</source>
+                            <target>${java.target.version}</target>
+                    </configuration>	                
+                </plugin>      
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+          
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                    </configuration>
+                </plugin>            
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>hibernate3-maven-plugin</artifactId>
+                    <version>${hibernate3-maven-plugin.version}</version>
+                    <extensions>true</extensions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-entitymanager</artifactId>
+                            <version>${hibernate3.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>generate-drop-ddl</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="false" drop="true" format="true" 
+                                        outputfilename="${project.artifactId}-dropJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>generate-create-ddl</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <hibernatetool>
+                                    <hbm2ddl export="false" create="true" drop="false" format="true" 
+                                        outputfilename="${project.artifactId}-createJPA.ddl"/>
+                                </hibernatetool>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>        
+                    <version>${sql-maven-plugin.version}</version>        
+                
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.h2database</groupId>
+                            <artifactId>h2</artifactId>
+                            <version>${h2db.version}</version>
+                        </dependency>
+                    </dependencies>
+                
+                    <configuration>
+                        <username>${jdbc.user}</username>
+                        <password>${jdbc.password}</password>
+                        <driver>${jdbc.driver}</driver>
+                        <url>${jdbc.url}</url>          
+                    </configuration>
+                </plugin>          
+
+            </plugins>    
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile> <!-- H2 server-based DB -->
+            <id>h2srv</id>
+            <properties>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+                  <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2db.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile> <!-- H2 file-based DB -->
+            <id>h2db</id>
+            <activation>
+                <property> 
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.h2.Driver</jdbc.driver>
+                  <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+                  <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2db.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!--  tell Eclipse what to do with some of the plugins -->
+        <profile>
+          <id>m2e</id>
+          <activation>
+            <property>
+              <name>m2e.version</name>
+            </property>
+          </activation>
+          <build>
+            <pluginManagement>
+                <plugins>
+                    <plugin>
+                      <groupId>org.eclipse.m2e</groupId>
+                      <artifactId>lifecycle-mapping</artifactId>
+                      <version>1.0.0</version>
+                      <configuration>
+                        <lifecycleMappingMetadata>
+                          <pluginExecutions>
+                            
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>hibernate3-maven-plugin</artifactId>
+                                <versionRange>[2.2,)</versionRange>
+                                <goals>
+                                  <goal>hbm2ddl</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore/>
+                              </action>
+                            </pluginExecution>
+
+                            <pluginExecution>
+                              <pluginExecutionFilter>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>sql-maven-plugin</artifactId>
+                                <versionRange>[1.0.0,)</versionRange>
+                                <goals>
+                                  <goal>execute</goal>
+                                </goals>
+                              </pluginExecutionFilter>
+                              <action>
+                                <ignore />
+                              </action>
+                            </pluginExecution>
+    
+                          </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                      </configuration>
+                    </plugin>
+
+                </plugins>
+            </pluginManagement>
+           </build>
+        </profile>
+    </profiles>
+</project>
 ---
