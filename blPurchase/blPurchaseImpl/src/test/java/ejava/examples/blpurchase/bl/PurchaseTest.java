@@ -80,7 +80,7 @@ public class PurchaseTest {
 			//the user selects a product
 		Product product=null;
 		Random random=new Random();
-		for (int i=0; product == null; i++) {
+		for (int i=0; product == null || product.getCount()==0; i++) {
 			List<Product> products=catalog.getProducts(random.nextInt(100), 1);
 			product=products.iterator().next();
 			assertTrue("I can't find anything to buy!!!", i<1000);
