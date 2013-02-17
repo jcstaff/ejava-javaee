@@ -2,19 +2,21 @@ package myorg.entityex.annotated;
 
 import java.util.Date;
 
-public class Animal {
+@javax.persistence.Entity
+public class Animal2 {
 	private int id;
 	private String name;
 	private Date dob;
 	private double weight;
 	
-	public Animal() {} //must have default ctor
-	public Animal(String name, Date dob, double weight) {
+	public Animal2() {} //must have default ctor
+	public Animal2(String name, Date dob, double weight) {
 		this.name = name;
 		this.dob = dob;
 		this.weight = weight;
 	}
 	
+	@javax.persistence.Id
 	public int getId() { return id; }
 	public void setId(int id) {
 		this.id = id;

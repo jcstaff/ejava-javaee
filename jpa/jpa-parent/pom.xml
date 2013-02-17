@@ -200,11 +200,6 @@
 
         <profile> <!-- H2 file-based DB -->
             <id>h2db</id>
-            <activation>
-                <property> 
-                    <name>!jdbcdb</name>
-                </property>
-            </activation>
             <properties>
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>

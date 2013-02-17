@@ -3,10 +3,12 @@ package myorg.entityex;
 import static org.junit.Assert.*;
 
 
-import java.util.List;
+import java.util.GregorianCalendar;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+
+import myorg.entityex.mapped.Animal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,7 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class AutoTest {
+public class AnimalTest {
     private static Log log = LogFactory.getLog(Auto.class);
     private static final String PERSISTENCE_UNIT = "entityEx-test";
     private static EntityManagerFactory emf;
@@ -65,28 +67,35 @@ public class AutoTest {
     
     public void cleanup() {
         em.getTransaction().begin();
-        List<Auto> autos = em.createQuery("select a from Auto a", Auto.class)
-            .getResultList();
-        for (Auto a: autos) {
-            em.remove(a);
-        }
+        //delete what we need to here
         em.getTransaction().commit();
-        log.info("removed " + autos.size() + " autos");
     }
 
     @Test
-    public void testCreate() {
-        log.info("testCreate");
+    public void testCreateAnimal() {
+        log.info("testCreateAnimal");
+    	Animal animal = new Animal("bessie", 
+    			new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
+        em.persist(animal);        
         
-        Auto car = new Auto();
-        car.setMake("Chrysler");
-        car.setModel("Gold Duster");
-        car.setColor("Gold");
-        car.setMileage(60*1000);
+        assertNotNull("animal not found", em.find(Animal.class,animal.getId()));
         
-        log.info("creating auto:" + car);                        
-        em.persist(car);        
+        em.flush(); //make sure all writes were issued to DB
+        em.clear(); //purge the local entity manager entity cache to cause new instance
+        assertNotNull("animal not found", em.find(Animal.class,animal.getId()));
+    }
+
+    @Test
+    public void testCreateAnimalAnnotated() {
+        log.info("testCreateAnimalAnnotated");
+    	myorg.entityex.annotated.Animal2 animal = new myorg.entityex.annotated.Animal2("bessie", 
+    			new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
+        em.persist(animal);        
         
-        assertNotNull("car not found", em.find(Auto.class,car.getId()));
+        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));
+        
+        em.flush(); //make sure all writes were issued to DB
+        em.clear(); //purge the local entity manager entity cache to cause new instance
+        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));
     }
 }

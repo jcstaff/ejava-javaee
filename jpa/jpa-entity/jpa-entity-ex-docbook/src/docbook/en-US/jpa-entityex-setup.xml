@@ -8,11 +8,54 @@
         <title>Setup Maven Project</title>
              
         <itemizedlist>
-            <listitem><para>Use the ejava.jpa:jpa-archetype to setup a new Maven project for this exercise.</para>
+            <listitem><para>Add the following to your .m2/settings.xml file. This will allow you to 
+                resolve the exercise archetype and set a default database for the exercise.</para>
+<programlisting language=""><![CDATA[
+    <profiles>
+       <profile>
+            <id>webdev-repositories</id>
+            <repositories>
+                <repository>
+                    <id>webdev-baseline</id>
+                    <name>webdev.apl.jhu.edu baseline</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+                </repository>
+                <repository>
+                    <id>webdev-snapshot</id>
+                    <name>webdev.apl.jhu.edu SNAPSHOT</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>webdev-plugins</id>
+                    <name>ejava webdev repository</name>
+                    <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>h2db</activeProfile>
+        <!--
+        <activeProfile>h2srv</activeProfile>
+        -->
+    </activeProfiles>
+]]></programlisting>                        
+            </listitem>
+        
+            <listitem><para>Use the ejava.jpa:jpa-archetype to setup a new Maven project for this exercise.
+                Activate the webdev-repositories profile (-Pwebdev-repositories) so that you can resolve
+                the archetype off the Internet.</para>
  <programlisting language=""><![CDATA[
 $ mvn archetype:generate -B \
 -DarchetypeGroupId=ejava.jpa -DarchetypeArtifactId=jpa-archetype \
--DgroupId=myorg.entityex -DartifactId=entityEx
+-DgroupId=myorg.entityex -DartifactId=entityEx \
+-Pwebdev-repositories
 
 [INFO] Scanning for projects...
 [INFO]                                                                         

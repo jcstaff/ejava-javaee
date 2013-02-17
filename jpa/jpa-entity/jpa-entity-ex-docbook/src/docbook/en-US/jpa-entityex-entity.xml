@@ -59,9 +59,13 @@ public class Animal {
 ]]></programlisting>
             </listitem>
             
+            <listitem><para>Copy the existing AutoTest.java to AnimalTest.java and
+                remove (or ignore) references to the Auto class from AnimalTest.java</para></listitem>
             <listitem><para>Attempt to persist the Animal by adding the following 
-                @Test method to the existing JUnit class.</para>
+                @Test method to the AnimalTest.java JUnit class.</para>
  <programlisting language="java"><![CDATA[
+ # src/test/java/myorg/entityex/AnimalTest.java
+ 
     @Test
     public void testCreateAnimal() {
         log.info("testCreateAnimal");
@@ -235,26 +239,32 @@ javax.persistence.PersistenceException: org.hibernate.InstantiationException: No
                        custom constructor -- we would get this constructor for free.</para></listitem>
                 </itemizedlist>
             </listitem>
+            
         </orderedlist>
     </section>
+    
+    
+    
+    
+    
     
     <section id="jpa-entityex-entity-annotations">
         <title>Create POJO Class using annotations</title>
         
         <orderedlist>
-            <listitem><para>Copy the POJO class to a new java package without changing the class name.</para>
+            <listitem><para>Copy the POJO class to a new java package and class name (Animal2).</para>
 <programlisting language="java"><![CDATA[
 package myorg.entityex.annotated;
 
 import java.util.Date;
 
-public class Animal {
+public class Animal2 {
     private int id;
     private String name;
     private Date dob;
     private double weight;
     
-    public Animal() {} //must have default ctor
+    public Animal2() {} //must have default ctor
 ...
 }
 ]]></programlisting>                        
@@ -264,8 +274,8 @@ public class Animal {
 <programlisting language="java"><![CDATA[
 import javax.persistence.Entity;
 
-@Entity
-public class Animal {
+@javax.persistence.Entity
+public class Animal2 {
 ]]></programlisting>                        
             </listitem>
 
@@ -277,28 +287,150 @@ public class Animal {
 
         <mapping-file>orm/Animal-orm.xml</mapping-file>
         <class>myorg.entityex.Auto</class>
-        <class>myorg.entityex.annotated.Animal</class>
+        <class>myorg.entityex.annotated.Animal2</class>
         <properties>
+]]></programlisting>
+                <note>
+                    <title>@Entities are only automatically scanned for in archive local to persistence.xml</title>  
+                    <para>Classes annotated with @Entity are automatically located when
+                        placed in the same archive as the persistence.xml or correctly
+                        referenced by a jarfile element. However, since this exercise has
+                        placed the persistence.xml outside of the src/test tree with the 
+                        @Entity classes, we must define them in the persistence unit. Note
+                        how the current structure looks -- the persistence.xml and Animal2 class
+                        are in what is considered separate archives.
+                    </para>
+<programlisting language=""><![CDATA[
+$ tree target/*classes
+target/classes
+├── ddl
+├── myorg
+│   └── entityex
+│       ├── annotated
+│       │   └── Animal2.class
+│       ├── Auto.class
+│       └── mapped
+│           └── Animal.class
+└── orm
+    └── Animal-orm.xml
+target/test-classes
+├── hibernate.properties
+├── log4j.xml
+├── META-INF
+│   └── persistence.xml
+└── myorg
+    └── entityex
+        └── AutoTest.class
+]]></programlisting>                        
+                </note>                        
+            </listitem>
+
+            <listitem><para>Add a new test method to work with the new class added to the module.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testCreateAnimalAnnotated() {
+        log.info("testCreateAnimalAnnotated");
+        myorg.entityex.annotated.Animal2 animal = new myorg.entityex.annotated.Animal2("bessie", 
+                new GregorianCalendar(1960, 1, 1).getTime(), 1400.2);
+        em.persist(animal);        
+        
+        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));
+        
+        em.flush(); //make sure all writes were issued to DB
+        em.clear(); //purge the local entity manager entity cache to cause new instance
+        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para>Add a new test method to work with the new class added to the 
-                module.</para>
+            <listitem><para>Attempt to build/run your module at this point. You should get a familiar 
+                error about Animal2 not having an identifier.</para>
 <programlisting language=""><![CDATA[
+Unable to configure EntityManagerFactory: No identifier specified for entity: myorg.entityex.annotated.Animal2
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
+            <listitem><para>Since we want to use annotations for the new class, fix the issue by adding
+                a @javax.persistence.Id annotation to the id attribute.</para>
+<programlisting language="java"><![CDATA[
+    @javax.persistence.Id
+    public int getId() { return id; }
+    public void setId(int id) {
+        this.id = id;
+    }
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
+            <listitem><para>Re-run you test. It should succeed this time.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test
+...
+[INFO] BUILD SUCCESS
+
+$ cat 
 ]]></programlisting>                        
             </listitem>
+
+            <listitem><para>If you would like to observe the data in the database, do two things</para>
+
+                <itemizedlist>
+                    <listitem><para>Turn off the hibernate.hbm2ddl.auto=create option by commenting it out
+                        in hibernate.properties</para>
+<programlisting language=""><![CDATA[
+$ more src/test/resources/hibernate.properties
+ 
+hibernate.dialect=${hibernate.dialect}
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.password=${jdbc.password}
+hibernate.connection.username=${jdbc.user}
+#hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
+]]></programlisting>                        
+                    </listitem>
+                    <listitem><para>Make sure you are running with the h2srv (server) profile and have the 
+                        server running. The easier way to run with the server profile within Eclipse is
+                        to choose it as one of your active profiles in .m2/settings/settings.xml and have
+                        Eclipse re-read your settings.xml</para>
+<programlisting language=""><![CDATA[
+# start server
+$ java -jar (localRepository)/com/h2database/h2/1.3.168/h2-1.3.168.jar
+
+
+# .m2/settings.xml
+    <activeProfiles>
+    <!--
+        <activeProfile>h2db</activeProfile>
+        -->
+        <activeProfile>h2srv</activeProfile>
+
+# or manually from command line
+$ mvn clean test -P\!h2db -Ph2srv
+]]></programlisting>                        
+                    </listitem>
+                </itemizedlist>
+
+            </listitem>
+
+            <listitem><para>Type the following command in the H2 browser UI</para>
+<programlisting language=""><![CDATA[
+SELECT * FROM ANIMAL2;
+ID      DOB     NAME    WEIGHT  
+0   1960-02-01 00:00:00.0   bessie  1400.2
+]]></programlisting>                        
+            </listitem>
+            
         </orderedlist>
     </section>
-    
+
+        
+    <section id="jpa-entityex-entity-summary">
+       <title>Summary</title>
+       <para>In this chapter you created two POJOs and correctly registered them with the 
+           persistence unit. One used a orm.xml descriptor and the other used Java annotations.
+           Each entity had to be equipped with a default constructor and at least one property
+           to use as the primary key.</para>
+    </section>    
 </chapter>
   

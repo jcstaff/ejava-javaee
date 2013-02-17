@@ -2,9 +2,7 @@ package myorg.entityex.mapped;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
 
-@Entity(name="xxx")
 public class Animal {
 	private int id;
 	private String name;

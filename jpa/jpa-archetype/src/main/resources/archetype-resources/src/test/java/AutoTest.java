@@ -61,7 +61,7 @@ public class AutoTest {
      }
     
     @AfterClass
-    public static void tesrDownClass() {
+    public static void tearDownClass() {
         log.debug("closing entity manager factory");
         if (emf!=null) { emf.close(); }
     }
