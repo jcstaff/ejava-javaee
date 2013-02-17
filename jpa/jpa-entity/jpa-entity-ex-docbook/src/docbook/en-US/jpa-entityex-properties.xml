@@ -3,13 +3,217 @@
 
 <chapter id="jpa-entityex-property">
     <title>Mapping Class Properties</title>
-    <para></para>
+    <para>In this chapter we will create custom class/database mappings
+        for some class properties</para>
    <itemizedlist>
-        <listitem><para></para></listitem>
+        <listitem><para>Map a class to a specific table</para></listitem>
+        <listitem><para>Map a property to a specific column</para></listitem>
+        <listitem><para>Define constraints for properties</para></listitem>
+        <listitem><para>Take a look at using getters and setters</para></listitem>
     </itemizedlist>
         
-    <section id="jpa-entityex-property-mapping">
-        <title></title>
+    <section id="jpa-entityex-property-mapclass">
+        <title>Map Entity to Specific Table</title>
+
+        <orderedlist>
+            <listitem><para>Copy your Animal.java class to Cat.java</para>
+<programlisting language="java"><![CDATA[
+package myorg.entityex.mapped;
+
+import java.util.Date;
+
+public class Cat {
+    private int id;
+    private String name;
+    private Date dob;
+    private double weight;
+    
+    public Cat() {} //must have default ctor
+    public Cat(String name, Date dob, double weight) {
+        this.name = name;
+        this.dob = dob;
+        this.weight = weight;
+    }
+    
+    public int getId() { return id; }
+...
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Copy your Animal2.java class to Cat2.java</para>
+<programlisting language="java"><![CDATA[
+package myorg.entityex.annotated;
+
+import java.util.Date;
+
+@javax.persistence.Entity
+public class Cat2 {
+    private int id;
+    private String name;
+    private Date dob;
+    private double weight;
+    
+    public Cat2() {} //must have default ctor
+    public Cat2(String name, Date dob, double weight) {
+        this.name = name;
+        this.dob = dob;
+        this.weight = weight;
+    }
+    
+    @javax.persistence.Id
+    public int getId() { return id; }
+...
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Name the new Cat entity class in the Animal-orm.xml</para>
+<programlisting language="xml"><![CDATA[
+# src/main/resources/orm/Animal-orm.xml
+
+    <entity class="myorg.entityex.mapped.Animal">
+...
+    <entity class="myorg.entityex.mapped.Cat">
+        <attributes>
+            <id name="id"/>
+        </attributes>
+    </entity>
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Name the new Cat2 entity class in the persistence.xml</para>
+<programlisting language="xml"><![CDATA[
+# src/test/resources/META-INF/persistence.xml
+
+        <mapping-file>orm/Animal-orm.xml</mapping-file>
+        <class>myorg.entityex.Auto</class>
+        <class>myorg.entityex.annotated.Animal2</class>
+        <class>myorg.entityex.annotated.Cat2</class>
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Rebuild your module form the command line and observe the 
+                create schema generated for Cat and Cat2. Notice that the JPA provider
+                used the class name as the default entity name and will be attempting to
+                map the entity to a database table by the same name as the entity.</para>
+<programlisting language=""><![CDATA[
+$ more target/classes/ddl/*
+...
+   create table Cat (
+        id integer not null,
+        dob timestamp,
+        name varchar(255),
+        weight double not null,
+        primary key (id)
+    );
+
+    create table Cat2 (
+        id integer not null,
+        dob timestamp,
+        name varchar(255),
+        weight double not null,
+        primary key (id)
+    );
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Add a table element to the orm.xml definition to 
+                map Cat to the ENTITYEX_CAT table.</para>
+<programlisting language="xml"><![CDATA[
+    <entity class="myorg.entityex.mapped.Cat">
+        <table name="ENTITYEX_CAT"/>
+        <attributes>
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Add a @javax.persistence.Table annotation to the Cat2
+                class to map instances to the ENTITYEX_CAT table.</para>
+<programlisting language="java"><![CDATA[
+@javax.persistence.Entity
+@javax.persistence.Table(name="ENTITYEX_CAT")
+public class Cat2 {
+    private int id;
+]]></programlisting>
+            </listitem>
+
+
+            <listitem><para>Rebuild your module form the command line and observe the 
+                create schema generated for Cat and Cat2. Notice now that we have mapped
+                two entity classes to the same table using a custom table name.</para>
+<programlisting language=""><![CDATA[
+$ more target/classes/ddl/*
+...
+   create table ENTITYEX_CAT (
+        id integer not null,
+        dob timestamp,
+        name varchar(255),
+        weight double not null,
+        primary key (id)
+    );
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Map the id property for both the Cat and Cat2 to the CAT_ID
+                column. </para>
+<programlisting language="java"><![CDATA[
+    @javax.persistence.Id
+    @javax.persistence.Column(name="CAT_ID")
+    private int id;
+]]></programlisting>
+<programlisting language="xml"><![CDATA[
+    <entity class="myorg.entityex.mapped.Cat">
+        <table name="ENTITYEX_CAT"/>
+        <attributes>
+            <id name="id">
+                <column name="CAT_ID"/>
+            </id>
+        </attributes>
+    </entity>
+]]></programlisting>
+            </listitem>
+
+            <listitem><para>Make the name column mandatory (nullable=false) and 
+                define the length of the string to be 20 characters. Note that these
+                property assignments are only useful as documentation and generating
+                schema. Many of the column properties are not used at runtime by the 
+                provider.</para>
+<programlisting language="java"><![CDATA[
+    @javax.persistence.Column(nullable=false, length=20)
+    private String name;
+]]></programlisting>
+            </listitem>
+
+            <listitem><para></para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>
+            </listitem>
+
+        </orderedlist>
+    </section>
+
+    <section id="jpa-entityex-property-mapproperty">
+        <title>Map Entity Property to Specific Table Column</title>
+
+        <orderedlist>
+            <listitem><para></para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>
+            </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="jpa-entityex-property-constraints">
+        <title>Define Constraints for Properties</title>
+
+        <orderedlist>
+            <listitem><para></para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>
+            </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="jpa-entityex-property-methods">
+        <title>Alternately Use JPA Property Access</title>
 
         <orderedlist>
             <listitem><para></para>

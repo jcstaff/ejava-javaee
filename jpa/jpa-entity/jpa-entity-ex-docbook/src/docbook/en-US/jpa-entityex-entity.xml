@@ -350,13 +350,11 @@ Unable to configure EntityManagerFactory: No identifier specified for entity: my
             </listitem>
 
             <listitem><para>Since we want to use annotations for the new class, fix the issue by adding
-                a @javax.persistence.Id annotation to the id attribute.</para>
+                a @javax.persistence.Id annotation to the id attribute. This is called FIELD access in JPA.
+                You can alternately use PROPERTY access by moving the annotation to the getId() method.</para>
 <programlisting language="java"><![CDATA[
     @javax.persistence.Id
-    public int getId() { return id; }
-    public void setId(int id) {
-        this.id = id;
-    }
+    private int id;
 ]]></programlisting>                        
             </listitem>
 

@@ -9,4 +9,19 @@
         </attributes>
     </entity>
 
+    <entity class="myorg.entityex.mapped.Cat">
+        <table name="ENTITYEX_CAT"/>
+        <attributes>
+            <id name="id">
+                <column name="CAT_ID"/>
+            </id>
+            <basic name="name">
+                <column nullable="false" length="20"/>
+            </basic>
+            <basic name="dob">
+                <temporal>DATE</temporal>
+            </basic>
+        </attributes>
+    </entity>
+
 </entity-mappings>

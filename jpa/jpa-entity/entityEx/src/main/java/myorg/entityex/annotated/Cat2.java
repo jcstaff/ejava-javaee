@@ -3,15 +3,20 @@ package myorg.entityex.annotated;
 import java.util.Date;
 
 @javax.persistence.Entity
-public class Animal2 {
+@javax.persistence.Table(name="ENTITYEX_CAT")
+public class Cat2 {
 	@javax.persistence.Id
+	@javax.persistence.Column(name="CAT_ID")
 	private int id;
+	@javax.persistence.Column(nullable=false, length=20)
 	private String name;
+	@javax.persistence.Temporal(javax.persistence.TemporalType.DATE)
 	private Date dob;
+	@javax.persistence.Column(precision=3, scale=1)  //010.2lbs
 	private double weight;
 	
-	public Animal2() {} //must have default ctor
-	public Animal2(String name, Date dob, double weight) {
+	public Cat2() {} //must have default ctor
+	public Cat2(String name, Date dob, double weight) {
 		this.name = name;
 		this.dob = dob;
 		this.weight = weight;

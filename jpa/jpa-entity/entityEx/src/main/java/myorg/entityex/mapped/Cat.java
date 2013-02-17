@@ -1,17 +1,15 @@
-package myorg.entityex.annotated;
+package myorg.entityex.mapped;
 
 import java.util.Date;
 
-@javax.persistence.Entity
-public class Animal2 {
-	@javax.persistence.Id
+public class Cat {
 	private int id;
 	private String name;
 	private Date dob;
 	private double weight;
 	
-	public Animal2() {} //must have default ctor
-	public Animal2(String name, Date dob, double weight) {
+	public Cat() {} //must have default ctor
+	public Cat(String name, Date dob, double weight) {
 		this.name = name;
 		this.dob = dob;
 		this.weight = weight;
