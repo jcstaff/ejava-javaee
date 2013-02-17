@@ -72,12 +72,25 @@
             <listitem><para>Connect to URL <ulink url="http://127.0.1.1:8082">http://127.0.1.1:8082</ulink>
                 from a browser</para>
             </listitem>
-            <listitem><para>Use JDBC URL: jdbc:h2:tcp://127.0.0.1:9092/ejava</para></listitem>
+            <listitem><para>Use JDBC URL: jdbc:h2:tcp://127.0.0.1:9092/h2db/ejava;LOCK_MODE=0</para></listitem>
             <listitem><para>Log in as user "sa" and empty password</para></listitem>
         </itemizedlist>
         <note>
             <para>This will create a database folder called "ejava" relative to 
                 where you started the database server.</para>
+        </note>
+        <note>
+            <para>LOCK_MODE refers to how you want your connection impacted by other transactions in progress.
+            A normal application would want some isolation between transactions, but it is useful to have the 
+            UI be able to watch in-progress transactions (i.e., perform dirty reads).
+            The options include:</para>
+            <itemizedlist>
+                <listitem><para>0 - Read Uncommitted - transaction isolation disabled</para></listitem>
+                <listitem><para>1 - Serializable - database is (read and write) locked until transaction commits</para></listitem>
+                <listitem><para>3 - Read Committed (default) - read locks released after statement completes</para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
         </note>                   
     </section>
    
