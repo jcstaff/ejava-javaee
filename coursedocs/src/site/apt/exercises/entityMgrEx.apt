@@ -872,7 +872,7 @@ public class Auto implements Serializable {
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
 
-    <persistence-unit name="entityEx">
+    <persistence-unit name="entityMgrEx">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
         <properties>
@@ -1832,7 +1832,7 @@ main:
                                 <artifactId>hibernate3-maven-plugin</artifactId>
                                 <versionRange>[2.2,)</versionRange>
                                 <goals>
-                                  <goal>hbm2ddl</goal>
+                                  <goal>run</goal>
                                 </goals>
                               </pluginExecutionFilter>
                               <action>
@@ -2163,7 +2163,7 @@ $ mkdir ../jpa-parent
                                 <artifactId>hibernate3-maven-plugin</artifactId>
                                 <versionRange>[2.2,)</versionRange>
                                 <goals>
-                                  <goal>hbm2ddl</goal>
+                                  <goal>run</goal>
                                 </goals>
                               </pluginExecutionFilter>
                               <action>
