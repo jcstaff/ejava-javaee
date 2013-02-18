@@ -1,8 +1,13 @@
 package myorg.entityex.mapped;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class Cat {
+	private static final Log log = LogFactory.getLog(Cat.class);
 	private int id;
 	private String name;
 	private Date dob;
@@ -30,8 +35,12 @@ public class Cat {
 		this.dob = dob;
 	}
 	
-	public double getWeight() { return weight; }
-	public void setWeight(double weight) {
-		this.weight = weight;
+	public BigDecimal getWeight() {
+		log.debug("mapped.getWeight()");
+		return new BigDecimal(weight); 
+	}
+	public void setWeight(BigDecimal weight) {
+		log.debug("mapped.setWeight()");
+		this.weight = weight==null ? 0 : weight.doubleValue();
 	}
 }

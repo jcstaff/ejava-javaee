@@ -3,11 +3,15 @@ package myorg.entityex;
 import static org.junit.Assert.*;
 
 
+import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import myorg.entityex.annotated.Dog;
 import myorg.entityex.mapped.Animal;
 
 import org.apache.commons.logging.Log;
@@ -97,5 +101,49 @@ public class AnimalTest {
         em.flush(); //make sure all writes were issued to DB
         em.clear(); //purge the local entity manager entity cache to cause new instance
         assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));
+    }
+    
+    @Test
+    public void testCreateCatMapped() {
+    	log.info("testCreateCatMapped");
+    	myorg.entityex.mapped.Cat cat = new myorg.entityex.mapped.Cat("fluffy", null, 99.9);
+    	em.persist(cat);                                             //get provider to call getters
+    	em.flush(); em.detach(cat);
+    	cat = em.find(myorg.entityex.mapped.Cat.class, cat.getId()); //get provider to call setters
+    }
+
+    @Test
+    public void testCreateCatAnnotated() {
+    	log.info("testCreateCatAnnotated");
+    	myorg.entityex.annotated.Cat2 cat = new myorg.entityex.annotated.Cat2("fluffy", null, 99.9);
+    	em.persist(cat);                                                 //get provider to call getters
+    	em.flush(); em.detach(cat);
+    	cat = em.find(myorg.entityex.annotated.Cat2.class, cat.getId()); //get provider to call setters
+    }
+    
+    @Test
+    public void testEnums() {
+    	log.info("testEnums");
+    	Dog dog = new Dog()
+    		.setGender(Dog.Sex.FEMALE)
+    		.setColor(Dog.Color.MIX)
+    		.setBreed(Dog.Breed.SAINT_BERNARD);
+    	em.persist(dog);
+    	em.flush();
+    	
+    	//check the raw value stored in the database
+    	Object[] o = (Object[])em.createNativeQuery("select GENDER, COLOR, BREED from ENTITYEX_DOG where id=" + dog.getId())
+    			.getSingleResult();
+    	log.debug("cols=" + Arrays.toString(o));
+    	assertEquals("unexpected gender", Dog.Sex.FEMALE.ordinal(), ((Number)o[0]).intValue());
+    	assertEquals("unexpected color", Dog.Color.MIX.name(), ((String)o[1]));
+    	assertEquals("unexpected breed", Dog.Breed.SAINT_BERNARD.prettyName, ((String)o[2]));
+    	
+    	//get a new instance
+    	em.detach(dog);
+    	Dog dog2 = em.find(Dog.class, dog.getId());
+    	assertEquals("unexpected dog gender", dog.getGender(), dog2.getGender());
+    	assertEquals("unexpected dog color", dog.getColor(), dog2.getColor());
+    	assertEquals("unexpected dog breed", dog.getBreed(), dog2.getBreed());
     }
 }

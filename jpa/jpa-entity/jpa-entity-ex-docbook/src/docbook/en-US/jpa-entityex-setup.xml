@@ -6,6 +6,29 @@
         
     <section id="jpa-entityex-maven">
         <title>Setup Maven Project</title>
+        
+        <warning>
+            <para>The project created from this archetype has two mechanisms for managing schema;
+                maven plugin-based and entitymanager-based. Know that when you start this exercise
+                the two mechanisms may be both activated and competing (last one wins). One type may be
+                better for some usages while the other may be more helpful in others. Know which is
+                best to use in which circumstance and which one is active or turned off when encountering
+                a database setup issue.</para> 
+            <para>
+                The entitymanager mechanism is activated and deactivated through the 
+                hibernate.hbm2ddl.auto property in src/test/resources/hibernate.properties. Set to 
+                create to turn on or comment out to turn off. The maven plugin mechanism is turned 
+                activated by the sql-maven-plugin within the local pom.xml. You can either comment 
+                out the entire plugin, or comment out or mangle key sections of the plugin definition 
+                in order to turn off this capability.
+            </para>
+            <para>The entitymanager technique is useful when making quick schema changes to your 
+                entities within Eclipse but not as good if you want to preserve data for analysis.
+                The maven plugin technique is useful when you commonly build from maven after making
+                entity changes. It is also useful in generating schema that can be analyzed after the
+                build is complete. 
+            </para>
+        </warning>
              
         <itemizedlist>
             <listitem><para>Add the following to your .m2/settings.xml file. This will allow you to 

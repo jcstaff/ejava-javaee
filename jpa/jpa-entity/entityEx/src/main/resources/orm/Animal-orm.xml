@@ -14,12 +14,16 @@
         <attributes>
             <id name="id">
                 <column name="CAT_ID"/>
+                <generated-value/>
             </id>
             <basic name="name">
                 <column nullable="false" length="20"/>
             </basic>
             <basic name="dob">
                 <temporal>DATE</temporal>
+            </basic>
+            <basic name="weight" access="PROPERTY">
+                <column precision="3" scale="1"/>
             </basic>
         </attributes>
     </entity>
