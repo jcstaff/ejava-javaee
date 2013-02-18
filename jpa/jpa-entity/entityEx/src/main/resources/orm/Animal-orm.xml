@@ -27,5 +27,27 @@
             </basic>
         </attributes>
     </entity>
+    
+    <entity class="myorg.entityex.annotated.Bunny">
+        <sequence-generator name="animal-sequence-gen"
+            sequence-name="animal_sequence"/>
+        <table-generator name="animal-table-gen"
+            table="animal_sequences"
+            initial-value="3"
+            allocation-size="10"
+            pk-column-name="key"
+            pk-column-value="animals"
+            value-column-name="seq"/>
+        <attributes>
+            <id name="id">
+                <!-- 
+                <generated-value strategy="SEQUENCE"
+                    generator="animal-sequence-gen"/> 
+                 -->
+                <generated-value strategy="TABLE"
+                    generator="animal-table-gen"/> 
+            </id>
+        </attributes>
+    </entity>
 
 </entity-mappings>

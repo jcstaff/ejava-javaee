@@ -5,12 +5,15 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import myorg.entityex.annotated.Bunny;
 import myorg.entityex.annotated.Dog;
 import myorg.entityex.mapped.Animal;
 
@@ -145,5 +148,28 @@ public class AnimalTest {
     	assertEquals("unexpected dog gender", dog.getGender(), dog2.getGender());
     	assertEquals("unexpected dog color", dog.getColor(), dog2.getColor());
     	assertEquals("unexpected dog breed", dog.getBreed(), dog2.getBreed());
+    }
+    
+    @Test
+    public void testPKGen() {
+    	log.info("testPKGen");
+    	Bunny bunny = new Bunny();
+    	bunny.setName("fuzzy");
+    	assertTrue("primary key unexpectedly assigned", bunny.getId()==0);
+    	em.persist(bunny);
+    	em.flush();
+    	log.info("bunny.getId()=" + bunny.getId());
+    	assertFalse("primary key not assigned", bunny.getId()==0);
+    	
+    	Set<Integer> ids = new HashSet<Integer>();
+    	ids.add(bunny.getId());
+    	for (String name: new String[]{"peter", "march hare", "pat"}) {
+        	Bunny b = new Bunny();
+        	b.setName(name);
+        	em.persist(b);
+            em.flush();
+        	assertTrue("id not unique:" + b.getId(), ids.add(b.getId()));
+    	}
+    	log.debug("ids=" + ids);
     }
 }
