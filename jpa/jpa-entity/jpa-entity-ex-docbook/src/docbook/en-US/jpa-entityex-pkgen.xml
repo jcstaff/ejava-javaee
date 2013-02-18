@@ -2,7 +2,7 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="jpa-entityex-pkgen">
-    <title>JPA Entity Class Basics</title>
+    <title>Primary Key Generation</title>
     <para>This chapter will take you through the steps to setting up entity classes
         for three different primary key generation strategies:</para>
     <itemizedlist>
@@ -11,7 +11,7 @@
         <listitem><para>TABLE</para></listitem>
     </itemizedlist>
     <para>There is a fourth strategy called AUTO and is the default. Since the job of most
-        applications is to map to a known database schema, I woulkd not consider this to be
+        applications is to map to a known database schema, I would not consider this to be
         usable outside of quick prototypes like we went through in the previous sections. When
         using AUTO (the default), you are saying "I don't care what you do -- just get me a 
         primary key value" when you actually do care for production code. Fore this reason
