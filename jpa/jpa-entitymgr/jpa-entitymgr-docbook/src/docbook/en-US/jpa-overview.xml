@@ -98,7 +98,7 @@ public class Author implements Serializable {
         <itemizedlist>
             <listitem><para>Annotated as entity or declared in orm.xml</para></listitem>
             <listitem><para>Unique identity (form primary key(s))</para></listitem>
-            <listitem><para>Non-primary default constructor</para></listitem>
+            <listitem><para>Non-private default constructor</para></listitem>
         </itemizedlist>                   
     </section>
     
@@ -117,6 +117,7 @@ log.debug("em.contains(author)=" + em.contains(author));
 em.persist(author);
 log.debug("created author:" + author);        
 assertTrue("missing id", author.getId() > 0);
+log.debug("em.contains(author)=" + em.contains(author));
 ]]></programlisting>
 
         <programlisting language=""><![CDATA[

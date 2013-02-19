@@ -1,6 +1,7 @@
 package ejava.examples.orm.core.annotated;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.*;
 
@@ -22,7 +23,7 @@ public class Car implements Serializable {
     private String make;
     private String model;
     private int year;
-    private double cost;
+    private BigDecimal cost;
     
     public Car() {}
     public Car(long id) { this.id = id; }
@@ -67,11 +68,11 @@ public class Car implements Serializable {
         this.year = year;
     }
     
-    @Column(name="CAR_COST", scale=7, precision=2)
-    public double getCost() {
+    @Column(name="CAR_COST", precision=7, scale=2)
+    public BigDecimal getCost() {
         return cost;
     }
-    public void setCost(double cost) {
+    public void setCost(BigDecimal cost) {
         this.cost = cost;
     }
 
