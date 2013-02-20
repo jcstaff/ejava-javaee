@@ -283,5 +283,48 @@
 	      	</pluginManagement>
            </build>
         </profile>
+
+        <profile>
+            <id>webdev-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>webdev.website</id>
+                    <name>ejava JHU webdev website</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/ejava-javaee</url>
+                </site>
+                <repository>
+                    <id>webdev.repository</id>
+                    <name>ejava JHU repository</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/maven2</url>
+                </repository>
+                <snapshotRepository>
+                    <id>webdev.snapshot.repo</id>
+                    <name>ejava JHU snapshot repository</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>test-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>webdev.website</id>
+                    <name>ejava JHU webdev website</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/ejava-javaee</url>
+                </site>
+                <repository>
+                    <id>webdev.repository</id>
+                    <name>ejava JHU repository</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2</url>
+                </repository>
+                <snapshotRepository>
+                    <id>webdev.snapshot.repo</id>
+                    <name>ejava JHU snapshot repository</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
     </profiles>
 </project>
