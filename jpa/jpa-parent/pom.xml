@@ -45,6 +45,7 @@
         <junit.version>4.10</junit.version>
         <log4j.version>1.2.13</log4j.version>
         <slf4j.version>1.6.1</slf4j.version>
+        <wagon-ssh-external.version>2.2</wagon-ssh-external.version>
     </properties>
 
     <dependencyManagement>
@@ -83,6 +84,13 @@
     </dependencyManagement>
 
     <build>
+        <extensions> <!-- needed for site deploy over scp -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>${wagon-ssh-external.version}</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                   <!-- make sure we are building java6 -->
