@@ -2,11 +2,10 @@ package myorg.entityex;
 
 import static org.junit.Assert.*;
 
-
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -15,6 +14,7 @@ import javax.persistence.Persistence;
 
 import myorg.entityex.annotated.Bunny;
 import myorg.entityex.annotated.Dog;
+import myorg.entityex.annotated.Horse;
 import myorg.entityex.mapped.Animal;
 
 import org.apache.commons.logging.Log;
@@ -171,5 +171,30 @@ public class AnimalTest {
         	assertTrue("id not unique:" + b.getId(), ids.add(b.getId()));
     	}
     	log.debug("ids=" + ids);
+    }
+    
+    @Test 
+    public void testLob() {
+    	log.info("testLob");
+    	//create our host object with Lob objects
+    	Horse horse = new Horse();
+    	horse.setName("Mr. Ed");
+    	horse.setDescription("There once was a horse of course and his name was Mr. Ed...");
+    	horse.setHistory("Mister Ed is a fictional talking horse residing in Mount Kisco, New York,...".toCharArray());
+	    	byte[] picture = new byte[10*1000];
+	    	new Random().nextBytes(picture);
+    	horse.setPhoto(picture);
+	    	Horse.Jockey jockey = new Horse.Jockey();
+	    	jockey.setName("Wilbur Post");
+    	horse.setJockey(jockey);
+    	em.persist(horse);
+    	
+    	//flush to DB and get a new instance
+    	em.flush(); em.detach(horse);
+    	Horse horse2 = em.find(Horse.class, horse.getId());
+    	assertEquals("unexpected description", horse.getDescription(), horse2.getDescription());
+    	assertTrue("unexpected history", Arrays.equals(horse.getHistory(), horse2.getHistory()));
+    	assertTrue("unexpected photo", Arrays.equals(horse.getPhoto(), horse2.getPhoto()));
+    	assertEquals("unexpected jockey", horse.getJockey().getName(), horse2.getJockey().getName());
     }
 }
