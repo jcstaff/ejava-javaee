@@ -63,6 +63,12 @@ public class Horse {
 ]]></programlisting>                        
             </listitem>
         
+            <listitem><para>Add the new class to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.entityex.annotated.Horse</class>
+]]></programlisting>                        
+            </listitem>
+        
             <listitem><para>Build the module and observe the database schema that is created.
                 Note that all of our string and char[] properties are being mapped to a varchar.</para>
 <programlisting language=""><![CDATA[

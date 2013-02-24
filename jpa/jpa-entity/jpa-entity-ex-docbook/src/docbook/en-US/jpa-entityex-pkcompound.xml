@@ -1,0 +1,388 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entityex-pkcompound">
+    <title>Mapping Compound Primary Keys</title>
+    <para>This chapter will take you through mapping a set of two or more 
+       natural fields as a compound primary key. Nothing is being generated 
+       with natural/compound keys. We are combining multiple fields to 
+       represent the object's identity.</para>
+    <para>A compound primary key is required to...</para>
+    <itemizedlist>
+        <listitem><para>Be Serializable</para></listitem>
+        <listitem><para>Have a default constructor (either built-in or declared)</para></listitem>
+        <listitem><para>Supply a hash() and equals() method</para></listitem>
+        <listitem><para>Provide public access to </para></listitem>
+    </itemizedlist>
+
+    <section id="jpa-entityex-pkcompound-embedded">
+        <title>Using Embedded Compound Primary Keys</title>
+        <para>Embedded compound primary keys are primary key classes that are
+            integrated into the using class in its aggregate form. The using
+            class makes only a reference to the primary key class and not to 
+            any of the primary key class properties.
+        </para>
+
+        <orderedlist>
+        
+            <listitem><para>Create an instance of the following JPA primary key 
+                class in your src/main tree.</para>
+<programlisting language="java"><![CDATA[
+package myorg.entityex.annotated;
+
+import java.io.Serializable;
+import javax.persistence.*;
+
+@Embeddable
+public class CowPK implements Serializable { //required to be Serializable
+    private static final long serialVersionUID = 1L;
+    private String herd;
+    private String name;
+    
+    public CowPK(){} //required default ctor
+    public CowPK(String herd, String name) {
+        this.herd = herd;
+        this.name = name;
+    };
+    
+    public String getHerd() { return herd; }
+    public String getName() { return name; }
+    
+    @Override
+    public int hashCode() { //required hashCode method
+        return herd.hashCode() + name.hashCode();
+    } 
+    
+    @Override
+    public boolean equals(Object obj) { //required equals method
+        try {
+            return herd.equals(((CowPK)obj).herd) && 
+                    name.equals(((CowPK)obj).name);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+}
+]]></programlisting>
+                <para>Note the class is...</para>
+                <itemizedlist>
+                    <listitem><para>Annotated as @Embeddable</para></listitem>
+                    <listitem><para>Implement Serializable</para></listitem>
+                    <listitem><para>Provide a default constructor</para></listitem>
+                    <listitem><para>Provides overrides for hashCode and equals</para></listitem>
+                    <listitem><para>Provides attributes that will be used for the primary key fields</para></listitem>
+                </itemizedlist>                        
+                <para>Note the class also...</para>
+                <itemizedlist>
+                    <listitem><para>Optionally implemented a convenience constructor</para></listitem>
+                    <listitem><para>Optionally removed the setter methods so the primary 
+                        key fields could not be accidentally changed</para></listitem>
+                </itemizedlist>                        
+            </listitem>
+
+            <listitem><para>Add the following entity class to the src/main tree. This class
+                will declare an @EmbdeddedId and no @Id property. It will also use FIELD
+                level access to properties.</para>
+<programlisting language="java"><![CDATA[
+package myorg.entityex.annotated;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name="ENITYEX_COW")
+public class Cow {
+    @EmbeddedId
+    private CowPK pk;
+    private int weight;
+
+    public Cow() {}
+    public Cow(CowPK cowPK) {
+        this.pk = cowPK;
+    }
+    
+    public CowPK getPk() { return pk; }
+    public void setPk(CowPK pk) {
+        this.pk = pk;
+    }
+    
+    public int getWeight() { return weight; }
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+}
+]]></programlisting>
+                <para>Note the entity class makes wholesale use of the embedded primary key class
+                    and is not required to have any interaction with the properties of the 
+                    embedded class.</para>                        
+            </listitem>
+
+            <listitem><para>Add the new entity class to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.entityex.annotated.Cow</class>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Build the module with the new entity and primary key class. Note the 
+                schema that is produced. The herd and name from the primary key class have been
+                integrated into the using class' table.</para>
+<programlisting language=""><![CDATA[
+    create table Cow (
+        herd varchar(255) not null,
+        name varchar(255) not null,
+        weight integer not null,
+        primary key (herd, name)
+    );
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Notice in the above database schema that the ID columns are set
+                to their default values. We can set the properties from either the primary
+                key class or within the using entity class. Add the following to your two
+                classes to help define the database columns used by the primary key class.</para>
+<programlisting language="java"><![CDATA[
+    @Column(name="HERD", length=16)
+    private String herd;
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[
+    @EmbeddedId
+    @AttributeOverrides({
+        @AttributeOverride(name="name", column=@Column(name="NAME", length=16))
+    })
+    private CowPK pk;
+]]></programlisting>
+                <para>Note the technique used for the "herd" is to annotate the property directly
+                    within the primary key class. This is useful when the primary key class is
+                    dedicated for use by a single entity class or the annotations are common
+                    across entity classes. The technique used for "name" is to annotate the 
+                    primary key property of the entity class using an @AttributeOverrride. Note 
+                    there can only be a single @AnnotationOverride per property -- so we show
+                    the use of the @AttrinbuteOverrides({}) annotation to hold one or more 
+                    @AttributeOverride elements.</para>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module and note the generated database schema produced.
+                The herd and name columns have been constrained to 16 characters. The names of 
+                the columns are also showing up as CAPITALIZED since that is how we typed them
+                in the @Column.name mapping.</para>
+<programlisting language=""><![CDATA[
+    create table Cow (
+        HERD varchar(16) not null,
+        NAME varchar(16) not null,
+        weight integer not null,
+        primary key (HERD, NAME)
+    );
+]]></programlisting>                        
+            </listitem>
+
+
+            <listitem><para>Add the following test method to your JUnit test case</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testEmbeddedId() {
+        log.info("testEmbedded");
+        Cow cow = new Cow(new CowPK("Ponderosa", "Bessie"));
+        cow.setWeight(900);
+        em.persist(cow);
+        
+        //flush to DB and get a new instance
+        em.flush(); em.detach(cow);
+        Cow cow2 = em.find(Cow.class, new CowPK("Ponderosa", "Bessie"));
+        assertNotNull("cow not found", cow2);
+        assertEquals("unexpected herd", cow.getPk().getHerd(), cow2.getPk().getHerd());
+        assertEquals("unexpected name", cow.getPk().getName(), cow2.getPk().getName());
+        assertEquals("unexpected weight", cow.getWeight(), cow2.getWeight());       
+    }
+]]></programlisting>
+                <para>Note how an instance of the compound primary key class is passed
+                     to the find() method to locate the entity class by primary key.</para>
+            </listitem>
+
+            <listitem><para>Rebuild and test your module with the new test method in place.
+               You should notice the following information within the database when complete.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Ph2srv -P\!h2db
+...
+ -testEmbedded
+Hibernate: 
+    insert 
+    into
+        ENITYEX_COW
+        (weight, HERD, NAME) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    select
+        cow0_.HERD as HERD5_0_,
+        cow0_.NAME as NAME5_0_,
+        cow0_.weight as weight5_0_ 
+    from
+        ENITYEX_COW cow0_ 
+    where
+        cow0_.HERD=? 
+        and cow0_.NAME=?
+...
+[INFO] BUILD SUCCESS
+
+
+SELECT * FROM ENITYEX_COW;
+HERD    NAME    WEIGHT  
+Ponderosa   Bessie  900
+]]></programlisting>                        
+            </listitem>
+
+        </orderedlist>
+        
+        <para>In this section you have modeled an embedded class as a compound primary key 
+            class that has encapsulated all properties within the primary key class.</para>
+    </section>
+
+    <section id="jpa-entityex-pkcompound-idclass">
+        <title>Using Compound Primary Keys as IdClass</title>
+        <para>In this section we will address the case were the entity class wishes
+            to module one or more of the primary key properties as direct properties 
+            of the entity class.</para>
+
+        <orderedlist>
+        
+            <listitem><para>Put the following entity class in place in your src/main tree.</para>
+<programlisting language="java"><![CDATA[
+package myorg.entityex.annotated;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name="ENITYEX_COW2")
+@IdClass(CowPK.class)
+@AttributeOverrides({
+    @AttributeOverride(name="name", column=@Column(name="NAME", length=16)) 
+})
+public class Cow2 {
+    @Id
+    private String herd;
+    @Id
+    private String name;
+    private int weight;
+
+    public Cow2() {}
+    public Cow2(String herd, String name) {
+        this.herd = herd;
+        this.name = name;
+    }
+    
+    public String getHerd() { return herd; }
+    public String getName() { return name; }
+
+    public int getWeight() { return weight; }
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+}
+]]></programlisting>
+                <para>Note this class...</para>
+                <itemizedlist>
+                    <listitem><para>Declares the primary key class as an @IdClass</para></listitem>
+                    <listitem><para>Identifies two properties as @Id properties and these must match
+                        the properties of the primary key class.</para></listitem>
+                </itemizedlist>                        
+                <para>This class also happens to...</para>
+                <itemizedlist>                        
+                    <listitem><para>Provide a custom override of the "name" primary key property using @AttributeOverride
+                        at the class level.</para></listitem>
+                    <listitem><para>Provides read-only access to the primary key values by only supplying getters</para></listitem>
+                </itemizedlist>                        
+            </listitem>
+
+            <listitem><para>Add the new entity class to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.entityex.annotated.Cow2</class>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Build the module and not the generated database schema is identical to the
+                embedded primary key mapping we created in the previous section).</para>
+<programlisting language=""><![CDATA[
+    create table ENITYEX_COW2 (
+        HERD varchar(16) not null,
+        NAME varchar(16) not null,
+        weight integer not null,
+        primary key (HERD, NAME)
+    );
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the following test method for the new entity class to your 
+                existing Junit test case.</para>
+<programlisting language=""><![CDATA[
+    @Test
+    public void testIdClass() {
+        log.info("testIdClass");
+        Cow2 cow = new Cow2("Ponderosa", "Bessie");
+        cow.setWeight(900);
+        em.persist(cow);
+        
+        //flush to DB and get a new instance
+        em.flush(); em.detach(cow);
+        Cow2 cow2 = em.find(Cow2.class, new CowPK("Ponderosa", "Bessie"));
+        assertNotNull("cow not found", cow2);
+        assertEquals("unexpected herd", cow.getHerd(), cow2.getHerd());
+        assertEquals("unexpected name", cow.getName(), cow2.getName());
+        assertEquals("unexpected weight", cow.getWeight(), cow2.getWeight());       
+    }
+]]></programlisting>
+                <para>Note how the use of the primary key is the same when interfacing with the 
+                    entitymanager. The only real difference is that the entity deals directly with
+                    the properties of the primary key class and not the primary key class itself.</para>                        
+            </listitem>
+
+            <listitem><para>Rebuild the module with the new test method. You should get the 
+                following in the database when complete.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Ph2srv -P\!h2db
+...
+ -testIdClass
+Hibernate: 
+    insert 
+    into
+        ENITYEX_COW2
+        (weight, HERD, NAME) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    select
+        cow2x0_.HERD as HERD6_0_,
+        cow2x0_.NAME as NAME6_0_,
+        cow2x0_.weight as weight6_0_ 
+    from
+        ENITYEX_COW2 cow2x0_ 
+    where
+        cow2x0_.HERD=? 
+        and cow2x0_.NAME=?
+...
+[INFO] BUILD SUCCESS
+
+
+SELECT * FROM ENITYEX_COW2;
+HERD    NAME    WEIGHT  
+Ponderosa   Bessie  900
+]]></programlisting>                        
+            </listitem>
+
+        </orderedlist>
+        <para>In this section you successfully mapped a compound primary key class
+           as an IdClass for an entity where multiple @Id properties were directly
+           exposed by the entity. The IdClass declared properties that were identical
+           to the number and name of @Id properties within the entity class.</para>
+    </section>
+
+    <section id="jpa-entityex-pkcompound-summary">
+       <title>Summary</title>
+       <para>In this chapter we worked with primary keys made up of multiple values.
+          There were two styles of usage for the primary key class; embedded and idclass.
+          For the embedded case, the entity worked with the primary key class directly and
+          never the primary key class properties. In the idclass case, the entity class
+          declared properties that matched the idclass (or vice-versa) but never interacted
+          with the primary key class. We showed how both mappings to the database were 
+          identical and how to define custom mappings for the targeted database schema.</para>
+    </section>    
+</chapter>
+  

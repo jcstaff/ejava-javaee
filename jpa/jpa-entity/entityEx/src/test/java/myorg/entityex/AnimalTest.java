@@ -13,6 +13,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import myorg.entityex.annotated.Bunny;
+import myorg.entityex.annotated.Cow;
+import myorg.entityex.annotated.Cow2;
+import myorg.entityex.annotated.CowPK;
 import myorg.entityex.annotated.Dog;
 import myorg.entityex.annotated.Horse;
 import myorg.entityex.mapped.Animal;
@@ -196,5 +199,37 @@ public class AnimalTest {
     	assertTrue("unexpected history", Arrays.equals(horse.getHistory(), horse2.getHistory()));
     	assertTrue("unexpected photo", Arrays.equals(horse.getPhoto(), horse2.getPhoto()));
     	assertEquals("unexpected jockey", horse.getJockey().getName(), horse2.getJockey().getName());
+    }
+    
+    @Test
+    public void testEmbeddedId() {
+    	log.info("testEmbedded");
+    	Cow cow = new Cow(new CowPK("Ponderosa", "Bessie"));
+    	cow.setWeight(900);
+    	em.persist(cow);
+    	
+    	//flush to DB and get a new instance
+    	em.flush(); em.detach(cow);
+    	Cow cow2 = em.find(Cow.class, new CowPK("Ponderosa", "Bessie"));
+    	assertNotNull("cow not found", cow2);
+    	assertEquals("unexpected herd", cow.getPk().getHerd(), cow2.getPk().getHerd());
+    	assertEquals("unexpected name", cow.getPk().getName(), cow2.getPk().getName());
+    	assertEquals("unexpected weight", cow.getWeight(), cow2.getWeight());    	
+    }
+    
+    @Test
+    public void testIdClass() {
+    	log.info("testIdClass");
+    	Cow2 cow = new Cow2("Ponderosa", "Bessie");
+    	cow.setWeight(900);
+    	em.persist(cow);
+    	
+    	//flush to DB and get a new instance
+    	em.flush(); em.detach(cow);
+    	Cow2 cow2 = em.find(Cow2.class, new CowPK("Ponderosa", "Bessie"));
+    	assertNotNull("cow not found", cow2);
+    	assertEquals("unexpected herd", cow.getHerd(), cow2.getHerd());
+    	assertEquals("unexpected name", cow.getName(), cow2.getName());
+    	assertEquals("unexpected weight", cow.getWeight(), cow2.getWeight());    	
     }
 }
