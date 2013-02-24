@@ -3,6 +3,7 @@ package myorg.entityex.annotated;
 import javax.persistence.*;
 
 @Entity
+@Table(name="ENTITYEX_BEAR")
 public class Bear {
 	@Embeddable
 	public static class Name {

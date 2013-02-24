@@ -13,6 +13,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import myorg.entityex.annotated.Bear;
+import myorg.entityex.annotated.Bear2;
 import myorg.entityex.annotated.Bunny;
 import myorg.entityex.annotated.Cow;
 import myorg.entityex.annotated.Cow2;
@@ -258,5 +259,32 @@ public class AnimalTest {
     			bear.getAddress().getCity(), bear2.getAddress().getCity());
     	assertEquals("unexpected state", 
     			bear.getAddress().getState(), bear2.getAddress().getState());
+    }
+    
+    @Test
+    public void testMultiTableMapping() {
+    	log.info("testMultiTableMapping");
+    	Bear2 bear = new Bear2()
+    		.setFirstName("Yogi")
+    		.setLastName("Bear")
+    		.setStreetNumber(1)
+    		.setStreetName("Picnic")
+    		.setCity("Jellystone Park")
+    		.setState("???");
+    	em.persist(bear);
+    	
+    	//flush to DB and get a new instance
+    	em.flush(); em.detach(bear);
+    	Bear2 bear2 = em.find(Bear2.class, bear.getId());
+    	assertEquals("unexpected firstName", bear.getFirstName(), bear2.getFirstName());
+    	assertEquals("unexpected lastName", bear.getLastName(), bear2.getLastName());
+    	assertEquals("unexpected street number", 
+    			bear.getStreetNumber(), bear2.getStreetNumber());
+    	assertEquals("unexpected street name", 
+    			bear.getStreetName(), bear2.getStreetName());
+    	assertEquals("unexpected city", 
+    			bear.getCity(), bear2.getCity());
+    	assertEquals("unexpected state", 
+    			bear.getState(), bear2.getState());
     }
 }
