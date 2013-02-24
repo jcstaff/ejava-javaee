@@ -6,49 +6,12 @@
         
     <section id="jpa-entityex-maven">
         <title>Setup Maven Project</title>
+        <para>The setup for this exercise will use a maven archetype process to build you the 
+           shell of a JPA module to perform these exercises. The module can be created
+           anywhere, but if you create it within a directory that already has a pom.xml,
+           the archetype will attempt to integrate the new module as a sub-module of the 
+           existing parent.</para>
         
-        <warning>
-            <para>The project created from this archetype has two mechanisms for managing schema;
-                maven plugin-based and entitymanager-based. Know that when you start this exercise
-                the two mechanisms may be both activated and competing (last one wins). One type may be
-                better for some usages while the other may be more helpful in others. Know which is
-                best to use in which circumstance and which one is active or turned off when encountering
-                a database setup issue.</para> 
-            <para>
-                The entitymanager mechanism is activated and deactivated through the 
-                hibernate.hbm2ddl.auto property in src/test/resources/hibernate.properties. Set to 
-                create to turn on or comment out to turn off. 
-            </para>
-<programlisting language=""><![CDATA[
-# src/test/resources/hibernate.properties 
-...
-#hibernate.hbm2ddl.auto=create
-]]></programlisting>                        
-            <para>
-                The maven plugin mechanism is turned 
-                activated by the sql-maven-plugin within the local pom.xml. You can either comment 
-                out the entire plugin, or comment out or mangle key sections of the plugin definition 
-                in order to turn off this capability.
-            </para>
-<programlisting language=""><![CDATA[
-# pom.xml
-                        <!-- runs schema against the DB  
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>sql-maven-plugin</artifactId>
-                        ...        
-                    </plugin>
-                             -->
-]]></programlisting>                        
-            
-            <para>The entitymanager technique is useful when making quick schema changes to your 
-                entities within Eclipse but not as good if you want to preserve data for analysis.
-                The maven plugin technique is useful when you commonly build from maven after making
-                entity changes. It is also useful in generating schema that can be analyzed after the
-                build is complete. 
-            </para>
-        </warning>
-             
         <itemizedlist>
             <listitem><para>Add the following to your .m2/settings.xml file. This will allow you to 
                 resolve the exercise archetype and set a default database for the exercise.</para>
@@ -96,59 +59,45 @@
  <programlisting language=""><![CDATA[
 $ mvn archetype:generate -B \
 -DarchetypeGroupId=ejava.jpa -DarchetypeArtifactId=jpa-archetype \
--DgroupId=myorg.entityex -DartifactId=entityEx \
+-DgroupId=myorg.relex -DartifactId=relationEx \
 -Pwebdev-repositories
 
+...
 [INFO] Scanning for projects...
-[INFO]                                                                         
-[INFO] ------------------------------------------------------------------------
-[INFO] Building JPA Entity 3.0.2013.1-SNAPSHOT
-[INFO] ------------------------------------------------------------------------
-[INFO] 
-[INFO] >>> maven-archetype-plugin:2.2:generate (default-cli) @ jpa-entity >>>
-[INFO] 
-[INFO] <<< maven-archetype-plugin:2.2:generate (default-cli) @ jpa-entity <<<
-[INFO] 
-[INFO] --- maven-archetype-plugin:2.2:generate (default-cli) @ jpa-entity ---
-[INFO] Generating project in Batch mode
-[INFO] Archetype [ejava.jpa:jpa-archetype:3.0.2013.1-SNAPSHOT] found in catalog local
+...
 [INFO] ----------------------------------------------------------------------------
 [INFO] Using following parameters for creating project from Archetype: jpa-archetype:3.0.2013.1-SNAPSHOT
 [INFO] ----------------------------------------------------------------------------
-[INFO] Parameter: groupId, Value: myorg.entityex
-[INFO] Parameter: artifactId, Value: entityEx
+[INFO] Parameter: groupId, Value: myorg.relex
+[INFO] Parameter: artifactId, Value: relationEx
 [INFO] Parameter: version, Value: 1.0-SNAPSHOT
-[INFO] Parameter: package, Value: myorg.entityex
-[INFO] Parameter: packageInPathFormat, Value: myorg/entityex
+[INFO] Parameter: package, Value: myorg.relex
+[INFO] Parameter: packageInPathFormat, Value: myorg/relex
 [INFO] Parameter: version, Value: 1.0-SNAPSHOT
-[INFO] Parameter: package, Value: myorg.entityex
-[INFO] Parameter: groupId, Value: myorg.entityex
-[INFO] Parameter: artifactId, Value: entityEx
-[INFO] Parent element not overwritten in /home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-entity/entityEx/pom.xml
-[INFO] project created from Archetype in dir: /home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-entity/entityEx
+[INFO] Parameter: package, Value: myorg.relex
+[INFO] Parameter: groupId, Value: myorg.relex
+[INFO] Parameter: artifactId, Value: relationEx
+[INFO] Parent element not overwritten in /home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-relation/relationEx/pom.xml
+[INFO] project created from Archetype in dir: /home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-relation/relationEx
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 5.535s
-[INFO] Finished at: Sat Feb 09 23:04:10 EST 2013
-[INFO] Final Memory: 15M/59M
 [INFO] ------------------------------------------------------------------------
 ]]></programlisting>
             </listitem>
             <listitem><para>You should now have an instantiated template for a JPA project</para>
 <programlisting language=""><![CDATA[
-entityEx/
+relationEx/
 ├── pom.xml
 └── src
     ├── main
     │   └── java
     │       └── myorg
-    │           └── entityex
+    │           └── relex
     │               └── Auto.java
     └── test
         ├── java
         │   └── myorg
-        │       └── entityex
+        │       └── relex
         │           └── AutoTest.java
         └── resources
             ├── hibernate.properties
