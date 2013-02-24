@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import myorg.entityex.annotated.Bear;
 import myorg.entityex.annotated.Bunny;
 import myorg.entityex.annotated.Cow;
 import myorg.entityex.annotated.Cow2;
@@ -231,5 +232,31 @@ public class AnimalTest {
     	assertEquals("unexpected herd", cow.getHerd(), cow2.getHerd());
     	assertEquals("unexpected name", cow.getName(), cow2.getName());
     	assertEquals("unexpected weight", cow.getWeight(), cow2.getWeight());    	
+    }
+    
+    @Test
+    public void testEmbeddedObject() {
+    	log.info("testEmbeddedObject");
+    	Bear bear = new Bear();
+    	bear.setName(new Bear.Name().setFirstName("Yogi").setLastName("Bear"));
+    	bear.setAddress(new Bear.Address()
+    		.setCity("Jellystone Park")
+    		.setState("???")
+    	    .setStreet(new Bear.Street().setNumber(1).setName("Picnic")));
+    	em.persist(bear);
+    	
+    	//flush to DB and get a new instance
+    	em.flush(); em.detach(bear);
+    	Bear bear2 = em.find(Bear.class, bear.getId());
+    	assertEquals("unexpected firstName", bear.getName().getFirstName(), bear2.getName().getFirstName());
+    	assertEquals("unexpected lastName", bear.getName().getLastName(), bear2.getName().getLastName());
+    	assertEquals("unexpected street number", 
+    			bear.getAddress().getStreet().getNumber(), bear2.getAddress().getStreet().getNumber());
+    	assertEquals("unexpected street name", 
+    			bear.getAddress().getStreet().getName(), bear2.getAddress().getStreet().getName());
+    	assertEquals("unexpected city", 
+    			bear.getAddress().getCity(), bear2.getAddress().getCity());
+    	assertEquals("unexpected state", 
+    			bear.getAddress().getState(), bear2.getAddress().getState());
     }
 }
