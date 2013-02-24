@@ -3,6 +3,8 @@ package myorg.entityex;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Random;
@@ -20,6 +22,7 @@ import myorg.entityex.annotated.Cow2;
 import myorg.entityex.annotated.CowPK;
 import myorg.entityex.annotated.Dog;
 import myorg.entityex.annotated.Horse;
+import myorg.entityex.annotated.Shark;
 import myorg.entityex.mapped.Animal;
 
 import org.apache.commons.logging.Log;
@@ -127,6 +130,22 @@ public class AnimalTest {
     	em.persist(cat);                                                 //get provider to call getters
     	em.flush(); em.detach(cat);
     	cat = em.find(myorg.entityex.annotated.Cat2.class, cat.getId()); //get provider to call setters
+    }
+
+    @Test
+    public void testTemporal() {
+    	log.info("testTemporal");
+    	Shark shark = new Shark()
+    		.setDate(new GregorianCalendar(1776, Calendar.JULY, 4))
+    		.setTime(new Date())
+    		.setTimestamp(new Date());
+    	em.persist(shark);
+    	log.info("initial object=" + shark);
+    	
+    	//flush commands to DB and get new instance
+    	em.flush(); em.detach(shark);
+    	Shark shark2 = em.find(Shark.class, shark.getId());
+    	log.info("object from DB=" + shark2);
     }
     
     @Test
@@ -287,4 +306,5 @@ public class AnimalTest {
     	assertEquals("unexpected state", 
     			bear.getState(), bear2.getState());
     }
+    
 }
