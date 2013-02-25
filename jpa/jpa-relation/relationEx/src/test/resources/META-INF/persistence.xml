@@ -14,8 +14,8 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
         <class>myorg.relex.Auto</class>
-        <properties>
-           <!-- defined in src/test/resources/hibernate.properties -->
-        </properties>
+        <class>myorg.relex.one2one.Person</class>
+        <class>myorg.relex.one2one.Player</class>
+        <class>myorg.relex.one2one.Employee</class>
     </persistence-unit>            
 </persistence>
