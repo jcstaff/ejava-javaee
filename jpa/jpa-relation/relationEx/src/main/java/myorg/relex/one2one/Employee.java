@@ -11,18 +11,17 @@ import javax.persistence.*;
 @Entity
 @Table(name="RELATIONEX_EMPLOYEE")
 public class Employee {
-	//@Id
-	//private int id;
+	@Id
+	private int id;
 	@Temporal(TemporalType.DATE)
 	private Date hireDate;
 	
 	@OneToOne(optional=false,fetch=FetchType.LAZY)
 	//@PrimaryKeyJoinColumn
-	//@MapsId
-	@Id
+	@MapsId
 	private Person person;
 	
-	//public int getId() { return id; }
+	public int getId() { return id; }
 
 	public Person getPerson() { return person; }
 	public Employee setPerson(Person person) {
