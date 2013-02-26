@@ -57,7 +57,7 @@ public class One2OneTest extends JPATestBase {
         
         //clear the persistence context and get new instances
         em.flush(); em.clear();
-        Employee employee2 = em.find(Employee.class, employee.getId());
+        Employee employee2 = em.find(Employee.class, employee.getPerson().getId());
         assertEquals("unexpected name", employee.getPerson().getName(), employee2.getPerson().getName());
         
         //remove the objects and flush commands to the database
@@ -65,6 +65,6 @@ public class One2OneTest extends JPATestBase {
         em.remove(employee2.getPerson());
         em.flush();
         assertNull("person not deleted", em.find(Employee.class, employee.getPerson().getId()));
-        assertNull("player not deleted", em.find(Player.class, employee.getId()));
+        assertNull("player not deleted", em.find(Player.class, employee.getPerson().getId()));
     }
 }
