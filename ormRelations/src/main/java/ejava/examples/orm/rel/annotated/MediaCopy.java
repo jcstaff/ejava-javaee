@@ -30,38 +30,15 @@ import ejava.examples.orm.rel.MediaCopyPK;
  *     ...
  * </pre>
  * 
- * The composite primary key is based on mediaId and copyNo. However, the 
- * mediaId is derived from the assigned media object from the ManyToOne 
- * relationship. That means that the interface to this class wants to use
- * set(media, copyNo) and primary key processing wants to use 
- * set(mediaId, copyNo). The way around this was two mappings related to
- * media; mediaId is defined as an @Id field mapped to a MEDIACOPY_MID column.
- * media is defined as a @ManyToOne field and also mapped to the MEDIACOPY_MID
- * column. That means when one is set, both uses of the field are set. <p/>
+ * The MediaCopy now has two uses for the MEDIACOPY_MID column. One as a primary
+ * key (part of a compound primary key) and the other as the foreign key to the Media.
+ * We need to make sure the provider preserves the semantics of the primary key while
+ * reusing it from the foreign key.
  * 
- * This sounds fine, but there are two things that may go wrong. The first is
- * that we need to make sure that the dual setMediaId() and setMedia() don't 
- * try to modify the primary key field (with what would be the exact same 
- * value) after it has been initially set. The second is probably a side-effect 
- * of the first; JBoss ignores the common column mapping and creates a 
- * unique column name for MEDIAID, separate from MEDIACOPY_MID.<p/>
- * 
- * The net result is we do one of the following: honor a legacy DB schema of 
- * mediaId/copyNo or honor Java interface semantics of media/copyNo. The 
- * way to do the first is to mark media as @Transient. That means the value
- * has a chance of being null unless it is repaired by the DAO. The way to
- * do the second is to mark the field as @ManyToOne. That means we may get an
- * extra DB column for this field or stand a chance at an illegal double set
- * of a primary key field.<p/>
- * 
- * Since this is part of a @ManyToOne demo, we will allow the DB schema to
- * augmented. @JoinColumn versus @PrimaryKeyJoinColum was used to map the
- * local MEDIACOPY_MID to the primary key of the Media object. This was done
- * so we could have better control over the semantics of the MEDIACOPY_MID
- * column; which didn't seem to be set correct when using the other approach.
- * We want it to be required and not updatable.
- *
- * @author jcstaff
+ * This implementation will use the JPA 1.0 technique of mapping both the 
+ * primary and foreign key properties to the same column and then mark the 
+ * foreign key as READ-ONLY using the insertable and updatable properties
+ * of the @Column.
  */
 
 @Entity @Table(name="ORMREL_MEDIACOPY")
@@ -69,8 +46,13 @@ import ejava.examples.orm.rel.MediaCopyPK;
 public class MediaCopy implements Serializable {
     private static final Log log = LogFactory.getLog(MediaCopy.class);
     private static final long serialVersionUID = 1L;    
+    @Id //mapped to COPY_NO by IdClass
     private int copyNo;    
+    @Id //mapped to MEDIACOPY_MID by IdClass
     private long mediaId;    
+    @ManyToOne
+    @JoinColumn(name="MEDIACOPY_MID", //mapped same as mediaId property
+            insertable=false, updatable=false) //makes column read-only
     private Media media;
     
     @SuppressWarnings("unused")
@@ -86,19 +68,9 @@ public class MediaCopy implements Serializable {
     public int getCopyNo()                { return copyNo; }    
     private void setCopyNo(int copyNo)    { this.copyNo = copyNo; }
     
-    //this property is used for the composite primary key and is mapped to
-    //the same column as the media @ManyToOne property FK
-    @Id @Column(name="MEDIACOPY_MID")
     public long getMediaId()              { return mediaId; }
     private void setMediaId(long mediaId) { this.mediaId = mediaId; }
     
-    @ManyToOne //use m2o to have media automatically associated
-    //define as insertable/updatable=false since this FK is part of our
-    //compound primary key
-    @JoinColumn(
-            name="MEDIACOPY_MID",
-            insertable=false,
-            updatable=false)
     public Media getMedia()               { return media; }    
     private void setMedia(Media media)    { this.media = media; }
 

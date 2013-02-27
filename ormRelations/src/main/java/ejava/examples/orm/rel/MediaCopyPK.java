@@ -6,7 +6,9 @@ import javax.persistence.Column;
 
 public class MediaCopyPK implements Serializable {
     private static final long serialVersionUID = 1L;
+    @Column(name="MEDIACOPY_MID")
     private long mediaId;
+    @Column(name="COPY_NO")    
     private int copyNo;
     
     public MediaCopyPK() {}
@@ -14,20 +16,16 @@ public class MediaCopyPK implements Serializable {
         this.mediaId = mediaId;
         this.copyNo = copyNo;
     }
-    @Column(name="COPY_NO")    
-    public int getCopyNo() {
-        return copyNo;
-    }
+    public int getCopyNo() { return copyNo; }
     public void setCopyNo(int copyNo) {
         this.copyNo = copyNo;
     }
-    @Column(name="MEDIACOPY_MID")
-    public long getMediaId() {
-        return mediaId;
-    }
+    
+    public long getMediaId() { return mediaId; }
     public void setMediaId(long mediaId) {
         this.mediaId = mediaId;
     }
+    
     public boolean equals(Object obj) {
         try {
             if (obj == this) return true;
