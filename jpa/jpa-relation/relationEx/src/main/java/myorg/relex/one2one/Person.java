@@ -15,7 +15,7 @@ public class Person {
 	public int getId() { return id; }
 	
 	public String getName() { return name; }
-	public Person setName(String name) {
-		this.name = name; return this;
+	public void setName(String name) {
+		this.name = name; 
 	}
 }

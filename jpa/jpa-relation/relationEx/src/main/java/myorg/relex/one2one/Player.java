@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Table(name="RELATIONEX_PLAYER")
 public class Player {
 	public enum Position { DEFENSE, OFFENSE, SPECIAL_TEAMS};
-	@Id
+	@Id @GeneratedValue
 	private int id;
 	@Enumerated(EnumType.STRING)
 	private Position position;
@@ -22,12 +22,12 @@ public class Player {
 	public int getId() { return id; }
 
 	public Person getPerson() { return person; }
-	public Player setPerson(Person person) {
-		this.person = person; return this;
+	public void setPerson(Person person) {
+		this.person = person;
 	}
 
 	public Position getPosition() { return position; }
-	public Player setPosition(Position position) {
-		this.position = position; return this;
+	public void setPosition(Position position) {
+		this.position = position;
 	}
 }

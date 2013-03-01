@@ -17,19 +17,19 @@ public class Employee {
 	private Date hireDate;
 	
 	@OneToOne(optional=false,fetch=FetchType.LAZY)
-	//@PrimaryKeyJoinColumn
-	@MapsId
+	@PrimaryKeyJoinColumn //informs provider the FK is derived from PK
 	private Person person;
 	
-	public int getId() { return id; }
+	public int getId() { return person.getId(); }
 
 	public Person getPerson() { return person; }
-	public Employee setPerson(Person person) {
-		this.person = person; return this;
+	public void setPerson(Person person) {
+		this.person = person;
+		if (person != null) { id = person.getId(); }
 	}
 
 	public Date getHireDate() { return hireDate; }
-	public Employee setHireDate(Date hireDate) {
-		this.hireDate = hireDate; return this;
+	public void setHireDate(Date hireDate) {
+		this.hireDate = hireDate;
 	}
 }
