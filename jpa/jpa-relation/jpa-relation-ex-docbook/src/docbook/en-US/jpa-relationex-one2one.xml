@@ -37,10 +37,12 @@ public class One2OneTest extends JPATestBase {
 }
 ]]></programlisting>                        
                 </listitem>
-                
+ 
                 <listitem><para>Verify the new JUnit test class builds and executes to completion</para>
 <programlisting language=""><![CDATA[
-relationEx]$ mvn clean test -P\!h2db -Ph2srv;
+relationEx]$ mvn clean test -P\!h2db -Ph2srv
+...
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://localhost:9092/h2db/ejava]
 ...
 [INFO] BUILD SUCCESS                
 ]]></programlisting>                        
@@ -52,7 +54,7 @@ relationEx]$ mvn clean test -P\!h2db -Ph2srv;
         
     <section id="jpa-relationex-o2o-uni">
         <title>One-to-One Uni-directional Relationships</title>
-        <para>The notion of uni-directional a relationship is solely a characterization
+        <para>The notion of a uni-directional relationship is solely a characterization
             of what the Java class at either end of the relationship knows about the 
             other. For uni-directional relationships only one class references the 
             other while the other passively participates in the relationship.</para>
@@ -62,11 +64,13 @@ relationEx]$ mvn clean test -P\!h2db -Ph2srv;
             <para>In this first case we are going to model the relationship from the
                 owning side of the relationship as a foreign key in the owning entity's
                 table.</para>
-            
             <orderedlist>
             
                 <listitem><para>Create the following entity class in your src/main tree to
-                    represent the passive side of the relationship.</para>
+                    represent the passive side of the relationship. I am calling this "passive"
+                    (or "ignorant") because it will know nothing of the relationships we will 
+                    form within this section. This is different than the "inverse" side we will 
+                    address in the bi-directional case.</para>
 <programlisting language="java"><![CDATA[
 package myorg.relex.one2one;
 
@@ -85,8 +89,8 @@ public class Person {
     public int getId() { return id; }
     
     public String getName() { return name; }
-    public Person setName(String name) {
-        this.name = name; return this;
+    public void setName(String name) {
+        this.name = name; 
     }
 }
 ]]></programlisting>
@@ -109,9 +113,10 @@ import javax.persistence.*;
 @Table(name="RELATIONEX_PLAYER")
 public class Player {
     public enum Position { DEFENSE, OFFENSE, SPECIAL_TEAMS};
-    @Id
+    @Id @GeneratedValue
     private int id;
     @Enumerated(EnumType.STRING)
+    @Column(length=16)
     private Position position;
     
     //@OneToOne
@@ -120,13 +125,13 @@ public class Player {
     public int getId() { return id; }
 
     public Person getPerson() { return person; }
-    public Player setPerson(Person person) {
-        this.person = person; return this;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public Position getPosition() { return position; }
-    public Player setPosition(Position position) {
-        this.position = position; return this;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }
 ]]></programlisting>                        
@@ -144,42 +149,44 @@ public class Player {
 ]]></programlisting>                        
                 </listitem>
                 
-                <listitem><para>Attempt to build the module and not the error that results.
+                <listitem><para>Attempt to build the module and note the error that results.
                     The error is stating the provider does not know how to map the non-serializable
                     Person class to a column within the Player table.</para>
 <programlisting language=""><![CDATA[
 org.hibernate.MappingException: Could not determine type for: myorg.relex.one2one.Person, at table: 
-RELATIONEX_PLAYER, for columns: [org.hibernate.mapping.Column(person)
-]]></programlisting>                        
+RELATIONEX_PLAYER, for columns: [org.hibernate.mapping.Column(person). 
+]]></programlisting>
+                    <para>If you look back at the Class mapping topic, we were able to map a 
+                        serialized relationship to a BLOB column. That is what we are accidentally 
+                        doing here if we leave off the @XxxToXxx relationship specification.</para>                        
                 </listitem>
                 
-                <listitem><para>Add a JPA @OneToOne relationship mapping to the Player table.
+                <listitem><para>Add a JPA @OneToOne relationship mapping from the Player to Person.
                     Also include a definitions to...</para>
                     <itemizedlist>
                         <listitem><para>Make the Person required for the Player</para></listitem>
                         <listitem><para>Specify the Person must be also fetched when obtaining the Player</para></listitem>
                         <listitem><para>Specify a foreign key column in the Player table that references the Person table</para></listitem>
-                        <listitem><para>Specify the foreign key to be unique since this is a one-to-one relationship</para></listitem>
                     </itemizedlist>
 <programlisting language=""><![CDATA[
     @OneToOne(optional=false,fetch=FetchType.EAGER)
-    @JoinColumn(name="PERSON_ID", unique=true)
+    @JoinColumn(name="PERSON_ID")
     private Person person;
 ]]></programlisting>                        
                 </listitem>
                 
                 <listitem><para>Build the module and observe the database schema generated.</para>
 <programlisting language=""><![CDATA[
-    create table RELATIONEX_PERSON (
+   create table RELATIONEX_PERSON (
         id integer generated by default as identity,
         name varchar(255),
         primary key (id)
     );
 
     create table RELATIONEX_PLAYER (
-        id integer not null,
-        position varchar(255),
-        PERSON_ID integer not null unique,
+        id integer generated by default as identity,
+        position varchar(16),
+        PERSON_ID integer not null,
         primary key (id),
         unique (PERSON_ID)
     );
@@ -191,9 +198,10 @@ RELATIONEX_PLAYER, for columns: [org.hibernate.mapping.Column(person)
 ]]></programlisting>
                     <itemizedlist>
                         <listitem><para>The Player table contains a foreign key referencing the Person table. Note
-                            the foreign key value (PERSON_ID) is not modeled within the Player entity class. Only the
-                            relationship to the Person has been depicted within the Player.</para></listitem>
-                        <listitem><para>The foreign key column is required to be supplied. This means that all
+                            the foreign key *value* (PERSON_ID) is not modeled within the Player entity class. Only the
+                            *relationship* to the Person has been depicted within the Player. If we want the person
+                            ID value, we can ask the person object related to the player.</para></listitem>
+                        <listitem><para>The foreign key column is required to be supplied ("not null"). This means that all
                             Players must have a Person</para></listitem>
                         <listitem><para>The foreign key column is required to be unique. This means that only one
                             Player may reference one Person using the PERSON_ID.</para></listitem>
@@ -205,12 +213,13 @@ RELATIONEX_PLAYER, for columns: [org.hibernate.mapping.Column(person)
     @Test
     public void testOne2OneUniFK() {
         log.info("*** testOne2OneUniFK ***");
-        Person person = new Person()
-            .setName("Johnny Unitas");
-        Player player = new Player()
-            .setPerson(person)
-            .setPosition(Player.Position.OFFENSE);
-        em.persist(player);
+        Person person = new Person();
+        person.setName("Johnny Unitas");
+        Player player = new Player();
+        player.setPerson(person);
+        player.setPosition(Player.Position.OFFENSE);
+        //em.persist(person);
+        em.persist(player); //provider will propagate person.id to player.FK
         
         //clear the persistence context and get new instances
         em.flush(); em.clear();
@@ -251,13 +260,8 @@ save the transient instance before flushing: myorg.relex.one2one.Player.person -
         em.persist(player);
 ]]></programlisting>       
                     <note>
-                        <para>We will look at cascades a bit later and one might think an automatic
-                           cascade of the PERSIST from Player to Person would correct the problem.
-                           Technically it would, but it seems inappropriate in this case. A Player
-                           requires a Person and it seems reasonable for the Person to be required
-                           to pre-exist the Player rather than have the Player create the yet-to-exist
-                           Person. To take that analogy further -- should a passenger create a plane
-                           or should the plane already exist prior to the passenger?</para>
+                        <para>We will look at cascades a bit later which may or may not be
+                            appropriate to solve this dependent/parent table persistence.</para>
                     </note>                 
                 </listitem>
                 
@@ -268,6 +272,8 @@ save the transient instance before flushing: myorg.relex.one2one.Player.person -
                     Person is required for the Player and we requested an EAGER fetch type, 
                     an database inner join is performed between the Player and Person tables.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniFK
+...
 -*** testOne2OneUniFK ***
 Hibernate: 
     insert 
@@ -280,9 +286,9 @@ Hibernate:
     insert 
     into
         RELATIONEX_PLAYER
-        (PERSON_ID, position, id) 
+        (id, PERSON_ID, position) 
     values
-        (?, ?, ?)
+        (null, ?, ?)
 Hibernate: 
     select
         player0_.id as id2_1_,
@@ -304,10 +310,12 @@ Hibernate:
                         to be returned.</para>                        
 <programlisting language="java"><![CDATA[
     @OneToOne(optional=true,fetch=FetchType.EAGER)
-    @JoinColumn(name="PERSON_ID", unique=true)
+    @JoinColumn(name="PERSON_ID")
     private Person person;
 ]]></programlisting>                        
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniFK
+...
 Hibernate: 
     select
         player0_.id as id2_1_,
@@ -330,10 +338,12 @@ Hibernate:
                        once we got to the player.getPerson().getName() calls.</para>    
 <programlisting language="java"><![CDATA[
     @OneToOne(optional=false,fetch=FetchType.LAZY)
-    @JoinColumn(name="PERSON_ID", unique=true)
+    @JoinColumn(name="PERSON_ID")
     private Person person;
 ]]></programlisting>                        
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniFK
+...
 Hibernate: 
     select
         player0_.id as id2_0_,
@@ -343,7 +353,7 @@ Hibernate:
         RELATIONEX_PLAYER player0_ 
     where
         player0_.id=?
-Hibernate: 
+Hibernate: <<<=== caused by player.getPerson().getName() 
     select
         person0_.id as id1_0_,
         person0_.name as name1_0_ 
@@ -356,11 +366,12 @@ Hibernate:
                         <para>If we comment out the calls to getPerson.getName(), only a 
                             single select on the Player is performed and the Person is 
                             never retrieved. That is the performance power of LAZY load.</para>
-
 <programlisting language="java"><![CDATA[
         //assertEquals("unexpected name", player.getPerson().getName(), player2.getPerson().getName());
 ]]></programlisting>                        
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniFK
+...
 Hibernate: 
     select
         player0_.id as id2_0_,
@@ -373,23 +384,55 @@ Hibernate:
 ]]></programlisting>                        
                 </listitem>
                 
-                <listitem><para>Perform a query of the two tables using the database UI. Note that
-                    we have an ID for the Player and a a foreign key to the Person modeled as 
-                    two separate columns.</para>
+                <listitem><para>Add the following code to the test method to perform
+                    a query of the two tables using SQL in order to verify the expected 
+                    mappings and values</para>
+<programlisting language="java"><![CDATA[
+        Object[] cols = (Object[]) em.createNativeQuery(
+                "select person.id person_id, person.name, " +
+                       "player.id player_id, player.person_id player_person_id " +
+                "from RELATIONEX_PLAYER player " +
+                "join RELATIONEX_PERSON person on person.id = player.person_id " +
+                "where player.id = ?1")
+                .setParameter(1, player.getId())
+                .getSingleResult();
+        log.info("row=" + Arrays.toString(cols));
+        assertEquals("unexpected person_id", person.getId(), ((Number)cols[0]).intValue());
+        assertEquals("unexpected person_name", person.getName(), (String)cols[1]);
+        assertEquals("unexpected player_id", player.getId(), ((Number)cols[2]).intValue());
+        assertEquals("unexpected player_person_id", person.getId(), ((Number)cols[3]).intValue());
+]]></programlisting>                        
+                </listitem>
+                
+                <listitem><para>Rebuild the module to verify the SQL mappings is 
+                   what we expected.</para>
 <programlisting language=""><![CDATA[
-SELECT * FROM RELATIONEX_PERSON person join RELATIONEX_PLAYER  player on player.PERSON_ID = person.ID;
-ID      NAME            ID      POSITION    PERSON_ID  
-1       Johnny Unitas   0       OFFENSE     1                 
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniFK
+...
+Hibernate: 
+    select
+        person.id person_id,
+        person.name,
+        player.id player_id,
+        player.person_id player_person_id 
+    from
+        RELATIONEX_PLAYER player 
+    join
+        RELATIONEX_PERSON person 
+            on person.id = player.person_id 
+    where
+        player.id = ?
+ -row=[1, Johnny Unitas, 1, 1]
 ]]></programlisting>                        
                 </listitem>
                 
                 <listitem><para>Add the following delete logic to the test method to remove the 
                     Person object.</para>
 <programlisting language="java"><![CDATA[
-        //remove the objects and flush commands to the database
+        //em.remove(player2);
         em.remove(player2.getPerson());
         em.flush();
-        assertNull("person not deleted", em.find(Person.class, player.getPerson().getId()));
+        assertNull("person not deleted", em.find(Person.class, person.getId()));
         assertNull("player not deleted", em.find(Player.class, player.getId()));
 ]]></programlisting>                        
                 </listitem>
@@ -427,9 +470,6 @@ delete from RELATIONEX_PERSON where id=? [23503-168]
 <programlisting language=""><![CDATA[
         em.remove(player2);
         em.remove(player2.getPerson());
-        em.flush();
-        assertNull("person not deleted", em.find(Person.class, player.getPerson().getId()));
-        assertNull("player not deleted", em.find(Player.class, player.getId()));
 ]]></programlisting>                        
                 </listitem>
                 
@@ -460,6 +500,25 @@ Hibernate:
                 common to persisting and deleting obejcts with foreign key references.</para>
             
         </section>
+
+
+
+        <section id="jpa-relationex-o2o-uni-jointable">
+            <title>One-to-One Uni-directional Using a Join Table</title>
+            <para>Next we are going to realize the one-to-one uni-directional relationship
+                from the dependent to parent entity using a join table. The implementation
+                of the dependent entity is identical except for changing the @JoinColumn
+                to a @JoinTable</para>
+            <orderedlist>
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
+            
+        </section>
+
+
 
         <section id="jpa-relationex-o2o-uni-pkj">
             <title>One-to-One Uni-directional Using a Primary Key Join</title>
@@ -561,8 +620,8 @@ public class Employee {
             </orderedlist>
         </section>
 
-        <section id="jpa-relationex-o2o-uni-link">
-            <title>One-to-One Uni-directional Using a Link Table</title>
+        <section id="jpa-relationex-o2o-uni-mapsid">
+            <title>One-to-One Uni-directional Using MapsId</title>
             <para></para>
             <orderedlist>
                 <listitem><para></para>
@@ -571,6 +630,40 @@ public class Employee {
                 </listitem>
             </orderedlist>
         </section>
+
+        <section id="jpa-relationex-o2o-uni-compositepk">
+            <title>One-to-One Uni-directional Using Composite Keys</title>
+            <para>This section will cover cases where one wants to map 
+                a one-to-one primary key join to a parent entity that
+                uses a composite primary key. The dependent entity may
+                use either an @IdClass/@PrimaryKeyJoins or an @EmbeddedId/@MapsId 
+                to realize this relationship and identity</para>
+
+            <section id="jpa-relationex-o2o-uni-idclass">
+                <title>One-to-One Uni-directional </title>
+                <para></para>
+                <orderedlist>
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+                </orderedlist>
+            </section>
+
+            <section id="jpa-relationex-o2o-uni-embeddedid">
+                <title>One-to-One Uni-directional </title>
+                <para></para>
+                <orderedlist>
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+                </orderedlist>
+            </section>
+
+        </section>
+
+
 
         <section id="jpa-relationex-o2o-uni-cascade">
             <title>One-to-One Uni-directional Using Cascades</title>
