@@ -16,7 +16,7 @@ public class BoxOffice {
 	@EmbeddedId 
 	private ShowEventPK pk; //will be set by provider with help of @MapsId
 	
-	@OneToOne(optional=false)
+	@OneToOne(optional=false, fetch=FetchType.EAGER)
 	@MapsId //provider maps this composite FK to @EmbeddedId PK value
 	private ShowEvent show;
 	

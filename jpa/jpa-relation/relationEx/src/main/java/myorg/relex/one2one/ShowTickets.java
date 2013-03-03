@@ -23,7 +23,7 @@ public class ShowTickets {
 	@Column(name="TICKET_TIME")
 	private Date time;
 	
-	@OneToOne(optional=false)
+	@OneToOne(optional=false, fetch=FetchType.EAGER)
 	@PrimaryKeyJoinColumns({
 		@PrimaryKeyJoinColumn(name="TICKET_DATE", referencedColumnName="date"),
 		@PrimaryKeyJoinColumn(name="TICKET_TIME", referencedColumnName="time"),

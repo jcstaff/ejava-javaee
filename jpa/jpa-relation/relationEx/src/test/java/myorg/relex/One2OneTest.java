@@ -227,8 +227,8 @@ public class One2OneTest extends JPATestBase {
      * relationship to a parent class that uses a composite primary key mapped thru an @IdClass
      */
     @Test
-    public void testOneToOneUniIdClass() {
-        log.info("*** testOneToOneUniIdClass ***");
+    public void testOne2OneUniIdClass() {
+        log.info("*** testOne2OneUniIdClass ***");
         Date showDate = new GregorianCalendar(1975+new Random().nextInt(100),
         		Calendar.JANUARY, 1).getTime();
         Date showTime = new GregorianCalendar(0, 0, 0, 0, 0, 0).getTime();
@@ -242,6 +242,7 @@ public class One2OneTest extends JPATestBase {
         //flush commands to database, clear cache, and pull back new instance
         em.flush(); em.clear();
         ShowTickets tickets2 = em.find(ShowTickets.class, new ShowEventPK(tickets.getDate(), tickets.getTime()));
+        log.info("calling parent...");
         assertEquals("unexpected name", tickets.getShow().getName(), tickets2.getShow().getName());
 
         //verify the contents of the database tables, columns, and relationships
@@ -279,8 +280,8 @@ public class One2OneTest extends JPATestBase {
      * @EmbeddedId
      */
     @Test
-    public void testOneToOneUniEmbeddedId() {
-        log.info("*** testOneToOneUniEmbedded ***");
+    public void testOne2OneUniEmbeddedId() {
+        log.info("*** testOne2OneUniEmbedded ***");
         Date showDate = new GregorianCalendar(1975+new Random().nextInt(100),
         		Calendar.JANUARY, 1).getTime();
         Date showTime = new GregorianCalendar(0, 0, 0, 0, 0, 0).getTime();
