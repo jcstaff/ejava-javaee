@@ -11,22 +11,24 @@ import javax.persistence.*;
 @Entity
 @Table(name="RELATIONEX_EMPLOYEE")
 public class Employee {
-	@Id
+	@Id //pk value must be assigned, not generated
 	private int id;
+	
+	@OneToOne(optional=false,fetch=FetchType.EAGER)
+	@PrimaryKeyJoinColumn //informs provider the FK derived from PK
+	private Person person;
+
 	@Temporal(TemporalType.DATE)
 	private Date hireDate;
 	
-	@OneToOne(optional=false,fetch=FetchType.LAZY)
-	@PrimaryKeyJoinColumn //informs provider the FK is derived from PK
-	private Person person;
-	
-	public int getId() { return person.getId(); }
-
-	public Person getPerson() { return person; }
-	public void setPerson(Person person) {
+	protected Employee() {}
+	public Employee(Person person) {
 		this.person = person;
 		if (person != null) { id = person.getId(); }
 	}
+
+	public int getId() { return person.getId(); }
+	public Person getPerson() { return person; }
 
 	public Date getHireDate() { return hireDate; }
 	public void setHireDate(Date hireDate) {

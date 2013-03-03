@@ -88,8 +88,7 @@ public class One2OneTest extends JPATestBase {
         log.info("*** testOne2OneUniJoinTable ***");
         Person person = new Person();
         person.setName("Joe Smith");
-        Member member = new Member();
-        member.setPerson(person);
+        Member member = new Member(person);
         member.setRole(Member.Role.SECONDARY);
         em.persist(person);
         em.persist(member); //provider will propagate person.id to player.FK
@@ -145,14 +144,15 @@ public class One2OneTest extends JPATestBase {
         em.persist(person);
         em.flush(); //generate the PK for the person
         
-        Employee employee = new Employee();
-    	employee.setPerson(person); //set PK/FK -- provider will not auto propagate
+        Employee employee = new Employee(person);//set PK/FK -- provider will not auto propagate
     	employee.setHireDate(new GregorianCalendar(1996, Calendar.JANUARY, 1).getTime());
+        //em.persist(person);
         em.persist(employee);
         
         //clear the persistence context and get new instances
         em.flush(); em.clear();
         Employee employee2 = em.find(Employee.class, employee.getPerson().getId());
+        log.info("calling person...");
         assertEquals("unexpected name", employee.getPerson().getName(), employee2.getPerson().getName());
         
         //verify the contents of the database tables, columns, and relationships
