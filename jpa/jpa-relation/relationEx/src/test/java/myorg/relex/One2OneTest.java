@@ -234,10 +234,10 @@ public class One2OneTest extends JPATestBase {
         Date showTime = new GregorianCalendar(0, 0, 0, 0, 0, 0).getTime();
         ShowEvent show = new ShowEvent(showDate, showTime);
         show.setName("Rocky Horror");
-        ShowTickets tickets = new ShowTickets(show);
+        ShowTickets tickets = new ShowTickets(show); //parent already has natural PK by this point
         tickets.setTicketsLeft(300);
         em.persist(show);
-        em.persist(tickets); //provider auto propagates parent.cid to dependent.FK mapped to dependent.cid 
+        em.persist(tickets);  
         
         //flush commands to database, clear cache, and pull back new instance
         em.flush(); em.clear();
@@ -295,6 +295,7 @@ public class One2OneTest extends JPATestBase {
         //flush commands to database, clear cache, and pull back new instance
         em.flush(); em.clear();
         BoxOffice boxOffice2 = em.find(BoxOffice.class, new ShowEventPK(boxOffice.getDate(), boxOffice.getTime()));
+        log.info("calling parent...");
         assertEquals("unexpected name", boxOffice.getShow().getName(), boxOffice2.getShow().getName());
 
         //verify the contents of the database tables, columns, and relationships
@@ -312,8 +313,7 @@ public class One2OneTest extends JPATestBase {
         assertEquals("unexpected show_time", boxOffice2.getShow().getTime(), (Date)cols[1]);
         assertEquals("unexpected ticket_date", boxOffice2.getDate(), (Date)cols[2]);
         assertEquals("unexpected ticket_time", boxOffice2.getTime(), (Date)cols[3]);
-        assertEquals("unexpected ticketsLeft", boxOffice2.getTicketsLeft(), ((Number)cols[4]).intValue());
-        
+        assertEquals("unexpected ticketsLeft", boxOffice2.getTicketsLeft(), ((Number)cols[4]).intValue());        
         
         //remove the objects and flush commands to the database
         em.remove(boxOffice2);

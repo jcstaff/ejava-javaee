@@ -7,8 +7,9 @@ import javax.persistence.*;
 /**
  * This class provides an example of a the owning entity of a
  * one-to-one, uni-directional relationship where the dependent's
- * primary key is derived from the parent and the parent uses
- * a composite primary key.
+ * primary key is derived from the parent, the parent uses
+ * a composite primary key, and the dependent used an @EmeddedId
+ * and @MapsId.
  */
 @Entity
 @Table(name="RELATIONEX_BOXOFFICE")
@@ -23,7 +24,7 @@ public class BoxOffice {
 	@Column(name="TICKETS")
 	private int ticketsLeft;
 
-	public BoxOffice() {}
+	protected BoxOffice() {}
 	public BoxOffice(ShowEvent show) {
 		this.show = show;
 	}

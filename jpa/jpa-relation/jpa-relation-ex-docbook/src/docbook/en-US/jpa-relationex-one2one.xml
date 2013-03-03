@@ -1567,12 +1567,15 @@ Hibernate:
             <para>This section will cover cases where one wants to map 
                 a one-to-one primary key join to a parent entity that
                 uses a composite primary key. The dependent entity may
-                use either an @IdClass/@PrimaryKeyJoins or an @EmbeddedId/@MapsId 
+                use either an @IdClass/@PrimaryKeyJoin or an @EmbeddedId/@MapsId 
                 to realize this relationship and identity.</para>
-                
-            <orderedlist>
-                <listitem><para>To get started, put the following parent class in place
-                    in your src/main tree.</para>
+
+                <section id="jpa-relationex-o2o-uni-compositepk-parent">
+                    <title>Setup Parent with Composite Primary Key</title>
+                                
+                    <orderedlist>
+                        <listitem><para>To get started, put the following parent class in place
+                            in your src/main tree.</para>
 <programlisting language="java"><![CDATA[
 package myorg.relex.one2one;
 
@@ -1613,13 +1616,13 @@ public class ShowEvent {
     }
 }
 ]]></programlisting>                        
-                    <para>The above entity class uses two properties to form its primary key --
-                        thus it requires a composite primary key to represent the PK within JPA.</para>
-                </listitem>
- 
-                <listitem><para>Put the following composite primary key 
-                   in place. It is defined as @Embeddable so that it can be used
-                   both as an @IdClass and an @EmbeddableId.</para>
+                            <para>The above entity class uses two properties to form its primary key --
+                                thus it requires a composite primary key to represent the PK within JPA.</para>
+                        </listitem>
+     
+                        <listitem><para>Put the following composite primary key 
+                           in place. It is defined as @Embeddable so that it can be used
+                           both as an @IdClass and an @EmbeddableId.</para>
 <programlisting language="java"><![CDATA[
 package myorg.relex.one2one;
 
@@ -1657,19 +1660,21 @@ public class ShowEventPK implements Serializable {
     }
 }
 ]]></programlisting>                        
-                </listitem>
+                        </listitem>
 
-                <listitem><para>Add the above parent entity to the persistence unit.</para>
-<programlisting language="xml"><![CDATA[
-        <class>myorg.relex.one2one.ShowEvent</class>
-]]></programlisting>                        
-                </listitem>
-            </orderedlist>                
+                        <listitem><para>Add the above parent entity to the persistence unit.</para>
+    <programlisting language="xml"><![CDATA[
+            <class>myorg.relex.one2one.ShowEvent</class>
+    ]]></programlisting>                        
+                        </listitem>
+                </orderedlist>
                 
-            <para>Continue on with mapping the dependent entity using an @IdClass and 
-                @EmbeddedId. You will find the @IdClass technique acts much like the 
-                @PrimaryKeyJoin we performed earlier. The @EmbeddedId technique acts 
-                much like the @MapsId case as well.</para>
+                <para>Continue on with mapping the dependent entity using an @IdClass and 
+                    @EmbeddedId. You will find the @IdClass technique acts much like the 
+                    @PrimaryKeyJoin we performed earlier. The @EmbeddedId technique acts 
+                    much like the @MapsId case as well.</para>
+            </section>                
+                
 
             <section id="jpa-relationex-o2o-uni-idclass">
                 <title>One-to-One Uni-directional Using @IdClass</title>
@@ -1814,8 +1819,8 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
 ]]></programlisting>
 
                         <para>In this case, the provider was able to generate default mappings
-                            that are exactly what we would have created manually. If you would
-                            have enabled the following custom mappings explicitly map primary
+                            that are exactly what we would have created manually. You could have 
+                            enabled the following custom mappings to explicitly map primary
                             key column values from the dependent table columns to the parent 
                             table columns.</para>
 <programlisting language="java"><![CDATA[
@@ -1860,10 +1865,10 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
         Date showTime = new GregorianCalendar(0, 0, 0, 0, 0, 0).getTime();
         ShowEvent show = new ShowEvent(showDate, showTime);
         show.setName("Rocky Horror");
-        ShowTickets tickets = new ShowTickets(show);
+        ShowTickets tickets = new ShowTickets(show); //parent already has natural PK by this point
         tickets.setTicketsLeft(300);
         em.persist(show);
-        em.persist(tickets); //provider auto propagates parent.cid to dependent.FK mapped to dependent.cid 
+        em.persist(tickets);  
         
         //flush commands to database, clear cache, and pull back new instance
         em.flush(); em.clear();
@@ -2012,14 +2017,264 @@ Hibernate:
             </section>
 
             <section id="jpa-relationex-o2o-uni-embeddedid">
-                <title>One-to-One Uni-directional </title>
-                <para></para>
+                <title>One-to-One Uni-directional Using @EmbeddedId</title>
+                <para>In this second example of @MapsId, we will be informing the provider 
+                   that the primary key for the dependent table is realized by the foreign key
+                   and, in this case, is a composite primary key. We must use an @EmbeddedId
+                   in order for this to work correctly.</para>
                 <orderedlist>
-                    <listitem><para></para>
-<programlisting language=""><![CDATA[
+                    
+                    <listitem><para>Add the following entity class to your src/main tree. It is 
+                       not complete at this point and schema generation will show there bring a 
+                       separate primary and foreign key.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import java.util.Date;
+import javax.persistence.*;
+
+/**
+ * This class provides an example of a the owning entity of a
+ * one-to-one, uni-directional relationship where the dependent's
+ * primary key is derived from the parent, the parent uses
+ * a composite primary key, and the dependent used an @EmeddedId
+ * and @MapsId.
+ */
+@Entity
+@Table(name="RELATIONEX_BOXOFFICE")
+public class BoxOffice {
+    @EmbeddedId 
+    private ShowEventPK pk; //will be set by provider with help of @MapsId
+    
+    @OneToOne(optional=false, fetch=FetchType.EAGER)
+//    @MapsId //provider maps this composite FK to @EmbeddedId PK value
+    private ShowEvent show;
+    
+    @Column(name="TICKETS")
+    private int ticketsLeft;
+
+    protected BoxOffice() {}
+    public BoxOffice(ShowEvent show) {
+        this.show = show;
+    }
+
+    public Date getDate() { return show==null ? null : show.getDate(); }
+    public Date getTime() { return show==null ? null : show.getTime(); }
+    public ShowEvent getShow() { return show; }
+
+    public int getTicketsLeft() { return ticketsLeft; }
+    public void setTicketsLeft(int ticketsLeft) {
+        this.ticketsLeft = ticketsLeft;
+    }
+}
 ]]></programlisting>                        
-                </listitem>
+                    </listitem>
+                    
+                    <listitem><para>Add the dependent entity class to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2one.BoxOffice</class>
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Build the module and observe the generated schema.
+                       Notice the separate use of date/time for the primary key and 
+                       show_date/time for the foreign key.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_BOXOFFICE (
+        date timestamp not null,
+        time timestamp not null,
+        TICKETS integer,
+        show_date date not null,
+        show_time time not null,
+        primary key (date, time),
+        unique (show_date, show_time)
+    );
+    alter table RELATIONEX_BOXOFFICE 
+        add constraint FK64CED797E3196D0 
+        foreign key (show_date, show_time) 
+        references RELATIONEX_SHOWEVENT;
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Update the dependent table mapping so that the 
+                       foreign key is used to realize the primary key for the entity. Notice also the
+                       class provides no way to set the @EmbeddedId exception thru the @MapsId
+                       on the foreign key.</para>
+<programlisting language="java"><![CDATA[
+    @OneToOne(optional=false, fetch=FetchType.EAGER)
+    @MapsId //provider maps this composite FK to @EmbeddedId PK value
+    private ShowEvent show;
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Re-build the module and observe the generated database schema.
+                       Note the primary key has now been mapped to the show_date/time foreign key
+                       columns.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_BOXOFFICE (
+        TICKETS integer,
+        show_date date,
+        show_time time not null,
+        primary key (show_date, show_time),
+        unique (show_date, show_time)
+    );
+    alter table RELATIONEX_BOXOFFICE 
+        add constraint FK64CED797E3196D0 
+        foreign key (show_date, show_time) 
+        references RELATIONEX_SHOWEVENT;
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Add the following test method to your one-to-one test case.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOne2OneUniEmbeddedId() {
+        log.info("*** testOne2OneUniEmbedded ***");
+        Date showDate = new GregorianCalendar(1975+new Random().nextInt(100),
+                Calendar.JANUARY, 1).getTime();
+        Date showTime = new GregorianCalendar(0, 0, 0, 0, 0, 0).getTime();
+        ShowEvent show = new ShowEvent(showDate, showTime);
+        show.setName("Rocky Horror");
+        BoxOffice boxOffice = new BoxOffice(show);
+        boxOffice.setTicketsLeft(500);
+        em.persist(show);
+        em.persist(boxOffice); //provider auto propagates parent.cid to dependent.FK mapped to dependent.cid 
+        
+        //flush commands to database, clear cache, and pull back new instance
+        em.flush(); em.clear();
+        BoxOffice boxOffice2 = em.find(BoxOffice.class, new ShowEventPK(boxOffice.getDate(), boxOffice.getTime()));
+        log.info("calling parent...");
+        assertEquals("unexpected name", boxOffice.getShow().getName(), boxOffice2.getShow().getName());
+    }
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Re-build the module and run the test method above.</para>
+<programlisting language="java"><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniEmbeddedId
+...
+ -*** testOne2OneUniEmbedded ***
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SHOWEVENT
+        (name, date, time) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_BOXOFFICE
+        (TICKETS, show_date, show_time) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    select
+        boxoffice0_.show_date as show2_9_0_,
+        boxoffice0_.show_time as show3_9_0_,
+        boxoffice0_.TICKETS as TICKETS9_0_ 
+    from
+        RELATIONEX_BOXOFFICE boxoffice0_ 
+    where
+        boxoffice0_.show_date=? 
+        and boxoffice0_.show_time=?
+Hibernate: 
+    select
+        showevent0_.date as date7_0_,
+        showevent0_.time as time7_0_,
+        showevent0_.name as name7_0_ 
+    from
+        RELATIONEX_SHOWEVENT showevent0_ 
+    where
+        showevent0_.date=? 
+        and showevent0_.time=?
+ -calling parent...
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Add the following to verify our assertions about the SQL structure and 
+                        values underlying the JPA abstraction.</para>
+<programlisting language="java"><![CDATA[
+        Object[] cols = (Object[]) em.createNativeQuery(
+                "select show.date show_date, show.time show_time, " +
+                       "tickets.show_date ticket_date, tickets.show_time ticket_time, tickets.tickets " +
+                "from RELATIONEX_SHOWEVENT show " +
+                "join RELATIONEX_BOXOFFICE tickets on show.date = tickets.show_date and show.time = tickets.show_time " +
+                "where tickets.show_date = ?1 and tickets.show_time = ?2")
+                .setParameter(1, boxOffice.getShow().getDate(), TemporalType.DATE)
+                .setParameter(2, boxOffice.getShow().getTime(), TemporalType.TIME)
+                .getSingleResult();
+        log.info("row=" + Arrays.toString(cols));
+        assertEquals("unexpected show_date", boxOffice2.getShow().getDate(), (Date)cols[0]);
+        assertEquals("unexpected show_time", boxOffice2.getShow().getTime(), (Date)cols[1]);
+        assertEquals("unexpected ticket_date", boxOffice2.getDate(), (Date)cols[2]);
+        assertEquals("unexpected ticket_time", boxOffice2.getTime(), (Date)cols[3]);
+        assertEquals("unexpected ticketsLeft", boxOffice2.getTicketsLeft(), ((Number)cols[4]).intValue());
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Re-build the module and re-run the test method to verify the underlying
+                        SQL structure is how assume it to be.</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        show.date show_date,
+        show.time show_time,
+        tickets.show_date ticket_date,
+        tickets.show_time ticket_time,
+        tickets.tickets 
+    from
+        RELATIONEX_SHOWEVENT show 
+    join
+        RELATIONEX_BOXOFFICE tickets 
+            on show.date = tickets.show_date 
+            and show.time = tickets.show_time 
+    where
+        tickets.show_date = ? 
+        and tickets.show_time = ?
+ -row=[1994-01-01, 00:00:00, 1994-01-01, 00:00:00, 500]
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Add the following removal logic to test that we can remove the 
+                        two entities and their associated rows.</para>
+<programlisting language="java"><![CDATA[
+        em.remove(boxOffice2);
+        em.remove(boxOffice2.getShow());
+        em.flush();
+        assertNull("tickets not deleted", em.find(ShowEvent.class, 
+                new ShowEventPK(show.getDate(), show.getTime())));
+        assertNull("show not deleted", em.find(BoxOffice.class, 
+                new ShowEventPK(boxOffice.getDate(), boxOffice.getTime())));
+]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Observe the output of the deletes. It is consistent with before.</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_BOXOFFICE 
+    where
+        show_date=? 
+        and show_time=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SHOWEVENT 
+    where
+        date=? 
+        and time=?
+]]></programlisting>                        
+                    </listitem>
                 </orderedlist>
+                
+                <para>You have not completed the mapping of a one-to-one, uni-directional relationship
+                   using a composite key and realized through the use of an @EmbeddedId and @MapsId.</para>
             </section>
 
         </section>
@@ -2035,6 +2290,7 @@ Hibernate:
 ]]></programlisting>                        
                 </listitem>
             </orderedlist>
+
         </section>
     </section>
 
