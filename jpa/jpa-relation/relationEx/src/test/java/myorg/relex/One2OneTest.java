@@ -10,6 +10,8 @@ import java.util.Random;
 
 import javax.persistence.TemporalType;
 
+import myorg.relex.one2one.Applicant;
+import myorg.relex.one2one.Application;
 import myorg.relex.one2one.Coach;
 import myorg.relex.one2one.Employee;
 import myorg.relex.one2one.Member;
@@ -326,9 +328,61 @@ public class One2OneTest extends JPATestBase {
     }
     
     
+    /**
+     * This test provides a demonstration of creating a one-to-one
+     * bi-directional relationship using entities that will share
+     * a generated primary key value and be joined by their common
+     * primary key value.
+     */
     @Test
-    public void testOneToOneUniCascade() {
-        log.info("*** testOneToOneUniCascade ***");
+    public void testOne2OneBiPKJ() {
+        log.info("*** testOne2OneBiPKJ() ***");
+        Applicant applicant = new Applicant();
+        applicant.setName("Jason Garret");
+        Application application = new Application(applicant);
+        application.setDesiredStartDate(new GregorianCalendar(2008, Calendar.JANUARY, 1).getTime());
+        em.persist(applicant);   //provider will generate a PK
+        em.persist(application); //provider will propogate parent.PK to dependent.FK/PK
+        
+        //clear the persistence context and get new instances from the owning side
+        em.flush(); em.clear();
+        log.info("finding dependent...");
+        Application application2 = em.find(Application.class, application.getId());
+        log.info("found dependent...");
+        assertTrue("unexpected startDate", 
+        		application.getDesiredStartDate().equals(
+        		application2.getDesiredStartDate()));
+        log.info("calling parent...");
+        assertEquals("unexpected name", application.getApplicant().getName(), application2.getApplicant().getName());
+        
+        //clear the persistence context and get new instances from the inverse side
+        em.flush(); em.clear();
+        log.info("finding parent...");
+        Applicant applicant2 = em.find(Applicant.class, applicant.getId());
+        log.info("found parent...");
+        assertEquals("unexpected name", applicant.getName(), applicant2.getName());
+        log.info("calling dependent...");
+        assertTrue("unexpected startDate", 
+        		applicant.getApplication().getDesiredStartDate().equals(
+        		applicant2.getApplication().getDesiredStartDate()));
+        
+        //remove the objects and flush commands to the database
+        em.remove(applicant2.getApplication());
+        em.remove(applicant2);
+        em.flush();
+        assertNull("applicant not deleted", em.find(Applicant.class, applicant2.getId()));
+        assertNull("application not deleted", em.find(Application.class, applicant2.getApplication().getId()));
+    }
+    
+    
+    
+    @Test
+    public void testOne2OneOrphan() {
+        log.info("*** testOne2OneOrphan ***");
+    }
+    @Test
+    public void testOne2OneCascade() {
+        log.info("*** testOne2OneCascade ***");
     }
     
     

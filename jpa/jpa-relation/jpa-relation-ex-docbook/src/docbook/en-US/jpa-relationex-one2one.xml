@@ -2279,30 +2279,560 @@ Hibernate:
 
         </section>
 
-
-
-        <section id="jpa-relationex-o2o-uni-cascade">
-            <title>One-to-One Uni-directional Using Cascades</title>
-            <para></para>
-            <orderedlist>
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-            </orderedlist>
-
-        </section>
     </section>
 
 
 
     <section id="jpa-relationex-o2o-bi">
         <title>Mapping One-to-One Bi-directional Relationships</title>
-        <para></para>
+        <para>In this chapter, we have so far only addressed uni-directional relationships -- where only one side
+            of the relationship was aware of the other at the Java class level. We can also make our relationships 
+            bi-directional for easy navigation to/from either side. This requires no change the database and is only 
+            a change at the Java and mapping levels.</para>
+        
+        <para>In bi-directional relationships, it is important to understand there are two sides/types to the relationship; owning side and inverse side.</para>
+        <itemizedlist>
+            <listitem><para>The owning side of the relation defines the mapping to the database. This is what we did for the uni-directional sections above</para></listitem>
+            <listitem><para>The inverse side of the relation must refer to its owning side mapping through the "mappedBy" property of the @XxxToXxx annotation</para></listitem>
+            <listitem><para>For OneToOne relationships, the owning side contains the foreign key or defines the join table</para></listitem>
+            <listitem><para>The provider will initialize the state of the inverse side during calls like find() and refresh(), but will not
+                update its value during application changes to the owning side. This is the application programmer's job to make 
+                the two references consistent.</para></listitem>
+            <listitem><para>The provider will only trigger persistence changes thru changes to the owning side</para></listitem>
+        </itemizedlist>
+  
   
         <section id="jpa-relationex-o2o-bi-1">
-            <title>One-to-One Bi-directional Relationships</title>
+            <title>One-to-One Bi-directional Joined By Primary Key</title>
+            <para>Lets start the discussion of one-to-one bi-directional using a set of entities
+                that are pretty much joined at the hip. Their properties have been mapped to 
+                separate database tables and Java entity classes, but they will never reference
+                a different instance. For this reason we will assign them a common primary key,
+                join them by that common primary key value, and propagate the primary key to the
+                dependent class using @MapsId.</para>
+            <orderedlist>
+
+                <listitem><para>Add the following inverse side entity class to your src/main tree. It is
+                    currently incomplete and will soon cause an error. </para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the inverse side of a
+ * one-to-one bi-directional relationship.
+ */
+@Entity
+@Table(name="RELATIONEX_APPLICANT")
+public class Applicant {
+    @Id @GeneratedValue
+    private int id;
+    @Column(length=32)
+    private String name;
+
+//  @OneToOne(mappedBy="applicant", //identifies property on owning side
+//          fetch=FetchType.LAZY)
+//  @Transient
+    private Application application;
+
+    public Applicant(){}
+    public Applicant(int id) {
+        this.id = id;
+    }
+    
+    public int getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Application getApplication() { return application; }
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following owning side entity class to your src/main tree. It is currently
+                    incomplete and will not yet generate the desired primary key mapping we desire in this case.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import java.util.Date;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the owning side
+ * of a one-to-one, bi-directional relationship.
+ */
+@Entity
+@Table(name="RELATIONEX_APPLICATION")
+public class Application {
+    @Id
+    private int id;
+//    @MapsId //foreign key realizes primary key
+    @OneToOne(//lack of mappedBy identifies this as owning side 
+              optional=false, fetch=FetchType.EAGER)
+    private Applicant applicant;
+    
+    @Temporal(TemporalType.DATE)
+    private Date desiredStartDate;
+
+    protected Application() {}
+    public Application(Applicant applicant) {
+        this.applicant = applicant;
+        if (applicant != null) { 
+            applicant.setApplication(this); //must maintain inverse side 
+        }
+    }
+    
+    public int getId() { return id; }
+    public Applicant getApplicant() { return applicant; }
+
+    public Date getDesiredStartDate() { return desiredStartDate; }
+    public void setDesiredStartDate(Date desiredStartDate) {
+        this.desiredStartDate = desiredStartDate;
+    }
+}
+]]></programlisting>
+                    <note>
+                        <para>It is important to note that -- in the case of a bi-directional
+                            relationship -- the application developer is responsible for setting
+                            both sides of the relationship even though JPA is only concerned with
+                            the inverse side when making changes to the database. We can either
+                            make the assignment here ...</para>
+<programlisting language="java"><![CDATA[
+            applicant.setApplication(this); //must maintain inverse side 
+]]></programlisting>                        
+                            <para>... or from the code that called the ctor(application)
+                            in the first place.</para>
+<programlisting language="java"><![CDATA[
+        Application application = new Application(applicant);
+        applicant.setApplication(application); //must maintain inverse side 
+]]></programlisting>                        
+                    </note>
+                </listitem>
+
+                <listitem><para>Add the two entity classes to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2one.Applicant</class>
+        <class>myorg.relex.one2one.Application</class>
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Attempt to build the module and note the error from the provider attempting 
+                    to map the Application entity properties. </para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes
+...
+org.hibernate.MappingException: Could not determine type for: myorg.relex.one2one.Application, at table: 
+RELATIONEX_APPLICANT, for columns: [org.hibernate.mapping.Column(application)]
+]]></programlisting>
+                    <para>The error occurs because...</para>
+                    <itemizedlist>
+                        <listitem><para>The entity uses FIELD access and an un-annotated field property was 
+                            found that has no default mapping</para></listitem>
+                        <listitem><para>The referenced Application entity does not implement Serializable
+                            and cannot be stuffed into a BLOB column within Applicant (and nor do we want it to)</para></listitem>
+                    </itemizedlist>                        
+                </listitem>
+
+                <listitem><para>Lets initially get beyond the error by marking the property as @Transient.
+                    This will allow the Java attribute to exist in memory but will not have any mapping
+                    to the database. That may be what we ultimately want for some cases, but not here.
+                    We are only using @Transient to get back to a stable state while we work through 
+                    any other mapping issues in front of us.</para>
+<programlisting language="java"><![CDATA[
+    @Transient
+    private Application application;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Re-build the module and observe the generated database schema so far. Notice 
+                    the expected uni-direction behavior has been recreated with our current mapping.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_APPLICANT (
+        id integer generated by default as identity,
+        name varchar(32),
+        primary key (id)
+    );
+
+    create table RELATIONEX_APPLICATION (
+        id integer not null,
+        desiredStartDate date,
+        applicant_id integer not null,
+        primary key (id),
+        unique (applicant_id)
+    );
+...
+    alter table RELATIONEX_APPLICATION 
+        add constraint FK8B404CA01EF7E92E 
+        foreign key (applicant_id) 
+        references RELATIONEX_APPLICANT;
+]]></programlisting>
+                    <para>Currently we are seeing...</para>
+                    <itemizedlist>
+                        <listitem><para>The inverse/parent Applicant entity table has no reference to the owning/dependent Application since it is @Transient</para></listitem>
+                        <listitem><para>The owning/dependent Application entity table has a foreign key reference to the inverse Applicant entity table.</para></listitem>
+                        <listitem><para>The owning/dependent Application entity is realizing the relation through a foreign key join rather than a primary key join.</para></listitem>
+                    </itemizedlist>                        
+                </listitem>
+
+                <listitem><para>Fix the mapping from the owning/dependent Application to the inverse/parent Applicant entity by adding @MapsId
+                   to the owning side definition.</para>
+<programlisting language="java"><![CDATA[
+    @MapsId //foreign key realizes primary key
+    @OneToOne(//lack of mappedBy identifies this as owning side 
+              optional=false, fetch=FetchType.EAGER)
+    private Applicant applicant;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Re-build the module and observe the generated database schema so far. Notice the former 
+                    ID primary key column for the owning/dependent Application entity table was removed and its role 
+                    taken by the APPLICANT_ID foreign key column because of the @MapsId annotation.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_APPLICANT (
+        id integer generated by default as identity,
+        name varchar(32),
+        primary key (id)
+    );
+
+    create table RELATIONEX_APPLICATION (
+        desiredStartDate date,
+        applicant_id integer not null,
+        primary key (applicant_id),
+        unique (applicant_id)
+    );
+...
+    alter table RELATIONEX_APPLICATION 
+        add constraint FK8B404CA01EF7E92E 
+        foreign key (applicant_id) 
+        references RELATIONEX_APPLICANT;
+]]></programlisting>                 
+                    <warning>
+                        <title>Primary Key Joins are Mandatory Relationships</title>
+                        <para>Since primary keys cannot be optional, only mandatory relationships can be 
+                            created through primary keys joins. The parent can not be deleted
+                            without also removing the dependent entity (first). The inverse side must be in place 
+                            with the primary key to be shared. The owning side of primary key join
+                            cannot be the entity generating the primary key.</para>
+                    </warning>       
+                </listitem>
+
+                <listitem><para>Attempt to fix the parent entity by replacing the @Transient specification
+                    with a @OneToOne relationship mapping. However, in doing it exactly this way we are 
+                    causing an error with the database mapping we will soon see...</para>
+<programlisting language="java"><![CDATA[
+    @OneToOne(
+//          mappedBy="applicant", //identifies property on owning side
+            fetch=FetchType.LAZY)
+//  @Transient
+    private Application application;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Re-build the module and observe the generated database schema. Notice that
+                    our "inverse" Applicant entity table has inherited an unwanted database column
+                    ("application_applicant_id") and foreign key to the "owning" Application entity table.
+                    That circular reference is not a bi-directional relationship -- it is two, independent
+                    uni-directional relationships.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+  create table RELATIONEX_APPLICANT (
+        id integer generated by default as identity,
+        name varchar(32),
+        application_applicant_id integer,
+        primary key (id)
+    );
+
+    create table RELATIONEX_APPLICATION (
+        desiredStartDate date,
+        applicant_id integer not null,
+        primary key (applicant_id),
+        unique (applicant_id)
+    );
+...
+    alter table RELATIONEX_APPLICANT 
+        add constraint FK8C43FE52AB28790B 
+        foreign key (application_applicant_id) 
+        references RELATIONEX_APPLICATION;
+
+    alter table RELATIONEX_APPLICATION 
+        add constraint FK8B404CA01EF7E92E 
+        foreign key (applicant_id) 
+        references RELATIONEX_APPLICANT;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Fix the mistaken mapping by making the parent entity the 
+                   inverse side of the relationship using the property "mappedBy".</para>
+<programlisting language="java"><![CDATA[
+    @OneToOne(
+            mappedBy="applicant", //identifies property on owning side
+            fetch=FetchType.LAZY)
+    private Application application;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Re-build the module and observe the generated database schema. We now have
+                    the database schema we need to implement a one-to-one, bi-directional relationship
+                    realized through a common, generated primary key value.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_APPLICANT (
+        id integer generated by default as identity,
+        name varchar(32),
+        primary key (id)
+    );
+   create table RELATIONEX_APPLICATION (
+        desiredStartDate date,
+        applicant_id integer not null,
+        primary key (applicant_id),
+        unique (applicant_id)
+    );
+...
+   alter table RELATIONEX_APPLICATION 
+        add constraint FK8B404CA01EF7E92E 
+        foreign key (applicant_id) 
+        references RELATIONEX_APPLICANT;
+]]></programlisting>                        
+                    <para>We now have...</para>
+                    <itemizedlist>
+                        <listitem><para>The parent Applicant entity table has a generated PK</para></listitem>
+                        <listitem><para>The parent/inverse Applicant entity table has no foreign key reference to the 
+                            dependent/owning Application entity table.</para></listitem>
+                        <listitem><para>The dependent/owning Application entity table has a foreign key reference
+                            to the parent/inverse Applicant entity table. This is used to form the relationship.</para></listitem>
+                        <listitem><para>The parent/inverse Applicant with the generated primary key can be 
+                           inserted at any time.</para></listitem>
+                        <listitem><para>The dependent/owning Application with the non-null foreign key 
+                           can only be inserted after the parent/inverse Application entity</para></listitem>
+                    </itemizedlist>
+                </listitem>
+
+                <listitem><para>Add the following test method to your existing one-to-one test case.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOne2OneBiPKJ() {
+        log.info("*** testOne2OneBiPKJ() ***");
+        Applicant applicant = new Applicant();
+        applicant.setName("Jason Garret");
+        Application application = new Application(applicant);
+        application.setDesiredStartDate(new GregorianCalendar(2008, Calendar.JANUARY, 1).getTime());
+        em.persist(applicant);   //provider will generate a PK
+        em.persist(application); //provider will propogate parent.PK to dependent.FK/PK
+     }
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Build the module, run the new test method, and notice the database output
+                    shows a good bit of what we expect from our uni-directional experience.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneBiPKJ 
+...
+ -*** testOne2OneBiPKJ() ***
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_APPLICANT
+        (id, name) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_APPLICATION
+        (desiredStartDate, applicant_id) 
+    values
+        (?, ?)
+]]></programlisting>
+                </listitem>                        
+
+                <listitem><para>Add the following to the test method to verify the actions to the 
+                    database when the entities are being found from the owning/dependent side of the 
+                    relationship. This should be similar to our uni-directional case since we are 
+                    using the entity class with the foreign key in the find(). However, our mapping
+                    seems to cause some additional database interaction.</para>
+<programlisting language="java"><![CDATA[
+        em.flush(); em.clear();
+        log.info("finding dependent...");
+        Application application2 = em.find(Application.class, application.getId());
+        log.info("found dependent...");
+        assertTrue("unexpected startDate", 
+                application.getDesiredStartDate().equals(
+                application2.getDesiredStartDate()));
+        log.info("calling parent...");
+        assertEquals("unexpected name", application.getApplicant().getName(), application2.getApplicant().getName());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Re-build the module, run the new test method, and notice the database output 
+                   contains three select statements, including an extra select for the owning side after
+                   both the owning and inverse sides have been retrieved during the EAGER fetch.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneBiPKJ 
+...
+-finding dependent...
+Hibernate: 
+    select
+        applicatio0_.applicant_id as applicant2_11_0_,
+        applicatio0_.desiredStartDate as desiredS1_11_0_ 
+    from
+        RELATIONEX_APPLICATION applicatio0_ 
+    where
+        applicatio0_.applicant_id=?
+Hibernate: 
+    select
+        applicant0_.id as id10_0_,
+        applicant0_.name as name10_0_ 
+    from
+        RELATIONEX_APPLICANT applicant0_ 
+    where
+        applicant0_.id=?
+Hibernate: 
+    select
+        applicatio0_.applicant_id as applicant2_11_0_,
+        applicatio0_.desiredStartDate as desiredS1_11_0_ 
+    from
+        RELATIONEX_APPLICATION applicatio0_ 
+    where
+        applicatio0_.applicant_id=?
+ -found dependent...
+ -calling parent...
+]]></programlisting>                        
+                </listitem>
+                
+                <listitem><para>Add the following to the test method to verify the actions to the 
+                    database when the entities are being found from the inverse/parent side of the 
+                    relationship. This is something we could not do in the uni-directional case since
+                    the only one side of the relationship knew about the other.</para>
+<programlisting language="java"><![CDATA[
+        em.flush(); em.clear();
+        log.info("finding parent...");
+        Applicant applicant2 = em.find(Applicant.class, applicant.getId());
+        log.info("found parent...");
+        assertEquals("unexpected name", applicant.getName(), applicant2.getName());
+        log.info("calling dependent...");
+        assertTrue("unexpected startDate", 
+                applicant.getApplication().getDesiredStartDate().equals(
+                applicant2.getApplication().getDesiredStartDate()));
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Re-build the module, run the test method, and notice the database output 
+                   shows the inverse/parent being obtained first by primary key and then the owning/dependent
+                   entity being obtained through its foreign key/primary key.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneBiPKJ 
+...
+ -finding parent...
+Hibernate: 
+    select
+        applicant0_.id as id10_0_,
+        applicant0_.name as name10_0_ 
+    from
+        RELATIONEX_APPLICANT applicant0_ 
+    where
+        applicant0_.id=?
+Hibernate: 
+    select
+        applicatio0_.applicant_id as applicant2_11_0_,
+        applicatio0_.desiredStartDate as desiredS1_11_0_ 
+    from
+        RELATIONEX_APPLICATION applicatio0_ 
+    where
+        applicatio0_.applicant_id=?
+ -found parent...
+ -calling dependent...
+]]></programlisting>           
+                    <note>
+                        <para>Hardly scientific, but know that in this mapping case and provider 
+                            software version, we end up saving one query to the database when 
+                            accessing our primary key joined entities form the inverse/parent 
+                            side of the bi-directional relationship.</para>
+                    </note>             
+                </listitem>                        
+
+                <listitem><para>Add the following to the test method to verify delete actions.</para>
+<programlisting language="java"><![CDATA[
+        em.remove(applicant2.getApplication());
+        em.remove(applicant2);
+        em.flush();
+        assertNull("applicant not deleted", em.find(Applicant.class, applicant2.getId()));
+        assertNull("application not deleted", em.find(Application.class, applicant2.getApplication().getId()));
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Re-build the module and notice the successful deletion.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneBiPKJ 
+...
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_APPLICATION 
+    where
+        applicant_id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_APPLICANT 
+    where
+        id=?
+]]></programlisting>                        
+                </listitem>                        
+            </orderedlist>
+        </section>
+
+  
+        <section id="jpa-relationex-o2o-bi-x">
+            <title>One-to-One Bi-directional Relationships X</title>
             <para></para>
+            <orderedlist>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
+        </section>
+    </section>
+
+
+    <section id="jpa-relationex-o2o-actions">
+        <title>One-to-One EntityManager Automated Actions</title>
+        <para>In this section will will go through some automated actions your EntityManager provider can do for your 
+            application behind the scenes that you would otherwise need to do in extra EntityManager calls or additional
+            tracking of entity use.</para>
+
+        <section id="jpa-relationex-o2o-orphan">
+            <title>One-to-One Using Orphan Removal</title>
+            <para>For cases when the parent in a XxxToOne relationship becomes unreferenced by its dependent entity and the parent
+               only exists to support that dependent entity -- orphanRemoval can be applied.</para>
+
+            <itemizedlist>
+                <listitem><para>Child object removes (nulls in the case of OneToOne) its relationship to the parent</para></listitem>
+                <listitem><para>Leaving child was only reference, thus the last reference from the OneToOne relationship</para></listitem>
+                <listitem><para>em.remove() on the orphaned parent is applied</para></listitem>
+                <listitem><para>Orphaned parent entity must not be reassigned to new child. It exists for the sole use of the referencing child(ren)
+                   of that collection.</para></listitem>
+                <listitem><para>Not necessary to declare cascade=DELETE for this relationship</para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+    
             <orderedlist>
                 <listitem><para></para>
 <programlisting language=""><![CDATA[
@@ -2311,8 +2841,27 @@ Hibernate:
             </orderedlist>
         </section>
 
-    </section>
+        <section id="jpa-relationex-o2o-cascade">
+            <title>One-to-One Using Cascades</title>
+            <para></para>
+    
+            <itemizedlist>
+                <listitem><para>cascade=REMOVE should only be declared for OneToXxx relationships and not ManyToXxx. To do otherwise
+                    is not portable.</para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+    
+            <orderedlist>
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
 
+        </section>
+    </section>
 
     <section id="jpa-relationex-summary">
        <title>Summary</title>

@@ -14,6 +14,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
         <class>myorg.relex.Auto</class>
+        <!-- one2one uni-directional -->
         <class>myorg.relex.one2one.Person</class>
         <class>myorg.relex.one2one.Player</class>
         <class>myorg.relex.one2one.Member</class>
@@ -22,6 +23,9 @@
         <class>myorg.relex.one2one.ShowEvent</class>
         <class>myorg.relex.one2one.ShowTickets</class>
         <class>myorg.relex.one2one.BoxOffice</class>
+        <!-- one2one bi-directional -->
+        <class>myorg.relex.one2one.Applicant</class>
+        <class>myorg.relex.one2one.Application</class>
         <!-- 
         <class>myorg.relex.many2one.LifePhase</class>
          -->
