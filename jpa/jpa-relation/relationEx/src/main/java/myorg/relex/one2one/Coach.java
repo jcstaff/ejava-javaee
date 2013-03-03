@@ -2,7 +2,11 @@ package myorg.relex.one2one;
 
 import javax.persistence.*;
 
-
+/**
+ * This class demonstrates a one-to-one, uni-directional relationship
+ * where the foreign key is used to define the primary key with the
+ * use of @MapsId
+ */
 @Entity
 @Table(name="RELATIONEX_COACH")
 public class Coach {
@@ -10,7 +14,7 @@ public class Coach {
 	@Id //provider sets to FK value with help from @MapsId 
 	private int id;
 
-	@OneToOne(optional=false)
+	@OneToOne(optional=false, fetch=FetchType.EAGER)
 	@MapsId //informs provider the PK is derived from FK
 	private Person person;
 

@@ -197,6 +197,7 @@ public class One2OneTest extends JPATestBase {
         //flush commands to database, clear cache, and pull back new instance
         em.flush(); em.clear();
         Coach coach2 = em.find(Coach.class, coach.getId());
+        log.info("calling person...");
         assertEquals("unexpected name", coach.getPerson().getName(), coach2.getPerson().getName());
 
         //verify the contents of the database tables, columns, and relationships
@@ -212,7 +213,6 @@ public class One2OneTest extends JPATestBase {
         assertEquals("unexpected person_id", person.getId(), ((Number)cols[0]).intValue());
         assertEquals("unexpected person_name", person.getName(), (String)cols[1]);
         assertEquals("unexpected coach_id", coach.getId(), ((Number)cols[2]).intValue());
-        
         
         //remove the objects and flush commands to the database
         em.remove(coach2);

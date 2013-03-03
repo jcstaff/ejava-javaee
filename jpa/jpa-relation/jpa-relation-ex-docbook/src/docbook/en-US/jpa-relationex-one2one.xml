@@ -923,12 +923,13 @@ Hibernate:
         <section id="jpa-relationex-o2o-uni-pkj">
             <title>One-to-One Uni-directional Using a Primary Key Join</title>
             <para>Next we will attempt to remove the separate foreign key column
-                from the dependent] table or the separate join table mapping the dependent
+                from the dependent table or the separate join table mapping the dependent
                 and parent tables. We will instead map the dependent to the parent using a 
                 join of their primary key values. This means that the 
                 primary keys of both entities/tables must be the same value. The parent's
                 primary key can be automatically generated -- but the dependent's primary
-                key value must be based on the parent's value. 
+                key value must be based on the parent's value. As you will see, that will cause
+                a slight complication in ordering the persists of the two entities. 
             </para>
             <orderedlist>
 
@@ -984,8 +985,9 @@ public class Employee {
                         <listitem><para>The relationship to the parent entity is defined as being realized through the
                             value in the primary key</para></listitem>
                         <listitem><para>The dependent entity class requires the parent be provided in the constructor and
-                            never modified since it is required and is the source of the primary key for the dependent.
-                            It is illegal to change any primary key value.</para></listitem>
+                            provides no setters for the relation. JPA has no requirement for this but is an appropriate
+                            class design since the person is a required relation, the source of the primary key, and 
+                            it is illegal to change the value of a primary key in the database.</para></listitem>
                     </itemizedlist>
                         
                 </listitem>
@@ -1111,8 +1113,8 @@ Hibernate:
 
                     <para>Notice that -- in the primary key join case -- the query to the 
                         database uses two separate selects rather than a single select with 
-                        a join as done with the FK-join case. We can tell the relationship
-                        is required by the fact that the select for the parent table occurs
+                        a join as done with the FK-join case. We can tell the fetch mode is 
+                        EAGER by the fact that the select for the parent table occurs
                         prior to making a call to the parent.</para>                        
 <programlisting language=""><![CDATA[
 Hibernate: 
@@ -1291,20 +1293,273 @@ Hibernate:
             <para>You have finished modeling a one-to-one, uni-directional relationship
                 using a primary key join. Using this technique saved the dependent of 
                 using a separate foreign key column but created the requirement that the
-                parent entity be persisted first. In the next section we will show how
-                a new feature in JPA 2.0 can eliminate that requirement.</para>
+                parent entity be persisted first. We also saw how changing the required and 
+                fetch mode could impact the underlying quieries to the database. 
+                In the next section we will show how a new feature in JPA 2.0 can ease
+                the propagation of the parent primary key to the dependent entity.</para>
             
         </section>
 
         <section id="jpa-relationex-o2o-uni-mapsid">
             <title>One-to-One Uni-directional Using MapsId</title>
-            <para></para>
+            <para>JPA 2.0 added a new annotation called @MapsId that can ease the propagation
+                of the parent primary key to the dependent entity. There are several uses of
+                @MapsId. We will first look at its capability to identify the foreign key of
+                a dependent entity as being the source of the primary key value. We saw in the 
+                FK-join case where the provider automatically propagates FK values to dependent
+                entities but not PK-joins. Rather than saying the PK realizes the FK. @MapsId 
+                seems to state the FK realizes the PK. Lets take a concrete look... 
+                </para>
             <orderedlist>
-                <listitem><para></para>
+            
+                <listitem><para>Add the following entity class to your src/main tree.
+                    It is incomplete at this point in time.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import javax.persistence.*;
+
+/**
+ * This class demonstrates a one-to-one, uni-directional relationship
+ * where the foreign key is used to define the primary key with the
+ * use of @MapsId
+ */
+@Entity
+@Table(name="RELATIONEX_COACH")
+public class Coach {
+    public enum Type {HEAD, ASSISTANT };
+    @Id //provider sets to FK value with help from @MapsId 
+    private int id;
+
+    @OneToOne(optional=false, fetch=FetchType.EAGER)
+//    @MapsId //informs provider the PK is derived from FK
+    private Person person;
+
+    @Enumerated(EnumType.STRING) @Column(length=16)
+    private Type type;
+
+    public Coach() {}   
+    public Coach(Person person) {
+        this.person = person;
+    }
+    
+    public int getId() { return person==null ? 0 : person.getId(); }
+    public Person getPerson() { return person; }
+
+    public Type getType() { return type; }
+    public void setType(Type type) {
+        this.type = type;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Add the entity class to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2one.Coach</class>
+]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Rebuild the module and take a look at the generated
+                    database schema for what was initially defined above. Notice 
+                    how the dependent table has been define to have both a primary 
+                    key and a separate foreign key. Lets fix that so there is only
+                    a single column to represent the two purposes like what we did
+                    for the PK-join case.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_COACH (
+        id integer not null,
+        type varchar(16),
+        person_id integer not null,
+        primary key (id),
+        unique (person_id)
+    );
+...
+    alter table RELATIONEX_COACH 
+        add constraint FK75C513EA4BE1E366 
+        foreign key (person_id) 
+        references RELATIONEX_PERSON;
+]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Update the dependent entity class to inform the provider
+                    to derive the primary key value from the assigned foreign key relationship
+                    using the @MapsId annotation.</para>
+<programlisting language="java"><![CDATA[
+    @Id //provider sets to FK value with help from @MapsId 
+    private int id;
+
+    @OneToOne(optional=false, fetch=FetchType.EAGER)
+    @MapsId //informs provider the PK is derived from FK
+    private Person person;
+]]></programlisting>
+                    <para>If you look back over the entire class design you should
+                        notice that the class provides no way to ever assign the @Id
+                        except through @MapsId.</para>                        
+                </listitem>
+            
+                <listitem><para>Rebuild the module and review the generated database schema.
+                    Notice how the provider is now using the column named after the 
+                    foreign key as the primary key and has eliminated the separate 
+                    primary key.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+   create table RELATIONEX_COACH (
+        type varchar(16),
+        person_id integer not null,
+        primary key (person_id),
+        unique (person_id)
+    );
+...
+    alter table RELATIONEX_COACH 
+        add constraint FK75C513EA4BE1E366 
+        foreign key (person_id) 
+        references RELATIONEX_PERSON;
+]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Add the following test method to your existing one-to-one test case.
+                   Notice the design of the test method persists the parent and dependent class
+                   together -- without having to worry about deriving the parent primary key first.
+                   That is very convenient.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOne2OneUniMapsId() {
+        log.info("*** testOne2OneUniMapsId ***");
+        Person person = new Person();
+        person.setName("John Harbaugh");
+        Coach coach = new Coach(person);
+        coach.setType(Coach.Type.HEAD);
+        em.persist(person);
+        em.persist(coach); //provider auto propagates person.id to coach.FK mapped to coach.PK 
+        
+        //flush commands to database, clear cache, and pull back new instance
+        em.flush(); em.clear();
+        Coach coach2 = em.find(Coach.class, coach.getId());
+        log.info("calling person...");
+        assertEquals("unexpected name", coach.getPerson().getName(), coach2.getPerson().getName());
+    }
+]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Re-build the module and run the the new test method. Notice 
+                   the provider issues two separate selects; one select each for the dependent 
+                   and parent entity.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniMapsId
+...
+ -*** testOne2OneUniMapsId ***
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_PERSON
+        (id, name) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_COACH
+        (type, person_id) 
+    values
+        (?, ?)
+Hibernate: 
+    select
+        coach0_.person_id as person2_5_0_,
+        coach0_.type as type5_0_ 
+    from
+        RELATIONEX_COACH coach0_ 
+    where
+        coach0_.person_id=?
+Hibernate: 
+    select
+        person0_.id as id1_0_,
+        person0_.name as name1_0_ 
+    from
+        RELATIONEX_PERSON person0_ 
+    where
+        person0_.id=?
+ -calling person...
+]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Add the following assertions about the SQL structure and values.</para>
+<programlisting language="java"><![CDATA[
+        Object[] cols = (Object[]) em.createNativeQuery(
+                "select person.id person_id, person.name, " +
+                       "coach.person_id coach_id " +
+                "from RELATIONEX_COACH coach " +
+                "join RELATIONEX_PERSON person on person.id = coach.person_id " +
+                "where coach.person_id = ?1")
+                .setParameter(1, coach.getId())
+                .getSingleResult();
+        log.info("row=" + Arrays.toString(cols));
+        assertEquals("unexpected person_id", person.getId(), ((Number)cols[0]).intValue());
+        assertEquals("unexpected person_name", person.getName(), (String)cols[1]);
+        assertEquals("unexpected coach_id", coach.getId(), ((Number)cols[2]).intValue());]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Rebuild the module, re-run the test method, and observe the
+                   results of the new assertions.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniMapsId
+...
+Hibernate: 
+    select
+        person.id person_id,
+        person.name,
+        coach.person_id coach_id 
+    from
+        RELATIONEX_COACH coach 
+    join
+        RELATIONEX_PERSON person 
+            on person.id = coach.person_id 
+    where
+        coach.person_id = ?
+ -row=[1, John Harbaugh, 1]
+]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Add cleanup logic and assertions of the removal of the 
+                   two entity rows.</para>
+<programlisting language="java"><![CDATA[
+        em.remove(coach2);
+        em.remove(coach2.getPerson());
+        em.flush();
+        assertNull("person not deleted", em.find(Person.class, person.getId()));
+        assertNull("coach not deleted", em.find(Coach.class, coach.getId()));
+]]></programlisting>                        
+                </listitem>
+            
+                <listitem><para>Re-build the module, re-run the test method, and note the
+                    successful deletion of the two entity rows.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneUniMapsId
+...
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_COACH 
+    where
+        person_id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_PERSON 
+    where
+        id=?
 ]]></programlisting>                        
                 </listitem>
             </orderedlist>
+            
+            <para>You have completed implementing a one-to-one, uni-directional
+                relationship using a @MapsId to derive the primary key of the 
+                dependent entity from the foreign key to the parent entity.
+                This allowed the persist() of the two entities to occur without
+                worrying about a sequencing them in separate actions to the database.</para>
         </section>
 
         <section id="jpa-relationex-o2o-uni-compositepk">
