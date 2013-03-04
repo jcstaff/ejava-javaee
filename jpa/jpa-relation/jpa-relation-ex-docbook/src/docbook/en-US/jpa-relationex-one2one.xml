@@ -3783,8 +3783,10 @@ Hibernate:
     <section id="jpa-relationex-o2o-actions">
         <title>One-to-One EntityManager Automated Actions</title>
         <para>In this section will will go through some automated actions your EntityManager provider can do for your 
-            application behind the scenes that you would otherwise need to do in extra EntityManager calls or additional
-            tracking of entity use.</para>
+            application behind the scenes. These actions automate what you would otherwise need to do in extra 
+            EntityManager calls or additional tracking of entity use. The first case is restricted to deletes and 
+            deals with orphan removal. The second case is much broader in scope and applies to cascading actions
+            that occur during the other CRUD actions.</para>
 
         <section id="jpa-relationex-o2o-orphan">
             <title>One-to-One Using Orphan Removal</title>
@@ -3802,6 +3804,67 @@ Hibernate:
             </itemizedlist>
     
             <orderedlist>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
                 <listitem><para></para>
 <programlisting language=""><![CDATA[
 ]]></programlisting>                        
@@ -3821,12 +3884,580 @@ Hibernate:
                 <listitem><para></para></listitem>
             </itemizedlist>
     
-            <orderedlist>
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
+            <section id="jpa-relationex-o2o-cascade-fromowner">
+                <title>One-to-One Using Cascades From Owner</title>
+                <para>In this example we will demonstrate how cascades can be setup and 
+                    automated from the owning side of a relationship.</para>
+                <orderedlist>
+                
+                    <listitem><para>Put the following entity class in place in your src/main tree. 
+                        This class will be the passive/ignorant side of a one-to-one, uni-directional
+                        relationship.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import java.util.Date;
+import javax.persistence.*;
+
+/**
+ * This class provides an example of a recipient of cascade actions. 
+ */
+@Entity
+@Table(name="RELATIONEX_LICENSE")
+public class License {
+    @Id @GeneratedValue
+    private int id;
+    @Temporal(TemporalType.DATE)
+    private Date renewal;
+    
+    public int getId() { return id; }
+
+    public Date getRenewal() { return renewal; }
+    public void setRenewal(Date renewal) {
+        this.renewal = renewal;
+    }
+}
 ]]></programlisting>                        
-                </listitem>
-            </orderedlist>
+                    </listitem>
+                
+                    <listitem><para>Put the following entity clas in place in your src/main tree.
+                        This class will be the owning side of a one-to-one, uni-directional 
+                        relationship. It is currently incomplete and will need to be updated later.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import java.util.Date;
+import javax.persistence.*;
+
+/**
+ * This class provides an example initiation of cascade actions to a 
+ * related entity.
+ */
+@Entity
+@Table(name="RELATIONEX_LICAPP")
+public class LicenseApplication {
+    @Id @GeneratedValue
+    private int id;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated;
+    
+    @OneToOne(optional=false, fetch=FetchType.EAGER, 
+            cascade={
+//              CascadeType.PERSIST,
+//              CascadeType.DETACH,
+//              CascadeType.REMOVE,
+//              CascadeType.REFRESH,
+//              CascadeType.MERGE
+            })
+    private License license;
+    
+    public LicenseApplication() {}
+    public LicenseApplication(License license) {
+        this.license = license;
+    }
+    
+    public int getId() { return id; }
+    public License getLicense() { return license; }
+
+    public Date getUpdated() { return updated; }
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+}
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Add the two new entities to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2one.License</class>
+        <class>myorg.relex.one2one.LicenseApplication</class>
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Build the module and verify the database schema created
+                        for this exercise is as follows. The specific schema has very little to do 
+                        with implementing the JPA cascades, but it is of general interest to
+                        any JPA mapping exercise.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+   create table RELATIONEX_LICAPP (
+        id integer generated by default as identity,
+        updated timestamp,
+        license_id integer not null,
+        primary key (id),
+        unique (license_id)
+    );
+
+    create table RELATIONEX_LICENSE (
+        id integer generated by default as identity,
+        renewal date,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_LICAPP 
+        add constraint FK51E55C6BE67289CE 
+        foreign key (license_id) 
+        references RELATIONEX_LICENSE;
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Put the following test method in place in your existing
+                        one-to-one test case.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOne2OneCascadeFromOwner() {
+        log.info("*** testOne2OneCascadeFromOwner ***");
+        License license = new License();
+        license.setRenewal(new GregorianCalendar(2012,1,1).getTime());
+        LicenseApplication licapp = new LicenseApplication(license);
+        licapp.setUpdated(new Date());
+        em.persist(licapp);
+        em.flush();
+    }
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Re-build the module, attempt to run the new unit test, and 
+                        observe the reported error.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+ -*** testOne2OneCascadeFromOwner ***
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_LICAPP
+        (id, license_id, updated) 
+    values
+        (null, ?, ?)
+ -SQL Error: 23502, SQLState: 23502
+ -NULL not allowed for column "LICENSE_ID"; SQL statement:
+insert into RELATIONEX_LICAPP (id, license_id, updated) values (null, ?, ?) [23502-168]
+]]></programlisting>
+                        <para>The problem is the test method only persisted the licapp and 
+                            not the license that it references. We could fix this by adding 
+                            a call to em.persist(license) prior to calling em.persist(licapp),
+                            but lets solve this with cascades instead.</para>                        
+                    </listitem>
+                
+                    <listitem><para>It is not always appropriate for the dependent entity 
+                       to create the missing parent, but in this case we are going to rationalize
+                       this it is appropriate -- especially when the instance is there and all 
+                       we want to to automate the persistence of the overall (small) object tree.
+                       Update the relationship in the licapp to cascade persist calls to the related
+                       License entity.</para>
+<programlisting language="java"><![CDATA[
+@Entity
+@Table(name="RELATIONEX_LICAPP")
+public class LicenseApplication {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER, 
+            cascade={
+                CascadeType.PERSIST
+            })
+    private License license;
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Re-build the module, re-run the test method and observe 
+                        that the error has gone away and the license is now being automatically
+                        persisted with the licapp.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+ -*** testOne2OneCascadeFromOwner ***
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_LICENSE
+        (id, renewal) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_LICAPP
+        (id, license_id, updated) 
+    values
+        (null, ?, ?)
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Put the following test code in place to demonstrate behavior 
+                        of cascading a call to detach(). This section of the test looks to
+                        detach the existing entities and then instantiate new instances within the 
+                        local cache.</para>
+<programlisting language="java"><![CDATA[
+        assertTrue("licapp was not managed???", em.contains(licapp));
+        assertTrue("license was not managed???", em.contains(license));
+        em.detach(licapp);
+        assertFalse("licapp still managed", em.contains(licapp));
+        assertFalse("license still managed", em.contains(license));
+        licapp = em.find(LicenseApplication.class, licapp.getId());
+        license = licapp.getLicense();
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Re-build the module, attempt to re-run the unit test, and 
+                        observe the following error when asserting the detached state.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+$ more `find . -name *.txt | grep reports`
+-------------------------------------------------------------------------------
+Test set: myorg.relex.One2OneTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 7.046 sec <<< FAILURE!
+testOne2OneCascadeFromOwner(myorg.relex.One2OneTest)  Time elapsed: 0.724 sec  <<< FAILURE!
+java.lang.AssertionError: license still managed
+        at org.junit.Assert.fail(Assert.java:93)
+        at org.junit.Assert.assertTrue(Assert.java:43)
+        at org.junit.Assert.assertFalse(Assert.java:68)
+        at myorg.relex.One2OneTest.testOne2OneCascadeFromOwner(One2OneTest.java:529)
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Fix the immediate error by enabling cascade=DETACH
+                        from the licapp to the license entity.</para>
+<programlisting language="java"><![CDATA[
+@Entity
+@Table(name="RELATIONEX_LICAPP")
+public class LicenseApplication {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER, 
+            cascade={
+                CascadeType.PERSIST,
+                CascadeType.DETACH
+            })
+    private License license;
+]]></programlisting>                        
+                    </listitem>
+                
+                    <listitem><para>Re-build the module, re-run the test method, and
+                       observe how the change allowed the detach() to propagate down to the 
+                       license entity.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Add the following to your test method in order to 
+                        demonstrate how to cascade refresh() to relationships. The
+                        strategy derives a new renewal and modified date/timestamp
+                        for the license and licapp entities, updates the database
+                        directly through a bulk query, and then synchronizes the entity
+                        state with the database using refresh().</para>
+                    <note>
+                        <para>Bulk query changes bypass the entity cache and render 
+                            any cached instances for updated database rows out of sync.</para>
+                    </note>
+<programlisting language="java"><![CDATA[
+        Date newDate = new GregorianCalendar(2014, 1, 1).getTime();
+        Date newUpdate = new Date(licapp.getUpdated().getTime()+1);
+        assertEquals("unexpected update count", 1, 
+          em.createQuery("update License lic set lic.renewal=:renewal where lic.id=:id")
+            .setParameter("renewal", newDate, TemporalType.DATE)
+            .setParameter("id", license.getId())
+            .executeUpdate());
+        assertEquals("unexpected update count", 1, 
+                em.createQuery("update LicenseApplication licapp set licapp.updated=:updated where licapp.id=:id")
+                .setParameter("updated", newUpdate, TemporalType.TIMESTAMP)
+                .setParameter("id", licapp.getId())
+                .executeUpdate());
+        assertFalse("unexpected updated value prior to refresh", 
+                licapp.getUpdated().getTime() == newUpdate.getTime());
+        assertFalse("unexpected renewal value prior to refresh", 
+                license.getRenewal().getTime() == newDate.getTime());
+        log.info("database updated");
+        em.refresh(licapp);
+        log.info("entities refreshed");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+        assertTrue(String.format("licapp not refreshed, exp=%s, act=%s", df.format(newUpdate), df.format(licapp.getUpdated())), 
+                licapp.getUpdated().getTime() == newUpdate.getTime());
+        assertTrue(String.format("license not refreshed, exp=%s, act=%s", df.format(newDate), df.format(license.getRenewal())), 
+                license.getRenewal().getTime() == newDate.getTime());
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Re-build the module and attempt to run the additional tests. This
+                        will fail since we only synchonized the licapp with the database state.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+ -database updated
+Hibernate: 
+    select
+        licenseapp0_.id as id17_0_,
+        licenseapp0_.license_id as license3_17_0_,
+        licenseapp0_.updated as updated17_0_ 
+    from
+        RELATIONEX_LICAPP licenseapp0_ 
+    where
+        licenseapp0_.id=?
+ -entities refreshed
+...
+Failed tests:   testOne2OneCascadeFromOwner(myorg.relex.One2OneTest): 
+ license not refreshed, exp=2014-02-01 00:00:00.000-0500, act=2012-02-01 00:00:00.000-0500
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Correct the issue by adding cascade=REFRESH to the relationship
+                       in the licapp entity.</para>
+<programlisting language="java"><![CDATA[
+@Entity
+@Table(name="RELATIONEX_LICAPP")
+public class LicenseApplication {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER, 
+            cascade={
+                CascadeType.PERSIST,
+                CascadeType.DETACH,
+                CascadeType.REFRESH
+            })
+    private License license;
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Re-build the module, re-run the test method, and observe the 
+                        successful results for the refresh() being cascaded to the license. Notice
+                        how both entities are re-fetched from the database.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+ -database updated
+Hibernate: 
+    select
+        license0_.id as id16_0_,
+        license0_.renewal as renewal16_0_ 
+    from
+        RELATIONEX_LICENSE license0_ 
+    where
+        license0_.id=?
+Hibernate: 
+    select
+        licenseapp0_.id as id17_1_,
+        licenseapp0_.license_id as license3_17_1_,
+        licenseapp0_.updated as updated17_1_,
+        license1_.id as id16_0_,
+        license1_.renewal as renewal16_0_ 
+    from
+        RELATIONEX_LICAPP licenseapp0_ 
+    inner join
+        RELATIONEX_LICENSE license1_ 
+            on licenseapp0_.license_id=license1_.id 
+    where
+        licenseapp0_.id=?
+ -entities refreshed
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Add the following to your test method to demonstrate the ability
+                        to cascade merge() calls thru relationships. The code updates two detached 
+                        entities, merges them using the entity manager, and then checks the state
+                        of the resultant managed entities.</para>
+<programlisting language="java"><![CDATA[
+        em.detach(licapp);
+        newDate = new GregorianCalendar(2016, 1, 1).getTime();
+        newUpdate = new Date(licapp.getUpdated().getTime()+1);
+        assertFalse("licapp still managed", em.contains(licapp));
+        assertFalse("license still managed", em.contains(licapp.getLicense()));
+        licapp.setUpdated(newUpdate);
+        licapp.getLicense().setRenewal(newDate);
+        log.info("merging changes to detached entities");
+        licapp=em.merge(licapp);
+        em.flush();
+        log.info("merging complete");
+        assertTrue("merged licapp not managed", em.contains(licapp));
+        assertTrue("merged licapp.license not managed", em.contains(licapp.getLicense()));
+        assertTrue(String.format("licapp not merged, exp=%s, act=%s", df.format(newUpdate), df.format(licapp.getUpdated())), 
+                licapp.getUpdated().getTime() == newUpdate.getTime());
+        assertTrue(String.format("license not merged, exp=%s, act=%s", df.format(newDate), df.format(license.getRenewal())), 
+                licapp.getLicense().getRenewal().getTime() == newDate.getTime());
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Re-build the module, re-run the test method, and observe the
+                        error that occurs. The problem is that only changes to the licapp are considered
+                        during the merge. Any changes to license is ignored. 
+                        </para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+ -merging changes to detached entities
+Hibernate: 
+    select
+        licenseapp0_.id as id17_0_,
+        licenseapp0_.license_id as license3_17_0_,
+        licenseapp0_.updated as updated17_0_ 
+    from
+        RELATIONEX_LICAPP licenseapp0_ 
+    where
+        licenseapp0_.id=?
+Hibernate: 
+    select
+        license0_.id as id16_0_,
+        license0_.renewal as renewal16_0_ 
+    from
+        RELATIONEX_LICENSE license0_ 
+    where
+        license0_.id=?
+Hibernate: 
+    update
+        RELATIONEX_LICAPP 
+    set
+        license_id=?,
+        updated=? 
+    where
+        id=?
+ -merging complete
+...
+Failed tests:   testOne2OneCascadeFromOwner(myorg.relex.One2OneTest): license not merged, exp=2016-02-01 00:00:00.000-0500, act=2016-02-01 00:00:00.000-0500
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Attempt to fix the issue by adding cascade=MERGE to the relationship
+                        defined in licapp.</para>
+<programlisting language="java"><![CDATA[
+@Entity
+@Table(name="RELATIONEX_LICAPP")
+public class LicenseApplication {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER, 
+            cascade={
+                CascadeType.PERSIST,
+                CascadeType.DETACH,
+                CascadeType.REFRESH,
+                CascadeType.MERGE
+            })
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Re-build the module, re-run the test method, and observe how
+                        the test now passes. Updates from licapp and license are issued to the 
+                        database.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+ -merging changes to detached entities
+Hibernate: 
+    select
+        licenseapp0_.id as id17_1_,
+        licenseapp0_.license_id as license3_17_1_,
+        licenseapp0_.updated as updated17_1_,
+        license1_.id as id16_0_,
+        license1_.renewal as renewal16_0_ 
+    from
+        RELATIONEX_LICAPP licenseapp0_ 
+    inner join
+        RELATIONEX_LICENSE license1_ 
+            on licenseapp0_.license_id=license1_.id 
+    where
+        licenseapp0_.id=?
+Hibernate: 
+    update
+        RELATIONEX_LICENSE 
+    set
+        renewal=? 
+    where
+        id=?
+Hibernate: 
+    update
+        RELATIONEX_LICAPP 
+    set
+        license_id=?,
+        updated=? 
+    where
+        id=?
+ -merging complete
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Add the following to your test method to demonstrate 
+                        cascades for the remove() method. In this code we attempt to remove
+                        just the licapp but expect both the licapp and related license to 
+                        be deleted from the database when complete.</para>
+<programlisting language=""><![CDATA[
+        em.remove(licapp);
+        em.flush();
+        assertNull("licapp not deleted", em.find(LicenseApplication.class, licapp.getId()));
+        assertNull("licapp.license not deleted", em.find(License.class, licapp.getLicense().getId()));
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Re-build the module, attempt to run the updated test method, and
+                        observe the following error. The trouble is only the licapp is deleted from
+                        the database and the license is being ignored.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_LICAPP 
+    where
+        id=?
+...
+Failed tests:   testOne2OneCascadeFromOwner(myorg.relex.One2OneTest): licapp.license not deleted
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Attempt to fix the problem by adding cascade=DELETE to 
+                        the relationship defined within licapp.</para>
+<programlisting language="java"><![CDATA[
+@Entity
+@Table(name="RELATIONEX_LICAPP")
+public class LicenseApplication {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER, 
+            cascade={
+                CascadeType.PERSIST,
+                CascadeType.DETACH,
+                CascadeType.REMOVE,
+                CascadeType.REFRESH,
+                CascadeType.MERGE
+            })
+    private License license;
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Re-build the module, re-run the test method, and observe 
+                        how the tests now pass. Both the licapp and license are being deleted
+                        during the call to remove().</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromOwner
+...
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_LICAPP 
+    where
+        id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_LICENSE 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    </listitem>
+
+                </orderedlist>
+                <para>You have finished implementing cascade functionality from the 
+                    owning side of a one-to-one relationship. As you can see, the 
+                    cascade capability can save extract calls to the EntityManager 
+                    when there is a large object graph to be persisted or acted on
+                    in other ways. However, as you can also guess -- not every call
+                    should be cascaded at all times. Use this capability wisely as
+                    you can encounter many situations where the cascade could lead to
+                    severe issues or at least poorer performance than desired.</para>
+            </section>
 
         </section>
     </section>

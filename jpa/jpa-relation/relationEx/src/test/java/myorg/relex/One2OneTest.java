@@ -2,6 +2,8 @@ package myorg.relex;
 
 import static org.junit.Assert.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +20,8 @@ import myorg.relex.one2one.Coach;
 import myorg.relex.one2one.Driver;
 import myorg.relex.one2one.Driver2;
 import myorg.relex.one2one.Employee;
+import myorg.relex.one2one.License;
+import myorg.relex.one2one.LicenseApplication;
 import myorg.relex.one2one.Member;
 import myorg.relex.one2one.Person;
 import myorg.relex.one2one.Player;
@@ -499,13 +503,85 @@ public class One2OneTest extends JPATestBase {
         assertNull("truck not deleted", em.find(Auto.class, truck.getId()));
     }
     
-    @Test
+    @Test @Ignore
     public void testOne2OneOrphan() {
         log.info("*** testOne2OneOrphan ***");
     }
+    
+    /**
+     * This test demonstrates use of cascades in a one-to-one 
+     * uni-directional relationship or one where all cascades come
+     * from the owning/dependent side.
+     */
     @Test
-    public void testOne2OneCascade() {
-        log.info("*** testOne2OneCascade ***");
+    public void testOne2OneCascadeFromOwner() {
+        log.info("*** testOne2OneCascadeFromOwner ***");
+        License license = new License();
+        license.setRenewal(new GregorianCalendar(2012,1,1).getTime());
+        LicenseApplication licapp = new LicenseApplication(license);
+        licapp.setUpdated(new Date());
+        em.persist(licapp);
+        em.flush();
+        
+        //detach the current instances and obtain new instances
+        assertTrue("licapp was not managed???", em.contains(licapp));
+        assertTrue("license was not managed???", em.contains(license));
+        em.detach(licapp);
+        assertFalse("licapp still managed", em.contains(licapp));
+        assertFalse("license still managed", em.contains(license));
+        licapp = em.find(LicenseApplication.class, licapp.getId());
+        license = licapp.getLicense();
+        
+        //perform a bulk update and refresh on the entities to synchronize state
+        Date newDate = new GregorianCalendar(2014, 1, 1).getTime();
+        Date newUpdate = new Date(licapp.getUpdated().getTime()+1);
+        assertEquals("unexpected update count", 1, 
+          em.createQuery("update License lic set lic.renewal=:renewal where lic.id=:id")
+        	.setParameter("renewal", newDate, TemporalType.DATE)
+        	.setParameter("id", license.getId())
+        	.executeUpdate());
+        assertEquals("unexpected update count", 1, 
+                em.createQuery("update LicenseApplication licapp set licapp.updated=:updated where licapp.id=:id")
+              	.setParameter("updated", newUpdate, TemporalType.TIMESTAMP)
+              	.setParameter("id", licapp.getId())
+              	.executeUpdate());
+        assertFalse("unexpected updated value prior to refresh", 
+        		licapp.getUpdated().getTime() == newUpdate.getTime());
+        assertFalse("unexpected renewal value prior to refresh", 
+        		license.getRenewal().getTime() == newDate.getTime());
+        log.info("database updated");
+        em.refresh(licapp);
+        log.info("entities refreshed");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+        assertTrue(String.format("licapp not refreshed, exp=%s, act=%s", df.format(newUpdate), df.format(licapp.getUpdated())), 
+        		licapp.getUpdated().getTime() == newUpdate.getTime());
+        assertTrue(String.format("license not refreshed, exp=%s, act=%s", df.format(newDate), df.format(license.getRenewal())), 
+        		license.getRenewal().getTime() == newDate.getTime());
+        
+        //detach, change, and merge changes from the detached entities
+        em.detach(licapp);
+        newDate = new GregorianCalendar(2016, 1, 1).getTime();
+        newUpdate = new Date(licapp.getUpdated().getTime()+1);
+        assertFalse("licapp still managed", em.contains(licapp));
+        assertFalse("license still managed", em.contains(licapp.getLicense()));
+        licapp.setUpdated(newUpdate);
+        licapp.getLicense().setRenewal(newDate);
+        log.info("merging changes to detached entities");
+        licapp=em.merge(licapp);
+        em.flush();
+        log.info("merging complete");
+        assertTrue("merged licapp not managed", em.contains(licapp));
+        assertTrue("merged licapp.license not managed", em.contains(licapp.getLicense()));
+        assertTrue(String.format("licapp not merged, exp=%s, act=%s", df.format(newUpdate), df.format(licapp.getUpdated())), 
+        		licapp.getUpdated().getTime() == newUpdate.getTime());
+        assertTrue(String.format("license not merged, exp=%s, act=%s", df.format(newDate), df.format(license.getRenewal())), 
+        		licapp.getLicense().getRenewal().getTime() == newDate.getTime());
+        
+        //delete remaining objects
+        em.remove(licapp);
+        em.flush();
+        assertNull("licapp not deleted", em.find(LicenseApplication.class, licapp.getId()));
+        assertNull("licapp.license not deleted", em.find(License.class, licapp.getLicense().getId()));
     }
     
     
