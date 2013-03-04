@@ -7,27 +7,27 @@ import javax.persistence.*;
  * relationship where the inverse/parent represents a 0..1 or changing relation.
  */
 @Entity
-@Table(name="RELATIONEX_DRIVER")
-public class Driver {
+@Table(name="RELATIONEX_DRIVER2")
+public class Driver2 {
 	@Id @GeneratedValue
 	private int id;
 	@Column(length=20)
 	private String name;
 	
-	@OneToOne(
+	@OneToOne(mappedBy="driver",//driver is now the inverse side
 			optional=false,    //we must have the auto for this driver
 			fetch=FetchType.EAGER)
-	private Auto auto;
+	private Auto2 auto;
 	
-	protected Driver() {}
-	public Driver(Auto auto) {
+	protected Driver2() {}
+	public Driver2(Auto2 auto) {
 		this.auto = auto;
 	}
 	
 	public int getId() { return id; }
 
-	public Auto getAuto() { return auto; }
-	public void setAuto(Auto auto) { //drivers can switch Autos
+	public Auto2 getAuto() { return auto; }
+	public void setAuto(Auto2 auto) { //drivers can switch Autos
 		this.auto = auto;
 	}
 

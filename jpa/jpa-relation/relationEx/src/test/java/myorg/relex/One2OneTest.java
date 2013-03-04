@@ -13,8 +13,10 @@ import javax.persistence.TemporalType;
 import myorg.relex.one2one.Applicant;
 import myorg.relex.one2one.Application;
 import myorg.relex.one2one.Auto;
+import myorg.relex.one2one.Auto2;
 import myorg.relex.one2one.Coach;
 import myorg.relex.one2one.Driver;
+import myorg.relex.one2one.Driver2;
 import myorg.relex.one2one.Employee;
 import myorg.relex.one2one.Member;
 import myorg.relex.one2one.Person;
@@ -410,17 +412,91 @@ public class One2OneTest extends JPATestBase {
         log.info("calling dependent...");
         assertEquals("unexpected name", auto.getDriver().getName(), auto2.getDriver().getName());
         
-        //remove the driver from the auto
-        em.remove(auto2.getDriver()); //driver must be deleted since requires auto
+        //create a new auto for the current driver to be switched to
+        Auto truck = new Auto();
+        truck.setType(Auto.Type.TRUCK);
+        em.persist(truck);
+        driver = em.find(Driver.class, driver.getId()); //get the managed instance
+        driver.setAuto(truck);
+        truck.setDriver(driver);
+        
         em.flush(); em.clear();
         Auto auto3 = em.find(Auto.class, auto.getId());
+        Driver driver3 = em.find(Driver.class, driver.getId());
+        Auto truck3 = em.find(Auto.class, truck.getId());
         assertNull("driver not removed from auto", auto3.getDriver());
+        assertEquals("driver not assigned to truck", truck.getId(), driver3.getAuto().getId());
+        assertEquals("truck not assigned to driver", driver.getId(), truck3.getDriver().getId());
         
         //remove remaining object(s) from database
+        em.remove(truck3.getDriver());
+        em.remove(truck3);
         em.remove(auto3);
         em.flush();
-        assertNull("driver not deleted", em.find(Driver.class, auto2.getDriver().getId()));
-        assertNull("auto not deleted", em.find(Auto.class, auto2.getId()));
+        assertNull("driver not deleted", em.find(Driver.class, truck3.getDriver().getId()));
+        assertNull("auto not deleted", em.find(Auto.class, auto.getId()));
+        assertNull("truck not deleted", em.find(Auto.class, truck.getId()));
+    }
+
+    /**
+     * This test provides a demonstration of making the inverse/parent side of 
+     * a relationship optional and the owning/dependent side required.
+     */
+    @Test
+    public void testOne2OneBiInverseOptional() {
+        log.info("*** testOne2OneBiInverseOptional() ***");
+        Auto2 auto = new Auto2();           //auto is owning/dependent side
+        auto.setType(Auto2.Type.CAR);
+        Driver2 driver = new Driver2(auto); //driver is inverse/parent side
+        driver.setName("Danica Patrick");
+        auto.setDriver(driver);           //owning side must be set
+        em.persist(driver);
+        em.persist(auto);
+        em.flush();
+
+        //clear the persistence context and get new instances from the inverse side
+        em.flush(); em.clear();
+        log.info("finding parent...");
+        Driver2 driver2 = em.find(Driver2.class, driver.getId());
+        log.info("found parent...");
+        assertEquals("unexpected name", driver.getName(), driver2.getName());
+        log.info("calling dependent...");
+        assertEquals("unexpected name", driver.getAuto().getType(), driver2.getAuto().getType());
+
+        //clear the persistence context and get new instances from the owning side
+        em.flush(); em.clear();
+        log.info("finding dependent...");
+        Auto2 auto2 = em.find(Auto2.class, auto.getId());
+        log.info("found dependent...");
+        assertEquals("unexpected type", auto.getType(), auto.getType());
+        log.info("calling parent...");
+        assertEquals("unexpected name", auto.getDriver().getName(), auto2.getDriver().getName());
+
+        //create a new auto for the current driver to be switched to
+        Auto2 truck = new Auto2();
+        truck.setType(Auto2.Type.TRUCK);
+        driver = em.find(Driver2.class, driver.getId()); //get the managed instance
+        driver.setAuto(truck);
+        auto2.setDriver(null);  //must remove reference to former driver
+        truck.setDriver(driver);//prior to assigning to new driver for 1:1
+        em.persist(truck);
+        
+        em.flush(); em.clear();
+        Auto2 auto3 = em.find(Auto2.class, auto.getId());
+        Driver2 driver3 = em.find(Driver2.class, driver.getId());
+        Auto2 truck3 = em.find(Auto2.class, truck.getId());
+        assertNull("driver not removed from auto", auto3.getDriver());
+        assertEquals("driver not assigned to truck", truck.getId(), driver3.getAuto().getId());
+        assertEquals("truck not assigned to driver", driver.getId(), truck3.getDriver().getId());
+        
+        //remove remaining object(s) from database
+        em.remove(truck3);
+        em.remove(auto3);
+        em.remove(truck3.getDriver());
+        em.flush();
+        assertNull("driver not deleted", em.find(Driver.class, truck3.getDriver().getId()));
+        assertNull("auto not deleted", em.find(Auto.class, auto.getId()));
+        assertNull("truck not deleted", em.find(Auto.class, truck.getId()));
     }
     
     @Test
