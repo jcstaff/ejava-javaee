@@ -12,7 +12,9 @@ import javax.persistence.TemporalType;
 
 import myorg.relex.one2one.Applicant;
 import myorg.relex.one2one.Application;
+import myorg.relex.one2one.Auto;
 import myorg.relex.one2one.Coach;
+import myorg.relex.one2one.Driver;
 import myorg.relex.one2one.Employee;
 import myorg.relex.one2one.Member;
 import myorg.relex.one2one.Person;
@@ -374,7 +376,52 @@ public class One2OneTest extends JPATestBase {
         assertNull("application not deleted", em.find(Application.class, applicant2.getApplication().getId()));
     }
     
-    
+    /**
+     * This test provides a demonstration of creating a one-to-one bi-directional
+     * relationship where the inverse/parent side of the relation has a 0..1 with 
+     * the owning/dependent side.
+     */
+    @Test
+    public void testOne2OneBiOwningOptional() {
+        log.info("*** testOne2OneBiOwningOptional() ***");
+        Auto auto = new Auto();           //auto is inverse/parent side
+        auto.setType(Auto.Type.CAR);
+        Driver driver = new Driver(auto); //driver is owning/dependent side
+        driver.setName("Danica Patrick");
+        auto.setDriver(driver); //application must maintain inverse side
+        em.persist(auto);
+        em.persist(driver);
+
+        //clear the persistence context and get new instances from the owning side
+        em.flush(); em.clear();
+        log.info("finding dependent...");
+        Driver driver2 = em.find(Driver.class, driver.getId());
+        log.info("found dependent...");
+        assertEquals("unexpected name", driver.getName(), driver2.getName());
+        log.info("calling parent...");
+        assertEquals("unexpected name", driver.getAuto().getType(), driver2.getAuto().getType());
+
+        //clear the persistence context and get new instances from the inverse side
+        em.flush(); em.clear();
+        log.info("finding parent...");
+        Auto auto2 = em.find(Auto.class, auto.getId());
+        log.info("found parent...");
+        assertEquals("unexpected type", auto.getType(), auto.getType());
+        log.info("calling dependent...");
+        assertEquals("unexpected name", auto.getDriver().getName(), auto2.getDriver().getName());
+        
+        //remove the driver from the auto
+        em.remove(auto2.getDriver()); //driver must be deleted since requires auto
+        em.flush(); em.clear();
+        Auto auto3 = em.find(Auto.class, auto.getId());
+        assertNull("driver not removed from auto", auto3.getDriver());
+        
+        //remove remaining object(s) from database
+        em.remove(auto3);
+        em.flush();
+        assertNull("driver not deleted", em.find(Driver.class, auto2.getDriver().getId()));
+        assertNull("auto not deleted", em.find(Auto.class, auto2.getId()));
+    }
     
     @Test
     public void testOne2OneOrphan() {
