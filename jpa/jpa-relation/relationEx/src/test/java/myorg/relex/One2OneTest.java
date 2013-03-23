@@ -14,6 +14,7 @@ import javax.persistence.TemporalType;
 
 import myorg.relex.one2one.Applicant;
 import myorg.relex.one2one.Application;
+import myorg.relex.one2one.Attendee;
 import myorg.relex.one2one.Auto;
 import myorg.relex.one2one.Auto2;
 import myorg.relex.one2one.Coach;
@@ -25,6 +26,7 @@ import myorg.relex.one2one.LicenseApplication;
 import myorg.relex.one2one.Member;
 import myorg.relex.one2one.Person;
 import myorg.relex.one2one.Player;
+import myorg.relex.one2one.Residence;
 import myorg.relex.one2one.ShowEvent;
 import myorg.relex.one2one.ShowEventPK;
 import myorg.relex.one2one.ShowTickets;
@@ -584,8 +586,70 @@ public class One2OneTest extends JPATestBase {
         assertNull("licapp.license not deleted", em.find(License.class, licapp.getLicense().getId()));
     }
     
+    /**
+     * This test demonstrates use of cascades in a one-to-one 
+     * bi-directional relationship where all cascades come
+     * from the inverse/parent side of the relationship.
+     */
+    @Test
+    public void testOne2OneCascadeFromInverse() {
+        log.info("*** testOne2OneCascadeFromInverse ***");
+    }
     
     
+    /**
+     * This test demonstrates the capability to have the provider automatically
+     * delete a parent class when it becomes dereferenced from its dependent in 
+     * a relationship.
+     */
+    @Test
+    public void testOrphanRemoval() {
+    	log.info("*** testOrphanRemoval ***");
+    	
+    	log.debug("start by verifying the state of the database");
+    	int startCount = em.createQuery("select count(r) from Residence r", Number.class)
+    			              .getSingleResult().intValue();
+    	log.debug("create a new attendee and residence");
+    	Attendee attendee = new Attendee();
+    	attendee.setName("jones");
+    	attendee.setResidence(new Residence("Columbia", "MD"));
+    	em.persist(attendee);
+    	em.flush();
+    	
+    	log.debug("verify we have a new residence in the database");
+    	assertEquals("unexpected number of residences", startCount+1,
+    			em.createQuery("select count(r) from Residence r", Number.class)
+	              .getSingleResult().intValue());
+    	log.debug("verify we can find our new instance");
+    	int originalId=attendee.getResidence().getId();
+    	assertNotNull("could not find residence", em.find(Residence.class, originalId));
+    	
+    	log.debug("have attendee change residence");
+    	//ISSUE: https://hibernate.atlassian.net/browse/HHH-6484
+    	//MORE: https://hibernate.atlassian.net/browse/HHH-5559
+    	attendee.setResidence(null);
+    	em.flush();
+    	attendee.setResidence(new Residence("Baltimore", "MD"));
+    	em.flush();
+    	
+    	log.debug("verify we have the same number of residences");
+    	assertEquals("unexpected number of residences", startCount+1,
+    			em.createQuery("select count(r) from Residence r", Number.class)
+	              .getSingleResult().intValue());
+    	
+    	log.debug("verify the new instance replaced the original instance");
+    	assertNull("found original residence", em.find(Residence.class, originalId));
+    	assertNotNull("could not find new residence", em.find(Residence.class, attendee.getResidence().getId()));
+    	
+    	log.debug("remove reference to the current residence");
+    	attendee.setResidence(null);
+    	//em.flush(); -- note flush is done during follow-on query
+    	
+    	log.debug("verify all residences created during this test have been deleted");
+    	assertEquals("unexpected number of residences", startCount,
+    			em.createQuery("select count(r) from Residence r", Number.class)
+	              .getSingleResult().intValue());
+    }
     
     
     

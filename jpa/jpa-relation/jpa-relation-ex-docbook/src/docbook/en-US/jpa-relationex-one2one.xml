@@ -3784,93 +3784,10 @@ Hibernate:
         <title>One-to-One EntityManager Automated Actions</title>
         <para>In this section will will go through some automated actions your EntityManager provider can do for your 
             application behind the scenes. These actions automate what you would otherwise need to do in extra 
-            EntityManager calls or additional tracking of entity use. The first case is restricted to deletes and 
-            deals with orphan removal. The second case is much broader in scope and applies to cascading actions
-            that occur during the other CRUD actions.</para>
+            EntityManager calls or additional tracking of entity use.  The first case is broad in scope and applies 
+            to cascading actions that occur during the other CRUD actions. The second case is confined to the removal
+            of orphaned parent entities.</para>
 
-        <section id="jpa-relationex-o2o-orphan">
-            <title>One-to-One Using Orphan Removal</title>
-            <para>For cases when the parent in a XxxToOne relationship becomes unreferenced by its dependent entity and the parent
-               only exists to support that dependent entity -- orphanRemoval can be applied.</para>
-
-            <itemizedlist>
-                <listitem><para>Child object removes (nulls in the case of OneToOne) its relationship to the parent</para></listitem>
-                <listitem><para>Leaving child was only reference, thus the last reference from the OneToOne relationship</para></listitem>
-                <listitem><para>em.remove() on the orphaned parent is applied</para></listitem>
-                <listitem><para>Orphaned parent entity must not be reassigned to new child. It exists for the sole use of the referencing child(ren)
-                   of that collection.</para></listitem>
-                <listitem><para>Not necessary to declare cascade=DELETE for this relationship</para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>
-    
-            <orderedlist>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-            </orderedlist>
-        </section>
 
         <section id="jpa-relationex-o2o-cascade">
             <title>One-to-One Using Cascades</title>
@@ -4459,12 +4376,428 @@ Hibernate:
                     severe issues or at least poorer performance than desired.</para>
             </section>
 
+            <section id="jpa-relationex-o2o-cascade-frominverse">
+                <title>One-to-One Using Cascades From Inverse</title>
+                <para>In this example we will demonstrate how cascades can be setup and 
+                    automated from the inverse side of a relationship.</para>
+                <orderedlist>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                    </listitem>
+                </orderedlist>
+            </section>
+        </section>
+
+        <section id="jpa-relationex-o2o-orphan">
+            <title>One-to-One Using Orphan Removal</title>
+            <para>Orphan removal can e handy when the parent in a XxxToOne relationship becomes unreferenced by its 
+                dependent entity and the parent only exists to support that dependent entity. This is different from 
+                cascade=DELETE. In this case the dependent entity is not being deleted. It is re-referencing the parent.
+                The basic rules are as follows.</para>
+            <itemizedlist>
+                <listitem><para>Child object removes (nulls in the case of OneToOne) its relationship to the parent</para></listitem>
+                <listitem><para>em.remove() on the orphaned parent is applied</para></listitem>
+                <listitem><para>Orphaned parent entity must not be reassigned to new child. It exists for the sole use of the referencing child(ren)
+                   of that collection.</para></listitem>
+                <listitem><para>Not necessary to declare cascade=DELETE for this relationship</para></listitem>
+            </itemizedlist>
+    
+            <orderedlist>
+
+                <listitem><para>Put the following entity class in your src/main tree. This entity class represents a 
+                    parent entity that exists solely for the use of a dependent entity that will be related to it
+                    in a follow-on step.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import javax.persistence.*;
+
+/**
+ * This entity class provides an example of an entity that
+ * will get deleted when no longer referenced by its dependent
+ * entity in a one-to-one relation. This is called orphan removal.
+ */
+@Entity
+@Table(name="RELATIONEX_RESIDENCE")
+public class Residence {
+    @Id @GeneratedValue
+    private int id;
+    @Column(length=16, nullable=false)
+    private String city;
+    @Column(length=2, nullable=false)
+    private String state;
+    
+    protected Residence() {}   
+    public Residence(int id) { this.id = id; }
+    public Residence(String city, String state) {
+        this.city = city;
+        this.state = state;
+    }
+
+    public int getId() { return id; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) {
+        this.city = city;
+    }
+    
+    public String getState() { return state;}
+    public void setState(String state) {
+        this.state = state;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Put the following entity class in your src/main tree. This entity provides 
+                    an example of a dependent entity with a parent that only exists to support this instance.
+                    If this instance ceases to reference the parent -- the parent will be removed by the provider.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import javax.persistence.*;
+
+/**
+ * This entity class provides an example of a dependent with a relationship to a parent entity that
+ * should only exist to support this entity. When this entity ceases to reference the parent, it 
+ * will become "orphaned" and subject to orphanRemoval by the provider.
+ */
+@Entity
+@Table(name="RELATIONEX_ATTENDEE")
+public class Attendee {
+    @Id @GeneratedValue
+    private int id;
+    
+    //orphanRemoval will take care of dereference and DELETE from dependent Attendee 
+    @OneToOne(cascade=CascadeType.PERSIST, orphanRemoval=true)
+    private Residence residence;
+    
+    private String name;
+
+    public int getId() { return id; }
+
+    public Residence getResidence() { return residence; }
+    public void setResidence(Residence residence) {
+        this.residence = residence;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the two entity classes to the persistence unit using the persistence.xml.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2one.Residence</class>
+        <class>myorg.relex.one2one.Attendee</class>
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following test method to your existing one-to-one JUnit test case. At this
+                    point in time, the test just creates an instance of the two related entities. Consistent with
+                    the concept that the parent is only there to support the parent -- we have maintained no reference
+                    to the parent except through the dependent entity.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOrphanRemoval() {
+        log.info("*** testOrphanRemoval ***");
+        
+        log.debug("start by verifying the state of the database");
+        int startCount = em.createQuery("select count(r) from Residence r", Number.class)
+                              .getSingleResult().intValue();
+        log.debug("create a new attendee and residence");
+        Attendee attendee = new Attendee();
+        attendee.setName("jones");
+        attendee.setResidence(new Residence("Columbia", "MD"));
+        em.persist(attendee);
+        em.flush();
+        
+        log.debug("verify we have a new residence in the database");
+        assertEquals("unexpected number of residences", startCount+1,
+                em.createQuery("select count(r) from Residence r", Number.class)
+                  .getSingleResult().intValue());
+        log.debug("verify we can find our new instance");
+        int originalId=attendee.getResidence().getId();
+        assertNotNull("could not find residence", em.find(Residence.class, originalId));
+    }
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Build the module and run the new test method. Notice how the two entities are
+                    inserted into the database and the foreign key column for the dependent entity table
+                    is set to reference the parent.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOrphanRemoval
+...
+ -start by verifying the state of the database
+Hibernate: 
+    select
+        count(residence0_.id) as col_0_0_ 
+    from
+        RELATIONEX_RESIDENCE residence0_ limit ?
+ -create a new attendee and residence
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_RESIDENCE
+        (id, city, state) 
+    values
+        (null, ?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_ATTENDEE
+        (id, name, residence_id) 
+    values
+        (null, ?, ?)
+ -verify we have a new residence in the database
+Hibernate: 
+    select
+        count(residence0_.id) as col_0_0_ 
+    from
+        RELATIONEX_RESIDENCE residence0_ limit ?
+ -verify we can find our new instance
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following to your test method to orphan your original parent.
+                   </para>
+<programlisting language="java"><![CDATA[
+        log.debug("have attendee change residence");
+        //ISSUE: https://hibernate.atlassian.net/browse/HHH-6484
+        //MORE: https://hibernate.atlassian.net/browse/HHH-5559
+//      attendee.setResidence(null);
+//      em.flush();
+        attendee.setResidence(new Residence("Baltimore", "MD"));
+        em.flush();
+
+        log.debug("verify we have the same number of residences");
+        assertEquals("unexpected number of residences", startCount+1,
+                em.createQuery("select count(r) from Residence r", Number.class)
+                  .getSingleResult().intValue());
+        
+        log.debug("verify the new instance replaced the original instance");
+        assertNull("found original residence", em.find(Residence.class, originalId));
+        assertNotNull("could not find new residence", em.find(Residence.class, attendee.getResidence().getId()));
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method to exercise the additional
+                    test snippet. There is a small debate about what should happen. Ideally the older, orphaned 
+                    parent should get deleted when the new parent takes its place as documented in the following
+                    trouble tickets(
+                   <ulink url="https://hibernate.atlassian.net/browse/HHH-6484">HHH-6484</ulink> and
+                   <ulink url="https://hibernate.atlassian.net/browse/HHH-5559">HHH-5559</ulink>). However, 
+                   that does not end up being the case</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOrphanRemoval
+...
+ -have attendee change residence
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_RESIDENCE
+        (id, city, state) 
+    values
+        (null, ?, ?)
+Hibernate: 
+    update
+        RELATIONEX_ATTENDEE 
+    set
+        name=?,
+        residence_id=? 
+    where
+        id=?
+ -verify we have the same number of residences
+Hibernate: 
+    select
+        count(residence0_.id) as col_0_0_ 
+    from
+        RELATIONEX_RESIDENCE residence0_ limit ?
+...
+Failed tests:   testOrphanRemoval(myorg.relex.One2OneTest): unexpected number of residences expected:<1> but was:<2>
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Uncomment setting the parent reference to null and calling em.flush()
+                    on the session. This will cause the desired behavior with the extra steps/calls.</para>
+<programlisting language="java"><![CDATA[
+        attendee.setResidence(null);
+        em.flush();
+        attendee.setResidence(new Residence("Baltimore", "MD"));
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method with the above lines uncommented.
+                    This should cause the older, orphaned parent to be deleted. The assignment to the new parent
+                    is an independent step.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOrphanRemoval
+...
+ -have attendee change residence
+Hibernate: 
+    update
+        RELATIONEX_ATTENDEE 
+    set
+        name=?,
+        residence_id=? 
+    where
+        id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_RESIDENCE 
+    where
+        id=?
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_RESIDENCE
+        (id, city, state) 
+    values
+        (null, ?, ?)
+Hibernate: 
+    update
+        RELATIONEX_ATTENDEE 
+    set
+        name=?,
+        residence_id=? 
+    where
+        id=?
+ -verify we have the same number of residences
+Hibernate: 
+    select
+        count(residence0_.id) as col_0_0_ 
+    from
+        RELATIONEX_RESIDENCE residence0_ limit ?
+ -verify the new instance replaced the original instance
+Hibernate: 
+    select
+        residence0_.id as id18_0_,
+        residence0_.city as city18_0_,
+        residence0_.state as state18_0_ 
+    from
+        RELATIONEX_RESIDENCE residence0_ 
+    where
+        residence0_.id=?
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following statements to verify a simple nulling of the parent.
+                    With the work-around above, there should be no surprise here that this works. However,
+                    the flush() is unnecessary because it appears to be happening automatically because
+                    of the follow-on query.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("remove reference to the current residence");
+        attendee.setResidence(null);
+        //em.flush(); -- note flush is done during follow-on query
+        
+        log.debug("verify all residences created during this test have been deleted");
+        assertEquals("unexpected number of residences", startCount,
+                em.createQuery("select count(r) from Residence r", Number.class)
+                  .getSingleResult().intValue());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method with the final 
+                    exercise of the orphan management capability. Notice how the query made the
+                    manual call to em.flush() unnecessary.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOrphanRemoval
+...
+ -remove reference to the current residence
+ -verify all residences created during this test have been deleted
+Hibernate: 
+    update
+        RELATIONEX_ATTENDEE 
+    set
+        name=?,
+        residence_id=? 
+    where
+        id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_RESIDENCE 
+    where
+        id=?
+Hibernate: 
+    select
+        count(residence0_.id) as col_0_0_ 
+    from
+        RELATIONEX_RESIDENCE residence0_ limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            </orderedlist>
+            
+            <para>You have finished working with orphanRemoval and found that the provider
+                will automatically delete the parent entity when the reference from the 
+                dependent is nulled out and the session is flushed to the database. You 
+                saw how a simple replace did not cause the behavior and noticed there were
+                a few trouble tickets written against that lack of behavior that causes
+                your business logic to take extra steps to have the orphan removed.</para>
         </section>
     </section>
 
     <section id="jpa-relationex-summary">
        <title>Summary</title>
-       <para>In this chapter we
-       </para>
+       <para>In this chapter we mapped two entity classes through a one-to-one relationship
+           using multiple techniques and under different situations. 
+      </para>
+      <itemizedlist>
+          <listitem><para>Uni-directional and Bi-directional Relationships</para></listitem>
+          <listitem><para>Simple and Composite Primary/Foreign Key</para></listitem>
+          <listitem><para>Primary Key, Foreign Key and Link Table Joins</para></listitem>
+          <listitem><para>Cascading actions across relationships</para></listitem>
+          <listitem><para>Cascade and Orphan Removal</para></listitem>
+      </itemizedlist>
     </section>    
 </chapter>
