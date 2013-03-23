@@ -24,6 +24,7 @@ import myorg.relex.one2one.Employee;
 import myorg.relex.one2one.License;
 import myorg.relex.one2one.LicenseApplication;
 import myorg.relex.one2one.Member;
+import myorg.relex.one2one.Passenger;
 import myorg.relex.one2one.Person;
 import myorg.relex.one2one.Player;
 import myorg.relex.one2one.Residence;
@@ -31,6 +32,7 @@ import myorg.relex.one2one.ShowEvent;
 import myorg.relex.one2one.ShowEventPK;
 import myorg.relex.one2one.ShowTickets;
 import myorg.relex.one2one.BoxOffice;
+import myorg.relex.one2one.Ticket;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -594,6 +596,57 @@ public class One2OneTest extends JPATestBase {
     @Test
     public void testOne2OneCascadeFromInverse() {
         log.info("*** testOne2OneCascadeFromInverse ***");
+        Ticket ticket = new Ticket();
+        ticket.setDate(new GregorianCalendar(2013, Calendar.MARCH, 16).getTime());
+        Passenger passenger = new Passenger(ticket, "Fred"); //set inverse side
+        ticket.setPassenger(passenger);                //set the owning side
+        em.persist(ticket);                            //persist from inverse side
+        em.flush();
+        assertTrue("ticket not managed", em.contains(ticket));
+        assertTrue("passenger not managed", em.contains(passenger));
+        
+        log.debug("detach both instances from the persistence context");
+        em.detach(ticket);
+        assertFalse("ticket managed", em.contains(ticket));
+        assertFalse("passenger managed", em.contains(passenger));
+        
+        log.debug("perform a bulk update to both objects");
+        ticket = em.find(Ticket.class, ticket.getId());
+        Date newDate=new GregorianCalendar(2013, Calendar.APRIL, 1).getTime();
+        String newName = "Frederick";
+        em.createQuery("update Ticket t set t.date=:date")
+          .setParameter("date", newDate,TemporalType.DATE)
+          .executeUpdate();
+        em.createQuery("update Passenger p set p.name=:name where p.name='Fred'")
+           .setParameter("name", newName)
+           .executeUpdate();
+        assertFalse("unexpected date", newDate.equals(ticket.getDate()));
+        assertFalse("unexpected name", newName.equals(ticket.getPassenger().getName()));
+        em.refresh(ticket);
+        assertTrue("date not refreshed", newDate.equals(ticket.getDate()));
+        assertTrue("name not refreshed", newName.equals(ticket.getPassenger().getName()));
+        
+        log.debug("merging changes from inverse side");
+        Ticket ticket2 = new Ticket(ticket.getId());
+        ticket2.setDate(new GregorianCalendar(2014, Calendar.APRIL, 1).getTime());
+        Passenger passenger2 = new Passenger(passenger.getId());
+        passenger2.setName("Rick");
+        ticket2.setPassenger(passenger2);
+        passenger2.setTicket(ticket2);
+        assertFalse("unexpected date", ticket2.getDate().equals(ticket.getDate()));
+        assertFalse("unexpected name", ticket2.getPassenger().getName().equals(ticket.getPassenger().getName()));
+        ticket=em.merge(ticket2);
+        em.flush();
+        assertTrue("date not merged", ticket2.getDate().equals(ticket.getDate()));
+        assertTrue("name not merged", ticket2.getPassenger().getName().equals(ticket.getPassenger().getName()));
+        
+        log.debug("delete the entities from the inverse side");
+        assertNotNull("ticket not found", em.find(Ticket.class, ticket.getId()));
+        assertNotNull("passenger not found", em.find(Passenger.class, ticket.getPassenger().getId()));
+        em.remove(ticket);
+        em.flush();
+        assertNull("ticket not removed", em.find(Ticket.class, ticket.getId()));
+        assertNull("passenger not removed", em.find(Passenger.class, ticket.getPassenger().getId()));
     }
     
     

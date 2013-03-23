@@ -3788,19 +3788,6 @@ Hibernate:
             to cascading actions that occur during the other CRUD actions. The second case is confined to the removal
             of orphaned parent entities.</para>
 
-
-        <section id="jpa-relationex-o2o-cascade">
-            <title>One-to-One Using Cascades</title>
-            <para></para>
-    
-            <itemizedlist>
-                <listitem><para>cascade=REMOVE should only be declared for OneToXxx relationships and not ManyToXxx. To do otherwise
-                    is not portable.</para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>
-    
             <section id="jpa-relationex-o2o-cascade-fromowner">
                 <title>One-to-One Using Cascades From Owner</title>
                 <para>In this example we will demonstrate how cascades can be setup and 
@@ -4382,53 +4369,569 @@ Hibernate:
                     automated from the inverse side of a relationship.</para>
                 <orderedlist>
 
-                    <listitem><para></para>
-<programlisting language=""><![CDATA[
+                    <listitem><para>Add the following inverse/parent entity to your src/main source tree.
+                        It is currently incomplete and will cause errors later when we attempt to cascade
+                        entity manager commands from the inverse to owning side.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import java.util.Date;
+import javax.persistence.*;
+
+/**
+ * This entity class provides an example of cascades being originated from
+ * the inverse side of a bi-directional relationship.
+ */
+@Entity
+@Table(name="RELATIONEX_TICKET")
+public class Ticket {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToOne(mappedBy="ticket", fetch=FetchType.EAGER,
+            cascade={
+//          CascadeType.PERSIST,
+//          CascadeType.DETACH,
+//          CascadeType.REFRESH,
+//          CascadeType.MERGE,
+//          CascadeType.REMOVE
+        })
+    private Passenger passenger;
+    
+    @Temporal(TemporalType.DATE)
+    Date date;
+
+    public Ticket(){}
+    public Ticket(int id) { this.id = id; }
+    public int getId() { return id; }
+
+    public Passenger getPassenger() { return passenger; }
+    public void setPassenger(Passenger passenger) {
+        this.passenger = passenger;
+    }
+
+    public Date getDate() { return date; }
+    public void setDate(Date date) {
+        this.date = date;
+    }   
+}
 ]]></programlisting>                        
                     </listitem>
 
-                    <listitem><para></para>
-<programlisting language=""><![CDATA[
+                    <listitem><para>Add the following owning/dependent entity class to your src/main tree. Although
+                        this class will own the foreign key and JPA relation, it is designed to not initiate any 
+                        cascade calls from the owning side to the inverse side.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2one;
+
+import javax.persistence.*;
+
+/**
+ * This entity class provides an example of the owning side of a 
+ * bi-directional relation where all cascades are being initiated
+ * from the inverse side (i.e., not from here).
+ */
+@Entity
+@Table(name="RELATIONEX_PASSENGER")
+public class Passenger {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToOne(optional=false)
+    private Ticket ticket;
+
+    @Column(length=32, nullable=false)
+    private String name;
+    
+    protected Passenger() {}
+    public Passenger(int id) { this.id = id; }
+    public Passenger(Ticket ticket, String name) {
+        this.ticket = ticket;
+        this.name = name;
+    }
+    
+    public int getId() { return id; }
+
+    public Ticket getTicket() { return ticket; }
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
+    }
+    
+    public String getName() { return name;}
+    public void setName(String name) {
+        this.name = name;
+    }
+}
 ]]></programlisting>                        
                     </listitem>
 
-                    <listitem><para></para>
-<programlisting language=""><![CDATA[
+                    <listitem><para>Add the two entity classes to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2one.Ticket</class>
+        <class>myorg.relex.one2one.Passenger</class>
 ]]></programlisting>                        
                     </listitem>
 
-                    <listitem><para></para>
-<programlisting language=""><![CDATA[
+                    <listitem><para>Add the following test method to your existing one-to-one JUnit test case.
+                        At this point in time we are testing the ability to cascade the PERSIST call from the 
+                        inverse/parent side of the relation to the owning/dependent side.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOne2OneCascadeFromInverse() {
+        log.info("*** testOne2OneCascadeFromInverse ***");
+        Ticket ticket = new Ticket();
+        ticket.setDate(new GregorianCalendar(2013, Calendar.MARCH, 16).getTime());
+        Passenger passenger = new Passenger(ticket, "Fred"); //set inverse side
+        ticket.setPassenger(passenger);                //set the owning side
+        em.persist(ticket);                            //persist from inverse side
+        em.flush();
+        assertTrue("ticket not managed", em.contains(ticket));
+        assertTrue("passenger not managed", em.contains(passenger));
+    }
 ]]></programlisting>                        
                     </listitem>
 
-                    <listitem><para></para>
+                    <listitem><para>Build the module and attempt to run the new unit test. The test will fail 
+                       at this point because the inverse side has not been configured to cascade the PERSIST
+                       call to the owning side.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+ -*** testOne2OneCascadeFromInverse ***
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_TICKET
+        (id, date) 
+    values
+        (null, ?)
+...
+  testOne2OneCascadeFromInverse(myorg.relex.One2OneTest): org.hibernate.TransientObjectException: 
+  object references an unsaved transient instance - save the transient instance before flushing: 
+  myorg.relex.one2one.Ticket.passenger -> myorg.relex.one2one.Passenger
 ]]></programlisting>                        
                     </listitem>
 
-                    <listitem><para></para>
-<programlisting language=""><![CDATA[
+                    <listitem><para>Fix the inverse/parent side of the relationship by adding a cascade
+                        of PERSIST.</para>
+<programlisting language="java"><![CDATA[
+    @OneToOne(mappedBy="ticket", fetch=FetchType.EAGER,
+            cascade={
+          CascadeType.PERSIST,
+//          CascadeType.DETACH,
+//          CascadeType.REFRESH,
+//          CascadeType.MERGE,
+//          CascadeType.REMOVE
+        })
+    private Passenger passenger;
 ]]></programlisting>                        
                     </listitem>
 
-                    <listitem><para></para>
+                    <listitem><para>Rebuild the module and re-run the unit test to verify the persist is now
+                        being cascaded from the inverse to owning side of the relationship.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+ -*** testOne2OneCascadeFromInverse ***
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_TICKET
+        (id, date) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_PASSENGER
+        (id, name, ticket_id) 
+    values
+        (null, ?, ?)
+...
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
                     </listitem>
 
-                    <listitem><para></para>
-<programlisting language=""><![CDATA[
+                    <listitem><para>Add the following code snippet to the test method to verify the capability
+                        to cascade a DETACH from the inverse to owning side of a relationship.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("detach both instances from the persistence context");
+        em.detach(ticket);
+        assertFalse("ticket managed", em.contains(ticket));
+        assertFalse("passenger managed", em.contains(passenger));
 ]]></programlisting>                        
                     </listitem>
 
-                    <listitem><para></para>
+                    <listitem><para>Rebuild and attempt to re-run the test method. The test method will fail
+                        because the inverse side is not configured to cascade the DETACH.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+-detach both instances from the persistence context
+...
+Failed tests:   testOne2OneCascadeFromInverse(myorg.relex.One2OneTest): passenger managed
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Fix the inverse side by adding a cascade of DETACH to the relationship.</para>
+<programlisting language="java"><![CDATA[
+    @OneToOne(mappedBy="ticket", fetch=FetchType.EAGER,
+            cascade={
+            CascadeType.PERSIST,
+            CascadeType.DETACH,
+//          CascadeType.REFRESH,
+//          CascadeType.MERGE,
+//          CascadeType.REMOVE
+        })
+    private Passenger passenger;
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Rebuild and re-run the test method with the correction in place. This should 
+                        now pass.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+ -detach both instances from the persistence context
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Add the following code snippet to your test method to demonstrate the 
+                        capability to cascade a REFRESH.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("perform a bulk update to both objects");
+        ticket = em.find(Ticket.class, ticket.getId());
+        Date newDate=new GregorianCalendar(2013, Calendar.APRIL, 1).getTime();
+        String newName = "Frederick";
+        em.createQuery("update Ticket t set t.date=:date")
+          .setParameter("date", newDate,TemporalType.DATE)
+          .executeUpdate();
+        em.createQuery("update Passenger p set p.name=:name where p.name='Fred'")
+           .setParameter("name", newName)
+           .executeUpdate();
+        assertFalse("unexpected date", newDate.equals(ticket.getDate()));
+        assertFalse("unexpected name", newName.equals(ticket.getPassenger().getName()));
+        em.refresh(ticket);
+        assertTrue("date not refreshed", newDate.equals(ticket.getDate()));
+        assertTrue("name not refreshed", newName.equals(ticket.getPassenger().getName()));
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Rebuild the module and attempt to re-run the test method. It should
+                        fail at this point because your inverse side is not configured to cascade the 
+                        REFRESH. Notice how only the state for the ticket was retrieved from the 
+                        database during the refresh() call.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+-perform a bulk update to both objects
+Hibernate: 
+    select
+        ticket0_.id as id18_1_,
+        ticket0_.date as date18_1_,
+        passenger1_.id as id19_0_,
+        passenger1_.name as name19_0_,
+        passenger1_.ticket_id as ticket3_19_0_ 
+    from
+        RELATIONEX_TICKET ticket0_ 
+    left outer join
+        RELATIONEX_PASSENGER passenger1_ 
+            on ticket0_.id=passenger1_.ticket_id 
+    where
+        ticket0_.id=?
+Hibernate: 
+    update
+        RELATIONEX_TICKET 
+    set
+        date=?
+Hibernate: 
+    update
+        RELATIONEX_PASSENGER 
+    set
+        name=? 
+    where
+        name='Fred'
+Hibernate: 
+    select
+        ticket0_.id as id18_0_,
+        ticket0_.date as date18_0_ 
+    from
+        RELATIONEX_TICKET ticket0_ 
+    where
+        ticket0_.id=?
+...
+Failed tests:   testOne2OneCascadeFromInverse(myorg.relex.One2OneTest): name not refreshed
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Fix the issue by configuring the inverse side to cascade the REFRESH
+                        so that both entities will be updated with the state of the database when the 
+                        inverse side is refreshed.
+                    </para>
+<programlisting language="java"><![CDATA[
+    @OneToOne(mappedBy="ticket", fetch=FetchType.EAGER,
+            cascade={
+            CascadeType.PERSIST,
+            CascadeType.DETACH,
+            CascadeType.REFRESH,
+//          CascadeType.MERGE,
+//          CascadeType.REMOVE
+        })
+    private Passenger passenger;
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Rebuild the module and re-run the test method. It should pass at this
+                        point. Notice how both the state for the inverse and owning side is retrieved from 
+                        the database during the refresh of the inverse side.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+ -perform a bulk update to both objects
+Hibernate: 
+    select
+        ticket0_.id as id18_1_,
+        ticket0_.date as date18_1_,
+        passenger1_.id as id19_0_,
+        passenger1_.name as name19_0_,
+        passenger1_.ticket_id as ticket3_19_0_ 
+    from
+        RELATIONEX_TICKET ticket0_ 
+    left outer join
+        RELATIONEX_PASSENGER passenger1_ 
+            on ticket0_.id=passenger1_.ticket_id 
+    where
+        ticket0_.id=?
+Hibernate: 
+    update
+        RELATIONEX_TICKET 
+    set
+        date=?
+Hibernate: 
+    update
+        RELATIONEX_PASSENGER 
+    set
+        name=? 
+    where
+        name='Fred'
+Hibernate: 
+    select
+        passenger0_.id as id19_0_,
+        passenger0_.name as name19_0_,
+        passenger0_.ticket_id as ticket3_19_0_ 
+    from
+        RELATIONEX_PASSENGER passenger0_ 
+    where
+        passenger0_.id=?
+Hibernate: 
+    select
+        ticket0_.id as id18_1_,
+        ticket0_.date as date18_1_,
+        passenger1_.id as id19_0_,
+        passenger1_.name as name19_0_,
+        passenger1_.ticket_id as ticket3_19_0_ 
+    from
+        RELATIONEX_TICKET ticket0_ 
+    left outer join
+        RELATIONEX_PASSENGER passenger1_ 
+            on ticket0_.id=passenger1_.ticket_id 
+    where
+        ticket0_.id=?
+Hibernate: 
+    select
+        passenger0_.id as id19_1_,
+        passenger0_.name as name19_1_,
+        passenger0_.ticket_id as ticket3_19_1_,
+        ticket1_.id as id18_0_,
+        ticket1_.date as date18_0_ 
+    from
+        RELATIONEX_PASSENGER passenger0_ 
+    inner join
+        RELATIONEX_TICKET ticket1_ 
+            on passenger0_.ticket_id=ticket1_.id 
+    where
+        passenger0_.ticket_id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Add the following code snippet to your test method to demonstrate the ability
+                        to cascade a MERGE from the inverse side.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("merging changes from inverse side");
+        Ticket ticket2 = new Ticket(ticket.getId());
+        ticket2.setDate(new GregorianCalendar(2014, Calendar.APRIL, 1).getTime());
+        Passenger passenger2 = new Passenger(passenger.getId());
+        passenger2.setName("Rick");
+        ticket2.setPassenger(passenger2);
+        passenger2.setTicket(ticket2);
+        assertFalse("unexpected date", ticket2.getDate().equals(ticket.getDate()));
+        assertFalse("unexpected name", ticket2.getPassenger().getName().equals(ticket.getPassenger().getName()));
+        ticket=em.merge(ticket2);
+        em.flush();
+        assertTrue("date not merged", ticket2.getDate().equals(ticket.getDate()));
+        assertTrue("name not merged", ticket2.getPassenger().getName().equals(ticket.getPassenger().getName()));
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Rebuild the module and attempt to run the updated test method. This will
+                        fail because the inverse side is not yet configured to cascade the MERGE. Notice how 
+                        only the inverse side is being updated and not the owning entity.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+ -merging changes from inverse side
+Hibernate: 
+    select
+        passenger0_.id as id19_1_,
+        passenger0_.name as name19_1_,
+        passenger0_.ticket_id as ticket3_19_1_,
+        ticket1_.id as id18_0_,
+        ticket1_.date as date18_0_ 
+    from
+        RELATIONEX_PASSENGER passenger0_ 
+    inner join
+        RELATIONEX_TICKET ticket1_ 
+            on passenger0_.ticket_id=ticket1_.id 
+    where
+        passenger0_.ticket_id=?
+ -tearDown() started, em=org.hibernate.ejb.EntityManagerImpl@5dfadfd6
+Hibernate: 
+    update
+        RELATIONEX_TICKET 
+    set
+        date=? 
+    where
+        id=?
+...
+Failed tests:   testOne2OneCascadeFromInverse(myorg.relex.One2OneTest): name not merged
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Fix the issue by configuring the inverse side to cascade the MERGE.</para>
+<programlisting language="java"><![CDATA[
+    @OneToOne(mappedBy="ticket", fetch=FetchType.EAGER,
+            cascade={
+            CascadeType.PERSIST,
+            CascadeType.DETACH,
+            CascadeType.REFRESH,
+            CascadeType.MERGE,
+//          CascadeType.REMOVE
+        })
+    private Passenger passenger;
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Rebuild the module and re-run the test method. The test method should now
+                        pass because to MERGE is bing cascaded from the inverse to owning side of the relation.
+                        Notice how both sides are being updated.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+Hibernate: 
+    update
+        RELATIONEX_PASSENGER 
+    set
+        name=?,
+        ticket_id=? 
+    where
+        id=?
+Hibernate: 
+    update
+        RELATIONEX_TICKET 
+    set
+        date=? 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Add the following code snippet to your test method to demonstrate 
+                        the cascade from the inverse side.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("delete the entities from the inverse side");
+        assertNotNull("ticket not found", em.find(Ticket.class, ticket.getId()));
+        assertNotNull("passenger not found", em.find(Passenger.class, ticket.getPassenger().getId()));
+        em.remove(ticket);
+        em.flush();
+        assertNull("ticket not removed", em.find(Ticket.class, ticket.getId()));
+        assertNull("passenger not removed", em.find(Passenger.class, ticket.getPassenger().getId()));
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Rebuild the module and attempt to run the updated test method. This 
+                        will fail because the inverse side is not configured to cascade the DELETE.
+                        Notice how only the inverse side is being deleted from the database during
+                        the call to remove.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+ -delete the entities from the inverse side
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_TICKET 
+    where
+        id=?
+ -SQL Error: 23503, SQLState: 23503
+ -Referential integrity constraint violation: "FKD08633EA1BCEB406: PUBLIC.RELATIONEX_PASSENGER FOREIGN KEY(TICKET_ID) 
+ REFERENCES PUBLIC.RELATIONEX_TICKET(ID) (1)"; SQL statement:
+delete from RELATIONEX_TICKET where id=? [23503-168]
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Fix the issue by configuring the inverse side to cascade the DELETE.</para>
+<programlisting language="java"><![CDATA[
+    @OneToOne(mappedBy="ticket", fetch=FetchType.EAGER,
+            cascade={
+            CascadeType.PERSIST,
+            CascadeType.DETACH,
+            CascadeType.REFRESH,
+            CascadeType.MERGE,
+            CascadeType.REMOVE
+        })
+    private Passenger passenger;
+]]></programlisting>                        
+                    </listitem>
+
+                    <listitem><para>Rebuild the module and re-run the test method. The test method should pass
+                        this time because the DELETE is now configured to be cascaded from the inverse to owning
+                        side. Notice how both sides of the relationship are being deleted from the database, 
+                        starting with the owning/dependent side to prevent a foreign key constraint violation.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -Dtest=myorg.relex.One2OneTest#testOne2OneCascadeFromInverse
+...
+ -delete the entities from the inverse side
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_PASSENGER 
+    where
+        id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_TICKET 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
                     </listitem>
                 </orderedlist>
+                
+                <para>You have now finished demonstrating how entity manager actions can be automatically
+                    cascaded from the inverse/parent side of a relationship to the owning/dependent side
+                    of a bi-directional relationship. This is not always an appropriate or desired behavior
+                    but it is notable that cascade direction and relationship ownership are independent 
+                    of one another. You can configure cascades to be originated from the owning or inverse 
+                    side of a relationship.</para>
             </section>
-        </section>
 
         <section id="jpa-relationex-o2o-orphan">
             <title>One-to-One Using Orphan Removal</title>
