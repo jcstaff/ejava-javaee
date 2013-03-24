@@ -346,17 +346,87 @@ Hibernate:
                         
                 </listitem>
     
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
+                <listitem><para>Add the following code snippet to the test method to attempt to remove one of the 
+                    child objects. There is an error with code because it attempts to remove the child object
+                    without removing the relationship to the parent.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("remove one of the child objects");
+        em.remove(bus2.getPassengers().get(0)); //ouch!!! this will violate a FK-constraint
+        em.flush();
 ]]></programlisting>                        
                 </listitem>
     
-                <listitem><para></para>
+                <listitem><para>Rebuild the module and attempt to re-run the test method. Not the foreign key constraint
+                    violatation with the current implementation of the test method.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniJoinTable
+...
+ -remove one of the child objects
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_RIDER 
+    where
+        id=?
+ -SQL Error: 23503, SQLState: 23503
+ -Referential integrity constraint violation: "FKE78EAB2B3961502F: PUBLIC.RELATIONEX_BUS_RIDER FOREIGN KEY(RIDER_ID) REFERENCES PUBLIC.RELATIONEX_RIDER(ID) (1)"; SQL statement:
+delete from RELATIONEX_RIDER where id=? [23503-168]
 ]]></programlisting>                        
                 </listitem>
+    
+                <listitem><para>Update the test method to remove the relationship prior to removing the child object.
+                    This should satisfy all constraints.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("remove one of the child objects");
+        Rider rider = bus2.getPassengers().get(0);
+        log.debug("removing the relationship");
+        assertTrue("ride not found in relation", bus2.getPassengers().remove(rider));
+        em.flush();
+        log.debug("removing the object");
+        em.remove(rider); 
+        em.flush();
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. The provider now knows to delete
+                     the relationship prior to deleting the child object. However, it is of some interest that the 
+                     provider chose to delete all relationships and re-add only teh remaining ones rather than
+                     remove a specific one.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniJoinTable
+...
+ -remove one of the child objects
+ -removing the relationship
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_BUS_RIDER 
+    where
+        BUS_NO=?
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_BUS_RIDER
+        (BUS_NO, RIDER_ID) 
+    values
+        (?, ?)
+ -removing the object
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_RIDER 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
             </orderedlist>
-            <para></para>
+            <para>You have finished a brief section on implementing a one-to-many, uni-directional
+                relationship using a join table. You should have noticed that the join table is the 
+                default mapping for such a construct and in the following section we will eliminate 
+                the join table and insert a foreign key into the child table.</para>
         </section>
   
         <section id="jpa-relationex-o2m-uni-fk">
@@ -367,12 +437,810 @@ Hibernate:
                 to a foreign key in the dependent entity table.</para>
             <orderedlist>
     
-                <listitem><para></para>
+                <listitem><para>Place the following entity class in your src/main tree. It provides an example of the 
+                    many side of a one-to-many, uni-directional relationship that we will map using a foreign key
+                    in the table for this entity class.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2many;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the many side of a one-to-many, uni-directional relationship
+ * mapped using a foreign key in the child entity table. Note that all mapping will be from the one/owning
+ * side and no reference to the foreign key exists within this class.
+ */
+@Entity
+@Table(name="RELATIONEX_STOP")
+public class Stop {
+    @Id @GeneratedValue
+    private int id;
+    @Column(length=16)
+    private String name;
+
+    public int getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Place the following entity class in your src/main tree. It provides an example
+                of the one side of a one-to-many, uni-directional relationship that will define a foreign
+                key mapping in the remote child table. The @JoinColumn referenced in the @OneToMany relationship
+                is referring to a column in the child's table and not the parent's table.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2many;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the one side of a one-to-many, uni-directional relationship 
+ * mapped using a foreign key inserted into the child/many table. The @JoinColumn is referencing 
+ * the child table and not this entity's table.
+ */
+@Entity
+@Table(name="RELATIONEX_ROUTE")
+public class Route {
+    @Id 
+    private int number;
+    
+    @OneToMany
+    @JoinColumn
+    private List<Stop> stops;
+
+    protected Route() {}
+    public Route(int number) {
+        this.number = number;
+    }
+
+    public int getNumber() { return number; }
+
+    public List<Stop> getStops() {
+        if (stops == null) {  stops = new ArrayList<Stop>(); }
+        return stops;
+    }
+    public void setStops(List<Stop> stops) {
+        this.stops = stops;
+    }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Add the two new entity classes to the persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2many.Stop</class>
+        <class>myorg.relex.one2many.Route</class>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Build the module and inspect the default database schema generated for 
+                the two entities and their one-to-many, uni-directional relationship.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_ROUTE (
+        number integer not null,
+        primary key (number)
+    );
+...
+    create table RELATIONEX_STOP (
+        id integer generated by default as identity,
+        name varchar(16),
+        stops_number integer,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_STOP 
+        add constraint FK35604A92586DC195 
+        foreign key (stops_number) 
+        references RELATIONEX_ROUTE;
+]]></programlisting>
+                <para>Notice that...</para>
+                <itemizedlist>
+                    <listitem><para>A foreign key was added to the child/many table to reference the parent/one table</para></listitem>
+                    <listitem><para>There is no property within the child/many entity to module this foreign key</para></listitem>
+                </itemizedlist>
+            </listitem>
+
+            <listitem><para>Add the following test method to your existig one-to-many JUnit test case.-</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOneToManyUniFK() {
+        log.info("*** testOneToManyUniFK ***");
+        Route route = new Route(302);
+        em.persist(route);
+        List<Stop> stops = new ArrayList<Stop>();
+        for (int i=0; i<2; i++) {
+            Stop stop = new Stop();
+            stop.setName("stop" + i);
+            em.persist(stop);
+            stops.add(stop);
+        }
+        log.debug("relating entities");
+        route.getStops().addAll(stops);
+        em.flush(); em.clear();
+        
+        log.debug("verify we have expected objects");
+        Route route2 = em.find(Route.class, route.getNumber());
+        assertNotNull("route not found", route2);
+        for (Stop s: route.getStops()) {
+            assertNotNull("stop not found", em.find(Stop.class, s.getId()));
+        }
+        log.debug("verify they are related");
+        assertEquals("unexpected number of stops", route.getStops().size(), route2.getStops().size());
+    }
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild and module and run the new test method to demonstrate creating the 
+                    entities and relating them through the one-to-many, uni-directional foreign key from the
+                    child table. In this case the provider simply updates a foreign key column in the child 
+                    table rather than inserting a row in a separate join table.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniFK
+...
+ -relating entities
+Hibernate: 
+    update
+        RELATIONEX_STOP 
+    set
+        stops_number=? 
+    where
+        id=?
+Hibernate: 
+    update
+        RELATIONEX_STOP 
+    set
+        stops_number=? 
+    where
+        id=?
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Notice how there is no longer a join required when obtaining a list of all children</para>
+<programlisting language=""><![CDATA[
+ -verify we have expected objects
+...
+ -verify they are related
+Hibernate: 
+    select
+        stops0_.stops_number as stops3_25_1_,
+        stops0_.id as id1_,
+        stops0_.id as id24_0_,
+        stops0_.name as name24_0_ 
+    from
+        RELATIONEX_STOP stops0_ 
+    where
+        stops0_.stops_number=?
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following snippet to verify we can delete a child entity. Note that we
+                    have more flexibility in this @JoinColumn case than we did with the previous @JoinTable case.
+                    Since there is no separate foreign key referencing the child row and the foreign key is part of
+                    the child row -- a delete of the child will automatically remove the relationship.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("remove one of the child objects");
+        log.debug("removing the object and relationship");
+        em.remove(route2.getStops().get(0)); 
+        em.flush();
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the unit test to verify we can delete one of the child
+                    objects. Note that we only delete a single row from the child table. In the previous case the 
+                    provider deleted all instances referencing the parent from the join table and re-added them.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniFK
+...
+ -remove one of the child objects
+ -removing the object and relationship
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_STOP 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
                 </listitem>
             </orderedlist>
-            <para></para>
+        
+            <para>You have finished implementing a one-to-many, uni-directional relationship using a 
+            @JoinColumn from the child table. This case was designed to solve the common situation
+            in Java and databases where the database is mapped using a simple foreign key in the 
+            child table and Java is mapped using only a collection in the parent/one entity. The 
+            child/member Java entity has no direct knowledge of which parent entities it will be 
+            associated with. 
+            </para>
+        </section>
+
+        <section id="jpa-relationex-o2m-uni-simple-elementcollection">
+            <title>One-to-Many Uni-directional Mapping of Simple Types using ElementCollection</title>
+            <para>In this section we will demonstrate how to map a collection of a simple data type to a 
+                database using a parent/dependent set of tables and a foreign key. This case is similar to 
+                the one-to-many, uni-directional relationship with a @JoinColumn where all mapping is being done 
+                from the owning/one side. However, in this case, the child/many side is not an entity and does 
+                not have a primary key.</para>
+            <orderedlist>
+    
+                <listitem><para>Place the following entity class in your src/main tree. The class models a collection
+                    of alias strings we will want mapped to a separate dependent/child table. However, the class is 
+                    currently incomplete and will initially define a mapping we do not want.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.one2many;
+
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the owning side of a collection of base data types.
+ * In this case we want a unique set of strings (aliases) mapped to this entity using
+ * a separate dependent table and a foreign key relationship.
+ */
+@Entity
+@Table(name="RELATIONEX_SUSPECT")
+public class Suspect {
+    @Id @GeneratedValue
+    private int id;
+    @Column(length=32)
+    private String name;
+        
+//  @ElementCollection
+//  @CollectionTable(
+//          name="RELATIONEX_SUSPECT_ALIASES",
+//          joinColumns=@JoinColumn(name="SUSPECT_ID"), 
+//          uniqueConstraints=@UniqueConstraint(columnNames={"SUSPECT_ID", "ALIAS"}))
+//  @Column(name="ALIAS", length=32)
+    @Lob
+    private Set<String> aliases;
+
+    public int getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<String> getAliases() {
+        if (aliases==null) { aliases = new HashSet<String>(); }
+        return aliases;
+    }
+    public void setAliases(Set<String> aliases) {
+        this.aliases = aliases;
+    }
+}
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the new entity class to the persistence unit</para>
+ <programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2many.Suspect</class>
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Build the module and look at the database schema generated. Notice how the 
+                    set of strings was mapped to a single column within the parent table of type blob where
+                    the set will be serialized into that column when saved.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+   create table RELATIONEX_SUSPECT (
+        id integer generated by default as identity,
+        aliases blob,
+        name varchar(32),
+        primary key (id)
+    );
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Fix the mapping such that the list of aliases are kept in a separate 
+                    dependent/child table with a value column containing the property value and a 
+                    foreign key back to the parent entity.</para>
+ <programlisting language=""><![CDATA[
+    @ElementCollection
+//  @CollectionTable(
+//          name="RELATIONEX_SUSPECT_ALIASES",
+//          joinColumns=@JoinColumn(name="SUSPECT_ID"), 
+//          uniqueConstraints=@UniqueConstraint(columnNames={"SUSPECT_ID", "ALIAS"}))
+//  @Column(name="ALIAS", length=32)
+    private Set<String> aliases;
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Rebuild the module and observe the new database schema generated.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_SUSPECT (
+        id integer generated by default as identity,
+        name varchar(32),
+        primary key (id)
+    );
+...
+    create table Suspect_aliases (
+        Suspect_id integer not null,
+        aliases varchar(255)
+    );
+...
+    alter table Suspect_aliases 
+        add constraint FK9AC56596DE29C9CF 
+        foreign key (Suspect_id) 
+        references RELATIONEX_SUSPECT;
+]]></programlisting>
+                    <para>Notice that...</para>
+                    <itemizedlist>
+                        <listitem><para>A new table was created to house the collection values</para></listitem>
+                        <listitem><para>The new table has no primary key</para></listitem>
+                        <listitem><para>The new table has a foreign key that references the parent table</para></listitem>        
+                    </itemizedlist>
+                    
+                </listitem>        
+    
+                <listitem><para>Update the table mapping to control the table and column properties of the child table.</para>
+ <programlisting language="java"><![CDATA[
+    @ElementCollection
+    @CollectionTable(
+            name="RELATIONEX_SUSPECT_ALIASES",
+            joinColumns=@JoinColumn(name="SUSPECT_ID"), 
+            uniqueConstraints=@UniqueConstraint(columnNames={"SUSPECT_ID", "ALIAS"}))
+    @Column(name="ALIAS", length=32)
+    private Set<String> aliases;
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Rebuild the module and notice the change in database schema generated.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+   create table RELATIONEX_SUSPECT (
+        id integer generated by default as identity,
+        name varchar(32),
+        primary key (id)
+    );
+
+   create table RELATIONEX_SUSPECT_ALIASES (
+        SUSPECT_ID integer not null,
+        ALIAS varchar(32),
+        unique (SUSPECT_ID, ALIAS)
+    );
+...
+    alter table RELATIONEX_SUSPECT_ALIASES 
+        add constraint FK3FD160E6DE29C9CF 
+        foreign key (SUSPECT_ID) 
+        references RELATIONEX_SUSPECT;
+]]></programlisting>
+                    <para>Notice that...</para>
+                    <itemizedlist>
+                        <listitem><para>@ColumnTable.name was used to name the dependent/child table</para></listitem>
+                        <listitem><para>@ColumnTable.joinColumns was used to name the foreign key to the parent table</para></listitem>
+                        <listitem><para>@ColumnTable.uniqueConstraints was used to restrict columns in table to unique values</para></listitem>
+                        <listitem><para>@Column.name was used to name the value column used to hold the member of collection</para></listitem>
+                        <listitem><para>@Column.length was used to control the size of the value column</para></listitem>
+                    </itemizedlist>
+                </listitem>        
+    
+                <listitem><para>Add a new test method to your existing one-to-many JUnit test case to demonstrate 
+                    mapping of simple value collections to parent/dependent tables using a foreign key relationship.</para>
+ <programlisting language="java"><![CDATA[
+    @Test
+    public void testOneToManyUniElementCollection() {
+        log.info("*** testOneToManyUniElementCollection ***");
+        Suspect suspect = new Suspect();
+        suspect.setName("william");
+        em.persist(suspect);
+        suspect.getAliases().add("bill");
+        suspect.getAliases().add("billy");
+        em.flush(); em.clear();
+        
+        log.debug("verify we have expected objects");
+        Suspect suspect2 = em.find(Suspect.class,  suspect.getId());
+        assertNotNull("suspect not found", suspect2);
+        for (String a: suspect.getAliases()) {
+            assertNotNull("alias not found", suspect2.getAliases().contains(a));
+        }
+    }
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Rebuild the module and run the new test method to demonstrate the construction
+                    of the object graph and the mapping to parent/dependent tables.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniElementCollection
+...
+ -*** testOneToManyUniElementCollection ***
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SUSPECT
+        (id, name) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SUSPECT_ALIASES
+        (SUSPECT_ID, ALIAS) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SUSPECT_ALIASES
+        (SUSPECT_ID, ALIAS) 
+    values
+        (?, ?)
+]]></programlisting>
+ <programlisting language=""><![CDATA[
+ -verify we have expected objects
+Hibernate: 
+    select
+        suspect0_.id as id26_0_,
+        suspect0_.name as name26_0_ 
+    from
+        RELATIONEX_SUSPECT suspect0_ 
+    where
+        suspect0_.id=?
+Hibernate: 
+    select
+        aliases0_.SUSPECT_ID as SUSPECT1_26_0_,
+        aliases0_.ALIAS as ALIAS0_ 
+    from
+        RELATIONEX_SUSPECT_ALIASES aliases0_ 
+    where
+        aliases0_.SUSPECT_ID=?
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Add the following code snippet to demonstrate we can remove a row from 
+                    the dependent/child table by removing the value from the collecion.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("remove one of the child objects");
+        String alias = suspect2.getAliases().iterator().next();
+        assertTrue("alias not found", suspect2.getAliases().remove(alias)); 
+        em.flush();
+]]></programlisting>
+                </listitem>        
+    
+                <listitem><para>Rebuild the module and re-run the test method to demonstrate the removal of an element
+                     from the collection. Note how the provider is removing a row from the database table.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniElementCollection
+...
+ -remove one of the child objects
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SUSPECT_ALIASES 
+    where
+        SUSPECT_ID=? 
+        and ALIAS=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                    <note>
+                        <title>JPA does not define non-unique indexes</title>
+                        <para>Our example was able to take advantage of the fact that an alias should be 
+                            unique for a suspect. If that was not the case, we would have had to remove
+                            the uniqueness constraint for SUSPECT_ID+ALIAS and risked performing a full 
+                            table scan if we didn't either a) manually define a value index on ALIAS 
+                            outside of schema generation or b) use
+                            a vendor-specific annotation to define the necessary non-unique index.
+                            Since database schema generally goes through manual manipulation prior to 
+                            operational deployment and the generation here is just an aide -- this should
+                            not be much of an issue.</para>
+                    </note>
+                </listitem>        
+            </orderedlist>
+            <para>You have finished mapping a collection of simple types to a set of parent and dependent 
+                tables linked through a foreign key. The value within the collection was mapped directly to 
+                a column within the dependent table. By mapping the collection to a separate table instead of 
+                storing a serialized block into a single column -- we gain the ability to use values in the 
+                collection within future database queries.</para>
+        </section>
+
+        <section id="jpa-relationex-o2m-uni-embeddable-elementcollection">
+            <title>One-to-Many Uni-directional Mapping of Embeddable Type using ElementCollection</title>
+            <para>In the previous section we demonstrated how we could map a collection of simple data 
+                values to a set of parent/dependent tables and link them through a foreign key. In this
+                section we are going to add a small complexity where the simple value is now an embeddable 
+                type and will map to multiple columns in the dependent entity table.</para>
+            <orderedlist>
+
+                <listitem><para>Put the following entity class into your src/main tree. This class provides
+                    and example of an embeddable non-entity class that will be mapped using an @ElementCollection
+                    mapping.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.one2many;
+
+import java.util.Date;
+
+import javax.persistence.*;
+
+/**
+ * This class is an example of a non-entity class that will be mapped to a dependent table
+ * and form the many side of an @ElementCollection.
+ */
+@Embeddable
+public class Produce {
+    public static enum Color { RED, GREEN, YELLOW }
+    @Column(length=16)
+    private String name;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(length=10)
+    private Color color;
+    
+    @Temporal(TemporalType.DATE)
+    private Date expires;
+    
+    public Produce() {}
+    public Produce(String name, Color color, Date expires) {
+        this.name = name;
+        this.color = color;
+        this.expires = expires;
+    }
+
+    public String getName() { return name; }
+    public Color getColor() { return color; }
+    public Date getExpires() { return expires; }
+}
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Put the following entity class in place in your src/main tree. This class provides
+                    and example of using an @ElementCollection to persist a list of embeddable, non-entity classes
+                    within a dependent/child table linked to this entity table using a foreign key. The class defines
+                    some of the CollectionTable mappings but leaves some of the default values to what is defined within
+                    the Embeddable class.</para>
+ <programlisting language="java"><![CDATA[
+package myorg.relex.one2many;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.*;
+
+/**
+ * This entity class provides an example of mapping a collection of non-entity/embeddable class instances
+ * to a dependent/child table and relating the child table to this entity table using a foreign key. 
+ */
+@Entity
+@Table(name="RELATIONEX_BASKET")
+public class Basket {
+    @Id @GeneratedValue
+    private int id;
+    
+    @ElementCollection
+    @CollectionTable(
+            name="RELATIONEX_BASKET_PRODUCE",
+            joinColumns=@JoinColumn(name="BASKET_ID"))
+//  @AttributeOverrides({
+//      @AttributeOverride(name="name", column=@Column(name="ITEM_NAME")),
+//      @AttributeOverride(name="color", column=@Column(name="ITEM_COLOR"))
+//  })
+    private List<Produce> contents;
+    
+    @Column(length=16)
+    private String name;
+
+    public int getId() { return id; }
+
+    public List<Produce> getContents() {
+        if (contents == null) { contents = new ArrayList<Produce>(); }
+        return contents;
+    }
+    public void setContents(List<Produce> contents) {
+        this.contents = contents;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Add the two entity classes to the persistence unit.</para>
+ <programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2many.Basket</class>
+        <class>myorg.relex.one2many.Produce</class>
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Build the module and observe the generated schema produced. Notice 
+                    how the @Column mappings from the @Embeddable class show up in the resultant schema.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_BASKET (
+        id integer generated by default as identity,
+        name varchar(16),
+        primary key (id)
+    );
+
+    create table RELATIONEX_BASKET_PRODUCE (
+        BASKET_ID integer not null,
+        color varchar(10),
+        expires date,
+        name varchar(16)
+    );
+...
+    alter table RELATIONEX_BASKET_PRODUCE 
+        add constraint FKA97DDDD776CDC1E5 
+        foreign key (BASKET_ID) 
+        references RELATIONEX_BASKET;
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Assume we wish to control the schema from the parent class. Update the
+                    parent class to control the column names for the product name and color but not the
+                    expiration date. You can do this using an @AttributeOverride for each property you 
+                    wish to change. However multiple @AttributeOverride instances must be wrapped within 
+                    an array and defined within an @AttributeOverrides instance.</para>
+ <programlisting language="java"><![CDATA[
+    @ElementCollection
+    @CollectionTable(
+            name="RELATIONEX_BASKET_PRODUCE",
+            joinColumns=@JoinColumn(name="BASKET_ID"))
+    @AttributeOverrides({
+        @AttributeOverride(name="name", column=@Column(name="ITEM_NAME")),
+        @AttributeOverride(name="color", column=@Column(name="ITEM_COLOR"))
+    })
+    private List<Produce> contents;
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Rebuild the module and observe the updated database schema. Notice how
+                    the name of the columns specified in the parent definition of the mapping was used
+                    over the default name. It also eliminated the @Column length. We could fix that 
+                    in the @Column definition of the @AttributeOverride as well.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_BASKET (
+        id integer generated by default as identity,
+        name varchar(16),
+        primary key (id)
+    );
+
+    create table RELATIONEX_BASKET_PRODUCE (
+        BASKET_ID integer not null,
+        ITEM_COLOR varchar(255),
+        expires date,
+        ITEM_NAME varchar(255)
+    );
+...
+    alter table RELATIONEX_BASKET_PRODUCE 
+        add constraint FKA97DDDD776CDC1E5 
+        foreign key (BASKET_ID) 
+        references RELATIONEX_BASKET;
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Add the following test method to your existing one-to-many JUnit test case.</para>
+ <programlisting language="java"><![CDATA[
+    @Test
+    public void testOneToManyUniEmbeddableElementCollection() {
+        log.info("*** testOneToManyUniEmbeddableElementCollection ***");
+        Basket basket = new Basket();
+        basket.setName("assorted fruit");
+        em.persist(basket);
+        basket.getContents().add(new Produce("apple", Produce.Color.RED, new Date(System.currentTimeMillis()+(3600000*24*30))));
+        basket.getContents().add(new Produce("banana", Produce.Color.YELLOW, new Date(System.currentTimeMillis()+(3600000*24*14))));
+        em.flush(); em.clear();
+        
+        log.debug("verify we have expected objects");
+        Basket basket2 = em.find(Basket.class, basket.getId());
+        assertNotNull("basket not found", basket2);
+        assertEquals("unexpected contents", basket.getContents().size(), basket2.getContents().size());
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Build the module and run the new test method to demonstrate the building of the object
+                    graph and the mapping to the database.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniEmbeddableElementCollection
+...
+ -*** testOneToManyUniEmbeddableElementCollection ***
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_BASKET
+        (id, name) 
+    values
+        (null, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_BASKET_PRODUCE
+        (BASKET_ID, ITEM_COLOR, expires, ITEM_NAME) 
+    values
+        (?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_BASKET_PRODUCE
+        (BASKET_ID, ITEM_COLOR, expires, ITEM_NAME) 
+    values
+        (?, ?, ?, ?)
+]]></programlisting>
+ <programlisting language=""><![CDATA[
+ -verify we have expected objects
+Hibernate: 
+    select
+        basket0_.id as id27_0_,
+        basket0_.name as name27_0_ 
+    from
+        RELATIONEX_BASKET basket0_ 
+    where
+        basket0_.id=?
+Hibernate: 
+    select
+        contents0_.BASKET_ID as BASKET1_27_0_,
+        contents0_.ITEM_COLOR as ITEM2_0_,
+        contents0_.expires as expires0_,
+        contents0_.ITEM_NAME as ITEM4_0_ 
+    from
+        RELATIONEX_BASKET_PRODUCE contents0_ 
+    where
+        contents0_.BASKET_ID=?
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Add the following code snippet to verify we can delete one of the 
+                    embeddable instances from the collection and the database.</para>
+ <programlisting language="java"><![CDATA[
+        log.debug("remove one of the child objects");
+        Produce produce = basket2.getContents().get(0);
+        assertTrue("produce not found", basket2.getContents().remove(produce));
+        em.flush();
+]]></programlisting>
+                </listitem>        
+
+                <listitem><para>Rebuild the module and re-run the test method to observe how
+                    the provider will be deleting our embeddable instance. Notice, in this case,
+                    the provider is deleting all related instances and re-adding the remaining instance(s)
+                    that are still associated to the parent. That is likely due to the fact that
+                    the instance has no primary key and no field combinations were labelled as unique.
+                    The provider has no way to tell one instance from another -- so it must delete and
+                    re-add.</para>
+ <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniEmbeddableElementCollection
+...
+ -remove one of the child objects
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_BASKET_PRODUCE 
+    where
+        BASKET_ID=?
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_BASKET_PRODUCE
+        (BASKET_ID, ITEM_COLOR, expires, ITEM_NAME) 
+    values
+        (?, ?, ?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                </listitem>        
+            </orderedlist>
+            <para>You have finished mapping a collection of embeddable, non-entity class instances to 
+                a dependent table related to the parent table using a foreign key. You were also able to
+                control the table and column properties through @Column definitions directly applied to
+                the embeddable class and override them in the parent class use @AttributeOverride(s).</para>
         </section>
         
     </section>
@@ -386,20 +1254,22 @@ Hibernate:
             <title>One-to-Many Bi-directional using Foreign Key Join</title>
             <para>In this section we will demonstrate the use of a simple foreign key mapping
                 from the owning/dependent entity table to the inverse/parent entity table.</para>
-        <orderedlist>
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </listitem>
-        </orderedlist>
-        <para></para>
+            <orderedlist>
+    
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+            </orderedlist>
         </section>
   
+
         <section id="jpa-relationex-o2m-bi-composite">
             <title>One-to-Many Bi-directional using Derived Composite Primary</title>
             <para>In this section we will demonstrate a one-to-many, bi-directional relationship
                 where the primary key of the owning/dependent entity is derived from the 
                 one side.</para>
+                
         <orderedlist>
             <listitem><para></para>
 <programlisting language=""><![CDATA[
