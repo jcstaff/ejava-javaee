@@ -43,17 +43,21 @@ public class DemoBase {
 
     @After
     public void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
+    	if (em != null) {
+	        EntityTransaction tx = em.getTransaction();
+	        if (tx.isActive()) {
+	            if (tx.getRollbackOnly() == true) { tx.rollback(); }
+	            else                              { tx.commit(); }
+	        }
+	        em.close(); em = null;
+    	}
     }
     
     @AfterClass
     public static void tearDownClass() {
-        emf.close();
+    	if (emf != null) {
+    		emf.close(); emf=null;
+    	}
     }
     
     @SuppressWarnings("unchecked")
