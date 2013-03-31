@@ -56,4 +56,8 @@ public class JPATestBase {
         em.getTransaction().begin();
         em.getTransaction().commit();
     }
+    
+    protected EntityManager createEm() {
+    	return emf.createEntityManager();
+    }
 }

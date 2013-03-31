@@ -1,0 +1,127 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-relationex-collections">
+    <title>JPA Collections</title>
+    <para>In this chapter we will take a closer look at the collections used within a 
+        relationship and how we can better map them to the business need. We will primarily
+        look at collection ordering and access.
+    </para>
+        
+    <section id="jpa-relationex-coll-setup">
+        <title>Setup</title>
+        <para>Create a JUnit test class to host tests for the collection mappings.</para>
+
+        <orderedlist>
+            <listitem><para>Put the following Junit test case base class in your src/test tree.
+                You can delete the sample test method once we add our first real test. JUnit
+                will fail a test case if it cannot locate a @Test to run.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex;
+
+import static org.junit.Assert.*;
+
+import javax.persistence.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.*;
+
+public class CollectionTest extends JPATestBase {
+    private static Log log = LogFactory.getLog(CollectionTest.class);
+    @Test
+    public void testSample() {
+        log.info("testSample");
+    }
+}
+]]></programlisting>                        
+                </listitem>
+ 
+                <listitem><para>Verify the new JUnit test class builds and executes to completion</para>
+<programlisting language=""><![CDATA[
+relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest
+
+...
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://localhost:9092/h2db/ejava]
+...
+[INFO] BUILD SUCCESS                
+]]></programlisting>                        
+                </listitem>
+        
+        </orderedlist>
+    </section>
+
+        
+        
+    <section id="jpa-relationex-coll-entityid">
+        <title>Collection Membership Identity</title>
+        <para>This section will focus on how Java and JPA determine identify within a relationship</para>
+        
+        <section id="jpa-relationex-coll-entityid-xxx">
+            <title></title>
+            <para>In this section we will ...</para>
+            <orderedlist>
+    
+                <listitem><para></para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+                </listitem>
+                
+            </orderedlist>
+        </section>
+        
+    </section>
+
+
+
+    <section id="jpa-relationex-coll-ordered">
+        <title>Collection Ordering</title>
+            <para>In this section we will demonstrate the use of ordering a collection mapped with JPA. 
+                The previous sections mapped the many aspects of the collection but did not represent 
+                any specific ordering within the collection.
+            </para>
+        
+        <section id="jpa-relationex-coll-ordered-xxx">
+            <title>Ordered Collections</title>
+                
+            <orderedlist>
+    
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+            </orderedlist>
+        </section>        
+    </section>
+
+
+
+    <section id="jpa-relationex-coll-iface">
+        <title>Collection Interfaces</title>
+            <para>In this section we will demonstrate the use of different collection interfaces 
+                that can be used with JPA.
+            </para>
+        
+        <section id="jpa-relationex-coll-iface-map">
+            <title>Using Maps with Collections</title>
+            <para>In this section we will demonstrate the mapping of a collection using a java.util.Map
+                interface. This technique is useful for un-ordered collections with elements that are normally
+                accessed by an entity property from the parent/one side of the relationship. Note that access
+                to any entity by any property is always available through the EntityManager and JPAQL.
+            </para>
+                
+            <orderedlist>
+    
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+            </orderedlist>
+        </section>        
+    </section>
+
+    <section id="jpa-relationex-o2m-summary">
+       <title>Summary</title>
+       <para>In this chapter we...
+       </para>
+    </section>    
+</chapter>
