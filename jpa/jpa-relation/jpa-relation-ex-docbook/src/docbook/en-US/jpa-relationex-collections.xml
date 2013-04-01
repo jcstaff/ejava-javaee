@@ -53,11 +53,316 @@ relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest
         
         
     <section id="jpa-relationex-coll-entityid">
-        <title>Collection Membership Identity</title>
-        <para>This section will focus on how Java and JPA determine identify within a relationship</para>
+        <title>Entity Identity</title>
+        <para>This section will focus on how Java and JPA determine the identity of an entity 
+            and when one instance equals another. To demonstrate the concepts, please the following
+            artifacts in place.</para>
         
-        <section id="jpa-relationex-coll-entityid-xxx">
-            <title></title>
+            <orderedlist>
+    
+                <listitem><para>Place the following mapped superclass in place in your src/main tree. Mapped superclasses
+                    are POJO base classes for entities that are not themselves entities. The reason we did not make this
+                    class an entity is because it is abstract and will never exist within our example tree without a
+                    subclass representing the entity. Each instance of the mapped superclass will be assigned an 
+                    instanceId, a database primary key (when persisted), and a business Id (name).  
+                    </para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * This class is used as a common base implementation by several implementations
+ * of hashCode/equals.
+ */
+@MappedSuperclass
+public abstract class Ship {
+    @Transient
+    protected final Log log = LogFactory.getLog(getClass());
+    private static AtomicInteger instanceId = new AtomicInteger();
+    @Transient
+    private int oid = instanceId.getAndAdd(1);
+    
+    @Id
+    @GeneratedValue
+    protected int id;
+    
+    @Column(length = 16)
+    protected String name; //businessId
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    protected Date created;
+
+    
+    public int getId() { return id; }
+    public Ship setId(int id) {
+        this.id = id;
+        return this;
+    }
+
+    public String getName() { return name; }
+    public Ship setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Date getCreated() { return created; }
+    public Ship setCreated(Date created) {
+        this.created = created;
+        return this;
+    }
+    
+    public abstract int peekHashCode();
+    protected int objectHashCode() {
+        return super.hashCode();
+    }
+    
+    @Override
+    public int hashCode() {
+        return logHashCode(peekHashCode());
+    }
+    
+    public int logHashCode(int hashCode) {
+        log.info(toString() +
+                ".hashCode=" + hashCode);
+        return hashCode;
+    }
+    
+    public boolean logEquals(Object obj, boolean equals) {
+        log.info(new StringBuilder()
+            .append(toString())
+            .append(".equals(id=")
+            .append(obj==null?null : ((Ship)obj).id + ",oid=" + ((Ship)obj).oid)
+            .append(")=")
+            .append(equals));
+        return equals;
+    }
+    
+    public String toString() {
+        return getClass().getSimpleName() + "(id=" + id + ",oid=" + oid + ")";
+    }
+}]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Place the following entity class in you src/main tree. This class will be used
+                    to represent a parent/one end of a one-to-many relationship. It is currently incomplete. 
+                    We will add more to it later.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.persistence.*;
+
+/**
+ * This class provides an example one/parent entity with a relationship to many child/dependent
+ * objects -- with the members in each collection based on a different hashCode/equals method.
+ */
+@Entity
+@Table(name="RELATIONEX_FLEET")
+public class Fleet {
+    @Id @GeneratedValue
+    private int id;
+    @Column(length=16)
+    private String name;
+
+    public int getId() { return id; }
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    public String getName() { return name;}
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add onl</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.Fleet</class>
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
+
+        <section id="jpa-relationex-coll-entityid-instanceId">
+            <title>Instance Id</title>
+            <para>In this section we will demonstrate how using the default java.lang.Object
+                hashCode and equals methods is used within Java collections and impacts JPA code.
+                This technique works when working with a single instance that represents a real 
+                object. If two objects are of the same class but different instances -- then they
+                will have a different hashCode identity and equals will be returned as false even
+                if every Java attribute they host have an equivalent value. 
+            </para>
+            <orderedlist>
+    
+                <listitem><para>Add the following entity class to your src/main tree. This class
+                    represents an entity that implements hashCode and equals using the default
+                    java.lang.Object hashCode/equals implementation except it will print some debug
+                    when these methods are called. Notice that it extends the managed superclass you
+                    added earlier.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+import javax.persistence.*;
+
+/**
+ * This class is provides an example of an entity that implements hashCode/equals 
+ * using the default java.lang.Object implementation. Note this implementation is instance-specific. 
+ * No other instance will report the same value even if they represent the same row in the DB.
+ */
+@Entity
+@Table(name="RELATIONEX_SHIP")
+public class ShipByDefault extends Ship {
+    @Override
+    public int peekHashCode() {
+        return super.objectHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            boolean equals = super.equals(obj);
+            return logEquals(obj, equals);
+        } catch (Exception ex) {
+            return logEquals(obj, false);
+        }
+    }
+}
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the new entity class to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.ShipByDefault</class>
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following test method and initial code to your collections JUnit 
+                    test case. This test provides a simple demonstration how two instances with the 
+                    same values will report they are different when using the default java.lang.Object
+                    implementations of hashCode and equals.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testDefault() {
+        log.info("*** testDefault ***");
+        
+        Ship ship1 = new ShipByDefault();
+        Ship ship2 = new ShipByDefault();
+        assertFalse("unexpected hashCode", ship1.hashCode() == ship2.hashCode());
+        assertFalse("unexpected equality", ship1.equals(ship2));
+    }
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Build the module, run the new JUnit test case, and observe the results.
+                    Notice how the two instances have the same databaseId (unassigned at this point) but
+                    a different instanceId, significantly different hashCodes and an equals that does
+                    not match.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testDefault
+...
+ -*** testDefault ***
+ -ShipByDefault(id=0,oid=4).hashCode=1215713589
+ -ShipByDefault(id=0,oid=5).hashCode=1100908089
+ -ShipByDefault(id=0,oid=4).equals(id=0,oid=5)=false
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines of code to the existing test method to 
+                   persist the entity and attempt to retrieve it while still in the cache.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("persisting entity");
+        em.persist(ship1);
+        em.flush();
+        Ship ship3 = em.find(ShipByDefault.class, ship1.getId());
+        assertTrue("unexpected hashCode", ship1.hashCode() == ship3.hashCode());
+        assertTrue("unexpected inequality", ship1.equals(ship3));
+]]></programlisting>                        
+                </listitem>
+                
+                <listitem><para>Rebuild the module, re-run the test method and observe the equality 
+                    that occurs. The two variable instances have the same hashCode and are equal because
+                    they reference the same entity instance. </para>
+<programlisting language=""><![CDATA[
+ -persisting entity
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_SHIP
+        (id, created, name) 
+    values
+        (null, ?, ?)
+ -ShipByDefault(id=1,oid=4).hashCode=1341189399
+ -ShipByDefault(id=1,oid=4).hashCode=1341189399
+ -ShipByDefault(id=1,oid=4).equals(id=1,oid=4)=true
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+                
+                <listitem><para>Add the following lines of code to your existing test method to 
+                    show how the equality of the instances depends on whether the cache is still in place.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instance of entity");
+        em.clear();
+        Ship ship4 = em.find(ShipByDefault.class, ship1.getId());
+        assertFalse("unexpected hashCode", ship1.hashCode() == ship4.hashCode());
+        assertFalse("unexpected equality", ship1.equals(ship4));
+]]></programlisting>                        
+                </listitem>
+    
+    
+                <listitem><para>Rebuild the module, re-run the test method, and observe the fact we now have
+                    inequality now that we have different instances. We can be sure they are different instances 
+                    -- even though they both represent the same database Id -- by the value printed for the oid.</para>
+<programlisting language=""><![CDATA[
+ -getting new instance of entity
+Hibernate: 
+    select
+        shipbydefa0_.id as id29_0_,
+        shipbydefa0_.created as created29_0_,
+        shipbydefa0_.name as name29_0_ 
+    from
+        RELATIONEX_SHIP shipbydefa0_ 
+    where
+        shipbydefa0_.id=?
+ -ShipByDefault(id=1,oid=4).hashCode=368668382
+ -ShipByDefault(id=1,oid=6).hashCode=346534810
+ -ShipByDefault(id=1,oid=4).equals(id=1,oid=6)=false
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+                
+            </orderedlist>
+            <para>You have finished demonstrating how entities using the default java.lang.Object
+                implementation of hashCode and equals identify themselves as equal only if they are
+                referencing the same instance. This works as long as the instance is available to 
+                be referenced but would not work in cases where we want the indentity to span instances
+                that might share the same properties. In the next section we will look at factoring in
+                database Id into the hashCode and equality implementations.</para>
+        </section>
+        
+        <section id="jpa-relationex-coll-entityid-pk">
+            <title>Primary Key Id</title>
             <para>In this section we will ...</para>
             <orderedlist>
     
@@ -68,7 +373,31 @@ relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest
                 
             </orderedlist>
         </section>
-        
+        <section id="jpa-relationex-coll-entityid-switch">
+            <title>Switching Ids</title>
+            <para>In this section we will ...</para>
+            <orderedlist>
+    
+                <listitem><para></para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+                </listitem>
+                
+            </orderedlist>
+        </section>
+
+        <section id="jpa-relationex-coll-entityid-busId">
+            <title>Business Id</title>
+            <para>In this section we will ...</para>
+            <orderedlist>
+    
+                <listitem><para></para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+                </listitem>
+                
+            </orderedlist>
+        </section>
     </section>
 
 

@@ -4,9 +4,9 @@ package myorg.relex.collection;
 import javax.persistence.*;
 
 /**
- * This class is provides an example of an entity that implements hashcode/equals 
+ * This class is provides an example of an entity that implements hashCode/equals 
  * using its business identity. Note that it is not always easy to derive a business Id
- * in all cases. 
+ * for an entity class.
  */
 @Entity
 @Table(name="RELATIONEX_SHIP")

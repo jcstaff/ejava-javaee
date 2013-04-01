@@ -3,8 +3,9 @@ package myorg.relex.collection;
 import javax.persistence.*;
 
 /**
- * This class is provides an example of an entity that implements hashcode/equals 
+ * This class is provides an example of an entity that implements hashCode/equals 
  * using the default java.lang.Object implementation. Note this implementation is instance-specific. 
+ * No other instance will report the same value even if they represent the same row in the DB.
  */
 @Entity
 @Table(name="RELATIONEX_SHIP")

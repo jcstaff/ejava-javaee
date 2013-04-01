@@ -4,9 +4,10 @@ package myorg.relex.collection;
 import javax.persistence.*;
 
 /**
- * This class is provides an example of an entity that implements hashcode/equals 
+ * This class is provides an example of an entity that implements hashCode/equals 
  * using its database assigned primary key. Note the PK is not assigned until the 
- * entity is inserted into the database. 
+ * entity is inserted into the database -- so there will be a period of time prior
+ * to persist() when all instances of this class report the same hashCode/equals. 
  */
 @Entity
 @Table(name="RELATIONEX_SHIP")
