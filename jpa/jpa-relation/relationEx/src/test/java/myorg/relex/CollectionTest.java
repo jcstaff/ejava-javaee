@@ -339,6 +339,8 @@ public class CollectionTest extends JPATestBase {
     		boolean added;
     		assertTrue(added=fleet.getShipsListByPK().add((ShipByPK)ship));
     		log.debug("entity " + ship + " added to list=" + added);
+    		//since the entity is identified by an unassigned PK 
+    		//the subsequent entities overlap with the first entity and are discarded
     		added=fleet.getShipsSetByPK().add((ShipByPK)ship);
     		log.debug("entity " + ship + " added to set=" + added);
     		added = fleet.getShipsSortedSetByPK().add((ShipByPK)ship);
@@ -360,13 +362,16 @@ public class CollectionTest extends JPATestBase {
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship.peekHashCode());
     		assertFalse(ship.peekHashCode() == originalHashCode.get(i));
     		boolean contains;
-    		//since the entity is identified by an unassigned PK the entities
-    		//have changed their identifying information to a new unique value
+    		//since the entity is identified by a PK value that is shared across multiple instances
+    		//representing the same row -- we will get matches between previous instances referencing
+    		//the row and some collections in what we have pulled back.
     		assertTrue(contains=fleet.getShipsListByPK().contains(ship));
     		log.debug("list contains " + ship + "=" + contains);
-    		if (i<=0) { //sets only have one entry
+    		if (i<=0) { //sets only have one entry above because of common hashCode during add() 
+    			//regular sets don't seem to want to match our value
 	    		assertFalse(contains=fleet.getShipsSetByPK().contains(ship));
 	    		log.debug("set contains " + ship + "=" + contains);
+	    		//sorted sets are willing to re-inspect their hashCode to identify the match
 	    		assertTrue(contains=fleet.getShipsSortedSetByPK().contains(ship));
 	    		log.debug("sorted set contains " + ship + "=" + contains);
     		}
@@ -387,7 +392,8 @@ public class CollectionTest extends JPATestBase {
     	log.debug("check if second parent has original child objects"); 
     	for (int i=0; i<count; i++) {
     		Ship ship = fleet.getShipsListByPK().get(i);
-    		//basis of hashCode has changed
+    		//basis of hashCode has changed since the original object created
+    		//but has not changed since the persist()
     		Ship ship2 = em.find(ShipByPK.class, ship.getId());
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship2.peekHashCode());
     		assertFalse(originalHashCode.get(i) == ship2.peekHashCode());
@@ -403,7 +409,7 @@ public class CollectionTest extends JPATestBase {
 	    		assertTrue(contains=fleet2.getShipsSortedSetByPK().contains(ship));    			
 	    		log.debug("sorted set contains " + ship + "=" + contains);
     		}
-    		assertFalse(em.contains(ship));
+    		assertFalse(contains=em.contains(ship));
     		log.debug("em contains " + ship + "=" + contains);
     	}
     }
@@ -426,9 +432,10 @@ public class CollectionTest extends JPATestBase {
     		boolean added;
     		assertTrue(added=fleet.getShipsListBySwitch().add((ShipBySwitch)ship));
     		log.debug("entity " + ship + " added to list=" + added);
-    		added=fleet.getShipsSetBySwitch().add((ShipBySwitch)ship);
+    		//since entities are starting out instance-based -- all elements are accepted by sets
+    		assertTrue(added=fleet.getShipsSetBySwitch().add((ShipBySwitch)ship));
     		log.debug("entity " + ship + " added to set=" + added);
-    		added = fleet.getShipsSortedSetBySwitch().add((ShipBySwitch)ship);
+    		assertTrue(added = fleet.getShipsSortedSetBySwitch().add((ShipBySwitch)ship));
     		log.debug("entity " + ship + " added to sorted set=" + added);
     	}
     	assertEquals("unexpected list size", count, fleet.getShipsListBySwitch().size());
@@ -447,13 +454,14 @@ public class CollectionTest extends JPATestBase {
     		boolean contains;
     		assertTrue(contains=fleet.getShipsListBySwitch().contains(ship));
     		log.debug("list contains " + ship + "=" + contains);
+    		//new hashCode/equals results in mis-match of values even with same PK
     		assertFalse(contains=fleet.getShipsSetBySwitch().contains(ship));
     		log.debug("set contains " + ship + "=" + contains);
-//    		assertTrue(
-    			contains=fleet.getShipsSortedSetBySwitch().contains(ship);//);
+    		//new hashCode/equals results confuse sorted set -- some true, some false
+   			contains=fleet.getShipsSortedSetBySwitch().contains(ship);
     		log.debug("sorted set contains " + ship + "=" + contains);
-//    		assertFalse(
-    			contains=em.contains(ship);//);
+    		//entity manager answers contains=true for instances it manages
+    		assertTrue(contains=em.contains(ship));
     		log.debug("em contains " + ship + "=" + contains);
     	}
     	
@@ -475,6 +483,8 @@ public class CollectionTest extends JPATestBase {
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship2.peekHashCode());
     		assertFalse(originalHashCode.get(i) == ship2.peekHashCode());
     		boolean contains;
+    		//since the entities are now being identified by PK value -- the previous
+    		//values will match the entities in the retrieved collections
     		assertTrue(contains=fleet.getShipsListBySwitch().contains(ship));
     		log.debug("original list contains " + ship + "=" + contains);
     		assertTrue(contains=fleet2.getShipsListBySwitch().contains(ship));
@@ -483,6 +493,7 @@ public class CollectionTest extends JPATestBase {
     		log.debug("set contains " + ship + "=" + contains);
     		assertTrue(contains=fleet2.getShipsSortedSetBySwitch().contains(ship));
     		log.debug("sorted set contains " + ship + "=" + contains);
+    		//entity manager only answers contains=true for instances it manages
     		assertFalse(contains=em.contains(ship));
     		log.debug("em contains " + ship + "=" + contains);
     	}

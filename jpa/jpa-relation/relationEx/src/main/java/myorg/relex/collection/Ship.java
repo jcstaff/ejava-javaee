@@ -74,8 +74,8 @@ public abstract class Ship {
 	public boolean logEquals(Object obj, boolean equals) {
 		log.info(new StringBuilder()
 		    .append(toString())
-		    .append(".equals(")
-		    .append(obj==null?null : ((Ship)obj).id + "," + ((Ship)obj).oid)
+		    .append(".equals(id=")
+		    .append(obj==null?null : ((Ship)obj).id + ",oid=" + ((Ship)obj).oid)
 		    .append(")=")
 		    .append(equals));
 		return equals;
