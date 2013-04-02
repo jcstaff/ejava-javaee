@@ -148,6 +148,20 @@ javaeeEx
             </dependency>
 ---
 
+    [[1]] Add the following database properties to define your connection to 
+    the database for Impl unit testing.
+
+---
+    <properties>
+        ...
+        <jdbc.driver>org.h2.Driver</jdbc.driver>
+        <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
+        <jdbc.user>sa</jdbc.user>
+        <jdbc.password/>
+        <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
+    </properties>
+---
+
     [[1]] Add the following pluginManagement to your parent pom to 
     account for certain plugins used by the Impl project.
 
