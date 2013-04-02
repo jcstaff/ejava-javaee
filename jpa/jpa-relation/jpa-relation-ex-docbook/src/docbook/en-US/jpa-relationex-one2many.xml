@@ -1263,6 +1263,69 @@ Hibernate:
             </orderedlist>
         </section>
   
+        <section id="jpa-relationex-o2m-bi-jointable">
+            <title>One-to-Many Bi-directional using Join Table</title>
+            <para>In this section we will demonstrate map a one-to-many relationship using a join table
+                and a bi-directional relationship. From the database perspective, this will look identical
+                to the one-to-many, uni-directional case. However, from the JPA-perspective the relationship
+                is being owned (i.e, defined) by the child/many side. In the uni-directional case there was
+                no property in the child/many entity class that represented the relationship. Now there is. 
+            </para>
+            <orderedlist>
+    
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+ 
+                <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+                </listitem>        
+            </orderedlist>
+        </section>
+  
+
 
         <section id="jpa-relationex-o2m-bi-composite">
             <title>One-to-Many Bi-directional using Derived Composite Primary</title>
