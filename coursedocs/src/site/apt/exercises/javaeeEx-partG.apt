@@ -83,7 +83,7 @@ $ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
     count.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
     @Test
@@ -143,7 +143,7 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
     the existing test method.
 
 ---
-$cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 
             loops += 1;
@@ -179,7 +179,7 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.421 sec
     [[1]] Attempt a deeper processing of the people returned.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
             log.debug("people=" + people);
@@ -213,7 +213,7 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
 
 
 ---
-./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
+./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarIT.txt
  -------------------------------------------------------------------------------
 Test set: myorg.javaeeex.ejbclient.RegistrarIT
  -------------------------------------------------------------------------------
@@ -276,7 +276,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     [[1]] Update the RMI Test to use the hydrated form.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
         do {
@@ -322,7 +322,7 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
     Web UI use case. Do this after the paging tests.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
         ...
         assertEquals("unexpected number of people", TOTAL, count);
@@ -363,10 +363,10 @@ Tests run: 6, Failures: 0, Errors: 1, Skipped: 0
 [INFO] There are test failures.
 ---
 ---
-./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarTest.txt
+./javaeeExTest/target/failsafe-reports/myorg.javaeeex.ejbclient.RegistrarIT.txt
 ::::::::::::::
  -------------------------------------------------------------------------------
-Test set: myorg.javaeeex.ejbclient.RegistrarTest
+Test set: myorg.javaeeex.ejbclient.RegistrarIT
  -------------------------------------------------------------------------------
 Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.356 sec <<< FAILURE!
 testWebUseCase(myorg.javaeeex.ejbclient.RegistrarIT)  Time elapsed: 1.111 sec  <<< ERROR!
@@ -418,7 +418,7 @@ $cat ./javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
     [[1]] Update the RMI Test RMI Test to use the new hydrated form.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
         //view a specific user
@@ -495,7 +495,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     person.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
         //update the address of a specific user
@@ -515,7 +515,7 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
     [[1]] Update the RMI Test method to report the changes of the person.
 
 ---
-$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarTest.java
+$ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
         //view user again
