@@ -129,4 +129,41 @@ public class CollectionTest extends JPATestBase {
     	log.debug("checking set for entity");
         assertFalse("set found changed entity after persist", ships.contains(ship1));
     }
+
+    /**
+     * This method will demonstrate how instances basing their hashCode and equals on
+     * a consistent business identity through their lifetime offer the best solution
+     * of them all -- assuming it it possible or needed. 
+     */
+    @Test
+    public void testByBusinessId() {
+    	log.info("*** testByBusinessId ***");
+
+    	Ship ship1 = new ShipByBusinessId().setName("one").setCreated(new Date());
+    	try { Thread.sleep(1);} catch (InterruptedException e) {}
+    	Ship ship2 = new ShipByBusinessId().setName("two").setCreated(new Date());
+    	assertFalse("unexpected hashCode", ship1.hashCode() == ship2.hashCode());
+    	assertFalse("unexpected equality", ship1.equals(ship2));
+
+    	Set<Ship> ships = new HashSet<Ship>();
+    	log.debug("add first ship to the set");
+    	assertTrue("first entity not accepted into set", ships.add(ship1));
+    	log.debug("add second ship to the set");
+    	assertTrue("second entity not accepted into set", ships.add(ship2));
+    	assertEquals("unexpected set.size", 2, ships.size());
+        log.debug("ships=" + ships);
+
+        em.persist(ship1);
+    	em.flush();
+    	em.clear();
+    	log.debug("getting new instance of entity");
+    	Ship ship4 = em.find(ShipByBusinessId.class, ship1.getId());
+    	ship1.setId(0); //making sure that databaseId not used in hashCode/equals
+    	assertTrue("unexpected hashCode", ship1.hashCode() == ship4.hashCode());
+    	assertTrue("unexpected equality", ship1.equals(ship4));
+    	
+    	log.debug("set=" + ships);
+    	log.debug("checking set for entity");
+        assertTrue("entity not found after persist", ships.contains(ship1));
+    }
 }

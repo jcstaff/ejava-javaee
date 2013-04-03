@@ -254,12 +254,6 @@ public class ShipByDefault extends Ship {
 ]]></programlisting>                        
                 </listitem>
     
-                <listitem><para>Add the new entity class to your persistence unit.</para>
-<programlisting language="xml"><![CDATA[
-        <class>myorg.relex.collection.ShipByDefault</class>
-]]></programlisting>                        
-                </listitem>
-    
                 <listitem><para>Add the following test method and initial code to your collections JUnit 
                     test case. This test provides a simple demonstration how two instances with the 
                     same values will report they are different when using the default java.lang.Object
@@ -751,15 +745,198 @@ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testBySwitch
 
         <section id="jpa-relationex-coll-entityid-busId">
             <title>Business Id</title>
-            <para>In this section we will ...</para>
+            <para>In this section we will look at one last identity mechanism. It is based on a 
+                "business identity". In this approach we model our entity with enough properties
+                such that they may be able to uniquely identity the entity without a database Id.
+                It is possible the designer could use these field(s) as the primary key or just 
+                make them the implementation basis for hashCode and equals. In the following example
+                we will use both a database-assigned primary key and separate identifying business
+                properties.
+                </para>
             <orderedlist>
     
-                <listitem><para></para>
+                <listitem><para>Add the following entity class to your src/main tree. This entity class
+                    derives its hashCode and equals using a name and createTime property. It may be 
+                    possible that two entities have the same name -- but no two entities should be 
+                    created with the same name in the same millisecond.</para>
 <programlisting language="java"><![CDATA[
+package myorg.relex.collection;
+
+
+import javax.persistence.*;
+
+/**
+ * This class is provides an example of an entity that implements hashCode/equals 
+ * using its business identity. Note that it is not always easy to derive a business Id
+ * for an entity class.
+ */
+@Entity
+@Table(name="RELATIONEX_SHIP")
+public class ShipByBusinessId extends Ship {
+    @Override
+    public int peekHashCode() {
+        return (name==null ? 0 : name.hashCode()) + 
+               (created==null ? 0 : (int)created.getTime());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            boolean equals = name.equals(((ShipByBusinessId)obj).name) &&
+                    created.getTime() == (((ShipByBusinessId)obj).created.getTime());
+            return logEquals(obj, equals);
+        } catch (Exception ex) {
+            return logEquals(obj, false);
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + 
+                ", name=" + name + 
+                ", created=" + (created==null ? 0 : created.getTime()); 
+    }
+}
 ]]></programlisting>                        
                 </listitem>
-                
+    
+                <listitem><para>Add the new entity class to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.collection.ShipByBusinessId</class>
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following test method to your existing JUnit test case.
+                   The first part of the test simply verifies we can determine the two instances
+                   are different. Note that since we are factoring in the createTime into the 
+                   businessId -- a delay is inserted to make sure we get at least one millisecond
+                   different in createTime. Depending on how our entities are created -- this may not
+                   be necessary.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testByBusinessId() {
+        log.info("*** testByBusinessId ***");
+
+        Ship ship1 = new ShipByBusinessId().setName("one").setCreated(new Date());
+        try { Thread.sleep(1);} catch (InterruptedException e) {}
+        Ship ship2 = new ShipByBusinessId().setName("two").setCreated(new Date());
+        assertFalse("unexpected hashCode", ship1.hashCode() == ship2.hashCode());
+        assertFalse("unexpected equality", ship1.equals(ship2));
+    }
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Build the model and run the new test method. Note that we are 
+                    factoring in both name and createTime into the hashCode/equals and ignoring
+                    the databaseId and instanceId.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByBusinessId
+...
+ -*** testByBusinessId ***
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364958763502.hashCode=-840726444
+ -ShipByBusinessId(id=0,oid=5), name=two, created=1364958763503.hashCode=-840721349
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364958763502.equals(id=0,oid=5)=false
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following to your test method. Since we have a unique 
+                    identities at this point, both instances will be placed into the set. We
+                    will also notice later that since the hashCode/equals does not change --
+                    the set will be usable after the calls to persist() complete.</para>
+<programlisting language="java"><![CDATA[
+        Set<Ship> ships = new HashSet<Ship>();
+        log.debug("add first ship to the set");
+        assertTrue("first entity not accepted into set", ships.add(ship1));
+        log.debug("add second ship to the set");
+        assertTrue("second entity not accepted into set", ships.add(ship2));
+        assertEquals("unexpected set.size", 2, ships.size());
+        log.debug("ships=" + ships);
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. Of no surprise --
+                    we get both instances inserted into the set.</para>
+<programlisting language="java"><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByBusinessId
+...
+ -add first ship to the set
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364959025047.hashCode=-840464899
+ -add second ship to the set
+ -ShipByBusinessId(id=0,oid=5), name=two, created=1364959025048.hashCode=-840459804
+ -ships=[ShipByBusinessId(id=0,oid=4), name=one, created=1364959025047, ShipByBusinessId(id=0,oid=5), name=two, created=1364959025048]
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines to your test method. In this section
+                    we will be determining whether a managed and unmanaged instance will have
+                    the same Id. Note the extra effort to zero out the databaseId for the 
+                    unmanaged instance.</para>
+<programlisting language="java"><![CDATA[
+        em.persist(ship1);
+        em.flush();
+        em.clear();
+        log.debug("getting new instance of entity");
+        Ship ship4 = em.find(ShipByBusinessId.class, ship1.getId());
+        ship1.setId(0); //making sure that databaseId not used in hashCode/equals
+        assertTrue("unexpected hashCode", ship1.hashCode() == ship4.hashCode());
+        assertTrue("unexpected equality", ship1.equals(ship4));
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild the module and re-run the test method. Note how the 
+                    instances match even when one does not have the databaseId to work with.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByBusinessId
+...
+-getting new instance of entity
+Hibernate: 
+    select
+        shipbybusi0_.id as id29_0_,
+        shipbybusi0_.created as created29_0_,
+        shipbybusi0_.name as name29_0_ 
+    from
+        RELATIONEX_SHIP shipbybusi0_ 
+    where
+        shipbybusi0_.id=?
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364959720863.hashCode=-839769083
+ -ShipByBusinessId(id=1,oid=6), name=one, created=1364959720863.hashCode=-839769083
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364959720863.equals(id=1,oid=6)=true
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Add the following lines to your test method. This is where the
+                    hashCode/equals basis switch failed us last time.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("set=" + ships);
+        log.debug("checking set for entity");
+        assertTrue("entity not found after persist", ships.contains(ship1));
+]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Rebuild your module and re-run the test method. This time around
+                    you should notice the entity is able to be found within the set.</para>
+<programlisting language="java"><![CDATA[
+-set=[ShipByBusinessId(id=0,oid=5), name=two, created=1364959903295, ShipByBusinessId(id=0,oid=4), name=one, created=1364959903294]
+ -checking set for entity
+ -ShipByBusinessId(id=0,oid=4), name=one, created=1364959903294.hashCode=-839586652
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
             </orderedlist>
+            <para>You have finished working through the business identity solution for calculating
+                hashCode and equals. This technique has the benefit of being stable from the time
+                the instance was created in memory and through persistence into the database. It was
+                a bit harder to calculate because we needed to find enough stable entity properties
+                persisted to the database so we could derive the values. If these values are actually
+                unique -- we could have considered using them for the primary key but that would 
+                have added database complexity/expense.</para>
         </section>
     </section>
 

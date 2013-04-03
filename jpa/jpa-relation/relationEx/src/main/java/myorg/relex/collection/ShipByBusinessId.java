@@ -1,6 +1,8 @@
 package myorg.relex.collection;
 
 
+import java.text.DateFormat;
+
 import javax.persistence.*;
 
 /**
@@ -26,5 +28,12 @@ public class ShipByBusinessId extends Ship {
 		} catch (Exception ex) {
 			return logEquals(obj, false);
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + 
+				", name=" + name + 
+				", created=" + (created==null ? 0 : created.getTime()); 
 	}
 }
