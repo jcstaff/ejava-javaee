@@ -1245,108 +1245,19 @@ Hibernate:
         
     </section>
 
-    <section id="jpa-relationex-o2m-bi">
-        <title>One-to-Many Bi-directional</title>
-        <para>JPA requires the many side of a one-to-many, bi-directional relationship to be the 
-            owning side of that relationship. There is no choice to be made along those lines.</para>
-
-        <section id="jpa-relationex-o2m-bi-fk">
-            <title>One-to-Many Bi-directional using Foreign Key Join</title>
-            <para>In this section we will demonstrate the use of a simple foreign key mapping
-                from the owning/dependent entity table to the inverse/parent entity table.</para>
-            <orderedlist>
-    
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
-            </orderedlist>
-        </section>
-  
-        <section id="jpa-relationex-o2m-bi-jointable">
-            <title>One-to-Many Bi-directional using Join Table</title>
-            <para>In this section we will demonstrate map a one-to-many relationship using a join table
-                and a bi-directional relationship. From the database perspective, this will look identical
-                to the one-to-many, uni-directional case. However, from the JPA-perspective the relationship
-                is being owned (i.e, defined) by the child/many side. In the uni-directional case there was
-                no property in the child/many entity class that represented the relationship. Now there is. 
-            </para>
-            <orderedlist>
-    
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
- 
-                <listitem><para></para>
- <programlisting language=""><![CDATA[
-]]></programlisting>
-                </listitem>        
-            </orderedlist>
-        </section>
-  
-
-
-        <section id="jpa-relationex-o2m-bi-composite">
-            <title>One-to-Many Bi-directional using Derived Composite Primary</title>
-            <para>In this section we will demonstrate a one-to-many, bi-directional relationship
-                where the primary key of the owning/dependent entity is derived from the 
-                one side.</para>
-                
-        <orderedlist>
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </listitem>
-        </orderedlist>
-        <para></para>
-        </section>
-    </section>
-
-
     <section id="jpa-relationex-o2m-summary">
        <title>Summary</title>
-       <para>In this chapter we...
+       <para>In this chapter we you worked with several types of one-to-many, uni-directional relationships.
+           In this type of relationship -- the many/dependent/child entity knows nothing of the relationship
+           and it must be defined from the one/parent side. You formed that mapping using a join table as well
+           as inserting a foreign key into the child table (without the child entity knowing about it). You also
+           created mappings to many/child/dependent non-entity classes like Strings and JPA @Embeddable classes.
+           This allows you to create entity classes with collections of non-entity POJOs and have them mapped
+           to database tables that can be used for searches.
+       </para>
+       <para>We will pause our look at relationship types take a detour into collection types in the next chapter.
+           We want to make sure we understand many of the options available and requirements associated with those 
+           options before we get too far into more relationships involving a "many" side.  
        </para>
     </section>    
 </chapter>
