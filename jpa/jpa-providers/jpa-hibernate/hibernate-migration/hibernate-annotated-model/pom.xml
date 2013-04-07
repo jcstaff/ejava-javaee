@@ -8,18 +8,24 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hibernate-model</artifactId>
+    <artifactId>hibernate-annotated-model</artifactId>
 
-    <name>Hibernate Migration::Model</name>
+    <name>Hibernate Migration::Annotated Model</name>
     <description>
-        This project provides example legacy classes absent of any persistence annotations,
-        mappings, or library references.
+        This project provides example legacy classes updated with persistence annotations that many be used 
+        to configure legacy Hibernate Sessions and JPA EntityManagers.
     </description>
     
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${legacy-hibernate.version}</version>
         </dependency>
 
         <dependency>

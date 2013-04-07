@@ -1,16 +1,29 @@
-package ejava.jpa.hibernatemigration.legacyhbm;
+package ejava.jpa.hibernatemigration.annotated;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 /**
- * This class provides an example legacy class that will use an external entity mapping. It 
+ * This class provides an example class that uses annotation entity mapping. It 
  * extends a superclass and contains an enum. It is the inverse side of a OneToMany, 
  * bi-directional relationship.
  */
+@Entity
+@Table(name="HMIG_CUSTOMER")
 public class Customer extends Person {
+	@OneToMany(mappedBy="customer")
 	private Set<Sale> purchases;
+	@Column(length=32)
 	private String email;
+	@Enumerated(EnumType.STRING)
+	@Column(length=8)
 	private CustomerLevel level=CustomerLevel.BRONZE;
 	
 	public Set<Sale> getPurchases() {

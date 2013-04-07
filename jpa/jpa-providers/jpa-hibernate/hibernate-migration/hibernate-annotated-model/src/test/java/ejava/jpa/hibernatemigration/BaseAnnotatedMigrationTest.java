@@ -1,6 +1,9 @@
 package ejava.jpa.hibernatemigration;
 
 import static org.junit.Assert.assertEquals;
+
+
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -14,12 +17,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import ejava.jpa.hibernatemigration.legacyhbm.Clerk;
-import ejava.jpa.hibernatemigration.legacyhbm.Customer;
-import ejava.jpa.hibernatemigration.legacyhbm.CustomerLevel;
-import ejava.jpa.hibernatemigration.legacyhbm.Sale;
+import ejava.jpa.hibernatemigration.annotated.Clerk;
+import ejava.jpa.hibernatemigration.annotated.Customer;
+import ejava.jpa.hibernatemigration.annotated.CustomerLevel;
+import ejava.jpa.hibernatemigration.annotated.Sale;
 
-public abstract class BaseMigrationTest {
+public abstract class BaseAnnotatedMigrationTest {
 	private final Log log = LogFactory.getLog(getClass());
 
 	protected abstract void save(Object entity);
