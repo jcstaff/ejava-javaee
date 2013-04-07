@@ -21,6 +21,7 @@
         <module>hibernate-jpamix</module>
         <module>hibernate-annotated-model</module>
         <module>hibernate-annotated-session</module>
+        <module>hibernate-annotated-session-override</module>
     </modules>
     
     <properties>
@@ -34,8 +35,15 @@
         <!-- hibernate 3.2.0.ga was released to ibiblio 2007-01-04 
         --> 
         <legacy-hibernate.version>3.2.0.ga</legacy-hibernate.version>
+        <!--
         <annotated-hibernate.version>3.5.0-Final</annotated-hibernate.version>
+        -->
+        <annotated-hibernate.version>3.2.0.ga</annotated-hibernate.version>
         <annotated-hibernate-slf4j.version>1.5.8</annotated-hibernate-slf4j.version>
+
+        <annotated-override-hibernate.version>3.5.0-Final</annotated-override-hibernate.version>
+        <annotated-override-hibernate-slf4j.version>1.5.8</annotated-override-hibernate-slf4j.version>
+
         <hibernate3-maven-plugin-hibernate.version>3.6.0.Final</hibernate3-maven-plugin-hibernate.version>
     </properties>
 
