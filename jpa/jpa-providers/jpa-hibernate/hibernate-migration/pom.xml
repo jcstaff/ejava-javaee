@@ -13,14 +13,24 @@
         This project and its sub-modules demonstrate a gradual migration from legacy 
         hibernate mappings to a modern JPA mapping implementation.
     </description>
+
+    <modules>
+        <module>hibernate-model</module>
+        <module>hibernate-hbm</module>
+        <module>hibernate-orm</module>
+        <module>hibernate-jpamix</module>
+    </modules>
     
     <properties>
         <commons-logging.version>1.1.1</commons-logging.version>
         <h2db.version>1.3.168</h2db.version>
         <hsqldb.version>2.2.8</hsqldb.version>
         <junit.version>4.10</junit.version>
+        <slf4j.version>1.6.1</slf4j.version>
         <log4j.version>1.2.13</log4j.version>
         <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
+        <!-- hibernate 3.2.0.ga was released to ibiblio 2007-01-04 --> 
+        <legacy-hibernate.version>3.2.0.ga</legacy-hibernate.version>
     </properties>
 
     <dependencyManagement>
@@ -50,13 +60,14 @@
                 <artifactId>log4j</artifactId>
                 <version>${log4j.version}</version>
             </dependency>    
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     
-    <modules>
-        <module>hibernate-hbm</module>
-    </modules>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -65,34 +76,39 @@
                     <artifactId>hibernate3-maven-plugin</artifactId>
                     <version>${hibernate3-maven-plugin.version}</version>
                     <extensions>true</extensions>
-                    <executions>
-                        <execution>
-                            <id>generate-drop-ddl</id>
-                            <phase>process-test-resources</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <hibernatetool>
-                                    <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                        outputfilename="${project.artifactId}-drop.ddl"/>
-                                </hibernatetool>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>generate-create-ddl</id>
-                            <phase>process-test-resources</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <hibernatetool>
-                                    <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                        outputfilename="${project.artifactId}-create.ddl"/>
-                                </hibernatetool>
-                            </configuration>
-                        </execution>
-                    </executions>
+                    <configuration>
+                        <hibernatetool destdir="target/classes/ddl">
+                            <classpath>
+                                <path location="${project.build.directory}/classes" />
+                                <path location="${project.build.directory}/test-classes" />
+                            </classpath>
+                        </hibernatetool>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>hibernate3-maven-plugin</artifactId>
+                                        <versionRange>[3.0,)</versionRange>
+                                        <goals>
+                                            <goal>run</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -8,12 +8,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hibernate-hbm</artifactId>
+    <artifactId>hibernate-orm</artifactId>
 
-    <name>Hibernate Migration::Legacy HBM files</name>
+    <name>Hibernate Migration::JPA ORM Mapping</name>
     <description>
-        This project provides an example legacy Hibernate project that uses Hibernate Session,
-        the Hibernate API, and mappings using HBM files.
+        This project provides an example legacy Hibernate project that has been migrated to use
+        a JPA persistence unit and entities mapped using just orm.xml files and no annotations.
     </description>
     
     <dependencies>
@@ -22,7 +22,7 @@
             <artifactId>hibernate-model</artifactId>
             <version>${project.version}</version>
         </dependency>
-    
+
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -63,13 +63,13 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
-                    <exclude>hibernate.cfg.xml</exclude>
+                    <exclude>persistence.xml</exclude>
                 </excludes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>hibernate.cfg.xml</include>
+                    <include>persistence.xml</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
@@ -107,31 +107,33 @@
                 <executions>
 
                     <execution>
-                        <id>generate-drop-hbm</id>
+                        <id>generate-drop-jpa</id>
                         <phase>process-test-resources</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <hibernatetool>
-                                <configuration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml" />
+                                <jpaconfiguration persistenceunit="hibernate-migration-sales" 
+                                    propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                                 <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                    outputfilename="${project.artifactId}-dropHBM.ddl"/>
+                                    outputfilename="${project.artifactId}-dropJPA.ddl"/>
                             </hibernatetool>
                         </configuration>
                     </execution>
 
                     <execution>
-                        <id>generate-create-hbm</id>
+                        <id>generate-create-jpa</id>
                         <phase>process-test-resources</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <hibernatetool>
-                                <configuration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml" />
+                                <jpaconfiguration persistenceunit="hibernate-migration-sales" 
+                                    propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                                 <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                    outputfilename="${project.artifactId}-createHBM.ddl"/>
+                                    outputfilename="${project.artifactId}-createJPA.ddl"/>
                             </hibernatetool>
                         </configuration>
                     </execution>

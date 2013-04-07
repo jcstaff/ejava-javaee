@@ -9,10 +9,9 @@ import java.util.Set;
  * relationship.
  */
 public class Customer extends Person {
-	public enum Level { BRONZE, SILVER, GOLD }
 	private Set<Sale> purchases;
 	private String email;
-	private Level level=Level.BRONZE;
+	private CustomerLevel level=CustomerLevel.BRONZE;
 	
 	public Set<Sale> getPurchases() {
 		if (purchases==null) { purchases=new HashSet<Sale>(); }
@@ -26,8 +25,8 @@ public class Customer extends Person {
 		this.email = email;
 	}
 	
-	public Level getLevel() { return level; }
-	public void setLevel(Level level) {
+	public CustomerLevel getLevel() { return level; }
+	public void setLevel(CustomerLevel level) {
 		this.level = level;
 	}
 

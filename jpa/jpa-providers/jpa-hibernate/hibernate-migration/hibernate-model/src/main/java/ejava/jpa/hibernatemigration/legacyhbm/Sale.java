@@ -16,8 +16,8 @@ import java.util.UUID;
  */
 public class Sale {
 	private String id;
-	private Date dateTime;
 	private BigDecimal amount;
+	private Date dateTime;
 	private Set<Clerk> salesClerks;
 	private Customer customer;
 
@@ -68,7 +68,7 @@ public class Sale {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 		return "id=" + id +
 				", date=" + (dateTime==null?null:df.format(dateTime)) +
-				", amount=$" + (amount==null?null:NumberFormat.getCurrencyInstance().format(amount)) +
+				", amount=" + (amount==null?null:NumberFormat.getCurrencyInstance().format(amount)) +
 				",\ncustomer=" + customer +
 				",\nclerks=" + salesClerks;
 	}

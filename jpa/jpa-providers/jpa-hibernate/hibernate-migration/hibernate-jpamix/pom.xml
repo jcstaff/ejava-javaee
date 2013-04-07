@@ -8,12 +8,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hibernate-hbm</artifactId>
+    <artifactId>hibernate-jpamix</artifactId>
 
-    <name>Hibernate Migration::Legacy HBM files</name>
+    <name>Hibernate Migration::Legacy HBM/JPA ORM file mix</name>
     <description>
-        This project provides an example legacy Hibernate project that uses Hibernate Session,
-        the Hibernate API, and mappings using HBM files.
+        This project provides an example legacy Hibernate project that has migrated to a JPA Entity
+        Manager with a mix of JPA orm.xml and legacy HBM mapping files and no annotations.
     </description>
     
     <dependencies>
@@ -114,9 +114,11 @@
                         </goals>
                         <configuration>
                             <hibernatetool>
+                                <jpaconfiguration persistenceunit="hibernate-migration-sales" 
+                                    propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                                 <configuration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml" />
                                 <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                    outputfilename="${project.artifactId}-dropHBM.ddl"/>
+                                    outputfilename="${project.artifactId}-dropJPAMIX.ddl"/>
                             </hibernatetool>
                         </configuration>
                     </execution>
@@ -129,9 +131,11 @@
                         </goals>
                         <configuration>
                             <hibernatetool>
+                                <jpaconfiguration persistenceunit="hibernate-migration-sales" 
+                                    propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                                 <configuration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml" />
                                 <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                    outputfilename="${project.artifactId}-createHBM.ddl"/>
+                                    outputfilename="${project.artifactId}-createJPAMIX.ddl"/>
                             </hibernatetool>
                         </configuration>
                     </execution>

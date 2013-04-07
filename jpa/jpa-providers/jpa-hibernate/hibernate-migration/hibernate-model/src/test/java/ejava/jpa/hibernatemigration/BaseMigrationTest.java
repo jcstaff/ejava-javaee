@@ -1,6 +1,7 @@
 package ejava.jpa.hibernatemigration;
 
 import static org.junit.Assert.assertEquals;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -12,15 +13,11 @@ import java.util.GregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.cfg.Configuration;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ejava.jpa.hibernatemigration.legacyhbm.Clerk;
 import ejava.jpa.hibernatemigration.legacyhbm.Customer;
+import ejava.jpa.hibernatemigration.legacyhbm.CustomerLevel;
 import ejava.jpa.hibernatemigration.legacyhbm.Sale;
 
 public abstract class BaseMigrationTest {
@@ -41,7 +38,7 @@ public abstract class BaseMigrationTest {
 		Customer customer = new Customer();
 		customer.setName("joe");
 		customer.setEmail("joe@email.com");
-		customer.setLevel(Customer.Level.SILVER);
+		customer.setLevel(CustomerLevel.SILVER);
 		
 		//create two clerks for the sale
 		Clerk clerk1 = new Clerk();
