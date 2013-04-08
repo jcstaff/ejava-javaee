@@ -10,30 +10,319 @@
          
     </para>
         
-    <section id="hibernate-migration-orm-section1">
-        <title>hibernate-migration Section 1</title>
-        <para></para>
+    <section id="hibernate-migration-orm-mapping">
+        <title>Going from HBM to ORM mapping files</title>
+        <para>This may not be the sexiest part of the migration but it can get you one step closer
+            to using a JPA persistence unit when you cannot modify the source code of the entity
+            classes being modeled. We will create a set of JPA Object/Relational (ORM) XML files 
+            that will replace the HBM files.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
+            <listitem><para>The hibernate.cfg.xml file will get replaced by a META-INF/persistence.xml.
+                The HBM files will get replaced by orm.xml variants but notice there is an extra mapping
+                file for the Person base class. The hibernate.properties file we factored out in the 
+                legacy application can stay as defined previously. Hibernate will pick that up.</para>
 <programlisting language=""><![CDATA[
+src/
+├── main
+│   ├── java
+│   └── resources
+│       ├── jpa
+│       │   ├── Clerk-orm.xml
+│       │   ├── Customer-orm.xml
+│       │   ├── Person-orm.xml
+│       │   └── Sale-orm.xml
+│       └── META-INF
+│           └── persistence.xml
+└── test
+    └── resources
+        └── hibernate.properties
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>With JPA we are able to create a reusable definition for the base Person
+               class using a mapped-superclass. This will end up being a table-per-concrete-class
+               approach once complete. The mapped-superclass is able to define reused properties as
+               well as a primary key and generation strategy.</para>
+<programlisting language="xml"><![CDATA[
+src/main/resources/jpa/Person-orm.xml
+::::::::::::::
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm 
+        http://java.sun.com/xml/ns/persistence/orm_1_0.xsd"
+    version="1.0">
+    
+    <mapped-superclass class="ejava.jpa.hibernatemigration.legacyhbm.Person"
+        access="FIELD">
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="name" optional="false">
+                <column length="32"/>
+            </basic>
+        </attributes>
+    </mapped-superclass>
+</entity-mappings>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The Customer mapping extends the Person mapping and details
+                the remaining properties. One thing to note that is different between HBM and ORM.xml
+                files -- unmapped properties in HBM are @Transitent by default. Unmapped properties
+                in JPA take on the default mapping properties of the JPA Spec. You must specifically
+                annotate a property as transient in order for it to be ignored by JPA.</para>
+<programlisting language="xml"><![CDATA[
+src/main/resources/jpa/Customer-orm.xml
+::::::::::::::
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm 
+        http://java.sun.com/xml/ns/persistence/orm_1_0.xsd"
+    version="1.0">
+    
+    <!-- id and name mapped in superclass ORM -->    
+    <entity class="ejava.jpa.hibernatemigration.legacyhbm.Customer"
+        access="FIELD">
+        <table name="HMIG_CUSTOMER"/>
+        <attributes>
+            <basic name="email">
+                <column length="32"/>
+            </basic>
+            <basic name="level">
+                <column length="8"/>
+                <enumerated>STRING</enumerated>
+            </basic>
+            
+            <one-to-many name="purchases" mapped-by="customer"/>
+        </attributes>
+    </entity>
+</entity-mappings>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Clerk also extends the mapping of Person and adds some specifics of its own to 
+               match the HBM mappings.</para>
+<programlisting language="xml"><![CDATA[
+src/main/resources/jpa/Clerk-orm.xml
+::::::::::::::
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm 
+        http://java.sun.com/xml/ns/persistence/orm_1_0.xsd"
+    version="1.0">
+
+    <!-- id and name mapped in superclass ORM -->    
+    <entity class="ejava.jpa.hibernatemigration.legacyhbm.Clerk"
+        access="FIELD">
+        <table name="HMIG_CLERK"/>
+        <attributes>
+            <basic name="hireDate" optional="false">
+                <column name="HIRE_DATE"/>
+                <temporal>DATE</temporal>
+            </basic>
+            <basic name="termDate">
+                <column name="TERM_DATE"/>
+                <temporal>DATE</temporal>
+            </basic>
+            <many-to-many name="sales" mapped-by="salesClerks"/>
+        </attributes>
+    </entity>
+</entity-mappings>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Sale is demonstrating a few extra constructs offered by JPA where we can
+                assigned the default package and access type for entities within that package. This can
+                be helpful if you package multiple entities from the same package in to the same file.</para>
+<programlisting language=""><![CDATA[
+src/main/resources/jpa/Sale-orm.xml
+::::::::::::::
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm 
+        http://java.sun.com/xml/ns/persistence/orm_1_0.xsd"
+    version="1.0">
+    
+    <package>ejava.jpa.hibernatemigration.legacyhbm</package>
+    <access>FIELD</access>
+    
+    <entity class="Sale">
+        <table name="HMIG_SALE"/>
+        <attributes>
+            <id name="id">
+                <column length="36"/>
+            </id>
+            <basic name="amount" optional="false">
+                <column precision="7" scale="2"/>
+            </basic>
+            <basic name="dateTime" optional="false">
+                <column name="SALE_TIME"/>
+                <temporal>TIMESTAMP</temporal>
+            </basic>
+
+            <many-to-one name="customer" optional="false">
+                <join-column name="CUSTOMER_ID"/>
+            </many-to-one>
+            <many-to-many name="salesClerks">
+                <join-table name="HMIG_SALE_CLERK">
+                    <join-column name="SALE_ID"/>
+                    <inverse-join-column name="CLERK_ID"/>
+                </join-table>
+            </many-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Like with the hibernare.cfg.xml, the persistence unit can defined properties of the connection
+                and vendor-specific properties about the provider (all commented out) as well as references to the mapping files.
+                One additional thing to point out with JPA -- mapping files augment and override classes and their annotations.
+                With HBM files -- it is one or the other. JPA mapping files can state to ignore class annotations but can just 
+                as easily be used in concert with the class annotations.</para>
+<programlisting language=""><![CDATA[
+src/main/resources/META-INF/persistence.xml
+::::::::::::::
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" 
+    version="1.0">
+
+    <persistence-unit name="hibernate-migration-sales">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        
+        <mapping-file>jpa/Person-orm.xml</mapping-file>
+        <mapping-file>jpa/Customer-orm.xml</mapping-file>
+        <mapping-file>jpa/Clerk-orm.xml</mapping-file>
+        <mapping-file>jpa/Sale-orm.xml</mapping-file>
+                
+        <properties>
+        <!-- properties moved to hibernate.properties file
+            <property name="connection.driver_class" value="${jdbc.driver}"/>
+            <property name="connection.url" value="${jdbc.url}"/>
+            <property name="connection.username" value="${jdbc.user}"/>
+            <property name="connection.password" value="${jdbc.password}"/>
+            <property name="connection.pool_size" value="1"/>
+            <property name="dialect" value="${hibernate.dialect}"/>
+            <property name="show_sql" value="true"/>
+            <property name="hbm2ddl.auto" value="create"/>
+            <property name="current_session_context_class" value="thread"/>
+            <property name="cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+            -->
+        </properties>
+    </persistence-unit>        
+    
+</persistence>
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
+        <para>You have finished looking at the migration from HBM to ORM.xml files. As stated, we can 
+           form a JPA persistence unit with ORM.xml mappings (and class mappings later on). With Hibernate,
+           all unmapped properties are transient. With JPA -- all unmapped properties have their JPA
+           Spec-defined mappings defaults applied and must be specifically marked as transient to be ignored.
+           ORM.xml mappings can augment or replace metadata expressed in the entity classes. With straight
+           Hibernate, you can only use the HBM file or the entity class annotations -- not both.</para>
         
-        <para></para>
     </section>
+
+
 
     <section id="hibernate-migration-orm-section2">
-        <title>hibernate-migration Section 2</title>
-        <para></para>
+        <title>JPA EntityManager API</title>
+        <para>In this section we will demonstrate how to access the JPA API for interacting with the 
+            persistence unit. As done previously, we will show access to the API through extension
+            points in our testcase.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
+            <listitem><para>The persistence unit is represented at runtime by a persistence context and 
+                accessed through the EntityManager. An EntityManager is created from an EntityManagerFactory
+                and the EntityManagerFactory is configured through the persistence unit we put together above.
+                Each persistence.xml can define multiple persistence units -- so we must pass in the name
+                of the persistence unit when creating the EntityManagerFactory.</para>
+<programlisting language="java"><![CDATA[
+public class ORMMappingTest extends BaseMigrationTest {
+        private static final String PERSISTENCE_UNIT_NAME = "hibernate-migration-sales";
+        private static EntityManagerFactory emf;
+
+        @BeforeClass
+        public static void setUpClass() {
+                log.debug("creating entityManagerFactory");
+                emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>EntityManagers are usually associated with a single transaction or 
+                many transactions for applications that can keep them open long enough. In the
+                testcase, we create the EntityManager and start a transaction prior to each testcase.</para>
+<programlisting language="java"><![CDATA[
+        private EntityManager em;
+
+        @Before
+        public void setUp() {
+                log.debug("creating session");
+                em = emf.createEntityManager();
+                em.getTransaction().begin();
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The transaction is committed and the EntityManager is closed at the end 
+                of the testcase.</para>
+<programlisting language="java"><![CDATA[
+        @After
+        public void tearDown() {
+                if (em != null) {
+                        if (em.getTransaction().isActive()) {
+                                em.getTransaction().commit();
+                        }
+                        em.close();
+                }
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The EntityManagerFactory is closed at the end of the testcase.</para>
+<programlisting language="java"><![CDATA[
+        @AfterClass
+        public static void tearDownClass() {
+                if (emf!=null) {
+                        emf.close();
+                }
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The rest of the concrete methods that map the abstract testcase calls to 
+                the JPA API are shown below. Note there is a near one-to-one mapping between what 
+                Hibernate and JPA need to do in each case.</para>
+<programlisting language="java"><![CDATA[
+        @Override
+        protected void save(Object entity) { em.persist(entity); }
+        @Override
+        protected void flush() { em.flush(); }
+        @Override
+        protected void clear() { em.clear(); }
+        @Override
+        protected <T> T get(Class<T> clazz, Serializable pk) { return em.find(clazz, pk); }
+        @Override
+        protected void beginTransaction() { 
+                if (em!=null) { em.getTransaction().begin(); }
+        }
+        @Override
+        protected void commitTransaction() {
+                if (em!=null) { em.getTransaction().commit(); } 
+        }
 ]]></programlisting>                        
             </listitem>
 
@@ -42,10 +331,209 @@
         <para></para>
     </section>
 
+    <section id="hibernate-migration-orm-session">
+        <title>Obtaining HIbernate Session from JPA</title>
+        <para>JPA is a standard that freely admits it may not cover all cases addressed by the providers that
+            implement it. There are official back doors added for SQL database access and access to the
+            raw provider implementation behind the EntityManager (i.e., the Hibernate Session).</para>
+  
+        <orderedlist>
+
+            <listitem><para>The following call can be made to obtain a Hibernate Session object from
+               behind the JPA EntityManager facade.</para>
+<programlisting language=""><![CDATA[
+protected Session getCurrentSession() { return (em==null)?null : (Session)em.getDelegate(); }
+]]></programlisting>                        
+            </listitem>
+
+        </orderedlist>
+        <para>In this quick section we showed how a client can gain access to the legacy/raw
+            Hibernate Session object after migrating to a JPA interface. This can be useful to make
+            provider-specific calls. In the next section we will show a more hybrid approach where
+            some of the entities were mapped with JPA and some with Hibernate.</para>
+        
+    </section>
+
+
+    <section id="hibernate-migration-orm-mixing">
+        <title>Mixing HBM and JPA definitions</title>
+        <para></para>
+  
+        <orderedlist>
+
+            <listitem><para>Our mapping tree looks like the following. We are using a Hibernate-specific
+               HBM file for both Clerk and Customer and a JPA orm.xml file for Sale.</para>
+<programlisting language=""><![CDATA[
+src
+├── main
+│   ├── java
+│   └── resources
+│       ├── hibernate
+│       │   ├── Clerk.hbm.xml
+│       │   └── Customer.hbm.xml
+│       ├── hibernate.cfg.xml
+│       ├── jpa
+│       │   └── Sale-orm.xml
+│       └── META-INF
+│           └── persistence.xml
+└── test
+    └── resources
+        └── hibernate.properties
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para></para>
+<programlisting language=""><![CDATA[
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+        <mapping resource="hibernate/Clerk.hbm.xml"/>
+        <mapping resource="hibernate/Customer.hbm.xml"/>
+        <!-- mapped with JPA 
+        <mapping resource="hibernate/Sale.hbm.xml"/>
+         -->
+    </session-factory>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para></para>
+<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" 
+    version="1.0">
+
+    <persistence-unit name="hibernate-migration-sales">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        
+        <!-- mapped with HBM
+        <mapping-file>jpa/Person-orm.xml</mapping-file>
+        <mapping-file>jpa/Customer-orm.xml</mapping-file>
+        <mapping-file>jpa/Clerk-orm.xml</mapping-file>
+         -->
+        <mapping-file>jpa/Sale-orm.xml</mapping-file>
+
+        <properties>
+        </properties>
+    </persistence-unit>        
+    
+</persistence>
+]]></programlisting>                        
+            </listitem>
+
+        <note>
+            <title>TODO</title>
+            <para>Provide more details on this later...</para>
+        </note>
+
+        </orderedlist>
+        
+        <para>In this section we took a step back and opened the door for a partial migration
+           from Hibernate HBM to JPA ORM.xml files. This option ...</para>
+        
+    </section>
+
+
+    <section id="hibernate-migration-orm-schema">
+        <title>Generating Schema for JPA files</title>
+        <para>In this section we will describe the only part of the Maven build that is unique to this
+            section -- generating schema from a JPA persistence unit versus a Hibernate Session configuration.</para>
+  
+        <orderedlist>
+
+            <listitem><para>To keep the document short, we are only going to show the important differences 
+                between the HBM schema generation and the JPA approach. Notice how -- in the configuration 
+                section of the plugin -- a jpaconfiguration implementation is being expressed and the componentProperties
+                section provides the name of the persistence unit. That is all we should need to process the ORM.xml files.</para>
+<programlisting language="xml"><![CDATA[
+                <configuration>
+                    <components>
+                        <component>
+                            <name>hbm2ddl</name>
+                            <implementation>jpaconfiguration</implementation>
+                            <outputDirectory>target/classes/ddl</outputDirectory>
+                        </component>
+                    </components>
+                    <componentProperties>
+                        <persistenceunit>hibernate-migration-sales</persistenceunit>
+                        <export>false</export>
+                        <format>true</format>
+                    </componentProperties>
+                </configuration>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The following is an example of what was produced.</para>
+<programlisting language=""><![CDATA[
+    create table HMIG_CLERK (
+        id integer generated by default as identity (start with 1),
+        name varchar(32) not null,
+        HIRE_DATE date not null,
+        TERM_DATE date,
+        primary key (id)
+    );
+
+    create table HMIG_CUSTOMER (
+        id integer generated by default as identity (start with 1),
+        name varchar(32) not null,
+        email varchar(32),
+        level varchar(8),
+        primary key (id)
+    );
+
+    create table HMIG_SALE (
+        id varchar(36) not null,
+        amount numeric not null,
+        SALE_TIME timestamp not null,
+        CUSTOMER_ID integer not null,
+        primary key (id)
+    );
+
+    create table HMIG_SALE_CLERK (
+        SALE_ID varchar(36) not null,
+        CLERK_ID integer not null,
+        primary key (SALE_ID, CLERK_ID)
+    );
+
+    alter table HMIG_SALE 
+        add constraint FK862A2223AE3F6B6 
+        foreign key (CUSTOMER_ID) 
+        references HMIG_CUSTOMER;
+
+    alter table HMIG_SALE_CLERK 
+        add constraint FK33F2DF198C45F016 
+        foreign key (SALE_ID) 
+        references HMIG_SALE;
+
+    alter table HMIG_SALE_CLERK 
+        add constraint FK33F2DF19B837D55E 
+        foreign key (CLERK_ID) 
+        references HMIG_CLERK;
+]]></programlisting>                        
+            </listitem>
+
+        </orderedlist>
+        <para>You have finished looking at how to generate database schema from a JPA persistence unit
+           definition and the 2.x version of the hibernate3-maven-plugin. In the follow-on sections we
+           will switch to using the newer 3.x implementation/configuration.</para>
+    </section>
 
     <section id="hibernate-migration-orm-summary">
        <title>Summary</title>
-       <para>In this chapter we
+       <para>In this chapter we took an approach that would get us to a JPA API without changing the Java classes. We showed
+           and approach where the hibernate.cfg.xml was replaced by the persistence.xml to express the persistence unit. We saw
+           where the hbm.xml mappings were replaced by the orm.xml mappings to allow for vendor neutral mappings and a definition
+           usuable by the persistence unit. We also kept the door open to raw Hibernate usage. At one level we showed how we can
+           simply ask for the Hibernate Session from the JPA EntityManager. At another level we showed how since the provider -- in 
+           this case -- is Hibernate, we can leave hibernate.cfg.xml and hbm.xml files in place to reference entities we have not 
+           yet migrated. They can be stored/accessed by the outer JPA EntityManager and the Hibernate Session configured from the 
+           EntityManager.
        </para>
     </section>    
 </chapter>
