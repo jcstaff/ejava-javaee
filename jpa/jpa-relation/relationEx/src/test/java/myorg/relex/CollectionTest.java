@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -14,11 +15,14 @@ import java.util.Set;
 import javax.persistence.*;
 
 import myorg.relex.collection.Fleet;
+import myorg.relex.collection.Path;
+import myorg.relex.collection.Segment;
 import myorg.relex.collection.Ship;
 import myorg.relex.collection.ShipByBusinessId;
 import myorg.relex.collection.ShipByDefault;
 import myorg.relex.collection.ShipByPK;
 import myorg.relex.collection.ShipBySwitch;
+import myorg.relex.one2many.Route;
 
 import org.apache.commons.logging.Log;
 
@@ -165,5 +169,29 @@ public class CollectionTest extends JPATestBase {
     	log.debug("set=" + ships);
     	log.debug("checking set for entity");
         assertTrue("entity not found after persist", ships.contains(ship1));
+    }
+    
+    @Test
+    public void testOrderBy() {
+    	log.info("*** testOrderBy ***");
+    	
+    	Segment s1 = new Segment().setNumber(1).setFrom("A").setTo("B");
+    	Segment s2 = new Segment().setNumber(2).setFrom("B").setTo("C");
+    	Segment s3 = new Segment().setNumber(3).setFrom("C").setTo("D");
+    	Path path = new Path();
+    	path.addSegment(s2).addSegment(s3).addSegment(s1);
+    	log.debug("path.segments=" + path.getSegments());
+    	Iterator<Segment> itr = path.getSegments().iterator();
+    	assertEquals(2, itr.next().getNumber());
+    	assertEquals(3, itr.next().getNumber());
+    	assertEquals(1, itr.next().getNumber());
+    	
+    	em.persist(path);
+    	em.flush(); em.clear();
+    	Path path2 = em.find(Path.class, path.getId());
+    	assertEquals(1, itr.next().getNumber());
+    	assertEquals(2, itr.next().getNumber());
+    	assertEquals(3, itr.next().getNumber());
+    	log.debug("path2.segments=" + path2.getSegments());
     }
 }

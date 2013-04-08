@@ -1,0 +1,123 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-relationex-one2many-bi">
+    <title>Mapping One-to-Many/Many-to-One Bi-directional Relationships</title>
+    <para>JPA requires the many side of a one-to-many, bi-directional relationship to be the 
+        owning side of that relationship. There is no choice to be made along those lines.</para>
+        
+    <section id="jpa-relationex-o2mb-setup">
+        <title>Setup</title>
+        <para>Create a JUnit test class to host tests for the one-to-many mappings.</para>
+
+        <orderedlist>
+            <listitem><para>Put the following Junit test case base class in your src/test tree.
+                You can delete the sample test method once we add our first real test. JUnit
+                will fail a test case if it cannot locate a @Test to run.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex;
+
+import static org.junit.Assert.*;
+
+import javax.persistence.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.*;
+
+public class One2ManyBiTest extends JPATestBase {
+    private static Log log = LogFactory.getLog(One2ManyBiTest.class);
+    @Test
+    public void testSample() {
+        log.info("testSample");
+    }
+}
+]]></programlisting>                        
+                </listitem>
+ 
+                <listitem><para>Verify the new JUnit test class builds and executes to completion</para>
+<programlisting language=""><![CDATA[
+relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest
+
+...
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://localhost:9092/h2db/ejava]
+...
+[INFO] BUILD SUCCESS                
+]]></programlisting>                        
+                </listitem>
+        
+        </orderedlist>
+    </section>
+        
+        
+    <section id="jpa-relationex-o2mb-xxx">
+        <title></title>
+        <para>In this section...</para>
+        
+        <section id="jpa-relationex-o2mb-xxx-yyy">
+            <title></title>
+            <para>In this section ...</para>
+            <orderedlist>
+    
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+            </orderedlist>
+        </section>
+    </section>
+
+    <section id="jpa-relationex-o2m-bi-fk">
+        <title>One-to-Many Bi-directional using Foreign Key Join</title>
+        <para>In this section we will demonstrate the use of a simple foreign key mapping
+            from the owning/dependent entity table to the inverse/parent entity table.</para>
+        <orderedlist>
+
+            <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+            </listitem>        
+        </orderedlist>
+    </section>
+  
+    <section id="jpa-relationex-o2m-bi-jointable">
+        <title>One-to-Many Bi-directional using Join Table</title>
+        <para>In this section we will demonstrate map a one-to-many relationship using a join table
+            and a bi-directional relationship. From the database perspective, this will look identical
+            to the one-to-many, uni-directional case. However, from the JPA-perspective the relationship
+            is being owned (i.e, defined) by the child/many side. In the uni-directional case there was
+            no property in the child/many entity class that represented the relationship. Now there is. 
+        </para>
+        <orderedlist>
+
+            <listitem><para></para>
+ <programlisting language=""><![CDATA[
+]]></programlisting>
+            </listitem>        
+        </orderedlist>
+        <para></para>
+    </section>
+  
+
+
+    <section id="jpa-relationex-o2m-bi-composite">
+        <title>One-to-Many Bi-directional using Derived Composite Primary</title>
+        <para>In this section we will demonstrate a one-to-many, bi-directional relationship
+            where the primary key of the owning/dependent entity is derived from the 
+            one side.</para>
+            
+        <orderedlist>
+            <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+        <para></para>
+    </section>
+
+
+    <section id="jpa-relationex-o2mb-summary">
+       <title>Summary</title>
+       <para>In this chapter we...
+       </para>
+    </section>    
+</chapter>
