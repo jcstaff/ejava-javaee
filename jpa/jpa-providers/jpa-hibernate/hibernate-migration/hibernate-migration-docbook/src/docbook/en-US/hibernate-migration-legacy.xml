@@ -9,119 +9,864 @@
         
     <section id="hibernate-migration-legacy-model">
         <title>Class Model</title>
-        <para></para>
+        <para>The example legacy model consists of four classes (Person, CLerk, Customer,
+            Sale) and an enum (CustomerLevel). Each of the classes is meant to be used
+            with FIELD access and each overrides hashCode/equals to provide a stable and
+            unique identity for use within Sets. Since these aspects are not central to 
+            the migration -- they have been left out of this write-up but are available 
+            in the source code repository. 
+        </para>
   
         <orderedlist>
 
             <listitem><para></para>
 <programlisting language=""><![CDATA[
+src/main/
+├── java
+│   └── ejava
+│       └── jpa
+│           └── hibernatemigration
+│               └── legacyhbm
+│                   ├── Clerk.java
+│                   ├── Customer.java
+│                   ├── CustomerLevel.java
+│                   ├── Person.java
+│                   └── Sale.java
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>One of the simpler classes is Person. It is a base class to Customer
+                and Clerk. It supplies an id and name property for its derived classes.</para>
+<programlisting language="java"><![CDATA[
+package ejava.jpa.hibernatemigration.legacyhbm;
+...
+public class Person {
+    private int id;
+    private String name;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Clerk extends Person and adds a few temporal attributes for when 
+                they were hired and terminated. Clerk also contains a Set of Sales which is part
+                of a Many-to-Many collection with Sale where Clerk will be the inverse side.</para>
+<programlisting language="java"><![CDATA[
+package ejava.jpa.hibernatemigration.legacyhbm;
+...
+public class Clerk extends Person {
+        private Set<Sale> sales;
+        private Date hireDate;
+        private Date termDate;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Customer extends Person and adds an enum and String string attribute.
+                It also contains a Set of Sales which is part of a One-to-Many relation where
+                Customer will be the inverse side.</para>
+<programlisting language="java"><![CDATA[
+package ejava.jpa.hibernatemigration.legacyhbm;
+...
+public class Customer extends Person {
+        private Set<Sale> purchases;
+        private String email;
+        private CustomerLevel level=CustomerLevel.BRONZE;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Sale is identified by a business-assigned primary key value 
+                -- implemented here as a UUID String. Sale provides tracking of floating point
+                information, a timestamp. Sale also has a Many-to-One relation with Customer 
+                and a Many-to-Many relation with Clerk. In both cases -- Sale will be the owning side.</para>
+<programlisting language="java"><![CDATA[
+public class Sale {
+        private String id;
+        private BigDecimal amount;
+        private Date dateTime;
+        private Set<Clerk> salesClerks;
+        private Customer customer;
+
+        public Sale() {
+                this(UUID.randomUUID().toString());
+        }
+        public Sale(String id) {
+                this.id = id;
+        }
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
+        <para>That completes the key aspects of the example class model used in the application.
+            Next we will describe the Hibernate setup.
+        </para>
         
-        <para></para>
     </section>
 
     <section id="hibernate-migration-legacy-config">
         <title>Hibernate Configuration</title>
-        <para></para>
+        <para>The following files make-up the Hibernate configuration. It consists of individual
+            Hibernate Mapping (HBM) files, a Hibernate Session configuration XML (hibernate.cfg.xml)
+            and properties (hibernate.properties) file. Although all can be placed in either the 
+            XML or properties file, the structure of the session is expressed in the XML file in 
+            the src/main branch and the database connection properties were expressed in the 
+            properties file in the src/test branch. That permits the Session definition to be 
+            distributed as a set without concern of the runtime properties being embedded from the 
+            test environment.</para>
   
         <orderedlist>
 
             <listitem><para></para>
 <programlisting language=""><![CDATA[
+src
+├── main
+│   ├── java
+│   └── resources
+│       ├── hibernate
+│       │   ├── Clerk.hbm.xml
+│       │   ├── Customer.hbm.xml
+│       │   └── Sale.hbm.xml
+│       └── hibernate.cfg.xml
+└── test
+    └── resources
+        └── hibernate.properties
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The Clerk mapping maps the entity to the HMIG_CLERK table and assigns
+                a strategy of IDENTITY for database assigned primary keys. It provides column
+                size and optional specifications for individual properties and expresses the 
+                granularity of the java.lang.Dates being persisted are only down to the DATE
+                level. It defines a many-to-many relationship with Sale where the Customer
+                is the inverse side.</para>
+<programlisting language="xml"><![CDATA[
+src/main/resources/hibernate/Clerk.hbm.xml
+::::::::::::::
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="ejava.jpa.hibernatemigration.legacyhbm">
+    <class name="Clerk" table="HMIG_CLERK">
+        <id name="id" access="field">
+            <generator class="identity"/>
+        </id>
+        <property name="name" 
+            access="field"
+            not-null="true" 
+            length="32"/>
+        <property name="hireDate" 
+            access="field"
+            not-null="true" 
+            type="date" 
+            column="HIRE_DATE"/>
+        <property name="termDate" 
+            access="field"
+            type="date" 
+            column="TERM_DATE"/>
+
+        <set name="sales" table="HMIG_SALE_CLERK" access="field" inverse="true">
+            <key column="CLERK_ID"/>
+            <many-to-many column="SALE_ID" class="Sale"/>
+        </set>            
+    </class>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Customer assigns the table name and database identity generation the same
+               as Clerk. Also of note -- both Customer and Clerk have modeled their relationship with 
+               Person as a table per concrete class. Customer uses a very odd syntax to map the String
+               name of the enum to the database table. The value 12 is the ordinal value for String in 
+               a SQL types construct (This is the kind of thing we can clean up by migrating to JPA).
+               The Customer maps the inverse side of a one-to-many with the Sale.</para>
+<programlisting language="xml"><![CDATA[
+src/main/resources/hibernate/Customer.hbm.xml
+::::::::::::::
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="ejava.jpa.hibernatemigration.legacyhbm">
+    <class name="Customer" table="HMIG_CUSTOMER">
+        <id name="id" access="field">
+            <generator class="identity"/>
+        </id>
+        <property name="name"
+            access="field" 
+            not-null="true" 
+            length="32"/>
+        <property name="email"
+            access="field" 
+            length="32"/>
+        <property name="level"
+            access="field"
+            length="8">
+            <type name="org.hibernate.type.EnumType">
+              <param name="enumClass">ejava.jpa.hibernatemigration.legacyhbm.CustomerLevel</param>
+              <param name="type">12</param> 
+            </type>             
+        </property>
+        
+        <set name="purchases" access="field" inverse="true">
+            <key column="CUSTOMER_ID"/>
+            <one-to-many class="Sale"/>
+        </set>
+    </class>
+</hibernate-mapping>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The Sale mapping defines a manually assigned primary key, a decimal amount for the price,
+                and a temporal granularity of TIMESTAMP for the dateTime of sale. It defines the two relationships
+                with Custome and Clerk -- where Sale is the owner of both.</para>
+<programlisting language="xml"><![CDATA[
+src/main/resources/hibernate/Sale.hbm.xml
+::::::::::::::
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="ejava.jpa.hibernatemigration.legacyhbm">
+    <class name="Sale" table="HMIG_SALE">
+        <id name="id" access="field" length="36"/>
+        <property name="amount"
+            access="field" 
+            not-null="true" 
+            precision="7"
+            scale="2"/>
+        <property name="dateTime" 
+            access="field"
+            not-null="true" 
+            type="timestamp" 
+            column="SALE_TIME"/>
+
+        <many-to-one name="customer" access="field" 
+            class="Customer" 
+            column="CUSTOMER_ID"
+            not-null="true"/>
+        <set name="salesClerks" access="field" table="HMIG_SALE_CLERK">
+            <key column="SALE_ID"/>
+            <many-to-many column="CLERK_ID" class="Clerk"/>
+        </set>            
+    </class>
+</hibernate-mapping>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Although the HBM files can be placed anywhere in the application, the default
+               location for the hibernate.cfg.xml file is in the root directory. Although not required -- this
+               document can define the runtime properties with the database (commented out below) and may
+               reference the HBM or other mapping constructs. If they are not listed here, they can be manually
+               added through calls to the Hibernate Configuration object constructed by the application.</para>
+<programlisting language="xml"><![CDATA[
+src/main/resources/hibernate.cfg.xml
+::::::::::::::
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+
+        <!-- defined in src/test/resources/hibernate.properties
+        <property name="connection.driver_class">${jdbc.driver}</property>
+        <property name="connection.url">${jdbc.url}</property>
+        <property name="connection.username">${jdbc.user}</property>
+        <property name="connection.password">${jdbc.password}</property>
+        <property name="connection.pool_size">1</property>
+        <property name="dialect">${hibernate.dialect}</property>
+        <property name="show_sql">true</property>
+        <property name="hbm2ddl.auto">create</property>
+        <property name="current_session_context_class">thread</property>
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+             -->
+
+        <mapping resource="hibernate/Clerk.hbm.xml"/>
+        <mapping resource="hibernate/Sale.hbm.xml"/>
+        <mapping resource="hibernate/Customer.hbm.xml"/>
+    </session-factory>
+
+</hibernate-configuration>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The above resulted in the following database schema.</para>
+<programlisting language=""><![CDATA[
+    create table HMIG_CLERK (
+        id integer generated by default as identity (start with 1),
+        name varchar(32) not null,
+        HIRE_DATE date not null,
+        TERM_DATE date,
+        primary key (id)
+    );
+
+    create table HMIG_CUSTOMER (
+        id integer generated by default as identity (start with 1),
+        name varchar(32) not null,
+        email varchar(32),
+        level varchar(8),
+        primary key (id)
+    );
+
+    create table HMIG_SALE (
+        id varchar(36) not null,
+        amount numeric not null,
+        SALE_TIME timestamp not null,
+        CUSTOMER_ID integer not null,
+        primary key (id)
+    );
+
+    create table HMIG_SALE_CLERK (
+        CLERK_ID integer not null,
+        SALE_ID varchar(36) not null,
+        primary key (SALE_ID, CLERK_ID)
+    );
+
+    alter table HMIG_SALE 
+        add constraint FK862A2223AE3F6B6 
+        foreign key (CUSTOMER_ID) 
+        references HMIG_CUSTOMER;
+
+    alter table HMIG_SALE_CLERK 
+        add constraint FK33F2DF19B837D55E 
+        foreign key (CLERK_ID) 
+        references HMIG_CLERK;
+
+    alter table HMIG_SALE_CLERK 
+        add constraint FK33F2DF198C45F016 
+        foreign key (SALE_ID) 
+        references HMIG_SALE;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>We placed the runtime properties of the Session in hibernate.properties within 
+                the src/test branch of the tree so it would not be part of the delivered artifact with out
+                test properties. You will notice the file leverages filtering -- where each ${variable} can 
+                be replaced during compilation</para>
+<programlisting language=""><![CDATA[
+$ cat src/test/resources/hibernate.properties 
+hibernate.dialect=${hibernate.dialect}
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.password=${jdbc.password}
+hibernate.connection.username=${jdbc.user}
+hibernate.connection.pool_size=1
+hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
+hibernate.current_session_context_class=thread
+hibernate.cache.provider_class=org.hibernate.cache.NoCacheProvider
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>This is what a listing of the final archive(s) look like with the above src/main
+                information.</para>
+<programlisting language=""><![CDATA[
+ddl/hibernate-hbm-createHBM.ddl
+ddl/hibernate-hbm-dropHBM.ddl
+ejava/jpa/hibernatemigration/legacyhbm/Clerk.class
+ejava/jpa/hibernatemigration/legacyhbm/Customer.class
+ejava/jpa/hibernatemigration/legacyhbm/CustomerLevel.class
+ejava/jpa/hibernatemigration/legacyhbm/Person.class
+ejava/jpa/hibernatemigration/legacyhbm/Sale.class
+hibernate.cfg.xml
+hibernate/Clerk.hbm.xml
+hibernate/Customer.hbm.xml
+hibernate/Sale.hbm.xml
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
+        <para>You have finished taking a look at the descriptor files behind most legacy Hibernate
+            approaches. Next we will look at how the application can obtain references to Hibernate
+            API -- which will use the above information to access the database.</para>
         
-        <para></para>
     </section>
     
-    <section id="hibernate-migration-legacy-testcase">
-        <title>Test Case</title>
-        <para></para>
-  
-        <orderedlist>
-
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </listitem>
-
-        </orderedlist>
-        
-        <para></para>
-    </section>
-
     <section id="hibernate-migration-legacy-api">
         <title>Hibernate Session API</title>
-        <para></para>
+        <para>We will demonstrate access to the Hibernate API through the extension of a JUnit testcase
+            that we will detail in the next section. He we will show the extension points and how they 
+            where used to obtain access to and use the Hibernate API. This same framework will be used in
+            all of the testcases demonstrated in this migration topic.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
+            <listitem><para>The methods below are all callback methods for JUnit or concrete implementations
+                for abstract methods defined in the base testcase.</para>
+<programlisting language="java"><![CDATA[
+src/test/java/ejava/jpa/hibernatemigration/legacyhbm/LegacyHBMTest.java
+::::::::::::::
+package ejava.jpa.hibernatemigration.legacyhbm;
+
+...
+public class LegacyHBMTest extends BaseMigrationTest {
 ]]></programlisting>                        
             </listitem>
 
+            <listitem><para>Access to the Hibernate API is through a Session. A Session is obtained from a 
+                SessionFactory and a SessionFactory is built from a Configuration. The Configuration processes
+                the information we covered in the XML files above. You can see we have access to the Configuration
+                object during the following calls but have chosen to just let it have its default values from the 
+                supplied XML files.</para>
+<programlisting language="java"><![CDATA[
+        private static SessionFactory sessionFactory;
+
+        @BeforeClass
+        public static void setUpClass() {
+                log.debug("creating sessionFactory");
+                sessionFactory=new Configuration().configure().buildSessionFactory();
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The Session is generally created to support a single transaction but may support 
+                many depending on how long-lived you can make it. In the following setUp for each testMethod
+                we create a Session from the SessionFactory and start a transaction.</para>
+<programlisting language="java"><![CDATA[
+        private Session session;
+
+        @Before
+        public void setUp() {
+                log.debug("creating session");
+                session = sessionFactory.getCurrentSession();
+                session.beginTransaction();
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>At the end of each testMethod the Session's transaction is committed and
+                the session is closed.</para>
+<programlisting language="java"><![CDATA[
+        @After
+        public void tearDown() {
+                if (session != null) {
+                        if (session.getTransaction().isActive()) {
+                                session.getTransaction().commit();
+                        }
+                }
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>At the termination of the testcase, the SessionFactory is closed.</para>
+<programlisting language="java"><![CDATA[
+        @AfterClass
+        public static void tearDownClass() {
+                if (sessionFactory!=null) {
+                        sessionFactory.close();
+                }
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The remaining methods defined support the abstract methods of the base testcase 
+               covered next. You will notice that all actions are based off the Session and the SessionFactory
+               is nice enough to let us know which is the current session.</para>
+<programlisting language="java"><![CDATA[
+        @Override
+        protected void save(Object entity) { session.save(entity); }
+        @Override
+        protected void flush() { session.flush(); }
+        @Override
+        protected void clear() { session.clear(); }
+        @Override
+        @SuppressWarnings("unchecked")
+        protected <T> T get(Class<T> clazz, Serializable pk) { return (T)session.get(clazz, pk); }
+        @Override
+        protected void beginTransaction() { sessionFactory.getCurrentSession().beginTransaction(); }
+        @Override
+        protected void commitTransaction() { sessionFactory.getCurrentSession().getTransaction().commit(); }
+]]></programlisting>                        
+            </listitem>
         </orderedlist>
+        <para>You have finished looking at extending the testcase for Hibernate-specific implementation.
+            Next we will look at the base testcase that makes calls to what was just covered above.</para>
         
-        <para></para>
     </section>
 
-    <section id="hibernate-migration-legacy-section2">
-        <title>hibernate-migration-docbook Section 2</title>
-        <para></para>
+    <section id="hibernate-migration-legacy-testcase">
+        <title>Test Case</title>
+        <para>In this section will take the only look at the base testcase that is used across all this
+            and downstream examples. The testcase builds a sample instance of the class model described
+            above, persists the model, and retrieves it back from the database.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
+            <listitem><para>The calls in the testcase are encapsulated in the following JUnit test.</para>
+<programlisting language="java"><![CDATA[
+public abstract class BaseMigrationTest {
+        private final Log log = LogFactory.getLog(getClass());
+
+        protected abstract void save(Object entity);
+        protected abstract void flush();
+        protected abstract void clear();
+        protected abstract <T> T get(Class<T> clazz, Serializable pk);
+        protected abstract void beginTransaction();
+        protected abstract void commitTransaction();
+
+        @Test
+        public void testPersist() {
+                log.info("*** testPersist ***");
+        ...
+        }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>First the test wires up instances in the class model using standard POJO calls.</para>
+<programlisting language="java"><![CDATA[
+                //create our customer
+                Customer customer = new Customer();
+                customer.setName("joe");
+                customer.setEmail("joe@email.com");
+                customer.setLevel(CustomerLevel.SILVER);
+
+                //create two clerks for the sale
+                Clerk clerk1 = new Clerk();
+                clerk1.setName("tom");
+                clerk1.setHireDate(new GregorianCalendar(2010, Calendar.JANUARY, 1).getTime());
+
+                //create the sale
+                Clerk clerk2 = new Clerk();
+                clerk2.setName("mary");
+                clerk2.setHireDate(new GregorianCalendar(2012, Calendar.JULY, 1).getTime());
+
+                Sale sale = new Sale();
+                sale.setDateTime(new Date());
+                sale.setAmount(new BigDecimal(100.12));
+
+                //associate the entities
+                sale.setCustomer(customer);
+                customer.setPurchaes(sale);
+                sale.addSalesClerk(clerk1);
+                clerk1.addSale(sale);
+                sale.addSalesClerk(clerk2);
+                clerk2.addSale(sale);
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>In the following segment, the instances are persisted in the session and later
+                flushed to the database to simulate a transaction ending.</para>
 <programlisting language=""><![CDATA[
+
+                //persist objects
+                log.info("(prior to persist) sale=" + sale);
+                save(customer);
+                save(clerk1);
+                save(clerk2);
+                save(sale);
+
+                //flushing session to database
+                flush();
+                log.info("(after flush) sale=" + sale);
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Next we obtain new instances of the objects through their relationships -- starting 
+                with the Sale.</para>
+<programlisting language=""><![CDATA[
+                //get a new instance of sale
+                clear();
+                Sale sale2 = get(Sale.class, sale.getId());
+
+                //verify state and relationships were persisted
+                assertNotNull("could not locate sale", sale2);
+                assertEquals("unexpected amount", sale.getAmount().intValue(), sale2.getAmount().intValue());
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>We perform a sanity check of the other instances after finishing up with the sale.</para>
+<programlisting language=""><![CDATA[
+                //test the sale/customer many-to-one collection mapping from owning side
+                assertNotNull("no customer found", sale2.getCustomer());
+                assertEquals("unexpected sale.customer.id", sale.getCustomer().getId(), sale2.getCustomer().getId());
+                assertEquals("unexpected customer name", customer.getName(), sale2.getCustomer().getName());
+
+                //test the sale/customer many-to-one collection mapping from inverse side
+                assertEquals("unexpected purchase count", 1, sale2.getCustomer().getPurchases().size());
+                assertEquals("unexpected saleId", sale.getId(), sale2.getCustomer().getPurchases().iterator().next().getId());
+
+                //test the sale/clerk many-to-many collection from owning side 
+                assertEquals("unexpected number of clerks", 2, sale2.getSalesClerks().size());
+                assertTrue("could not locate clerk1", sale2.getSalesClerks().contains(clerk1));
+                assertTrue("could not locate clerk2", sale2.getSalesClerks().contains(clerk2));
+
+                //test the sale/clerk many-to-many collection from inverse side
+                for (Clerk clerk: sale2.getSalesClerks()) {
+                        assertEquals("unexpected number if sales", 1, clerk.getSales().size());
+                        assertTrue("sale not found in clerk", clerk.getSales().contains(sale));
+                }
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
+        <para>You have finished looking at the generic portion of the testcase that is used 
+           for this and all downstream examples. It is a simple test -- but one that will help
+           achieve our primary goal of demonstrating the migration.</para>
         
-        <para></para>
     </section>
 
     <section id="hibernate-migration-legacy-maven">
         <title>Maven Build</title>
-        <para></para>
+        <para>The above artifacts go nowhere without being built. To do that, they have been 
+            assembled into a single Maven project. To make sure the demonstration was as realistic
+            as possible, an old version of Hibernate (dating back to 2007) was used for the 
+            legacy versions of the project. The real example used multiple modules for the 
+            build to provide re-use. We will be showing it here as a single logical module
+            for simplicity.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
+            <listitem><para>Our legacy example will be using a version of Hibernate that dates
+                back to 2007. This should provide some comfort to those that are far behind the
+                version updates -- that what we are going to demonstrate is not beyind your reach.</para>
+<programlisting language="xml"><![CDATA[
+    <properties>
+        <!-- hibernate 3.2.0.ga was released to ibiblio 2007-01-04 -->
+        <legacy-hibernate.version>3.2.0.ga</legacy-hibernate.version>
+        ...
+    </properties>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Besides the standard dependencies like commons-logging, junit, and log4j, the
+                only dependency required for this first example is the hibernate-entity-manager. It brings
+                in several other dependencies (like hibernate-annotations) and makes it simple to obtain all 
+                that we need.</para>
+<programlisting language="xml"><![CDATA[
+    <dependencies>
+...
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${legacy-hibernate.version}</version>
+        </dependency>
+...
+    </dependencies>
+
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>You saw earlier where the hibernate.cfg.xml and hibernate.properties
+                files in the src/main and src/test trees leveraged property filtering. The 
+                following build construct sets up the filtering when copying from the src to
+                target tree. The variable values must come from a defined property within the pom.</para>
+<programlisting language="xml"><![CDATA[
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>hibernate.cfg.xml</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>hibernate.cfg.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <excludes>
+                    <exclude>hibernate.properties</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>hibernate.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+    ...
+    </build>        
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The variables for the filtering and the driver/implementatin for the 
+                connection at runtime is made available through a default profile. We are using 
+                Hypersonic for this demonstration and will use the embedded database stored to 
+                a file. That means there is no database to start/stop/manage as part of running
+                these tests.</para>
+<programlisting language="xml"><![CDATA[
+    <profiles>
+        <profile>
+            <id>hsqldb</id> <!-- Hypersonic server-based DB -->
+            <activation>
+                <property>
+                    <name>!jdbcdb</name>
+                </property>
+            </activation>
+            <properties>
+                  <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                  <jdbc.url>jdbc:hsqldb:${basedir}/target/hsqldb/ejava</jdbc.url>
+                  <jdbc.user>sa</jdbc.user>
+                  <jdbc.password/>
+                  <hibernate.dialect>
+                      org.hibernate.dialect.HSQLDialect
+                  </hibernate.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        ...
+    <profiles>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>You can look at the contents of the database after the test runs by executing the following jar file and 
+                entering the file based URL specified above and the Standalone option.</para>
 <programlisting language=""><![CDATA[
+$ java -jar ~/.m2/repository/org/hsqldb/hsqldb/2.2.8/hsqldb-2.2.8.jar
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>You can build the model using standard Maven commands or import into your IDE and run.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test
+...
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
-        
-        <para></para>
+        <para>You have finished looking at the key maven aspects for building the legacy project. Most of the remaining
+            details are standard Maven constructs. However, there is one more important thing to cover before we leave the 
+            legacy application and start migrating. We want to generate schema form the supplied mappings so we can validate
+            we have mapped things correctly.</para>
     </section>
 
     <section id="hibernate-migration-legacy-schema">
         <title>Generating Schema</title>
-        <para></para>
+        <para>Whether you use auto-generated schema to directly defined your database schema or simply use it as a guide, it
+           is quite valuable to generate schema form the entity mappings of your Hibernate and JPA applications so you can 
+           sanity check the results and more easily spot errors that can go undetected until late into runtime. We are going
+           to leverage Hibernate's ability to generate schema through the hibernate3-maven-plugin. Unfortunately the plugin
+           went through a major release from 2.2 to 3.0 sometime around 2012 and the configurations changed drastically.
+           You are going to be shown the legacy 2.x syntax here for the legacy project and the 3.x syntax in the follow-on
+           projects later on. The definition for the plugin can be quite lengthy in total, but can be reduced when factored 
+           into a pluginManagement section in a shared parent pom.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
+            <listitem><para>Define the hibernate3-maven-plugin core structure. The version used in this case is 2.2.</para>
 <programlisting language=""><![CDATA[
+    <build>
+        <plugins>
+            <!-- generates a DDL file for persistence unit using an older version of the plugin -->
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>${legacy-hibernate3-maven-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>${legacy-hibernate.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <components>
+                        <component>
+                            <name>hbm2ddl</name>
+                            <outputDirectory>target/classes/ddl</outputDirectory>
+                        </component>
+                    </components>
+                    <componentProperties>
+                        <configurationfile>target/classes/hibernate.cfg.xml</configurationfile>
+                        <export>false</export>
+                        <format>true</format>
+                    </componentProperties>
+                </configuration>
+                <executions>
+                
+              ...
+              
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Generate the drop and create scripts. Run them in a maven phase that assures 
+                you the classes exist prior to running the plugin.</para>
+<programlisting language="xml"><![CDATA[
+                    <execution>
+                        <id>generate-drop-hbm</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>hbm2ddl</goal>
+                        </goals>
+                        <configuration>
+                            <componentProperties>
+                                <outputfilename>${project.artifactId}-dropHBM.ddl</outputfilename>
+                                <drop>true</drop>
+                                <create>false</create>
+                            </componentProperties>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>generate-create-hbm</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>hbm2ddl</goal>
+                        </goals>
+                        <configuration>
+                            <componentProperties>
+                                <outputfilename>${project.artifactId}-createHBM.ddl</outputfilename>
+                                <drop>false</drop>
+                                <create>true</create>
+                            </componentProperties>
+                        </configuration>
+                    </execution>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The above plugin generates the following two files that express creating
+                the complete schema and dropping it from the database.</para>
+<programlisting language=""><![CDATA[
+target/classes/
+├── ddl
+│   ├── hibernate-hbm-createHBM.ddl
+│   └── hibernate-hbm-dropHBM.ddl
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
+        <para>You have finished looking through how schema can be generated with the legacy
+            hibernate3-maven-plugin version using hibernate-specific techniques to define the 
+            session. In the next chapter we will use the same version of the plugin to process
+            a JPA persistence unit.</para>
         
-        <para></para>
     </section>
 
     <section id="hibernate-migration-legacy-summary">
        <title>Summary</title>
-       <para>In this chapter we
+       <para>In this chapter we took a look at a legacy Hibernate application that we wish to 
+           migrate to JPA through one of a couple possible first steps. This part of the example
+           defined the class model, a legacy database schema through the supplied mappings,
+           a maven build and unit test, and schema generation. I know of some projects that would
+           be happy with just that.
        </para>
     </section>    
 </chapter>

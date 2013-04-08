@@ -87,23 +87,6 @@
     <build>
         <pluginManagement>
             <plugins>
-            <!--
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>hibernate3-maven-plugin</artifactId>
-                    <version>${hibernate3-maven-plugin.version}</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <hibernatetool destdir="target/classes/ddl">
-                            <classpath>
-                                <path location="${project.build.directory}/classes" />
-                                <path location="${project.build.directory}/test-classes" />
-                            </classpath>
-                        </hibernatetool>
-                    </configuration>
-                </plugin>
-                -->
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
