@@ -5,41 +5,625 @@
     <title>Adding Metadata thru Class Annotations</title>
     <para>This chapter describes a migration increment where we can get rid of 
         verbose Hibernate HBM files and replace the source of metadata with class
-        annotations.
+        annotations. This allows the class to express how it is designed in one location
+        and not be forced to express details in a separate XML file. However -- there
+        is a catch. There is debate over some of the metadata annotations that can express
+        database-specific properties. JPA solves that issue by allowing the entity class
+        to express a default and allowing an optional ORM.xml to override that default when
+        necessary. Hibernate Session -- however is one or the other. You can use annotations
+        or HBM files and not a combination of both. This section will demonstrate how the
+        entity annotations processed by the Hibernate Session can be overridden by the application. 
+         
     </para>
         
-    <section id="hibernate-migration-annotation-section1">
-        <title>hibernate-migration Section 1</title>
-        <para></para>
+    <section id="hibernate-migration-annotation-entities">
+        <title>Entity Class Annotations</title>
+        <para>In this section we will migrate the HBM or ORM mappings from their XML files to 
+            the entity classes. This makes for a very concise and readable design.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
+            <listitem><para>To get started we are going to create a new version of the example class
+                model and leave the older one in tact. </para>
 <programlisting language=""><![CDATA[
+├── main
+│   ├── java
+│   │   └── ejava
+│   │       └── jpa
+│   │           └── hibernatemigration
+│   │               ├── annotated
+│   │               │   ├── Clerk.java
+│   │               │   ├── Customer.java
+│   │               │   ├── CustomerLevel.java
+│   │               │   ├── Person.java
+│   │               │   └── Sale.java
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The annotations we see below should map 1:1 with the annotations we defined
+                within the ORM.xml files in the previous section. In this case the Person entity class
+                is declaring it as an @MappedSuperclass and defining a few properties inherited by Clerk
+                and Customer.</para>
+<programlisting language="java"><![CDATA[
+@MappedSuperclass
+public class Person {
+        @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private int id;
+
+        @Basic(optional=false)
+        @Column(length=32)
+    private String name;
+]]></programlisting>                        
+            </listitem>
+
+
+            <listitem><para>Clerk ...</para>
+<programlisting language="java"><![CDATA[
+@Entity
+@Table(name="HMIG_CLERK")
+public class Clerk extends Person {
+        @ManyToMany(mappedBy="salesClerks")
+        private Set<Sale> sales;
+
+        @Basic(optional=false)
+        @Temporal(TemporalType.DATE)
+        @Column(name="HIRE_DATE")
+        private Date hireDate;
+
+        @Temporal(TemporalType.DATE)
+        @Column(name="TERM_DATE")
+        private Date termDate;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Customer ...</para>
+<programlisting language="java"><![CDATA[
+@Entity
+@Table(name="HMIG_CUSTOMER")
+public class Customer extends Person {
+        @OneToMany(mappedBy="customer")
+        private Set<Sale> purchases;
+        @Column(length=32)
+        private String email;
+        @Enumerated(EnumType.STRING)
+        @Column(length=8)
+        private CustomerLevel level=CustomerLevel.BRONZE;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Sale, on the other hand was left un-mapped by the entity class annotations and will
+                be required to use an HBM mapping as an example.</para>
+<programlisting language="java"><![CDATA[
+public class Sale {
+        private String id;
+        private BigDecimal amount;
+        private Date dateTime;
+        private Set<Clerk> salesClerks;
+        private Customer customer;
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
-        
-        <para></para>
+        <para>You have finished the migration from the HBM mappings to entity class annotations. Hopefully
+            you can see the benefits and risks associated with placing information directly within the class
+            mapped to the database. Next we will look at a few remaining mapping issues before our application
+            is ready to run with this new approach.</para>
     </section>
 
-    <section id="hibernate-migration-annotation-section2">
-        <title>hibernate-migration Section 2</title>
-        <para></para>
+
+
+
+
+    <section id="hibernate-migration-annotation-configuration">
+        <title>Using Annotated Classes with Hibernate Configuration</title>
+        <para>In this section we will look at what is required to use the annotated classes with Hibernate.
+            For the most part, the main difference is using a different Configuration class -- that is Annotation-aware.
+            This class is provided in the hibernate-annotations artifact.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
+            <listitem><para>Remember we left one of the classes unmapped from class annotations so we have to provide
+                a mapping for that class in an HBM file. This is the same mapping you have seen for Sale earlier.</para>
 <programlisting language=""><![CDATA[
+src/
+├── main
+│   └── resources
+│       ├── hibernate
+│       │   └── Sale.hbm.xml
+│       └── hibernate.cfg.xml
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The hibernate.xfg.xml looks a little different from what you last saw -- but I am sure 
+                the changes present here are very obvious. We have traded an HBM reference for a class reference 
+                for the Clerk and Customer classes. Sale still uses a reference to an HBM mapping definition.</para>
+<programlisting language="xml"><![CDATA[
+./src/main/resources/hibernate.cfg.xml
+::::::::::::::
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+        <!-- some of the classes use annotations -->
+        <mapping class="ejava.jpa.hibernatemigration.annotated.Clerk"/>
+        <mapping class="ejava.jpa.hibernatemigration.annotated.Customer"/>
+        <!-- this class does not use annotations -->
+        <mapping resource="hibernate/Sale.hbm.xml"/>
+    </session-factory>
+
+</hibernate-configuration>
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
-        
-        <para></para>
+        <para>You have finished going through the Hibernate configuration for using annotated classes. The main difference is
+            that the classes are listed versus the HBM mappings in the hibernate.cfg.xml (or API equivalent of the Configuration).
+            Next we will look at the API changes we need at start-up.</para>
     </section>
 
+
+
+
+    <section id="hibernate-migration-annotation-session">
+        <title>Accessing Annotated Classes with Hibernate Session</title>
+        <para>There is only a single change required when adding annotated classes to the Hibernate Session. Instead of 
+            instantiating a normal Configuration class when building a SessionFactory -- we instantiate an AnnotationConfiguration
+            instead. The rest is identical to what you saw in the legacy HBM approach.</para>
+  
+        <orderedlist>
+
+            <listitem><para></para>
+<programlisting language="java"><![CDATA[
+        @BeforeClass
+        public static void setUpClass() {
+                log.debug("creating sessionFactory");
+                sessionFactory=new AnnotationConfiguration().configure().buildSessionFactory();
+        }
+]]></programlisting>                        
+            </listitem>
+        </orderedlist>
+        
+        <para>You have finished going through the few changes necessary to access the annotated classes
+            as entities using Hibernate Session. At this point we may be feeling good -- especially since
+            we can mix annotated and non-annotated approaches. However, the mixture is at the Session level 
+            and not within a specific entity class. Hibernate provides no means to override the entity
+            class annotations using the HBM file. In fact, some of the elements in the HBM schema are required
+            and cannot be left out. The next section shows a first option in achieving an annotation override.</para>
+    </section>
+
+
+    <section id="hibernate-migration-annotation-custom-configuration">
+        <title>Adding Overrides thru Custom Configuration</title>
+        <para>For all the great things one can do with entity class annotations and all the good one
+            can optionally do with JPA mapping file overrides, Hibernate does not offer that override
+            capability through its HBM mapping construct. You must do so through API calls. We will
+            start with the first of two options -- custom Configuration</para>
+  
+        <orderedlist>
+
+            <listitem><para>Lets start with the end of the story and work backwards since it is easier to see
+                that way. Notice what we have done to the Configuration. We have replaced the Hibernate call 
+                with a version we have customized for our own use.</para>
+<programlisting language="java"><![CDATA[
+public class CustomizedConfigurationHBMTest extends BaseAnnotatedMigrationTest {
+...
+        @BeforeClass
+        public static void setUpClass() {
+                log.debug("creating sessionFactory");
+                sessionFactory=new CustomizedConfiguration().configure().buildSessionFactory();
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The class is implemented as an extension of the AnnotationConfiguration class
+                since it is the entity class annotations we primarily wish to override.</para>
+<programlisting language="java"><![CDATA[
+public class CustomizedConfiguration extends AnnotationConfiguration {
+        private static final long serialVersionUID = 1L;
+        private static final Log log = LogFactory.getLog(CustomizedConfiguration.class);
+        private Map<String, String> tableMap = new HashMap<String, String>();
+...
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The overridden call to configure() calls the parent and then
+                looks for any properties in the session configuration that expresses a table name
+                override for a particular class. Once found -- it is stored in a map for a follow-on
+                callback.</para>
+<programlisting language="java"><![CDATA[
+       @Override
+        public Configuration configure() throws HibernateException {
+                log.info(AnnotationConfiguration.class.getResource("AnnotationConfiguration.class"));
+                Configuration config = super.configure();
+                for (Object o : getProperties().keySet()) {
+                        String key = (String)o;
+                        log.info("checking " + o);
+                        //different versions of hibernate express key property differently
+                        if (key.matches("(hibernate.)*(tableName:)+.*")) {
+                                String[] tokens = key.split(":");
+                                if (tokens.length != 2) {
+                                        log.warn("bad tableName key:" + key);
+                                        continue;
+                                }
+                                String className = tokens[1];
+                                String tableName = getProperty(key);
+                                if (tableName==null || tableName.length()==0) {
+                                        log.warn("empty tableName value:" + key);
+                                        continue;
+                                }
+                                tableMap.put(className, tableName);
+                        }
+                }
+                return config;
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>After the secondPassCompile callback is complete, all classes have a PersistClass associated with
+                them and this class houses the class' mapping to the database. If we can find the call we are configured to
+                use -- we have succeeded in overriding at least one type of annotation.</para>
+<programlisting language="java"><![CDATA[
+        @Override
+        protected void secondPassCompile() throws MappingException {
+                super.secondPassCompile();
+                for (Entry<String, String> e: tableMap.entrySet()) {
+                        String className = e.getKey();
+                        String tableName = e.getValue();
+
+                        PersistentClass pc = getClassMapping(className);
+                        if (pc == null) {
+                                log.warn("entity class " + tableName + " not found in session configuration");
+                                continue;
+                        }
+
+                        String oldName = pc.getTable().getName();
+                        if (!tableName.equals(oldName)) {
+                                pc.getTable().setName(tableName);
+                                log.info(String.format("changed %s tableName from %s to %s", 
+                                                className, oldName, tableName));
+                        }
+                }
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>To demonstrate our override we add a tableName property to the hibernate.cfg.xml properties.</para>
+<programlisting language="xml"><![CDATA[
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+        <!-- custom overrides for annotated classes -->
+        <property name="tableName:ejava.jpa.hibernatemigration.annotated.Clerk">HMIG_CLERK_OVERRIDE</property>
+
+        <!-- some of the classes use annotations -->
+        <mapping class="ejava.jpa.hibernatemigration.annotated.Clerk"/>
+        <mapping class="ejava.jpa.hibernatemigration.annotated.Customer"/>
+        <!-- this class does not use annotations -->
+        <mapping resource="hibernate/Sale.hbm.xml"/>
+        
+    </session-factory>
+
+</hibernate-configuration>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>During the configure step our class recognizes the pattern, parses the tokens and 
+               stores the className and tableName for after the secondPassCompile.</para>
+<programlisting language=""><![CDATA[
+-checking tableName:ejava.jpa.hibernatemigration.annotated.Clerk
+]]></programlisting>                        
+            </listitem>
+
+
+            <listitem><para>After the secondPassCompile you can see Hibernate print what it determined was going
+                to be the proper table mappings and then our override comes in at the end.</para>
+<programlisting language=""><![CDATA[
+ -Mapping class: ejava.jpa.hibernatemigration.annotated.Sale -> HMIG_SALE
+ -Mapping collection: ejava.jpa.hibernatemigration.annotated.Sale.salesClerks -> HMIG_SALE_CLERK
+ -Binding entity from annotated class: ejava.jpa.hibernatemigration.annotated.Clerk
+ -Bind entity ejava.jpa.hibernatemigration.annotated.Clerk on table HMIG_CLERK
+ -Binding entity from annotated class: ejava.jpa.hibernatemigration.annotated.Customer
+ -Bind entity ejava.jpa.hibernatemigration.annotated.Customer on table HMIG_CUSTOMER
+ -Mapping collection: ejava.jpa.hibernatemigration.annotated.Customer.purchases -> HMIG_SALE
+ -changed ejava.jpa.hibernatemigration.annotated.Clerk tableName from HMIG_CLERK to HMIG_CLERK_OVERRIDE
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>In the debug output for the SQL exchanges with the database, we can verify the tableName has been changed.</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    insert 
+    into
+        HMIG_CLERK_OVERRIDE
+        (id, name, HIRE_DATE, TERM_DATE) 
+    values
+        (null, ?, ?, ?)
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Life is good! right? Not so fast. Although the Hibernate Session authors may have been open to 
+                us extending Configuration and changing things -- the tool writers didn't get that same memo. When generating
+                schema the generation configuration does not allow us to express anything beyind a straight configuration,
+                annotationconfiguration, or one of the other classes supported by Hibernate. For that reason, we get the
+                following in the generated database schema.</para>
+<programlisting language=""><![CDATA[
+    create table HMIG_CLERK (
+        id integer generated by default as identity (start with 1),
+        name varchar(32) not null,
+        HIRE_DATE date not null,
+        TERM_DATE date,
+        primary key (id)
+    );
+]]></programlisting>                        
+            </listitem>
+
+        </orderedlist>
+        <para>You are done looking at our first attempt at implementing a property override when using a Hibernate Session
+            and entity class annotations. We achieved most of our goal but fell short of tool integration. Luckily
+            there is another option that is supported by DDL generation. In the next section we will take a look at 
+            providing the given Configuration a NamingStrategy rather than extending the Configuration.
+        </para>
+        
+    </section>
+
+    <section id="hibernate-migration-annotation-custom-strategy">
+        <title>Adding Overrides thru Custom NamingStrategy</title>
+        <para>Hibernate provides the option of overriding its DefaultNamingStrategy with a few built-in versions as well as
+            you own custom override. This class is consulted for names for entities, tables, columns, join-columns, etc.
+            We can clearly jump in there. The only down-side is that it class does not receive any callback with the 
+            configuration. You may have to cook something up yourself (like we did here).</para>
+  
+        <orderedlist>
+
+            <listitem><para>We start off by extending the default Hibernate naming strategy class. This class will 
+                accept a configuration mapping from class-to-table and and override mapping from table-to-table.
+                The former is called when there is no table specification on the class. The later is called when there
+                is a table specification and gives us a change to change it.</para>
+<programlisting language="java"><![CDATA[
+public class CustomizedNamingStrategy extends DefaultNamingStrategy {
+        private static final Log log = LogFactory.getLog(CustomizedNamingStrategy.class);
+        //mapping from className to tableName
+        private Map<String, String> classTableMap = new HashMap<String, String>();
+        //tableName override
+        private Map<String, String> tableMap = new HashMap<String, String>();
+...
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>We add some methods to allow our application to configure the overrides</para>
+<programlisting language="java"><![CDATA[
+        public CustomizedNamingStrategy addClassTableMapping(String className, String tableName) {
+                classTableMap.put(className, tableName);
+                return this;
+        }
+        public CustomizedNamingStrategy addTableMapping(String oldName, String newName) {
+                tableMap.put(oldName, newName);
+                return this;
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>We implement the callback method when the provider is looking for a 
+                table name and there was none provided in the class annotations.</para>
+<programlisting language="java"><![CDATA[
+        @Override
+        public String classToTableName(String className) {
+                log.debug("classToTableName(" + className + ")");
+                String tableName = super.classToTableName(className);
+
+                String newName = classTableMap.get(className);
+                if (newName != null) {
+                        log.info(String.format("updating %s from tableName: %s to %s", 
+                                        className, tableName, newName));
+                        tableName = newName;
+                }
+                return tableName;
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>We implement the callback method when the provider is looking for a 
+                table name ansd there was one provided by the class annotation. In this case we 
+                are given a chance to override what the configuration was goinf to use.</para>
+<programlisting language="java"><![CDATA[
+        @Override
+        public String tableName(String tableName) {
+                log.debug("tableName(" + tableName + ")");
+
+                String newName = tableMap.get(tableName);
+                if (newName != null) {
+                        log.info(String.format("updating tableName from %s to %s", 
+                                        tableName, newName));
+                        tableName = newName;
+                }
+                return tableName;
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>One more step is to create a class that sets the mapping values. Clearly 
+                this could be driven off of anything and was hard-coded here for quick implementation.</para>
+<programlisting language="java"><![CDATA[
+public class ProjectNamingStrategy extends CustomizedNamingStrategy {
+        public ProjectNamingStrategy() {
+                //this is in case the class metadata did not specify a tableName
+                addClassTableMapping(Customer.class.getName(), "HMIG_CUSTOMER_STRATEGY");
+                //this is in case the class metadata did spec a tableName we want to override
+                addTableMapping("HMIG_CUSTOMER", "HMIG_CUSTOMER_STRATEGY");
+        }
+}
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>We now set an instance of our NamingStrategy as the naming strategy for the configuration.</para>
+<programlisting language="java"><![CDATA[
+       @BeforeClass
+        public static void setUpClass() {
+                log.debug("creating sessionFactory");
+                sessionFactory=new AnnotationConfiguration()
+                        .setNamingStrategy(new ProjectNamingStrategy())
+                        .configure().buildSessionFactory();
+        }
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>During the SessionFactory creation -- we can see our naming strategy get called and 
+                get a chance to override our targeted table name.</para>
+<programlisting language=""><![CDATA[
+ -updating tableName from HMIG_CUSTOMER to HMIG_CUSTOMER_STRATEGY
+ -Bind entity ejava.jpa.hibernatemigration.annotated.Customer on table HMIG_CUSTOMER_STRATEGY
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Like with the previous strategy, we can now see our override taking place.</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    insert 
+    into
+        HMIG_CUSTOMER_STRATEGY
+        (id, name, email, level) 
+    values
+        (null, ?, ?, ?)
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Unlike our previous strategy, we can also provide this NamingStrategy to the
+                DLL generation tool. This looks different from before since we have switched to the 
+                new hibernate3-maven-plugin API in this example. More details later -- but notive we can 
+                provide a specification to our NamingStrategy.</para>
+<programlisting language="xml"><![CDATA[
+    <hibernatetool>
+        <annotationconfiguration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml"
+            namingstrategy="ejava.jpa.hibernatemigration.ProjectNamingStrategy"/>
+        <hbm2ddl export="false" create="true" drop="false" format="true" 
+            outputfilename="${project.artifactId}-createNAM.ddl"/>
+    </hibernatetool>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The following is an example of what is generated from the DDL plugin.</para>
+<programlisting language=""><![CDATA[
+    create table HMIG_CUSTOMER_STRATEGY (
+        id integer generated by default as identity (start with 1),
+        name varchar(32) not null,
+        email varchar(32),
+        level varchar(8),
+        primary key (id)
+    );
+...
+    alter table HMIG_SALE 
+        add constraint FK862A2223AB739428 
+        foreign key (CUSTOMER_ID) 
+        references HMIG_CUSTOMER_STRATEGY;
+]]></programlisting>                        
+            </listitem>
+
+        </orderedlist>
+        <para>We have finished looking at the custom NamingStrategy option. Both this and the custom 
+            Configuration option gave us most of what we wanted, but this one added a small amount of
+            tool support that could be quite useful. Next we will look at the full hibernate3-maven-plugin
+            that made this happen since we are now switching to the new 3.x release.</para>
+    </section>
+
+
+
+
+    <section id="hibernate-migration-annotation-schema">
+        <title>Generating Schema from Class Annotations and NamingStrategy</title>
+        <para>As a move forward, we are now goinf to leverage the 3.x version of the 
+            hibernate3-maven-plugin. This upgrade apparently wraps Hibernate Ant tasks and
+            just serves as a delegation wrapper. Most of the documentation is at the Ant
+            level.</para>
+  
+        <orderedlist>
+
+            <listitem><para>My success varied with this plugin and versions required. You will notice it
+                requires hibernate-entitymanager to be declared as a dependency and sometimes that is 
+                good when the plugin is operating at a different version that our application. In 
+                some combinations I was able to run as old as 3.2.0.ga and in others I ran as new as 
+                3.6.0.Final and am still investigating the differences.</para>
+<programlisting language="xml"><![CDATA[
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>${hibernate3-maven-plugin-hibernate.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <hibernatetool destdir="target/classes/ddl">
+                        <classpath>
+                            <path location="${project.build.directory}/classes" />
+                            <path location="${project.build.directory}/test-classes" />
+                        </classpath>
+                    </hibernatetool>
+                </configuration>
+                <executions>
+...
+                </executions>
+            </plugin>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Notice ...</para>
+<programlisting language="xml"><![CDATA[
+    <execution>
+        <id>generate-drop-hbm</id>
+        <phase>process-test-resources</phase>
+        <goals>
+            <goal>run</goal>
+        </goals>
+        <configuration>
+            <hibernatetool>
+                <annotationconfiguration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml"
+                    namingstrategy="ejava.jpa.hibernatemigration.ProjectNamingStrategy"/>
+                <hbm2ddl export="false" create="false" drop="true" format="true" 
+                    outputfilename="${project.artifactId}-dropNAM.ddl"/>
+            </hibernatetool>
+        </configuration>
+    </execution>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Notice ...</para>
+<programlisting language="xml"><![CDATA[
+    <execution>
+        <id>generate-create-hbm</id>
+        <phase>process-test-resources</phase>
+        <goals>
+            <goal>run</goal>
+        </goals>
+        <configuration>
+            <hibernatetool>
+                <annotationconfiguration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml"
+                    namingstrategy="ejava.jpa.hibernatemigration.ProjectNamingStrategy"/>
+                <hbm2ddl export="false" create="true" drop="false" format="true" 
+                    outputfilename="${project.artifactId}-createNAM.ddl"/>
+            </hibernatetool>
+        </configuration>
+    </execution>
+]]></programlisting>                        
+            </listitem>
+
+        </orderedlist>        
+        <para></para>
+    </section>
 
     <section id="hibernate-migration-annotation-summary">
        <title>Summary</title>
@@ -47,4 +631,3 @@
        </para>
     </section>    
 </chapter>
-  

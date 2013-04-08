@@ -30,7 +30,7 @@ public class NamingStrategyHBMTest extends BaseAnnotatedMigrationTest {
 	@BeforeClass
 	public static void setUpClass() {
 		log.debug("creating sessionFactory");
-		sessionFactory=new CustomizedConfiguration()
+		sessionFactory=new AnnotationConfiguration()
 			.setNamingStrategy(new ProjectNamingStrategy())
 			.configure().buildSessionFactory();
 	}

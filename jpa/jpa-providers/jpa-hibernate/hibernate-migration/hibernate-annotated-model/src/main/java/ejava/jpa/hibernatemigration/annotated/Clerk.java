@@ -24,7 +24,6 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name="HMIG_CLERK")
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public class Clerk extends Person {
 	@ManyToMany(mappedBy="salesClerks")
 	private Set<Sale> sales;
