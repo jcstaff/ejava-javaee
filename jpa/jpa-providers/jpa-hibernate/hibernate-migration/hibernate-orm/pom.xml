@@ -92,11 +92,11 @@
         </testResources>
 
         <plugins>
-            <!-- generates a DDL file for persistence unit
-                see effective-pom for full configuration -->
+            <!-- generates a DDL file for persistence unit using an older version of the plugin -->
             <plugin>
                 <artifactId>hibernate3-maven-plugin</artifactId>
                 <groupId>org.codehaus.mojo</groupId>
+                <version>${legacy-hibernate3-maven-plugin.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.hibernate</groupId>
@@ -104,37 +104,49 @@
                         <version>${legacy-hibernate.version}</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <components>
+                        <component>
+                            <name>hbm2ddl</name>
+                            <implementation>jpaconfiguration</implementation>
+                            <outputDirectory>target/classes/ddl</outputDirectory>
+                        </component>
+                    </components>
+                    <componentProperties>
+                        <persistenceunit>hibernate-migration-sales</persistenceunit>
+                        <export>false</export>
+                        <format>true</format>
+                    </componentProperties>
+                </configuration>
                 <executions>
 
                     <execution>
-                        <id>generate-drop-jpa</id>
+                        <id>generate-drop-hbm</id>
                         <phase>process-test-resources</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>hbm2ddl</goal>
                         </goals>
                         <configuration>
-                            <hibernatetool>
-                                <jpaconfiguration persistenceunit="hibernate-migration-sales" 
-                                    propertyfile="${basedir}/target/test-classes/hibernate.properties" />
-                                <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                    outputfilename="${project.artifactId}-dropJPA.ddl"/>
-                            </hibernatetool>
+                            <componentProperties>
+                                <outputfilename>${project.artifactId}-dropJPA.ddl</outputfilename>
+                                <drop>true</drop>
+                                <create>false</create>
+                            </componentProperties>
                         </configuration>
                     </execution>
 
                     <execution>
-                        <id>generate-create-jpa</id>
+                        <id>generate-create-hbm</id>
                         <phase>process-test-resources</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>hbm2ddl</goal>
                         </goals>
                         <configuration>
-                            <hibernatetool>
-                                <jpaconfiguration persistenceunit="hibernate-migration-sales" 
-                                    propertyfile="${basedir}/target/test-classes/hibernate.properties" />
-                                <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                    outputfilename="${project.artifactId}-createJPA.ddl"/>
-                            </hibernatetool>
+                            <componentProperties>
+                                <outputfilename>${project.artifactId}-createJPA.ddl</outputfilename>
+                                <drop>false</drop>
+                                <create>true</create>
+                            </componentProperties>
                         </configuration>
                     </execution>
 
