@@ -1,0 +1,45 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+    <bookinfo>
+        <title>Hibernate Migration</title>
+        <subtitle>Migrating from Legacy Hibernate Session/HBM descriptors to JPA</subtitle>
+    </bookinfo>
+    <preface id="hibernate-migration-purpose">
+        <title>Purpose</title>
+        <para>Many other topics on this site are centered on how to work with the modern APIs. This topic is
+            centered on how best to work with the legacy form of a Hibernate project and migrate it gradually 
+            to modern JPA constructs. The Hibernate Session will still be in place -- under the hood as acting as
+            the provider -- and accessible through a legal JPA call when needed. However, we will start benefiting 
+            from using a standard API to express mappings.
+            </para>
+            <para>During this topic we will...</para>
+        <itemizedlist>
+            <listitem><para>Demonstrate a set of incremental steps to upgrade a legacy Hibernate project to include</para>
+                <itemizedlist>
+                    <listitem><para>Migrate from from Hibernate Session to JPA EntityManager by replacing descriptor files</para></listitem>
+                    <listitem><para>Mix use of Hibernate Session with JPA EntityManager</para></listitem>
+                    <listitem><para>Migrate away from Hibernate HBM files to Java annotated classes</para></listitem>
+                    <listitem><para>Override Java annotated classes within Hibernate Session</para></listitem>
+                    <listitem><para>Fully migrate to JPA Entity Manager, class annotations, and ORM.xml overrides</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Demonstrate how to automatically generate database schema for a project based on</para>
+                <itemizedlist>
+                    <listitem><para>Hibernate Session and older version of hibernate3-maven-plugin</para></listitem>
+                    <listitem><para>JPA EntityManager and older version of hibernate3-maven-plugin</para></listitem>
+                    <listitem><para>Hibernate Session and modern version of hibernate3-maven-plugin</para></listitem>
+                    <listitem><para>JPA EntityManager and modern version of hibernate3-maven-plugin</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="hibernate-migration-legacy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="hibernate-migration-orm.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="hibernate-migration-annotation.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="hibernate-migration-jpa.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

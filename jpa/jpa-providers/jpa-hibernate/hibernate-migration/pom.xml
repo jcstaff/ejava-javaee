@@ -1,6 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>ejava.jpa.hibernate</groupId>
         <artifactId>hibernate-root</artifactId>
@@ -28,7 +27,7 @@
         <module>hibernate-annotated-session</module>
         <module>hibernate-annotated-session-override</module>
         <module>hibernate-annotated-jpa</module>
-    </modules>
+  </modules>
     
     <properties>
         <commons-logging.version>1.1.1</commons-logging.version>
@@ -128,7 +127,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -141,13 +140,20 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>docs</id>
+            <modules>
+                <module>hibernate-migration-docbook</module>
+            </modules>
+        </profile>
+
         <profile> <!-- H2 embedded/file-based DB -->
             <id>h2db</id>
             <properties>
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
+                  <jdbc.password/>
                   <hibernate.dialect>
                       org.hibernate.dialect.H2Dialect
                   </hibernate.dialect>
@@ -168,7 +174,7 @@
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
+                  <jdbc.password/>
                   <hibernate.dialect>
                       org.hibernate.dialect.H2Dialect
                   </hibernate.dialect>
@@ -193,7 +199,7 @@
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:${basedir}/target/hsqldb/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
+                  <jdbc.password/>
                   <hibernate.dialect>
                       org.hibernate.dialect.HSQLDialect
                   </hibernate.dialect>
@@ -213,7 +219,7 @@
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password />
+                  <jdbc.password/>
                   <hibernate.dialect>
                       org.hibernate.dialect.HSQLDialect
                   </hibernate.dialect>
