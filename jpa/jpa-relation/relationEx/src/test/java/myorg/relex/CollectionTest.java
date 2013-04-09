@@ -139,7 +139,7 @@ public class CollectionTest extends JPATestBase {
      * a consistent business identity through their lifetime offer the best solution
      * of them all -- assuming it it possible or needed. 
      */
-    @Test
+    @Test @Ignore
     public void testByBusinessId() {
     	log.info("*** testByBusinessId ***");
 
@@ -171,7 +171,7 @@ public class CollectionTest extends JPATestBase {
         assertTrue("entity not found after persist", ships.contains(ship1));
     }
     
-    @Test
+    @Test @Ignore
     public void testOrderBy() {
     	log.info("*** testOrderBy ***");
     	

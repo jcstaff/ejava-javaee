@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>ejava.jpa.hibernate</groupId>
-        <artifactId>hibernate-root</artifactId>
-        <version>3.0.2013.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ejava.jpa.hibernate.migration</groupId>
     <artifactId>migration-root</artifactId>
+    <version>3.0.2013.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Migration::Root</name>
@@ -20,14 +15,16 @@
 
     <modules>
         <module>hibernate-model</module>
+        <!--
         <module>hibernate-hbm</module>
         <module>hibernate-orm</module>
+        -->
         <module>hibernate-jpamix</module>
         <module>hibernate-annotated-model</module>
         <module>hibernate-annotated-session</module>
         <module>hibernate-annotated-session-override</module>
         <module>hibernate-annotated-jpa</module>
-  </modules>
+    </modules>
     
     <properties>
         <commons-logging.version>1.1.1</commons-logging.version>
@@ -214,6 +211,49 @@
                     <scope>test</scope>
                 </dependency>       
             </dependencies>
+        </profile>
+
+        <profile>
+            <id>webdev-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>webdev.website</id>
+                    <name>ejava JHU webdev website</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/ejava-javaee</url>
+                </site>
+                <repository>
+                    <id>webdev.repository</id>
+                    <name>ejava JHU repository</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/maven2</url>
+                </repository>
+                <snapshotRepository>
+                    <id>webdev.snapshot.repo</id>
+                    <name>ejava JHU snapshot repository</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>test-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>webdev.website</id>
+                    <name>ejava JHU webdev website</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/ejava-javaee</url>
+                </site>
+                <repository>
+                    <id>webdev.repository</id>
+                    <name>ejava JHU repository</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2</url>
+                </repository>
+                <snapshotRepository>
+                    <id>webdev.snapshot.repo</id>
+                    <name>ejava JHU snapshot repository</name>
+                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
     </profiles>
 </project>

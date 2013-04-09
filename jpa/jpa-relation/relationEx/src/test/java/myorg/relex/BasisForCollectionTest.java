@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.junit.*;
 
-
+@Ignore
 public class BasisForCollectionTest extends JPATestBase {
     private static Log log = LogFactory.getLog(BasisForCollectionTest.class);
 
