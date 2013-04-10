@@ -192,7 +192,7 @@ URI uri = UriBuilder.fromUri(appURI).path("index.html").build();
 
 //build the overall request 
 HttpGet get = new HttpGet(uri);
-get.addHeader(HttpHeaders.ACCEPT, MediaType.TEXT_HTML);
+get.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML);
 
 HttpResponse response = client.execute(get);
 if (Response.Status.OK.getStatusCode() == response.getStatusLine().getStatusCode()) {
