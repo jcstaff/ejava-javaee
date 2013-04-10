@@ -20,6 +20,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JNDIUtil {
 	private static final Log log = LogFactory.getLog(JNDIUtil.class);
+	public static final String PROPERTY_FILE="ejava-jndi.properties";
+	private static final String[] PATHS = new String[]{
+		"/" + PROPERTY_FILE, PROPERTY_FILE
+	};
 	
 	/**
 	 * This method will return a jndi.properties object that is based on the
@@ -32,18 +36,31 @@ public class JNDIUtil {
 	 * @throws IOException
 	 */
     public static Properties getJNDIProperties(String prefix) throws IOException {
-    	InputStream is=JNDIUtil.class.getResourceAsStream("/ejava-jndi.properties");
-    	Properties props = new Properties();
-    	props.load(is);
-    	is.close();
+    	InputStream is = null;
+    	for (int i=0; is==null && i<PATHS.length; i++) {
+    		log.debug("trying: " + PATHS[i]);
+    		is = JNDIUtil.class.getResourceAsStream(PATHS[i]);
+    	}
+    	for (int i=0; is==null && i<PATHS.length; i++) {
+    		log.debug("trying loader for thread: " + PATHS[i]);
+    		is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PATHS[i]);
+    	}
     	
     	Properties env = new Properties();
-    	for (String key : props.stringPropertyNames()) {
-    		String value = props.getProperty(key);
-    		if (key.startsWith(prefix) && value != null && !value.isEmpty()) {
-    			String name=key.substring(prefix.length(),key.length());
-    			env.put(name, value);
-    		}
+    	if (is!=null) {
+        	Properties props = new Properties();
+        	props.load(is);
+        	is.close();
+        	
+        	for (String key : props.stringPropertyNames()) {
+        		String value = props.getProperty(key);
+        		if (key.startsWith(prefix) && value != null && !value.isEmpty()) {
+        			String name=key.substring(prefix.length(),key.length());
+        			env.put(name, value);
+        		}
+        	}
+    	} else {
+    		log.warn("unable to locate ejava-jndi.properties from classpath");
     	}
     	return env;
     }

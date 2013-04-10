@@ -58,16 +58,9 @@ public class TellerHandlerServlet extends HttpServlet {
      * caused by the design of our example. 
      */
     @javax.ejb.EJB(beanInterface=TellerLocal.class)
-    private Teller teller;
+    private Teller injectedTeller;
 
-    /**
-     * For containers that support @EJB injection, this will allow
-     * our deployment descriptor to manually point to the remote 
-     * server and remote interface. Unfortunately, the Jetty container
-     * does not support this feature.
-     */
-    @javax.ejb.EJB
-    private TellerRemote tellerRemote;
+    private Properties env=null;
 
     /**
      * Init verify the teller reference to the EJB logic is in place and
@@ -75,12 +68,13 @@ public class TellerHandlerServlet extends HttpServlet {
      * the servlet init parameters.
      */
     public void init() throws ServletException {
-        log.debug("init() called; teller=" + teller);
-        log.debug("init() called; tellerRemote=" + tellerRemote);
+        log.debug("init() called; teller=" + injectedTeller);
         
         try {
             ServletConfig config = getServletConfig();
-            initTeller();
+            if (injectedTeller==null) { //not running on server, prepare manual lookups
+                env=JNDIUtil.getJNDIProperties("jboss.remoting.");
+            }
             
             //build a list of handlers for individual commands
             if (ADMIN_TYPE.equals(config.getInitParameter(HANDLER_TYPE_KEY))) {
@@ -113,11 +107,17 @@ public class TellerHandlerServlet extends HttpServlet {
         String command = request.getParameter(COMMAND_PARAM);
         log.debug("command=" + command);
 
+        InitialContext jndi = null;
+        Teller teller = injectedTeller; //assign to what was injected
         try {
+        	if (teller==null) { //not injected -- manually lookup
+        	    jndi=new InitialContext(env);
+     	        teller = (Teller)jndi.lookup(jndiName);
+        	}
             if (command != null) {
                 Handler handler = handlers.get(command);
                 if (handler != null) {
-                    handler.handle(request, response);
+                    handler.handle(request, response, teller);
                 }
                 else {
                     RequestDispatcher rd = 
@@ -135,6 +135,10 @@ public class TellerHandlerServlet extends HttpServlet {
             RequestDispatcher rd = getServletContext().getRequestDispatcher(
                     UNKNOWN_COMMAND_URL);
                     rd.forward(request, response);
+        } finally {
+        	if (jndi != null) {
+        		try { jndi.close(); } catch (Exception ex){}
+        	}
         }
     }
 
@@ -150,24 +154,6 @@ public class TellerHandlerServlet extends HttpServlet {
 
     public void destroy() {
         log.debug("destroy() called");
-    }
-    
-    /**
-     * Injection should have already set the teller value if running 
-     * within the application server. However, our possibly external 
-     * development environment may need to establish a remote connection.
-     * @throws NamingException
-     */
-    protected void initTeller() throws Exception {
-    	//if teller not injected -- need to lookup remote manually
-        if (teller == null) {         	
-            log.info("teller was null, getting teller manually");
-        	Properties env=JNDIUtil.getJNDIProperties("jboss.remoting.");
-            InitialContext jndi = new InitialContext(env);
-            log.debug("teller jndi name:" + jndiName);
-            teller = (Teller)jndi.lookup(jndiName);
-            log.debug("teller=" + teller);
-        }
     }
     
     private abstract class Handler {
@@ -190,17 +176,17 @@ public class TellerHandlerServlet extends HttpServlet {
         protected static final String DISPLAY_LEDGER_URL = 
             "/WEB-INF/content/DisplayLedger.jsp";
         public abstract void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller t) 
                 throws ServletException, IOException;
     }
     
     private class CreateAccount extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller t) 
                 throws ServletException, IOException {
             try {
                 String acctNum = (String)request.getParameter(ACCT_NUM_PARAM);                
-                Account account = teller.createAccount(acctNum);
+                Account account = t.createAccount(acctNum);
                 
                 request.setAttribute(ACCOUNT_PARAM, account);                
                 RequestDispatcher rd = 
@@ -219,7 +205,7 @@ public class TellerHandlerServlet extends HttpServlet {
 
     private class GetAccount extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller teller) 
                 throws ServletException, IOException {
             try {
                 String acctNum = (String)request.getParameter(ACCT_NUM_PARAM);                
@@ -242,7 +228,7 @@ public class TellerHandlerServlet extends HttpServlet {
 
     private class DepositAccount extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller teller) 
                 throws ServletException, IOException {
             try {
                 String acctNum = (String)request.getParameter(ACCT_NUM_PARAM);                
@@ -270,7 +256,7 @@ public class TellerHandlerServlet extends HttpServlet {
 
     private class WithdrawAccount extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller teller) 
                 throws ServletException, IOException {
             try {
                 String acctNum = (String)request.getParameter(ACCT_NUM_PARAM);                
@@ -298,7 +284,7 @@ public class TellerHandlerServlet extends HttpServlet {
 
     private class CloseAccount extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller teller) 
                 throws ServletException, IOException {
             try {
                 String acctNum = (String)request.getParameter(ACCT_NUM_PARAM);                
@@ -319,7 +305,7 @@ public class TellerHandlerServlet extends HttpServlet {
 
     private class CreateAccounts extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller teller) 
                 throws ServletException, IOException {
             try {
                 String countStr = (String)request.getParameter(COUNT_PARAM);
@@ -346,7 +332,7 @@ public class TellerHandlerServlet extends HttpServlet {
 
     private class GetAccounts extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller teller) 
                 throws ServletException, IOException {
             try {
                 String indexStr = (String)request.getParameter(INDEX_PARAM);
@@ -380,7 +366,7 @@ public class TellerHandlerServlet extends HttpServlet {
 
     private class GetLedger extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller teller) 
                 throws ServletException, IOException {
             try {
                 Ledger ledger = teller.getLedger();
@@ -403,7 +389,7 @@ public class TellerHandlerServlet extends HttpServlet {
 
     private class StealAccounts extends Handler {
         public void handle(HttpServletRequest request, 
-                HttpServletResponse response) 
+                HttpServletResponse response, Teller teller) 
                 throws ServletException, IOException {
             try {
                 List<Account> accounts = teller.getAccounts(0, 100);
