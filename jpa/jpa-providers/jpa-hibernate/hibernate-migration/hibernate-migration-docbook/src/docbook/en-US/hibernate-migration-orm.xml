@@ -24,20 +24,20 @@
                 file for the Person base class. The hibernate.properties file we factored out in the 
                 legacy application can stay as defined previously. Hibernate will pick that up.</para>
 <programlisting language=""><![CDATA[
-src/
-├── main
-│   ├── java
-│   └── resources
-│       ├── jpa
-│       │   ├── Clerk-orm.xml
-│       │   ├── Customer-orm.xml
-│       │   ├── Person-orm.xml
-│       │   └── Sale-orm.xml
-│       └── META-INF
-│           └── persistence.xml
-└── test
-    └── resources
-        └── hibernate.properties
+src
+|-- main
+|   |-- java
+|   `-- resources
+|       |-- jpa
+|       |   |-- Clerk-orm.xml
+|       |   |-- Customer-orm.xml
+|       |   |-- Person-orm.xml
+|       |   `-- Sale-orm.xml
+|       `-- META-INF
+|           `-- persistence.xml
+`-- test
+    `-- resources
+        `-- hibernate.properties
 ]]></programlisting>                        
             </listitem>
 
@@ -365,20 +365,20 @@ protected Session getCurrentSession() { return (em==null)?null : (Session)em.get
                HBM file for both Clerk and Customer and a JPA orm.xml file for Sale.</para>
 <programlisting language=""><![CDATA[
 src
-├── main
-│   ├── java
-│   └── resources
-│       ├── hibernate
-│       │   ├── Clerk.hbm.xml
-│       │   └── Customer.hbm.xml
-│       ├── hibernate.cfg.xml
-│       ├── jpa
-│       │   └── Sale-orm.xml
-│       └── META-INF
-│           └── persistence.xml
-└── test
-    └── resources
-        └── hibernate.properties
+|-- main
+|   |-- java
+|   `-- resources
+|       |-- hibernate
+|       |   |-- Clerk.hbm.xml
+|       |   `-- Customer.hbm.xml
+|       |-- hibernate.cfg.xml
+|       |-- jpa
+|       |   `-- Sale-orm.xml
+|       `-- META-INF
+|           `-- persistence.xml
+`-- test
+    `-- resources
+        `-- hibernate.properties
 ]]></programlisting>                        
             </listitem>
 

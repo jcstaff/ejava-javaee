@@ -21,17 +21,17 @@
 
             <listitem><para></para>
 <programlisting language=""><![CDATA[
-src/main/
-├── java
-│   └── ejava
-│       └── jpa
-│           └── hibernatemigration
-│               └── legacyhbm
-│                   ├── Clerk.java
-│                   ├── Customer.java
-│                   ├── CustomerLevel.java
-│                   ├── Person.java
-│                   └── Sale.java
+src/main
+|-- java
+|   `-- ejava
+|       `-- jpa
+|           `-- hibernatemigration
+|               `-- legacyhbm
+|                   |-- Clerk.java
+|                   |-- Customer.java
+|                   |-- CustomerLevel.java
+|                   |-- Person.java
+|                   `-- Sale.java
 ]]></programlisting>                        
             </listitem>
 
@@ -116,17 +116,17 @@ public class Sale {
             <listitem><para></para>
 <programlisting language=""><![CDATA[
 src
-├── main
-│   ├── java
-│   └── resources
-│       ├── hibernate
-│       │   ├── Clerk.hbm.xml
-│       │   ├── Customer.hbm.xml
-│       │   └── Sale.hbm.xml
-│       └── hibernate.cfg.xml
-└── test
-    └── resources
-        └── hibernate.properties
+|-- main
+|   |-- java
+|   `-- resources
+|       |-- hibernate
+|       |   |-- Clerk.hbm.xml
+|       |   |-- Customer.hbm.xml
+|       |   `-- Sale.hbm.xml
+|       `-- hibernate.cfg.xml
+`-- test
+    `-- resources
+        `-- hibernate.properties
 ]]></programlisting>                        
             </listitem>
 
@@ -845,10 +845,9 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
             <listitem><para>The above plugin generates the following two files that express creating
                 the complete schema and dropping it from the database.</para>
 <programlisting language=""><![CDATA[
-target/classes/
-├── ddl
-│   ├── hibernate-hbm-createHBM.ddl
-│   └── hibernate-hbm-dropHBM.ddl
+target/classes/ddl
+|-- hibernate-hbm-createHBM.ddl
+`-- hibernate-hbm-dropHBM.ddl
 ]]></programlisting>                        
             </listitem>
 

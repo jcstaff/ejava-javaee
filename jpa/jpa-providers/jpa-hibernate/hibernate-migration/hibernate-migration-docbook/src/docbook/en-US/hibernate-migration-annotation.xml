@@ -26,17 +26,17 @@
             <listitem><para>To get started we are going to create a new version of the example class
                 model and leave the older one in tact. </para>
 <programlisting language=""><![CDATA[
-├── main
-│   ├── java
-│   │   └── ejava
-│   │       └── jpa
-│   │           └── hibernatemigration
-│   │               ├── annotated
-│   │               │   ├── Clerk.java
-│   │               │   ├── Customer.java
-│   │               │   ├── CustomerLevel.java
-│   │               │   ├── Person.java
-│   │               │   └── Sale.java
+src/main
+|-- java
+|   `-- ejava
+|       `-- jpa
+|           `-- hibernatemigration
+|               |-- annotated
+|               |   |-- Clerk.java
+|               |   |-- Customer.java
+|               |   |-- CustomerLevel.java
+|               |   |-- Person.java
+|               |   `-- Sale.java
 ]]></programlisting>                        
             </listitem>
 
@@ -125,12 +125,12 @@ public class Sale {
             <listitem><para>Remember we left one of the classes unmapped from class annotations so we have to provide
                 a mapping for that class in an HBM file. This is the same mapping you have seen for Sale earlier.</para>
 <programlisting language=""><![CDATA[
-src/
-├── main
-│   └── resources
-│       ├── hibernate
-│       │   └── Sale.hbm.xml
-│       └── hibernate.cfg.xml
+src/main
+|-- java
+`-- resources
+    |-- hibernate
+    |   `-- Sale.hbm.xml
+    `-- hibernate.cfg.xml
 ]]></programlisting>                        
             </listitem>
 
@@ -620,6 +620,20 @@ Hibernate:
     </execution>
 ]]></programlisting>                        
             </listitem>
+            
+            <note>
+                <para>The above shows an example of using a hibernate.cfg.xml file. If you simply have
+                    HBM files and, at most, a hibernate.properties file, you can add referencces to 
+                    thos files using
+                </para>
+<programlisting language=""><![CDATA[
+<hibernatetool destdir="${build.dir}/generated">
+    <configuration propertyfile="target/test-classes/hibernate.properties">
+    <fileset dir="target/classes/hibernate">
+        <include name="**/*.hbm.xml"/>
+    </fileset>
+ </configuration>]]></programlisting>                        
+            </note>
 
         </orderedlist>        
         <para></para>
