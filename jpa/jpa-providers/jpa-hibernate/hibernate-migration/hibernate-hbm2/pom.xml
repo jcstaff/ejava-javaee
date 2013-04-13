@@ -16,11 +16,6 @@
         of the hibernate3-maven-plugin to create DDL files without a hibernate.cfg.xml.
     </description>
 
-    <properties>
-        <hibernate.version>${legacy-hibernate.version}</hibernate.version>
-    </properties>
-
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -30,7 +25,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>${hibernate.version}</version>
+            <version>${legacy-hibernate.version}</version>
         </dependency>
     </dependencies>
 
@@ -113,7 +108,7 @@
                                     </fileset>
                                 </configuration>
                                 <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                    outputfilename="${project.artifactId}-dropHBM.ddl"/>
+                                    outputfilename="${project.artifactId}-dropHBM2.ddl"/>
                             </hibernatetool>
                         </configuration>
                     </execution>
@@ -132,7 +127,7 @@
                                     </fileset>
                                 </configuration>
                                 <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                    outputfilename="${project.artifactId}-createHBM.ddl"/>
+                                    outputfilename="${project.artifactId}-createHBM2.ddl"/>
                             </hibernatetool>
                         </configuration>
                     </execution>

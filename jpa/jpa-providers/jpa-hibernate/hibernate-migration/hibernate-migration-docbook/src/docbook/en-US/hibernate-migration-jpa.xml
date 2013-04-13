@@ -2,19 +2,168 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="hibernate-migration-jpa">
-    <title>Hibernate Legacy Project</title>
+    <title>JPA-based Project</title>
     <para>This chapter describes describes the final stage of the migration where the
-        classes, descriptors, and APIs have all been switched to JPA.
+        classes, descriptors, and APIs have all been switched to JPA. If we do encounter 
+        apsects of the legacy mapping that is not supported in JPA -- we know from the previous
+        chapters that we can fully leverage the legacy Hibernate mappings where necessary
+        or desired. 
     </para>
         
-    <section id="hibernate-migration-jpa-section1">
-        <title>hibernate-migration Section 1</title>
-        <para></para>
+    <section id="hibernate-migration-jpa-structure">
+        <title>JPA Project Structure</title>
+        <para>In this pass we are going to treat the annotated entity classes as an 
+            external library and provide overrides specific to our application.</para>
   
         <orderedlist>
 
-            <listitem><para></para>
+            <listitem><para>Our application supplies a persistence.xml that describes
+                how this application will use its persistence unit. For example, some
+                applications use a direct database connection and others borrow a 
+                connection from a javax.sql.DataSource. In this case, our persistence
+                unit is defining some application-specific overrides for the two of the 
+                entities (Clerk and Customer) and providing the full mapping for the 
+                third entity (Sale) because that class does not supply any metadata.
+                classes.</para>
 <programlisting language=""><![CDATA[
+src
+|-- main
+|   |-- java
+|   `-- resources
+|       |-- jpa
+|       |   |-- Clerk-orm.xml
+|       |   |-- Customer-orm.xml
+|       |   `-- Sale-orm.xml
+|       `-- META-INF
+|           `-- persistence.xml
+`-- test
+    `-- resources
+        `-- hibernate.properties
+
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The Customer ORM entity definition overrides
+                the table name used in the class annotations to be something
+                specific to this application. Although not needed for our simple
+                mapping requirements, we have also switched the schema references
+                to JPA 2.0.</para>
+<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm 
+        http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+    version="2.0">
+    
+    <entity class="ejava.jpa.hibernatemigration.annotated.Customer">
+        <table name="HMIG_CUSTOMER_ORM"/>
+    </entity>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The Clerk ORM provides the same type of table override
+                and to simply things -- we could have placed the simple overrides
+                for Customer and Clerk into a single ORM file with multiple 
+                entity elements.</para>
+<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm 
+        http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+    version="2.0">
+
+    <entity class="ejava.jpa.hibernatemigration.annotated.Clerk">
+        <table name="HMIG_CLERK_ORM"/>
+    </entity>
+</entity-mappings>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The Sale ORM file provides the full mapping
+                to the database because the class does not provide any mapping
+                annotations and many of the mappings are too complicated for standard
+                JPA Entity defaults to solve.</para>
+<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm 
+        http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+    version="2.0">
+    
+    <package>ejava.jpa.hibernatemigration.annotated</package>
+    <access>FIELD</access>
+    
+    <entity class="Sale">
+        <table name="HMIG_SALE_ORM"/>
+        <attributes>
+            <id name="id">
+                <column length="36"/>
+            </id>
+            <basic name="amount" optional="false">
+                <column precision="7" scale="2"/>
+            </basic>
+            <basic name="dateTime" optional="false">
+                <column name="SALE_TIME"/>
+                <temporal>TIMESTAMP</temporal>
+            </basic>
+
+            <many-to-one name="customer" optional="false">
+                <join-column name="CUSTOMER_ID"/>
+            </many-to-one>
+            <many-to-many name="salesClerks">
+                <join-table name="HMIG_SALE_CLERK">
+                    <join-column name="SALE_ID"/>
+                    <inverse-join-column name="CLERK_ID"/>
+                </join-table>
+            </many-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The persistence unit is defined to use the Hibernate provider (in case there
+                are multiple in the classpath) and include our three ORM mapping files.</para>
+<programlisting language=""><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" 
+    version="2.0">
+
+    <persistence-unit name="hibernate-migration-sales">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        
+        <mapping-file>jpa/Customer-orm.xml</mapping-file>
+        <mapping-file>jpa/Clerk-orm.xml</mapping-file>
+        <mapping-file>jpa/Sale-orm.xml</mapping-file>
+    </persistence-unit>        
+    
+</persistence>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The hibernate.properties file has not changed from the original legacy project. We 
+                optionally separate it from the persistence.xml because it defines many runtime properties that
+                may be specific to our current environment (like database URL and credentials). If we do think
+                that some of the properties are better associated with the persistence unit (e.g., hibernate.cache.provider)
+                we can move that to the properties section of the persistence.xml.</para>
+<programlisting language=""><![CDATA[
+hibernate.dialect=${hibernate.dialect}
+hibernate.connection.url=${jdbc.url}
+hibernate.connection.driver_class=${jdbc.driver}
+hibernate.connection.password=${jdbc.password}
+hibernate.connection.username=${jdbc.user}
+hibernate.connection.pool_size=1
+hibernate.hbm2ddl.auto=create
+hibernate.show_sql=true
+hibernate.format_sql=true
+#hibernate.jdbc.batch_size=0
+hibernate.current_session_context_class=thread
+hibernate.cache.provider_class=org.hibernate.cache.NoCacheProvider
 ]]></programlisting>                        
             </listitem>
 
@@ -23,26 +172,175 @@
         <para></para>
     </section>
 
-    <section id="hibernate-migration-jpa-section2">
-        <title>hibernate-migration Section 2</title>
-        <para></para>
+    <section id="hibernate-migration-jpa-schema">
+        <title>Generating Schema from JPA Persistence Unit</title>
+        <para>This section will cover database schema generation from a persistence unit. It is very similar to
+           what we did in the previous section when we used the 3.x version of the hibernate3-maven-plugin
+           except this time we will use a jpaconfiguration element.</para>
   
         <orderedlist>
 
+            <listitem><para>We start off with a modest upgrade to our JPA library so that it supports
+                JPA2 constructs. Versions of Hibernate with JPA2 support have been in place since
+                mid-2010. You should be able to locate versions newer than what is used here.</para>
+<programlisting language="xml"><![CDATA[
+    <properties>
+        <!-- hibernate 3.5.0-Final was released to ibiblio April 2010 -->
+        <jpa2-hibernate.version>3.5.0-Final</jpa2-hibernate.version>
+        <hibernate-slf4j.version>1.5.8</hibernate-slf4j.version>
+    </properties>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>A the project dependency needs to reference the newer hibernate-entitymanager
+                version. Be sure to also include a dependency on slf4j-log4j12 and make sure it is a compatible
+                version with the version used by hibernate.</para>
+<programlisting language="xml"><![CDATA[
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${jpa2-hibernate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${hibernate-slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+]]></programlisting>
+                <note>
+                    <para>This different chapters used numerous options and versions for libraries. 
+                        The next section will detail some of the errors and causes, but for now know
+                        the hibernate3-maven-plugin is relying on a scope=compile dependency on 
+                        the hibernate-entitymanager at this point.</para>
+                </note>
+            </listitem>                        
+
             <listitem><para></para>
+<programlisting language="xml"><![CDATA[
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <hibernatetool destdir="target/classes/ddl">
+                        <classpath>
+                            <path location="${project.build.directory}/classes" />
+                            <path location="${project.build.directory}/test-classes" />
+                        </classpath>
+                    </hibernatetool>
+                </configuration>
+                <executions>
+...
+                </executions>
+            </plugin>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>A jpaconfiguration and persistenceunit name is used to locate the 
+                persistence unit definition and define the entities to Hibernate.</para>
+<programlisting language="xml"><![CDATA[
+    <execution>
+        <id>generate-drop-hbm</id>
+        <phase>process-test-resources</phase>
+        <goals>
+            <goal>run</goal>
+        </goals>
+        <configuration>
+            <hibernatetool>
+                <jpaconfiguration persistenceunit="hibernate-migration-sales" 
+                    propertyfile="${basedir}/target/test-classes/hibernate.properties" />
+                <hbm2ddl export="false" create="false" drop="true" format="true" 
+                    outputfilename="${project.artifactId}-dropJPA.ddl"/>
+            </hibernatetool>
+        </configuration>
+    </execution>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The create script execution uses the same technique.</para>
+<programlisting language="xml"><![CDATA[
+    <execution>
+        <id>generate-create-hbm</id>
+        <phase>process-test-resources</phase>
+        <goals>
+            <goal>run</goal>
+        </goals>
+        <configuration>
+            <hibernatetool>
+                <jpaconfiguration persistenceunit="hibernate-migration-sales" 
+                    propertyfile="${basedir}/target/test-classes/hibernate.properties" />
+                <hbm2ddl export="false" create="true" drop="false" format="true" 
+                    outputfilename="${project.artifactId}-createJPA.ddl"/>
+            </hibernatetool>
+        </configuration>
+    </execution>
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>The following lists the generated DDL from the hibernate3-maven-plugin,
+                our configurations, and definitions.</para>
 <programlisting language=""><![CDATA[
+    create table HMIG_CLERK_ORM (
+        id integer generated by default as identity (start with 1),
+        name varchar(32) not null,
+        HIRE_DATE date not null,
+        TERM_DATE date,
+        primary key (id)
+    );
+
+    create table HMIG_CUSTOMER_ORM (
+        id integer generated by default as identity (start with 1),
+        name varchar(32) not null,
+        email varchar(32),
+        level varchar(8),
+        primary key (id)
+    );
+
+    create table HMIG_SALE_CLERK (
+        SALE_ID varchar(36) not null,
+        CLERK_ID integer not null,
+        primary key (SALE_ID, CLERK_ID)
+    );
+
+    create table HMIG_SALE_ORM (
+        id varchar(36) not null,
+        amount numeric not null,
+        SALE_TIME timestamp not null,
+        CUSTOMER_ID integer not null,
+        primary key (id)
+    );
+
+    alter table HMIG_SALE_CLERK 
+        add constraint FK33F2DF1955121688 
+        foreign key (SALE_ID) 
+        references HMIG_SALE_ORM;
+
+    alter table HMIG_SALE_CLERK 
+        add constraint FK33F2DF198F07D2C 
+        foreign key (CLERK_ID) 
+        references HMIG_CLERK_ORM;
+
+    alter table HMIG_SALE_ORM 
+        add constraint FK4262BAAEAB739428 
+        foreign key (CUSTOMER_ID) 
+        references HMIG_CUSTOMER_ORM;
 ]]></programlisting>                        
             </listitem>
 
         </orderedlist>
         
-        <para></para>
+        <para>You have finished going through the specifics for setting up the hibernate3-maven-plugin 
+            to generate database schema for our JPA module. That wraps up what is needed to cover the 
+            final leg of the migration to the JPA-centric approach.</para>
     </section>
-
 
     <section id="hibernate-migration-jpa-summary">
        <title>Summary</title>
-       <para>In this chapter we
+       <para>In this chapter we defined use of our application through the JPA interface -- the same interface
+           that was used during the ORM.xml file section. However, in this case we leveraged a mixture of 
+           Java class annotations and ORM.xml files to define the persistence unit.
        </para>
     </section>    
 </chapter>

@@ -28,18 +28,11 @@
             <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+        <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${legacy-hibernate.version}</version>
         </dependency>
 
-        <!-- needed for later versions of hibernate
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
-        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-model</artifactId>
@@ -98,13 +91,6 @@
                 <artifactId>hibernate3-maven-plugin</artifactId>
                 <version>${hibernate3-maven-plugin.version}</version>
                 <extensions>true</extensions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-entitymanager</artifactId>
-                        <version>${legacy-hibernate.version}</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
                     <hibernatetool destdir="target/classes/ddl">
                         <classpath>

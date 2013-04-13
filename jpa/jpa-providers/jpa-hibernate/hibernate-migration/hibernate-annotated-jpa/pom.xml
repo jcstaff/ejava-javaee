@@ -31,16 +31,14 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>${legacy-hibernate.version}</version>
+            <version>${jpa2-hibernate.version}</version>
         </dependency>
-
-        <!-- needed for later versions of hibernate
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <version>${hibernate-slf4j.version}</version>
             <scope>test</scope>
         </dependency>
-        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-annotated-model</artifactId>
@@ -99,13 +97,6 @@
                 <artifactId>hibernate3-maven-plugin</artifactId>
                 <version>${hibernate3-maven-plugin.version}</version>
                 <extensions>true</extensions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-entitymanager</artifactId>
-                        <version>${legacy-hibernate.version}</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
                     <hibernatetool destdir="target/classes/ddl">
                         <classpath>
@@ -126,9 +117,8 @@
                             <hibernatetool>
                                 <jpaconfiguration persistenceunit="hibernate-migration-sales" 
                                     propertyfile="${basedir}/target/test-classes/hibernate.properties" />
-                                <configuration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml" />
                                 <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                    outputfilename="${project.artifactId}-dropJPAMIX.ddl"/>
+                                    outputfilename="${project.artifactId}-dropJPA.ddl"/>
                             </hibernatetool>
                         </configuration>
                     </execution>
@@ -143,9 +133,8 @@
                             <hibernatetool>
                                 <jpaconfiguration persistenceunit="hibernate-migration-sales" 
                                     propertyfile="${basedir}/target/test-classes/hibernate.properties" />
-                                <configuration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml" />
                                 <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                    outputfilename="${project.artifactId}-createJPAMIX.ddl"/>
+                                    outputfilename="${project.artifactId}-createJPA.ddl"/>
                             </hibernatetool>
                         </configuration>
                     </execution>

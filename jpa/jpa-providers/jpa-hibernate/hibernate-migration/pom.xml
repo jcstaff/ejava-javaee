@@ -36,17 +36,9 @@
         <legacy-hibernate3-maven-plugin.version>2.2</legacy-hibernate3-maven-plugin.version>
         <!-- hibernate 3.2.0.ga was released to ibiblio 2007-01-04 --> 
         <legacy-hibernate.version>3.2.0.ga</legacy-hibernate.version>
-
-        <annotated-hibernate.version>3.2.0.ga</annotated-hibernate.version>
-        <annotated-hibernate-slf4j.version>1.5.8</annotated-hibernate-slf4j.version>
-        <!--
-        <annotated-override-hibernate.version>3.5.0-Final</annotated-override-hibernate.version>
-        -->
-        <annotated-override-hibernate.version>3.2.0.ga</annotated-override-hibernate.version>
-        <annotated-override-hibernate-slf4j.version>1.5.8</annotated-override-hibernate-slf4j.version>
-
-        <hibernate3-maven-plugin-hibernate.version>3.6.0.Final</hibernate3-maven-plugin-hibernate.version>
-
+        <!-- hibernate 3.5.0-Final was released to ibiblio April 2010 -->
+        <jpa2-hibernate.version>3.5.0-Final</jpa2-hibernate.version>
+        <hibernate-slf4j.version>1.5.8</hibernate-slf4j.version>
         <wagon-ssh-external.version>2.2</wagon-ssh-external.version>
     </properties>
 
@@ -125,6 +117,21 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <repositories>
+        <repository>
+            <id>maven-nuxeo</id>
+            <name>Maven Nuxeo Repository</name>
+            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>maven-nuxeo</id>
+            <name>Maven Nuxeo Repository</name>
+            <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <profiles>
         <profile>
