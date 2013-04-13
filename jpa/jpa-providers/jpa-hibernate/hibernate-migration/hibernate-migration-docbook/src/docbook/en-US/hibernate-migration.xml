@@ -12,11 +12,11 @@
             centered on how best to work with the legacy form of a Hibernate project and migrate it gradually 
             to modern JPA constructs. The Hibernate Session will still be in place -- under the hood as acting as
             the provider -- and accessible through a legal JPA call when needed. However, we will start benefiting 
-            from using a standard API to express mappings.
+            from using a standard API (and Hibernate extensions) to express mappings.
             </para>
             <para>During this topic we will...</para>
         <itemizedlist>
-            <listitem><para>Demonstrate a set of incremental steps to upgrade a legacy Hibernate project to include</para>
+            <listitem><para>Demonstrate options to upgrade a legacy Hibernate project to include</para>
                 <itemizedlist>
                     <listitem><para>Migrate from from Hibernate Session to JPA EntityManager by replacing descriptor files</para></listitem>
                     <listitem><para>Mix use of Hibernate Session with JPA EntityManager</para></listitem>
@@ -27,10 +27,10 @@
             </listitem>
             <listitem><para>Demonstrate how to automatically generate database schema for a project based on</para>
                 <itemizedlist>
-                    <listitem><para>Hibernate Session and older version of hibernate3-maven-plugin</para></listitem>
-                    <listitem><para>JPA EntityManager and older version of hibernate3-maven-plugin</para></listitem>
-                    <listitem><para>Hibernate Session and modern version of hibernate3-maven-plugin</para></listitem>
-                    <listitem><para>JPA EntityManager and modern version of hibernate3-maven-plugin</para></listitem>
+                    <listitem><para>Hibernate Session and 2.x version of hibernate3-maven-plugin</para></listitem>
+                    <listitem><para>JPA EntityManager and 2.x version of hibernate3-maven-plugin</para></listitem>
+                    <listitem><para>Hibernate Session and 3.x version of hibernate3-maven-plugin</para></listitem>
+                    <listitem><para>JPA EntityManager and 3.x version of hibernate3-maven-plugin</para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>

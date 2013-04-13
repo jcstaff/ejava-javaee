@@ -3,17 +3,16 @@
 
 <chapter id="hibernate-migration-annotation">
     <title>Adding Metadata thru Class Annotations</title>
-    <para>This chapter describes a migration increment where we can get rid of 
-        verbose Hibernate HBM files and replace the source of metadata with class
-        annotations. This allows the class to express how it is designed in one location
-        and not be forced to express details in a separate XML file. However -- there
-        is a catch. There is debate over some of the metadata annotations that can express
-        database-specific properties. JPA solves that issue by allowing the entity class
-        to express a default and allowing an optional ORM.xml to override that default when
-        necessary. Hibernate Session -- however is one or the other. You can use annotations
+    <para>This chapter describes a migration increment where we get rid of 
+        verbose Hibernate HBM files and replace the XML source of metadata with class
+        annotations. This permits class design details to be expressed in one location
+        and not in separate Java class and XML files. However -- there
+        is a catch. There is debate whether some of the metadata annotations are appropriate 
+        to place in a Java class. JPA solves this issue by allowing the entity class
+        to express a default and that can be augmented or replaced by metadata within the ORM.xml.
+        Hibernate Session -- however is one or the other. You can use annotations
         or HBM files and not a combination of both. This section will demonstrate how the
-        entity annotations processed by the Hibernate Session can be overridden by the application. 
-         
+        entity annotations processed by the Hibernate Session can be overridden by the application.          
     </para>
         
     <section id="hibernate-migration-annotation-entities">
@@ -47,17 +46,19 @@ src/main
 <programlisting language="java"><![CDATA[
 @MappedSuperclass
 public class Person {
-        @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id;
 
-        @Basic(optional=false)
-        @Column(length=32)
+    @Basic(optional=false)
+    @Column(length=32)
     private String name;
 ]]></programlisting>                        
             </listitem>
 
 
-            <listitem><para>Clerk ...</para>
+            <listitem><para>One nice aspect of using class annotations is that most information
+                 is type-safe. In defining the DATE granularity for the hire/termDate, the 
+                 developer cannot make a spelling or syntax error without the compiler complaining.</para>
 <programlisting language="java"><![CDATA[
 @Entity
 @Table(name="HMIG_CLERK")
@@ -76,7 +77,12 @@ public class Clerk extends Person {
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para>Customer ...</para>
+            <listitem><para>Even though we have spent a decent amount of effort on defining
+                VARCHAR lengths and dateTime accuracy for the database schema -- realize that
+                most of the mapping information is not used beyond optional schema creation or
+                validation. A JPA provider will not check that a String attribute is within 
+                @Column.length constraints. These types of checks are left to the database
+                to enforce.</para>
 <programlisting language="java"><![CDATA[
 @Entity
 @Table(name="HMIG_CUSTOMER")
@@ -91,8 +97,9 @@ public class Customer extends Person {
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para>Sale, on the other hand was left un-mapped by the entity class annotations and will
-                be required to use an HBM mapping as an example.</para>
+            <listitem><para>Sale was left un-mapped by entity class annotations and will
+                be required to use an HBM mapping. This will provide an example of a 
+                hybrid approach that mixes class annotations and HBM file(s).</para>
 <programlisting language="java"><![CDATA[
 public class Sale {
         private String id;
@@ -104,7 +111,7 @@ public class Sale {
             </listitem>
 
         </orderedlist>
-        <para>You have finished the migration from the HBM mappings to entity class annotations. Hopefully
+        <para>You have finished migrating from HBM mappings to entity class annotations. Hopefully
             you can see the benefits and risks associated with placing information directly within the class
             mapped to the database. Next we will look at a few remaining mapping issues before our application
             is ready to run with this new approach.</para>
@@ -138,8 +145,6 @@ src/main
                 the changes present here are very obvious. We have traded an HBM reference for a class reference 
                 for the Clerk and Customer classes. Sale still uses a reference to an HBM mapping definition.</para>
 <programlisting language="xml"><![CDATA[
-./src/main/resources/hibernate.cfg.xml
-::::::::::::::
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
@@ -355,7 +360,7 @@ Hibernate:
                 us extending Configuration and changing things -- the tool writers didn't get that same memo. When generating
                 schema the generation configuration does not allow us to express anything beyind a straight configuration,
                 annotationconfiguration, or one of the other classes supported by Hibernate. For that reason, we get the
-                following in the generated database schema.</para>
+                followingun-customized mapping generated during database schema generation.</para>
 <programlisting language=""><![CDATA[
     create table HMIG_CLERK (
         id integer generated by default as identity (start with 1),
@@ -379,7 +384,7 @@ Hibernate:
     <section id="hibernate-migration-annotation-custom-strategy">
         <title>Adding Overrides thru Custom NamingStrategy</title>
         <para>Hibernate provides the option of overriding its DefaultNamingStrategy with a few built-in versions as well as
-            you own custom override. This class is consulted for names for entities, tables, columns, join-columns, etc.
+            your own custom override. This class is consulted for names for entities, tables, columns, join-columns, etc.
             We can clearly jump in there. The only down-side is that it class does not receive any callback with the 
             configuration. You may have to cook something up yourself (like we did here).</para>
   
@@ -388,7 +393,7 @@ Hibernate:
             <listitem><para>We start off by extending the default Hibernate naming strategy class. This class will 
                 accept a configuration mapping from class-to-table and and override mapping from table-to-table.
                 The former is called when there is no table specification on the class. The later is called when there
-                is a table specification and gives us a change to change it.</para>
+                is a table specification and gives us a chance to change it.</para>
 <programlisting language="java"><![CDATA[
 public class CustomizedNamingStrategy extends DefaultNamingStrategy {
         private static final Log log = LogFactory.getLog(CustomizedNamingStrategy.class);
@@ -434,8 +439,8 @@ public class CustomizedNamingStrategy extends DefaultNamingStrategy {
             </listitem>
 
             <listitem><para>We implement the callback method when the provider is looking for a 
-                table name ansd there was one provided by the class annotation. In this case we 
-                are given a chance to override what the configuration was goinf to use.</para>
+                table name and there was one provided by the class annotation. In this case we 
+                are given a chance to override what the configuration was going to use.</para>
 <programlisting language="java"><![CDATA[
         @Override
         public String tableName(String tableName) {
@@ -500,7 +505,7 @@ Hibernate:
 
             <listitem><para>Unlike our previous strategy, we can also provide this NamingStrategy to the
                 DLL generation tool. This looks different from before since we have switched to the 
-                new hibernate3-maven-plugin API in this example. More details later -- but notive we can 
+                new hibernate3-maven-plugin API in this example. More details later -- but notice we can 
                 provide a specification to our NamingStrategy.</para>
 <programlisting language="xml"><![CDATA[
     <hibernatetool>
@@ -541,18 +546,21 @@ Hibernate:
 
     <section id="hibernate-migration-annotation-schema">
         <title>Generating Schema from Class Annotations and NamingStrategy</title>
-        <para>As a move forward, we are now goinf to leverage the 3.x version of the 
-            hibernate3-maven-plugin. This upgrade apparently wraps Hibernate Ant tasks and
-            just serves as a delegation wrapper. Most of the documentation is at the Ant
-            level.</para>
+        <para>As a move forward, we are going to switch to the 3.x version of the 
+            hibernate3-maven-plugin. This upgrade wraps Hibernate Ant tasks and
+            just serves as a delegation wrapper. Most of the
+            <ulink url="http://docs.jboss.org/tools/latest/en/hibernatetools/html/ant.html">
+            documentation is at the Ant level</ulink>.
+        </para>
   
         <orderedlist>
 
             <listitem><para>My success varied with this plugin and versions required. You will notice it
-                requires hibernate-entitymanager to be declared as a dependency and sometimes that is 
-                good when the plugin is operating at a different version that our application. In 
-                some combinations I was able to run as old as 3.2.0.ga and in others I ran as new as 
-                3.6.0.Final and am still investigating the differences.</para>
+                provides the ability to declare a separate plugin dependency on the hibernate-entitymanager.
+                I found this useful when my application used hibernate4 and the plugin required hibernate3.
+                However, if the application uses hibernate3 -- then the version used by the plugin and 
+                pom dependency must be the same. In that case, you can simply leave the dependency on 
+                hibernate-entitymanager out of the plugin#dependencies.</para>
 <programlisting language="xml"><![CDATA[
             <plugin>
                 <artifactId>hibernate3-maven-plugin</artifactId>
@@ -581,7 +589,9 @@ Hibernate:
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para>Notice ...</para>
+            <listitem><para>The configuration for the schema generation is defined by a Hibernate Configuration --
+                which is represented by the annotationconfiguration element shown below. Note we have also assigned
+                the namingstrategy for the configuration to our customer strategy.</para>
 <programlisting language="xml"><![CDATA[
     <execution>
         <id>generate-drop-hbm</id>
@@ -601,7 +611,8 @@ Hibernate:
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para>Notice ...</para>
+            <listitem><para>We still need to create two executions; one to generate the drops and the other to generate
+                 the creates.</para>
 <programlisting language="xml"><![CDATA[
     <execution>
         <id>generate-create-hbm</id>
@@ -619,12 +630,10 @@ Hibernate:
         </configuration>
     </execution>
 ]]></programlisting>                        
-            </listitem>
-            
             <note>
                 <para>The above shows an example of using a hibernate.cfg.xml file. If you simply have
-                    HBM files and, at most, a hibernate.properties file, you can add referencces to 
-                    thos files using
+                    HBM files and, at most, a hibernate.properties file, you can add references to 
+                    those files using
                 </para>
 <programlisting language=""><![CDATA[
 <hibernatetool destdir="${build.dir}/generated">
@@ -634,14 +643,21 @@ Hibernate:
     </fileset>
  </configuration>]]></programlisting>                        
             </note>
-
+            </listitem>
         </orderedlist>        
-        <para></para>
+        <para>You have finished looking at schema generation for a Hibernate Session that has overrides for
+             the annotated classes. This represents the last section within this topic.</para>
     </section>
 
     <section id="hibernate-migration-annotation-summary">
        <title>Summary</title>
-       <para>In this chapter we
+       <para>In this chapter we replaced verbose XML mapping files with Java class annotations. This permits 
+           us to place the information and mapping design in a single location. The down-side, however, is that
+           class annotations cannot be mixed with HBM files within the same class. No fear. We simply needed to
+           write a small set of classes to manipulate the Hibernate Configuration to supply the overrides.
+           This wraps up our coverage of incremental steps moving from Hibernate Sessions to JPA. The next
+           chapter shows the end state where we have fully migrated the application away from HBM files, to 
+           class annotations, and to a JPA EntityManager API.
        </para>
     </section>    
 </chapter>

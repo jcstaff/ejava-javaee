@@ -1,0 +1,144 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>ejava.jpa.hibernate.migration</groupId>
+        <artifactId>migration-root</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>hibernate-hbm2</artifactId>
+
+    <name>Hibernate Migration::Legacy HBM files /w 3.x Plugin</name>
+    <description>
+        This project provides an example legacy Hibernate project that uses the 3.x version
+        of the hibernate3-maven-plugin to create DDL files without a hibernate.cfg.xml.
+    </description>
+
+    <properties>
+        <hibernate.version>${legacy-hibernate.version}</hibernate.version>
+    </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/compile</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>src/compile</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>              
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-hbm</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-hbm</artifactId>
+                                    <version>${project.version}</version>
+                                    <includes>hibernate/*hbm.xml</includes>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>      
+
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <hibernatetool destdir="target/classes/ddl">
+                        <classpath>
+                            <path location="${project.build.directory}/classes" />
+                            <path location="${project.build.directory}/test-classes" />
+                        </classpath>
+                    </hibernatetool>
+                </configuration>
+                <executions>
+
+                    <execution>
+                        <id>generate-drop-hbm</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <hibernatetool>
+                                <configuration propertyfile="target/compile/hibernate.properties">
+                                    <fileset dir="target/classes/hibernate">
+                                        <include name="*.hbm.xml"/>
+                                    </fileset>
+                                </configuration>
+                                <hbm2ddl export="false" create="false" drop="true" format="true" 
+                                    outputfilename="${project.artifactId}-dropHBM.ddl"/>
+                            </hibernatetool>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>generate-create-hbm</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <hibernatetool>
+                                <configuration propertyfile="target/compile/hibernate.properties">
+                                    <fileset dir="target/classes/hibernate">
+                                        <include name="*.hbm.xml"/>
+                                    </fileset>
+                                </configuration>
+                                <hbm2ddl export="false" create="true" drop="false" format="true" 
+                                    outputfilename="${project.artifactId}-createHBM.ddl"/>
+                            </hibernatetool>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

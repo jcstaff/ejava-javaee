@@ -17,8 +17,8 @@ import org.junit.BeforeClass;
 
 import ejava.jpa.hibernatemigration.BaseMigrationTest;
 
-public class LegacyHBMTest extends BaseMigrationTest {
-	private static final Log log = LogFactory.getLog(LegacyHBMTest.class);
+public class JPASessionTest extends BaseMigrationTest {
+	private static final Log log = LogFactory.getLog(JPASessionTest.class);
 	private static final String PERSISTENCE_UNIT_NAME = "hibernate-migration-sales";
 	private static EntityManagerFactory emf;
 	private EntityManager em;
