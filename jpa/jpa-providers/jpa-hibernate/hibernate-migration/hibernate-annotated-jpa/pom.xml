@@ -32,6 +32,7 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${jpa2-hibernate.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -97,6 +98,19 @@
                 <artifactId>hibernate3-maven-plugin</artifactId>
                 <version>${hibernate3-maven-plugin.version}</version>
                 <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>${jpa2-hibernate.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-api</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <hibernatetool destdir="target/classes/ddl">
                         <classpath>

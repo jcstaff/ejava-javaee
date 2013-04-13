@@ -641,7 +641,9 @@ public abstract class BaseMigrationTest {
             <listitem><para>Besides the standard dependencies like commons-logging, junit, and log4j, the
                 only dependency required for this first example is the hibernate-entity-manager. It brings
                 in several other dependencies (like hibernate-annotations) and makes it simple to obtain all 
-                that we need.</para>
+                that we need. We are currently marking it as scope=provided to prevent a specific dependency
+                on hibernate when most of the hibernate dependency is within the tests and runtime and not
+                the component itself.</para>
 <programlisting language="xml"><![CDATA[
     <dependencies>
 ...
@@ -649,6 +651,7 @@ public abstract class BaseMigrationTest {
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${legacy-hibernate.version}</version>
+            <scope>provided</scope>
         </dependency>
 ...
     </dependencies>

@@ -13,18 +13,18 @@
     <section id="hibernate-migration-jpa-structure">
         <title>JPA Project Structure</title>
         <para>In this pass we are going to treat the annotated entity classes as an 
-            external library and provide overrides specific to our application.</para>
+            external library and provide overrides for table names specific to our application.
+            Note too that the Sales class does not provide any Java annotations.</para>
   
         <orderedlist>
 
             <listitem><para>Our application supplies a persistence.xml that describes
-                how this application will use its persistence unit. For example, some
+                how this application will use the persistence unit. For example, some
                 applications use a direct database connection and others borrow a 
                 connection from a javax.sql.DataSource. In this case, our persistence
                 unit is defining some application-specific overrides for the two of the 
                 entities (Clerk and Customer) and providing the full mapping for the 
-                third entity (Sale) because that class does not supply any metadata.
-                classes.</para>
+                third entity (Sale) because that class does not supply any metadata.</para>
 <programlisting language=""><![CDATA[
 src
 |-- main
@@ -200,6 +200,7 @@ hibernate.cache.provider_class=org.hibernate.cache.NoCacheProvider
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${jpa2-hibernate.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -208,21 +209,31 @@ hibernate.cache.provider_class=org.hibernate.cache.NoCacheProvider
             <scope>test</scope>
         </dependency>
 ]]></programlisting>
-                <note>
-                    <para>This different chapters used numerous options and versions for libraries. 
-                        The next section will detail some of the errors and causes, but for now know
-                        the hibernate3-maven-plugin is relying on a scope=compile dependency on 
-                        the hibernate-entitymanager at this point.</para>
-                </note>
             </listitem>                        
 
-            <listitem><para></para>
+            <listitem><para>We add a plugin dependency on hibernate-entitymanager to force the plugin to use
+                 the same version of the entitymanager as the application. If the dependency above was scope=compile,
+                 this would not have been necessary. The exclusion for the slf4j-api removes a conflicting dependency
+                 later versions of the entitymanager have with the 3.x version of the hibernate3-maven-plugin.</para>
 <programlisting language="xml"><![CDATA[
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>hibernate3-maven-plugin</artifactId>
                 <version>${hibernate3-maven-plugin.version}</version>
                 <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>${jpa2-hibernate.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-api</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <hibernatetool destdir="target/classes/ddl">
                         <classpath>

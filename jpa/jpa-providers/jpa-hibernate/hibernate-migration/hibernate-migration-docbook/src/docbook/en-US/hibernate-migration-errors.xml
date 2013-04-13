@@ -9,48 +9,134 @@
     </para>
         
     <section id="hibernate-migration-errors-1">
-        <title>Maven Errors</title>
-        <para>This section lists a few of the errors and causes with Maven configurations.</para>
+        <title>Missing hibernate-entitymanager</title>
+        <para>This error occurs when using the hibernate3-maven-plugin and the project does 
+            not declare a dependency on the hibernate-entitymanager.</para>
 
         <section id="hibernate-migration-errors-1-symptom">
-            <title>Symptom</title>
+            <title>Symptom: NoClassDefFoundError: org.hibernate.cfg.Configuration</title>
 <programlisting language=""><![CDATA[
+[ERROR] Failed to execute goal org.codehaus.mojo:hibernate3-maven-plugin:3.0:run (generate-drop-hbm) on project hibernate-hbm2: 
+There was an error creating the AntRun task. An Ant BuildException has occured: java.lang.NoClassDefFoundError: 
+org/hibernate/cfg/Configuration: org.hibernate.cfg.Configuration
 ]]></programlisting>                        
         </section>  
 
         <section id="hibernate-migration-errors-1-cause">
-            <title>Symptom</title>
-<programlisting language=""><![CDATA[
+            <title>Cause: Missing dependency on hibernate-entitymanager</title>
+            <para>The error occurs because the plugin has no hibernate artifact to provide it the necessary classes.
+                That could be due to....</para>
+                <itemizedlist>
+                    <listitem><para>The dependency on hibernate-entitymanager was either missing or declared scope=test or
+                         provided.</para>
+<programlisting language="xml"><![CDATA[
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${legacy-hibernate.version}</version>
+            <scope>test</scope>
+        </dependency>
+]]></programlisting>                        
+                    </listitem>
+                    <listitem><para>The plugin did not declare a dependency on hibernate-entitymanager to compensate
+                        for the module not having a scope=compile dependency.</para></listitem>
+                </itemizedlist>
+<programlisting language="xml"><![CDATA[
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <dependencies>
+                </dependencies>
+...
 ]]></programlisting>                        
         </section>  
 
         <section id="hibernate-migration-errors-1-solution">
-            <title>Symptom</title>
+            <title>Solution: Declare plugin dependency on hibernate-entitymanager</title>
+            <para>Either the module or the module plugin must have a dependency on hibernate-entitymanager to
+                have the missing class(es) be resolved for DDL generation.</para>
 <programlisting language=""><![CDATA[
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>${legacy-hibernate.version}</version>
+                    </dependency>
+                </dependencies>
 ]]></programlisting>                        
         </section>  
     </section>
 
 
     <section id="hibernate-migration-errors-2">
-        <title>Maven Errors</title>
-        <para>This section lists a few of the errors and causes with Maven configurations.</para>
+        <title>Mixed Hibernate Versions with plugin and JPA</title>
+        <para>This error is caused when there is a version of hibernate in your project that conflicts with the default 
+            version used by the hibernate3-maven-plugin.</para>
 
         <section id="hibernate-migration-errors-2-symptom">
-            <title>Symptom</title>
+            <title>Symptom: NoSuchMethodException: org.hibernate.validator.ClassValidator.&lt;init&gt;(...)</title>
+            <para>When using the JPA aspects of the plugin you may notice the following.</para>
 <programlisting language=""><![CDATA[
+[INFO] --- hibernate3-maven-plugin:2.2:hbm2ddl (generate-drop-hbm) @ hibernate-orm ---
+ -Hibernate Annotations 3.4.0.GA
+ -Hibernate 3.3.1.GA
+]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+Failed to execute goal org.codehaus.mojo:hibernate3-maven-plugin:2.2:hbm2ddl (generate-drop-hbm) on project hibernate-orm: 
+Execution generate-drop-hbm of goal org.codehaus.mojo:hibernate3-maven-plugin:2.2:hbm2ddl failed: 
+[PersistenceUnit: hibernate-migration-sales] Unable to configure EntityManagerFactory: 
+java.lang.NoSuchMethodException: org.hibernate.validator.ClassValidator.<init>(java.lang.Class, java.util.ResourceBundle, org.hibernate.validator.MessageInterpolator, java.util.Map, org.hibernate.annotations.common.reflection.ReflectionManager)
 ]]></programlisting>                        
         </section>  
 
         <section id="hibernate-migration-errors-2-cause">
-            <title>Symptom</title>
-<programlisting language=""><![CDATA[
+            <title>Cause: Using JPAConfiguration and version mis-matches</title>
+            <para>This error is caused by using the JPA configuration of the plugin and not having all dependencies aligned.</para>
+<programlisting language="xml"><![CDATA[
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${legacy-hibernate.version}</version>
+            <scope>provided</scope>
+        </dependency>
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>${legacy-hibernate3-maven-plugin.version}</version>
+                <dependencies> 
+                </dependencies>
 ]]></programlisting>                        
         </section>  
 
         <section id="hibernate-migration-errors-2-solution">
-            <title>Symptom</title>
+            <title>Solution: Declare plugin dependency on hibernate-entitymanager</title>
+            <para>Declare a dependency on hibernate-entitymanager within the plugin to control the version brought in
+                when using the JPA extentions.</para>
 <programlisting language=""><![CDATA[
+            <plugin>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>${legacy-hibernate.version}</version>
+                    </dependency>
+                </dependencies>
 ]]></programlisting>                        
         </section>  
     </section>
@@ -58,34 +144,67 @@
 
 
     <section id="hibernate-migration-errors-3">
-        <title>Maven Errors</title>
-        <para>This section lists a few of the errors and causes with Maven configurations.</para>
+        <title>slf4j version mis-matches with later versions of Hibernate</title>
+        <para>Issues with hibernate and slf4j start appearing with some of the later versions of hibernate 3.x. where they 
+            switched dependencies from slf4j1.5.8 to 1.6.1.</para>
 
         <section id="hibernate-migration-errors-3-symptom">
-            <title>Symptom</title>
+            <title>Symptom: NoClassDefFoundError: org.slf4j.helpers.NOPLoggerFactory</title>
 <programlisting language=""><![CDATA[
-]]></programlisting>                        
+[ERROR] Failed to execute goal org.codehaus.mojo:hibernate3-maven-plugin:3.0:run (generate-drop-hbm) on project hibernate-annotated-jpa: 
+There was an error creating the AntRun task. An Ant BuildException has occured: java.lang.NoClassDefFoundError: org/slf4j/helpers/NOPLoggerFactory: 
+org.slf4j.helpers.NOPLoggerFactory]]></programlisting>                        
         </section>  
 
         <section id="hibernate-migration-errors-3-cause">
-            <title>Symptom</title>
-<programlisting language=""><![CDATA[
+            <title>Cause: plugin dependency on hibernate-entitymanager causes slf4j-api version mis-match </title>
+            <para>In this case we have created a plugin dependency on hibernate-entitymanager for the plugin using version 3.5.0-Final.
+                This brought in slf4j-api version 1.5.8 which collided with logging done within the plugin.</para>
+<programlisting language="xml"><![CDATA[
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>${jpa2-hibernate.version}</version>
+                    </dependency>
+                </dependencies>
 ]]></programlisting>                        
         </section>  
 
         <section id="hibernate-migration-errors-3-solution">
-            <title>Symptom</title>
-<programlisting language=""><![CDATA[
+            <title>Solution: Exclude slf4j-api from plugin dependency</title>
+<programlisting language="xml"><![CDATA[
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <version>${hibernate3-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>${jpa2-hibernate.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-api</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
 ]]></programlisting>                        
         </section>  
     </section>
 
-    <section id="hibernate-migration-jpa-summary">
+    <section id="hibernate-migration-errors-summary">
        <title>Summary</title>
-       <para>In this chapter we defined use of our application through the JPA interface -- the same interface
-           that was used during the ORM.xml file section. However, in this case we leveraged a mixture of 
-           Java class annotations and ORM.xml files to define the persistence unit.
+       <para>In this chapter we listed some error messages, described the causes, and provided solutions. When in doubt, 
+            you can also take a look at the source modules that were used to build the examples provided.
        </para>
     </section>    
 </chapter>
-  
