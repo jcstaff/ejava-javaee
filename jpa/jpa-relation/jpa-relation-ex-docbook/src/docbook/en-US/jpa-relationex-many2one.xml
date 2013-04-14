@@ -1,44 +1,121 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-relationex-many2one">
-    <title>Mapping Many-to-One Relationships</title>
-    <para></para>
+<chapter id="jpa-relationex-many2one-uni">
+    <title>Mapping Many-to-One, Uni-directional Relationships</title>
+    <para>Now that we are done the tour into one-to-many relations and collections themselves, 
+        we can turn our attention on the many side and aspects associated with implementing a 
+        many-to-one relationship. Our first stab at this will stick to the uni-directional case.</para>
         
-    <section id="jpa-relationex-many2one-uni">
+    <section id="jpa-relationex-m2o-uni-setup">
+        <title>Setup</title>
+        <para>Create a JUnit test class to host tests for the many-to-one mappings.</para>
+
+        <orderedlist>
+            <listitem><para>Put the following JUnit test case base class in your src/test tree.
+                You can delete the sample test method once we add our first real test. JUnit
+                will fail a test case if it cannot locate a @Test to run.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex;
+
+import static org.junit.Assert.*;
+
+import javax.persistence.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.*;
+
+public class Many2OneTest extends JPATestBase {
+    private static Log log = LogFactory.getLog(Many2OneTest.class);
+    @Test
+    public void testSample() {
+        log.info("testSample");
+    }
+}
+]]></programlisting>                        
+                </listitem>
+ 
+                <listitem><para>Verify the new JUnit test class builds and executes to completion</para>
+<programlisting language=""><![CDATA[
+relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest
+
+...
+ -HHH000401: using driver [org.h2.Driver] at URL [jdbc:h2:tcp://localhost:9092/h2db/ejava]
+...
+[INFO] BUILD SUCCESS                
+]]></programlisting>                        
+                </listitem>
+        
+        </orderedlist>
+    </section>
+
+    <section id="jpa-relationex-m2o-uni">
     <title>Many-to-One Uni-directional</title>
-        <para></para>
-  
-        <orderedlist>
+        <para>Many-to-one relationships map easily to the database because that is exactly 
+            how relationships are commonly formed in the database -- a foreign key from the 
+            many/child table to the one/parent table. We will start simple and then get into 
+            some interesting cases.</para>
 
-            <listitem><para></para>
+        <section id="jpa-relationex-m2o-uni-fk">
+            <title>Many-to-One Uni-directional Using a Foreign Key</title>
+            <para></para>
+            <orderedlist>
+
+                <listitem><para></para>
 <programlisting language=""><![CDATA[
 ]]></programlisting>                        
-            </listitem>
+                </listitem>
 
-        </orderedlist>
-        
-        <para></para>
-    </section>
+            </orderedlist>
+            <para></para>
+        </section>
 
-    <section id="jpa-relationex-many2one-bi">
-    <title>Many-to-One Bi-directional</title>
-        <para></para>
-  
-        <orderedlist>
+        <section id="jpa-relationex-m2o-uni-cmpfk">
+            <title>Many-to-One Uni-directional Using a Compound Foreign Key</title>
+            <para></para>
+            <orderedlist>
 
-            <listitem><para></para>
+                <listitem><para></para>
 <programlisting language=""><![CDATA[
 ]]></programlisting>                        
-            </listitem>
+                </listitem>
 
-        </orderedlist>
-        
-        <para></para>
+            </orderedlist>
+            <para></para>
+        </section>
+
+        <section id="jpa-relationex-m2o-uni-mapsId">
+            <title>Many-to-One Uni-directional Using a MapsId</title>
+            <para></para>
+            <orderedlist>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+            </orderedlist>
+            <para></para>
+        </section>
+
+        <section id="jpa-relationex-m2o-uni-sharedCmpFk">
+            <title>Many-to-One Uni-directional Using Shared Compound Foreign Key Columns</title>
+            <para></para>
+            <orderedlist>
+
+                <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </listitem>
+
+            </orderedlist>
+            <para></para>
+        </section>
+
     </section>
 
 
-    <section id="jpa-relationex-many2one-summary">
+    <section id="jpa-relationex-many2one-uni-summary">
        <title>Summary</title>
        <para>In this chapter we
        </para>

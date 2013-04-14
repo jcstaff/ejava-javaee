@@ -1,16 +1,16 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-relationex-one2many">
-    <title>Mapping One-to-Many Relationships</title>
+<chapter id="jpa-relationex-one2many-uni">
+    <title>Mapping One-to-Many Uni-directional Relationships</title>
     <para></para>
         
-    <section id="jpa-relationex-o2m-setup">
+    <section id="jpa-relationex-o2m-uni-setup">
         <title>Setup</title>
         <para>Create a JUnit test class to host tests for the one-to-many mappings.</para>
 
         <orderedlist>
-            <listitem><para>Put the following Junit test case base class in your src/test tree.
+            <listitem><para>Put the following JUnit test case base class in your src/test tree.
                 You can delete the sample test method once we add our first real test. JUnit
                 will fail a test case if it cannot locate a @Test to run.</para>
 <programlisting language="java"><![CDATA[
