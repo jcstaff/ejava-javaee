@@ -1,7 +1,6 @@
 package myorg.relex.collection;
 
 import java.util.Comparator;
-
 import javax.persistence.*;
 
 import org.apache.commons.logging.Log;
@@ -43,22 +42,10 @@ public class Segment implements Comparable<Segment>{
 		this.from = from;
 		return this;
 	}
-	/*
-	@Override
-	public int hashCode() {
-		return number + (from==null?0 : from.hashCode()) + (to==null?0 : to.hashCode());
-	}
-	@Override
-	public boolean equals(Object obj) {
-		try {
-			Segment rhs=(Segment)obj;
-			return hashCode() == rhs.hashCode();
-		} catch(Exception ex) { return false; }
-	}
-	*/
 
 	@Override
 	public int compareTo(Segment rhs) {
+		if (this == rhs) { return 0; }
 		int result = number - rhs.number;
 		log.debug(getClass().getSimpleName() + toString() + 
 				".compareTo" + rhs.toString() + 
@@ -71,4 +58,19 @@ public class Segment implements Comparable<Segment>{
 	public String toString() {
 		return "(id=" + id + ",number=" + number + ")";
 	}
+
+	/*
+	@Override
+	public int hashCode() {
+		return number + (from==null?0 : from.hashCode()) + (to==null?0 : to.hashCode());
+	}
+	@Override
+	public boolean equals(Object obj) {
+		try {
+			if (this == obj) { return true; }
+			Segment rhs=(Segment)obj;
+			return hashCode() == rhs.hashCode();
+		} catch(Exception ex) { return false; }
+	}
+	*/
 }

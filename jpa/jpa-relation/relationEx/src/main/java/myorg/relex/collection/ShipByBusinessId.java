@@ -22,6 +22,7 @@ public class ShipByBusinessId extends Ship {
 	@Override
 	public boolean equals(Object obj) {
 		try {
+            if (this == obj) { return logEquals(obj, true); }
 			boolean equals = name.equals(((ShipByBusinessId)obj).name) &&
 					created.getTime() == (((ShipByBusinessId)obj).created.getTime());
 			return logEquals(obj, equals);

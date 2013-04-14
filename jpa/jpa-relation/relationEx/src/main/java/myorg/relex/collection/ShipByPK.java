@@ -20,6 +20,7 @@ public class ShipByPK extends Ship {
 	@Override
 	public boolean equals(Object obj) {
 		try {
+            if (this == obj) { return logEquals(obj, true); }
 			boolean equals = id==((ShipByPK)obj).id;
 			return logEquals(obj, equals);
 		} catch (Exception ex) {

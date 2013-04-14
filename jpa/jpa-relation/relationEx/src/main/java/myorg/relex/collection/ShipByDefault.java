@@ -18,6 +18,7 @@ public class ShipByDefault extends Ship {
 	@Override
 	public boolean equals(Object obj) {
 		try {
+            if (this == obj) { return logEquals(obj, true); }
 			boolean equals = super.equals(obj);
 			return logEquals(obj, equals);
 		} catch (Exception ex) {

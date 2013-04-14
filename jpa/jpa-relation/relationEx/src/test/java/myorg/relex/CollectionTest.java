@@ -15,7 +15,9 @@ import java.util.Set;
 import javax.persistence.*;
 
 import myorg.relex.collection.Fleet;
+import myorg.relex.collection.Lineup;
 import myorg.relex.collection.Path;
+import myorg.relex.collection.Position;
 import myorg.relex.collection.Segment;
 import myorg.relex.collection.Ship;
 import myorg.relex.collection.ShipByBusinessId;
@@ -139,7 +141,7 @@ public class CollectionTest extends JPATestBase {
      * a consistent business identity through their lifetime offer the best solution
      * of them all -- assuming it it possible or needed. 
      */
-    @Test @Ignore
+    @Test
     public void testByBusinessId() {
     	log.info("*** testByBusinessId ***");
 
@@ -171,7 +173,11 @@ public class CollectionTest extends JPATestBase {
         assertTrue("entity not found after persist", ships.contains(ship1));
     }
     
-    @Test @Ignore
+    /**
+     * This method will demonstrate the ability to order entities by their business
+     * values when stored within JPA collections. 
+     */
+    @Test
     public void testOrderBy() {
     	log.info("*** testOrderBy ***");
     	
@@ -182,16 +188,72 @@ public class CollectionTest extends JPATestBase {
     	path.addSegment(s2).addSegment(s3).addSegment(s1);
     	log.debug("path.segments=" + path.getSegments());
     	Iterator<Segment> itr = path.getSegments().iterator();
+    	assertEquals(1, itr.next().getNumber());
     	assertEquals(2, itr.next().getNumber());
     	assertEquals(3, itr.next().getNumber());
-    	assertEquals(1, itr.next().getNumber());
     	
+    	log.debug("getting new path instance from database");
     	em.persist(path);
     	em.flush(); em.clear();
     	Path path2 = em.find(Path.class, path.getId());
+    	itr = path2.getSegments().iterator();
+    	log.debug("path2.segments=" + path2.getSegments());
     	assertEquals(1, itr.next().getNumber());
     	assertEquals(2, itr.next().getNumber());
     	assertEquals(3, itr.next().getNumber());
-    	log.debug("path2.segments=" + path2.getSegments());
+    }
+    
+    /**
+     * This test will demonstrate the ability to map child elements through Map interface.
+     */
+    @Test
+    public void testMap() {
+    	log.info("*** testMap ***");
+
+    	Position players[] = new Position[] {
+    			new Position("1st", "who"),
+    			new Position("2nd", "what"),
+    			new Position("3rd", "idontknow"),
+    			new Position("1st", "whom"),
+    			new Position("1st", "whoever")
+    	};
+    	log.debug("persisting players");
+    	for (Position p: players) {
+    		em.persist(p);
+    	}
+
+    	Lineup lineup = new Lineup();
+    	lineup.setTeam("today");
+    	lineup.addPosition(players[0]);
+    	lineup.addPosition(players[1]);
+    	lineup.addPosition(players[2]);
+    	log.debug("persisting lineup");
+    	em.persist(lineup);
+    	
+    	log.debug("getting new lineup instance");
+    	em.flush(); em.clear();
+    	Lineup lineup2 = em.find(Lineup.class, lineup.getId());
+    	assertEquals("unexpected size", lineup.getPositions().size(), lineup2.getPositions().size());
+    	for (int i=0; i<lineup.getPositions().size(); i++) {
+    		assertNotNull(players[i].getPlayer() + " not found", lineup2.getPositions().get(players[i].getPosition()));
+    	}
+    	
+    	log.debug("adding new player for position");
+    	lineup2.addPosition(players[3]);
+    	assertEquals("number of positions changed", lineup.getPositions().size(), lineup2.getPositions().size());
+    	em.flush();
+    	
+    	log.debug("checking positions");
+    	@SuppressWarnings("unchecked")
+		List<Object[]> rows = em.createNativeQuery("select ID, LINEUP_ID from RELATIONEX_POSITION").getResultList();
+		for (Object[] val : rows) {
+			int id = (Integer)val[0];
+			Integer lineupId = (Integer)val[1];
+			if (id==players[1].getId() || id==players[2].getId() || id==players[3].getId()) {
+				assertNotNull("unexpected lineupId", lineupId);
+			} else {
+				assertNull("lineupId was assigned for " + id, lineupId);
+			}
+		}
     }
 }

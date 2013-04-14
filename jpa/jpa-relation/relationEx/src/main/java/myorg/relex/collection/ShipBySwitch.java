@@ -21,6 +21,7 @@ public class ShipBySwitch extends Ship {
 	@Override
 	public boolean equals(Object obj) {
 		try {
+            if (this == obj) { return logEquals(obj, true); }
 			boolean equals = (id==0) ? super.equals(obj) :
 				id==((ShipBySwitch)obj).id;
 			return logEquals(obj, equals);
