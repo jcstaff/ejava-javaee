@@ -5,7 +5,11 @@
     <title>Mapping Many-to-One, Uni-directional Relationships</title>
     <para>Now that we are done the tour into one-to-many relations and collections themselves, 
         we can turn our attention on the many side and aspects associated with implementing a 
-        many-to-one relationship. Our first stab at this will stick to the uni-directional case.</para>
+        many-to-one relationship. Our first stab at this will stick to the uni-directional case.
+        Many to one, uni-directional relationships are especially appropriate when the many side is
+        huge and should best be obtained through a query rather than a through a collection
+        in the parent entity. However, many things we learn here will apply to the 
+        one-to-many/many-to-one bi-directional case.</para>
         
     <section id="jpa-relationex-m2o-uni-setup">
         <title>Setup</title>
@@ -58,45 +62,1545 @@ relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest
 
         <section id="jpa-relationex-m2o-uni-fk">
             <title>Many-to-One Uni-directional Using a Foreign Key</title>
-            <para></para>
+            <para>In this section you will create a many-to-one, uni-directional relationship
+                where the child entity references the parent entity using a separate foreign
+                key.</para>
             <orderedlist>
 
-                <listitem><para></para>
+                <listitem><para>Put the following class in your src/main tree. It provides an example of 
+                    the inverse side of a many-to-one, uni-directional relationship -- which means it 
+                    will have no reference to the relationship.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2one;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example one/parent entity in a many-to-one, uni-directional relationship.
+ * For that reason -- this class will not have any reference to the many entities that may possibly 
+ * reference it. These many/child objects must be obtained through the entity manager using a find or query.
+ */
+@Entity
+@Table(name="RELATIONEX_STATE")
+public class State {
+    @Id @Column(length=2)
+    private String id;
+    
+    @Column(length=20, nullable=false)
+    private String name;
+    
+    protected State() {}
+    public State(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    
+    public String getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Put the following class in your src/main tree. This entity class provides an 
+                   example of the owning side of a many-to-one, uni-directional relationship materialized
+                   through a foreign key column in the entity class table. It currently relies on defaults
+                   that we will experiment with and change.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2one;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the owning side of a many-to-one, uni-directional relationship
+ * that is realized through a foreign key from the child to the parent entity.
+ */
+@Entity
+@Table(name="RELATIONEX_STATERES")
+public class StateResident {
+    @Id @GeneratedValue
+    private int id;
+    
+    @ManyToOne(
+//          optional=false, 
+//          fetch=FetchType.EAGER
+        )
+//  @JoinColumn(
+//          name="STATE_ID", 
+//          nullable=false
+//      )
+    private State state;
+    
+    @Column(length=32)
+    private String name;
+    
+    protected StateResident() {}
+    public StateResident(State state) {
+        this.state = state;
+    }
+
+    public int getId() { return id; }
+
+    public State getState() { return state; }
+    public void setState(State state) {
+        this.state = state;
+    }
+    
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the two entity classes to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.many2one.State</class>
+        <class>myorg.relex.many2one.StateResident</class>
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Generate the database schema for the two entity classes and the relationship.
+                    Notice the provider automatically generated a foreign key column and named it after the 
+                    entity table the column references.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_STATE (
+        id varchar(12) not null,
+        name varchar(20) not null,
+        primary key (id)
+    );
+
+    create table RELATIONEX_STATERES (
+        id integer generated by default as identity,
+        name varchar(32),
+        state_id varchar(12), <!------- GENERATED FK Column
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_STATERES 
+        add constraint FK88A9D0FF4006DFB7 
+        foreign key (state_id) 
+        references RELATIONEX_STATE;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Change the child entity to make use of a foreign key column
+                    explicit -- with a specific name and nullable constraint.</para>
+<programlisting language="java"><![CDATA[
+    @ManyToOne
+    @JoinColumn(
+            name="STATE_ID", 
+            nullable=false
+        )
+    private State state;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Regenerate the database schema and note the changes made to the schema
+                    using the more explicit declaration of the foreign key column. It now</para>
+                        <itemizedlist>
+                            <listitem><para>uses a specified column name</para></listitem>
+                            <listitem><para>is defined to be non-nullable</para></listitem>
+                        </itemizedlist>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
+...
+    create table RELATIONEX_STATERES (
+        id integer generated by default as identity,
+        name varchar(32),
+        STATE_ID varchar(12) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_STATERES 
+        add constraint FK88A9D0FF4006DFB7 
+        foreign key (STATE_ID) 
+        references RELATIONEX_STATE;
+...
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Note there are two ways to get the provider to recognize whether the foreign
+                    key column is required. We demonstrated the table/column-centric approach above. The following
+                    uses a relationship-centric approach. You can optionally change your relationship definition
+                    to the following to show that the foreign key column is defined to be non-null in both cases.
+                    </para>
+<programlisting language="java"><![CDATA[
+    @ManyToOne(
+            optional=false)
+    @JoinColumn(
+            name="STATE_ID"//, 
+//          nullable=false
+        )
+    private State state;
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+    create table RELATIONEX_STATERES (
+        id integer generated by default as identity,
+        name varchar(32),
+        STATE_ID varchar(12) not null,
+        primary key (id)
+    );
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Create the following test method in your JUnit test case. This test method will
+                    create an instance of both the one and many side, relate them, and persist them. The flush()
+                    is only there so we can control/see the specific database commands and is not a required call
+                    within the body of the transaction. Note we arranged the order of the persists and left off any
+                    cascade definitions to show a point here that will initially cause an error.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testManyToOneUniFK() {
+        log.info("*** testManyToOneUniFK ***");
+        
+        State state = new State("MD", "Maryland");
+        StateResident res = new StateResident(state);
+        res.setName("joe");
+        log.debug("persisting child");
+        em.persist(res);
+        log.debug("persisting parent");
+        em.persist(state);
+        em.flush();
+    }
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Build the module and run the new test method. Notice this produces a foreign key constraint
+                    error because the child is being persisted to the database prior to the parent being managed.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniFK
+...
+ -*** testManyToOneUniFK ***
+ -persisting child
+Hibernate: 
+    select
+        state_.id,
+        state_.name as name28_ 
+    from
+        RELATIONEX_STATE state_ 
+    where
+        state_.id=?
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_STATERES
+        (id, name, STATE_ID) 
+    values
+        (null, ?, ?)
+...
+Tests in error: 
+  testManyToOneUniFK(myorg.relex.Many2OneTest): org.hibernate.exception.ConstraintViolationException: NULL not allowed for column "STATE_ID"; SQL statement:(..)
+...
+[INFO] BUILD FAILURE
+]]></programlisting>
+                    <para>We could attempt to fix this with a cascade.PERSIST from the child to the parent, but that 
+                        just seems wrong. The parent should exist prior to assigning children. There may be additional
+                        business rules that must go on to create the parent that is outside the scope of creating
+                        the child and child/parent relationship.</para>                        
+                </listitem>
+
+                <listitem><para>Re-order the creates to better simulate the parent being created prior to adding the 
+                    child entities.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("persisting parent");
+        em.persist(state);
+        log.debug("persisting child");
+        em.persist(res);
+        em.flush();
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. With the re-ordered 
+                    persist() calls the provider is able to successfully store our parent, child, and
+                    relationship.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniFK
+...
+ -persisting parent
+ -persisting child
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_STATE
+        (name, id) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_STATERES
+        (id, name, STATE_ID) 
+    values
+        (null, ?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to your test method. This will verify we can 
+                    obtain the child and its associated parent.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances");
+        em.clear();
+        StateResident res2 = em.find(StateResident.class, res.getId());
+        log.debug("checking child");
+        assertEquals("unexpected child data", res.getName(), res2.getName());
+        log.debug("checking parent");
+        assertEquals("unexpected parent data", state.getName());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method will the extra 
+                    calls to retrieve a fresh instance. Notice, under these conditions, the 
+                    provider chose to use an EAGER fetch during the find() and there was no 
+                    LAZY load during the calls to the child and parent.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniFK
+...
+ -getting new instances
+Hibernate: 
+    select
+        stateresid0_.id as id29_1_,
+        stateresid0_.name as name29_1_,
+        stateresid0_.STATE_ID as STATE3_29_1_,
+        state1_.id as id28_0_,
+        state1_.name as name28_0_ 
+    from
+        RELATIONEX_STATERES stateresid0_ 
+    inner join                           <!=== EAGER fetch of parent
+        RELATIONEX_STATE state1_ 
+            on stateresid0_.STATE_ID=state1_.id 
+    where
+        stateresid0_.id=?
+ -checking child
+ -checking parent
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Optionally change the fetch type for the parent to a LAZY fetch. Although
+                    the provider is permitted to ignore requests for LAZY fetch (but must honor requests for 
+                    EAGER), we do get a shallower query during the find() for the child and then a second 
+                    query for the parent when it is accessed.</para>
+<programlisting language=""><![CDATA[
+    @ManyToOne(
+            optional=false, 
+            fetch=FetchType.LAZY
+        )
+    @JoinColumn(name="STATE_ID")
+    private State state;
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+ -getting new instances
+Hibernate: 
+    select
+        stateresid0_.id as id29_0_,
+        stateresid0_.name as name29_0_,
+        stateresid0_.STATE_ID as STATE3_29_0_ 
+    from
+        RELATIONEX_STATERES stateresid0_ 
+    where
+        stateresid0_.id=?
+ -checking child
+ -checking parent
+Hibernate: 
+    select
+        state0_.id as id28_0_,
+        state0_.name as name28_0_ 
+    from
+        RELATIONEX_STATE state0_ 
+    where
+        state0_.id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add another child object for the same parent.</para>
+<programlisting language=""><![CDATA[
+        log.debug("add more residents");
+        StateResident resB = new StateResident(res2.getState());
+        em.persist(resB);
+        em.flush();
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild and re-run the test method. Observe the provider
+                   issues a database insert for only the new child entity with its 
+                   foreign key already set to the existing parent.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniFK
+...
+ -add more residents
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_STATERES
+        (id, name, STATE_ID) 
+    values
+        (null, ?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to your unit test. This will clear
+                   the cache of all instances and query for new instances. Note that we need
+                   to make use of the query since this is a uni-directional relationship
+                   and the parent has no knowledge of the relationship.</para>
+<programlisting language=""><![CDATA[
+        log.debug("getting new instances of residences");
+        em.clear();
+        List<StateResident> residents = em.createQuery(
+                    "select r from StateResident r " +
+                    "where r.state.id=:stateId", 
+                    StateResident.class)
+                .setParameter("stateId", res.getState().getId())
+                .getResultList();
+        assertEquals("unexpected number of residents", 2, residents.size());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice since we 
+                    are using a LAZY fetch, only the child entities are returned from the database.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniFK
+...
+ -getting new instances of residences
+Hibernate: 
+    select
+        stateresid0_.id as id29_,
+        stateresid0_.name as name29_,
+        stateresid0_.STATE_ID as STATE3_29_ 
+    from
+        RELATIONEX_STATERES stateresid0_ 
+    where
+        stateresid0_.STATE_ID=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>If you change the relationship back to an EAGER fetch, you will notice
+                    the provider still initially queries for the child entities and then issues a second 
+                    query for parents matching specific values.</para>
+<programlisting language=""><![CDATA[
+    @ManyToOne(
+            optional=false, 
+            fetch=FetchType.EAGER
+        )
+    @JoinColumn(name="STATE_ID")
+    private State state;
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+ -getting new instances of residences
+Hibernate: 
+    select
+        stateresid0_.id as id29_,
+        stateresid0_.name as name29_,
+        stateresid0_.STATE_ID as STATE3_29_ 
+    from
+        RELATIONEX_STATERES stateresid0_ 
+    where
+        stateresid0_.STATE_ID=?
+Hibernate: 
+    select
+        state0_.id as id28_0_,
+        state0_.name as name28_0_ 
+    from
+        RELATIONEX_STATE state0_ 
+    where
+        state0_.id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to your test method. This will verify
+                    that all managed children (the many) reference a common parent (the one)
+                    instance. We are implementing the check in terms of a change to one parent
+                    and attempting to observe that change in another child.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("changing state/data of common parent");
+        residents.get(0).getState().setName("Home State");
+        assertEquals("unexpected difference in parent data", 
+                residents.get(0).getState().getName(),
+                residents.get(1).getState().getName());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Observe our assertion 
+                    passes and we have a single update to the database.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniFK
+...
+ -changing state/data of common parent
+Hibernate: 
+    update
+        RELATIONEX_STATE 
+    set
+        name=? 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
                 </listitem>
 
             </orderedlist>
-            <para></para>
+            <para>You have finished going through a many-to-one, uni-directional relationship mapped
+                using a single foreign key column in the child entity table. The parent maintains no
+                collection or reference to the children. All references are maintained by the entity
+                and obtained through a find() or query() of the children. This is quite appropriate when
+                the size of the many can be quite large and is best to be queried for where paging
+                can be leveraged or other types of queries to reduce the total count returned.
+                </para>
+                <para>In the next section we will complicate the situation slightly by using a parent
+                    entity with a compound primary key -- which ripples over to the foreign key
+                    used by the child.</para>
         </section>
+
+
+
+
+
 
         <section id="jpa-relationex-m2o-uni-cmpfk">
             <title>Many-to-One Uni-directional Using a Compound Foreign Key</title>
-            <para></para>
+            <para>It this section we will create a new complication to the foreign key join by making
+                the primary key of the parent entity a compound primary key (i.e, multiple columns).
+                This will cause the related child entity to map more than one column as its foreign
+                key to the parent.  
+                </para>
+            <para>In this example we will use an embeddable primary key class as an @EmbeddedId in the
+                 parent entity.</para>
             <orderedlist>
 
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
+                <listitem><para>Place the following embeddable primary key class in your src/main tree. 
+                    Notice that it models two primary key values; number and street. It currently defines
+                    no specific mappings for the two properties, but we will experiment with changes later.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2one;
+
+import java.io.Serializable;
+import javax.persistence.*;
+
+/**
+ * This class provides an example compound primary key value that will be used in a many-to-one,
+ * uni-directional relationship.
+ */
+@Embeddable
+public class HousePK implements Serializable {
+    private static final long serialVersionUID = 5213787609029123676L;
+//  @Column(name="NO")
+    private int number;
+//  @Column(name="STR", length=50)
+    private String street;
+    
+    public HousePK() {}
+    public HousePK(int number, String street) {
+        this.number = number;
+        this.street = street;
+    }
+    
+    public int getNumber() { return number; }
+    public void setNumber(int number) {
+        this.number = number;
+    }
+    
+    public String getStreet() { return street; }
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    @Override
+    public int hashCode() {
+        return number + street==null?0:street.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this==obj) { return true; }
+            HousePK rhs = (HousePK)obj;
+            if (street==null && rhs.street != null) { return false; }
+            return number==rhs.number && street.equals(rhs.street);
+        } catch (Exception ex) { return false; }
+    }   
+}
+]]></programlisting>
+                    <para>Note, as a primary key class, it ...</para>                        
+                    <itemizedlist>
+                        <listitem><para>implements Serializable</para></listitem>
+                        <listitem><para>implements a default constructor</para></listitem>
+                        <listitem><para>overrides the default hashCode() based on the properties</para></listitem>
+                        <listitem><para>overrides the default equals() based on the properties</para></listitem>
+                    </itemizedlist>
+                </listitem>
+
+                <listitem><para>Put the following parent entity class in your src/main tree. This class provides an 
+                    example of the parent/one/inverse side of a many-to-one, uni-directional relationship. In that
+                    role, it has no reference to the child entity. However, since this is a compound primary/foreign
+                    key example, it defines its primary key in terms of the primary key class you added above. There 
+                    were two choices in implementing the compound primary key; @IdClass or @EmbeddedId. With the 
+                    @IdClass approach -- the entity would have modeled the number and street properties as properties
+                    of this class. With the @EmbeddedId approach, the entity models the properties as an opaque set
+                    encapsulated by the primary key class.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2one;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of a parent/inverse side of a many-to-one, uni-directional relationship where
+ * the parent and foreign key must use a compound value.
+ */
+@Entity
+@Table(name="RELATIONEX_HOUSE")
+public class House {
+    @EmbeddedId
+//  @AttributeOverrides({
+//      @AttributeOverride(name="street", column=@Column(name="STREET_NAME", length=20)),
+//  })
+    private HousePK id;
+    
+    @Column(length=16, nullable=false)
+    private String name;
+    
+    protected House() {}
+    public House(HousePK id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    
+    public HousePK getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
 ]]></programlisting>                        
                 </listitem>
 
+                <listitem><para>Add the following child entity class to your src/main tree. This class is the owning 
+                   side of the many-to-one relation and therefore has a reference to the one/parent side and a mapping
+                   of the relationship to the database. We currently have the class implemented to accepts all defaults
+                   and will be soon making changes after we see what default schema is applied.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2one;
+
+import javax.persistence.*;
+
+/**
+ * This class provides an example of the owning/child side of a many-to-one, uni-directional relationship
+ * where the parent uses a (embedded) compound primary key.
+ */
+@Entity
+@Table(name="RELATIONEX_OCCUPANT")
+public class Occupant {
+    @Id @GeneratedValue
+    private int id;
+    
+    @ManyToOne(optional=false)
+//  @JoinColumns({
+//          @JoinColumn(name="RES_NUM", referencedColumnName="NUMBER"),
+//          @JoinColumn(name="RES_STR", referencedColumnName="STREET_NAME")
+//  })
+    private House residence;
+    
+    @Column(length=16, nullable=false)
+    private String name;
+
+    protected Occupant(){}
+    public Occupant(String name, House residence) {
+        this.name = name;
+        this.residence = residence;
+    }
+    
+    public int getId() { return id; }
+
+    public House getResidence() { return residence; }
+    public void setResidence(House residence) {
+        this.residence = residence;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the new entity classes to the persistence unit. Do *not* list the primary key class.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.many2one.House</class>
+        <class>myorg.relex.many2one.Occupant</class>
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Generate schema for the model and observe the schema generated for the new entities.
+                    Notice how the default mapping properties of the primary key class was used within the parent
+                    entity table and the child table created values derived from the parent column name and parent 
+                    reference variable name (i.e., (parentVarName)_(PARENT_COLUMNNAME)).</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_HOUSE (
+        number integer not null,
+        street varchar(255) not null,
+        name varchar(16) not null,
+        primary key (number, street)
+    );
+...
+    create table RELATIONEX_OCCUPANT (
+        id integer generated by default as identity,
+        name varchar(16) not null,
+        residence_number integer not null,
+        residence_street varchar(255) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_OCCUPANT 
+        add constraint FK6957B84D35A694BB 
+        foreign key (residence_number, residence_street) 
+        references RELATIONEX_HOUSE;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Make the following annotation change to the primary key class and observe 
+                    how that impacts the schema generated.</para>
+<programlisting language="java"><![CDATA[
+    @Column(name="NO")
+    private int number;
+    @Column(name="STR", length=50)
+    private String street;
+]]></programlisting>  
+                    <para>The parent entity table inherited the column definitions from the primary 
+                        key class. Since the parent column names changed, the default child entity
+                        table foreign key column names changed to match.</para>                      
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_HOUSE (
+        NO integer not null,
+        STR varchar(50) not null,
+        name varchar(16) not null,
+        primary key (NO, STR)
+    );
+...
+    create table RELATIONEX_OCCUPANT (
+        id integer generated by default as identity,
+        name varchar(16) not null,
+        residence_NO integer not null,
+        residence_STR varchar(50) not null,
+        primary key (id)
+    );
+...
+   alter table RELATIONEX_OCCUPANT 
+        add constraint FK6957B84D81D611CF 
+        foreign key (residence_NO, residence_STR) 
+        references RELATIONEX_HOUSE;    
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Create a mapping override in the parent entity so one of the columns
+                    is defined by an entity override and the remaining property is still defined by 
+                    the primary key class. You do not need to make any changes to the primary key class
+                    here.</para>
+<programlisting language="java"><![CDATA[
+public class House {
+    @EmbeddedId
+    @AttributeOverrides({
+        @AttributeOverride(name="street", column=@Column(name="STREET_NAME", length=20)),
+    })
+    private HousePK id;
+]]></programlisting>
+                    <para>Notice how the parent entity table primary key column definition
+                         is a blend of specifications from the primary key class and overrides
+                         from the parent entity class.</para>                        
+<programlisting language=""><![CDATA[
+    create table RELATIONEX_HOUSE (
+        NO integer not null,
+        STREET_NAME varchar(20) not null,
+        name varchar(16) not null,
+        primary key (NO, STREET_NAME)
+    );
+...
+    create table RELATIONEX_OCCUPANT (
+        id integer generated by default as identity,
+        name varchar(16) not null,
+        residence_NO integer not null,
+        residence_STREET_NAME varchar(20) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_OCCUPANT 
+        add constraint FK6957B84D8AD189E5 
+        foreign key (residence_NO, residence_STREET_NAME) 
+]]></programlisting>
+                    <para>Notice how the child entity table foreign key columns, by default,
+                        change to match the parent primary key column names.</para>                        
+                </listitem>
+
+                <listitem><para>Add column specifications for the child entity table. You will notice that
+                    we are defining a @JoinColumn for each foreign key mapping we wish to override and
+                    we must wrap multiple @JoinColumn annotations within a @JoinColumns array</para>
+                    
+                    <para>Note too the referencedColumnName must match what the parent entity table is
+                    currently using. That means if you are changing values or overrides with the parent 
+                    primary key column *AND* you are attempting to override the default foreign key column
+                    properties -- these must match.</para>
+<programlisting language="java"><![CDATA[
+public class Occupant {
+...
+    @ManyToOne(optional=false)
+    @JoinColumns({
+            @JoinColumn(name="RES_NUM", referencedColumnName="NO"),
+            @JoinColumn(name="RES_STR", referencedColumnName="STREET_NAME")
+    })
+    private House residence;
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+    create table RELATIONEX_HOUSE (
+        NO integer not null,
+        STREET_NAME varchar(20) not null,
+        name varchar(16) not null,
+        primary key (NO, STREET_NAME)
+    );
+...
+    create table RELATIONEX_OCCUPANT (
+        id integer generated by default as identity,
+        name varchar(16) not null,
+        RES_NUM integer not null,
+        RES_STR varchar(20) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_OCCUPANT 
+        add constraint FK6957B84D739A6436 
+        foreign key (RES_NUM, RES_STR) 
+        references RELATIONEX_HOUSE;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following test method to your JUnit test case. This test will create
+                    and instance of the parent and child, relate them, and persist them. Learning from the 
+                    lessons of the previous section, we made sure the parent existed prior to persisting the child.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testManyToOneUniCompoundFK() {
+        log.info("*** testManyToOneUniCompoundFK ***");
+        
+        House house = new House(new HousePK(1600,"PA Ave"),"White House");
+        Occupant occupant = new Occupant("bo", house);
+        log.debug("persisting parent");
+        em.persist(house);
+        log.debug("persisting child");
+        em.persist(occupant);
+        em.flush();
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Build the module and run the new test method. Notice the extra columns
+                    used to persist the primary key of the parent and the foreign key of the child.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniCompoundFK
+...
+ -*** testManyToOneUniCompoundFK ***
+ -persisting parent
+ -persisting child
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_HOUSE
+        (name, NO, STREET_NAME) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_OCCUPANT
+        (id, name, RES_NUM, RES_STR) 
+    values
+        (null, ?, ?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to your test method to verify we can obtain a 
+                    reference to the child and parent through a find().</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances");
+        em.clear();
+        Occupant occupant2 = em.find(Occupant.class, occupant.getId());
+        log.debug("checking child");
+        assertEquals("unexpected child data", occupant.getName(), occupant2.getName());
+        log.debug("checking parent");
+        assertEquals("unexpected parent data", house.getName(), occupant2.getResidence().getName());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. As in the previous section,
+                    the find, by default, performs an EAGER fetch on the parent. This time, however, the 
+                    join uses both primary/foreign columns.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniCompoundFK
+...
+-getting new instances
+Hibernate: 
+    select
+        occupant0_.id as id31_1_,
+        occupant0_.name as name31_1_,
+        occupant0_.RES_NUM as RES3_31_1_,
+        occupant0_.RES_STR as RES4_31_1_,
+        house1_.NO as NO30_0_,
+        house1_.STREET_NAME as STREET2_30_0_,
+        house1_.name as name30_0_ 
+    from
+        RELATIONEX_OCCUPANT occupant0_ 
+    inner join
+        RELATIONEX_HOUSE house1_ 
+            on occupant0_.RES_NUM=house1_.NO 
+            and occupant0_.RES_STR=house1_.STREET_NAME 
+    where
+        occupant0_.id=?
+ -checking child
+ -checking parent
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to your test method. This will test adding 
+                    a second child for a common parent.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("add more child entities");
+        Occupant occupantB = new Occupant("miss beazily", occupant2.getResidence());
+        em.persist(occupantB);
+        em.flush();
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice how only the 
+                    new child needs to be persisted -- along with the foreign key columns to reference
+                    the parent.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniCompoundFK
+...
+ -add more child entities
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_OCCUPANT
+        (id, name, RES_NUM, RES_STR) 
+    values
+        (null, ?, ?, ?)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to your test method. This will query for child
+                    entities related to our parent. Note this is the only way (other than find()) that 
+                    we can locate the child entities since no reference to the child entities is maintained
+                    in a many-to-one, uni-directional relationship.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances of children");
+        em.clear();
+        List<Occupant> occupants = em.createQuery(
+                    "select o from Occupant o " +
+                    "where o.residence.id=:houseId", 
+                    Occupant.class)
+                .setParameter("houseId", occupant.getResidence().getId())
+                .getResultList();
+        assertEquals("unexpected number of children", 2, occupants.size());
+]]></programlisting>
+                    <para>Take extra note of what we did during the query and query parameter above.
+                        We did *not* pass in the individual primary key properties and do a 
+                        property-by-property match. That would have been tedious and error prone if
+                        the primary key was re-factored. What we did instead was to pass in the opaque
+                        primary key object and let the provider, with its mapping knowledge of the 
+                        primary key class and the parent/child entity classes -- form the details of 
+                        the where clause.</para>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice how the provider broke down
+                    the opaque primary key object we passed as a parameter and created the individual column
+                    tests in the where.</para>
+<programlisting language=""><![CDATA[
+ -getting new instances of children
+Hibernate: 
+    select
+        occupant0_.id as id31_,
+        occupant0_.name as name31_,
+        occupant0_.RES_NUM as RES3_31_,
+        occupant0_.RES_STR as RES4_31_ 
+    from
+        RELATIONEX_OCCUPANT occupant0_ 
+    where
+        occupant0_.RES_NUM=?       <!== provider created breakdown from PK comparison
+        and occupant0_.RES_STR=?           to individual column comparisons
+Hibernate: 
+    select
+        house0_.NO as NO30_0_,
+        house0_.STREET_NAME as STREET2_30_0_,
+        house0_.name as name30_0_ 
+    from
+        RELATIONEX_HOUSE house0_ 
+    where
+        house0_.NO=? 
+        and house0_.STREET_NAME=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
             </orderedlist>
-            <para></para>
+            <para>You have finished taking a look at the impact of a parent entity using
+                a compound primary key when there is a relationship from a child entity.
+                The circumstances around this situation is not all that unlike the one-to-one
+                case, but it is still worthy covering specifically here.</para>
+                
+            <para>In the next section we will shift the emphasis of the compound primary key
+               from the parent to the child where the child identity is derived from a property 
+               of the parent.</para>
         </section>
+
+
+
 
         <section id="jpa-relationex-m2o-uni-mapsId">
             <title>Many-to-One Uni-directional Using a MapsId</title>
-            <para></para>
+            <para>In this section we are going to revisit a topic that was addressed during the one-to-one
+                relationship coverage. We are going to take a look at a child class that uses a compound 
+                primary key with one of the properties of the primary key derived from the foreign key to 
+                the parent entity. This means that one of the columns of the child table will be both a 
+                primary key value and a foreign key value at the same time.</para>
             <orderedlist>
 
-                <listitem><para></para>
+                <listitem><para>Add the following parent entity class to your src/main tree. This 
+                    parent entity class will have its primary key automatically assigned by the container
+                    and the foreign key of the children entities will have to reference that column.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2one;
+
+import javax.persistence.*;
+/**
+ * This class is an example of a parent in a many-to-one, uni-directional relation where the 
+ * primary key of the child is derived from the primary key of the parent. 
+ */
+@Entity
+@Table(name="RELATIONEX_ITEMTYPE")
+public class ItemType {
+    @Id @GeneratedValue
+    private int id;
+    
+    @Column(length=20, nullable=false)
+    private String name;
+    
+    protected ItemType() {}
+    public ItemType(String name) {
+        this.name = name;
+    }
+
+    public int getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
+    }
+    @Override
+    public String toString() {
+        return id +":" + name;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Since the child entities will have a two properties -- one of them derived from
+                    the parent entity -- we need to model a compound primary key class for the child entity.
+                    Place the following primary key class in your src/main tree. It models two properties</para>
+                <itemizedlist>
+                    <listitem><para>typeId - represents the primary key value of the ItemType entity</para></listitem>
+                    <listitem><para>number - represents a unique value per ItemType.id given to an Item</para></listitem>
+                </itemizedlist>                    
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2one;
+
+import java.io.Serializable;
+import javax.persistence.*;
+/**
+ * This class provides an example primary key class for a child entity that
+ * derives one of its primary key values from its parent entity in a many-to-one
+ * relationship.
+ */
+@SuppressWarnings("serial")
+@Embeddable
+public class ItemPK implements Serializable {
+public class ItemPK implements Serializable {
+//    @Column(name="TYPE_ID_PK")
+    private int typeId; //unique value from parent ItemType.id  
+//    @Column(name="NUMBER_PK")
+    private int number; //unique value assigned to instances of Item
+
+    public int getTypeId() { return typeId; }
+    public ItemPK setTypeId(int typeId) {
+        this.typeId = typeId;
+        return this;
+    }   
+    public int getNumber() { return number; }
+    public ItemPK setNumber(int number) {
+        this.number = number;
+        return this;
+    }
+    
+    @Override
+    public int hashCode() {
+        return typeId + number;
+    }   
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) { return true; }
+            ItemPK rhs = (ItemPK) obj;
+            return typeId==rhs.typeId && number==rhs.number;
+        } catch (Exception ex) { return false; }
+    }
+    @Override
+    public String toString() {
+        return "(typeId=" + typeId + ",number=" + number + ")";
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Place the following child entity class in your src/main tree. This entity class
+                    uses an embedded primary key and a many-to-one relation to the parent entity. As stated,
+                    one of the properties (typeId) of the primary key will need to be the same value as the
+                    foreign key to the parent entity (itemType.id). The implementation below currently models 
+                    that as two separate columns and we will need to work to correct.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.many2one;
+
+import java.util.Date;
+import javax.persistence.*;
+/**
+ * This class provides an example of a child entity that derives its primary key from 
+ * the parent/one side of a many-to-one relation.
+ */
+@Entity
+@Table(name="RELATIONEX_ITEM")
+public class Item {
+    @EmbeddedId
+    private ItemPK id;
+    
+    @ManyToOne(optional=false)
+//  @MapsId("typeId") //refers to the ItemPK.typeId property
+//  @JoinColumn(name="TYPE_ID")
+    private ItemType itemType;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+    
+    protected Item() {}
+    public Item(ItemType itemType, int number) {        
+        this.itemType = itemType;
+            //typeId in PK auto-mapped to itemType FK
+        this.id = new ItemPK().setNumber(number);
+    }
+
+    public ItemPK getId() { return id; }
+    public ItemType getItemType() { return itemType; }
+
+    public Date getCreated() { return created; }
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+    
+    @Override
+    public String toString() {
+        return (itemType==null?null:itemType) + "pk=" + id;
+    }
+}
+]]></programlisting>
+                    <para>Pay special notice to the fact the child entity never sets the typeId property of
+                        the primary key. This property will be ignored by the provider and the property from
+                        the foreign key used instead once we get things mapped correctly.</para>                        
+                </listitem>
+
+                <listitem><para>Add the two entity classes to your peristence unit. Do *not* list the primary key class.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.many2one.Item</class>
+        <class>myorg.relex.many2one.ItemType</class>
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Generate database schema for the new entity classes and their relationship. Notice
+                    how there is a typeId from the compound primary key class property and a itemType_id from the 
+                    foreign key. The provider is stating that our mapping treats the two uses of the same property
+                    as two separate columns in the same table. You can tell the typeId is part of the primary key 
+                    from the "primary key (number, typeId)" declaration. You can tell itemType_id is a foreign key
+                    based on the "foreign key (itemType_id)" constraint declaration.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_ITEM (
+        number integer not null,
+        typeId integer not null,
+        created timestamp,
+        itemType_id integer not null,
+        primary key (number, typeId)
+    );
+
+    create table RELATIONEX_ITEMTYPE (
+        id integer generated by default as identity,
+        name varchar(20) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_ITEM 
+        add constraint FK355BBDA3C6C591FD 
+        foreign key (itemType_id) 
+        references RELATIONEX_ITEMTYPE;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the @MapsId("typeId") annotation to the @ManyToOne relation. This signals
+                    the provider to map the column for the compound primary key "typeId" column to the same column
+                    used to map the foreign key for the itemType.</para>
+<programlisting language="java"><![CDATA[
+    @ManyToOne(optional=false)
+    @MapsId("typeId") //refers to the ItemPK.typeId property
+    private ItemType itemType;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Regenerate schema and notice the two columns have mapped to the foreign key
+                    column. itemType_id still exists and has a foreign key constraint. itemType_id is now
+                    also listed in the primary key declaration.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_ITEM (
+        number integer not null,
+        created timestamp,
+        itemType_id integer,
+        primary key (number, itemType_id)
+    );
+
+    create table RELATIONEX_ITEMTYPE (
+        id integer generated by default as identity,
+        name varchar(20) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_ITEM 
+        add constraint FK355BBDA3C6C591FD 
+        foreign key (itemType_id) 
+        references RELATIONEX_ITEMTYPE;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Make a small cosmetic change by defining the column name for the foreign key 
+                    column.</para>
+<programlisting language="java"><![CDATA[
+    @ManyToOne(optional=false)
+    @MapsId("typeId") //refers to the ItemPK.typeId property
+    @JoinColumn(name="TYPE_ID")
+    private ItemType itemType;
+]]></programlisting>
+                    <para>Notice we are renaming the foreign key that the primary key is mapped to and not
+                        the primary key.</para>                        
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_ITEM (
+        number integer not null,
+        TYPE_ID integer,
+        created timestamp,
+        primary key (number, TYPE_ID)
+    );
+
+    create table RELATIONEX_ITEMTYPE (
+        id integer generated by default as identity,
+        name varchar(20) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_ITEM 
+        add constraint FK355BBDA349D11870 
+        foreign key (TYPE_ID) 
+        references RELATIONEX_ITEMTYPE;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Further test the assertion above about the primary key being mapped to 
+                    the foreign key by trying to define the primary key columns for Item. Add the following
+                    for the ItemPK class.</para>
+<programlisting language="java"><![CDATA[
+public class ItemPK implements Serializable {
+    @Column(name="TYPE_ID_PK")
+    private int typeId; //unique value from parent ItemType.id  
+    @Column(name="NUMBER_PK")
+    private int number; //unique value assigned to instances of Item
+]]></programlisting>                 
+                    <para>Notice only the non-FK annotation column definition was picked up from 
+                        the primary key class. The other property is defined by the foreign key column
+                        definition in the entity class.</para>       
+<programlisting language=""><![CDATA[
+$ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl 
+...
+    create table RELATIONEX_ITEM (
+        NUMBER_PK integer not null,
+        TYPE_ID integer,
+        created timestamp,
+        primary key (NUMBER_PK, TYPE_ID)
+    );
+
+    create table RELATIONEX_ITEMTYPE (
+        id integer generated by default as identity,
+        name varchar(20) not null,
+        primary key (id)
+    );
+...
+    alter table RELATIONEX_ITEM 
+        add constraint FK355BBDA349D11870 
+        foreign key (TYPE_ID) 
+        references RELATIONEX_ITEMTYPE;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following test method to your unit test. As in the previous sections, 
+                    this code will attempt to persist the parent, assign the managed parent to the child, and 
+                    then persist the child. The flush()es were added simply to control when the database output
+                    was issued and printed and not a requirement of the scenario.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testManyToOneUniMapsIdEmbedded() {
+        log.info("*** testManyToOneUniMapsIdEmbedded ***");
+        
+        ItemType type = new ItemType("snowblower");
+        log.debug("persisting parent:" + type);
+        em.persist(type);
+        em.flush();
+        log.debug("persisted parent:" + type);
+        
+        Item item = new Item(type,1);
+        item.setCreated(new Date());
+        log.debug("persisting child:" + item);
+        em.persist(item);
+        em.flush();
+        log.debug("persisted child:" + item);
+        //check PK assigned
+        ItemPK pk = new ItemPK().setTypeId(type.getId()).setNumber(1);
+        assertTrue(String.format("expected PK %s not match actual %s", pk, 
+                item.getId()), pk.equals(item.getId()));
+    }
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Build the module and run the new unit test. Notice first how the parent primary 
+                    key was unassigned until after the persist. After the persist, the output changed from 0 to 
+                    a non-0 value. The same thing happened for the child entity. The property in the child's primary
+                    key that is mapped to the foreign key was left unassigned by the child entity class. The provider
+                    updated the primary key values during the persist and caused the primary key property to be equal 
+                    to the foreign key value.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniMapsIdEmbedded
+...
+-persisting parent:0:snowblower
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_ITEMTYPE
+        (id, name) 
+    values
+        (null, ?)
+ -persisted parent:1:snowblower
+ -persisting child:1:snowblowerpk=(typeId=0,number=1)
+Hibernate:                                ^ 
+    insert                                +- unassigned
+    into
+        RELATIONEX_ITEM
+        (created, NUMBER_PK, TYPE_ID) 
+    values                               +- assigned by provider
+        (?, ?, ?)                        v
+ -persisted child:1:snowblowerpk=(typeId=1,number=1)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Place the following lines in your test method. This will cause new instances
+                    to be pulled from the database and checked against their expected values.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances");
+        em.clear();
+        Item item2 = em.find(Item.class, pk);
+        log.debug("checking child");
+        assertNotNull("child not found by primary key:" + pk, item2);
+        assertTrue("unexpected child data", item.getCreated().equals(item2.getCreated()));
+        log.debug("checking parent");
+        assertEquals("unexpected parent data", type.getName(), item2.getItemType().getName());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice the provider 
+                    continues to perform an EAGER fetch of the parent when using find() to locate the
+                    child. The provider is able to locate the child entity using a primary key 
+                    instance initialized with the parent's ID and a unique value assigned to the child
+                    number.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniMapsIdEmbedded
+...
+ -getting new instances
+Hibernate: 
+    select
+        item0_.NUMBER_PK as NUMBER1_32_1_,
+        item0_.TYPE_ID as TYPE2_32_1_,
+        item0_.created as created32_1_,
+        itemtype1_.id as id33_0_,
+        itemtype1_.name as name33_0_ 
+    from
+        RELATIONEX_ITEM item0_ 
+    inner join
+        RELATIONEX_ITEMTYPE itemtype1_ 
+            on item0_.TYPE_ID=itemtype1_.id 
+    where
+        item0_.NUMBER_PK=? 
+        and item0_.TYPE_ID=?
+ -checking child
+ -checking parent
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to the test method. This will add additional child 
+                   related to the same parent entity.</para>
+<programlisting language="java"><![CDATA[
+        Item itemB = new Item(item2.getItemType(),2);
+        log.debug("add more child entities:" + itemB);
+        itemB.setCreated(new Date());
+        em.persist(itemB);
+        em.flush();
+        log.debug("new child entities added:" + itemB);
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice, as before, only
+                    the foreign key and unique value is assigned to the new child entity prior to calling
+                    persist(). The primary key property used to identify the parent entity is unassigned 
+                    going into the persist and then updated by the provider once the persist completes.
+                    </para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest#testManyToOneUniMapsIdEmbedded
+...
+ -add more child entities:1:snowblowerpk=(typeId=0,number=2)
+Hibernate:                                       ^
+    insert                                       +- unassigned
+    into
+        RELATIONEX_ITEM
+        (created, NUMBER_PK, TYPE_ID) 
+    values                                        +- assigned by provider
+        (?, ?, ?)                                 v
+ -new child entities added:1:snowblowerpk=(typeId=1,number=2)
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to the test method. These will get new instances
+                    of all the children associated with a common parent. Notice we are using the foreign
+                    key during the where clause and no the primary key value. It does not matter which 
+                    value we use since they are both mapped to the same column.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("getting new instances of children");
+        em.clear();
+        List<Item> items = em.createQuery(
+                    "select i from Item i " +
+                    "where i.itemType.id=:typeId", 
+                    Item.class)
+                .setParameter("typeId", item.getItemType().getId())
+                .getResultList();
+        assertEquals("unexpected number of children", 2, items.size());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice the column
+                    used during the where clause to get the child rows is the column we mapped 
+                    for the foreign key.</para>
+<programlisting language=""><![CDATA[
+ -getting new instances of children
+Hibernate: 
+    select
+        item0_.NUMBER_PK as NUMBER1_32_,
+        item0_.TYPE_ID as TYPE2_32_,
+        item0_.created as created32_ 
+    from
+        RELATIONEX_ITEM item0_ 
+    where
+        item0_.TYPE_ID=?
+Hibernate: 
+    select
+        itemtype0_.id as id33_0_,
+        itemtype0_.name as name33_0_ 
+    from
+        RELATIONEX_ITEMTYPE itemtype0_ 
+    where
+        itemtype0_.id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>If you changed the query to use the primary key instead of the foreign key
+                    we end up with the same query because (again) @MapsId caused these two properties to 
+                    be mapped to the same column -- the foreign key column.</para>
+<programlisting language="java"><![CDATA[
+        List<Item> items = em.createQuery(
+                    "select i from Item i " +
+                    //"where i.itemType.id=:typeId", 
+                    "where i.id.typeId=:typeId", 
+                    Item.class)
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        item0_.NUMBER_PK as NUMBER1_32_,
+        item0_.TYPE_ID as TYPE2_32_,
+        item0_.created as created32_ 
+    from
+        RELATIONEX_ITEM item0_ 
+    where
+        item0_.TYPE_ID=?
 ]]></programlisting>                        
                 </listitem>
 
             </orderedlist>
-            <para></para>
+            <para>You have completed going through an example many-to-one, uni-directional relationship
+                where the child identity is partially determined from the identity of the parent. By default,
+                the provider would have mapped these as two separate columns. By using @MapsId on the relationship
+                -- the property within the primary key class identified by the @MapsId has its column mapped
+                to the same column used to reference the parent entity.</para>
+            <para>This example used the @EmbeddedId. Another option would have been the use of an @IdClass.
+                We will demonstrate the use of that technique in the next example using a more complicated
+                scenario. In the next case, the child has two parent entities, the primary key of the child
+                is derived from both parents, and the properties of both parents overlap columns.</para>
         </section>
+        
+        
+        
 
         <section id="jpa-relationex-m2o-uni-sharedCmpFk">
             <title>Many-to-One Uni-directional Using Shared Compound Foreign Key Columns</title>
@@ -117,7 +1621,7 @@ relationEx]$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.Many2OneTest
 
     <section id="jpa-relationex-many2one-uni-summary">
        <title>Summary</title>
-       <para>In this chapter we
+       <para>In this chapter we <!-- orphanDelete -->
        </para>
     </section>    
 </chapter>

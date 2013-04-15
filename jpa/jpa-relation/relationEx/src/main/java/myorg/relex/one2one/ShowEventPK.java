@@ -29,6 +29,7 @@ public class ShowEventPK implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		try {
+			if (this==obj) { return true; }
 			return date.equals(((ShowEventPK)obj).date) &&
 					time.equals(((ShowEventPK)obj).time);
 		} catch (Exception ex) { return false; }
