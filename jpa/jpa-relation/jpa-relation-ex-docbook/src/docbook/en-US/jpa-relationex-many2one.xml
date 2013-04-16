@@ -1593,35 +1593,17 @@ Hibernate:
                 the provider would have mapped these as two separate columns. By using @MapsId on the relationship
                 -- the property within the primary key class identified by the @MapsId has its column mapped
                 to the same column used to reference the parent entity.</para>
-            <para>This example used the @EmbeddedId. Another option would have been the use of an @IdClass.
-                We will demonstrate the use of that technique in the next example using a more complicated
-                scenario. In the next case, the child has two parent entities, the primary key of the child
-                is derived from both parents, and the properties of both parents overlap columns.</para>
+            <para>This example used the @EmbeddedId. Another option would have been the use of an @IdClass.</para>
         </section>
-        
-        
-        
-
-        <section id="jpa-relationex-m2o-uni-sharedCmpFk">
-            <title>Many-to-One Uni-directional Using Shared Compound Foreign Key Columns</title>
-            <para></para>
-            <orderedlist>
-
-                <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </listitem>
-
-            </orderedlist>
-            <para></para>
-        </section>
-
-    </section>
-
+    </section>    
 
     <section id="jpa-relationex-many2one-uni-summary">
        <title>Summary</title>
-       <para>In this chapter we <!-- orphanDelete -->
+       <para>In this chapter we took a look at variants of the many-to-one relationship using 
+           just the uni-directional case. You implemented the relationship using a simple foreign key
+           from the child entity table as well as through a join-table. You formed relationships with 
+           simple types and embeddable types that were owned by the parent entity. You enacted orphanRemoval
+           on first class child entities to have them deleted as well when removed from the collection.
        </para>
     </section>    
 </chapter>

@@ -14,6 +14,8 @@ import myorg.relex.one2many.Rider;
 import myorg.relex.one2many.Route;
 import myorg.relex.one2many.Stop;
 import myorg.relex.one2many.Suspect;
+import myorg.relex.one2many.Todo;
+import myorg.relex.one2many.TodoList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -148,5 +150,31 @@ public class One2ManyTest extends JPATestBase {
     	Produce produce = basket2.getContents().get(0);
     	assertTrue("produce not found", basket2.getContents().remove(produce));
     	em.flush();
+    }
+    
+    /**
+     * This test will demonstrate the ability of the provider to manage (delete) orphaned child objects.
+     */
+    @Test
+    public void testOneToManyUniOrphanRemoval() {
+    	log.info("*** testOneToManyUniEmbeddableElementCollection ***");
+
+    	//check how many child entities exist to start with
+    	int startCount = em.createQuery("select count(t) from Todo t", Number.class).getSingleResult().intValue();
+    	log.debug("create new TODO list with first entry");
+    	TodoList list = new TodoList();
+    	list.getTodos().add(new Todo("get up"));
+    	em.persist(list);
+    	em.flush();
+
+    	log.debug("verifying we have new child entity");
+    	assertEquals("new child not found", startCount +1,
+    		em.createQuery("select count(t) from Todo t", Number.class).getSingleResult().intValue());    	
+
+    	log.debug("removing child from list");
+    	list.getTodos().clear();
+    	em.flush();
+    	assertEquals("orphaned child not deleted", startCount,
+        		em.createQuery("select count(t) from Todo t", Number.class).getSingleResult().intValue());
     }
 }
