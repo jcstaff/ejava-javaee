@@ -4935,15 +4935,14 @@ Hibernate:
 
         <section id="jpa-relationex-o2o-orphan">
             <title>One-to-One Using Orphan Removal</title>
-            <para>Orphan removal can e handy when the parent in a XxxToOne relationship becomes unreferenced by its 
-                dependent entity and the parent only exists to support that dependent entity. This is different from 
-                cascade=DELETE. In this case the dependent entity is not being deleted. It is re-referencing the parent.
+            <para>Orphan removal can be handy when the target of a OneToXxx relationship becomes unreferenced by its 
+                referencing entity and the target entity only exists to support that referencing entity. This is different from 
+                cascade=DELETE. In this case the referencing entity is not being deleted. It is de-referencing the parent.
                 The basic rules are as follows.</para>
             <itemizedlist>
-                <listitem><para>Child object removes (nulls in the case of OneToOne) its relationship to the parent</para></listitem>
-                <listitem><para>em.remove() on the orphaned parent is applied</para></listitem>
-                <listitem><para>Orphaned parent entity must not be reassigned to new child. It exists for the sole use of the referencing child(ren)
-                   of that collection.</para></listitem>
+                <listitem><para>Referencing entity removes (nulls in the case of OneToOne) its relationship to the target entity</para></listitem>
+                <listitem><para>em.remove() on the orphaned target entity is applied</para></listitem>
+                <listitem><para>Orphaned target entity must not be reassigned to new child. It exists for the sole use of the referencing entity.</para></listitem>
                 <listitem><para>Not necessary to declare cascade=DELETE for this relationship</para></listitem>
             </itemizedlist>
     

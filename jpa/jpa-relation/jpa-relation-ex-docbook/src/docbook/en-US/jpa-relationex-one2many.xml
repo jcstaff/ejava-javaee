@@ -1245,6 +1245,268 @@ Hibernate:
         
     </section>
 
+    <section id="jpa-relationex-o2m-uni-provider-actions">
+       <title>One-to-Many Provider Actions</title>
+       <para>In this chapter we will assume what was covered in the one-to-one CASCADE portion is suitable
+           for now and focus this section on orphanRemoval.</para>
+       
+        <section id="jpa-relationex-o2m-uni-orphanRemoval">
+           <title>One-to-Many Orphan Removal</title>
+            <para>Orphan removal is specific to one-to-one and one-to-many relationships. For a one-to-many
+                relationship, this capability allows members of a collection to be removed once they stop
+                being members of that collection. Thus the child member is only there to support the parent
+                entity.</para>
+            <orderedlist>
+
+                <listitem><para>Put the following child entity class in your src/main tree. This class provides
+                    an example many side of a one-to-many relation. Thus it has no reference to the one side.</para>
+<programlisting language="java"><![CDATA[
+package myorg.relex.one2many;
+
+import javax.persistence.*;
+/**
+ * This class is an example of the many side of a one-to-many, uni-directional relationship 
+ * which uses orphanRemoval of target entities on the many side. This entity exists for the 
+ * sole use of the one side of the relation.
+ */
+@Entity
+@Table(name="RELATIONEX_TODO")
+public class Todo {
+    @Id @GeneratedValue
+    private int id;
+    
+    @Column(length=32)
+    private String title;
+    
+    public Todo() {}
+    public Todo(String title) {
+        this.title = title;
+    }
+
+    public int getId() { return id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Place the following parent entity in your src/main tree. This class 
+                    provides an example of the one/owning side of a one-to-many, uni-directional relationship.
+                    The relationship is realized through a foreign key from the child entity table to the parent.
+                    The parent has enabled cascade.PERSIST to allow for easy storage of the child entities but
+                    its currently incomplete when it comes to orphan removal. We will fix in a moment.</para>
+<programlisting language=""><![CDATA[
+package myorg.relex.one2many;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.*;
+/**
+ * This class provides an example owning entity in a one-to-many, uni-directional relationship 
+ * where the members of the collection are subject to orphanRemoval when they are removed from the 
+ * collection. 
+ */
+@Entity
+@Table(name="RELATIONEX_TODOLIST")
+public class TodoList {
+    @Id @GeneratedValue
+    private int id;
+    
+    @OneToMany(cascade={CascadeType.PERSIST}
+//            ,orphanRemoval=true
+        )
+    @JoinColumn
+    private List<Todo> todos;
+
+    public int getId() { return id; }
+
+    public List<Todo> getTodos() {
+        if (todos==null) {
+            todos = new ArrayList<Todo>();
+        }
+        return todos;
+    }
+    public void setTodos(List<Todo> todos) {
+        this.todos = todos;
+    }
+}
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the new entity classes to your persistence unit.</para>
+<programlisting language="xml"><![CDATA[
+        <class>myorg.relex.one2many.Todo</class>
+        <class>myorg.relex.one2many.TodoList</class>
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following test method to your JUnit test case. This portion of the test
+                    will simply create and parent and first child entity.</para>
+<programlisting language="java"><![CDATA[
+    @Test
+    public void testOneToManyUniOrphanRemoval() {
+        log.info("*** testOneToManyUniEmbeddableElementCollection ***");
+
+        //check how many child entities exist to start with
+        int startCount = em.createQuery("select count(t) from Todo t", Number.class).getSingleResult().intValue();
+        log.debug("create new TODO list with first entry");
+        TodoList list = new TodoList();
+        list.getTodos().add(new Todo("get up"));
+        em.persist(list);
+        em.flush();
+    }
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Build the module and run the new test method. Note the creation of the parent, child,
+                    and the relating of the child to the parent.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniOrphanRemoval
+...
+-*** testOneToManyUniEmbeddableElementCollection ***
+Hibernate: 
+    select
+        count(todo0_.id) as col_0_0_ 
+    from
+        RELATIONEX_TODO todo0_ limit ?
+ -create new TODO list with first entry
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_TODOLIST
+        (id) 
+    values
+        (null)
+Hibernate: 
+    insert 
+    into
+        RELATIONEX_TODO
+        (id, title) 
+    values
+        (null, ?)
+Hibernate: 
+    update
+        RELATIONEX_TODO 
+    set
+        todos_id=? 
+    where
+        id=?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to the unit test to verify a child instance was created.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("verifying we have new child entity");
+        assertEquals("new child not found", startCount +1,
+            em.createQuery("select count(t) from Todo t", Number.class).getSingleResult().intValue());      
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice we get the expected additional
+                    child entity in the table.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniOrphanRemoval
+...
+ -verifying we have new child entity
+Hibernate: 
+    select
+        count(todo0_.id) as col_0_0_ 
+    from
+        RELATIONEX_TODO todo0_ limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Add the following lines to your test method. This will remove the child entity 
+                    from the parent collection and test whether it was subjected to an orphan removal.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("removing child from list");
+        list.getTodos().clear();
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount,
+                em.createQuery("select count(t) from Todo t", Number.class).getSingleResult().intValue());
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice how the test currently fails.
+                    This is because we never enabled orphanRemoval on the relationship.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniOrphanRemoval
+...
+ -removing child from list
+Hibernate: 
+    update
+        RELATIONEX_TODO 
+    set
+        todos_id=null 
+    where
+        todos_id=?
+Hibernate: 
+    select
+        count(todo0_.id) as col_0_0_ 
+    from
+        RELATIONEX_TODO todo0_ limit ?
+...
+Failed tests:   testOneToManyUniOrphanRemoval(myorg.relex.One2ManyTest): orphaned child not deleted expected:<0> but was:<1>
+...
+[INFO] BUILD FAILURE
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Enable orphanRemoval on the relationship on the parent side.</para>
+<programlisting language="java"><![CDATA[
+    @OneToMany(cascade={CascadeType.PERSIST}
+            ,orphanRemoval=true 
+        )
+    @JoinColumn
+    private List<Todo> todos;
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Rebuild the module and re-run the test method. Notice how the child entity is 
+                    removed shortly after it was removed from the parent collection.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyTest#testOneToManyUniOrphanRemoval
+...
+-removing child from list
+Hibernate: 
+    update
+        RELATIONEX_TODO 
+    set
+        todos_id=null 
+    where
+        todos_id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_TODO 
+    where
+        id=?
+Hibernate: 
+    select
+        count(todo0_.id) as col_0_0_ 
+    from
+        RELATIONEX_TODO todo0_ limit ?
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                </listitem>
+
+            </orderedlist>
+            <para>You have finished taking a look at orphanRemoval within the context of a one-to-many,
+                uni-directional relationship. With this capability, entities removed from a parent collection
+                are automatically deleted from the database.</para>
+        </section>    
+    </section>    
+
+
     <section id="jpa-relationex-o2m-summary">
        <title>Summary</title>
        <para>In this chapter we you worked with several types of one-to-many, uni-directional relationships.
