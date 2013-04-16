@@ -29,8 +29,8 @@
       <!--
           <li>2013-xx-xx: Posted Async TODOs</li>
           <li>2013-xx-xx: Posted JMS materials</li>
-          <li>2013-xx-xx: Posted Security Updates</li>
           -->
+          <li>2013-04-16: Posted Security TODOs</li>
           <li>2013-04-10: Posted Web Tier TODOs</li>
           <li>2013-04-03: Posted Transaction TODOs</li>
           <li>2013-03-25: Posted EJB/Server-side Materials</li>
@@ -98,11 +98,27 @@
           </li>
       </ul></li>
 
-      <li><ul> <!- week 11: Security ->
-            <li>Project
+      -->
+      <li><ul> <!-- week 11: Security -->
+            <li>Web/Project
                 <ul>
+                  <li>Add a WAR project to eSales. Add in the controller,
+                      handler, and supporting JSP implementations.</li>
+                  <li>Add a WAR project to eBidbot and deploy your eBidbot
+                      EJBs within that WAR - either embedded or included from a 
+                      separate module. See the webejb example</li>
+                  <li>Add in the controller, handler, and supporting
+                      JSP implementations for eBidbot.  This WAR may obtain
+                      functionality implemented by eSalesEJB. However, it should not
+                      directly communicate with eSalesEJB. eBidbotEJB should act as a
+                      facade for all behavior performed on behalf of eBidbotWAR</li>
                   <li>Complete your project 2, finish testing, and turn in.</li>
                   <li>Start project 3</li>
+                </ul>
+            </li>
+            <li>Exercises
+                <ul>
+                  <li>Complete through Part I</li>
                 </ul>
             </li>
           <li>EJB
@@ -110,12 +126,6 @@
                   <li>Assign EJB to security-domain "other".
                   The RMI Tests should fail access at this point.</li>
                   <li>Specify required roles to access each EJB method</li>
-              </ul>
-          </li>
-          <li>Application Server
-              <ul>
-                  <li>Make sure your application server has the necessary users and 
-                  roles. (This was made available in the class example repository in week 01)</li>
               </ul>
           </li>
           <li>Integration Tests
@@ -143,14 +153,12 @@
                   means is to obtain through the EJB or WARs security context.</li>
               </ul>
           </li>
-            <li>Exercises
-                <ul>
-                  <li>Complete through Part I</li>
-                </ul>
-            </li>
       </ul></li>
+      </ul>
+      </subsection>
 
-      -->
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
       <li><ul> <!-- week 10: Web -->
             <li>Transactions/Project
                 <ul>
@@ -178,27 +186,7 @@
                       for eBidbot. eSales should use RMI.</li>
                 </ul>
             </li>
-            <li>Web/Project
-                <ul>
-                  <li>Add a WAR project to eSales. Add in the controller,
-                      handler, and supporting JSP implementations.</li>
-                  <li>Add a WAR project to eBidbot and deploy your eBidbot
-                      EJBs within that WAR - either embedded or included from a 
-                      separate module. See the webejb example</li>
-                  <li>Add in the controller, handler, and supporting
-                      JSP implementations for eBidbot.  This WAR may obtain
-                      functionality implemented by eSalesEJB. However, it should not
-                      directly communicate with eSalesEJB. eBidbotEJB should act as a
-                      facade for all behavior performed on behalf of eBidbotWAR</li>
-                </ul>
-            </li>
       </ul></li>
-
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
       <li><ul> <!-- week 08: JNDI and CDI -->
             <li>Exercises
                 <ul>
