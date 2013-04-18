@@ -3,6 +3,7 @@ package myorg.relex;
 import static org.junit.Assert.*;
 
 
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -177,4 +178,6 @@ public class One2ManyTest extends JPATestBase {
     	assertEquals("orphaned child not deleted", startCount,
         		em.createQuery("select count(t) from Todo t", Number.class).getSingleResult().intValue());
     }
+    
+    
 }
