@@ -131,7 +131,6 @@ public class One2ManyBiTest extends JPATestBase {
     	log.debug("checking parent");
     	assertEquals("unexpected number of children", 2, item2.getPurchase().getItems().size());
     	
-    	/*
     	log.debug("orphaning one of the children");
     	int startCount = em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue();
     	Purchase purchase3 = item2.getPurchase();
@@ -145,6 +144,5 @@ public class One2ManyBiTest extends JPATestBase {
     	em.flush();
     	assertEquals("orphaned child not deleted", startCount-2,
     			em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue());
-    	*/
     }
 }

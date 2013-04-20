@@ -16,8 +16,8 @@ public class Purchase {
 	
 	@OneToMany(
 			mappedBy="purchase", 
-			cascade={CascadeType.PERSIST, CascadeType.DETACH}
-//			orphanRemoval=true
+			cascade={CascadeType.PERSIST, CascadeType.DETACH},
+			orphanRemoval=true
 		)
 	private List<SaleItem> items;
 	

@@ -774,7 +774,7 @@ Hibernate:
         <orderedlist>
 
             <listitem><para>Put the following class in your src/main tree. This entity class provides an
-                example of the one/inverse side of a one-0to-many, bi-directional relationship mapped using 
+                example of the one/inverse side of a one-to-many, bi-directional relationship mapped using 
                 a join-table. Or at least it will be. The current version below has a few errors we need to 
                 correct.</para>
  <programlisting language="java"><![CDATA[
@@ -987,7 +987,7 @@ public class SaleItem {
             </listitem>
 
             <listitem><para>Regenerate schema for the entity classes and their relationship. Notice by the error 
-                produces that the link table name must be provided when defined form the child/many side. There
+                produced that the link table name must be provided when defined from the child/many side. There
                 is no default for this case.</para>
 <programlisting language=""><![CDATA[
 $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.ddl
@@ -1104,7 +1104,7 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
             </listitem>
 
             <listitem><para>Add the following test method to your existing JUnit test case. This method will
-                create instances of the parent and child entities and relates them.</para>
+                create instances of the parent and child entities and relate them.</para>
 <programlisting language="java"><![CDATA[
     @Test
     public void testOneToManyBiJoinTable() {
@@ -1164,7 +1164,7 @@ Hibernate:
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para>Rebuild the module and re-run the test method. Notive the initial find() 
+            <listitem><para>Rebuild the module and re-run the test method. Notice the initial find() 
                simply does a LAZY load on the parent table. Once the test method accesses the child
                collection -- the related child entities are loaded along with the join-table and the 
                parent table. The join table is queried to locate the parent table and the parent table
@@ -1367,7 +1367,8 @@ Hibernate:
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
+            <listitem><para>Add the following lines to the test method. This will obtain a access to the 
+                object graph based on a reference from the child.</para>
 <programlisting language="java"><![CDATA[
         log.debug("getting new instances from child side");
         em.detach(purchase2);
@@ -1380,54 +1381,295 @@ Hibernate:
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the find() is implementing
+                an EAGER fetch of the relation and parent in addition the the state of the child.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -getting new instances from child side
+Hibernate: 
+    select
+        saleitem0_.id as id39_1_,
+        saleitem0_.name as name39_1_,
+        saleitem0_.price as price39_1_,
+        saleitem0_1_.PURCHASE_ID as PURCHASE1_40_1_,
+        purchase1_.id as id38_0_,
+        purchase1_.date as date38_0_ 
+    from                                 <!==== query for child
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join                      <!==== EAGER fetch of relation
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID 
+    inner join                           <!==== EAGER fetch of parent
+        RELATIONEX_PURCHASE purchase1_ 
+            on saleitem0_1_.PURCHASE_ID=purchase1_.id 
+    where
+        saleitem0_.id=?
+]]></programlisting>   
+                <para>However -- even though the first child, relation, and parent of that child was
+                    eagerly fetched, the remaing children for the parent must be fetched once we inspect
+                    the state of the parent.</para>                     
+<programlisting language=""><![CDATA[
+ -checking child
+ -checking parent
+Hibernate: 
+    select
+        items0_.PURCHASE_ID as PURCHASE1_38_2_,
+        items0_.SALEITEM_ID as SALEITEM2_2_,
+        saleitem1_.id as id39_0_,
+        saleitem1_.name as name39_0_,
+        saleitem1_.price as price39_0_,
+        saleitem1_1_.PURCHASE_ID as PURCHASE1_40_0_,
+        purchase2_.id as id38_1_,
+        purchase2_.date as date38_1_ 
+    from
+        RELATIONEX_SALEITEM_PURCHASE items0_ 
+    inner join
+        RELATIONEX_SALEITEM saleitem1_ 
+            on items0_.SALEITEM_ID=saleitem1_.id 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem1_1_ 
+            on saleitem1_.id=saleitem1_1_.SALEITEM_ID 
+    inner join
+        RELATIONEX_PURCHASE purchase2_ 
+            on saleitem1_1_.PURCHASE_ID=purchase2_.id 
+    where
+        items0_.PURCHASE_ID=?
+...
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
+            <listitem><para>Change the mapping from EAGER to LAZY from the child.</para>
+<programlisting language="java"><![CDATA[
+public class SaleItem {
+...
+    @ManyToOne(optional=false, fetch=FetchType.LAZY)
+    @JoinTable(
+        name="RELATIONEX_SALEITEM_PURCHASE", 
+        joinColumns=@JoinColumn(name="SALEITEM_ID"),
+        inverseJoinColumns=@JoinColumn(name="PURCHASE_ID")
+    )
+    private Purchase purchase;
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
+            <listitem><para>Rebuild the module and re-run the test method. Notice in this case
+                the parent is not part of the initial query caused by the find().</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -getting new instances from child side
+Hibernate: 
+    select
+        saleitem0_.id as id39_0_,
+        saleitem0_.name as name39_0_,
+        saleitem0_.price as price39_0_,
+        saleitem0_1_.PURCHASE_ID as PURCHASE1_40_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID 
+    where
+        saleitem0_.id=?
+ ]]></programlisting>  
+                <para>But notice how the LAZY fatch from the child seemed to change the 
+                    behavior of the parent. It did an initial LAZY fetch and then followed
+                    up with a query for state for the children.</para>                      
+<programlisting language=""><![CDATA[
+ -checking child
+ -checking parent
+Hibernate: 
+    select
+        purchase0_.id as id38_0_,
+        purchase0_.date as date38_0_ 
+    from
+        RELATIONEX_PURCHASE purchase0_ 
+    where
+        purchase0_.id=?
+Hibernate: 
+    select
+        items0_.PURCHASE_ID as PURCHASE1_38_1_,
+        items0_.SALEITEM_ID as SALEITEM2_1_,
+        saleitem1_.id as id39_0_,
+        saleitem1_.name as name39_0_,
+        saleitem1_.price as price39_0_,
+        saleitem1_1_.PURCHASE_ID as PURCHASE1_40_0_ 
+    from
+        RELATIONEX_SALEITEM_PURCHASE items0_ 
+    inner join
+        RELATIONEX_SALEITEM saleitem1_ 
+            on items0_.SALEITEM_ID=saleitem1_.id 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem1_1_ 
+            on saleitem1_.id=saleitem1_1_.SALEITEM_ID 
+    where
+        items0_.PURCHASE_ID=?
+...
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
+            <listitem><para>Add the following lines to your test method. This will provide a test of orphan 
+                processing where we look the container to delete the child when the child is no longer referenced by the 
+                parent.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("orphaning one of the children");
+        int startCount = em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue();
+        Purchase purchase3 = item2.getPurchase();
+        purchase3.getItems().remove(item2);
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount-1,
+                em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue());
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
+            <listitem><para>Rebuild the module and re-run the test method. Notice that only the count(*) selects
+                show up in the SQL when the commands execute and the test fails because the orphaned child is not 
+                removed. There is a reason for this -- and we will fix.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -orphaning one of the children
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+...
+Failed tests:   testOneToManyBiJoinTable(myorg.relex.One2ManyBiTest): orphaned child not deleted expected:<1> but was:<2>
+...
+[INFO] BUILD FAILURE
+]]></programlisting>   
+                <para>Hold on here!?!? We admit that we didn't tell the provider to remove the orphan 
+                    child, but didn't the code remove the relationship? NO! it did not. The child was removed
+                    from the parent collection, but that is the inverse side. With the way we currently have it
+                    mapped the relationship can only be removed by actions on the child and the only way to 
+                    do that with a required (optional=false) parent is to manually remove the child or set
+                    orphanRemoval as we will do next.</para>                     
+            </listitem>
+
+            <listitem><para>Fix the mapping by enabling orphanRemoval from the parent to the child.</para>
+<programlisting language="java"><![CDATA[
+public class Purchase {
+...
+    @OneToMany(
+            mappedBy="purchase", 
+            cascade={CascadeType.PERSIST, CascadeType.DETACH},
+            orphanRemoval=true)
+    private List<SaleItem> items;
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the child is now removed 
+                from the database when it is removed from the parent (and the transaction is commited/flushed).
+                Notice also the row out of the relationship table is removed as well when the child is removed.</para>
 <programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -orphaning one of the children
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SALEITEM_PURCHASE 
+    where
+        SALEITEM_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SALEITEM 
+    where
+        id=?
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+...
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
+            <listitem><para>Add the following lines to the test method. These will remove the parent and test 
+                to see if removing the parent also removed the remaining child.</para>
+<programlisting language="java"><![CDATA[
+        log.debug("deleting parent");
+        em.remove(purchase3);
+        em.flush();
+        assertEquals("orphaned child not deleted", startCount-2,
+                em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue());
 ]]></programlisting>                        
             </listitem>
 
-            <listitem><para></para>
+            <listitem><para>Rebuild the module and re-run the test method. Notice how the child and the relation
+                were deleted even though there was not a cascade=DELETE on the parent to child relationship.
+                That is because cascade=DELETE is not necessary with orphanDelete. They serve the same purpose
+                when the parent is being deleted.</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </listitem>
-
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.One2ManyBiTest#testOneToManyBiJoinTable
+...
+ -deleting parent
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SALEITEM_PURCHASE 
+    where
+        SALEITEM_ID=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_SALEITEM 
+    where
+        id=?
+Hibernate: 
+    delete 
+    from
+        RELATIONEX_PURCHASE 
+    where
+        id=?
+Hibernate: 
+    select
+        count(saleitem0_.id) as col_0_0_ 
+    from
+        RELATIONEX_SALEITEM saleitem0_ 
+    left outer join
+        RELATIONEX_SALEITEM_PURCHASE saleitem0_1_ 
+            on saleitem0_.id=saleitem0_1_.SALEITEM_ID limit ?
+...
+[INFO] BUILD SUCCESS
 ]]></programlisting>                        
             </listitem>
         </orderedlist>
+        <para>You have finished looking at one-to-many/many-to-one, bi-directional relationships mapped
+            using a join table. This was functionally no different at the Java class level than the 
+            foreign key case and very similar to the one-to-many, uni-directional join table case.
+            However, this mapping leveraged a relationship from the child that formed the mapping
+            to the database and could be used to easily access the parent.</para>
     </section>
   
-
 
     <section id="jpa-relationex-o2m-bi-composite">
         <title>One-to-Many Bi-directional using Derived Composite Primary</title>

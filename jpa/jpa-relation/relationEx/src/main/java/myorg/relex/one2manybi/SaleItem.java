@@ -14,7 +14,7 @@ public class SaleItem {
 	@Id @GeneratedValue
 	private int id;
 	
-	@ManyToOne(optional=false, fetch=FetchType.EAGER)
+	@ManyToOne(optional=false, fetch=FetchType.LAZY)
 	@JoinTable(
 		name="RELATIONEX_SALEITEM_PURCHASE", 
 		joinColumns=@JoinColumn(name="SALEITEM_ID"),
