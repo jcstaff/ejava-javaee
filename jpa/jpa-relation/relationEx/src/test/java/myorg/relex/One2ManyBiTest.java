@@ -3,14 +3,19 @@ package myorg.relex;
 import static org.junit.Assert.*;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 
 import javax.persistence.*;
 
 import myorg.relex.one2manybi.Borrower;
+import myorg.relex.one2manybi.Car;
 import myorg.relex.one2manybi.Loan;
 import myorg.relex.one2manybi.Purchase;
 import myorg.relex.one2manybi.SaleItem;
+import myorg.relex.one2manybi.Tire;
+import myorg.relex.one2manybi.TirePK;
+import myorg.relex.one2manybi.TirePosition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -111,7 +116,7 @@ public class One2ManyBiTest extends JPATestBase {
     	assertTrue("unexpected date", purchase.getDate().equals(purchase2.getDate()));
     	log.debug("checking child");
     	assertEquals("unexpected number of children", 1, purchase2.getItems().size());
-    	assertEquals("", item.getPrice(), purchase2.getItems().get(0).getPrice(),.01);
+    	assertEquals("unepxtected child state", item.getPrice(), purchase2.getItems().get(0).getPrice(),.01);
     	log.debug("verify got new instances");
     	assertFalse("same parent instance returned", purchase == purchase2);
     	assertFalse("same child instance returned", item == purchase2.getItems().get(0));
@@ -144,5 +149,71 @@ public class One2ManyBiTest extends JPATestBase {
     	em.flush();
     	assertEquals("orphaned child not deleted", startCount-2,
     			em.createQuery("select count(s) from SaleItem s", Number.class).getSingleResult().intValue());
+    }
+    
+    /**
+     * This method provides an example of a one-to-many/many-to-one, bi-directional 
+     * relationship related through a compond primary key where a portion of the 
+     * child primary key is derived from the parent primary key value.
+     */
+    @Test
+    public void testOneToManyBiDerivedClass() {
+    	log.info("*** testOneToManyBiDerivedClass ***");
+    	
+    	log.debug("persisting parent");
+    	Car car = new Car();
+    	car.setModel("DeLorean");
+    	car.setYear(new GregorianCalendar(1983, 0, 0).getTime());
+    	em.persist(car);
+    	em.flush();
+    	
+    	log.debug("persisting child");
+    	Tire tire = new Tire(car, TirePosition.RIGHT_FRONT);
+    	tire.setMiles(2000);
+    	car.getTires().add(tire);
+    	em.persist(car); //cascade.PERSIST
+    	em.flush();
+    	
+    	log.debug("getting new instances");
+    	em.detach(car);
+    	Car car2 = em.find(Car.class, car.getId());
+    	assertNotNull("parent not found", car2);
+    	log.debug("checking parent");
+    	assertTrue("unexpected date", car.getYear().equals(car2.getYear()));
+    	log.debug("checking child");
+    	assertEquals("unexpected number of children", 1, car2.getTires().size());
+    	assertEquals("unexpected child state", tire.getMiles(), car2.getTires().iterator().next().getMiles());
+    	log.debug("verify got new instances");
+    	assertFalse("same parent instance returned", car == car2);
+    	assertFalse("same child instance returned", tire == car2.getTires().iterator().next());
+
+    	log.debug("adding new child");
+    	Tire tireB = new Tire(car2, TirePosition.LEFT_FRONT);
+    	car2.getTires().add(tireB);
+    	em.persist(car2);
+    	em.flush();
+
+    	log.debug("getting new instances from child side");
+    	em.detach(car2);
+    	Tire tire2 = em.find(Tire.class, new TirePK(car.getId(), tire.getPosition()));
+    	log.debug("checking child");
+    	assertNotNull("child not found", tire2);
+    	assertNotNull("parent not found", tire2.getCar());
+    	log.debug("checking parent");
+    	assertEquals("unexpected number of children", 2, tire2.getCar().getTires().size());
+    	
+    	log.debug("orphaning one of the children");
+    	int startCount = em.createQuery("select count(t) from Tire t", Number.class).getSingleResult().intValue();
+    	Car car3 = tire2.getCar();
+    	car3.getTires().remove(tire2);
+    	em.flush();
+    	assertEquals("orphaned child not deleted", startCount-1,
+    			em.createQuery("select count(t) from Tire t", Number.class).getSingleResult().intValue());
+    	
+    	log.debug("deleting parent");
+    	em.remove(car3);
+    	em.flush();
+    	assertEquals("orphaned child not deleted", startCount-2,
+    			em.createQuery("select count(t) from Tire t", Number.class).getSingleResult().intValue());
     }
 }
