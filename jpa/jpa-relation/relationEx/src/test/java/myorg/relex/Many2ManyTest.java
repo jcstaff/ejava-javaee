@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 import myorg.relex.many2many.Group;
 import myorg.relex.many2many.Individual;
+import myorg.relex.many2many.Node;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,5 +90,121 @@ public class Many2ManyTest extends JPATestBase {
     	log.debug("removing initial owner");
     	em.remove(em.find(Group.class, group.getId()));
     	em.flush();
+    }
+    
+    /**
+     * This test provides an example of a many-to-many, bi-directional relationship that just happens
+     * to use a single, recursive entity on both sides of the relationsip.
+     */
+    @Test
+    public void testManyToManyBi() {
+    	log.info("*** testManyToManyBi ***");
+    	
+    	log.debug("create instances");
+    	Node one = new Node("one");
+    	Node two = new Node(one,"two");
+    	em.persist(one);
+    	em.flush();
+    	
+    	log.debug("getting new instances from owning side");
+    	em.clear();
+    	Node one2 = em.find(Node.class, one.getId());
+    	assertNotNull("owning side not found", one2);
+    	log.debug("checking owning side");
+    	assertEquals("unexpected owning.name", one.getName(), one2.getName());
+    	log.debug("checking parents");
+    	assertEquals("unexpected parents.size", 0, one2.getParents().size());
+    	log.debug("checking children");
+    	assertEquals("unexpected children.size", 1, one2.getChildren().size());
+    	assertEquals("unexpected child.name", two.getName(), one2.getChildren().iterator().next().getName());
+    	
+    	log.debug("adding more inverse instances");
+    	Node twoB = new Node(one2, "twoB");
+    	Node twoC = new Node(one2, "twoC");
+    	em.persist(one2);
+    	em.flush();
+    	
+    	log.debug("getting new instances from inverse side");
+    	em.clear();
+    	Node two2 = em.find(Node.class, two.getId());
+    	assertNotNull("inverse node not found", two2);
+    	log.debug("checking inverse side");
+    	assertEquals("unexpected name", two.getName(), two2.getName());
+    	log.debug("checking parents");
+    	assertEquals("unexpected parents.size", 1, two2.getParents().size());
+    	log.debug("checking children");
+    	assertEquals("unexpected children.size", 0, two2.getChildren().size());
+    	
+    	log.debug("adding owning entity");
+    	Node oneB = new Node("oneB");
+    	oneB.getChildren().add(two2);
+    	two2.getParents().add(oneB);
+    	em.persist(oneB);
+    	em.flush();
+    	
+    	log.debug("checking relationships");
+    	assertEquals("unexpected parents", 0,
+    			em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+		    		.setParameter("node", one)
+		    		.getSingleResult().intValue());
+    	assertEquals("unexpected parents", 2,
+    			em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+		    		.setParameter("node", two)
+		    		.getSingleResult().intValue());
+    	assertEquals("unexpected parents", 1,
+    			em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+		    		.setParameter("node", twoB)
+		    		.getSingleResult().intValue());
+    	assertEquals("unexpected parents", 1,
+    			em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+		    		.setParameter("node", twoC)
+		    		.getSingleResult().intValue());    	
+    	assertEquals("unexpected children", 3,
+    			em.createQuery("select count(c) from Node n, IN (n.children) c where n=:node", Number.class)
+		    		.setParameter("node", one)
+		    		.getSingleResult().intValue());
+    	assertEquals("unexpected children", 0,
+    			em.createQuery("select count(c) from Node n, IN (n.children) c where n=:node", Number.class)
+		    		.setParameter("node", two)
+		    		.getSingleResult().intValue());    	
+    	assertEquals("unexpected children", 1,
+    			em.createQuery("select count(c) from Node n, IN (n.children) c where n=:node", Number.class)
+		    		.setParameter("node", oneB)
+		    		.getSingleResult().intValue());
+    	
+    	log.debug("getting managed owning side");
+    	assertNotNull(one = em.find(Node.class, one.getId()));
+    	log.debug("removing relationship");
+    	one.getChildren().remove(two);
+    	two.getParents().remove(one);
+    	em.flush();
+    	assertEquals("unexpected children", 2,
+    			em.createQuery("select count(c) from Node n, IN (n.children) c where n=:node", Number.class)
+		    		.setParameter("node", one)
+		    		.getSingleResult().intValue());
+    	assertEquals("unexpected parents", 1,
+    			em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+		    		.setParameter("node", two)
+		    		.getSingleResult().intValue());
+    	
+    	log.debug("deleting owner");
+    	em.remove(oneB);
+    	em.flush();
+    	assertEquals("unexpected parents", 0,
+    			em.createQuery("select count(p) from Node n, IN (n.parents) p where n=:node", Number.class)
+		    		.setParameter("node", two)
+		    		.getSingleResult().intValue());
+
+    	log.debug("deleting inverse");
+    	assertNotNull(twoB = em.find(Node.class, twoB.getId()));
+    	em.remove(twoB);
+    	em.flush();
+//    	assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
+    	one.getChildren().remove(twoB);
+    	em.flush();
+//    	assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
+    	em.remove(twoB);
+    	em.flush();
+    	assertNull("inverse not deleted", em.find(Node.class, twoB.getId()));
     }
 }
