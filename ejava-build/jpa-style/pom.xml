@@ -1,0 +1,114 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.build</groupId>
+        <artifactId>ejava-build</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jpa-style</artifactId>
+    <packaging>jar</packaging>
+
+    <name>JPA Style</name>
+    <description>
+        Support project supplying documentation resources to downstream projects.
+    </description>
+
+    <properties>
+        <style.resource>jpa-common.xsl</style.resource>
+        <jbossorg-docbook-xslt.version>1.1.1</jbossorg-docbook-xslt.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jbossorg-docbook-xslt</artifactId>
+            <version>${jbossorg-docbook-xslt.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.docbook</groupId>
+            <artifactId>docbook</artifactId>
+            <version>1.72.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.docs</groupId>
+            <artifactId>highlight</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>          
+                                <resource>
+                                    <directory>src/site/resources</directory>
+                                </resource>
+                            </resources>              
+                            <outputDirectory>${basedir}/target/classes/ejava/docs</outputDirectory>
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jboss</groupId>
+                                    <artifactId>jbossorg-docbook-xslt</artifactId>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <target>
+                            <move todir="${basedir}/target/classes/ejava/docs/xslt" flatten="true">
+                                <fileset dir="${basedir}/target/dependency/xslt/org/jboss">
+                                    <exclude name="xhtml-common.xsl" />
+                                </fileset>
+                            </move>
+                            <replace dir="${basedir}/target/classes/ejava/docs/xslt" token="xhtml-common.xsl" value="${style.resource}">
+                            </replace>
+                        </target>
+                    </configuration>
+                  </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>
