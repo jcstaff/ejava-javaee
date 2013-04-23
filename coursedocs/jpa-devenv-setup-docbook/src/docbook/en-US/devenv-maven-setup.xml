@@ -1,0 +1,182 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<chapter id="devenv-maven-setup">
+    <title>Maven Environment Setup</title>
+    <para></para>
+
+    <section id="devenv-maven-install">
+        <title>Maven Installation</title>
+        <para></para>
+        <orderedlist>
+            <listitem>
+                <para>
+                    Download Maven 3
+                    <ulink url="http://maven.apache.org/download.html">http://maven.apache.org/download.html</ulink>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Unzip the contents into a directory with no spaces in its path.
+                </para>
+                <programlisting><![CDATA[
+$ ls apache-maven-3.0.4/
+bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
+]]></programlisting>
+            </listitem>
+            <listitem>
+                <para>
+                    Add an environment variable for MAVEN_HOME and
+                    add MAVEN_HOME/bin to your PATH
+                </para>
+                <programlisting><![CDATA[
+//my linux system -- should be done in .bashrc
+export MAVEN_HOME=/opt/apache-maven-3.0.4
+export PATH=$MAVEN_HOME/bin:$PATH
+
+//my windows system -- should be done in Advanced System Settings->Environment Variables
+set MAVEN_HOME=/apps/apache-maven-3.0.4
+set PATH=%MAVEN_HOME%\bin;%PATH%
+]]></programlisting>
+            </listitem>
+            <listitem>
+                <para>Verify maven is installed and in the path</para>
+                <programlisting><![CDATA[
+//my fedora system
+$ mvn --version
+Apache Maven 3.0.4 (r1232337; 2012-01-17 03:44:56-0500)
+Maven home: /opt/apache-maven-3.0.4
+Java version: 1.7.0_09-icedtea, vendor: Oracle Corporation
+Java home: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.9.x86_64/jre
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "3.7.3-101.fc17.x86_64", arch: "amd64", family: "unix"                       
+
+//my windows xp system
+> mvn --version
+Apache Maven 3.0.4 (r1232337; 2012-01-17 03:44:56-0500)
+Maven home: C:\apps\apache-maven-3.0.4\bin\..
+Java version: 1.7.0_11, vendor: Oracle Corporation
+Java home: C:\apps\Java\jdk1.7.0_11\jre
+Default locale: en_US, platform encoding: Cp1252
+OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
+]]></programlisting>
+            </listitem>
+        </orderedlist>
+    </section>
+
+    <section id="devenv-maven-config">
+        <title>Maven Configuration</title>
+        <orderedlist>
+            <listitem>
+                <para>Add a skeletal settings.xml file that will be used
+                    to provide local overrides for the build. This is
+                    the place where you can customize the build for local
+                    environment specifics like directory locations, server
+                    address, server ports, etc.
+                </para>
+                <orderedlist>
+                    <listitem>
+                        <para>
+                            Add the following to the<code>.m2/settings.xml</code>
+                            file in your HOME directory.
+                        </para>
+                        <programlisting language="xml"><![CDATA[
+<?xml version="1.0"?>
+<settings xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <offline>false</offline>
+    
+    <profiles>
+    </profiles>
+    
+    <activeProfiles>
+    </activeProfiles>
+</settings>    
+]]></programlisting>
+                    </listitem>
+                    <listitem>
+                        <para>You can test whether your settings.xml
+                            file is seen by Maven by temporarily making
+                            it an invalid XML file and verifying that the
+                            next Maven build command fails with a parsing
+                            error.
+                        </para>
+                        <programlisting><![CDATA[
+$ mvn clean
+[ERROR] Error executing Maven.
+[ERROR] 1 problem was encountered while building the effective settings
+[FATAL] Non-parseable settings /home/user/.m2/settings.xml: only whitespace content allowed before start tag and not s (position: START_DOCUMENT seen <?xml version="1.0"?>\ns... @2:2)  @ /home/user/.m2/settings.xml, line 2, column 2
+]]></programlisting>
+                    </listitem>
+                    
+                    <listitem>
+                        <para>
+                            Add a default specification for the database
+                            profile we will be using for class at the bottom 
+                            of the <code>.m2/settings.xml</code> file in your
+                            HOME directory. 
+                        </para>
+                        <programlisting><![CDATA[
+    <activeProfiles>
+        <activeProfile>h2db</activeProfile>
+    </activeProfiles>
+]]></programlisting>
+                    </listitem>
+                    
+                    <listitem>
+                        <para>
+                            If your operating system HOME directory has spaces
+                            in the path (e.g., Windows XP's Documents and Settings)
+                            then add a <code>localRepository</code> path specification
+                            to the <code>.m2/settings.xml</code> file and have
+                            it point to a location that does not have spaces in 
+                            the path. The path does not have to exist. It will 
+                            be created during the next build. 
+                        </para>
+                        <programlisting><![CDATA[
+    <offline>false</offline>
+    <!-- this overrides the default $HOME/.m2/repository location. --> 
+    <localRepository>c:/jhu/repository</localRepository>
+]]></programlisting>
+                    </listitem>
+
+                </orderedlist>
+            </listitem>
+        </orderedlist>
+    </section>
+    
+    <section id="devenv-maven-test">
+        <title>Test Maven Build</title>
+        <para>
+            Each week you will be asked to update your cloned copy of the 
+            class examples and perform a test build. This will give both 
+            of us some comfort that your environment is setup correctly
+            and act as a baseline for debugging your class assignments.
+            Therefore, do the following to test your initial installation and
+            repeat each week.
+        </para>
+        <orderedlist>
+            <listitem>
+                <para>
+                    Change your current directory to the root of the cloned 
+                    repository and make sure you have a current copy. 
+                </para>
+                    <programlisting><![CDATA[
+$ ls 
+pom.xml ejava-build ejava-common ...
+$ git pull
+Already up-to-date.
+]]></programlisting>
+             </listitem>
+             <listitem><para>Test your configuration using </para>
+                <programlisting><![CDATA[
+$ mvn clean install
+[INFO] Scanning for projects...
+...
+]]></programlisting>                        
+             </listitem>
+         </orderedlist>
+    </section>
+</chapter>

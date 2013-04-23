@@ -21,11 +21,13 @@
     <modules>
         <module>ejava-build</module>
         <module>ejava-common</module>
+        <!--
         <module>solutions</module>
         <module>servers</module>
         <module>projects</module>
         <module>javase5Enhancements</module>
         <module>blPurchase</module>
+        -->
         <module>jdbcDAO</module>
         <module>jpa</module>
         <module>ormCore</module>
@@ -33,12 +35,14 @@
         <module>ormEJBQL</module>
         <module>ormInheritance</module>
         <module>ormListeners</module>
+        <!--
         <module>ejbsessionBank</module>
         <module>jndiDemo</module>
         <module>txReservation</module>
         <module>webtier</module>
         <module>webejb</module>
         <module>securePing</module>
+        -->
         <!-- These will be posted over the course of the semester
         <module>jmsCore</module>
         <module>asyncEJB</module>
@@ -253,6 +257,47 @@
                     <name>ejava JHU snapshot repository</name>
                     <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2-snapshot</url>
                     <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>jpa-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>ejava-jpa.website</id>
+                    <name>ejava-jpa website</name>
+                    <url>scpexe://ejava.info/var/www/ejava.info/html/sites/ejava-jpa</url>
+                </site>
+                <repository>
+                    <id>ejava-jpa.release</id>
+                    <name>ejava-jpa release</name>
+                    <url>https://ejava.info/nexus/content/repositories/ejava-release</url>
+                </repository>
+                <snapshotRepository>
+                    <id>ejava-jpa.snapshot</id>
+                    <name>ejava-jpa snapshot</name>
+                    <url>https://ejava.info/nexus/content/repositories/ejava-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>jpatest-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>test-website</id>
+                    <name>ejava-jpa test-deploy website</name>
+                    <url>scpexe://ejava.info/var/www/ejava.info/html/sites/test-deploy/ejava-jpa</url>
+                </site>
+                <repository>
+                    <id>test-release</id>
+                    <name>ejava-jpa test-deploy release</name>
+                    <url>https://ejava.info/nexus/content/repositories/test-release</url>
+                </repository>
+                <snapshotRepository>
+                    <id>test-snapshot</id>
+                    <name>ejava-jpa test-deploy snapshot</name>
+                    <url>https://ejava.info/nexus/content/repositories/test-snapshot</url>
                 </snapshotRepository>
             </distributionManagement>
         </profile>
