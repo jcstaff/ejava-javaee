@@ -1,0 +1,113 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="devenv-jdk-setup">
+    <title>Java JDK Setup</title>
+    <para>
+        You will need a copy of the Java 7 SDK installed. JavaEE 6 only 
+        requires JDK 6 but but JDK 6 will soon hit its end-of-life. 
+    </para>
+    <note>
+        <title>Java 6 source environment/Java 7 target environment</title>
+        <para>
+            The build environment configured for class will require 
+            source code to be Java 6-compliant while targeting a 
+            Java 7 runtime. This should give us a decent fallback option
+            between the two versions during this transition period
+            by supporting products.
+        </para>
+    </note>
+    <note>
+        <title>Keep 32/64-bit choices consistent</title>
+        <para>
+            Keep the 32/64-bit choice consistent with what
+            you download later for Eclipse.
+        </para>
+    </note>
+
+    <section id="devenv-jdk-install">
+        <title>Download and Install JDK</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Linux Users: The alternate JDKs (e.g., OpenJDK)
+                    available from your package manager will work fine for
+                    class.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Windows Users: Install the Java 7 JDK from Sun/Oracle
+                </para>
+                <orderedlist>
+                    <listitem>
+                        <para>
+                            Download a copy of the Java 7 JDK
+                            <ulink
+    url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html
+                            </ulink>.
+                            Choose Java SE 7 Update (latest) JDK. We will only be using the
+                            JDK portion in class so avoid the alternate downloads that add in the
+                            Glassfish JavaEE Application Server and NetBeans. We will be
+                            using JBoss and Eclipse.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Install the JDK and associated JRE in a
+                            directory that does not have spaces in its path.
+                        </para>
+                        <note>
+                            <title>Windows/Oracle JDK Users: stay awake here!!!</title>
+                            <para>
+                                The Oracle Windows JDK installer will attempt to place
+                                the JDK and JRE in a directory with spaces. Be sure to
+                                interrupt the installer defaults when it prompts you for 
+                                installation directory.    
+                            </para>
+                        </note>
+                    </listitem>
+                    <listitem>
+                        <para>Define an environment variable JAVA_HOME to reference the JDK</para>
+                    </listitem>
+                    <listitem>
+                        <para>Add JAVA_HOME/bin to your PATH if necessary</para>
+                    </listitem>
+                </orderedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="devenv-jdk-verify">
+    <title>Verify your JDK is installed</title>
+    <itemizedlist>
+        <listitem><para>Depending on how you performed the installation, you may need to a</para></listitem>
+        <listitem><para>ex. Fedora</para>
+ <programlisting language=""><![CDATA[
+$ java -version                                                  
+java version "1.7.0_09-icedtea"                                                                                
+OpenJDK Runtime Environment (fedora-2.3.4.fc17-x86_64)                                                         
+OpenJDK 64-Bit Server VM (build 23.2-b09, mixed mode) 
+
+$ javac -version
+javac 1.7.0_09
+]]></programlisting>
+        </listitem>        
+        <listitem><para>ex. Windows XP</para>
+ <programlisting language=""><![CDATA[
+>java -version
+java version "1.7.0_11"
+Java(TM) SE Runtime Environment (build 1.7.0_11-b21)
+Java HotSpot(TM) Client VM (build 23.6-b04, mixed mode, sharing)
+
+>javac -version
+javac 1.7.0_11
+]]></programlisting>
+        </listitem>        
+    </itemizedlist>
+    
+    <programlisting><![CDATA[
+]]></programlisting>
+    </section>    
+</chapter>
+  

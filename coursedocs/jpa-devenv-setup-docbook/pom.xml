@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.coursedocs</groupId>
+        <artifactId>coursedocs</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jpa-devenv-setup-docbook</artifactId>
+    <packaging>pom</packaging>
+
+    <name>JPA Development Env Setup</name>
+    <description>
+        This project contains instructions for setting up a development
+        environment to operate within class. This dev env will be suitable
+        for executing the sample projects and developing class projects
+        to turn in for course work.
+    </description>
+    
+    <properties>
+       <doc.base>jpa-devenv-setup</doc.base>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

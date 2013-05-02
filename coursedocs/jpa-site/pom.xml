@@ -1,0 +1,136 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.coursedocs</groupId>
+        <artifactId>coursedocs</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jpa-site</artifactId>
+    <packaging>war</packaging>
+
+    <name>JPA Site</name>
+    <description>
+        This project does the some of heavy lifting required to get 
+        certain resources easily referenced by the root level site.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>ejava.coursedocs</groupId>
+            <artifactId>jpa-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ejava.coursedocs</groupId>
+            <artifactId>jpa-devenv-setup-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ejava.coursedocs</groupId>
+            <artifactId>devenv-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ejava.jpa</groupId>
+            <artifactId>entitymanager-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ejava.jpa</groupId>
+            <artifactId>jpa-entity-ex-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ejava.jpa</groupId>
+            <artifactId>jpa-relation-ex-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ejava.jpa.hibernate.migration</groupId>
+            <artifactId>hibernate-migration-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>pre-site</phase>
+                    <goals>
+                        <goal>war</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+              <overlays>
+                <overlay>
+                    <groupId>ejava.coursedocs</groupId>
+                    <artifactId>jpa-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.coursedocs</groupId>
+                    <artifactId>jpa-devenv-setup-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.coursedocs</groupId>
+                    <artifactId>devenv-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.jpa</groupId>
+                    <artifactId>entitymanager-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+
+                <overlay>
+                    <groupId>ejava.jpa</groupId>
+                    <artifactId>jpa-entity-ex-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+               <overlay>
+                    <groupId>ejava.jpa</groupId>
+                    <artifactId>jpa-relation-ex-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.jpa.hibernate.migration</groupId>
+                    <artifactId>hibernate-migration-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+                </overlay>
+              </overlays>
+            </configuration>
+          </plugin>
+        </plugins>
+    </build>
+</project>

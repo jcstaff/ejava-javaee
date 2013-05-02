@@ -1,0 +1,304 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<chapter id="devenv-mavenproxy-setup">
+    <title>(Optional!!!) Maven Proxy Setup</title>
+    <para>
+        As you should have noticed in the previous section, you can 
+        function just fine as a developer connected to the Internet as
+        long as the critical Internet resources are available when they 
+        are needed to populate your <code>localRepository</code> cache.
+        However, if you were part of a larger development team you would
+        not want each separate developer reaching out the Internet to 
+        locate a common dependency. There is both a speed and failure
+        issue at risk with that type of setup.
+    </para>
+    <para> 
+        The steps listed in this chapter are not necessary
+        for class because you work alone and you have a <code>localRepository</code>
+        cache. In fact -- I urge you not to follow them unless you feel
+        the strong desire to dig deeper in this enterprise development
+        setup. However, it does provide you with some experience in 
+        setting up and using a realistic production maven environment. 
+    </para>
+    <para>
+        Still here? Okay -- lets get started...
+    </para>
+    <para>
+        In the previous section we installed and setup Maven
+        in a stand-alone client mode. In that mode the individual 
+        environment communicated directly with the external Internet
+        organizations to obtain missing artifacts. In this section
+        we will add a proxy server between the developer and the
+        Internet so that one or more developers can share what has
+        already been downloaded and be completely isolated from 
+        network and remote outages. Ideally this proxy would be placed
+        on a shared server somewhere on your local Intranet with
+        access to the outside Internet. The instructions will act
+        as though you are installing it locally. It is your decision
+        whether to use it and where to install it. If you do not 
+        install and configure a proxy -- you will notice small delays
+        in your builds while your local maven client checks Internet 
+        sources for new artifacts and updates to existing artifacts.
+     </para>
+    <figure>
+        <title>Maven Proxied and Non-Proxied Configuration</title>
+        <graphic scalefit="1" fileref="images/devenv-mvnproxy.jpg"/>
+    </figure>        
+    
+
+    <section id="devenv-mavenproxy-nexus-setup">
+        <title>Nexus OSS Manual Setup</title>
+        <para>
+            This procedure will take you through a manual download
+            and setup of the Nexus OSS software and have you go thru
+            a manual setup of all items. Use this approach if you 
+            want a minor amount of experience in setting up the sever.
+        </para>
+        <orderedlist>
+            <listitem>
+                <para>
+                    Download the Nexus OSS Software from Sonatype
+                <ulink url="http://www.sonatype.org/nexus/go">http://www.sonatype.org/nexus/go</ulink>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Unzip the the compressed file to your filesystem.
+                    There will be two directories created; one for the software
+                    (<code>nexus-(version)</code>) and another for the repository
+                    caches (<code>sonatype-work</code>)
+                </para>
+        <programlisting><![CDATA[
+$ unzip ~/Downloads/nexus-2.0.3-bundle.zip 
+Archive:  /home/user/Downloads/nexus-2.0.3-bundle.zip
+   creating: nexus-2.0.3/
+   creating: nexus-2.0.3/nexus/
+  inflating: nexus-2.0.3/LICENSE.txt  
+...
+
+
+$ ls nexus-2.0.3/ sonatype-work/
+nexus-2.0.3/:
+bin  conf  lib  LICENSE.txt  logs  nexus  NOTICE.txt  tmp
+
+sonatype-work/:
+nexus  README.txt
+]]></programlisting>           
+            </listitem>
+            
+            <listitem>
+                <para>
+                    The server will listen on port 8081 on all interfaces 
+                    (0.0.0.0) by default. Modify
+                    <code>nexus-2.0.3/conf/nexus.properties</code> if 
+                    you want something different.</para>
+        <programlisting><![CDATA[
+$ more nexus-2.0.3/conf/nexus.properties                                                                                                                                       
+...
+# Jetty section
+application-port=8081
+application-host=0.0.0.0
+...
+]]></programlisting>                        
+            </listitem>        
+            <listitem>
+                <para>
+                    Locate the startup script in the NEXUS_HOME/bin directory.
+                </para>
+        <programlisting><![CDATA[
+$ ls nexus-2.0.3/bin/
+jsw  nexus  nexus.bat                 
+]]></programlisting>
+            <tip>
+                <para>
+                    Linux users might want to register this script
+                    in /etc/init.d. If you also configure it to automatically
+                    start at boot -- supply a value for <code>RUN_AS_USER</code>
+                    to keep the server from running as root.</para>
+            </tip>                        
+            </listitem>
+            <listitem>
+                <para>
+                    Use the script appropriate for your platform
+                    to start and perform other controls on the server.
+                </para>
+        <programlisting><![CDATA[
+$ nexus-2.0.3/bin/nexus
+Usage: nexus-2.0.3/bin/nexus { console | start | stop | restart | status | dump }
+
+$ nexus-2.0.3/bin/nexus start
+Starting Nexus OSS...
+Started Nexus OSS.
+]]></programlisting>
+            <note>
+                <para>
+                    The above command attempts to run Nexus as a service. 
+                    If you do not have the permission on your system to 
+                    register nexus as a service, you can optionally
+                    run it as an interactive command.
+        <programlisting><![CDATA[                    
+$ nexus-2.0.3/bin/nexus console
+/etc/init.d/nexus console
+Running Nexus OSS...
+wrapper  | --> Wrapper Started as Console
+wrapper  | Launching a JVM...
+jvm 1    | Wrapper (Version 3.2.3) http://wrapper.tanukisoftware.org
+jvm 1    |   Copyright 1999-2006 Tanuki Software, Inc.  All Rights Reserved.
+jvm 1    | 
+jvm 1    | 2012-04-26 12:14:38.531:INFO:oejs.Server:jetty-7.5.4.v20111024
+]]></programlisting>
+                The specific error observed on Windows was
+        <programlisting><![CDATA[                    
+wrapper | The nexus-webapp service is not installed - The specified service does not exist as an installed service. (0x424)                            
+]]></programlisting>
+                </para>
+            </note>                        
+            </listitem>
+            <listitem><para>Access the Web UI for Nexus OSS
+                <ulink url="http://localhost:8081/nexus">http://localhost:8081/nexus</ulink>
+            </para></listitem>                    
+            <listitem><para>Login with the default account of admin/admin123</para></listitem>
+            <listitem><para>Change the admin password using Security-&gt;Change Password</para></listitem>
+            <listitem><para>Add remote repositories</para>
+                <orderedlist>
+                    <listitem><para>Click on Views/Repositories-&gt;Repositories</para></listitem>
+                    <listitem><para>Click the +Add...Proxy Repository</para></listitem>
+                    <listitem><para>Fill in the data for the repositories in the 
+                        following Repositories table. Use default values for 
+                        anything not included in the table.</para></listitem>
+                    <listitem><para>Press Save</para></listitem>
+                </orderedlist>
+                <table frame="all"><title>Repositories</title>
+                    <tgroup cols="4">
+                    <thead>
+                        <row>
+                            <entry>Repository ID</entry>
+                            <entry>Repository Name</entry>
+                            <entry>Repository Policy</entry>
+                            <entry>Remote Storage Location</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>jboss-nexus</entry>
+                            <entry>JBoss Nexus</entry>
+                            <entry>Release</entry>
+                            <entry><ulink url="https://repository.jboss.org/nexus/content/repositories/releases/">https://repository.jboss.org/nexus/content/repositories/releases/</ulink></entry>
+                        </row>
+                        <row>
+                            <entry>exoplatform</entry>
+                            <entry>Exoplatform</entry>
+                            <entry>Release</entry>
+                            <entry><ulink url="http://maven2.exoplatform.org/maven/">http://maven2.exoplatform.org/maven/</ulink></entry>
+                        </row>
+                        <!-- 
+                        <row>
+                            <entry>ejava-nexus</entry>
+                            <entry>EJava Nexus</entry>
+                            <entry>Release</entry>
+                            <entry><ulink url="http://ejava.info/nexus/content/groups/public/">http://ejava.info/nexus/content/groups/public/</ulink></entry>
+                        </row>
+                         -->
+                        <row>
+                            <entry>webdev-snapshot</entry>
+                            <entry>Webdev Snapshot</entry>
+                            <entry>Snapshot</entry>
+                            <entry><ulink url="http://webdev.apl.jhu.edu/~jcs/maven2-snapshot/">http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</ulink></entry>
+                        </row>
+                        <row>
+                            <entry>webdev-releases</entry>
+                            <entry>Webdev Releases</entry>
+                            <entry>Release</entry>
+                            <entry><ulink url="http://webdev.apl.jhu.edu/~jcs/maven2/">http://webdev.apl.jhu.edu/~jcs/maven2/</ulink></entry>
+                        </row>
+                    </tbody>
+                    </tgroup>
+                </table>
+                <note>
+                    <para>
+                        If the provided list is missing any sources, checkout
+                        for a current list of repositories and plugin repositories
+                        in ejava-build/dependencies/pom.xml and add those as well.
+                    </para>
+                </note>
+                <note>
+                    <para>
+                        Nexus will check each repository as they are
+                        added. In the various installations I performed
+                        I had to restart the nexus server in several instances
+                        in order to get the new repositories to transition to the 
+                        Available state. 
+                    </para>
+        <programlisting><![CDATA[
+$ service nexus restart
+Stopping Nexus OSS...
+Stopped Nexus OSS.
+Starting Nexus OSS...
+Started Nexus OSS.
+]]></programlisting>                        
+                </note>
+            </listitem>
+            <listitem><para>Add the created repositories to the Public Repositories</para>
+                <orderedlist>
+                    <listitem><para>Select <code>Public Repositories</code> line
+                        towards the top of the repositories list.</para></listitem>
+                    <listitem><para>Select repositories form the right Available
+                    column and add them to the left column. Specify them last
+                    in the following order</para>
+                    <orderedlist>
+                        <listitem><para>JBoss Nexus</para></listitem>
+                        <listitem><para>Exoplatform</para></listitem>
+                        <listitem><para>Ejava Nexus</para></listitem>
+                        <listitem><para>Webdev Snapshots</para></listitem>
+                        <listitem><para>Webdev Releases</para></listitem>
+                    </orderedlist>
+                    </listitem>
+                    <listitem><para>Press Save</para></listitem>
+                </orderedlist>
+            </listitem>
+        </orderedlist>
+     </section>
+             
+             
+             
+     <section id="devenv-mavenproxy-settings.xml">
+        <title>Integrate Proxy with Maven</title>
+        <orderedlist>
+            <listitem>
+                <para>
+                    Add the following to the <code>.m2/settings.xml</code> file
+                    in your HOME directory to enable use of the proxy
+                </para>
+        <programlisting language="xml"><![CDATA[
+...
+    <offline>false</offline>
+...
+    <mirrors>
+        <mirror>
+          <id>nexus</id>
+          <mirrorOf>*</mirrorOf>
+          <url>http://localhost:8081/nexus/content/groups/public</url>
+        </mirror>
+    </mirrors>
+
+    <profiles
+        ...
+]]></programlisting>                        
+            </listitem>
+            <listitem><para>Test your configuration using </para>
+        <programlisting><![CDATA[
+$ mvn clean test
+[INFO] Scanning for projects...
+Downloading: http://localhost:8081/nexus/content/groups/public/org/eclipse/wst/css/core/maven-metadata.xml
+Downloaded: http://localhost:8081/nexus/content/groups/public/org/eclipse/wst/css/core/maven-metadata.xml (376 B at 0.4 KB/sec)
+]]></programlisting>                        
+            </listitem>
+            <listitem>
+                <para>If you have Eclipse installed at this point, have 
+                it re-process your settings.xml by going to
+                <code>Window-&gt;Preferences-&gt;Maven-&gt;User Settings-&gt;Update Settings</code></para>
+            </listitem>                    
+        </orderedlist>
+     </section>
+</chapter>

@@ -1,0 +1,51 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+    <bookinfo>
+        <title>JPA Development Environment Setup</title>
+    </bookinfo>
+    <preface id="devenv-setup-purpose">
+        <title>Purpose</title>
+        <itemizedlist>
+            <listitem><para>Establish a build environment for</para>
+                <itemizedlist>
+                    <listitem><para>Building and deploying class examples</para></listitem>
+                    <listitem><para>Developing class projects</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Exposure to various JavaEE build environment tools</para></listitem>
+        </itemizedlist>
+        <note>
+            <title>Translate example syntax to your OS shell</title>
+            <para>
+                Many of the command line examples listed in these instructions
+                use bash syntax on Linux. You will need to translate the specific
+                commands into the shell syntax that is appropriate for your 
+                environment. Linux is not a requirement for class. Many students
+                have taken this class and used various versions of Windows and Mac
+                systems.  
+            </para>
+        </note>
+        <note>
+            <title>Don't use directories with spaces in path</title>
+            <para>
+                It is never a good idea to install software in a directory with
+                spaces in the fully qualified path name if the software contains
+                jar files that will eventually be part of a classpath. I strongly
+                recommend your working directory, the JDK, JBoss, and all 
+                repository locations comply with this critical guideline or 
+                you may suffer classpath issues at some point.  
+            </para>
+        </note>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="devenv-jdk-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-gitclient-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-maven-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-mavenproxy-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-h2-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="devenv-eclipse-setup.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>
