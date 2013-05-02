@@ -1,16 +1,20 @@
 <?xml version="1.0"?>
 <document>
   <properties>
-    <title>Java Persistence API Spring 2013</title>
+    <title>Enterprise Java (605.784.31) Spring 2013</title>
     <author email="jcstaff@apl.jhu.edu">jcstaff@apl.jhu.edu</author>
   </properties>
   <body>
-    <section name="Java Persistence API Spring 2013">
+    <section name="Enterprise Java (605.784.31) Spring 2013">
       <p>
-      This is the course content home page for the Java Persistence API
-      course. The class 
-      <a href="https://corpteams.sranet.sra.com/support/sra-u/Spring2013/api/SitePages/Home.aspx">
-      collaboration site</a> can be used for discussions.
+      This is the course home page for the Enterprise Java Course
+      (605.784), taught at John's Hopkins University, Engineering
+      Programs for Professionals.  
+      This site will be populated as the
+      semester progresses and topics are addressed. If you are looking
+      for a version of the full content for ejava-javaee, refer to
+      <a href="http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee">
+      http://webdev.apl.jhu.edu/~jcs/legacy-ejava-javaee</a>.
       </p>
       <p>
       Legal Disclaimer: The information and opinions expressed within the
@@ -117,8 +121,44 @@
                   <li>Start project 3</li>
                 </ul>
             </li>
+            <li>Exercises
+                <ul>
+                  <li>Complete through Part I</li>
+                </ul>
+            </li>
+          <li>EJB
+              <ul>
+                  <li>Assign EJB to security-domain "other".
+                  The RMI Tests should fail access at this point.</li>
+                  <li>Specify required roles to access each EJB method</li>
+              </ul>
+          </li>
+          <li>Integration Tests
+              <ul>
+                  <li>Add the necessary logins to your existing integration tests
+                  to allow them to pass again.</li>
+                  <li>Author at least one new test to demonstrate you have security
+                  enabled</li>
+              </ul>
+          </li>
+          <li>WAR
+              <ul>
+                  <li>Assign WAR to security-domain "other"</li>
+                  <li>Add security-constraint elements to the WAR web.xml. The 
+                  user should be prompted for a login at this point and be able to
+                  access web pages and EJB methods that they are authorized for
+                  and be refused access to what they are un-authorized to access</li>
+                  <li>Eliminate access to any information or option the user does
+                  not have access to see or use</li>
+              </ul>
+          </li>
+          <li>Overall
+              <ul>
+                  <li>Eliminate the passing of userId information when the appropriate
+                  means is to obtain through the EJB or WARs security context.</li>
+              </ul>
+          </li>
       </ul></li>
-
       <li><ul> <!-- week 10: Web -->
             <li>Transactions/Project
                 <ul>
