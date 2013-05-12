@@ -1,5 +1,7 @@
 package myorg.queryex;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,6 +11,11 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="QUERYEX_MOVIE")
+@NamedQueries(value = { 
+	@NamedQuery(name="Movie.findByTitle", query=
+		"select m from Movie m " +
+		"where lower(m.title) like concat(concat('%',lower(:title)),'%')")
+})
 public class Movie implements Comparable<Movie>{
 	@Id
 	@Column(name="ID", length=36)
@@ -50,6 +57,8 @@ public class Movie implements Comparable<Movie>{
 	public Movie(String id) {
 		this.id = id;
 	}
+	
+	public String getId() { return id; }
 	
 	public String getTitle() { return title; }
 	public Movie setTitle(String title) {
@@ -176,5 +185,11 @@ public class Movie implements Comparable<Movie>{
 			return releaseDate.compareTo(rhs.releaseDate);
 		}
 		return 0;
+	}
+	
+	@Override
+	public String toString() {
+		DateFormat df = new SimpleDateFormat("yyyy");
+		return title + (releaseDate==null ? "" : " (" + df.format(releaseDate) + ")"); 
 	}
 }

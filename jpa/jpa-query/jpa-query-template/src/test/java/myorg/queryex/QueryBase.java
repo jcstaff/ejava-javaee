@@ -1,6 +1,5 @@
 package myorg.queryex;
 
-import static org.junit.Assert.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -10,14 +9,13 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 
 public class QueryBase {
     private static Log log = LogFactory.getLog(QueryBase.class);
     private static final String PERSISTENCE_UNIT = "queryEx-test";
     private static EntityManagerFactory emf;
-    private EntityManager em;    
+    protected EntityManager em;    
 
     @BeforeClass
     public static void setUpClass() {

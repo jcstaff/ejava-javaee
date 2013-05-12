@@ -20,7 +20,11 @@ public class MovieFactory {
 				.setBirthDate(new GregorianCalendar(1949, Calendar.JANUARY, 24).getTime()));		
 		Actor a3 = new Actor(new Person("p3").setFirstName("Tim").setLastName("Matheson")
 				.setBirthDate(new GregorianCalendar(1947, Calendar.DECEMBER, 31).getTime()));
-		for (Actor a: new Actor[]{a1, a2, a3}) {
+		Actor a4 = new Actor(new Person("p4").setFirstName("Dustin").setLastName("Hoffman")
+				.setBirthDate(new GregorianCalendar(1937, Calendar.AUGUST, 8).getTime()));
+		Actor a5 = new Actor(new Person("p5").setFirstName("Robert").setLastName("De Niro")
+				.setBirthDate(new GregorianCalendar(1943, Calendar.AUGUST, 17).getTime()));
+		for (Actor a: new Actor[]{a1, a2, a3, a4, a5}) {
 			em.persist(a);
 		}
 		
@@ -82,14 +86,19 @@ public class MovieFactory {
 				.setMinutes((2*60)+32)
 				.addGenres("Buddy Film", "Courtroom Drama", "Crime Drama", "Reunion Films", "Crime", "Drama")	
 				.addRole(
-					new MovieRole("Sean Nokes").setActor(a1)
+					new MovieRole("Sean Nokes").setActor(a1),
+					new MovieRole("Danny Snyder").setActor(a4)
 					);
 
 		Movie m6 = new Movie("m6").setTitle("Wag The Dog").setReleaseDate(new GregorianCalendar(1997, Calendar.DECEMBER, 25).getTime())
 				.setDirector(d5)
 				.setRating(MovieRating.R)
 				.setMinutes((1*60)+37)
-				.addGenres("Media Satire", "Political Satire", "Comedy");	
+				.addGenres("Media Satire", "Political Satire", "Comedy")
+				.addRole(
+						new MovieRole("Stanley Motss").setActor(a4),
+						new MovieRole("Conrad Brean").setActor(a5)
+					);	
 
 		Movie m7 = new Movie("m7").setTitle("Diner").setReleaseDate(new GregorianCalendar(1982, Calendar.APRIL, 2).getTime())
 				.setDirector(d5)
