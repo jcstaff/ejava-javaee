@@ -2,6 +2,7 @@ package myorg.queryex;
 
 import static org.junit.Assert.*;
 
+
 import java.util.Date;
 import java.util.List;
 
@@ -30,26 +31,21 @@ public class SQLQueryTest extends QueryBase {
     	assertEquals("unexpected number of titles", 7, titles.size());
     }
     
-    private static class MovieRelease {
-    	public final String title;
-    	public final Date releaseDate;
-    	public MovieRelease(String title, Date releaseDate) {
-    		this.title = title;
-    		this.releaseDate = releaseDate;
-    	}
-    }
-    
-    @Test @Ignore
-    public void testResultClass() {
-    	log.info("*** testSQLQuery ***");    	
+    @Test
+    public void testSQLResultMapping() {
+    	log.info("*** testSQLResultMapping ***");    	
     	@SuppressWarnings("unchecked")
-		List<MovieRelease> results = em.createNativeQuery(
-    			"select title, release_date " +
-    			"from queryex_movie " +
-    			"order by title", MovieRelease.class).getResultList();
-    	for (MovieRelease movie : results) {
-    		log.debug(String.format("%s (%s)", movie.title, movie.releaseDate));
+		List<Movie> movies = em.createNativeQuery(
+    			"select m.* from queryex_movie m " +
+    			"join queryex_director dir on dir.person_id = m.director_id " +
+    			"join queryex_person p on p.id = dir.person_id " +
+    			"where p.first_name = 'Ron'" +
+    			"order by title ASC", Movie.class).getResultList();
+    	log.debug("result=" + movies);
+    	for (Movie movie: movies) {
+    		log.debug("em.contains(" + movie + ")=" + em.contains(movie));
+    		assertTrue(movie + " not managed", em.contains(movie));
     	}
-    	assertEquals("unexpected number of results", 7, results.size());
+    	assertEquals("unexpected number of movies", 2, movies.size());
     }
 }

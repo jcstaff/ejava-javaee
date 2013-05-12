@@ -783,16 +783,16 @@ Hibernate:
             
             <section id="jpa-queryex-query-values-resultclass">
                <title>Encapsulate Row Values with ResultClass</title>
-               <para>Using Object[] arrays is function but it can lead to some errors or 
-                   less than desired result handling. In this section you will encapsulate
-                   each row of values returned from the query into a instance of a result
+               <para>Using Object[] arrays is functional but it can lead to some errors or 
+                   less than desired query result handling. In this section you will encapsulate
+                   each row of values returned from the query with an instance of a result
                    class. The result class will provide type-safe access to the returned 
                    values as well as any additional functionality we wish to assign.</para>
                <orderedlist>
                     <listitem><para>Add the following result class as a static nested class 
                         within your test case. Notice it contains an attribute for each 
                         value we expect in the query response and contains a constructor
-                        that will process them in the proper order.</para>
+                        that will process them in a specific order.</para>
 <programlisting language="java"><![CDATA[
 private static class MovieRelease {
     public final String title;

@@ -21,14 +21,15 @@ public class QueryBase {
     public static void setUpClass() {
         log.debug("creating entity manager factory");
         emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+        EntityManager em1 = emf.createEntityManager();
+        cleanup(em1);
+        populate(em1);
     }
     
     @Before
     public void setUp() throws Exception {
         log.debug("creating entity manager");
         em = emf.createEntityManager();
-        cleanup();
-        populate();
         em.getTransaction().begin();
     }
 
@@ -59,10 +60,24 @@ public class QueryBase {
         if (emf!=null) { emf.close(); }
     }
     
-    public void cleanup() {
+    public static void cleanup(EntityManager em) {
+    	em.getTransaction().begin();
+    	for (Movie movie : em.createQuery("from Movie", Movie.class).getResultList()) {
+    		em.remove(movie);
+    	}
+    	for (Actor actor: em.createQuery("from Actor", Actor.class).getResultList()) {
+    		em.remove(actor);
+    	}
+    	for (Director director: em.createQuery("from Director", Director.class).getResultList()) {
+    		em.remove(director);
+    	}
+    	for (Person person: em.createQuery("from Person", Person.class).getResultList()) {
+    		em.remove(person);
+    	}
+    	em.getTransaction().commit();
     }
     
-    public void populate() {
+    public static void populate(EntityManager em) {
     	em.getTransaction().begin();
     	new MovieFactory().setEntityManager(em).populate();
     	em.getTransaction().commit();

@@ -113,17 +113,75 @@ Hibernate:
             to encapsulate the values returned from the query.</para>
     </section>
 
-    <section id="jpa-queryex-sqlquery-resultclass">
-       <title>SQL Query Result Class</title>
-       <para></para>
+    <section id="jpa-queryex-sqlquery-resultmapping">
+       <title>SQL Query Result Mapping</title>
+       <para>Since JPAQL queries can only be expressed in terms of the entity
+           model, there may be times when a more complicated native SQL query
+           is required to obtain the entities you wish to work with. In this
+           section you will use the simplest form of this capability -- where 
+           nothing additional is needed except the specification of the entity.
+           We can use this form when the result returns a single entity class.</para>
        <orderedlist>
-            <listitem><para></para>
+            <listitem><para>Add the following test method to your existing JUnit test case.
+                We will assume that one needed to express a very complicated native
+                SQL command to derive the entities desired. However, once identified,
+                the query must return all columns defined in the default entity 
+                mapping.</para>
 <programlisting language="java"><![CDATA[
-]]></programlisting>                        
+@Test
+public void testSQLResultMapping() {
+    log.info("*** testSQLResultMapping ***");       
+    @SuppressWarnings("unchecked")
+    List<Movie> movies = em.createNativeQuery(
+            "select m.* from queryex_movie m " +
+            "join queryex_director dir on dir.person_id = m.director_id " +
+            "join queryex_person p on p.id = dir.person_id " +
+            "where p.first_name = 'Ron'" +
+            "order by title ASC", Movie.class).getResultList();
+    log.debug("result=" + movies);
+    for (Movie movie: movies) {
+        log.debug("em.contains(" + movie + ")=" + em.contains(movie));
+        assertTrue(movie + " not managed", em.contains(movie));
+    }
+    assertEquals("unexpected number of movies", 2, movies.size());
+}]]></programlisting>
+                <para>Notice...</para>                        
+                <itemizedlist>
+                    <listitem><para>The native SQL query is free to do whatever it takes to identify the entity of interest</para></listitem>
+                    <listitem><para>The native SQL query is required to supply all columns required by the entity</para></listitem>
+                    <listitem><para>The returned entity is managed</para></listitem>
+                </itemizedlist>
             </listitem>
-            <listitem><para></para>
+            <listitem><para>Run the new test method.</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>                        
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.queryex.SQLQueryTest#testSQLResultMapping
+ -*** testSQLResultMapping ***
+Hibernate: 
+    select
+        m.* 
+    from
+        queryex_movie m 
+    join
+        queryex_director dir 
+            on dir.person_id = m.director_id 
+    join
+        queryex_person p 
+            on p.id = dir.person_id 
+    where
+        p.first_name = 'Ron'
+    order by
+        title ASC
+ -result=[Apollo 13 (1995), Tremors (1990)]
+ -em.contains(Apollo 13 (1995))=true
+ -em.contains(Tremors (1990))=true
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>
+                <para>Notice the query executes whatever is in the native SQL and 
+                    returns the columns required by the default entity mapping.
+                    The returned entity instances are managed by the persistence 
+                    context -- any changes to these entities will cause a database
+                    update.</para>                        
             </listitem>
        </orderedlist>
     </section>    
