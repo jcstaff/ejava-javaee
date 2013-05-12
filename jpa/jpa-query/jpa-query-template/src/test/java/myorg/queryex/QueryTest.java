@@ -2,6 +2,7 @@ package myorg.queryex;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +19,10 @@ import org.junit.Test;
 public class QueryTest extends QueryBase {
 	private static final Log log = LogFactory.getLog(QueryTest.class);
 	
+	/**
+	 * This test method demonstrates retrieving zero to many matching entities
+	 * from a database.
+	 */
 	@Test
 	public void testMulti() {
 		log.info("*** testMulti ***");
@@ -30,6 +35,10 @@ public class QueryTest extends QueryBase {
 		assertEquals("unexpected number of movies", 7, movies.size());
 	}
 
+	/**
+	 * This test method demonstrates retrieving a single result from the 
+	 * database when there is a single row that matches.
+	 */
 	@Test
 	public void testSingle() {
 		log.info("*** testSingle ***");
@@ -42,6 +51,10 @@ public class QueryTest extends QueryBase {
 		assertNotNull("no movie", movie);
 	}
 
+	/**
+	 * This test method demonstrates the exception that is thrown when 
+	 * no matching rows exist in the database when asking for a single result.
+	 */
 	@Test(expected=NoResultException.class)
 	public void testSingleNoResult() {
 		log.info("*** testSingleNoResult ***");
@@ -53,6 +66,10 @@ public class QueryTest extends QueryBase {
 		log.debug("query did not produce expected exception");
 	}
 
+	/**
+	 * This test method demonstrates the exception that is thrown when 
+	 * multiple matching rows exist in the database when asking for a single result.
+	 */
 	@Test(expected=NonUniqueResultException.class)
 	public void testSingleNonUniqueResult() {
 		log.info("*** testSingleNonUniqueResult ***");
@@ -64,6 +81,10 @@ public class QueryTest extends QueryBase {
 		log.debug("query did not produce expected exception");
 	}
 
+	/**
+	 * This test method demonstrates the ability to pass in parameters to a 
+	 * query.
+	 */
 	@Test
 	public void testParameters() {
 		log.info("*** testParameters ***");
@@ -81,7 +102,10 @@ public class QueryTest extends QueryBase {
 		assertEquals("unexpected number of movies", 1, movies.size());
 	}
 
-
+	/**
+	 * This test method demonstrates the ability to control the number of results 
+	 * returned from a query and to page through those results.
+	 */
 	@Test
 	public void testPaging() {
 		log.info("*** testPaging ***");
@@ -106,7 +130,7 @@ public class QueryTest extends QueryBase {
 	}
 	
 	/**
-	 * This method demonstrates passing a query hint to the provider for  
+	 * This test method demonstrates passing a query hint to the provider for  
 	 * the query execution.
 	 */
 	@Test
@@ -120,5 +144,55 @@ public class QueryTest extends QueryBase {
 		assertNotNull("no movie", movie);
 	}
 	
+	/**
+	 * This test method demonstrates retrieving values from a query and 
+	 * not the complete managed entity.
+	 */
+	@Test
+	public void testValueQuery() {
+		log.info("*** testValueQuery ***");
 	
+		List<String> titles = em.createQuery(
+				"select m.title from Movie m " +
+				"order by title ASC", String.class)
+				.getResultList();
+		for (String title : titles) {
+			log.debug(title);
+		}
+		assertEquals("unexpected number of titles", 7, titles.size());
+	}
+	
+	/**
+	 * This test method demonstrates retrieving the value result of a query 
+	 * function
+	 */
+	@Test
+	public void testResultValueQuery() {
+		log.info("*** testResultValueQuery ***");
+
+		int titleCount = em.createQuery(
+				"select count(m) from Movie m", Number.class)
+				.getSingleResult().intValue();
+		log.debug("titleCount=" + titleCount);
+		assertEquals("unexpected number of titles", 7, titleCount);
+	}
+	
+	/**
+	 * This test method demonstrates retrieving multiple values from a query.
+	 */
+	@Test
+	public void testMultiValueQuery() {
+		log.info("*** testMultiValueQuery ***");
+
+		List<Object[]> results = em.createQuery(
+				"select m.title, m.releaseDate from Movie m " +
+				"order by title ASC", Object[].class)
+				.getResultList();
+		for (Object[] result : results) {
+			String title = (String)result[0];
+			Date releaseDate = (Date)result[1];
+			log.debug(String.format("%s (%s)", title, releaseDate));
+		}
+		assertEquals("unexpected number of results", 7, results.size());
+	}	
 }

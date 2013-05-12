@@ -603,6 +603,186 @@ Hibernate:
             </listitem>
        </orderedlist>
     </section>    
+    
+    <section id="jpa-queryex-query-values">
+       <title>Value Queries</title>
+       <para>Retrieving an entity by its property values and having that entity 
+           be managed is a powerful capability provided by JPAQL queries. However,
+           there are times when retrieving a simple value -- rather than the complete entity --
+           is a better solution.
+       </para>
+
+            <section id="jpa-queryex-query-values-single">
+               <title>Retrieve Value</title>
+               <para>In this section we will form a query to return a list of 
+                   values from a single entity property that has a known type.
+                   This allows the query result to be placed into a convenient List
+                   for processing.</para>
+               <orderedlist>
+                    <listitem><para>Add the following test method to demonstrate querying
+                        an entity model and a collection of values.</para>
+<programlisting language="java"><![CDATA[
+@Test
+public void testValueQuery() {
+    log.info("*** testValueQuery ***");
+
+    List<String> titles = em.createQuery(
+            "select m.title from Movie m " +
+            "order by title ASC", String.class)
+            .getResultList();
+    for (String title : titles) {
+        log.debug(title);
+    }
+    assertEquals("unexpected number of titles", 7, titles.size());
+}]]></programlisting>
+                        <para>Notice...</para>
+                        <itemizedlist>
+                            <listitem><para>The data type returned in the list is declared in the query</para></listitem>
+                            <listitem><para>The result is returned as a simple list of values</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Run the new test method and observe that only the
+                       requested value from the entity is returned and not the entire 
+                       entity.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.queryex.QueryTest#testValueQuery
+...
+ -*** testValueQuery ***
+Hibernate: 
+    select
+        movie0_.TITLE as col_0_0_ 
+    from
+        QUERYEX_MOVIE movie0_ 
+    order by
+        movie0_.TITLE ASC
+ -Animal House
+ -Apollo 13
+ -Diner
+ -Footloose
+ -Sleepers
+ -Tremors
+ -Wag The Dog
+...
+[INFO] BUILD SUCCESS]]></programlisting>
+                    </listitem>
+               </orderedlist>
+
+            </section>    
+            <section id="jpa-queryex-query-values-result">
+               <title>Retrieve Function Result Value</title>
+               <para>In the previous section we performed a query on a single property and 
+                   the result returned a list. From that list we had the capability to get its 
+                   size to determine how many entities we had that matched the criteria. If
+                   that was our only purpose -- that would be inefficient. Lets delegate the 
+                   counting to the database and simply returned the result.</para>
+                   
+               <orderedlist>
+                    <listitem><para>Add the following test method to demonstrate querying
+                        an entity model and returning a single function result.</para>
+<programlisting language="java"><![CDATA[
+@Test
+public void testResultValueQuery() {
+    log.info("*** testResultValueQuery ***");
+
+    int titleCount = em.createQuery(
+            "select count(m) from Movie m", Number.class)
+            .getSingleResult().intValue();
+    log.debug("titleCount=" + titleCount);
+    assertEquals("unexpected number of titles", 7, titleCount);
+}]]></programlisting>          
+                        <para>Notice...</para>
+                        <itemizedlist>
+                            <listitem><para>The query returns the result of a JPAQL function</para></listitem>
+                            <listitem><para>Adding the return type to the query function allows for type-safe usage of the result</para></listitem>
+                            <listitem><para>The value can be retrieved using the getSingleResult()</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+
+                    <listitem><para>Run the new test method and observe the query produced.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.queryex.QueryTest#testResultValueQuery
+...
+ -*** testResultValueQuery ***
+Hibernate: 
+    select
+        count(movie0_.ID) as col_0_0_ 
+    from
+        QUERYEX_MOVIE movie0_ limit ?
+ -titleCount=7
+...
+[INFO] BUILD SUCCESS
+]]></programlisting>                        
+                    <para>Notice how the count() of rows is calculated in the database and only the 
+                       result is returned.</para>
+                    </listitem>
+               </orderedlist>
+            </section>    
+
+
+            <section id="jpa-queryex-query-values-multi">
+               <title>Retrieve Multiple Values</title>
+               <para>In this section you will query for multiple values for the entity. Results for 
+                    multiple values are returned in a Java Array[]. In the case of the properties being
+                    multiple types, the array is an Object[] array.</para>
+               <orderedlist>
+                    <listitem><para>Add the following test method to demonstrate querying
+                        an entity model and returning multiple values of different types.</para>
+<programlisting language="java"><![CDATA[
+@Test
+public void testMultiValueQuery() {
+    log.info("*** testMultiValueQuery ***");
+
+    List<Object[]> results = em.createQuery(
+            "select m.title, m.releaseDate from Movie m " +
+            "order by title ASC", Object[].class)
+            .getResultList();
+    for (Object[] result : results) {
+        String title = (String)result[0];
+        Date releaseDate = (Date)result[1];
+        log.debug(String.format("%s (%s)", title, releaseDate));
+    }
+    assertEquals("unexpected number of results", 7, results.size());
+}]]></programlisting>
+                        <para>Notice...</para>                        
+                        <itemizedlist>
+                            <listitem><para>The query requests multiple values to be returned</para></listitem>
+                            <listitem><para>The query is declared to return an Object[]</para></listitem>
+                            <listitem><para>The query returns a List with each element in the List containing an Object[]</para></listitem>
+                            <listitem><para>The elements of the Object[] are in the order expressed by the query</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Run the new test method and observe the database query produced.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.queryex.QueryTest#testMultiValueQuery
+...
+ -*** testMultiValueQuery ***
+Hibernate: 
+    select
+        movie0_.TITLE as col_0_0_,
+        movie0_.RELEASE_DATE as col_1_0_ 
+    from
+        QUERYEX_MOVIE movie0_ 
+    order by
+        movie0_.TITLE ASC
+ -Animal House (1978-06-01)
+ -Apollo 13 (1995-06-30)
+ -Diner (1982-04-02)
+ -Footloose (1984-02-17)
+ -Sleepers (1996-10-18)
+ -Tremors (1990-01-19)
+ -Wag The Dog (1997-12-25)
+...
+[INFO] BUILD SUCCESS]]></programlisting>
+                        <para>Notice how the database query resulted in a request for multiple values of
+                            different type and the provider made these values available to the application
+                            using their assigned type.
+                        </para>                        
+                    </listitem>
+               </orderedlist>
+            </section>    
+    </section>    
+
+       
 
     <section id="jpa-queryex-query-summary">
        <title>Summary</title>
