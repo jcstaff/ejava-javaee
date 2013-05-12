@@ -194,5 +194,36 @@ public class QueryTest extends QueryBase {
 			log.debug(String.format("%s (%s)", title, releaseDate));
 		}
 		assertEquals("unexpected number of results", 7, results.size());
-	}	
+	}
+	
+    private static class MovieRelease {
+    	public final String title;
+    	public final Date releaseDate;
+    	@SuppressWarnings("unused")
+		public MovieRelease(String title, Date releaseDate) {
+    		this.title = title;
+    		this.releaseDate = releaseDate;
+    	}
+    }
+
+    /**
+     * This test method demonstrates the ability to create a result class to 
+     * encapsulate the results returned from a value query.
+     */
+    @Test
+	public void testResultClass() {
+		log.info("*** testResultClass ***");
+
+		String query = String.format("select new %s(m.title, m.releaseDate) " +
+				"from Movie m order by title ASC", 
+				MovieRelease.class.getName());
+		log.debug(query);
+		List<MovieRelease> results = em.createQuery(query, MovieRelease.class)
+				.getResultList();
+		for (MovieRelease movie: results) {
+			log.debug(String.format("%s (%s)", movie.title, movie.releaseDate));
+		}
+		assertEquals("unexpected number of results", 7, results.size());
+	}
+	
 }

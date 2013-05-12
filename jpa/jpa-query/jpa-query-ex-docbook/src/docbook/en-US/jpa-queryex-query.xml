@@ -779,7 +779,86 @@ Hibernate:
                         </para>                        
                     </listitem>
                </orderedlist>
+            </section>
+            
+            <section id="jpa-queryex-query-values-resultclass">
+               <title>Encapsulate Row Values with ResultClass</title>
+               <para>Using Object[] arrays is function but it can lead to some errors or 
+                   less than desired result handling. In this section you will encapsulate
+                   each row of values returned from the query into a instance of a result
+                   class. The result class will provide type-safe access to the returned 
+                   values as well as any additional functionality we wish to assign.</para>
+               <orderedlist>
+                    <listitem><para>Add the following result class as a static nested class 
+                        within your test case. Notice it contains an attribute for each 
+                        value we expect in the query response and contains a constructor
+                        that will process them in the proper order.</para>
+<programlisting language="java"><![CDATA[
+private static class MovieRelease {
+    public final String title;
+    public final Date releaseDate;
+    @SuppressWarnings("unused")
+    public MovieRelease(String title, Date releaseDate) {
+        this.title = title;
+        this.releaseDate = releaseDate;
+    }
+}]]></programlisting>                        
+                    </listitem>
+                    <listitem><para>Add the following test method to your test case.
+                        This test method will issue a similar query as before --
+                        except this time will supply a result class expression for 
+                        the values to be handled by.</para>
+<programlisting language="java"><![CDATA[
+@Test
+public void testResultClass() {
+    log.info("*** testResultClass ***");
+
+    String query = String.format("select new %s(m.title, m.releaseDate) " +
+            "from Movie m order by title ASC", 
+            MovieRelease.class.getName());
+    List<MovieRelease> results = em.createQuery(query, MovieRelease.class)
+            .getResultList();
+    for (MovieRelease movie: results) {
+        log.debug(String.format("%s (%s)", movie.title, movie.releaseDate));
+    }
+    assertEquals("unexpected number of results", 7, results.size());
+}]]></programlisting>
+                        <para>Notice each row of the query result creates an instance
+                           of our result class, passing the values into the constructor
+                           in a particular order. Our result class is not an entity
+                           and will not be managed within the persistence context.</para>                        
+                    </listitem>
+                    <listitem><para>Run the new test method and observe the JPAQL issued 
+                        to the entity manager contains a constructor specification for the 
+                        result class and query values desired. The resultant database query
+                        is identical to the one produced in the Object[] array case. The 
+                        only difference is the provider handles the Object[] array processing
+                        for us.</para>
+<programlisting language=""><![CDATA[
+$ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.queryex.QueryTest#testResultClass
+...
+ -select new myorg.queryex.QueryTest$MovieRelease(m.title, m.releaseDate) from Movie m order by title ASC
+Hibernate: 
+    select
+        movie0_.TITLE as col_0_0_,
+        movie0_.RELEASE_DATE as col_1_0_ 
+    from
+        QUERYEX_MOVIE movie0_ 
+    order by
+        movie0_.TITLE ASC
+ -Animal House (1978-06-01)
+ -Apollo 13 (1995-06-30)
+ -Diner (1982-04-02)
+ -Footloose (1984-02-17)
+ -Sleepers (1996-10-18)
+ -Tremors (1990-01-19)
+ -Wag The Dog (1997-12-25)
+...
+[INFO] BUILD SUCCESS]]></programlisting>                        
+                    </listitem>
+               </orderedlist>
             </section>    
+                
     </section>    
 
        
