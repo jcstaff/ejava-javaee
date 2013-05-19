@@ -1,5 +1,6 @@
 package myorg.queryex;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,6 +28,12 @@ public class Director {
 	}
 
 	public Person getPerson() { return person; }
+	public String getFirstName() { return person==null?null : person.getFirstName(); }
+	public String getLastName() { return person==null?null : person.getLastName(); }
+	public Date getBirthDate() { return person==null?null : person.getBirthDate(); }
+	public Director setFirstName(String name) { if (person!=null){ person.setFirstName(name);} return this;}
+	public Director setLastName(String name) { if (person!=null){ person.setLastName(name);} return this;}
+	public Director setBirthDate(Date date) { if (person!=null){ person.setBirthDate(date);} return this;}
 
 	public Set<Movie> getMovies() {
 		if (movies == null) {

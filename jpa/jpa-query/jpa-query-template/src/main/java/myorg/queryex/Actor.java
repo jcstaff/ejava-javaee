@@ -1,11 +1,12 @@
 package myorg.queryex;
 
 import java.util.Comparator;
+
+import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -16,12 +17,15 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.Version;
 
 @Entity
 @Table(name="QUERYEX_ACTOR")
 public class Actor {
 	@Id
 	private String id;
+	@Version
+	private int version;
 
 	@OneToOne(optional=false, fetch=FetchType.EAGER,
 			cascade={CascadeType.PERSIST, CascadeType.DETACH})
@@ -29,10 +33,8 @@ public class Actor {
 	@JoinColumn(name="PERSON_ID")
 	private Person person;
 	
-	@Transient
 	@OneToMany(mappedBy="actor", 
 			cascade={CascadeType.PERSIST, CascadeType.REMOVE})
-	@OrderBy("movie.releaseDate")
 	private Set<MovieRole> roles= new TreeSet<MovieRole>(new Comparator<MovieRole>() {
 		@Override
 		public int compare(MovieRole lhs, MovieRole rhs) {
@@ -49,6 +51,13 @@ public class Actor {
 	}
 	
 	public Person getPerson() { return person; }
+	public String getFirstName() { return person==null?null : person.getFirstName(); }
+	public String getLastName() { return person==null?null : person.getLastName(); }
+	public Date getBirthDate() { return person==null?null : person.getBirthDate(); }
+	public Actor setFirstName(String name) { if (person!=null){ person.setFirstName(name);} return this;}
+	public Actor setLastName(String name) { if (person!=null){ person.setLastName(name);} return this;}
+	public Actor setBirthDate(Date date) { if (person!=null){ person.setBirthDate(date);} return this;}
+	public int getVersion() { return version; }
 
 	public Set<MovieRole> getRoles() {
 		return roles;
@@ -80,6 +89,6 @@ public class Actor {
 	
 	@Override
 	public String toString() {
-		return person.toString(); 
+		return person.toString() + ", version=" + version; 
 	}
 }

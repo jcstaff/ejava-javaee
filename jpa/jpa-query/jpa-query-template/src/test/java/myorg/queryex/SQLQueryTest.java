@@ -65,9 +65,9 @@ public class SQLQueryTest extends QueryBase {
 
     /**
      * This test method provides an example of using SQLResultSetMapping to 
-     * define more than one returned entity. The default column names are suitable
-     * for the provider to match them up. If they were now -- then we would have 
-     * to add alias entries to the SQLResultSetMapping.
+     * define more than one returned entity. Default names for each of the columns
+     * are being returned here. This will cause some ambiguity with two of the 
+     * entities and require some refinement in the next two test methods.
      */
     @Test
     public void testSQLMultiResultMapping() {
@@ -99,6 +99,12 @@ public class SQLQueryTest extends QueryBase {
     			"Ron", ((Movie)((Object[])results.get(0))[0]).getDirector().getPerson().getFirstName());
     }
 
+    /**
+     * This test method is a slight refinement of the test method above in that 
+     * is explicitly names each table-alias.column that gets returned by the select.
+     * Using this explicit query makes it easier for us to spot the ambiguity 
+     * between MOVIE.ID and PERSON.ID. 
+     */
     @Test
     public void testSQLMultiResultMapping1() {
     	log.info("*** testSQLMultiResultMapping ***");    	
@@ -132,6 +138,12 @@ public class SQLQueryTest extends QueryBase {
     			"Ron", ((Movie)((Object[])results.get(0))[0]).getDirector().getPerson().getFirstName());
     }
 
+    /**
+     * This test method provides the final refinement of the above two test methods --
+     * where the second of two tables is aliased so there is no ambiguity between
+     * the two tables. This alias is registered in the field mapping of the SqlResultMapping
+     * for the particular @EntityResult.
+     */
     @Test
     public void testSQLMultiResultMapping2() {
     	log.info("*** testSQLMultiResultMapping ***");    	

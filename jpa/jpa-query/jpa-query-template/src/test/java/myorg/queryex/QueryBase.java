@@ -14,7 +14,7 @@ import org.junit.BeforeClass;
 public class QueryBase {
     private static Log log = LogFactory.getLog(QueryBase.class);
     private static final String PERSISTENCE_UNIT = "queryEx-test";
-    private static EntityManagerFactory emf;
+    protected static EntityManagerFactory emf;
     protected EntityManager em;    
 
     @BeforeClass
