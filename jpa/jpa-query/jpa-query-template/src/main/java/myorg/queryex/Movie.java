@@ -11,10 +11,27 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="QUERYEX_MOVIE")
-@NamedQueries(value = { 
+@NamedQueries({ 
 	@NamedQuery(name="Movie.findByTitle", query=
 		"select m from Movie m " +
 		"where lower(m.title) like concat(concat('%',lower(:title)),'%')")
+})
+@SqlResultSetMappings({
+	@SqlResultSetMapping(name="Movie.movieMapping", entities={
+			@EntityResult(entityClass=Movie.class),
+			@EntityResult(entityClass=Director.class),
+			@EntityResult(entityClass=Person.class)
+	}),
+	@SqlResultSetMapping(name="Movie.movieMapping2", entities={
+			@EntityResult(entityClass=Movie.class),
+			@EntityResult(entityClass=Director.class),
+			@EntityResult(entityClass=Person.class, fields={
+				@FieldResult(name="id", column="p_id"),
+				@FieldResult(name="firstName", column="first_name"),
+				@FieldResult(name="lastName", column="last_name"),
+				@FieldResult(name="birthDate", column="birth_date")
+			})
+	})
 })
 public class Movie implements Comparable<Movie>{
 	@Id
