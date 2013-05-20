@@ -49,57 +49,71 @@
 ]]></programlisting>                        
             </listitem>
         
-            <listitem><para>Use the ejava.jpa:jpa-archetype to setup a new Maven project for this exercise.
+            <listitem><para>Use the ejava.jpa:jpa-queryex-archetype to setup a new Maven project for this exercise.
                 Activate the webdev-repositories profile (-Pwebdev-repositories) so that you can resolve
                 the archetype off the Internet.</para>
+                <note>
+                    <para>This archetype is specific to this exercise and is a different profile than what was 
+                        used by the previous exercises.</para>
+                </note>
  <programlisting language=""><![CDATA[
 $ mvn archetype:generate -B \
--DarchetypeGroupId=ejava.jpa -DarchetypeArtifactId=jpa-archetype \
--DgroupId=myorg.relex -DartifactId=relationEx \
+-DarchetypeGroupId=ejava.jpa -DarchetypeArtifactId=jpa-queryex-archetype \
+-DgroupId=myorg.queryex -DartifactId=queryEx \
 -Pwebdev-repositories
 
 ...
-[INFO] Scanning for projects...
-...
+[INFO] Generating project in Batch mode
+[INFO] Archetype [ejava.jpa:jpa-queryex-archetype:3.0.2013.1-SNAPSHOT] found in catalog local
 [INFO] ----------------------------------------------------------------------------
-[INFO] Using following parameters for creating project from Archetype: jpa-archetype:3.0.2013.1-SNAPSHOT
+[INFO] Using following parameters for creating project from Archetype: jpa-queryex-archetype:3.0.2013.1-SNAPSHOT
 [INFO] ----------------------------------------------------------------------------
-[INFO] Parameter: groupId, Value: myorg.relex
-[INFO] Parameter: artifactId, Value: relationEx
+[INFO] Parameter: groupId, Value: myorg.queryex
+[INFO] Parameter: artifactId, Value: queryEx
 [INFO] Parameter: version, Value: 1.0-SNAPSHOT
-[INFO] Parameter: package, Value: myorg.relex
-[INFO] Parameter: packageInPathFormat, Value: myorg/relex
+[INFO] Parameter: package, Value: myorg.queryex
+[INFO] Parameter: packageInPathFormat, Value: myorg/queryex
 [INFO] Parameter: version, Value: 1.0-SNAPSHOT
-[INFO] Parameter: package, Value: myorg.relex
-[INFO] Parameter: groupId, Value: myorg.relex
-[INFO] Parameter: artifactId, Value: relationEx
-[INFO] Parent element not overwritten in /home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-relation/relationEx/pom.xml
-[INFO] project created from Archetype in dir: /home/jcstaff/workspaces/ejava-javaee/git/jpa/jpa-relation/relationEx
+[INFO] Parameter: package, Value: myorg.queryex
+[INFO] Parameter: groupId, Value: myorg.queryex
+[INFO] Parameter: artifactId, Value: queryEx
+[INFO] project created from Archetype in dir: /tmp/queryEx
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
 ]]></programlisting>
             </listitem>
             <listitem><para>You should now have an instantiated template for a JPA project</para>
 <programlisting language=""><![CDATA[
-relationEx/
-├── pom.xml
-└── src
-    ├── main
-    │   └── java
-    │       └── myorg
-    │           └── relex
-    │               └── Auto.java
-    └── test
-        ├── java
-        │   └── myorg
-        │       └── relex
-        │           └── AutoTest.java
-        └── resources
-            ├── hibernate.properties
-            ├── log4j.xml
-            └── META-INF
-                └── persistence.xml
+queryEx/
+|-- pom.xml
+`-- src
+    |-- main
+    |   `-- java
+    |       `-- myorg
+    |           `-- queryex
+    |               |-- Actor.java
+    |               |-- Director.java
+    |               |-- Movie.java
+    |               |-- MoviePK.java
+    |               |-- MovieRating.java
+    |               |-- MovieRole.java
+    |               |-- MovieRolePK.java
+    |               `-- Person.java
+    `-- test
+        |-- java
+        |   `-- myorg
+        |       `-- queryex
+        |           |-- BulkUpdateTest.java
+        |           |-- MovieFactory.java
+        |           |-- QueryBase.java
+        |           |-- QueryLocksTest.java
+        |           |-- QueryTest.java
+        |           `-- SQLQueryTest.java
+        `-- resources
+            |-- hibernate.properties
+            |-- log4j.xml
+            `-- META-INF
+                `-- persistence.xml
 ]]></programlisting>                        
             </listitem>        
             <listitem><para>Verify the instantiated template builds in your environment</para>
@@ -141,74 +155,6 @@ relationEx]$ mvn clean test -P\!h2db -Ph2srv
             <listitem><para>You may now import the instantiated template into Eclipse as an "Existing Maven Project"</para>
             </listitem>
 
-                <listitem><para>Put the following Junit test case in your src/test tree</para>
-<programlisting language="java"><![CDATA[
-package myorg.relex;
-
-import javax.persistence.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.*;
-
-public class JPATestBase {
-    private static Log log = LogFactory.getLog(JPATestBase.class);
-    private static final String PERSISTENCE_UNIT = "relationEx-test";
-    private static EntityManagerFactory emf;
-    protected EntityManager em;    
-
-    @BeforeClass
-    public static void setUpClass() {
-        log.debug("creating entity manager factory");
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
-    }
-    
-    @Before
-    public void setUp() throws Exception {
-        log.debug("creating entity manager");
-        em = emf.createEntityManager();
-        cleanup();
-        em.getTransaction().begin();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        try {
-            log.debug("tearDown() started, em=" + em);
-            if (!em.getTransaction().isActive()) {
-                em.getTransaction().begin();
-                em.getTransaction().commit();            
-            } else if (!em.getTransaction().getRollbackOnly()) {
-                em.getTransaction().commit();                           
-            } else {
-                em.getTransaction().rollback();
-            }
-            em.close();
-            log.debug("tearDown() complete, em=" + em);
-        }
-        catch (Exception ex) {
-            log.fatal("tearDown failed", ex);
-            throw ex;
-        }
-     }
-    
-    @AfterClass
-    public static void tearDownClass() {
-        log.debug("closing entity manager factory");
-        if (emf!=null) { emf.close(); }
-    }
-    
-    public void cleanup() {
-        em.getTransaction().begin();
-        em.getTransaction().commit();
-    }
-
-    protected EntityManager createEm() {
-        return emf.createEntityManager();
-    }
-}
-]]></programlisting>                        
-                </listitem>
-            
         </itemizedlist>
 
     </section>
