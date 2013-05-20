@@ -8,14 +8,13 @@
         <relativePath></relativePath>
     </parent>
 
-    <groupId>myorg.queryex</groupId>
     <artifactId>queryEx</artifactId>
+
+    <groupId>myorg.queryex</groupId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>queryEx</name>
-    <description>
-        This project provides a starting point for developing JPA modules.
-    </description>
+    <name>JPA Query Exercise::Template</name>
+    <description>This project provides a starting point for the JPA Query Exercise.</description>
 
     <!-- dependency versions are defined within parent-pom -->
     <dependencies>
@@ -78,8 +77,7 @@
                             <path location="${project.build.directory}/classes" />
                             <path location="${project.build.directory}/test-classes" />
                         </classpath>
-                        <jpaconfiguration persistenceunit="queryEx-test" 
-                            propertyfile="${basedir}/target/test-classes/hibernate.properties" />
+                        <jpaconfiguration persistenceunit="queryEx-test" propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                     </hibernatetool>
                 </configuration>
             </plugin>
@@ -113,7 +111,6 @@
             <name>ejava webdev repository</name>
             <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
             <releases>
-                <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
@@ -128,7 +125,6 @@
                 <enabled>false</enabled>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>

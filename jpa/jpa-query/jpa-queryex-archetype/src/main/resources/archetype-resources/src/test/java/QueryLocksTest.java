@@ -1,4 +1,7 @@
-package myorg.queryex;
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+package ${package};
 
 import static org.junit.Assert.*;
 
@@ -17,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class QueryLocksTest extends QueryBase {
@@ -139,33 +143,28 @@ public class QueryLocksTest extends QueryBase {
 		return actors.size();
     }
     
-    @Test
+    @Test @Ignore
     public void testSimple() {
     	log.info("*** testPersistentSimple ***");
-		assertEquals("unexpected number of actors", 1, testUpsert(LockModeType.NONE, 1));
     }
 
-    @Test
+    @Test @Ignore
     public void testNONE() {
     	log.info("*** testNONE ***");
-		assertTrue("unexpected number of actors", testUpsert(LockModeType.NONE, 5) > 1);
     }
 
-    @Test
+    @Test @Ignore
     public void testPessimisticWrite1() {
     	log.info("*** testPersistentWrite1 ***");
-		assertEquals("unexpected number of actors", 1, testUpsert(LockModeType.PESSIMISTIC_WRITE, 1));
     }
 
-    @Test
+    @Test @Ignore
     public void testPessimisticWrite() {
     	log.info("*** testPersistentWrite ***");
-		assertEquals("unexpected number of actors", 1, testUpsert(LockModeType.PESSIMISTIC_WRITE, 5));
     }
 
-    @Test
+    @Test @Ignore
     public void testPessimisticForceIncrement() {
     	log.info("*** testPersistentForceIncrement ***");
-		assertEquals("unexpected number of actors", 1, testUpsert(LockModeType.PESSIMISTIC_FORCE_INCREMENT, 5));
     }
 }

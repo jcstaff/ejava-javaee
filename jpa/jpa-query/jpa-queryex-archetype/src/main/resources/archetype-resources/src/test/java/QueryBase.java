@@ -1,9 +1,8 @@
-package myorg.queryex;
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+package ${package};
 
-import static org.junit.Assert.*;
-
-import static org.junit.Assert.*;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -13,26 +12,27 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 
-public class AutoTest {
-    private static Log log = LogFactory.getLog(Auto.class);
+public class QueryBase {
+    private static Log log = LogFactory.getLog(QueryBase.class);
     private static final String PERSISTENCE_UNIT = "queryEx-test";
-    private static EntityManagerFactory emf;
-    private EntityManager em;    
+    protected static EntityManagerFactory emf;
+    protected EntityManager em;    
 
     @BeforeClass
     public static void setUpClass() {
         log.debug("creating entity manager factory");
         emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+        EntityManager em1 = emf.createEntityManager();
+        cleanup(em1);
+        populate(em1);
     }
     
     @Before
     public void setUp() throws Exception {
         log.debug("creating entity manager");
         em = emf.createEntityManager();
-        cleanup();
         em.getTransaction().begin();
     }
 
@@ -63,30 +63,26 @@ public class AutoTest {
         if (emf!=null) { emf.close(); }
     }
     
-    public void cleanup() {
-        em.getTransaction().begin();
-        List<Auto> autos = em.createQuery("select a from Auto a", Auto.class)
-            .getResultList();
-        for (Auto a: autos) {
-            em.remove(a);
-        }
-        em.getTransaction().commit();
-        log.info("removed " + autos.size() + " autos");
+    public static void cleanup(EntityManager em) {
+    	em.getTransaction().begin();
+    	for (Movie movie : em.createQuery("from Movie", Movie.class).getResultList()) {
+    		em.remove(movie);
+    	}
+    	for (Actor actor: em.createQuery("from Actor", Actor.class).getResultList()) {
+    		em.remove(actor);
+    	}
+    	for (Director director: em.createQuery("from Director", Director.class).getResultList()) {
+    		em.remove(director);
+    	}
+    	for (Person person: em.createQuery("from Person", Person.class).getResultList()) {
+    		em.remove(person);
+    	}
+    	em.getTransaction().commit();
     }
-
-    @Test
-    public void testCreate() {
-        log.info("testCreate");
-        
-        Auto car = new Auto();
-        car.setMake("Chrysler");
-        car.setModel("Gold Duster");
-        car.setColor("Gold");
-        car.setMileage(60*1000);
-        
-        log.info("creating auto:" + car);                        
-        em.persist(car);        
-        
-        assertNotNull("car not found", em.find(Auto.class,car.getId()));
+    
+    public static void populate(EntityManager em) {
+    	em.getTransaction().begin();
+    	new MovieFactory().setEntityManager(em).populate();
+    	em.getTransaction().commit();
     }
 }

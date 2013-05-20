@@ -1,3 +1,6 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -12,10 +15,10 @@
          work correctly -->
     <persistence-unit name="queryEx-test">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <class>myorg.queryex.Person</class>
-        <class>myorg.queryex.Actor</class>
-        <class>myorg.queryex.Director</class>
-        <class>myorg.queryex.Movie</class>
-        <class>myorg.queryex.MovieRole</class>
+        <class>${package}.Person</class>
+        <class>${package}.Actor</class>
+        <class>${package}.Director</class>
+        <class>${package}.Movie</class>
+        <class>${package}.MovieRole</class>
     </persistence-unit>            
 </persistence>

@@ -12,10 +12,10 @@
          work correctly -->
     <persistence-unit name="queryEx-test">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-
-        <class>myorg.queryex.Auto</class>
-        <properties>
-           <!-- defined in src/test/resources/hibernate.properties -->
-        </properties>
+        <class>myorg.queryex.Person</class>
+        <class>myorg.queryex.Actor</class>
+        <class>myorg.queryex.Director</class>
+        <class>myorg.queryex.Movie</class>
+        <class>myorg.queryex.MovieRole</class>
     </persistence-unit>            
 </persistence>
