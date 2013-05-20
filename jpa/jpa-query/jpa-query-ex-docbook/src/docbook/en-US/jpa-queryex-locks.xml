@@ -103,7 +103,7 @@ private class Writer extends Thread {
 };]]></programlisting>                        
             </listitem>
             
-            <listitem><para>Implement the run() method for the Worker class. The method
+            <listitem><para>Implement the run() method for the Writer class. The method
                 will search for the entity in the database and either create or update
                 it depending on the result of the query.</para>
 <programlisting language="java"><![CDATA[
@@ -160,7 +160,7 @@ public void run() {
             <listitem><para>Add a helper method to setup and execute each test. This helper
                 will accept a LockModeType and count of threads to execute. The helper method
                 will supply each thread with an instance to either INSERT or UPDATE. The primary
-                key is unique -- so the thread will use a query using properties of the object.</para>
+                key is unique -- so the thread will use a query based on the properties of the object.</para>
 <programlisting language="java"><![CDATA[
 protected int testUpsert(LockModeType lockMode, int count) {
     List<Writer> writers = new ArrayList<QueryLocksTest.Writer>();
@@ -283,7 +283,8 @@ Hibernate:
  -actors=[Anne Heche, version=0]
  -writer0 => INSERT 
 ]]></programlisting>
-                <para>Notice there is an audit of what each of the threads performed (INSERT or UPDATE).</para>                        
+                <para>Notice there is an audit of what each of the threads performed (INSERT or UPDATE)
+                   at the end of the above output.</para>                        
             </listitem>
             
             <listitem><para>Add the following line to the helper method to return the number of rows found in the database.</para>
@@ -300,8 +301,8 @@ public void testSimple() {
 }]]></programlisting>                        
             </listitem>
             
-            <listitem><para>Run the simple test method to verify the functionality of the test case. Since we use a single thread, the 
-                output is pretty straight forward.</para>
+            <listitem><para>Run the simple test method to verify the functionality of the test case. Since we use a single thread 
+                and no locking, the output is pretty straight forward.</para>
 <programlisting language=""><![CDATA[
 $ mvn clean test -Dtest=myorg.queryex.QueryLocksTest#testSimple
 ...
