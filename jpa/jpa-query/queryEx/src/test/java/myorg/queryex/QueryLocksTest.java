@@ -66,6 +66,10 @@ public class QueryLocksTest extends QueryBase {
                                     .setParameter("lastName", actor.getLastName())
                                     .setMaxResults(1)
                                     .getResultList();
+                    try { 
+                        log.debug(context + " sleeping " + sleepTime + " msecs"); 
+                        Thread.sleep(sleepTime); 
+                    } catch (Exception ex){}
                     if (actors.size()==0) {
                             log.debug(context + " creating entity");
                             em_.persist(actor);
@@ -76,10 +80,6 @@ public class QueryLocksTest extends QueryBase {
                             action=Action.UPDATE;
                     }
                     em_.flush();
-                    try { 
-                            log.debug(context + " sleeping " + sleepTime + " msecs"); 
-                            Thread.sleep(sleepTime); 
-                    } catch (Exception ex){}
                     log.debug(context + " committing transaction version=" + actor.getVersion());
                             em_.getTransaction().commit();
                     log.debug(context + " committed transaction version=" + actor.getVersion());
