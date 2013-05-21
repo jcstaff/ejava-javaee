@@ -126,6 +126,10 @@ public void run() {
                     <listitem><para>We are performing an INSERT if nothing is returned -- else UPDATE</para></listitem>
                 </itemizedlist>                        
 <programlisting language="java"><![CDATA[
+        try { 
+            log.debug(context + " sleeping " + sleepTime + " msecs"); 
+            Thread.sleep(sleepTime); 
+        } catch (Exception ex){}
         if (actors.size()==0) {
             log.debug(context + " creating entity");
             em_.persist(actor);
@@ -140,10 +144,6 @@ public void run() {
                     general accounting so the main loop will know what this instance did.</para>                        
 <programlisting language="java"><![CDATA[
         em_.flush();
-        try { 
-            log.debug(context + " sleeping " + sleepTime + " msecs"); 
-            Thread.sleep(sleepTime); 
-        } catch (Exception ex){}
         log.debug(context + " committing transaction version=" + actor.getVersion());
         em_.getTransaction().commit();
         log.debug(context + " committed transaction version=" + actor.getVersion());
@@ -205,6 +205,7 @@ Hibernate:
         person1_.FIRST_NAME=? 
         and person1_.LAST_NAME=? 
         or person1_.FIRST_NAME='writer0' limit ?
+ -writer0 sleeping 100 msecs
 ]]></programlisting>
                 <para>The above code will also cause the following to be produced when no match is 
                     found by the query.</para>                        
@@ -225,11 +226,10 @@ Hibernate:
     values
         (?, ?)
 ]]></programlisting>
-                <para>The threads have been designed to delay processing between the INSERT/UPDATE
-                    and the commit() to simulate additional work and to cause neighboring threads 
+                <para>The threads have been designed to delay processing between the select and the 
+                    INSERT/UPDATE to simulate additional work and to cause neighboring threads 
                     to wait (if configured to do so).</para>                        
 <programlisting language=""><![CDATA[
- -writer0 sleeping 100 msecs
  -writer0 committing transaction version=0
  -writer0 committed transaction version=0
 ]]></programlisting>                        
