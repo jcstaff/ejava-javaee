@@ -2,8 +2,10 @@ package myorg.queryex.criteria;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.From;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
@@ -68,6 +71,7 @@ public class CriteriaTest extends QueryBase {
 		log.debug("accessing criteria results");
 		log.debug("critera results=" + cresults);
 		
+		log.debug("comparing query results");
 		assertEquals("unexpected results",  lresults, cresults);
 	}
 	
@@ -114,6 +118,7 @@ public class CriteriaTest extends QueryBase {
 		log.debug("accessing criteria results");
 		log.debug("critera results=" + cresults);
 		
+		log.debug("comparing query results");
 		assertEquals("unexpected results",  lresults, cresults);
 	}
 
@@ -157,6 +162,7 @@ public class CriteriaTest extends QueryBase {
 		log.debug("accessing criteria results");
 		log.debug("critera results=" + cresults);
 
+		log.debug("comparing query results");
 		assertEquals("unexpected results",  lresults, cresults);
 	}
 	
@@ -203,19 +209,144 @@ public class CriteriaTest extends QueryBase {
 		log.debug("accessing criteria results");
 		log.debug("critera results=" + cresults);
 
+		log.debug("comparing query results");
 		assertEquals("unexpected results",  lresults, cresults);
 	}
 
-	@Test @Ignore
+	/**
+	 * This test demonstrates the ability to provide multiple elements in the 
+	 * select clause. In this example we are also ordering the results so they
+	 * can be accurately compared. In this specific example -- we use an Object[]
+	 * for the query return type.
+	 */
+	@Test
 	public void testMultiSelect() {
-		log.info("*** testSMultiSelect ***");
+		log.info("*** testMultiSelect ***");
 		
 		//build JPAQL query
 		StringBuilder qlString = new StringBuilder()
 			.append("select distinct p.firstName, p.lastName " +
 					"from Person p ")
-			.append("where p.firstName like :pattern");
+			.append("where p.firstName like :pattern " +
+					"order by p.firstName ASC");
 		TypedQuery<Object[]> lquery = em.createQuery(qlString.toString(), Object[].class)
+			.setParameter("pattern", "R%");
+		
+		//build criteria API query
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Object[]> cqdef = cb.createQuery(Object[].class);
+		Root<Person> p = cqdef.from(Person.class);
+		TypedQuery<Object[]> cquery = em.createQuery(cqdef
+				.select(cb.array(p.get("firstName"), p.get("lastName")))  
+				.distinct(true)
+				.where(cb.like(p.<String>get("firstName"),"R%"))
+				.orderBy(cb.asc(p.get("firstName")))
+			);
+		
+		log.debug("execute JPAQL query");
+		List<Object[]> lresults = lquery.getResultList();
+		log.debug("accessing criteria results");
+		for (Object[] row: lresults) {
+			log.debug("jpaql results  =" + row[0] + " " + row[1]);
+		}
+		em.clear();
+		
+		log.debug("execute Criteria API query");
+		List<Object[]> cresults = cquery.getResultList();
+		log.debug("accessing criteria results");
+		for (Object[] row: lresults) {
+			log.debug("criteria results  =" + row[0] + " " + row[1]);
+		}
+
+		log.debug("comparing query results");
+		Iterator<Object[]> litr = lresults.iterator();
+		Iterator<Object[]> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Object[] lrow = litr.next(); Object[] crow = citr.next();
+			for (int i=0; i<2; i++) {
+				assertEquals("unexpected tuple value:" + i, lrow[i], crow[i]);
+			}
+		}
+	}
+
+	static private class FirstLast {
+		public String first;
+		public String last;
+		@SuppressWarnings("unused")
+		public FirstLast(String first, String last) {
+			this.first = first;
+			this.last = last;
+		}
+		public String toString() { return first + " " + last; }
+	}
+
+	/**
+	 * This test is the same as the prior example except that it used a constructor
+	 * of a transient object to return type-safe results over the user of Object[]
+	 */
+	@Test
+	public void testMultiSelectConstructorExpression() {
+		log.info("*** testMultiSelectConstructorExpression ***");
+		
+		
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append(String.format("select distinct new %s(p.firstName, p.lastName) ", 
+					FirstLast.class.getName()) +
+					"from Person p ")
+			.append("where p.firstName like :pattern " +
+					"order by p.firstName ASC");
+		TypedQuery<FirstLast> lquery = em.createQuery(qlString.toString(), FirstLast.class)
+			.setParameter("pattern", "R%");
+		
+		//build criteria API query
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<FirstLast> cqdef = cb.createQuery(FirstLast.class);
+		Root<Person> p = cqdef.from(Person.class);
+		TypedQuery<FirstLast> cquery = em.createQuery(cqdef
+				.select(cb.construct(FirstLast.class, p.get("firstName"), p.get("lastName")))  
+				//.multiselect(p.get("firstName"), p.get("lastName")) //shorthand	  
+				.distinct(true)
+				.where(cb.like(p.<String>get("firstName"),"R%"))
+				.orderBy(cb.asc(p.get("firstName")))
+			);
+		
+		log.debug("execute JPAQL query");
+		List<FirstLast> lresults = lquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("jpaql results   =" + lresults);
+		em.clear();
+		
+		log.debug("execute Criteria API query");
+		List<FirstLast> cresults = cquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("criteria results=" + cresults);
+
+		log.debug("comparing query results");
+		Iterator<FirstLast> litr = lresults.iterator();
+		Iterator<FirstLast> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			FirstLast lrow = litr.next(); FirstLast crow = citr.next();
+			assertEquals("unexpected tuple value:first", lrow.first, crow.first);
+			assertEquals("unexpected tuple value:last", lrow.last, crow.last);
+		}
+	}
+
+	/**
+	 * This example is the same as before except it is using the JPA Tuple interface
+	 * for the return type.
+	 */
+	@Test
+	public void testMultiSelectTuple() {
+		log.info("*** testMultiSelectTuple ***");
+		
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select distinct p.firstName as fname, p.lastName as lname " +
+					"from Person p ")
+			.append("where p.firstName like :pattern " +
+					"order by p.firstName ASC");
+		TypedQuery<Tuple> lquery = em.createQuery(qlString.toString(), Tuple.class)
 			.setParameter("pattern", "R%");
 		
 		//build criteria API query
@@ -223,22 +354,45 @@ public class CriteriaTest extends QueryBase {
 		CriteriaQuery<Tuple> cqdef = cb.createTupleQuery();
 		Root<Person> p = cqdef.from(Person.class);
 		TypedQuery<Tuple> cquery = em.createQuery(cqdef
-				.select(cb.tuple(p.get("firstName"), p.get("lastName")))  
+				.select(cb.tuple(
+						p.get("firstName").alias("fname"), 
+						p.get("lastName").alias("lname"))) 
+				//.multiselect(  //shorthand
+				//		p.get("firstName").alias("fname"), 
+				//		p.get("lastName").alias("lname")) 
 				.distinct(true)
 				.where(cb.like(p.<String>get("firstName"),"R%"))
+				.orderBy(cb.asc(p.get("firstName")))
 			);
 		
 		log.debug("execute JPAQL query");
-		List<Object[]> lresults = lquery.getResultList();
-		log.debug("jpaql results  =" + lresults);
+		List<Tuple> lresults = lquery.getResultList();
 		log.debug("accessing criteria results");
+		for (Tuple t: lresults) {
+			log.debug("jpaql results  =" + 
+					t.get("fname",String.class) + " " + 
+					t.get("lname", String.class));
+		}
 		em.clear();
 		
 		log.debug("execute Criteria API query");
 		List<Tuple> cresults = cquery.getResultList();
 		log.debug("accessing criteria results");
-		log.debug("critera results=" + cresults);
+		for (Tuple t: cresults) {
+			log.debug("criteria results  =" + 
+					t.get("fname",String.class) + " " + 
+					t.get("lname", String.class));
+		}
 
-		assertEquals("unexpected results",  lresults, cresults);
+		log.debug("comparing query results");
+		Iterator<Tuple> litr = lresults.iterator();
+		Iterator<Tuple> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Tuple lt = litr.next(); Tuple ct = citr.next();
+			for (String alias: new String[]{"fname","lname"}) {
+				assertEquals("unexpected tuple value:" + alias, 
+					lt.get(alias,String.class), ct.get(alias, String.class));
+			}
+		}
 	}
 }
