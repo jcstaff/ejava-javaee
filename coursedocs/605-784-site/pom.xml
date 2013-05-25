@@ -60,6 +60,13 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>ejava.jpa</groupId>
+            <artifactId>jpa-query-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+       </dependency>
+        <dependency>
             <groupId>ejava.webejb</groupId>
             <artifactId>webejb-docbook</artifactId>
             <version>${project.version}</version>
@@ -139,6 +146,13 @@
                 <overlay>
                     <groupId>ejava.jpa</groupId>
                     <artifactId>entitymanager-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.jpa</groupId>
+                    <artifactId>jpa-query-docbook</artifactId>
+                    <version>${project.version}</version>
                     <type>war</type>
                     <targetPath>../site/docs/content</targetPath>
                </overlay>
