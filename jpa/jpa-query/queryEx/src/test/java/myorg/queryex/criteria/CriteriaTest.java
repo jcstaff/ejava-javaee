@@ -3,6 +3,7 @@ package myorg.queryex.criteria;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -23,6 +24,7 @@ import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
@@ -571,11 +573,10 @@ public class CriteriaTest extends QueryBase {
 		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
 		Root<Movie> m = cqdef.from(Movie.class);
-		TypedQuery<Movie> cquery = em2.createQuery(cqdef
-				.select(m)
-				.where(cb.equal(m.get("rating"), MovieRating.R))
-				.orderBy(cb.asc(m.get("releaseDate")))
-			);
+		cqdef.select(m)
+			.where(cb.equal(m.get("rating"), MovieRating.R))
+			.orderBy(cb.asc(m.get("releaseDate")));
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef);
 		
 		log.debug("execute JPAQL query");
 		List<Movie> lresults = lquery.getResultList();
@@ -595,46 +596,76 @@ public class CriteriaTest extends QueryBase {
 			assertTrue(String.format("unequal movies: (%s) (%s)", lm, cm), 
 					lm.equals(cm));
 		}
-		em2.close();
 	}
 
-	@Test @Ignore
+	/**
+	 * This test provides an example of using multiple predicates in the 
+	 * where clause. It also provides an example of using parameters -- which
+	 * was leveraged to provide a TemporalType.DATE comparison. Using parameters
+	 * does provide a syntax a little closer to 1:1 with JPAQL -- but the 
+	 * effort it takes to setup and supply parameter makes the Criteria
+	 * approach much more verbose. 
+	 */
+	@Test
 	public void testWherePredicates() {
 		log.info("*** testWherePredicates ***");
 		
 		//build JPAQL query
 		StringBuilder qlString = new StringBuilder()
 			.append("select distinct m from Movie m " +
-					"where m.rating=:rating ")
-			.append("order by m.releaseDate ASC");
+					"INNER JOIN m.genres genre " +
+					"JOIN FETCH m.genres ")
+			.append("where m.rating=:rating " +
+					"and genre like :genre " +
+					"and m.releaseDate >=:releaseDate ")
+			.append("order by m.releaseDate ASC ");
 		TypedQuery<Movie> lquery = em.createQuery(qlString.toString(), Movie.class)
-			.setParameter("rating", MovieRating.R);
+			.setParameter("rating", MovieRating.R)
+			.setParameter("genre", "%Comedy%")
+			.setParameter("releaseDate", 
+					new GregorianCalendar(1990, 0, 0).getTime(), 
+					TemporalType.DATE);
 		
 		//build criteria API query
 		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
 		Root<Movie> m = cqdef.from(Movie.class);
-		TypedQuery<Movie> cquery = em2.createQuery(cqdef
-				.select(m)
-				.where(cb.and(
-						cb.equal(m.get("rating"), MovieRating.R)
-					   ),
-					   cb.or(
-						cb.equal(m.get("rating"), MovieRating.R)
-					   )
-			     )
-				.orderBy(cb.asc(m.get("releaseDate")))
-			);
+		Join<Movie, String> genre = m.join("genres");
+		m.fetch("genres"); //eager load genres		
+		ParameterExpression<Date> releaseDateParam = 
+				cb.parameter(Date.class, "releaseDate");
+		ParameterExpression<MovieRating> ratingParam = 
+				cb.parameter(MovieRating.class, "rating");		
+		ParameterExpression<String> genreParam = 
+				cb.parameter(String.class, "genre");
+		cqdef.select(m).distinct(true)
+			.where(cb.equal(m.get("rating"), ratingParam),
+				   cb.like(genre, genreParam),
+				   cb.greaterThanOrEqualTo(
+						m.<Date>get("releaseDate"), releaseDateParam))
+			.orderBy(cb.desc(m.get("releaseDate")));
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef)
+			.setParameter("rating", MovieRating.R)
+			.setParameter("genre", "%Comedy%")
+			.setParameter("releaseDate", 
+					new GregorianCalendar(1990,0,0).getTime(), 
+					TemporalType.DATE);
 		
 		log.debug("execute JPAQL query");
 		List<Movie> lresults = lquery.getResultList();
 		log.debug("accessing criteria results");
 		log.debug("jpaql results  =" + lresults); 
+		for (Movie movie : lresults) {
+			log.debug("jpaql results  =" +  movie + movie.getGenres());
+		}
 		
 		log.debug("execute Criteria API query");
 		List<Movie> cresults = cquery.getResultList();
 		log.debug("accessing criteria results");
-		log.debug("criteria results  =" +  cresults);
+		log.debug("criteria results=" + lresults); 
+		for (Movie movie : cresults) {
+			log.debug("criteria results=" +  movie + movie.getGenres());
+		}
 
 		log.debug("comparing query results");
 		Iterator<Movie> litr = lresults.iterator();
@@ -643,7 +674,94 @@ public class CriteriaTest extends QueryBase {
 			Movie lm = litr.next(); Movie cm = citr.next();
 			assertTrue(String.format("unequal movies: (%s) (%s)", lm, cm), 
 					lm.equals(cm));
+			assertArrayEquals("unexpected genres", 
+					lm.getGenres().toArray(new String[]{}), 
+					cm.getGenres().toArray(new String[]{})
+					);
 		}
-		em2.close();
 	}
+	
+	/**
+	 * This test provides a demonstration of building up the wehere clause
+	 * Predicate in an incremental manner.
+	 */
+	@Test
+	public void testIncrementalWherePredicates() {
+		log.info("*** testIncrementalWherePredicates ***");
+		
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select distinct m from Movie m " +
+					"INNER JOIN m.genres genre " +
+					"JOIN FETCH m.genres ");
+		//iteratively build up the where clause -- supply first in-line
+		qlString.append(String.format("where m.rating='%s' ", MovieRating.R.name()));
+		qlString.append("and genre like :genre ");
+		qlString.append("and m.releaseDate >=:releaseDate ");
+		//add the trailing order by clause
+		qlString.append("order by m.releaseDate ASC ");
+		//form the base query
+		TypedQuery<Movie> lquery = em.createQuery(qlString.toString(), Movie.class);
+		//incrementally add parameter values 
+		lquery.setParameter("genre", "%Comedy%");
+		lquery.setParameter("releaseDate", 
+					new GregorianCalendar(1990, 0, 0).getTime(), 
+					TemporalType.DATE);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
+		Root<Movie> m = cqdef.from(Movie.class);
+		Join<Movie, String> genre = m.join("genres");
+		m.fetch("genres"); //eager load genres		
+		cqdef.select(m).distinct(true)
+			.orderBy(cb.desc(m.get("releaseDate")));		
+		//incrementally build up the where clause -- supply first in-line
+		Predicate predicate = cb.conjunction();
+		predicate = cb.and(predicate, 
+			cb.equal(m.get("rating"), MovieRating.R));
+		predicate = cb.and(predicate, 
+			cb.like(genre, 
+				    cb.parameter(String.class,"genre")));
+		predicate = cb.and(predicate, 
+			cb.greaterThanOrEqualTo(m.<Date>get("releaseDate"), 
+				    cb.parameter(Date.class,"releaseDate")));
+		cqdef.where(predicate);
+
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef);
+		cquery.setParameter("genre", "%Comedy%");
+		cquery.setParameter("releaseDate", 
+					new GregorianCalendar(1990,0,0).getTime(), 
+					TemporalType.DATE);
+		
+		log.debug("execute JPAQL query");
+		List<Movie> lresults = lquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("jpaql results  =" + lresults); 
+		for (Movie movie : lresults) {
+			log.debug("jpaql results  =" +  movie + movie.getGenres());
+		}
+		
+		log.debug("execute Criteria API query");
+		List<Movie> cresults = cquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("criteria results=" + lresults); 
+		for (Movie movie : cresults) {
+			log.debug("criteria results=" +  movie + movie.getGenres());
+		}
+
+		log.debug("comparing query results");
+		Iterator<Movie> litr = lresults.iterator();
+		Iterator<Movie> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Movie lm = litr.next(); Movie cm = citr.next();
+			assertTrue(String.format("unequal movies: (%s) (%s)", lm, cm), 
+					lm.equals(cm));
+			assertArrayEquals("unexpected genres", 
+					lm.getGenres().toArray(new String[]{}), 
+					cm.getGenres().toArray(new String[]{})
+					);
+		}
+	}
+	
 }
