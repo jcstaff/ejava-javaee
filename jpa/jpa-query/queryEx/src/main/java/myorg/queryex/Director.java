@@ -65,8 +65,8 @@ public class Director {
 			if (obj==null) { return false; }
 			Director rhs = (Director)obj;
 			if (person == null) {
-				if (rhs.person != null) { return false; }
-			} else if (!person.equals(rhs.person)) {
+				if (rhs.getPerson() != null) { return false; }
+			} else if (!person.equals(rhs.getPerson())) {
 				return false;
 			}
 			return true;

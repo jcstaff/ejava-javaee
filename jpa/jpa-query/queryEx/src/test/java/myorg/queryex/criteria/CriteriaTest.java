@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.TemporalType;
@@ -17,25 +18,55 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.From;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 
+import myorg.queryex.Actor;
 import myorg.queryex.Director;
 import myorg.queryex.Movie;
 import myorg.queryex.MovieRating;
+import myorg.queryex.MovieRole;
 import myorg.queryex.Person;
 import myorg.queryex.QueryBase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class CriteriaTest extends QueryBase {
 	private static final Log log = LogFactory.getLog(CriteriaTest.class);
+	private EntityManager em2; //second persistence context for parallel queries
+	
+	@Before
+	public void init() {
+		if (emf!=null) {
+			em2=emf.createEntityManager();
+		}
+	}
+	
+	@After
+	public void destroy() {
+		if (em2!=null && em2.isOpen()) {
+			if (em2.getTransaction().isActive()) {
+				if (em2.getTransaction().getRollbackOnly()) {
+					em2.getTransaction().rollback();
+				} else {
+					em2.getTransaction().commit();
+				}
+			}
+			em2.close();
+		}
+	}
+	
 
 	/**
 	 * This test demonstrates a basic criteria query as a starting point.
@@ -53,10 +84,10 @@ public class CriteriaTest extends QueryBase {
 			.setParameter("firstName", "Ron");
 		
 		//build criteria API query
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<Person> cqdef = cb.createQuery(Person.class);
 		Root<Person> p = cqdef.from(Person.class); 
-		TypedQuery<Person> cquery = em.createQuery(cqdef
+		TypedQuery<Person> cquery = em2.createQuery(cqdef
 				.select(p)
 				.where(cb.equal(p.get("firstName"), "Ron")));
 		
@@ -64,7 +95,6 @@ public class CriteriaTest extends QueryBase {
 		List<Person> lresults = lquery.getResultList();
 		log.debug("accessing jpaql results");
 		log.debug("jpaql results  =" + lresults);
-		em.clear();
 		
 		log.debug("execute Criteria API query");
 		List<Person> cresults = cquery.getResultList();		
@@ -96,11 +126,11 @@ public class CriteriaTest extends QueryBase {
 			.setParameter("firstName", "Ron");
 		
 		//build criteria API query
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<Director> cqdef = cb.createQuery(Director.class);
 		Root<Director> d = cqdef.from(Director.class); //from
 		Root<Person> p = cqdef.from(Person.class);     //from
-		TypedQuery<Director> cquery = em.createQuery(cqdef
+		TypedQuery<Director> cquery = em2.createQuery(cqdef
 				.select(d)
 				.where(cb.and(
 						cb.equal(d.get("person"), p)), 
@@ -141,10 +171,10 @@ public class CriteriaTest extends QueryBase {
 			.setParameter("firstName", "Ron");
 		
 		//build criteria API query
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<Director> cqdef = cb.createQuery(Director.class);
 		Root<Director> d = cqdef.from(Director.class);
-		TypedQuery<Director> cquery = em.createQuery(cqdef
+		TypedQuery<Director> cquery = em2.createQuery(cqdef
 				.select(d)//non-portable to eliminate redundant select() matching from()
 				.where(cb.equal( 
 						d.get("person").get("firstName") //Path expression
@@ -155,7 +185,6 @@ public class CriteriaTest extends QueryBase {
 		List<Director> lresults = lquery.getResultList();
 		log.debug("jpaql results  =" + lresults);
 		log.debug("accessing criteria results");
-		em.clear();
 		
 		log.debug("execute Criteria API query");
 		List<Director> cresults = cquery.getResultList();
@@ -187,10 +216,10 @@ public class CriteriaTest extends QueryBase {
 			.setParameter("pattern", "R%");
 		
 		//build criteria API query
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<String> cqdef = cb.createQuery(String.class);
 		Root<Person> p = cqdef.from(Person.class);
-		TypedQuery<String> cquery = em.createQuery(cqdef
+		TypedQuery<String> cquery = em2.createQuery(cqdef
 				//passing an path expression to select() rather than root
 			.select(p.<String>get("firstName"))   //select
 			.distinct(true)
@@ -202,7 +231,6 @@ public class CriteriaTest extends QueryBase {
 		List<String> lresults = lquery.getResultList();
 		log.debug("jpaql results  =" + lresults);
 		log.debug("accessing criteria results");
-		em.clear();
 		
 		log.debug("execute Criteria API query");
 		List<String> cresults = cquery.getResultList();
@@ -233,10 +261,10 @@ public class CriteriaTest extends QueryBase {
 			.setParameter("pattern", "R%");
 		
 		//build criteria API query
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<Object[]> cqdef = cb.createQuery(Object[].class);
 		Root<Person> p = cqdef.from(Person.class);
-		TypedQuery<Object[]> cquery = em.createQuery(cqdef
+		TypedQuery<Object[]> cquery = em2.createQuery(cqdef
 				.select(cb.array(p.get("firstName"), p.get("lastName")))  
 				.distinct(true)
 				.where(cb.like(p.<String>get("firstName"),"R%"))
@@ -249,7 +277,6 @@ public class CriteriaTest extends QueryBase {
 		for (Object[] row: lresults) {
 			log.debug("jpaql results  =" + row[0] + " " + row[1]);
 		}
-		em.clear();
 		
 		log.debug("execute Criteria API query");
 		List<Object[]> cresults = cquery.getResultList();
@@ -288,7 +315,6 @@ public class CriteriaTest extends QueryBase {
 	public void testMultiSelectConstructorExpression() {
 		log.info("*** testMultiSelectConstructorExpression ***");
 		
-		
 		//build JPAQL query
 		StringBuilder qlString = new StringBuilder()
 			.append(String.format("select distinct new %s(p.firstName, p.lastName) ", 
@@ -300,10 +326,10 @@ public class CriteriaTest extends QueryBase {
 			.setParameter("pattern", "R%");
 		
 		//build criteria API query
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<FirstLast> cqdef = cb.createQuery(FirstLast.class);
 		Root<Person> p = cqdef.from(Person.class);
-		TypedQuery<FirstLast> cquery = em.createQuery(cqdef
+		TypedQuery<FirstLast> cquery = em2.createQuery(cqdef
 				.select(cb.construct(FirstLast.class, p.get("firstName"), p.get("lastName")))  
 				//.multiselect(p.get("firstName"), p.get("lastName")) //shorthand	  
 				.distinct(true)
@@ -315,7 +341,6 @@ public class CriteriaTest extends QueryBase {
 		List<FirstLast> lresults = lquery.getResultList();
 		log.debug("accessing criteria results");
 		log.debug("jpaql results   =" + lresults);
-		em.clear();
 		
 		log.debug("execute Criteria API query");
 		List<FirstLast> cresults = cquery.getResultList();
@@ -350,10 +375,10 @@ public class CriteriaTest extends QueryBase {
 			.setParameter("pattern", "R%");
 		
 		//build criteria API query
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
 		CriteriaQuery<Tuple> cqdef = cb.createTupleQuery();
 		Root<Person> p = cqdef.from(Person.class);
-		TypedQuery<Tuple> cquery = em.createQuery(cqdef
+		TypedQuery<Tuple> cquery = em2.createQuery(cqdef
 				.select(cb.tuple(
 						p.get("firstName").alias("fname"), 
 						p.get("lastName").alias("lname"))) 
@@ -373,7 +398,6 @@ public class CriteriaTest extends QueryBase {
 					t.get("fname",String.class) + " " + 
 					t.get("lname", String.class));
 		}
-		em.clear();
 		
 		log.debug("execute Criteria API query");
 		List<Tuple> cresults = cquery.getResultList();
@@ -394,5 +418,232 @@ public class CriteriaTest extends QueryBase {
 					lt.get(alias,String.class), ct.get(alias, String.class));
 			}
 		}
+	}
+
+	/**
+	 * This test method demonstrates extending the query of the root to 
+	 * related objects through a join. 
+	 */
+	@Test
+	public void testJoin() {
+		log.info("*** testJoin ***");
+		
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select distinct m from Movie m " +
+					"LEFT JOIN m.director d " +
+					"LEFT JOIN d.person p ")
+			.append("where p.firstName=:firstName ")
+			.append("order by m.releaseDate ASC ");
+		TypedQuery<Movie> lquery = em.createQuery(qlString.toString(), Movie.class)
+			.setParameter("firstName", "Ron");
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
+		Root<Movie> m = cqdef.from(Movie.class);
+		Join<Movie, Director> d = m.join("director", JoinType.LEFT);
+		Join<Director, Person> p = d.join("person", JoinType.LEFT);
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef
+				.select(m)
+				.distinct(true)
+				.where(cb.equal(p.get("firstName"), "Ron"))
+				.orderBy(cb.asc(m.get("releaseDate")))
+			);
+		
+		log.debug("execute JPAQL query");
+		List<Movie> lresults = lquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("jpaql results  =" + lresults); 
+		
+		log.debug("execute Criteria API query");
+		List<Movie> cresults = cquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("criteria results  =" +  cresults);
+
+		log.debug("comparing query results");
+		Iterator<Movie> litr = lresults.iterator();
+		Iterator<Movie> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Movie lm = litr.next(); Movie cm = citr.next();
+			assertTrue(String.format("unequal movies: (%s) (%s)", lm, cm), 
+					lm.equals(cm));
+			assertTrue(String.format("unequal directors: (%s) (%s)", 
+					lm.getDirector() , cm.getDirector()), 
+					lm.getDirector().equals(cm.getDirector()));
+			Iterator<MovieRole> lmrItr = lm.getCast().iterator();
+			Iterator<MovieRole> cmrItr = cm.getCast().iterator();
+			while (lmrItr.hasNext() && cmrItr.hasNext()) {
+				MovieRole lmr=lmrItr.next(); MovieRole cmr=cmrItr.next();
+				assertTrue(String.format("unequal role: (%s) (%s)", lmr , cmr), 
+						lmr.equals(cmr));
+			}
+		}
+		em2.close();
+	}
+
+	/**
+	 * This class demonstrates the use of a FETCH JOIN -- where related 
+	 * entities are retrieved from the database as a side-effect of executing
+	 * the query. 
+	 */
+	@Test
+	@SuppressWarnings("unused")
+	public void testFetchJoin() {
+		log.info("*** testFetchJoin ***");
+
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select distinct m from Movie m " +
+					"LEFT JOIN FETCH m.director d " +
+					"LEFT JOIN FETCH m.cast role " +
+					"LEFT JOIN FETCH d.person dp " +
+					"LEFT JOIN FETCH role.actor actor " +
+					"LEFT JOIN FETCH actor.person ap ")
+			.append("order by m.releaseDate ASC");
+		TypedQuery<Movie> lquery = em.createQuery(qlString.toString(), Movie.class);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
+		Root<Movie> m = cqdef.from(Movie.class);
+		Fetch<Movie, Director> d = m.fetch("director", JoinType.LEFT);
+		Fetch<Director, Person> dp = d.fetch("person", JoinType.LEFT);
+		Fetch<Movie, MovieRole> role = m.fetch("cast", JoinType.LEFT);
+		Fetch<MovieRole, Actor> actor = role.fetch("actor", JoinType.LEFT);
+		Fetch<Actor, Person> ap = actor.fetch("person", JoinType.LEFT);
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef
+				.select(m)
+				.distinct(true)
+				.orderBy(cb.asc(m.get("releaseDate")))
+			);
+		
+		log.debug("execute JPAQL query");
+		List<Movie> lresults = lquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("jpaql results  =" + lresults); 
+		
+		log.debug("execute Criteria API query");
+		List<Movie> cresults = cquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("criteria results  =" +  cresults);
+
+		log.debug("closing entity managers since all data FETCHed");
+		em.close(); em=null; em2.close();
+		
+		log.debug("comparing query results");
+		Iterator<Movie> litr = lresults.iterator();
+		Iterator<Movie> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Movie lm = litr.next(); Movie cm = citr.next();
+			assertTrue(String.format("unequal movies: (%s) (%s)", lm, cm), 
+					lm.equals(cm));
+			assertTrue(String.format("unequal directors: (%s) (%s)", 
+					lm.getDirector() , cm.getDirector()), 
+					lm.getDirector().equals(cm.getDirector()));
+			Iterator<MovieRole> lmrItr = lm.getCast().iterator();
+			Iterator<MovieRole> cmrItr = cm.getCast().iterator();
+			while (lmrItr.hasNext() && cmrItr.hasNext()) {
+				MovieRole lmr=lmrItr.next(); MovieRole cmr=cmrItr.next();
+				assertTrue(String.format("unequal role: (%s) (%s)", lmr , cmr), 
+						lmr.equals(cmr));
+			}
+		}
+	}
+
+	/**
+	 * This test demonstrates use of the were clause with a single boolean
+	 * expression.
+	 */
+	@Test
+	public void testWhereBooleanExpression() {
+		log.info("*** testWhereBooleanExpression ***");
+		
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select distinct m from Movie m " +
+					"where m.rating=:rating ")
+			.append("order by m.releaseDate ASC");
+		TypedQuery<Movie> lquery = em.createQuery(qlString.toString(), Movie.class)
+			.setParameter("rating", MovieRating.R);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
+		Root<Movie> m = cqdef.from(Movie.class);
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef
+				.select(m)
+				.where(cb.equal(m.get("rating"), MovieRating.R))
+				.orderBy(cb.asc(m.get("releaseDate")))
+			);
+		
+		log.debug("execute JPAQL query");
+		List<Movie> lresults = lquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("jpaql results  =" + lresults); 
+		
+		log.debug("execute Criteria API query");
+		List<Movie> cresults = cquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("criteria results  =" +  cresults);
+
+		log.debug("comparing query results");
+		Iterator<Movie> litr = lresults.iterator();
+		Iterator<Movie> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Movie lm = litr.next(); Movie cm = citr.next();
+			assertTrue(String.format("unequal movies: (%s) (%s)", lm, cm), 
+					lm.equals(cm));
+		}
+		em2.close();
+	}
+
+	@Test @Ignore
+	public void testWherePredicates() {
+		log.info("*** testWherePredicates ***");
+		
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select distinct m from Movie m " +
+					"where m.rating=:rating ")
+			.append("order by m.releaseDate ASC");
+		TypedQuery<Movie> lquery = em.createQuery(qlString.toString(), Movie.class)
+			.setParameter("rating", MovieRating.R);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
+		Root<Movie> m = cqdef.from(Movie.class);
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef
+				.select(m)
+				.where(cb.and(
+						cb.equal(m.get("rating"), MovieRating.R)
+					   ),
+					   cb.or(
+						cb.equal(m.get("rating"), MovieRating.R)
+					   )
+			     )
+				.orderBy(cb.asc(m.get("releaseDate")))
+			);
+		
+		log.debug("execute JPAQL query");
+		List<Movie> lresults = lquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("jpaql results  =" + lresults); 
+		
+		log.debug("execute Criteria API query");
+		List<Movie> cresults = cquery.getResultList();
+		log.debug("accessing criteria results");
+		log.debug("criteria results  =" +  cresults);
+
+		log.debug("comparing query results");
+		Iterator<Movie> litr = lresults.iterator();
+		Iterator<Movie> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Movie lm = litr.next(); Movie cm = citr.next();
+			assertTrue(String.format("unequal movies: (%s) (%s)", lm, cm), 
+					lm.equals(cm));
+		}
+		em2.close();
 	}
 }
