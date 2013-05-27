@@ -28,6 +28,7 @@ import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
+import javax.persistence.criteria.Subquery;
 
 import myorg.queryex.Actor;
 import myorg.queryex.Director;
@@ -763,5 +764,523 @@ public class CriteriaTest extends QueryBase {
 					);
 		}
 	}
+
+	/**
+	 * This test provides a demonstration of using literal values. Many of the 
+	 * Criteria API work correctly with many built-in data types, but there are
+	 * times when you need to wrap a literal value of type T as an Expression<T>
+	 * or to express a null value. In this case the literal(T value) or 
+	 * nullLiteral(T valueType) is used to build the required expression.
+	 */
+	@Test
+	public void testBasicLiterals() {
+		log.info("*** testBasicQuery ***");
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select p from Person p ")
+			.append("where " +
+					"p.birthDate is null " +
+					"or p.birthDate > :birthDate ")
+			.append("order by lastName ASC");
+		TypedQuery<Person> lquery = em.createQuery(qlString.toString(), Person.class)
+			.setParameter("birthDate", new GregorianCalendar(1950, 0, 0).getTime());
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Person> cqdef = cb.createQuery(Person.class);
+		Root<Person> p = cqdef.from(Person.class); 
+		cqdef.select(p)				
+			.where(cb.or(
+				cb.equal(p.get("birthDate"), cb.nullLiteral(Date.class)),
+				cb.greaterThan(p.<Date>get("birthDate"), 
+					cb.literal(new GregorianCalendar(1950, 0, 0).getTime()))
+			))
+			.orderBy(cb.asc(p.get("lastName")));
+		TypedQuery<Person> cquery = em2.createQuery(cqdef);
+		
+		log.debug("execute JPAQL query");
+		List<Person> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Person person: lresults) {
+			log.debug("jpaql results  =" + person + ", " + person.getBirthDate());
+		}
+		
+		log.debug("execute Criteria API query");
+		List<Person> cresults = cquery.getResultList();		
+		log.debug("accessing criteria results");
+		log.debug("critera results=" + cresults);
+		for (Person person: cresults) {
+			log.debug("critera results=" + person + ", " + person.getBirthDate());
+		}
+		
+		log.debug("comparing query results");
+		assertEquals("unexpected results",  lresults, cresults);
+	}
+
+	/**
+	 * This test demonstrates a subquery. It also demonstrates a multi-select
+	 * so that that targeted objects are eagerly loaded by the query. The 
+	 * subquery is used to locate all Movies with Kevin Bacon. The outer query
+	 * locates all actors that were also in a Kevin Bacon movie.
+	 */
+	@Test
+	public void testSubQuery() {
+		log.info("*** testSubQuery ***");
+		//build JPAQL query
+			//build the subquery
+		StringBuilder subqlString = new StringBuilder()
+			.append("select m from Movie m " +
+					"JOIN m.cast role ")
+			.append("where " +
+					"role.actor.person.firstName = 'Kevin' " +
+					"and role.actor.person.lastName = 'Bacon'");
+			//build the outer query
+		StringBuilder qlString = new StringBuilder()
+			.append("select a as actor, m as movie, p as person " +
+					"from Actor a, Movie m, Person p " +
+					"JOIN a.roles role ")
+			.append("where ")
+			.append("not (p.firstName='Kevin' and p.lastName='Bacon') ")
+			.append("and m=role.movie ")
+			.append("and p=a.person ")
+			.append(String.format("and role.movie in (%s) ", 
+						subqlString.toString()))
+			.append("order by p.lastName ASC");
+		log.debug(qlString.toString());
+		TypedQuery<Tuple> lquery = em.createQuery(qlString.toString(), Tuple.class);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Tuple> cqdef = cb.createQuery(Tuple.class);
+		Root<Actor> a = cqdef.from(Actor.class);
+		Root<Movie> m = cqdef.from(Movie.class);
+		Root<Person> p = cqdef.from(Person.class);
+		Join<Actor, MovieRole> role = a.join("roles");
+
+		//build the subquery
+		Subquery<Movie> sqdef = cqdef.subquery(Movie.class);
+		Root<Movie> m2 = sqdef.from(Movie.class);
+		Join<Movie,MovieRole> r2 = m2.join("cast");
+		sqdef.select(m2)
+		  .where(cb.equal(r2.get("actor").get("person").get("firstName"),"Kevin"),
+				 cb.equal(r2.get("actor").get("person").get("lastName"),"Bacon"));
+		  
+			//build outer query
+		cqdef.multiselect(a.alias("actor"),m.alias("movie"),p.alias("person"))
+			.where(
+				   cb.not(cb.and(
+							cb.equal(p.get("firstName"),"Kevin"),
+							cb.equal(p.get("lastName"), "Bacon")
+							) //and
+					), //not+and
+				   cb.equal(m, role.get("movie")),
+				   cb.equal(p, a.get("person")),
+				   cb.in(m).value(sqdef)
+				) //where
+		     .orderBy(cb.asc(p.get("lastName")));
+		TypedQuery<Tuple> cquery = em2.createQuery(cqdef);
+
+		log.debug("execute JPAQL query");
+		List<Tuple> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Tuple row: lresults) {
+			log.debug("jpaql results  =" + row.get(0) + ", " + row.get(1));
+		}
+		
+		log.debug("execute Criteria API query");
+		List<Tuple> cresults = cquery.getResultList();		
+		log.debug("accessing criteria results");
+		log.debug("critera results=" + cresults);
+		for (Tuple row : cresults) {
+			log.debug("critera results=" + row.get(0) + ", " + row.get(1));
+		}
+
+		log.debug("comparing query results");
+		Iterator<Tuple> litr = lresults.iterator();
+		Iterator<Tuple> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Actor lactor = litr.next().get("actor",Actor.class);
+			Actor cactor = citr.next().get("actor",Actor.class);
+			assertTrue(
+				String.format("different actors (%s) (%s)", lactor, cactor), 
+				lactor.equals(cactor));
+		}
+		assertFalse("lopsided number of entities", 
+				litr.hasNext() || citr.hasNext());
+	}
+
 	
+	@Test
+	public void testSubQuery2() {
+		log.info("*** testSubQuery2 ***");
+		//build JPAQL query
+			//build the subquery
+		StringBuilder subqlString = new StringBuilder()
+			.append("select m from Movie m " +
+					"JOIN m.cast role ")
+			.append("where " +
+					"role.actor.person.firstName = 'Kevin' " +
+					"and role.actor.person.lastName = 'Bacon'");
+			//build the outer query
+		StringBuilder qlString = new StringBuilder()
+			.append("select role as role, a as actor " +
+					"from MovieRole role, Actor a " +
+					"JOIN FETCH role.movie m " +
+					"JOIN FETCH a.person p ")
+			.append("where ")
+			.append("not (p.firstName='Kevin' and p.lastName='Bacon') ")
+			.append("and m=role.movie ")
+			.append("and a=role.actor ")
+			.append("and p=a.person ")
+			.append(String.format("and role.movie in (%s) ", 
+					subqlString.toString()))
+			.append("order by p.lastName ASC");
+		log.debug(qlString.toString());
+		TypedQuery<Tuple> lquery = em.createQuery(
+				qlString.toString(), Tuple.class);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Tuple> cqdef = cb.createQuery(Tuple.class);
+		Root<MovieRole> role = cqdef.from(MovieRole.class);
+		Root<Actor> a = cqdef.from(Actor.class);
+		Join<MovieRole,Movie> m = role.join("movie");
+		Join<Actor,Person> p = a.join("person");
+		role.fetch("movie");
+		a.fetch("person");
+
+		//build the subquery
+		Subquery<Movie> sqdef = cqdef.subquery(Movie.class);
+		Root<Movie> m2 = sqdef.from(Movie.class);
+		Join<Movie,MovieRole> r2 = m2.join("cast");
+		sqdef.select(m2)
+		  .where(cb.equal(r2.get("actor").get("person").get("firstName"),"Kevin"),
+				 cb.equal(r2.get("actor").get("person").get("lastName"),"Bacon"));
+		  
+			//build outer query
+		cqdef.multiselect(role.alias("role"),a.alias("actor"))
+			.where(
+				   cb.not(cb.and(
+							cb.equal(p.get("firstName"),"Kevin"),
+							cb.equal(p.get("lastName"), "Bacon")
+							) //and
+					), //not+and
+				   cb.equal(m, role.get("movie")),
+				   cb.equal(a, role.get("actor")),
+				   cb.equal(p, a.get("person")),
+				   cb.in(m).value(sqdef)
+				) //where
+		     .orderBy(cb.asc(p.get("lastName")));
+		TypedQuery<Tuple> cquery = em2.createQuery(cqdef);
+
+		log.debug("execute JPAQL query");
+		List<Tuple> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Tuple r: lresults) {
+			log.debug("jpaql results  =" + 
+					r.get("actor") + ", " + 
+					r.get("role", MovieRole.class).getMovie());
+		}
+		
+		log.debug("execute Criteria API query");
+		List<Tuple> cresults = cquery.getResultList();		
+		log.debug("accessing criteria results");
+		log.debug("critera results=" + cresults);
+		for (Tuple row : cresults) {
+			log.debug("critera results=" + 
+					row.get("actor") + ", " + 
+					row.get("role", MovieRole.class).getMovie());
+		}
+
+		log.debug("comparing query results");
+		Iterator<Tuple> litr = lresults.iterator();
+		Iterator<Tuple> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Actor lactor = litr.next().get("actor", Actor.class);
+			Actor cactor = citr.next().get("actor",Actor.class);
+			assertTrue(String.format("different actors (%s) (%s)", lactor, cactor), 
+					lactor.equals(cactor));
+		}
+		assertFalse("lopsided number of entities", litr.hasNext() || citr.hasNext());
+	}
+
+
+	/**
+	 * The query above was purposely changed to demonstrate a correlated 
+	 * sub-query. The previous approach determined which movies matched the 
+	 * movies Kevin Bacon played in -- where the sub-query only had to execute 
+	 * once since it did not depend on the outer query. In this approach a
+	 * the sub-query must be executed for every row in the outer query since 
+	 * we changed the algo to -- find which movies our actors have played in
+	 * also had Kevin Bacon playing in them as well. In this later approach
+	 * the sub-query depends on the movie of the outer loop but only returns 
+	 * 0..1 rows. This is just example of what it means and how to do it -- and
+	 * not a judgement on good/bad at this point.  
+	 */
+	@Test
+	public void testCorrelatedSubQuery() {
+		log.info("*** testCorrelatedSubQuery ***");
+		//build JPAQL query
+			//build the subquery
+		StringBuilder subqlString = new StringBuilder()
+			.append("select m2 from Movie m2 " +
+					"JOIN m2.cast role ")
+			.append("where " +
+					"m2=m1 " +          //correlated subquery
+					"and role.actor.person.firstName = 'Kevin' " +
+					"and role.actor.person.lastName = 'Bacon'");
+			//build the outer query
+		StringBuilder qlString = new StringBuilder()
+			.append("select role as role, a as actor " +
+					"from MovieRole role, Actor a " +
+					"JOIN FETCH role.movie as m1 " +
+					"JOIN FETCH a.person p ")
+			.append("where not (p.firstName='Kevin' and p.lastName='Bacon') " +
+					"and m1=role.movie " +
+					"and role.actor=a " + 
+					"and a.person=p ")
+			.append(String.format("and exists (%s)", subqlString.toString()))
+			.append("order by p.lastName ASC");
+		log.debug(qlString.toString());
+		TypedQuery<Tuple> lquery = em.createQuery(
+				qlString.toString(), Tuple.class);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Tuple> cqdef = cb.createQuery(Tuple.class);
+		Root<MovieRole> role = cqdef.from(MovieRole.class);
+		Root<Actor> a = cqdef.from(Actor.class);
+		Join<MovieRole,Movie> m = role.join("movie");
+		Join<Actor,Person> p = a.join("person");
+		role.fetch("movie");
+		a.fetch("person");
+
+		//build the subquery
+		Subquery<Movie> sqdef = cqdef.subquery(Movie.class);
+		Root<Movie> m2 = sqdef.from(Movie.class);
+		Join<Movie,MovieRole> r2 = m2.join("cast");
+		sqdef.select(m2)
+		  .where(cb.equal(m2, m),     //correlated subquery
+				 cb.equal(r2.get("actor").get("person").get("firstName"),"Kevin"),
+				 cb.equal(r2.get("actor").get("person").get("lastName"),"Bacon"));
+		  
+			//build outer query
+		cqdef.multiselect(role.alias("role"),a.alias("actor"))
+			.where(
+				   cb.not(cb.and(
+						cb.equal(p.get("firstName"),"Kevin"),
+						cb.equal(p.get("lastName"), "Bacon")
+					)), //not+and
+				   cb.equal(m, role.get("movie")),
+				   cb.equal(a, role.get("actor")),
+				   cb.equal(p, a.get("person")),
+				   cb.exists(sqdef)
+				) //where
+		     .orderBy(cb.asc(p.get("lastName")));
+		TypedQuery<Tuple> cquery = em2.createQuery(cqdef);
+
+		log.debug("execute JPAQL query");
+		List<Tuple> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Tuple r: lresults) {
+			log.debug("jpaql results  =" + 
+					r.get("actor") + ", " + 
+					r.get("role", MovieRole.class).getMovie());
+		}
+		
+		log.debug("execute Criteria API query");
+		List<Tuple> cresults = cquery.getResultList();		
+		log.debug("accessing criteria results");
+		log.debug("critera results=" + cresults);
+		for (Tuple row : cresults) {
+			log.debug("critera results=" + 
+					row.get("actor") + ", " + 
+					row.get("role", MovieRole.class).getMovie());
+		}
+
+		log.debug("comparing query results");
+		Iterator<Tuple> litr = lresults.iterator();
+		Iterator<Tuple> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Actor lactor = litr.next().get("actor", Actor.class);
+			Actor cactor = citr.next().get("actor",Actor.class);
+			assertTrue(String.format("different actors (%s) (%s)", lactor, cactor), 
+					lactor.equals(cactor));
+		}
+		assertFalse("lopsided number of entities", litr.hasNext() || citr.hasNext());
+	}
+
+	/**
+	 * This test demonstrates a small improvement/simplification to the 
+	 * correlated join -- but a compexity to the Criteria API expression.
+	 * We eliminated separate select on Movie in the subquery and the 
+	 * evaluation of m1=m2. Instead we used the Movie from the outer query 
+	 * directly within the sub-query -- saving an evaluation. This, however,
+	 * caused us to use the Subquery.correlate() method to base the from()
+	 * in the sub-query on a property in the outer query.
+	 */
+	@Test
+	public void testCorrelatedSubQuery2() {
+		log.info("*** testCorrelatedSubQuery2 ***");
+		//build JPAQL query
+			//build the subquery
+		StringBuilder subqlString = new StringBuilder()
+			.append("select role " +
+					"from m.cast role ")  //correlated subquery
+			.append("where " +
+					"role.actor.person.firstName = 'Kevin' " +
+					"and role.actor.person.lastName = 'Bacon'");
+		//build the outer query
+		StringBuilder qlString = new StringBuilder()
+			.append("select role as role, a as actor " +
+					"from MovieRole role, Actor a " +
+					"JOIN FETCH role.movie as m " +
+					"JOIN FETCH a.person p ")
+			.append("where not (p.firstName='Kevin' and p.lastName='Bacon') " +
+					"and m=role.movie " +
+					"and role.actor=a " + 
+					"and a.person=p ")
+			.append(String.format("and exists (%s)", subqlString.toString()))
+			.append("order by p.lastName ASC");
+		log.debug(qlString.toString());
+		TypedQuery<Tuple> lquery = em.createQuery(
+				qlString.toString(), Tuple.class);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Tuple> cqdef = cb.createQuery(Tuple.class);
+		Root<MovieRole> role = cqdef.from(MovieRole.class);
+		Root<Actor> a = cqdef.from(Actor.class);
+		Join<MovieRole,Movie> m = role.join("movie");
+		Join<Actor,Person> p = a.join("person");
+		role.fetch("movie");
+		a.fetch("person");
+
+		//build the subquery
+		Subquery<MovieRole> sqdef = cqdef.subquery(MovieRole.class);
+		Join<MovieRole,Movie> m2 = sqdef.correlate(m);  //correlated subquery
+		Join<Movie,MovieRole> r2 = m2.join("cast");
+		sqdef.select(r2)
+		  .where(
+				 cb.equal(r2.get("actor").get("person").get("firstName"),"Kevin"),
+				 cb.equal(r2.get("actor").get("person").get("lastName"),"Bacon"));
+		  
+			//build outer query
+		cqdef.multiselect(role.alias("role"),a.alias("actor"))
+			.where(
+				   cb.not(cb.and(
+						cb.equal(p.get("firstName"),"Kevin"),
+						cb.equal(p.get("lastName"), "Bacon")
+					)), //not+and
+				   cb.equal(m, role.get("movie")),
+				   cb.equal(a, role.get("actor")),
+				   cb.equal(p, a.get("person")),
+				   cb.exists(sqdef)
+				) //where
+		     .orderBy(cb.asc(p.get("lastName")));
+		TypedQuery<Tuple> cquery = em2.createQuery(cqdef);
+
+		log.debug("execute JPAQL query");
+		List<Tuple> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Tuple r: lresults) {
+			log.debug("jpaql results  =" + 
+					r.get("actor") + ", " + 
+					r.get("role", MovieRole.class).getMovie());
+		}
+		
+		log.debug("execute Criteria API query");
+		List<Tuple> cresults = cquery.getResultList();		
+		log.debug("accessing criteria results");
+		log.debug("critera results=" + cresults);
+		for (Tuple row : cresults) {
+			log.debug("critera results=" + 
+					row.get("actor") + ", " + 
+					row.get("role", MovieRole.class).getMovie());
+		}
+
+		log.debug("comparing query results");
+		Iterator<Tuple> litr = lresults.iterator();
+		Iterator<Tuple> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Actor lactor = litr.next().get("actor", Actor.class);
+			Actor cactor = citr.next().get("actor",Actor.class);
+			assertTrue(String.format("different actors (%s) (%s)", lactor, cactor), 
+					lactor.equals(cactor));
+		}
+		assertFalse("lopsided number of entities", litr.hasNext() || citr.hasNext());
+	}
+
+	/**
+	 * This test method demonstrates the use of the in() operator. We used 
+	 * it earlier in the first subquery. This time we are expressing literal
+	 * values.
+	 */
+	@Test
+	public void testIn() {
+		log.info("*** testIn ***");
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select distinct m from Movie m " +
+					"JOIN m.genres genre " +
+					"JOIN FETCH m.genres ")
+			.append("where genre in ('Drama', 'Comedy') ")
+			.append("order by m.releaseDate ASC");
+		log.debug(qlString.toString());
+		TypedQuery<Movie> lquery = em.createQuery(
+				qlString.toString(), Movie.class);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
+		Root<Movie> m = cqdef.from(Movie.class);
+		Join<Movie,String> genre = m.join("genres");
+		m.fetch("genres");
+		cqdef.select(m).distinct(true)
+			.where( //value per-menthod
+					//cb.in(genre).value("Drama").value("Comedy"),
+					//shorthand
+					genre.in("Drama", "Comedy")
+				) 
+		     .orderBy(cb.asc(m.get("releaseDate")));
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef);
+
+		log.debug("execute JPAQL query");
+		List<Movie> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Movie r: lresults) {
+			log.debug("jpaql results  =" +  
+					r + ", " + 
+					r.getGenres());
+		}
+		
+		log.debug("execute Criteria API query");
+		List<Movie> cresults = cquery.getResultList();		
+		log.debug("accessing criteria results");
+		log.debug("critera results=" + cresults);
+		for (Movie r : cresults) {
+			log.debug("critera results=" + 
+					r + ", " + 
+					r.getGenres());
+		}
+
+		log.debug("comparing query results");
+		Iterator<Movie> litr = lresults.iterator();
+		Iterator<Movie> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Movie lm = litr.next();
+			Movie cm = citr.next();
+			assertTrue(String.format("different movies (%s) (%s)", lm, cm), 
+					lm.getTitle().equals(cm.getTitle()));
+			assertEquals("unexpected genres", lm.getGenres(), cm.getGenres());
+		}
+		assertFalse("lopsided number of entities", litr.hasNext() || citr.hasNext());
+	}
+
 }
