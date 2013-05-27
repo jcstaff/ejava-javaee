@@ -1243,7 +1243,7 @@ public class CriteriaTest extends QueryBase {
 		m.fetch("genres");
 		cqdef.select(m).distinct(true)
 			.where( //value per-menthod
-					//cb.in(genre).value("Drama").value("Comedy"),
+					cb.in(genre).value("Drama").value("Comedy"),
 					//shorthand
 					genre.in("Drama", "Comedy")
 				) 
@@ -1283,4 +1283,64 @@ public class CriteriaTest extends QueryBase {
 		assertFalse("lopsided number of entities", litr.hasNext() || citr.hasNext());
 	}
 
+	@Test
+	public void testCase() {
+		log.info("*** testCase ***");
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select case when m.title is not null THEN 'Drama' end " +
+					"from Movie m " +
+					"JOIN m.genres genre");
+		log.debug(qlString.toString());
+		TypedQuery<Object> lquery = em.createQuery(
+				qlString.toString(), Object.class);
+		
+		//build criteria API query
+		CriteriaBuilder cb = em2.getCriteriaBuilder();
+		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
+		Root<Movie> m = cqdef.from(Movie.class);
+		Join<Movie,String> genre = m.join("genres");
+		m.fetch("genres");
+		cqdef.select(m).distinct(true)
+			.where( //value per-menthod
+					cb.in(genre).value("Drama").value("Comedy"),
+					//shorthand
+					genre.in("Drama", "Comedy")
+				) 
+		     .orderBy(cb.asc(m.get("releaseDate")));
+		TypedQuery<Movie> cquery = em2.createQuery(cqdef);
+
+		log.debug("execute JPAQL query");
+		List<Object> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Object r: lresults) {
+			log.debug("jpaql results  =" +  
+					r);
+		}
+		
+		/*
+		log.debug("execute Criteria API query");
+		List<Movie> cresults = cquery.getResultList();		
+		log.debug("accessing criteria results");
+		log.debug("critera results=" + cresults);
+		for (Movie r : cresults) {
+			log.debug("critera results=" + 
+					r + ", " + 
+					r.getGenres());
+		}
+
+		log.debug("comparing query results");
+		Iterator<Movie> litr = lresults.iterator();
+		Iterator<Movie> citr = cresults.iterator();
+		while (litr.hasNext() && citr.hasNext()) {
+			Movie lm = litr.next();
+			Movie cm = citr.next();
+			assertTrue(String.format("different movies (%s) (%s)", lm, cm), 
+					lm.getTitle().equals(cm.getTitle()));
+			assertEquals("unexpected genres", lm.getGenres(), cm.getGenres());
+		}
+		assertFalse("lopsided number of entities", litr.hasNext() || citr.hasNext());
+		*/
+	}
 }
