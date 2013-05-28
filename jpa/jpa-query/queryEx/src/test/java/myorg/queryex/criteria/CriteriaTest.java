@@ -2,32 +2,24 @@ package myorg.queryex.criteria;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.Calendar;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.TemporalType;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
-import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Order;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.Subquery;
 
 import myorg.queryex.Actor;
@@ -42,7 +34,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CriteriaTest extends QueryBase {
@@ -58,15 +49,19 @@ public class CriteriaTest extends QueryBase {
 	
 	@After
 	public void destroy() {
-		if (em2!=null && em2.isOpen()) {
-			if (em2.getTransaction().isActive()) {
-				if (em2.getTransaction().getRollbackOnly()) {
-					em2.getTransaction().rollback();
+		destroy(em2);
+	}
+	
+	private static void destroy(EntityManager emgr) {
+		if (emgr!=null && emgr.isOpen()) {
+			if (emgr.getTransaction().isActive()) {
+				if (emgr.getTransaction().getRollbackOnly()) {
+					emgr.getTransaction().rollback();
 				} else {
-					em2.getTransaction().commit();
+					emgr.getTransaction().commit();
 				}
 			}
-			em2.close();
+			emgr.close();
 		}
 	}
 	
