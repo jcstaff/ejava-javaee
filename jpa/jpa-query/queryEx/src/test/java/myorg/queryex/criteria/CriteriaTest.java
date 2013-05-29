@@ -3,6 +3,7 @@ package myorg.queryex.criteria;
 import static org.junit.Assert.*;
 
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -1278,64 +1279,133 @@ public class CriteriaTest extends QueryBase {
 		assertFalse("lopsided number of entities", litr.hasNext() || citr.hasNext());
 	}
 
+	/**
+	 * This test method provides an example of using a case statement to control
+	 * the query output based on values encountered within the results.
+	 */
 	@Test
 	public void testCase() {
 		log.info("*** testCase ***");
 		//build JPAQL query
 		StringBuilder qlString = new StringBuilder()
-			.append("select case when m.title is not null THEN 'Drama' end " +
-					"from Movie m " +
-					"JOIN m.genres genre");
+			.append("select p.firstName, p.lastName, case " +
+					"when p.birthDate between '1920-01-01' and '1929-12-31' THEN 20 " +
+					"when p.birthDate between '1930-01-01' and '1939-12-31' THEN 30 " +
+					"when p.birthDate between '1940-01-01' and '1949-12-31' THEN 40 " +
+					"when p.birthDate between '1950-01-01' and '1959-12-31' THEN 50 " +
+					"else '-1' " +
+					"end ")
+			.append("from Person p " +
+					"order by lastName ASC");
 		log.debug(qlString.toString());
-		TypedQuery<Object> lquery = em.createQuery(
-				qlString.toString(), Object.class);
+		TypedQuery<Object[]> lquery = em.createQuery(
+				qlString.toString(), Object[].class);
 		
 		//build criteria API query
 		CriteriaBuilder cb = em2.getCriteriaBuilder();
-		CriteriaQuery<Movie> cqdef = cb.createQuery(Movie.class);
-		Root<Movie> m = cqdef.from(Movie.class);
-		Join<Movie,String> genre = m.join("genres");
-		m.fetch("genres");
-		cqdef.select(m).distinct(true)
-			.where( //value per-menthod
-					cb.in(genre).value("Drama").value("Comedy"),
-					//shorthand
-					genre.in("Drama", "Comedy")
-				) 
-		     .orderBy(cb.asc(m.get("releaseDate")));
-		TypedQuery<Movie> cquery = em2.createQuery(cqdef);
+		CriteriaQuery<Object[]> cqdef = cb.createQuery(Object[].class);
+		Root<Person> p = cqdef.from(Person.class);
+		cqdef.multiselect(p.get("firstName"), p.get("lastName"), 
+			cb.selectCase()
+				.when(cb.between(p.<Date>get("birthDate"), 
+					cb.literal(new GregorianCalendar(1920, 
+							Calendar.JANUARY, 1).getTime()), 
+					cb.literal(new GregorianCalendar(1929, 
+							Calendar.DECEMBER,31).getTime())), 20)
+				.when(cb.between(p.<Date>get("birthDate"), 
+					cb.literal(new GregorianCalendar(1930, 
+							Calendar.JANUARY, 1).getTime()), 
+					cb.literal(new GregorianCalendar(1939, 
+							Calendar.DECEMBER,31).getTime())), 30)
+				.when(cb.between(p.<Date>get("birthDate"), 
+					cb.literal(new GregorianCalendar(1940, 
+							Calendar.JANUARY, 1).getTime()), 
+					cb.literal(new GregorianCalendar(1949, 
+							Calendar.DECEMBER,31).getTime())), 40)
+				.when(cb.between(p.<Date>get("birthDate"), 
+					cb.literal(new GregorianCalendar(1950, 
+							Calendar.JANUARY, 1).getTime()), 
+					cb.literal(new GregorianCalendar(1959, 
+							Calendar.DECEMBER,31).getTime())), 50)
+				.otherwise(-1))
+	     .orderBy(cb.asc(p.get("lastName")));
+		TypedQuery<Object[]> cquery = em2.createQuery(cqdef);
 
 		log.debug("execute JPAQL query");
-		List<Object> lresults = lquery.getResultList();
+		List<Object[]> lresults = lquery.getResultList();
 		log.debug("accessing jpaql results");
 		log.debug("jpaql results  =" + lresults);
-		for (Object r: lresults) {
+		for (Object[] r: lresults) {
 			log.debug("jpaql results  =" +  
-					r);
+					r[0] + " " + r[1] + " born in " + r[2] +"s");
 		}
 		
-		/*
 		log.debug("execute Criteria API query");
-		List<Movie> cresults = cquery.getResultList();		
+		List<Object[]> cresults = cquery.getResultList();		
 		log.debug("accessing criteria results");
 		log.debug("critera results=" + cresults);
-		for (Movie r : cresults) {
-			log.debug("critera results=" + 
-					r + ", " + 
-					r.getGenres());
+		for (Object[] r : cresults) {
+			log.debug("criteria results=" +  
+					r[0] + " " + r[1] + " born in " + r[2] +"s");
 		}
 
 		log.debug("comparing query results");
-		Iterator<Movie> litr = lresults.iterator();
-		Iterator<Movie> citr = cresults.iterator();
+		Iterator<Object[]> litr = lresults.iterator();
+		Iterator<Object[]> citr = cresults.iterator();
 		while (litr.hasNext() && citr.hasNext()) {
-			Movie lm = litr.next();
-			Movie cm = citr.next();
-			assertTrue(String.format("different movies (%s) (%s)", lm, cm), 
-					lm.getTitle().equals(cm.getTitle()));
-			assertEquals("unexpected genres", lm.getGenres(), cm.getGenres());
+			assertEquals("unexpected dates", litr.next()[2], citr.next()[2]);
 		}
 		assertFalse("lopsided number of entities", litr.hasNext() || citr.hasNext());
-		*/
+	}
+	
+	/**
+	 * This test provides a quick sanity check of using a multiselect over a 
+	 * FETCH JOIN
+	 */
+	@Test
+	public void testFetch() {
+		log.debug("*** testFetch ***");
+		
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select m as movie, role as role, a as actor, p as person " +
+		            "from Movie m, MovieRole role, Actor a, Person p ")
+			.append("where role.movie=m " +
+					"and role.actor=a " +
+					"and a.person=p " +
+					"order by m.releaseDate ASC");
+		log.debug(qlString.toString());
+		TypedQuery<Tuple> lquery = em.createQuery(
+				qlString.toString(), Tuple.class);
+
+		log.debug("execute JPAQL query");
+		List<Tuple> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Tuple r: lresults) {
+			log.debug("jpaql results  =" + r.get("movie"));  
+		}
+	}
+
+	@Test
+	public void testCoalesce() {
+		log.debug("*** testCoalesce ***");
+		
+		//build JPAQL query
+		StringBuilder qlString = new StringBuilder()
+			.append("select coalesce(m.id, m.title) ")
+			.append("from Movie m " +
+					"order by m.releaseDate ASC");
+		log.debug(qlString.toString());
+		TypedQuery<Tuple> lquery = em.createQuery(
+				qlString.toString(), Tuple.class);
+
+		log.debug("execute JPAQL query");
+		List<Tuple> lresults = lquery.getResultList();
+		log.debug("accessing jpaql results");
+		log.debug("jpaql results  =" + lresults);
+		for (Tuple r: lresults) {
+			log.debug("jpaql results  =" + r.get(0));  
+		}
 	}
 }
