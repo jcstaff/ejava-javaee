@@ -1,0 +1,91 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-query-criteria">
+    <title>JPA Criteria API</title>
+    <para></para>
+        
+    <section id="jpa-query-criteria-template">
+        <title>Criteria API Demo Template</title>
+    
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select ...]]></programlisting>
+
+        <para>Boiler-plate code</para>
+<programlisting language=""><![CDATA[
+CriteriaBuilder cb = em.getCriteriaBuilder();
+
+//example-specific criteria API definition
+CriteriaQuery<T> qdef = ...
+
+TypedQuery<T> query = em.createQuery(qdef);
+List<T> objects = query.getResultList();
+for(T o: objects) {
+   log.info("found result:" + o);
+}]]></programlisting>                        
+        
+    </section>
+
+    <section id="jpa-query-criteria-entity">
+        <title>Simple Entity Query</title>
+        <para></para>
+
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c]]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language=""><![CDATA[
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+
+Root<Customer> c = qdef.from(Customer.class);        
+qdef.select(c);]]></programlisting>                        
+                        
+  
+        <itemizedlist>
+            <listitem><para>"from"</para>
+                <itemizedlist>
+                    <listitem><para>defines source of root query terms</para></listitem>
+                    <listitem><para>returns object leveraged in query body</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>"select" defines root query objects -- all path references must start from this set</para></listitem>
+            <listitem><para>no "where" clause indicates all entities are selected</para></listitem>
+        </itemizedlist>
+        
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_
+ -found result:firstName=cat, lastName=inhat
+ -found result:firstName=thing, lastName=one
+ -found result:firstName=thing, lastName=two]]></programlisting>                            
+    </section>
+
+    <section id="jpa-query-criteria-">
+        <title></title>
+        <para></para>
+  
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+        <para></para>
+    </section>
+
+
+    <section id="jpa-query-criteria-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

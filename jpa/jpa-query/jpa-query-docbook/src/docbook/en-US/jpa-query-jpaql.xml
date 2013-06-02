@@ -1,0 +1,60 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-query-jpaql">
+    <title>JPA Query Language</title>
+    <para></para>
+        
+    <section id="jpa-query-jpaql-entity">
+        <title>Simple Entity Query</title>
+        <para></para>
+
+<programlisting language=""><![CDATA[select object(c) from Customer as c]]></programlisting>
+        <para>Alternate, abbreviated form</para>                        
+<programlisting language=""><![CDATA[select c from Customer c]]></programlisting>                        
+  
+        <itemizedlist>
+            <listitem><para>"select" defines root query objects -- all path references must start from this set</para></listitem>
+            <listitem><para>"from" defines source of root query terms</para></listitem>
+            <listitem><para>"as" (optional) identifies a variable assignment of entity in from clause</para></listitem>
+            <listitem><para>"object()" (optional) identifies what is returned for the path expressed in select clause (e.g., object(), count()) -- left over from EJBQL</para></listitem>
+            <listitem><para>no "where" clause indicates all entities are selected</para></listitem>
+        </itemizedlist>
+        
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_
+ -found result:firstName=cat, lastName=inhat
+ -found result:firstName=thing, lastName=one
+ -found result:firstName=thing, lastName=two]]></programlisting>                            
+    </section>
+
+    <section id="jpa-query-jpaql-">
+        <title></title>
+        <para></para>
+  
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+        <para></para>
+    </section>
+
+
+    <section id="jpa-query-jpaql-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

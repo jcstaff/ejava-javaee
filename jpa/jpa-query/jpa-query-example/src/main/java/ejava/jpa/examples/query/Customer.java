@@ -14,11 +14,13 @@ import javax.persistence.*;
 })
 public class Customer {
     @Id @GeneratedValue 
-    @Column(name="CUSTOMER_ID")
+    @Column(name="CUSTOMER_ID")    
     private long id;
-    @Column(length=16)
+    
+    @Column(name="FIRST_NAME", length=16, nullable=true)
     private String firstName;
-    @Column(length=16)
+    
+    @Column(name="LAST_NAME", length=16, nullable=true)
     private String lastName;
     
     public long getId() { return id; }

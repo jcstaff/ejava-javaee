@@ -28,7 +28,7 @@ public class Sale {
      * relationship to show how JPA queries can still functionally associate
      * information without an explicit foreign key
      */
-    @Column(nullable=false)
+    @Column(name="BUYER_ID", nullable=false)
     private long buyerId;
 
     @ManyToOne(optional=false)

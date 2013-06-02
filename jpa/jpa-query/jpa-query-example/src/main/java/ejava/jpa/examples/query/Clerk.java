@@ -10,13 +10,18 @@ public class Clerk {
     @Id @GeneratedValue @Column(name="CLERK_ID")
     private long id;
 
-    @Column(length=16, nullable=false)
+    @Column(name="FIRST_NAME", length=16, nullable=false)
     private String firstName;
-    @Column(length=16, nullable=false)
+    
+    @Column(name="LAST_NAME", length=16, nullable=false)
     private String lastName;
+    
     @Temporal(TemporalType.DATE)
+    @Column(name="HIRE_DATE", nullable=false)
     private Date hireDate;
+    
     @Temporal(TemporalType.DATE)
+    @Column(name="TERM_DATE", nullable=true)
     private Date termDate;
 
     @ManyToMany(mappedBy="clerks", fetch=FetchType.LAZY)

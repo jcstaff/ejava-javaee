@@ -10,6 +10,8 @@ public class Store {
     @Id @GeneratedValue 
     @Column(name="STORE_ID")
     private long id;
+    
+    @Column(length=20, nullable=false)
     private String name;
 
     @OneToMany(mappedBy="store", 
