@@ -3,18 +3,12 @@ package myorg.relex;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-
-import javax.persistence.*;
-
-import myorg.relex.collection.Fleet;
 import myorg.relex.collection.Lineup;
 import myorg.relex.collection.Path;
 import myorg.relex.collection.Position;
@@ -24,13 +18,11 @@ import myorg.relex.collection.ShipByBusinessId;
 import myorg.relex.collection.ShipByDefault;
 import myorg.relex.collection.ShipByPK;
 import myorg.relex.collection.ShipBySwitch;
-import myorg.relex.one2many.Route;
 
 import org.apache.commons.logging.Log;
 
 import org.apache.commons.logging.LogFactory;
 
-import org.h2.command.ddl.SetComment;
 import org.junit.*;
 
 

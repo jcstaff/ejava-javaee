@@ -1,15 +1,10 @@
 package myorg.relex.collection;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This entity class provides an example of an ordered list of child entities ordered by a business property
@@ -18,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 @Entity
 @Table(name="RELATIONEX_PATH")
 public class Path {
-	private static final Log log = LogFactory.getLog(Path.class);
 	@Id @GeneratedValue
 	private int id;
 	

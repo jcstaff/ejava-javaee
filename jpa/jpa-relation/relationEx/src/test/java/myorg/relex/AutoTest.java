@@ -2,7 +2,6 @@ package myorg.relex;
 
 import static org.junit.Assert.*;
 
-import static org.junit.Assert.*;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

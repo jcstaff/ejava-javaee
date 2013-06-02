@@ -3,8 +3,6 @@ package myorg.relex;
 import static org.junit.Assert.*;
 
 
-import javax.persistence.*;
-
 import myorg.relex.many2many.Group;
 import myorg.relex.many2many.Individual;
 import myorg.relex.many2many.Node;

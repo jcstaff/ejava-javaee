@@ -5,9 +5,6 @@ import static org.junit.Assert.*;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-
-import javax.persistence.*;
-
 import myorg.relex.one2manybi.Borrower;
 import myorg.relex.one2manybi.Car;
 import myorg.relex.one2manybi.Loan;
