@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.logging.Log;
@@ -47,19 +49,48 @@ public class JPAQLTest extends QueryBase {
         return objects;
     }
     
+    /**
+     * This test demonstrates a single JPAQL query
+     */
     @Test
     public void testSimpleSelect() {
         log.info("*** testSimpleSelect() ***");
         
-        int rows = executeQuery(
+        TypedQuery<Customer> query = em.createQuery(
         		"select object(c) from Customer as c", 
-        		Customer.class).size();
+        		Customer.class);
+        List<Customer> results = query.getResultList();
+        for (Customer result : results) {
+        	log.info("found=" + result);
+        }
+        int rows = results.size();
         assertTrue("unexpected number of customers:" + rows, rows > 0);
     }
     
+    /**
+     * This test demonstrates querying for a non-entity. The property queried
+     * for is located off a path from the root query term.
+     */
     @Test
-    public void testEntityProperties() {
-        log.info("*** testEntityProperties() ***");
+    public void testNonEntityQuery() {
+        log.info("*** testNonEntityQuery() ***");
+        
+        TypedQuery<String> query = em.createQuery(
+                "select c.lastName from Customer c", String.class);
+        List<String> results = query.getResultList();
+        assertTrue("no results", results.size() > 0);
+        for(String result : results) {
+            log.info("lastName=" + result);
+        }
+    }
+
+    /**
+     * This test demonstrates a query for multiple properties. In this
+     * version we will use a generic Object[] for the return type.
+     */
+    @Test
+    public void testMultiSelectObjectArray() {
+        log.info("*** testMultiSelectObjectArray() ***");
         
         TypedQuery<Object[]> query = em.createQuery(
                 "select c.firstName, c.hireDate from Clerk c", Object[].class);
@@ -72,6 +103,48 @@ public class JPAQLTest extends QueryBase {
             log.info("firstName=" + firstName + " hireDate=" + hireDate);
         }
     }
+
+    /**
+     * This query demonstrates a query for multiple properties -- same as above
+     * -- except this example used a Tuple return type and select aliases 
+     */
+    @Test
+    public void testMultiSelectTuple() {
+        log.info("*** testMultiSelectTuple() ***");
+        
+        TypedQuery<Tuple> query = em.createQuery(
+                "select c.firstName as firstName, c.hireDate as hireDate from Clerk c", Tuple.class);
+        List<Tuple> results = query.getResultList();
+        assertTrue("no results", results.size() > 0);
+        for(Tuple result : results) {
+            assertEquals("unexpected result length", 2, result.getElements().size());
+            String firstName = result.get("firstName", String.class);
+            Date hireDate = result.get("hireDate", Date.class);
+            log.info("firstName=" + firstName + " hireDate=" + hireDate);
+        }
+    }
+    
+    /**
+     * This test provides another demonstration of selecting multiple properties --
+     * with this example using a constructor expression to return a typed 
+     * object for each result in the query.
+     */
+    @Test
+    public void testMultiSelectConstructor() {
+        log.info("*** testMultiSelectConstructor() ***");
+        
+        TypedQuery<Receipt> query = em.createQuery(
+            String.format("select new %s(", Receipt.class.getName()) +
+            "s.id,s.buyerId,s.date, s.amount) " +
+            "from Sale s", Receipt.class);
+        List<Receipt> results = query.getResultList();
+        assertTrue("no results", results.size() > 0);
+        for(Receipt receipt : results) {
+            assertNotNull("no receipt", receipt);
+            log.info("receipt=" + receipt);
+        }        
+    }
+
     
     @Test
     public void testEntityRelationships() {
@@ -89,21 +162,6 @@ public class JPAQLTest extends QueryBase {
         }
     }
 
-    @Test
-    public void testConstructorExpressions() {
-        log.info("*** testConstructorExpressions() ***");
-        
-        TypedQuery<Receipt> query = em.createQuery(
-            String.format("select new %s(", Receipt.class.getName()) +
-            "s.id,s.buyerId,s.date, s.amount) " +
-            "from Sale s", Receipt.class);
-        List<Receipt> results = query.getResultList();
-        assertTrue("no results", results.size() > 0);
-        for(Receipt receipt : results) {
-            assertNotNull("no receipt", receipt);
-            log.info("receipt=" + receipt);
-        }        
-    }
     
     @Test
     public void testIN() {

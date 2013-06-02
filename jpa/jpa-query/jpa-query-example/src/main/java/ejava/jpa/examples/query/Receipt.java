@@ -1,8 +1,13 @@
 package ejava.jpa.examples.query;
 
 import java.io.Serializable;
+
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class Receipt implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -21,11 +26,13 @@ public class Receipt implements Serializable {
         this.amount = amount;
     }
     public String toString() {
+    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US);
         StringBuilder text = new StringBuilder();
         text.append("sale=" + saleId);
         text.append(", customer=" + customerId);
-        text.append(", date=" + date);
-        text.append(", amount=" + amount);
+        text.append(", date=" + (date==null ? null : df.format(date)));
+        text.append(", amount=" + nf.format(amount));
         return text.toString();
     }
     public double getAmount() {

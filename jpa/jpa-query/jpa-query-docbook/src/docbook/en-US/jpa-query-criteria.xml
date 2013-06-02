@@ -28,13 +28,12 @@ for(T o: objects) {
 
     <section id="jpa-query-criteria-entity">
         <title>Simple Entity Query</title>
-        <para></para>
 
         <para>Equivalent JPAQL</para>
 <programlisting language=""><![CDATA[select c from Customer c]]></programlisting>
 
         <para>Criteria API Definition</para>
-<programlisting language=""><![CDATA[
+<programlisting language="java"><![CDATA[
 CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
 
 Root<Customer> c = qdef.from(Customer.class);        
@@ -51,6 +50,16 @@ qdef.select(c);]]></programlisting>
             <listitem><para>"select" defines root query objects -- all path references must start from this set</para></listitem>
             <listitem><para>no "where" clause indicates all entities are selected</para></listitem>
         </itemizedlist>
+
+        <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+
+Root<Customer> c = qdef.from(Customer.class);        
+qdef.select(c);
+
+TypedQuery<Customer> query = em.createQuery(qdef);
+List<Customer> results = query.getResultList();]]></programlisting>                        
         
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
@@ -66,16 +75,266 @@ Hibernate:
  -found result:firstName=thing, lastName=two]]></programlisting>                            
     </section>
 
+    <section id="jpa-query-criteria-nonentity">
+        <title>Non-Entity Query</title>
+
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c.lastName from Customer c]]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<String> qdef = cb.createQuery(String.class);
+
+Root<Customer> c = qdef.from(Customer.class);
+qdef.select(c.<String>get("lastName"));
+]]></programlisting>                        
+  
+        <itemizedlist>
+            <listitem><para>Allows return of simple property</para></listitem>
+            <listitem><para>c.get("lastName") is called a "path"</para></listitem>
+            <listitem><para>All paths based from root query terms (thus requirement for Root&lt;Customer&gt; c object)</para></listitem>
+            <listitem><para>Single path selects return typed list of values</para></listitem>
+        </itemizedlist>
+
+        <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<String> qdef = cb.createQuery(String.class);
+
+Root<Customer> c = qdef.from(Customer.class);
+qdef.select(c.<String>get("lastName"));
+
+TypedQuery<String> query = em.createQuery(qdef);
+List<String> results = query.getResultList();]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Query result is a List&lt;String&gt; because "c.lastName" is a String</para></listitem>
+        </itemizedlist>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.LAST_NAME as col_0_0_ 
+    from
+        JPAQL_CUSTOMER customer0_
+ -lastName=inhat
+ -lastName=one
+ -lastName=two]]></programlisting>                            
+    </section>
+
+    <section id="jpa-query-criteria-multiselect">
+        <title>Multi-select Query</title>
+
+        <section id="jpa-query-criteria-multiselect-array">
+            <title>Multi-select Query with Object[]</title>
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c.firstName, c.hireDate from Clerk c]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(cb.array(c.get("firstName"), c.get("hireDate")));
+]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Select specifies multiple terms within array()</para></listitem>
+                <listitem><para>Terms are expressed thru a path expression</para></listitem>
+                <listitem><para>Terms must be based off paths from root terms in the FROM (or JOIN) clause -- thus why Root&lt;Clerk&gt; c was retained from cb.from() call</para></listitem>
+            </itemizedlist>
+
+            <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(cb.array(c.get("firstName"), c.get("hireDate")));
+
+TypedQuery<Object[]> query = em.createQuery(qdef);
+List<Object[]> results = query.getResultList();
+assertTrue("no results", results.size() > 0);
+for(Object[] result : results) {
+    assertEquals("unexpected result length", 2, result.length);
+    String firstName = (String) result[0];
+    Date hireDate = (Date) result[1];
+    log.info("firstName=" + firstName + " hireDate=" + hireDate);
+}]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Query defined to return elements of select in Object[]</para></listitem>
+            </itemizedlist>
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.FIRST_NAME as col_0_0_,
+        clerk0_.HIRE_DATE as col_1_0_ 
+    from
+        JPAQL_CLERK clerk0_
+ -firstName=Manny hireDate=1970-01-01
+ -firstName=Moe hireDate=1970-01-01
+ -firstName=Jack hireDate=1973-03-01
+]]></programlisting>                            
+        </section>           
+
+        <section id="jpa-query-criteria-multiselect-tuple">
+           <title>Multi-select Query with Tuple</title>
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c.firstName as firstName, c.hireDate as hireDate from Clerk c]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Tuple> qdef = cb.createTupleQuery();
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(cb.tuple(
+        c.get("firstName").alias("firstName"), 
+        c.get("hireDate").alias("hireDate")));
+]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Aliases may be assigned to select terms for named-access to results</para></listitem>
+        </itemizedlist>
+
+            <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Tuple> qdef = cb.createTupleQuery();
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(cb.tuple(
+        c.get("firstName").alias("firstName"), 
+        c.get("hireDate").alias("hireDate")));
+
+TypedQuery<Tuple> query = em.createQuery(qdef);
+List<Tuple> results = query.getResultList();
+assertTrue("no results", results.size() > 0);
+for(Tuple result : results) {
+    assertEquals("unexpected result length", 2, result.getElements().size());
+    String firstName = result.get("firstName", String.class);
+    Date hireDate = result.get("hireDate", Date.class);
+    log.info("firstName=" + firstName + " hireDate=" + hireDate);
+}
+]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Query defined to return instances of Tuple class</para></listitem>
+            <listitem><para>Tuples provide access using</para>
+                <itemizedlist>
+                    <listitem><para>get(index) - simular to Object[]</para></listitem>
+                    <listitem><para>get(index, Class&lt;T&gt; resultType) - typed access by index</para></listitem>
+                    <listitem><para>get(alias) - access by alias</para></listitem>
+                    <listitem><para>get(alias, Class&lt;T&gt; resultType) - typed access by alias</para></listitem>
+                    <listitem><para>getElements() - access thru collection interface</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.FIRST_NAME as col_0_0_,
+        clerk0_.HIRE_DATE as col_1_0_ 
+    from
+        JPAQL_CLERK clerk0_
+ -firstName=Manny hireDate=1970-01-01
+ -firstName=Moe hireDate=1970-01-01
+ -firstName=Jack hireDate=1973-03-01
+]]></programlisting>                            
+        </section>           
+
+        <section id="jpa-query-criteria-multiselect-constructor">
+           <title>Multi-select Query with Constructor</title>
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[
+select new ejava.jpa.examples.query.Receipt(s.id,s.buyerId,s.date, s.amount)
+from Sale s]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Receipt> qdef = cb.createQuery(Receipt.class);
+
+Root<Sale> s = qdef.from(Sale.class);
+qdef.select(cb.construct(
+                Receipt.class, 
+                s.get("id"), 
+                s.get("buyerId"),
+                s.get("date"),
+                s.get("amount")));
+]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Individual elements of select() are matched up against class constructor</para></listitem>
+        </itemizedlist>
+
+            <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Receipt> qdef = cb.createQuery(Receipt.class);
+
+Root<Sale> s = qdef.from(Sale.class);
+qdef.select(cb.construct(
+                Receipt.class, 
+                s.get("id"), 
+                s.get("buyerId"),
+                s.get("date"),
+                s.get("amount")));
+
+TypedQuery<Receipt> query = em.createQuery(qdef);
+List<Receipt> results = query.getResultList();
+assertTrue("no results", results.size() > 0);
+for(Receipt receipt : results) {
+    assertNotNull("no receipt", receipt);
+    log.info("receipt=" + receipt);
+}        
+]]></programlisting>                        
+    <itemizedlist>
+        <listitem><para>Constructed class may be simple POJO -- no need to be an entity</para></listitem>
+        <listitem><para>Instances are not managed</para></listitem>
+        <listitem><para>Suitable for use as Data Transfer Objects (DTOs)</para></listitem>
+    </itemizedlist>
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as col_0_0_,
+        sale0_.BUYER_ID as col_1_0_,
+        sale0_.date as col_2_0_,
+        sale0_.amount as col_3_0_ 
+    from
+        JPAQL_SALE sale0_
+ -receipt=sale=1, customer=1, date=1998-04-10 10:13:35, amount=$100.00
+ -receipt=sale=2, customer=2, date=1999-06-11 14:15:10, amount=$150.00
+]]></programlisting>                            
+        </section>           
+    </section>
+
+
+
+
+
+
+
     <section id="jpa-query-criteria-">
         <title></title>
-        <para></para>
+
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[
+]]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
   
         <itemizedlist>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
         </itemizedlist>
-        <para></para>
+
+        <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                            
     </section>
 
 

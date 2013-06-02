@@ -85,7 +85,7 @@ public class Sale {
     	DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US);
         StringBuilder text = new StringBuilder();
-        text.append("date=" + date==null ? null : df.format(date));
+        text.append("date=" + (date==null ? null : df.format(date)));
         text.append(", amount=" + nf.format(amount));
         text.append(", buyer=" + buyerId);
         text.append(", clerks(" + clerks.size() + ")={");
