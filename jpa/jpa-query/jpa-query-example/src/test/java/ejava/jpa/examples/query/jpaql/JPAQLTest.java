@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.LazyInitializationException;
 import org.junit.Test;
 
 import ejava.jpa.examples.query.Clerk;
@@ -219,12 +221,39 @@ public class JPAQLTest extends QueryBase {
         assertTrue("unexpected number of customers:" + rows, rows > 0);
     }
     
-    
+
+    /**
+     * This test demonstrates the function of a JOIN FETCH to perform the 
+     * EAGER retrieval of entities as a side-effect of the query
+     */
     @Test
-    public void testFetchJoin() {        
-        log.info("** testFetchJoin() ***");
-        executeQuery(
-                "select s from Store s JOIN FETCH s.sales", Store.class);
+    public void testFetchJoin1() {        
+        log.info("** testFetchJoin1() ***");
+        EntityManager em2 = createEm();
+        Store store = em2.createQuery(
+        		"select s from Store s JOIN s.sales " +
+        		"where s.name='Big Al''s'",
+        		Store.class).getSingleResult();
+        log.info("em.contains(" + em2.contains(store) + ")");
+        em2.close();
+        try {
+        	store.getSales().get(0).getAmount();
+        	fail("did not trigger lazy initialization exception");
+        } catch (LazyInitializationException expected) {
+        	log.info("caught expected exception:" + expected);
+        }
+    }
+    @Test
+    public void testFetchJoin2() {        
+        log.info("** testFetchJoin2() ***");
+        EntityManager em2 = createEm();
+        Store store = em2.createQuery(
+        		"select s from Store s JOIN FETCH s.sales " +
+        		"where s.name='Big Al''s'",
+        		Store.class).getSingleResult();
+        log.info("em.contains(" + em2.contains(store) + ")");
+        em2.close();
+       	store.getSales().get(0).getAmount();
     }
     
     @Test

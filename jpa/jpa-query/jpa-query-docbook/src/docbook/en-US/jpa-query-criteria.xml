@@ -325,8 +325,8 @@ qdef.select(cb.array(s.get("id"),
                      s.get("store").get("name")));
 ]]></programlisting>                          
             <itemizedlist>
+                <listitem><para>All paths based off root-level FROM (or JOIN) terms</para></listitem>
                 <listitem><para>Paths use call chaining to change contexts</para></listitem>
-                <listitem><para>Paths that cross entity boundaries automatically add a join to SQL query</para></listitem>
                 <listitem><para>Paths -- used this way -- must always express a single element. Must use JOINs for paths involving collections</para></listitem>
                 <listitem><para>All paths based off root-level FROM (or JOIN) terms</para></listitem>
             </itemizedlist>
@@ -353,6 +353,7 @@ for(Object[] result : results) {
 
             <para>Runtime output</para>
 <programlisting language=""><![CDATA[
+Hibernate: 
     select
         sale0_.SALE_ID as col_0_0_,
         store1_.name as col_1_0_ 
@@ -379,12 +380,11 @@ for(Object[] result : results) {
 
                 <para>Criteria API Definition</para>
 <programlisting language="java"><![CDATA[
-        CriteriaQuery<Date> qdef = cb.createQuery(Date.class);
-        
-        Root<Clerk> c = qdef.from(Clerk.class);
-        Join<Clerk, Sale> sale = c.join("sales", JoinType.INNER);
-        qdef.select(sale.<Date>get("date"));
-]]></programlisting>                        
+CriteriaQuery<Date> qdef = cb.createQuery(Date.class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+Join<Clerk, Sale> sale = c.join("sales", JoinType.INNER);
+qdef.select(sale.<Date>get("date"));]]></programlisting>                        
                 <itemizedlist>
                     <listitem><para>Collection is brought in as a root term of the query through a JOIN expression</para></listitem>
                     <listitem><para>JOINs will match entities by their defined primary/foreign keys</para></listitem>
@@ -428,14 +428,13 @@ LEFT JOIN c.sales sale]]></programlisting>
 
         <para>Criteria API Definition</para>
 <programlisting language="java"><![CDATA[
-        CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
-        
-        Root<Clerk> c = qdef.from(Clerk.class);
-        Join<Clerk, Sale> sale = c.join("sales", JoinType.LEFT);
-        qdef.select(cb.array(c.get("id"),
-                             c.get("firstName"),
-                             sale.get("amount")));
-]]></programlisting>                        
+CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+Join<Clerk, Sale> sale = c.join("sales", JoinType.LEFT);
+qdef.select(cb.array(c.get("id"),
+                     c.get("firstName"),
+                     sale.get("amount")));]]></programlisting>                        
                 <itemizedlist>
                     <listitem><para>LEFT OUTER JOIN will return root with or without related entities</para></listitem>
                 </itemizedlist>
@@ -475,13 +474,12 @@ where c.id = s.buyerId]]></programlisting>
 
                 <para>Criteria API Definition</para>
 <programlisting language="java"><![CDATA[
-        CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
-        
-        Root<Sale> s = qdef.from(Sale.class);
-        Root<Customer> c = qdef.from(Customer.class);
-        qdef.select(c)
-            .where(cb.equal(c.get("id"), s.get("buyerId")));
-]]></programlisting>                        
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+
+Root<Sale> s = qdef.from(Sale.class);
+Root<Customer> c = qdef.from(Customer.class);
+qdef.select(c)
+    .where(cb.equal(c.get("id"), s.get("buyerId")));]]></programlisting>                        
                 <itemizedlist>
                     <listitem><para>Permits JOINs without relationship in entity model</para></listitem>
                 </itemizedlist>
@@ -507,10 +505,151 @@ Hibernate:
                 </itemizedlist>
             </section>  
 
-
         </section>
 
     </section>    
+
+
+    <section id="jpa-query-jpaql-fetchjoins">
+        <title>Eager Fetching through JOINs</title>
+
+
+        <section id="jpa-query-jpaql-fetchjoins-problem">
+            <title>Lazy Fetch Problem</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select s from Store s JOIN s.sales
+where s.name='Big Al''s']]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Store> qdef = cb.createQuery(Store.class);
+
+Root<Store> s = qdef.from(Store.class);
+s.join("sales");
+qdef.select(s)
+    .where(cb.equal(s.get("name"), "Big Al's"));]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>A normal JOIN (implicit or explicit) may honor the fetch=LAZY property setting of the relation</para></listitem>
+                <listitem><para>Can be exactly what is desired</para></listitem>
+                <listitem><para>Can also cause problems or extra work if not desired</para></listitem>
+            </itemizedlist>
+
+            <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+@Entity @Table(name="ORMQL_STORE")
+public class Store {
+...
+    @OneToMany(mappedBy="store", 
+            cascade={CascadeType.REMOVE}, 
+            fetch=FetchType.LAZY)
+    private List<Sale> sales = new ArrayList<Sale>();
+]]></programlisting>                        
+    <itemizedlist>
+        <listitem><para>Sales are lazily fetched when obtaining Store</para></listitem>
+    </itemizedlist>
+
+<programlisting language="java"><![CDATA[
+CriteriaBuilder cb = em2.getCriteriaBuilder();
+CriteriaQuery<Store> qdef = cb.createQuery(Store.class);
+
+Root<Store> s = qdef.from(Store.class);
+s.join("sales");
+qdef.select(s)
+    .where(cb.equal(s.get("name"), "Big Al's"));
+
+Store store = em2.createQuery(qdef).getSingleResult();
+em2.close();
+try {
+    store.getSales().get(0).getAmount();
+    fail("did not trigger lazy initialization exception");
+} catch (LazyInitializationException expected) {
+    log.info("caught expected exception:" + expected);
+}]]></programlisting>                        
+    <itemizedlist>
+        <listitem><para>Accessing the Sale properties causes a LazyInitializationException when persistence context no longer active or accessible</para></listitem>
+    </itemizedlist>
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        store0_.STORE_ID as STORE1_0_,
+        store0_.name as name0_ 
+    from
+        ORMQL_STORE store0_ 
+    inner join
+        JPAQL_SALE sales1_ 
+            on store0_.STORE_ID=sales1_.SALE_STORE 
+    where
+        store0_.name=? limit ?
+ -caught expected exception:org.hibernate.LazyInitializationException: 
+     failed to lazily initialize a collection of role: 
+     ejava.jpa.examples.query.Store.sales, no session or session was closed]]></programlisting>                            
+            <note>
+                <title>One Row per Parent is Returned for fetch=LAZY</title>
+                <para>Note that only a single row is required to be returned from the database
+                    for a fetch=LAZY relation. Although it requires more queries to the database,
+                    it eliminates duplicate parent information for each child row and can 
+                    eliminate the follow-on query all together when not accessed.</para>
+            </note>
+        </section>    
+
+
+        <section id="jpa-query-jpaql-fetchjoins-solution">
+            <title>Adding Eager Fetch during Query</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select s from Store s JOIN FETCH s.sales
+where s.name='Big Al''s']]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Store> qdef = cb.createQuery(Store.class);
+
+Root<Store> s = qdef.from(Store.class);
+s.fetch("sales");
+qdef.select(s)
+    .where(cb.equal(s.get("name"), "Big Al's"));
+]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>A JOIN FETCH used to eager load related entities as side-effect of query</para></listitem>
+                <listitem><para>Can be used as substitute for fetch=EAGER specification on relation</para></listitem>
+            </itemizedlist>
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        store0_.STORE_ID as STORE1_0_0_,
+        sales1_.SALE_ID as SALE1_1_1_,
+        store0_.name as name0_0_,
+        sales1_.amount as amount1_1_,
+        sales1_.BUYER_ID as BUYER3_1_1_,
+        sales1_.date as date1_1_,
+        sales1_.SALE_STORE as SALE5_1_1_,
+        sales1_.SALE_STORE as SALE5_0_0__,
+        sales1_.SALE_ID as SALE1_0__ 
+    from
+        ORMQL_STORE store0_ 
+    inner join
+        JPAQL_SALE sales1_ 
+            on store0_.STORE_ID=sales1_.SALE_STORE 
+    where
+        store0_.name=?]]></programlisting>                            
+            <itemizedlist>
+                <listitem><para>Sales are eagerly fetched when obtaining Store</para></listitem>
+            </itemizedlist>
+            <note>
+                <title>Parent Rows Repeated for each Child for fetch=EAGER</title>
+                <para>Note that adding JOIN FETCH to parent query causes the parent rows to 
+                    be repeated for each eagerly loaded child row and eliminated by the provider.
+                    This requires fewer database queries but results in more (and redundant) data
+                    to be returned from the query.</para>
+            </note>
+        </section>    
+
+    </section>
 
 
 

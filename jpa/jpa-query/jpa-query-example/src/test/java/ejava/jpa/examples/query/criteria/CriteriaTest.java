@@ -4,12 +4,14 @@ import static org.junit.Assert.assertEquals;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,6 +22,7 @@ import javax.persistence.criteria.Root;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.LazyInitializationException;
 import org.junit.Test;
 
 import ejava.jpa.examples.query.Clerk;
@@ -27,6 +30,7 @@ import ejava.jpa.examples.query.Customer;
 import ejava.jpa.examples.query.QueryBase;
 import ejava.jpa.examples.query.Receipt;
 import ejava.jpa.examples.query.Sale;
+import ejava.jpa.examples.query.Store;
 
 public class CriteriaTest extends QueryBase {
 	private static final Log log = LogFactory.getLog(CriteriaTest.class);
@@ -281,5 +285,54 @@ public class CriteriaTest extends QueryBase {
         assertTrue("unexpected number of customers:" + rows, rows > 0);
     }
     
+    /**
+     * This test demonstrates the function of a JOIN FETCH to perform the 
+     * EAGER retrieval of entities as a side-effect of the query
+     */
+    @Test
+    public void testFetchJoin1() {        
+        log.info("** testFetchJoin1() ***");
+        
+        EntityManager em2 = createEm();
+        CriteriaBuilder cb = em2.getCriteriaBuilder();
+        CriteriaQuery<Store> qdef = cb.createQuery(Store.class);
+        
+        //select s from Store s JOIN s.sales
+        //where s.name='Big Al''s'
+        Root<Store> s = qdef.from(Store.class);
+        s.join("sales");
+        qdef.select(s)
+            .where(cb.equal(s.get("name"), "Big Al's"));
+        
+        Store store = em2.createQuery(qdef).getSingleResult();
+        log.info("em.contains(" + em2.contains(store) + ")");
+        em2.close();
+        try {
+        	store.getSales().get(0).getAmount();
+        	fail("did not trigger lazy initialization exception");
+        } catch (LazyInitializationException expected) {
+        	log.info("caught expected exception:" + expected);
+        }
+    }
+    @Test
+    public void testFetchJoin2() {        
+        log.info("** testFetchJoin2() ***");
+
+        EntityManager em2 = createEm();
+        CriteriaBuilder cb = em2.getCriteriaBuilder();
+        CriteriaQuery<Store> qdef = cb.createQuery(Store.class);
+
+        //select s from Store s JOIN FETCH s.sales
+        //where s.name='Big Al''s'
+        Root<Store> s = qdef.from(Store.class);
+        s.fetch("sales");
+        qdef.select(s)
+            .where(cb.equal(s.get("name"), "Big Al's"));
+        
+        Store store = em2.createQuery(qdef).getSingleResult();
+        log.info("em.contains(" + em2.contains(store) + ")");
+        em2.close();
+       	store.getSales().get(0).getAmount();
+    }
     
 }

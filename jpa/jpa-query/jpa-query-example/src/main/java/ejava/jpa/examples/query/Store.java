@@ -1,7 +1,7 @@
 package ejava.jpa.examples.query;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -17,11 +17,12 @@ public class Store {
     @OneToMany(mappedBy="store", 
             cascade={CascadeType.REMOVE}, 
             fetch=FetchType.LAZY)
-    private Collection<Sale> sales = new ArrayList<Sale>();
+    private List<Sale> sales = new ArrayList<Sale>();
 
     public long getId() { return id; }
     
-    public Store setSales(Collection<Sale> sales) {
+    public List<Sale> getSales() { return sales; }
+    public Store setSales(List<Sale> sales) {
         this.sales = sales;
         return this;
     }
