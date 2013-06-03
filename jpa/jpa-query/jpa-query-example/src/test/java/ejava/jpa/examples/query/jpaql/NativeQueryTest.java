@@ -26,7 +26,7 @@ public class NativeQueryTest extends QueryBase {
         
         Query query = em.createNativeQuery(
         	String.format("select * from %s ", table.name()) +
-            String.format("where %s.firstName = :first", table.name()));
+            String.format("where %s.FIRST_NAME = :first", table.name()));
         List<Object[]> results = query.setParameter("first", "thing")
         		                      .getResultList();
         assertTrue("no customers found", results.size() > 0);
@@ -44,7 +44,7 @@ public class NativeQueryTest extends QueryBase {
         
         Query query = em.createNativeQuery(
         	String.format("select * from %s ", table.name()) +
-            String.format("where %s.firstName = :first", table.name()), Customer.class);
+            String.format("where %s.FIRST_NAME = :first", table.name()), Customer.class);
         List<Customer> results = query.setParameter("first", "thing")
                                       .getResultList();
         assertTrue("no customers found", results.size() > 0);
