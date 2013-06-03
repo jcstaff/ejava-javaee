@@ -1380,6 +1380,7 @@ public class CriteriaTest extends QueryBase {
 
 		log.debug("execute JPAQL query");
 		List<Tuple> lresults = lquery.getResultList();
+		em.close();
 		log.debug("accessing jpaql results");
 		log.debug("jpaql results  =" + lresults);
 		for (Tuple r: lresults) {

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.persistence.*;
@@ -40,11 +41,12 @@ public class Sale {
         joinColumns={@JoinColumn(name="SALE_ID")},
         inverseJoinColumns={@JoinColumn(name="CLERK_ID")}
         )
-    private Collection<Clerk> clerks = new ArrayList<Clerk>();
+    private List<Clerk> clerks = new ArrayList<Clerk>();
     
     public long getId() { return id; }
     
-    public Sale setClerks(Collection<Clerk> clerks) {
+    public List<Clerk> getClerks() { return clerks; }
+    public Sale setClerks(List<Clerk> clerks) {
         this.clerks = clerks;
         return this;
     }

@@ -335,4 +335,37 @@ public class CriteriaTest extends QueryBase {
        	store.getSales().get(0).getAmount();
     }
     
+    /**
+     * This test demonstrates the use of DISTINCT to limit the results
+     * to only unique values
+     */
+    @Test
+    public void testDISTINCT() {
+        log.info("*** testDISTINCT() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        {
+	        CriteriaQuery<String> qdef = cb.createQuery(String.class);
+	        
+	        //select DISTINCT c.lastName from Customer c
+	        Root<Customer> c = qdef.from(Customer.class);
+	        qdef.select(c.<String>get("lastName"))
+	            .distinct(true);
+	        
+	        int rows = executeQuery(qdef).size();
+	        assertEquals("unexpected number of rows", 3, rows);
+        }
+        
+        {        
+        	CriteriaQuery<String> qdef = cb.createQuery(String.class);
+        	
+        	//select DISTINCT c.firstName from Customer c
+        	Root<Customer> c = qdef.from(Customer.class);
+        	qdef.select(c.<String>get("firstName"))
+        		.distinct(true);
+        
+	        int rows = executeQuery(qdef).size();
+	        assertEquals("unexpected number of rows for DISTINCT", 2, rows);
+        }
+    }
 }

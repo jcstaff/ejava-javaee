@@ -255,7 +255,36 @@ public class JPAQLTest extends QueryBase {
         em2.close();
        	store.getSales().get(0).getAmount();
     }
+
+    /**
+     * This test demonstrates how we can leverage multi-selects to extend a 
+     * JOIN FETCH beyond a single root anchoring point.
+     */
+    @Test
+    public void testMultiSelectEntities() {
+        log.info("** testMultiSelectEntities() ***");
+
+        EntityManager em2 = createEm();
+        Sale sale = em2.createQuery(
+        		"select sa as sale " +
+        		"from Sale sa " +
+        		"join sa.store st " +
+        		"join sa.clerks c " +        		
+        		"join fetch sa.clerks " +
+        		"join fetch sa.store " +
+        		"where st.name='Big Al''s' " +
+        		"and sa member of c.sales",
+        		Tuple.class).getResultList().get(0).get("sale", Sale.class);
+        em2.close();
+       	sale.getAmount();
+       	sale.getClerks().get(0).getFirstName();
+       	sale.getStore();
+    }
     
+    /**
+     * This test demonstrates the use of DISTINCT to limit the results
+     * to only unique values
+     */
     @Test
     public void testDISTINCT() {
         log.info("*** testDISTINCT() ***");
