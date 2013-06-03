@@ -1,11 +1,11 @@
 package ejava.jpa.examples.query;
 
 import java.math.BigDecimal;
+
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;

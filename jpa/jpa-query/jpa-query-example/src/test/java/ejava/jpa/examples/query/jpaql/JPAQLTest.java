@@ -299,6 +299,13 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows for DISTINCT", 2, rows);
     }
     
+    
+    //where clauses
+    
+    
+    /**
+     * This test provides an example of an equality test in the where clause
+     */
     @Test
     public void testLiteral() {
         log.info("*** testLiteral() ***");

@@ -35,7 +35,6 @@ import ejava.jpa.examples.query.Store;
 public class CriteriaTest extends QueryBase {
 	private static final Log log = LogFactory.getLog(CriteriaTest.class);
 
-    @SuppressWarnings("unused")
 	private <T> List<T> executeQuery(CriteriaQuery<T> qdef) {
         return executeQuery(qdef, null);
     }
@@ -368,4 +367,28 @@ public class CriteriaTest extends QueryBase {
 	        assertEquals("unexpected number of rows for DISTINCT", 2, rows);
         }
     }
+    
+    //where clauses
+    
+    
+    /**
+     * This test provides an example of an equality test in the where clause
+     */
+    @Test
+    public void testLiteral() {
+        log.info("*** testLiteral() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+        
+        //select c from Customer c 
+        //where c.firstName='cat'
+        Root<Customer> c = qdef.from(Customer.class);
+        qdef.select(c)
+            .where(cb.equal(c.get("firstName"), "cat"));
+        
+        int rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows:", 1, rows);
+    }
+    
 }

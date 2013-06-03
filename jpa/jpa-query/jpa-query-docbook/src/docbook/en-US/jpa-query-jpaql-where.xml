@@ -5,26 +5,29 @@
     <title>JPAQL Where Clauses</title>
     <para></para>
         
-    <section id="jpa-query-jpaql-where">
-        <title></title>
-        <para></para>
+    <section id="jpa-query-jpaql-where-equals">
+        <title>Equality Test</title>
   
-<programlisting language=""><![CDATA[
-]]></programlisting>
+<programlisting language=""><![CDATA[select c from Customer c 
+where c.firstName='cat']]></programlisting>
 
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Return entities where there is an equality match</para></listitem>
         </itemizedlist>
-
-        <para>In programming context</para>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                            
 
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>                            
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME='cat'
+        
+ -found result:firstName=cat, lastName=inhat]]></programlisting>                            
     </section>
 
 
