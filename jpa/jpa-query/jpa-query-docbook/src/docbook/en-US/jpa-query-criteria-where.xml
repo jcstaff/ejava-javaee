@@ -36,7 +36,219 @@ Hibernate:
     where
         customer0_.FIRST_NAME=?
  -found result:firstName=cat, lastName=inhat]]></programlisting>                            
+
+
+        <para>No need to escape JPAQL special characters</para>
+<programlisting language=""><![CDATA[select c from Customer c 
+where c.firstName='cat']]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+        CriteriaQuery<Store> qdef = cb.createQuery(Store.class);
+        
+        Root<Store> s = qdef.from(Store.class);
+        qdef.select(s)
+            .where(cb.equal(s.get("name"), "Big Al's"));
+]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Literal values automatically escaped</para></listitem>
+        </itemizedlist>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        store0_.STORE_ID as STORE1_0_,
+        store0_.name as name0_ 
+    from
+        ORMQL_STORE store0_ 
+    where
+        store0_.name=?
+...
+ -found result:name=Big Al's, sales(2)={1, 2, }]]></programlisting>
+
     </section>
+
+
+    <section id="jpa-query-criteria-where-like">
+        <title>Like Test</title>
+        
+        <section id="jpa-query-criteria-where-like-literal">
+            <title>Like Test Literal</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Clerk c 
+where c.firstName like 'M%']]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.like(c.<String>get("firstName"), "M%"));
+]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME like ?
+...
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
+ -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }]]></programlisting>                            
+         </section>    
+
+        <section id="jpa-query-criteria-where-like-literalparam">
+           <title>Like Test Literal Parameter</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Clerk c
+where c.firstName like :firstName]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.like(c.<String>get("firstName"), 
+                   cb.parameter(String.class, "firstName")));
+]]></programlisting>                        
+
+            <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.like(c.<String>get("firstName"), 
+                   cb.parameter(String.class, "firstName")));
+
+TypedQuery<Clerk> query = em.createQuery(qdef)
+        .setParameter("firstName", "M%");
+List<Clerk> results = query.getResultList();
+]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME like ?
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
+ -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }]]></programlisting>                            
+        </section>    
+
+        <section id="jpa-query-criteria-where-like-concat">
+           <title>Like Test Concatenated String</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Clerk c
+where c.firstName like concat(:firstName,'%')]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.like(c.<String>get("firstName"),
+                   cb.concat(cb.parameter(String.class, "firstName"), "%")));
+]]></programlisting>                        
+
+            <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.like(c.<String>get("firstName"),
+                   cb.concat(cb.parameter(String.class, "firstName"), "%")));
+
+TypedQuery<Clerk> query = em.createQuery(qdef)
+        .setParameter("firstName", "M");
+List<Clerk> results = query.getResultList();]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME like (?||?)
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
+ -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }
+]]></programlisting>                            
+        </section>    
+
+        <section id="jpa-query-criteria-where-like-singlechar">
+           <title>Like Test Single Character Wildcard</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Clerk c
+where c.firstName like '_anny']]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.like(c.<String>get("firstName"),"_anny"));
+]]></programlisting>                        
+
+            <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.like(c.<String>get("firstName"),"_anny"));
+
+TypedQuery<Clerk> query = em.createQuery(qdef);
+List<Clerk> results = query.getResultList();]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME like ?
+
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
+]]></programlisting>                            
+        </section>    
+    </section>
+
 
 
 

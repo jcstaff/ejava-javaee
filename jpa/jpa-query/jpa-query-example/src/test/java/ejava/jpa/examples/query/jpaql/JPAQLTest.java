@@ -315,7 +315,7 @@ public class JPAQLTest extends QueryBase {
                 Customer.class).size();
         assertEquals("unexpected number of rows:", 1, rows);
     }
-    
+
     @Test
     public void testSpecialCharacter() {
         log.info("*** testSpecialCharacter() ***");
@@ -326,6 +326,9 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 1, rows);
     }
     
+    /**
+     * This test demonstrates the use of like in where clauses
+     */
     @Test
     public void testLike() {
         log.info("*** testLike() ***");

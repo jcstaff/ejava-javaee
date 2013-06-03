@@ -27,9 +27,135 @@ Hibernate:
     where
         customer0_.FIRST_NAME='cat'
         
- -found result:firstName=cat, lastName=inhat]]></programlisting>                            
+ -found result:firstName=cat, lastName=inhat]]></programlisting>
+ 
+        <para>Escaping special characters</para>
+<programlisting language=""><![CDATA[select s from Store s 
+where s.name='Big Al''s']]></programlisting>                        
+        <para>Runtime output</para>
+
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        store0_.STORE_ID as STORE1_0_,
+        store0_.name as name0_ 
+    from
+        ORMQL_STORE store0_ 
+    where
+        store0_.name='Big Al''s'
+...
+ -found result:name=Big Al's, sales(2)={1, 2, }
+]]></programlisting>                                                            
     </section>
 
+    <section id="jpa-query-jpaql-where-like">
+        <title>Like Test</title>
+        
+        <section id="jpa-query-jpaql-where-like-literal">
+           <title>Like Test Literal</title>
+<programlisting language=""><![CDATA[select c from Clerk c
+where c.firstName like 'M%']]></programlisting>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME like 'M%'
+...        
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
+ -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }]]></programlisting>                            
+         </section>    
+
+        <section id="jpa-query-jpaql-where-like-literalparam">
+           <title>Like Test Literal Parameter</title>
+<programlisting language=""><![CDATA[select c from Clerk c 
+where c.firstName like :firstName)]]></programlisting>
+
+        <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+TypedQuery<T> query = em.createQuery(ejbqlString, resultType);
+query.setParameter("firstName", "M%");
+List<T> objects = query.getResultList();
+]]></programlisting>                            
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME like ?
+        
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
+ -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }]]></programlisting>                            
+        </section>    
+
+        <section id="jpa-query-jpaql-where-like-concat">
+           <title>Like Test Concatenated String</title>
+<programlisting language=""><![CDATA[select c from Clerk c 
+where c.firstName like concat(:firstName,'%')]]></programlisting>
+
+        <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+TypedQuery<T> query = em.createQuery(ejbqlString, resultType);
+query.setParameter("firstName", "M");
+List<T> objects = query.getResultList();
+]]></programlisting>                            
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME like (?||'%')
+
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
+ -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }]]></programlisting>                            
+        </section>    
+
+        <section id="jpa-query-jpaql-where-like-singlechar">
+           <title>Like Test Single Character Wildcard</title>
+<programlisting language=""><![CDATA[select c from Clerk c 
+where c.firstName like '_anny']]></programlisting>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME like '_anny'
+
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }]]></programlisting>                            
+        </section>    
+    </section>
 
 
     <section id="jpa-query-jpaql-where-">

@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -389,6 +390,101 @@ public class CriteriaTest extends QueryBase {
         
         int rows = executeQuery(qdef).size();
         assertEquals("unexpected number of rows:", 1, rows);
+    }
+
+    /**
+     * This test demonstrates how literal values are automatically escaped
+     */
+    @Test
+    public void testSpecialCharacter() {
+        log.info("*** testSpecialCharacter() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Store> qdef = cb.createQuery(Store.class);
+        
+        //select s from Store s 
+        //where s.name='Big Al''s'
+        Root<Store> s = qdef.from(Store.class);
+        qdef.select(s)
+            .where(cb.equal(s.get("name"), "Big Al's"));
+        
+        int rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows", 1, rows);
+    }
+    
+    /**
+     * This test demonstrates the use of like in where clauses
+     */
+    @Test
+    public void testLike() {
+        log.info("*** testLike() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        {
+        	CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+        	
+        	//select c from Clerk c 
+            //where c.firstName like 'M%'
+        	Root<Clerk> c = qdef.from(Clerk.class);
+        	qdef.select(c)
+        	    .where(cb.like(c.<String>get("firstName"), "M%"));
+
+        	int rows = executeQuery(qdef).size();
+        	assertEquals("unexpected number of rows", 2, rows);
+        }
+        
+        {
+        	CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+        	
+        	//select c from Clerk c
+            //where c.firstName like :firstName
+        	Root<Clerk> c = qdef.from(Clerk.class);
+        	qdef.select(c)
+        	    .where(cb.like(c.<String>get("firstName"), 
+        	    		       cb.parameter(String.class, "firstName")));
+        	TypedQuery<Clerk> query = em.createQuery(qdef)
+        			.setParameter("firstName", "M%");
+        	List<Clerk> results = query.getResultList();
+            for(Object o: results) {
+                log.info("found result:" + o);
+             }
+            assertEquals("unexpected number of rows", 2, results.size());        
+        }
+        
+        {
+        	CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+        	
+        	//select c from Clerk c
+            //where c.firstName like concat(:firstName,'%')
+        	Root<Clerk> c = qdef.from(Clerk.class);
+        	qdef.select(c)
+        	    .where(cb.like(c.<String>get("firstName"),
+        	    		       cb.concat(cb.parameter(String.class, "firstName"), "%")));
+        	TypedQuery<Clerk> query = em.createQuery(qdef)
+        			.setParameter("firstName", "M");
+        	List<Clerk> results = query.getResultList();
+            for(Object o: results) {
+                log.info("found result:" + o);
+             }
+            assertEquals("unexpected number of rows", 2, results.size());        
+        }
+        
+        {
+        	CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+        	
+        	//select c from Clerk c
+            //where c.firstName like '_anny'
+        	Root<Clerk> c = qdef.from(Clerk.class);
+        	qdef.select(c)
+        	    .where(cb.like(c.<String>get("firstName"),"_anny"));
+        	TypedQuery<Clerk> query = em.createQuery(qdef);
+        	List<Clerk> results = query.getResultList();
+            for(Object o: results) {
+                log.info("found result:" + o);
+             }
+            assertEquals("unexpected number of rows", 1, results.size());        
+        }
+        
     }
     
 }
