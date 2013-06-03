@@ -145,10 +145,13 @@ public class JPAQLTest extends QueryBase {
         }        
     }
 
-    
+    /**
+     * This test provides an example of navigating a path formed by a 
+     * relationship. In this case the path used is a single element.
+     */
     @Test
-    public void testEntityRelationships() {
-        log.info("*** testEntityRelationships() ***");
+    public void testPathExpressions() {
+        log.info("*** testPathExpressions() ***");
         
         TypedQuery<Object[]> query = em.createQuery(
                 "select s.id, s.store.name from Sale s", Object[].class);
@@ -162,37 +165,24 @@ public class JPAQLTest extends QueryBase {
         }
     }
 
-    
+    /**
+     * This test provides an example collection path using an INNER JOIN
+     */
     @Test
-    public void testIN() {
-        log.info("*** testIN() ***");
+    public void testCollectionPathExpressionsInnerJoin() {
+        log.info("*** testCollectionPathExpressionsInnerJoin ***");
         
         int rows = executeQuery(
-                "select sale from Store s, IN(s.sales) sale", 
-                Sale.class).size();
-        assertTrue("unexpected number of sales:" + rows, rows > 0);
-
-        rows = executeQuery(
-                "select sale.date from Store s, IN(s.sales) sale",
+//              "select sale.date from Clerk c INNER JOIN c.sales sale", 
+//              "select sale.date from Clerk c, IN (c.sales) sale", 
+              "select sale.date from Clerk c JOIN c.sales sale", 
                 Date.class).size();
         assertTrue("unexpected number of sales:" + rows, rows > 0);
     }
-    
-    @Test
-    public void testInnerJoin() {
-        log.info("*** testInnerJoin() ***");
-        
-        int rows = executeQuery(
-                "select sale from Store s INNER JOIN s.sales sale",
-                Sale.class).size();
-        assertTrue("unexpected number of sales:" + rows, rows > 0);
 
-        rows = executeQuery(
-                "select sale.date from Store s INNER JOIN s.sales sale",
-        		Date.class).size();
-        assertTrue("unexpected number of sales:" + rows, rows > 0);
-    }
-    
+    /**
+     * This test provides an example collection path using an LEFT OUTER JOIN
+     */
     @Test
     public void testOuterJoin() {
         log.info("*** testOuterJoin() ***");
@@ -200,7 +190,9 @@ public class JPAQLTest extends QueryBase {
         TypedQuery<Object[]> query = em.createQuery(
             "select c.id, c.firstName, sale.amount " +
             "from Clerk c " +
-            "LEFT JOIN c.sales sale", Object[].class);
+//            "LEFT OUTER JOIN c.sales sale",
+            "LEFT JOIN c.sales sale",
+            Object[].class);
         List<Object[]> results = query.getResultList();
         assertTrue("no results", results.size() > 0);
         for(Object[] result : results) {
@@ -212,6 +204,21 @@ public class JPAQLTest extends QueryBase {
                     ", amount=" + amount);
         }
     }
+    
+    /**
+     * This test demonstrates creating an explicit JOIN based on adhoc criteria
+     */
+    @Test
+    public void testExplicitJoin() {
+    	log.info("*** testExplicitJoin ***");
+    	
+    	int rows = executeQuery(
+    		"select c from Sale s, Customer c " +
+    		"where c.id = s.buyerId", 
+    		Customer.class).size();
+        assertTrue("unexpected number of customers:" + rows, rows > 0);
+    }
+    
     
     @Test
     public void testFetchJoin() {        

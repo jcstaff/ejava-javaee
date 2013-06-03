@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.logging.Log;
@@ -178,4 +181,105 @@ public class CriteriaTest extends QueryBase {
             log.info("receipt=" + receipt);
         }        
     }
+
+    /**
+     * This test provides an example of navigating a path formed by a 
+     * relationship. In this case the path used is a single element.
+     */
+    @Test
+    public void testPathExpressions() {
+        log.info("*** testPathExpressions() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
+        
+        //select s.id, s.store.name from Sale s
+        Root<Sale> s = qdef.from(Sale.class);
+        qdef.select(cb.array(s.get("id"),
+        		             s.get("store").get("name")));
+        
+        TypedQuery<Object[]> query = em.createQuery(qdef);
+        List<Object[]> results = query.getResultList();
+        assertTrue("no results", results.size() > 0);
+        for(Object[] result : results) {
+            assertEquals("unexpected result length", 2, result.length);
+            Long id = (Long) result[0];
+            String name = (String) result[1];
+            log.info("sale.id=" + id + ", sale.store.name=" + name);
+        }
+    }
+
+    /**
+     * This test provides an example collection path using an INNER JOIN
+     */
+    @Test
+    public void testCollectionPathExpressionsInnerJoin() {
+        log.info("*** testCollectionPathExpressionsInnerJoin ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Date> qdef = cb.createQuery(Date.class);
+        
+        //select sale.date from Clerk c JOIN c.sales sale
+        Root<Clerk> c = qdef.from(Clerk.class);
+        Join<Clerk, Sale> sale = c.join("sales", JoinType.INNER);
+        qdef.select(sale.<Date>get("date"));
+
+        int rows=executeQuery(qdef).size();
+        assertTrue("unexpected number of sales:" + rows, rows > 0);
+    }
+
+    /**
+     * This test provides an example collection path using an LEFT OUTER JOIN
+     */
+    @Test
+    public void testOuterJoin() {
+        log.info("*** testOuterJoin() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
+        
+        //select c.id, c.firstName, sale.amount 
+        //from Clerk c 
+        //LEFT JOIN c.sales sale
+        Root<Clerk> c = qdef.from(Clerk.class);
+        Join<Clerk, Sale> sale = c.join("sales", JoinType.LEFT);
+        qdef.select(cb.array(c.get("id"),
+        		             c.get("firstName"),
+        		             sale.get("amount")));
+        
+        TypedQuery<Object[]> query = em.createQuery(qdef);
+        List<Object[]> results = query.getResultList();
+        assertTrue("no results", results.size() > 0);
+        for(Object[] result : results) {
+            assertEquals("unexpected result length", 3, result.length);
+            Long id = (Long) result[0];
+            String name = (String) result[1];
+            BigDecimal amount = (BigDecimal) result[2];
+            log.info("clerk.id=" + id + ", clerk.firstName=" + name +
+                    ", amount=" + amount);
+        }
+    }
+    
+    /**
+     * This test demonstrates creating an explicit JOIN based on adhoc criteria
+     */
+    @Test
+    public void testExplicitJoin() {
+    	log.info("*** testExplicitJoin ***");
+    	
+    	CriteriaBuilder cb = em.getCriteriaBuilder();
+    	CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+    	
+    	//select c from Sale s, Customer c 
+    	//where c.id = s.buyerId
+    	Root<Sale> s = qdef.from(Sale.class);
+    	Root<Customer> c = qdef.from(Customer.class);
+    	qdef.select(c)
+    	    .where(cb.equal(c.get("id"), s.get("buyerId")));
+    	
+    	int rows = executeQuery(qdef).size();
+        assertTrue("unexpected number of customers:" + rows, rows > 0);
+    }
+    
+    
 }

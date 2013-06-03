@@ -231,12 +231,174 @@ Hibernate:
  -receipt=sale=1, customer=1, date=1998-04-10 10:13:35, amount=$100.00
  -receipt=sale=2, customer=2, date=1999-06-11 14:15:10, amount=$150.00]]></programlisting>                            
         </section>    
-
-  
-
-
-
     </section>
+
+    <section id="jpa-query-jpaql-paths">
+       <title>Path Expressions</title>
+
+        <section id="jpa-query-jpaql-paths-single">
+            <title>Single Element Path Expressions</title>  
+<programlisting language=""><![CDATA[select s.id, s.store.name from Sale s]]></programlisting>
+            <itemizedlist>
+                <listitem><para>Paths use dot (".") notation to change contexts</para></listitem>
+                <listitem><para>Paths that cross entity boundaries automatically add a join to SQL query</para></listitem>
+                <listitem><para>Paths -- used this way -- must always express a single element. Must use JOINs for paths involving collections</para></listitem>
+                <listitem><para>All paths based off root-level FROM (or JOIN) terms</para></listitem>
+            </itemizedlist>
+
+            <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+TypedQuery<Object[]> query = em.createQuery(
+        "select s.id, s.store.name from Sale s", Object[].class);
+List<Object[]> results = query.getResultList();
+assertTrue("no results", results.size() > 0);
+for(Object[] result : results) {
+    assertEquals("unexpected result length", 2, result.length);
+    Long id = (Long) result[0];
+    String name = (String) result[1];
+    log.info("sale.id=" + id + ", sale.store.name=" + name);
+}]]></programlisting>                            
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as col_0_0_,
+        store1_.name as col_1_0_ 
+    from
+        JPAQL_SALE sale0_,
+        ORMQL_STORE store1_ 
+    where
+        sale0_.SALE_STORE=store1_.STORE_ID
+ -sale.id=1, sale.store.name=Big Al's
+ -sale.id=2, sale.store.name=Big Al's]]></programlisting>
+             <itemizedlist>
+                <listitem><para>Automatic INNER JOIN formed between Sale and Store because of the cross-entity path</para></listitem>
+            </itemizedlist>
+                            
+        </section>
+        
+        <section id="jpa-query-jpaql-paths-collections">
+            <title>Collection Element Path Expressions</title>
+            
+            <section id="jpa-query-jpaql-paths-collections-innerjoin">
+                <title>INNER JOIN Collection Path Expressions</title>
+<programlisting language=""><![CDATA[select sale.date from Clerk c INNER JOIN c.sales sale"]]></programlisting>
+        <para>Alternate, abbreviated form</para>                        
+<programlisting language=""><![CDATA[select sale.date from Clerk c JOIN c.sales sale"]]></programlisting>
+        <para>Alternate, legacy EJBQL form</para>                        
+<programlisting language=""><![CDATA[select sale.date from Clerk c, IN (c.sales) sale"]]></programlisting>
+                <itemizedlist>
+                    <listitem><para>Collection is brought in as a root term of the query through a JOIN expression</para></listitem>
+                    <listitem><para>JOINs will match entities by their defined primary/foreign keys</para></listitem>
+                    <listitem><para>INNER JOIN will return only those entities where there is a match</para></listitem>
+                </itemizedlist>
+    
+                <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale2_.date as col_0_0_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    inner join
+        JPAQL_SALE_CLERK_LINK sales1_ 
+            on clerk0_.CLERK_ID=sales1_.CLERK_ID 
+    inner join
+        JPAQL_SALE sale2_ 
+            on sales1_.SALE_ID=sale2_.SALE_ID
+ -found result:1998-04-10 10:13:35.0
+ -found result:1999-06-11 14:15:10.0
+ -found result:1999-06-11 14:15:10.0]]></programlisting>                            
+                <itemizedlist>
+                    <listitem><para>(Many-to-Many) Link table used during JOIN</para></listitem>
+                    <listitem><para>Tables automatically joined on primary keys</para></listitem>
+                    <listitem><para>Only Sales sold by our Clerks are returned</para></listitem>
+                </itemizedlist>
+            
+            </section>  
+
+
+
+            <section id="jpa-query-jpaql-paths-collections-leftjoin">
+                <title>LEFT OUTER JOIN Collection Path Expressions</title>
+<programlisting language=""><![CDATA[
+select c.id, c.firstName, sale.amount
+from Clerk c
+LEFT OUTER JOIN c.sales sale
+]]></programlisting>
+        <para>Alternate, abbreviated form</para>                        
+<programlisting language=""><![CDATA[
+select c.id, c.firstName, sale.amount
+from Clerk c
+LEFT JOIN c.sales sale
+]]></programlisting>
+                <itemizedlist>
+                    <listitem><para>LEFT OUTER JOIN will return root with or without related entities</para></listitem>
+                </itemizedlist>
+    
+                <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as col_0_0_,
+        clerk0_.FIRST_NAME as col_1_0_,
+        sale2_.amount as col_2_0_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    left outer join
+        JPAQL_SALE_CLERK_LINK sales1_ 
+            on clerk0_.CLERK_ID=sales1_.CLERK_ID 
+    left outer join
+        JPAQL_SALE sale2_ 
+            on sales1_.SALE_ID=sale2_.SALE_ID
+
+ -clerk.id=1, clerk.firstName=Manny, amount=100.00
+ -clerk.id=1, clerk.firstName=Manny, amount=150.00
+ -clerk.id=2, clerk.firstName=Moe, amount=150.00
+ -clerk.id=3, clerk.firstName=Jack, amount=null]]></programlisting>                            
+                <itemizedlist>
+                    <listitem><para>(Many-to-Many) Link table used during JOIN</para></listitem>
+                    <listitem><para>Tables automatically joined on primary keys</para></listitem>
+                    <listitem><para>All clerks, with or without a Sale, are returned</para></listitem>
+                </itemizedlist>
+            </section>  
+
+            <section id="jpa-query-jpaql-paths-collections-crossjoin">
+                <title>Explicit Collection Path Expressions</title>
+<programlisting language=""><![CDATA[select c from Sale s, Customer c where c.id = s.buyerId]]></programlisting>
+                <itemizedlist>
+                    <listitem><para>Permits JOINs without relationship in entity model</para></listitem>
+                </itemizedlist>
+    
+                <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer1_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer1_.FIRST_NAME as FIRST2_3_,
+        customer1_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_SALE sale0_ cross 
+    join
+        JPAQL_CUSTOMER customer1_ 
+    where
+        customer1_.CUSTOMER_ID=sale0_.BUYER_ID
+        
+ -found result:firstName=cat, lastName=inhat
+ -found result:firstName=thing, lastName=one]]></programlisting>                            
+                <itemizedlist>
+                    <listitem><para>Returns all Customers that are identified by a Sale</para></listitem>
+                </itemizedlist>
+            </section>  
+
+        </section>
+
+    </section>    
+
+
+
+
 
     <section id="jpa-query-jpaql-">
         <title></title>
@@ -252,7 +414,7 @@ Hibernate:
         </itemizedlist>
 
         <para>In programming context</para>
-<programlisting language=""><![CDATA[
+<programlisting language="java"><![CDATA[
 ]]></programlisting>                            
 
         <para>Runtime output</para>
