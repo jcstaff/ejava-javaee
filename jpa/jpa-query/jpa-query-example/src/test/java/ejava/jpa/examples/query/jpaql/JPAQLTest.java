@@ -486,6 +486,10 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 2, rows);
     }
 
+    /**
+     * This test provides an example of testing whether the collection
+     * is empty
+     */
     @Test
     public void testIsEmpty() {
         log.info("*** testIsEmpty() ***");

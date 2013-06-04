@@ -687,4 +687,39 @@ public class CriteriaTest extends QueryBase {
         }
     }
     
+    /**
+     * This test provides an example of testing whether the collection
+     * is empty
+     */
+    @Test
+    public void testIsEmpty() {
+        log.info("*** testIsEmpty() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        {
+            CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+            
+            //select c from Clerk c
+            //where c.sales IS EMPTY
+            Root<Clerk> c = qdef.from(Clerk.class);
+            qdef.select(c)
+                .where(cb.isEmpty(c.<List<Sale>>get("sales")));
+            
+            int rows = executeQuery(qdef).size();
+            assertEquals("unexpected number of rows", 1, rows);
+        }
+
+        {
+            CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+            
+            //select c from Clerk c
+            //where c.sales IS NOT EMPTY
+            Root<Clerk> c = qdef.from(Clerk.class);
+            qdef.select(c)
+                .where(cb.isNotEmpty(c.<List<Sale>>get("sales")));
+            
+            int rows = executeQuery(qdef).size();
+            assertEquals("unexpected number of rows", 2, rows);
+        }
+    }
 }
