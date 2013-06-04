@@ -2,7 +2,7 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="jpa-query-criteria-where">
-    <title>JPA Criteria API</title>
+    <title>Criteria Where Clauses</title>
     <para></para>
 
     <section id="jpa-query-criteria-where-equals">
@@ -249,7 +249,7 @@ Hibernate:
         </section>    
     </section>
 
-    <section id="jpa-query-jpaql-where-formulas">
+    <section id="jpa-query-criteria-where-formulas">
         <title>Formulas</title>
         <para></para>
   
@@ -270,26 +270,25 @@ qdef.select(cb.count(s))
   
         <para>In programming context</para>
 <programlisting language="java"><![CDATA[
-        CriteriaQuery<Number> qdef = cb.createQuery(Number.class); 
+CriteriaQuery<Number> qdef = cb.createQuery(Number.class); 
+
+//select count(s) from Sale s 
+//where (s.amount * :tax) > :amount"
+Root<Sale> s = qdef.from(Sale.class);
+qdef.select(cb.count(s))
+    .where(cb.greaterThan(
+        cb.prod(s.<BigDecimal>get("amount"), cb.parameter(BigDecimal.class, "tax")), 
+        new BigDecimal(10.0)));
+TypedQuery<Number> query = em.createQuery(qdef);
         
-        //select count(s) from Sale s 
-        //where (s.amount * :tax) > :amount"
-        Root<Sale> s = qdef.from(Sale.class);
-        qdef.select(cb.count(s))
-            .where(cb.greaterThan(
-                cb.prod(s.<BigDecimal>get("amount"), cb.parameter(BigDecimal.class, "tax")), 
-                new BigDecimal(10.0)));
-        TypedQuery<Number> query = em.createQuery(qdef);
-                
-        //keep raising taxes until somebody pays $10.00 in tax
-        double tax = 0.05;
-        for (;query.setParameter("tax", new BigDecimal(tax))
-                   .getSingleResult().intValue()==0;
-              tax += 0.01) {
-            log.debug("tax=" + NumberFormat.getPercentInstance().format(tax));
-        }
-        log.info("raise taxes to: " + NumberFormat.getPercentInstance().format(tax));
-]]></programlisting>                            
+//keep raising taxes until somebody pays $10.00 in tax
+double tax = 0.05;
+for (;query.setParameter("tax", new BigDecimal(tax))
+           .getSingleResult().intValue()==0;
+      tax += 0.01) {
+    log.debug("tax=" + NumberFormat.getPercentInstance().format(tax));
+}
+log.info("raise taxes to: " + NumberFormat.getPercentInstance().format(tax));]]></programlisting>                            
 
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
@@ -317,6 +316,78 @@ Hibernate:
     where
         sale0_.amount*?>10 limit ?
  -raise taxes to: 7%]]></programlisting>                            
+    </section>
+
+
+    <section id="jpa-query-criteria-where-logic">
+        <title>Logic Operators</title>
+  
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c
+where (c.firstName='cat' AND c.lastName='inhat')
+    OR c.firstName='thing']]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+
+Root<Customer> c = qdef.from(Customer.class);
+qdef.select(c)
+    .where(cb.or(
+            cb.and(cb.equal(c.get("firstName"), "cat"), 
+                   cb.equal(c.get("lastName"), "inhat")),
+            cb.equal(c.get("firstName"), "thing")));]]></programlisting>                        
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME=? 
+        and customer0_.LAST_NAME=? 
+        or customer0_.FIRST_NAME=?
+ -found result:firstName=cat, lastName=inhat
+ -found result:firstName=thing, lastName=one
+ -found result:firstName=thing, lastName=two]]></programlisting>                            
+
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c 
+where (NOT (c.firstName='cat' AND c.lastName='inhat')) 
+    OR c.firstName='thing']]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+
+Root<Customer> c = qdef.from(Customer.class);
+qdef.select(c)
+    .where(cb.or(
+            cb.not(cb.and(cb.equal(c.get("firstName"), "cat"), 
+                          cb.equal(c.get("lastName"), "inhat"))),
+            cb.equal(c.get("firstName"), "thing"))
+        );]]></programlisting>                        
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME<>? 
+        or customer0_.LAST_NAME<>? 
+        or customer0_.FIRST_NAME=?
+ -found result:firstName=thing, lastName=one
+ -found result:firstName=thing, lastName=two]]></programlisting>                            
+
     </section>
 
 

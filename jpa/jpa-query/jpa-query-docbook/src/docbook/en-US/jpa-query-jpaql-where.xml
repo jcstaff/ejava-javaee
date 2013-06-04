@@ -210,6 +210,54 @@ Hibernate:
     </section>
 
 
+    <section id="jpa-query-jpaql-where-logic">
+        <title>Logic Operators</title>
+  
+<programlisting language=""><![CDATA[select c from Customer c
+where (c.firstName='cat' AND c.lastName='inhat')
+    OR c.firstName='thing']]></programlisting>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME='cat' 
+        and customer0_.LAST_NAME='inhat' 
+        or customer0_.FIRST_NAME='thing'
+
+ -found result:firstName=cat, lastName=inhat
+ -found result:firstName=thing, lastName=one
+ -found result:firstName=thing, lastName=two]]></programlisting>                            
+
+<programlisting language=""><![CDATA[select c from Customer c 
+where (NOT (c.firstName='cat' AND c.lastName='inhat')) 
+    OR c.firstName='thing']]></programlisting>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME<>'cat' 
+        or customer0_.LAST_NAME<>'inhat' 
+        or customer0_.FIRST_NAME='thing'
+        
+ -found result:firstName=thing, lastName=one
+ -found result:firstName=thing, lastName=two]]></programlisting>                            
+
+    </section>
+
     <section id="jpa-query-jpaql-where-">
         <title></title>
         <para></para>

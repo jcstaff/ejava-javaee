@@ -389,24 +389,26 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected level for tax:" + tax, 0.07, tax, .01);
     }
     
+    /**
+     * This test provides a demonstration of using logical AND, OR, and NOT
+     * within a query where clause
+     */
     @Test
     public void testLogical() {
         log.info("*** testLogical() ***");
         int rows = executeQuery(
-                "select c from Customer c " +
-                "where (c.firstName='cat' AND" +
-                "      c.lastName='inhat') OR" +
-                "      c.firstName='thing' ",
-                Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 3, rows);        
+            "select c from Customer c " +
+            "where (c.firstName='cat' AND c.lastName='inhat')" +
+                "OR c.firstName='thing'",
+            Customer.class).size();
+        assertEquals("unexpected number of rows", 3, rows);        
 
         rows = executeQuery(
-                "select c from Customer c " +
-                "where NOT (c.firstName='cat' AND" +
-                "      c.lastName='inhat') OR" +
-                "      c.firstName='thing' ",
-                Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 2, rows);        
+            "select c from Customer c " +
+            "where (NOT (c.firstName='cat' AND c.lastName='inhat')) " +
+                "OR c.firstName='thing'",
+            Customer.class).size();
+        assertEquals("unexpected number of rows", 2, rows);        
     }
     
     @Test

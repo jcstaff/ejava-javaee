@@ -519,4 +519,51 @@ public class CriteriaTest extends QueryBase {
         
         assertEquals("unexpected level for tax:" + tax, 0.07, tax, .01);
     }
+    
+    /**
+     * This test provides a demonstration of using logical AND, OR, and NOT
+     * within a query where clause
+     */
+    @Test
+    public void testLogical() {
+        log.info("*** testLogical() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        
+        {
+        	CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+        	
+        	//select c from Customer c 
+            //where (c.firstName='cat' AND c.lastName='inhat')
+            //  OR c.firstName='thing'
+        	Root<Customer> c = qdef.from(Customer.class);
+        	qdef.select(c)
+        	    .where(cb.or(
+        	    		cb.and(cb.equal(c.get("firstName"), "cat"), 
+        	    			   cb.equal(c.get("lastName"), "inhat")),
+        	    		cb.equal(c.get("firstName"), "thing")));
+        	
+        	int rows=executeQuery(qdef).size();
+            assertEquals("unexpected number of rows", 3, rows);        
+        }
+
+        {
+        	CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+        	
+            //select c from Customer c
+            //where (NOT (c.firstName='cat' AND c.lastName='inhat'))
+            //  OR c.firstName='thing'
+        	Root<Customer> c = qdef.from(Customer.class);
+        	qdef.select(c)
+        	    .where(cb.or(
+	        	    	cb.not(cb.and(cb.equal(c.get("firstName"), "cat"), 
+	        	    		          cb.equal(c.get("lastName"), "inhat"))),
+        	    		cb.equal(c.get("firstName"), "thing"))
+        	    	);
+        	
+        	int rows=executeQuery(qdef).size();
+            assertEquals("unexpected number of rows", 2, rows);        
+        }
+    }
+    
 }
