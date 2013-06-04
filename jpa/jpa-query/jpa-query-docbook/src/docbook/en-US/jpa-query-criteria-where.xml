@@ -709,6 +709,92 @@ Hibernate:
     </section>
 
 
+    <section id="jpa-query-criteria-where-memberof">
+        <title>Membership Test</title>
+        <para>Can be used to determine membership in a collection</para>
+  
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Clerk c 
+where c.firstName = 'Manny']]></programlisting>
+<programlisting language=""><![CDATA[select s from Sale s
+where :clerk MEMBER OF s.clerks]]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.equal(c.get("firstName"), "Manny"));
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Sale> qdef2 = cb.createQuery(Sale.class);
+Root<Sale> s = qdef2.from(Sale.class);
+qdef2.select(s)
+     .where(cb.isMember(clerk, s.<List<Clerk>>get("clerks")));
+]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Defines a shorthand for a subquery</para></listitem>
+        </itemizedlist>
+
+        <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+Root<Clerk> c = qdef.from(Clerk.class);
+qdef.select(c)
+    .where(cb.equal(c.get("firstName"), "Manny"));
+Clerk clerk = em.createQuery(qdef).getSingleResult();
+
+//find all sales that involve this clerk
+CriteriaQuery<Sale> qdef2 = cb.createQuery(Sale.class);
+Root<Sale> s = qdef2.from(Sale.class);
+qdef2.select(s)
+     .where(cb.isMember(clerk, s.<List<Clerk>>get("clerks")));
+List<Sale> sales = em.createQuery(qdef2).getResultList();
+]]></programlisting>                        
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME=? limit ?
+]]></programlisting>                            
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        ? in (
+            select
+                clerk2_.CLERK_ID 
+            from
+                JPAQL_SALE_CLERK_LINK clerks1_,
+                JPAQL_CLERK clerk2_ 
+            where
+                sale0_.SALE_ID=clerks1_.SALE_ID 
+                and clerks1_.CLERK_ID=clerk2_.CLERK_ID
+        )
+...
+ -found=date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }
+...
+ -found=date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
+    </section>
+
+
+
     <section id="jpa-query-criteria-where-">
         <title></title>
 

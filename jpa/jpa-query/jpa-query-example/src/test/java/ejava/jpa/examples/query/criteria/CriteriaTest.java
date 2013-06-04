@@ -722,4 +722,38 @@ public class CriteriaTest extends QueryBase {
             assertEquals("unexpected number of rows", 2, rows);
         }
     }
+    
+    /**
+     * This test provides a demonstration of testing membership in 
+     * a collection.
+     */
+    @Test
+    public void testMemberOf() {
+        log.info("*** testMemberOf() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+        
+        //select c from Clerk c where c.firstName = 'Manny'
+        Root<Clerk> c = qdef.from(Clerk.class);
+        qdef.select(c)
+            .where(cb.equal(c.get("firstName"), "Manny"));
+        Clerk clerk = em.createQuery(qdef).getSingleResult();
+        
+        //find all sales that involve this clerk
+        CriteriaQuery<Sale> qdef2 = cb.createQuery(Sale.class);
+        //select s from Sale s
+        //where :clerk MEMBER OF s.clerks",
+        Root<Sale> s = qdef2.from(Sale.class);
+        qdef2.select(s)
+             .where(cb.isMember(clerk, s.<List<Clerk>>get("clerks")));
+        List<Sale> sales = em.createQuery(qdef2).getResultList();
+        
+        for (Sale result : sales) {
+        	log.info("found=" + result);
+        }
+        assertEquals("unexpected number of rows", 2, sales.size());
+    }
+    
+    
 }

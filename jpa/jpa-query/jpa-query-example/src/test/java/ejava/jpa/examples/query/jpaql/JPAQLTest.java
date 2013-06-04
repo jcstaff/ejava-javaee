@@ -507,26 +507,32 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 2, rows);
     }
 
+    /**
+     * This test provides a demonstration of testing membership in 
+     * a collection.
+     */
     @Test
     public void testMemberOf() {
         log.info("*** testMemberOf() ***");
         
         //get a clerk entity
-        Clerk clerk =
-            em.createQuery(
-                "select c from Clerk c where c.firstName = 'Manny'",
-                Clerk.class)
+        Clerk clerk = em.createQuery(
+            "select c from Clerk c where c.firstName = 'Manny'",
+            Clerk.class)
               .getSingleResult();
         
         //find all sales that involve this clerk
-        String ejbqlQueryString = 
-            "select s " +
-            "from Sale s " +
-            "where :clerk MEMBER OF s.clerks";
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("clerk", clerk);
-        int rows=executeQuery(ejbqlQueryString,params, Sale.class).size();
-        assertEquals("unexpected number of rows", 2, rows);
+        List<Sale> sales = em.createQuery(
+            "select s from Sale s " +
+            "where :clerk MEMBER OF s.clerks", 
+            Sale.class)
+                .setParameter("clerk", clerk)
+                .getResultList();
+        
+        for (Sale result : sales) {
+        	log.info("found=" + result);
+        }
+        assertEquals("unexpected number of rows", 2, sales.size());
     }
     
     @Test
