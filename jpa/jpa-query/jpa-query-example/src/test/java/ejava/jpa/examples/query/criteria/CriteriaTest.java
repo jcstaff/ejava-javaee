@@ -645,4 +645,46 @@ public class CriteriaTest extends QueryBase {
         }
     }
     
+    /**
+     * This test provides a demonstration of testing for a null value.
+     */
+    @Test
+    public void testIsNull() {
+        log.info("*** testIsNull() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        {
+            CriteriaQuery<Sale> qdef = cb.createQuery(Sale.class);
+            
+            //select s from Sale s 
+            //where s.store IS NULL
+            Root<Sale> s = qdef.from(Sale.class);
+            qdef.select(s)
+                .where(cb.isNull(s.get("store")));
+            	//.where(cb.equal(s.get("store"), cb.nullLiteral(Store.class)));
+                    
+            List<Sale> sales = em.createQuery(qdef).getResultList();
+            for (Sale result : sales) {
+            	log.info("found=" + result);
+            }
+            assertEquals("unexpected number of rows", 0, sales.size());
+        }
+        {
+            CriteriaQuery<Sale> qdef = cb.createQuery(Sale.class);
+            
+            //select s from Sale s 
+            //where s.store IS NOT NULL
+            Root<Sale> s = qdef.from(Sale.class);
+            qdef.select(s)
+                .where(cb.isNotNull(s.get("store")));
+            	//.where(cb.not(cb.equal(s.get("store"), cb.nullLiteral(Store.class))));
+                    
+            List<Sale> sales = em.createQuery(qdef).getResultList();
+            for (Sale result : sales) {
+            	log.info("found=" + result);
+            }
+            assertEquals("unexpected number of rows", 2, sales.size());
+        }
+    }
+    
 }

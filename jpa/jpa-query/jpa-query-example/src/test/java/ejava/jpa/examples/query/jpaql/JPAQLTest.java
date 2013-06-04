@@ -466,6 +466,9 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 1, rows);
     }
     
+    /**
+     * This test provides a demonstration of testing for a null value.
+     */
     @Test
     public void testIsNull() {
         log.info("*** testIsNull() ***");
