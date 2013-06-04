@@ -3,6 +3,7 @@ package ejava.jpa.examples.query.jpaql;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -363,27 +364,29 @@ public class JPAQLTest extends QueryBase {
         
     }
     
+    /**
+     * This test provides a demonstration of using a math formual within the 
+     * where clause.
+     */
     @Test
-    public void testArithmetic() {
-        log.info("*** testArithmetic() ***");
+    public void testFormulas() {
+        log.info("*** testFormulas() ***");
         
-        String query = "select s from Sale s " +
-            "where (s.amount * :tax) > :amount";
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("amount", new BigDecimal(10.00));
+        String jpaql = "select count(s) from Sale s " +
+                       "where (s.amount * :tax) > :amount";
+        TypedQuery<Number> query = em.createQuery(jpaql, Number.class)
+        		.setParameter("amount", new BigDecimal(10.00));
                 
-        double tax = 0.04;
-        int rows=0;
         //keep raising taxes until somebody pays $10.00 in tax
-        while (rows==0) {
-            params.put("tax", new BigDecimal(tax));
-            rows = executeQuery(query, params, Sale.class).size();    
-            if (rows == 0) { tax += 0.01; }
+        double tax = 0.05;
+        for (;query.setParameter("tax", new BigDecimal(tax))
+        		   .getSingleResult().intValue()==0;
+        	  tax += 0.01) {
+        	log.debug("tax=" + NumberFormat.getPercentInstance().format(tax));
         }
-        log.info("raise taxes to:" + tax);
+        log.info("raise taxes to: " + NumberFormat.getPercentInstance().format(tax));
         
-        assertEquals("unexpected level for tax:" + tax, 
-        		(int)(0.07 * 100), (int)(tax * 100));
+        assertEquals("unexpected level for tax:" + tax, 0.07, tax, .01);
     }
     
     @Test

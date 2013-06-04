@@ -249,6 +249,75 @@ Hibernate:
         </section>    
     </section>
 
+    <section id="jpa-query-jpaql-where-formulas">
+        <title>Formulas</title>
+        <para></para>
+  
+
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select s from Sale s 
+where (s.amount * :tax) > :amount]]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+CriteriaQuery<Number> qdef = cb.createQuery(Number.class); 
+
+Root<Sale> s = qdef.from(Sale.class);
+qdef.select(cb.count(s))
+    .where(cb.greaterThan(
+        cb.prod(s.<BigDecimal>get("amount"), cb.parameter(BigDecimal.class, "tax")), 
+        new BigDecimal(10.0)));]]></programlisting>                        
+  
+        <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+        CriteriaQuery<Number> qdef = cb.createQuery(Number.class); 
+        
+        //select count(s) from Sale s 
+        //where (s.amount * :tax) > :amount"
+        Root<Sale> s = qdef.from(Sale.class);
+        qdef.select(cb.count(s))
+            .where(cb.greaterThan(
+                cb.prod(s.<BigDecimal>get("amount"), cb.parameter(BigDecimal.class, "tax")), 
+                new BigDecimal(10.0)));
+        TypedQuery<Number> query = em.createQuery(qdef);
+                
+        //keep raising taxes until somebody pays $10.00 in tax
+        double tax = 0.05;
+        for (;query.setParameter("tax", new BigDecimal(tax))
+                   .getSingleResult().intValue()==0;
+              tax += 0.01) {
+            log.debug("tax=" + NumberFormat.getPercentInstance().format(tax));
+        }
+        log.info("raise taxes to: " + NumberFormat.getPercentInstance().format(tax));
+]]></programlisting>                            
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        count(*) as col_0_0_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        sale0_.amount*?>10 limit ?
+ -tax=5%
+Hibernate: 
+    select
+        count(*) as col_0_0_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        sale0_.amount*?>10 limit ?
+ -tax=6%
+Hibernate: 
+    select
+        count(*) as col_0_0_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        sale0_.amount*?>10 limit ?
+ -raise taxes to: 7%]]></programlisting>                            
+    </section>
 
 
 

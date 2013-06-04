@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -487,4 +488,35 @@ public class CriteriaTest extends QueryBase {
         
     }
     
+    /**
+     * This test provides a demonstration of using a math formual within the 
+     * where clause.
+     */
+    @Test
+    public void testFormulas() {
+        log.info("*** testFormulas() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> qdef = cb.createQuery(Number.class); 
+        
+        //select count(s) from Sale s 
+        //where (s.amount * :tax) > :amount"
+        Root<Sale> s = qdef.from(Sale.class);
+        qdef.select(cb.count(s))
+            .where(cb.greaterThan(
+            	cb.prod(s.<BigDecimal>get("amount"), cb.parameter(BigDecimal.class, "tax")), 
+            	new BigDecimal(10.0)));
+        TypedQuery<Number> query = em.createQuery(qdef);
+                
+        //keep raising taxes until somebody pays $10.00 in tax
+        double tax = 0.05;
+        for (;query.setParameter("tax", new BigDecimal(tax))
+        		   .getSingleResult().intValue()==0;
+        	  tax += 0.01) {
+        	log.debug("tax=" + NumberFormat.getPercentInstance().format(tax));
+        }
+        log.info("raise taxes to: " + NumberFormat.getPercentInstance().format(tax));
+        
+        assertEquals("unexpected level for tax:" + tax, 0.07, tax, .01);
+    }
 }
