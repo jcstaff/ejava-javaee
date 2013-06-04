@@ -411,25 +411,33 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 2, rows);        
     }
     
+    /**
+     * This test provides a demonstration for comparing two entities within
+     * a query
+     */
     @Test
     public void testEquality() {
         log.info("*** testEquality() ***");
         
         //get a clerk entity
-        Clerk clerk = (Clerk)
-            em.createQuery(
-                "select c from Clerk c where c.firstName = 'Manny'")
-              .getSingleResult();
+        Clerk clerk = em.createQuery(
+            	"select c from Clerk c where c.firstName = 'Manny'", 
+            	Clerk.class)
+               .getSingleResult();
         
         //find all sales that involve this clerk
-        String ejbqlQueryString = 
-            "select s " +
-            "from Sale s, IN (s.clerks) c " +
-            "where c = :clerk";
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("clerk", clerk);
-        int rows=executeQuery(ejbqlQueryString,params, Sale.class).size();
-        assertEquals("unexpected number of rows", 2, rows);
+        List<Sale> sales = em.createQuery( 
+            "select s from Sale s " +
+            "JOIN s.clerks c " +
+            "where c = :clerk", 
+            Sale.class)
+	            .setParameter("clerk", clerk)
+	            .getResultList();
+
+        for (Sale result : sales) {
+        	log.info("found=" + result);
+        }
+        assertEquals("unexpected number of rows", 2, sales.size());
     }
     
     @Test

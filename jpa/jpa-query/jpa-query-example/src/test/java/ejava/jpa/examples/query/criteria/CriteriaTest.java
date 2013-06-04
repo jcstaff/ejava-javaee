@@ -565,5 +565,42 @@ public class CriteriaTest extends QueryBase {
             assertEquals("unexpected number of rows", 2, rows);        
         }
     }
+
+    /**
+     * This test provides a demonstration for comparing two entities within
+     * a query
+     */
+    @Test
+    public void testEquality() {
+        log.info("*** testEquality() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+       	CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+
+       	//select c from Clerk c where c.firstName = 'Manny'", 
+       	Root<Clerk> c = qdef.from(Clerk.class);
+       	qdef.select(c)
+       	    .where(cb.equal(c.get("firstName"), "Manny"));
+       	Clerk clerk = em.createQuery(qdef).getSingleResult();
+
+       	//find all sales that involve this clerk
+       	
+        //select s from Sale s
+        //JOIN s.clerks c
+        //where c = :clerk 
+       	CriteriaQuery<Sale> qdef2 = cb.createQuery(Sale.class);
+       	Root<Sale> s = qdef2.from(Sale.class);
+       	Join<Sale, Clerk> c2 = s.join("clerks");
+       	qdef2.select(s)
+       	     .where(cb.equal(c2, clerk));
+       	
+        List<Sale> sales = em.createQuery(qdef2)
+	            .getResultList();
+        for (Sale result : sales) {
+        	log.info("found=" + result);
+        }
+        assertEquals("unexpected number of rows", 2, sales.size());
+    }
+    
     
 }

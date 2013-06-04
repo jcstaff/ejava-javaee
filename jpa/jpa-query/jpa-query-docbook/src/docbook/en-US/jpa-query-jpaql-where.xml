@@ -258,6 +258,89 @@ Hibernate:
 
     </section>
 
+    <section id="jpa-query-jpaql-where-equality">
+        <title>Equality Tests</title>
+        
+        <itemizedlist>
+            <listitem><para>Must compare values</para>
+                <itemizedlist>
+                    <listitem><para>Of same type</para></listitem>
+                    <listitem><para>Of legal promotion type</para>
+                        <itemizedlist>
+                            <listitem><para>Can compare 123:int to 123:long</para></listitem>
+                            <listitem><para>Cannot compare 123:int to "123":string</para></listitem>
+                            <listitem><para></para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Can compare entities</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+<programlisting language=""><![CDATA[select s from Sale s
+    JOIN s.clerks c
+    where c = :clerk]]></programlisting>
+
+        <itemizedlist>
+            <listitem><para>Compare entities and not primary/foreign key values</para></listitem>
+        </itemizedlist>
+
+        <para>In programming context</para>
+<programlisting language="java"><![CDATA[
+//get a clerk entity
+Clerk clerk = em.createQuery(
+        "select c from Clerk c where c.firstName = 'Manny'", 
+        Clerk.class)
+       .getSingleResult();
+
+//find all sales that involve this clerk
+List<Sale> sales = em.createQuery( 
+    "select s from Sale s " +
+    "JOIN s.clerks c " +
+    "where c = :clerk", 
+    Sale.class)
+        .setParameter("clerk", clerk)
+        .getResultList();
+]]></programlisting>                            
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        clerk0_.FIRST_NAME='Manny' limit ?]]></programlisting>                        
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    inner join
+        JPAQL_SALE_CLERK_LINK clerks1_ 
+            on sale0_.SALE_ID=clerks1_.SALE_ID 
+    inner join
+        JPAQL_CLERK clerk2_ 
+            on clerks1_.CLERK_ID=clerk2_.CLERK_ID 
+    where
+        clerk2_.CLERK_ID=?
+...
+ -found=date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }
+...
+ -found=date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                        
+
+    </section>
+
     <section id="jpa-query-jpaql-where-">
         <title></title>
         <para></para>
