@@ -269,7 +269,6 @@ Hibernate:
                         <itemizedlist>
                             <listitem><para>Can compare 123:int to 123:long</para></listitem>
                             <listitem><para>Cannot compare 123:int to "123":string</para></listitem>
-                            <listitem><para></para></listitem>
                         </itemizedlist>
                     </listitem>
                     <listitem><para>Can compare entities</para></listitem>
@@ -340,6 +339,52 @@ Hibernate:
  -found=date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                        
 
     </section>
+
+    <section id="jpa-query-jpaql-where-between">
+        <title>Between</title>
+  
+<programlisting language=""><![CDATA[select s from Sale s
+where s.amount BETWEEN :low AND :high]]></programlisting>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        sale0_.amount between ? and ?
+...
+ -found result:date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }
+]]></programlisting>                            
+
+
+<programlisting language=""><![CDATA[select s from Sale s
+where s.amount NOT BETWEEN :low AND :high]]></programlisting>
+
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        sale0_.amount not between ? and ?
+...
+ -found result:date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
+    </section>
+
 
     <section id="jpa-query-jpaql-where-">
         <title></title>

@@ -602,5 +602,47 @@ public class CriteriaTest extends QueryBase {
         assertEquals("unexpected number of rows", 2, sales.size());
     }
     
+    /**
+     * This test provides an example of using between condition
+     */
+    @Test
+    public void testBetween() {
+        log.info("*** testBetween() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        {
+	        CriteriaQuery<Sale> qdef = cb.createQuery(Sale.class);
+	        
+	        //select s from Sale s
+	        //where s.amount BETWEEN :low AND :high"
+	        Root<Sale> s = qdef.from(Sale.class);
+	        qdef.select(s)
+	            .where(cb.between(s.<BigDecimal>get("amount"), 
+		            		new BigDecimal(90.00), 
+		            		new BigDecimal(110.00)));
+	        List<Sale> sales = em.createQuery(qdef).getResultList();
+	        for (Sale result : sales) {
+	        	log.info("found=" + result);
+	        }
+	        assertEquals("unexpected number of rows", 1, sales.size());
+        }
+
+        {
+	        CriteriaQuery<Sale> qdef = cb.createQuery(Sale.class);
+	        
+	        //select s from Sale s
+	        //where s.amount NOT BETWEEN :low AND :high"
+	        Root<Sale> s = qdef.from(Sale.class);
+	        qdef.select(s)
+	            .where(cb.not(cb.between(s.<BigDecimal>get("amount"), 
+		            		new BigDecimal(90.00), 
+		            		new BigDecimal(110.00))));
+	        List<Sale> sales = em.createQuery(qdef).getResultList();
+	        for (Sale result : sales) {
+	        	log.info("found=" + result);
+	        }
+	        assertEquals("unexpected number of rows", 1, sales.size());
+        }
+    }
     
 }

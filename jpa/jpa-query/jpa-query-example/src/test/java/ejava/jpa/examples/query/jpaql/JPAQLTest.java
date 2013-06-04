@@ -440,6 +440,9 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 2, sales.size());
     }
     
+    /**
+     * This test provides an example of using between condition
+     */
     @Test
     public void testBetween() {
         log.info("*** testBetween() ***");
@@ -451,6 +454,15 @@ public class JPAQLTest extends QueryBase {
         params.put("high", new BigDecimal(110.00));
                 
         int rows = executeQuery(query, params, Sale.class).size();    
+        assertEquals("unexpected number of rows", 1, rows);
+
+        query = "select s from Sale s " +
+                "where s.amount NOT BETWEEN :low AND :high";
+        params = new HashMap<String, Object>();
+        params.put("low", new BigDecimal(90.00));
+        params.put("high", new BigDecimal(110.00));
+                    
+        rows = executeQuery(query, params, Sale.class).size();    
         assertEquals("unexpected number of rows", 1, rows);
     }
     
