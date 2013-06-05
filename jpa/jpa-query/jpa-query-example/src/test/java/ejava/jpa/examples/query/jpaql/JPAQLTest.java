@@ -551,6 +551,46 @@ public class JPAQLTest extends QueryBase {
     }
     
     
+    /**
+     * This test provides a demonstration for using the ALL criteria.
+     */
+    @Test
+    public void testAll() {
+        log.info("*** testAll() ***");  
+        
+        //executeQuery("select s from Sale s", Sale.class);
+        
+		List<Clerk> results = executeQuery(
+                "select c from Clerk c " +
+                "where 125 < ALL " +
+                "   (select s.amount from c.sales s)",
+               Clerk.class);       
+        assertEquals("unexpected number of rows", 2, results.size());
+        
+        results = executeQuery(
+                "select c from Clerk c " +
+                "where 125 > ALL " +
+                "   (select s.amount from c.sales s)",
+               Clerk.class);       
+        assertEquals("unexpected number of rows", 1, results.size());
+    }
+        
+    @Test
+    public void testAny() {
+		List<Clerk> results = executeQuery(
+                "select c from Clerk c " +
+                "where 125 < ANY " +
+                "   (select s.amount from c.sales s)",
+               Clerk.class);       
+        results = executeQuery(
+                "select c from Clerk c " +
+                "where 125 > ANY " +
+                "   (select s.amount from c.sales s)",
+               Clerk.class);       
+        //assertEquals("unexpected number of rows", 1, results.size());
+     }
+
+    
     
     
     @Test
@@ -715,37 +755,5 @@ public class JPAQLTest extends QueryBase {
                 100, 
                 results.get(1).getAmount().intValue());
     }
-    
-    @Test
-    public void testAll() {
-        log.info("*** testAll() ***");  
-        
-        executeQuery("select s from Sale s", Sale.class);
-        
-        @SuppressWarnings("unused")
-		List<Clerk> results = executeQuery(
-                "select c from Clerk c " +
-                "where 125 < ALL " +
-                "   (select s.amount from c.sales s)",
-               Clerk.class);       
-        results = executeQuery(
-                "select c from Clerk c " +
-                "where 125 > ALL " +
-                "   (select s.amount from c.sales s)",
-               Clerk.class);       
-        //assertEquals("unexpected number of rows", 1, results.size());
-        
-        results = executeQuery(
-                "select c from Clerk c " +
-                "where 125 < ANY " +
-                "   (select s.amount from c.sales s)",
-               Clerk.class);       
-        results = executeQuery(
-                "select c from Clerk c " +
-                "where 125 > ANY " +
-                "   (select s.amount from c.sales s)",
-               Clerk.class);       
-        //assertEquals("unexpected number of rows", 1, results.size());
-     }
 
 }
