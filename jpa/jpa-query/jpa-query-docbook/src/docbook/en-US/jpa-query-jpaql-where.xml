@@ -571,6 +571,37 @@ Hibernate:
     </section>
 
 
+    <section id="jpa-query-jpaql-where-subquery">
+        <title>Subqueries</title>
+        <para>Useful when query cannot be expressed through JOINs</para>
+  
+<programlisting language=""><![CDATA[select c from Customer c
+where c.id IN
+    (select s.buyerId from Sale s
+     where s.amount > 100)]]></programlisting>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.CUSTOMER_ID in (
+            select
+                sale1_.BUYER_ID 
+            from
+                JPAQL_SALE sale1_ 
+            where
+                sale1_.amount>100
+        )
+        
+ -found result:firstName=thing, lastName=one]]></programlisting>                            
+    </section>
+
 
 
     <section id="jpa-query-jpaql-where-">

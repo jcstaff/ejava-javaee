@@ -20,7 +20,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -754,6 +756,38 @@ public class CriteriaTest extends QueryBase {
         }
         assertEquals("unexpected number of rows", 2, sales.size());
     }
+    
+    
+    /**
+     * This test provides a demonstration of using an explicit subquery
+     */
+    @Test
+    public void testSubqueries() {
+       log.info("*** testSubqueries() ***");   
+
+       CriteriaBuilder cb = em.getCriteriaBuilder();
+       CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+       
+       //select c from Customer c
+ 	   //where c.id IN
+       //    (select s.buyerId from Sale s
+       //     where s.amount > 100)
+       
+       		//form subquery
+       Subquery<Long> sqdef = qdef.subquery(Long.class);
+       Root<Sale> s = sqdef.from(Sale.class);
+       sqdef.select(s.<Long>get("buyerId"))
+            .where(cb.greaterThan(s.<BigDecimal>get("amount"), new BigDecimal(100)));
+
+  		//form outer query
+   	   Root<Customer> c = qdef.from(Customer.class);
+	   qdef.select(c)
+           .where(cb.in(c.get("id")).value(sqdef));
+
+       int rows = executeQuery(qdef).size();
+       assertEquals("unexpected number of rows", 1, rows);
+    }
+    
     
     
 }

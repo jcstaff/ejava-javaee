@@ -793,6 +793,55 @@ Hibernate:
  -found=date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
     </section>
 
+    <section id="jpa-query-criteria-where-subquery">
+        <title>Subqueries</title>
+        <para>Useful when query cannot be expressed through JOINs</para>
+  
+        <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c
+where c.id IN
+    (select s.buyerId from Sale s
+     where s.amount > 100)]]></programlisting>
+
+        <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+       CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+       
+            //form subquery
+       Subquery<Long> sqdef = qdef.subquery(Long.class);
+       Root<Sale> s = sqdef.from(Sale.class);
+       sqdef.select(s.<Long>get("buyerId"))
+            .where(cb.greaterThan(s.<BigDecimal>get("amount"), new BigDecimal(100)));
+
+            //form outer query
+       Root<Customer> c = qdef.from(Customer.class);
+       qdef.select(c)
+           .where(cb.in(c.get("id")).value(sqdef));
+]]></programlisting>                        
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.CUSTOMER_ID in (
+            select
+                sale1_.BUYER_ID 
+            from
+                JPAQL_SALE sale1_ 
+            where
+                sale1_.amount>100
+        )
+        
+ -found result:firstName=thing, lastName=one
+]]></programlisting>                            
+    </section>
+
 
 
     <section id="jpa-query-criteria-where-">

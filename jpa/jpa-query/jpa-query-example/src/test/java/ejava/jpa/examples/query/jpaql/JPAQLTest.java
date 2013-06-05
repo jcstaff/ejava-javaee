@@ -524,8 +524,7 @@ public class JPAQLTest extends QueryBase {
         //find all sales that involve this clerk
         List<Sale> sales = em.createQuery(
             "select s from Sale s " +
-            "where :clerk MEMBER OF s.clerks", 
-            Sale.class)
+            "where :clerk MEMBER OF s.clerks", Sale.class)
                 .setParameter("clerk", clerk)
                 .getResultList();
         
@@ -534,6 +533,25 @@ public class JPAQLTest extends QueryBase {
         }
         assertEquals("unexpected number of rows", 2, sales.size());
     }
+
+    /**
+     * This test provides a demonstration of using an explicit subquery
+     */
+    @Test
+    public void testSubqueries() {
+       log.info("*** testSubqueries() ***");   
+       
+       List<Customer> results = executeQuery(
+               "select c from Customer c " +
+               "where c.id IN " +
+                   "(select s.buyerId from Sale s " +
+                    "where s.amount > 100)",
+              Customer.class);       
+       assertEquals("unexpected number of rows", 1, results.size());
+    }
+    
+    
+    
     
     @Test
     public void testStringFunctions() {
@@ -696,19 +714,6 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected first element", 
                 100, 
                 results.get(1).getAmount().intValue());
-    }
-    
-    @Test
-    public void testSubqueries() {
-       log.info("*** testSubqueries() ***");   
-       
-       List<Customer> results = executeQuery(
-               "select c from Customer c " +
-               "where c.id IN " +
-               "   (select s.buyerId from Sale s " +
-               "    where s.amount > 100)",
-              Customer.class);       
-       assertEquals("unexpected number of rows", 1, results.size());
     }
     
     @Test
