@@ -2,34 +2,322 @@
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="jpa-query-criteria-function">
-    <title>Criteria Group Functions</title>
+    <title>Criteria Functions</title>
     <para></para>
         
     <section id="jpa-query-criteria-function-string">
         <title>String Functions</title>
-
-        <para>Equivalent JPAQL</para>
-<programlisting language=""><![CDATA[
-]]></programlisting>
-
-        <para>Criteria API Definition</para>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
   
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
+        <section id="jpa-query-criteria-function-string-base">
+            <title>Base Query</title>
 
-        <para>In programming context</para>
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c where c.firstName='CAT']]></programlisting>
+
+            <para>Criteria API Definition</para>
 <programlisting language="java"><![CDATA[
-]]></programlisting>                        
+CriteriaQuery qdef = cb.createQuery();
+Root<Customer> c = qdef.from(Customer.class);
+
+qdef.select(c)
+    .where(cb.equal(c.get("firstName"),"CAT"));]]></programlisting>
+        <itemizedlist>
+            <listitem><para>Using an untyped CriteriaQuery to be able to switch
+                 between different query output types within example</para></listitem>
+        </itemizedlist>
+                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME=?]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>No rows found because 'CAT' does not match anything because of case</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-query-criteria-function-string-lower">
+            <title>LOWER</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c where c.firstName=LOWER('CAT')]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+qdef.select(c)
+    .where(cb.equal(c.get("firstName"),cb.lower(cb.literal("CAT"))));]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME=lower(?)
+
+ -found result:firstName=cat, lastName=inhat]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>One customer found because case-sensitive compare now correct</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-query-criteria-function-string-upper">
+            <title>UPPER</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select UPPER(c.firstName) from Customer c where c.firstName=LOWER('CAT')]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+qdef.select(cb.upper(c.<String>get("firstName")))
+    .where(cb.equal(c.get("firstName"),cb.lower(cb.literal("CAT"))));]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        upper(customer0_.FIRST_NAME) as col_0_0_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME=lower(?)
+
+ -found result:CAT]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>First name of customer located returned in upper case</para></listitem>
+            </itemizedlist>
+        </section>          
+
+        <section id="jpa-query-criteria-function-string-trim">
+            <title>TRIM</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select TRIM(LEADING 'c' FROM c.firstName) from Customer c where c.firstName='cat')]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+qdef.select(cb.trim(Trimspec.LEADING, 'c', c.<String>get("firstName")))
+    .where(cb.equal(c.get("firstName"),"cat"));]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        trim(LEADING ? 
+    from
+        customer0_.FIRST_NAME) as col_0_0_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME=?
+ -found result:at]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Customer's name, excluding initial 'c' character, returned</para></listitem>
+            </itemizedlist>
+        </section>
+        
+        <section id="jpa-query-criteria-function-string-concat">
+            <title>CONCAT</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c where CONCAT(CONCAT(c.firstName,' '),c.lastName) ='cat inhat')]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+qdef.select(c)
+    .where(cb.equal(
+            cb.concat(
+                    cb.concat(c.<String>get("firstName"), " "),
+                    c.<String>get("lastName")),
+            "cat inhat"));]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        (
+            customer0_.FIRST_NAME||?||customer0_.LAST_NAME
+        )=?
+
+ -found result:firstName=cat, lastName=inhat]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Customer located after concatenation of fields yields match</para></listitem>
+            </itemizedlist>
+        </section>            
+
+        <section id="jpa-query-criteria-function-string-length">
+            <title>LENGTH</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c where LENGTH(c.firstName) = 3]]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+qdef.select(c)
+    .where(cb.equal(cb.length(c.<String>get("firstName")),3));]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        length(customer0_.FIRST_NAME)=3
+
+ -found result:firstName=cat, lastName=inhat]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Customer found where length of firstName matches specified length criteria</para></listitem>
+        </itemizedlist>
+    </section>
+
+        <section id="jpa-query-criteria-function-string-locate">
+            <title>LOCATE</title>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[]]>select c from Customer c where LOCATE('cat',c.firstName,2) > 0</programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+qdef.select(c)
+    .where(cb.greaterThan(cb.locate(c.<String>get("firstName"), "cat", 2),0));]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        locate(?, customer0_.FIRST_NAME, 2)>0]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>No firstName found with 'cat' starting at position=2</para></listitem>
+            </itemizedlist>
+        
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c where LOCATE('at',c.firstName,2) > 1]]></programlisting>
+
+
+            <para>Equivalent JPAQL</para>
+<programlisting language="java"><![CDATA[
+qdef.select(c)
+    .where(cb.greaterThan(cb.locate(c.<String>get("firstName"), "at", 2),1));]]></programlisting>                        
 
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>                            
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        locate(?, customer0_.FIRST_NAME, 2)>1
+
+ -found result:firstName=cat, lastName=inhat]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>firstName found with 'at' starting at a position 2</para></listitem>
+        </itemizedlist>
     </section>
+    
+        <section id="jpa-query-criteria-function-string-substring">
+            <title>SUBSTRING</title>    
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select SUBSTRING(c.firstName,2,2) from Customer c where c.firstName = 'cat']]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+qdef.select(cb.substring(c.<String>get("firstName"),  2, 2))
+    .where(cb.equal(c.get("firstName"), "cat"));]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        substring(customer0_.FIRST_NAME,
+        2,
+        2) as col_0_0_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME=?
+
+ -found result:at]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Return the two character substring of firstName starting at position two</para></listitem>
+            </itemizedlist>
+
+            <para>Equivalent JPAQL</para>
+<programlisting language=""><![CDATA[select c from Customer c where SUBSTRING(c.firstName,2,2) = 'at']]></programlisting>
+
+            <para>Criteria API Definition</para>
+<programlisting language="java"><![CDATA[
+qdef.select(c)
+    .where(cb.equal(
+            cb.substring(c.<String>get("firstName"), 2, 2), 
+            "at"));]]></programlisting>                        
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        substring(customer0_.FIRST_NAME, 2, 2)=?
+ -found result:firstName=cat, lastName=inhat]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Find the customer with a two characters starting a position two of firstName equaling  'at'</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <section id="jpa-query-criteria-function-date">
         <title>Date Functions</title>

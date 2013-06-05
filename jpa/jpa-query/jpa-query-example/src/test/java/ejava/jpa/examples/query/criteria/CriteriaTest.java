@@ -16,6 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
@@ -869,5 +870,97 @@ public class CriteriaTest extends QueryBase {
         List<Clerk> results2 = executeQuery(qdef);
         assertEquals("unexpected number of rows", 1, results2.size());
      }
+    
+    
+    /**
+     * This test method demonstrates several date functions
+     */
+    @Test
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void testStringFunctions() {
+        log.info("*** testStringFunctions() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery qdef = cb.createQuery();
+		Root<Customer> c = qdef.from(Customer.class);
+        
+        //select c from Customer c
+        //where c.firstName='CAT'
+        qdef.select(c)
+            .where(cb.equal(c.get("firstName"),"CAT"));
+        int rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows", 0, rows);
+
+        //select c from Customer c
+        //where c.firstName=LOWER('CAT')"
+        qdef.select(c)
+            .where(cb.equal(c.get("firstName"),cb.lower(cb.literal("CAT"))));
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows", 1, rows);
+            
+        //select UPPER(c.firstName) from Customer c
+        //where c.firstName=LOWER('CAT')
+        qdef.select(cb.upper(c.<String>get("firstName")))
+            .where(cb.equal(c.get("firstName"),cb.lower(cb.literal("CAT"))));
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows", 1, rows);
+    
+        //select TRIM(LEADING 'c' FROM c.firstName) from Customer c
+        //where c.firstName='cat')
+        qdef.select(cb.trim(Trimspec.LEADING, 'c', c.<String>get("firstName")))
+            .where(cb.equal(c.get("firstName"),"cat"));
+        List<String> result = executeQuery(qdef);        
+        assertEquals("unexpected number of rows", 1, rows);
+        assertEquals("unexpected value", "at", result.get(0));
+        
+        //select c from Customer c
+        //where CONCAT(CONCAT(c.firstName,' '),c.lastName) ='cat inhat')
+        qdef.select(c)
+        	.where(cb.equal(
+        			cb.concat(
+        					cb.concat(c.<String>get("firstName"), " "),
+        					c.<String>get("lastName")),
+        			"cat inhat"));
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        
+        //select c from Customer c
+        //where LENGTH(c.firstName) = 3
+        qdef.select(c)
+            .where(cb.equal(cb.length(c.<String>get("firstName")),3));
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        
+        //select c from Customer c " +
+        //where LOCATE('cat',c.firstName,2) > 0",
+        qdef.select(c)
+            .where(cb.greaterThan(cb.locate(c.<String>get("firstName"), "cat", 2),0));        
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows:" + rows, 0, rows);        
+
+        //select c from Customer c
+        //where LOCATE('at',c.firstName,2) > 1
+        qdef.select(c)
+            .where(cb.greaterThan(cb.locate(c.<String>get("firstName"), "at", 2),1));        
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);        
+
+        //select SUBSTRING(c.firstName,2,2) from Customer c " +
+        //where c.firstName = 'cat'",
+        qdef.select(cb.substring(c.<String>get("firstName"),  2, 2))
+            .where(cb.equal(c.get("firstName"), "cat"));
+        result = executeQuery(qdef);        
+        assertEquals("unexpected number of rows", 1, rows);
+        assertEquals("unexpected value", "at", result.get(0));
+        
+        //select c from Customer c
+        //where SUBSTRING(c.firstName,2,2) = 'at'
+        qdef.select(c)
+            .where(cb.equal(
+            		cb.substring(c.<String>get("firstName"), 2, 2), 
+            		"at"));
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows:" + rows, 1, rows);
+    }
     
 }

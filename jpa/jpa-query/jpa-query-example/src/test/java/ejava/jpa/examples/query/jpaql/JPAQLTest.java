@@ -67,7 +67,7 @@ public class JPAQLTest extends QueryBase {
         	log.info("found=" + result);
         }
         int rows = results.size();
-        assertTrue("unexpected number of customers:" + rows, rows > 0);
+        assertTrue("unexpected number of customers", rows > 0);
     }
     
     /**
@@ -180,7 +180,7 @@ public class JPAQLTest extends QueryBase {
 //              "select sale.date from Clerk c, IN (c.sales) sale", 
               "select sale.date from Clerk c JOIN c.sales sale", 
                 Date.class).size();
-        assertTrue("unexpected number of sales:" + rows, rows > 0);
+        assertTrue("unexpected number of sales", rows > 0);
     }
 
     /**
@@ -219,7 +219,7 @@ public class JPAQLTest extends QueryBase {
     		"select c from Sale s, Customer c " +
     		"where c.id = s.buyerId", 
     		Customer.class).size();
-        assertTrue("unexpected number of customers:" + rows, rows > 0);
+        assertTrue("unexpected number of customers", rows > 0);
     }
     
 
@@ -599,7 +599,9 @@ public class JPAQLTest extends QueryBase {
 
     
     
-    
+    /**
+     * This test method demonstrates several date functions
+     */
     @Test
     public void testStringFunctions() {
         log.info("*** testStringFunctions() ***");
@@ -608,61 +610,61 @@ public class JPAQLTest extends QueryBase {
                 "select c from Customer c " +
                 "where c.firstName='CAT'",
                 Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 0, rows);
+        assertEquals("unexpected number of rows", 0, rows);
 
         rows = executeQuery(
                 "select c from Customer c " +
                 "where c.firstName=LOWER('CAT')",
                 Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        assertEquals("unexpected number of rows", 1, rows);
     
         rows = executeQuery(
                 "select UPPER(c.firstName) from Customer c " +
                 "where c.firstName=LOWER('CAT')",
                 String.class).size();
-        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        assertEquals("unexpected number of rows", 1, rows);
     
         rows = executeQuery(
                 "select TRIM(LEADING 'c' FROM c.firstName) from Customer c " +
                 "where c.firstName='cat')",
                 String.class).size();
-        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        assertEquals("unexpected number of rows", 1, rows);
         
         rows = executeQuery(
                 "select c from Customer c " +
                 "where CONCAT(CONCAT(c.firstName,' '),c.lastName) ='cat inhat')",
                 Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        assertEquals("unexpected number of rows", 1, rows);
         
         rows = executeQuery(
                 "select c from Customer c " +
                 "where LENGTH(c.firstName) = 3",
                 Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        assertEquals("unexpected number of rows", 1, rows);
         
         rows = executeQuery(
                 "select c from Customer c " +
                 "where LOCATE('cat',c.firstName,2) > 0",
                 Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 0, rows);        
+        assertEquals("unexpected number of rows", 0, rows);        
 
         rows = executeQuery(
                 "select c from Customer c " +
                 "where LOCATE('at',c.firstName,2) > 1",
                 Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 1, rows);        
+        assertEquals("unexpected number of rows", 1, rows);        
 
         rows = executeQuery(
                 "select SUBSTRING(c.firstName,2,2) from Customer c " +
                 "where c.firstName = 'cat'",
                 String.class).size();
-        assertEquals("unexpected number of rows:" + rows, 1, rows);
+        assertEquals("unexpected number of rows", 1, rows);
         
         rows = executeQuery(
                 "select c from Customer c " +
                 "where SUBSTRING(c.firstName,2,2) = 'at'",
                 Customer.class).size();
-        assertEquals("unexpected number of rows:" + rows, 1, rows);        
+        assertEquals("unexpected number of rows", 1, rows);        
     }
 
     @Test

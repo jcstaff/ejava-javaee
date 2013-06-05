@@ -7,10 +7,11 @@
         
     <section id="jpa-query-jpaql-function-string">
         <title>String Functions</title>
-        <para></para>
   
+        <section id="jpa-query-jpaql-function-string-base">
+            <title>Base Query</title>
 <programlisting language=""><![CDATA[select c from Customer c where c.firstName='CAT']]></programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
  -executing query:
 Hibernate: 
@@ -22,13 +23,15 @@ Hibernate:
         JPAQL_CUSTOMER customer0_ 
     where
         customer0_.FIRST_NAME='CAT']]></programlisting>                        
-        <itemizedlist>
-            <listitem><para>No rows found because 'CAT' does not match anything because of case</para></listitem>
-        </itemizedlist>
+            <itemizedlist>
+                <listitem><para>No rows found because 'CAT' does not match anything because of case</para></listitem>
+            </itemizedlist>
+        </section>
 
-
+        <section id="jpa-query-jpaql-function-string-lower">
+            <title>LOWER</title>
 <programlisting language=""><![CDATA[select c from Customer c where c.firstName=LOWER('CAT')]]></programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
 Hibernate: 
     select
@@ -41,13 +44,15 @@ Hibernate:
         customer0_.FIRST_NAME=lower('CAT')
         
  -found result:firstName=cat, lastName=inhat]]></programlisting>                        
-        <itemizedlist>
-            <listitem><para>One customer found because case-sensitive compare now correct</para></listitem>
-        </itemizedlist>
+            <itemizedlist>
+                <listitem><para>One customer found because case-sensitive compare now correct</para></listitem>
+            </itemizedlist>
+        </section>
 
-
+        <section id="jpa-query-jpaql-function-string-upper">
+            <title>UPPER</title>
 <programlisting language=""><![CDATA[select UPPER(c.firstName) from Customer c where c.firstName=LOWER('CAT')]]></programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
 Hibernate: 
     select
@@ -58,12 +63,15 @@ Hibernate:
         customer0_.FIRST_NAME=lower('CAT')
         
  -found result:CAT]]></programlisting>                        
-        <itemizedlist>
-            <listitem><para>First name of customer located returned in upper case</para></listitem>
-        </itemizedlist>
+            <itemizedlist>
+                <listitem><para>First name of customer located returned in upper case</para></listitem>
+            </itemizedlist>
+        </section>          
 
+        <section id="jpa-query-jpaql-function-string-trim">
+            <title>TRIM</title>
 <programlisting language=""><![CDATA[select TRIM(LEADING 'c' FROM c.firstName) from Customer c where c.firstName='cat')]]></programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
 Hibernate: 
     select
@@ -77,12 +85,15 @@ Hibernate:
 
  -found result:at
 ]]></programlisting>                        
-        <itemizedlist>
-            <listitem><para>Customer's name, excluding initial 'c' character, returned</para></listitem>
-        </itemizedlist>
-
+            <itemizedlist>
+                <listitem><para>Customer's name, excluding initial 'c' character, returned</para></listitem>
+            </itemizedlist>
+        </section>
+        
+        <section id="jpa-query-jpaql-function-string-concat">
+            <title>CONCAT</title>
 <programlisting language=""><![CDATA[select c from Customer c where CONCAT(CONCAT(c.firstName,' '),c.lastName) ='cat inhat')]]></programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
 Hibernate: 
     select
@@ -100,12 +111,15 @@ Hibernate:
 
  -found result:firstName=cat, lastName=inhat
 ]]></programlisting>                        
-        <itemizedlist>
-            <listitem><para>Customer located after concatenation of fields yields match</para></listitem>
-        </itemizedlist>
+            <itemizedlist>
+                <listitem><para>Customer located after concatenation of fields yields match</para></listitem>
+            </itemizedlist>
+        </section>            
 
+        <section id="jpa-query-jpaql-function-string-length">
+            <title>LENGTH</title>
 <programlisting language=""><![CDATA[select c from Customer c where LENGTH(c.firstName) = 3]]></programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
 Hibernate: 
     select
@@ -121,10 +135,12 @@ Hibernate:
         <itemizedlist>
             <listitem><para>Customer found where length of firstName matches specified length criteria</para></listitem>
         </itemizedlist>
+    </section>
 
-
+        <section id="jpa-query-jpaql-function-string-locate">
+            <title>LOCATE</title>
 <programlisting language=""><![CDATA[]]>select c from Customer c where LOCATE('cat',c.firstName,2) > 0</programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
 Hibernate: 
     select
@@ -135,10 +151,10 @@ Hibernate:
         JPAQL_CUSTOMER customer0_ 
     where
         locate('cat', customer0_.FIRST_NAME, 2)>0]]></programlisting>                        
-        <itemizedlist>
-            <listitem><para>No firstName found with 'cat' starting at position=2</para></listitem>
-        </itemizedlist>
-
+            <itemizedlist>
+                <listitem><para>No firstName found with 'cat' starting at position=2</para></listitem>
+            </itemizedlist>
+        
 <programlisting language=""><![CDATA[select c from Customer c where LOCATE('at',c.firstName,2) > 1]]></programlisting>
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
@@ -156,9 +172,12 @@ Hibernate:
         <itemizedlist>
             <listitem><para>firstName found with 'at' starting at a position 2</para></listitem>
         </itemizedlist>
-
+    </section>
+    
+        <section id="jpa-query-jpaql-function-string-substring">
+            <title>SUBSTRING</title>    
 <programlisting language=""><![CDATA[select SUBSTRING(c.firstName,2,2) from Customer c where c.firstName = 'cat']]></programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
 Hibernate: 
     select
@@ -170,12 +189,12 @@ Hibernate:
     where
         customer0_.FIRST_NAME='cat'
     -found result:at]]></programlisting>                        
-        <itemizedlist>
-            <listitem><para>Return the two character substring of firstName starting at position two</para></listitem>
-        </itemizedlist>
+            <itemizedlist>
+                <listitem><para>Return the two character substring of firstName starting at position two</para></listitem>
+            </itemizedlist>
 
 <programlisting language=""><![CDATA[select c from Customer c where SUBSTRING(c.firstName,2,2) = 'at']]></programlisting>
-        <para>Runtime output</para>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
 Hibernate: 
     select
@@ -188,10 +207,14 @@ Hibernate:
         substring(customer0_.FIRST_NAME, 2, 2)='at'
         
  -found result:firstName=cat, lastName=inhat]]></programlisting>                        
-        <itemizedlist>
-            <listitem><para>Find the customer with a two characters starting a position two of firstName equaling  'at'</para></listitem>
-        </itemizedlist>
+            <itemizedlist>
+                <listitem><para>Find the customer with a two characters starting a position two of firstName equaling  'at'</para></listitem>
+            </itemizedlist>
+        </section>
     </section>
+
+
+
 
     <section id="jpa-query-jpaql-function-date">
         <title>Date Functions</title>
