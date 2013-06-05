@@ -317,21 +317,59 @@ Hibernate:
 
     <section id="jpa-query-jpaql-function-orderby">
         <title>Order By</title>
-        <para></para>
-  
-<programlisting language=""><![CDATA[
-]]></programlisting>
-
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>ASC - ascending order</para></listitem>
+            <listitem><para>DESC - descending order</para></listitem>
         </itemizedlist>
+
+<programlisting language=""><![CDATA[select s from Sale s ORDER BY s.amount ASC]]></programlisting>
 
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>                            
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    order by
+        sale0_.amount ASC
+...
+ -found result:date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }
+...
+ -found result:date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
+        <itemizedlist>
+            <listitem><para>Note the ASC order on amount</para></listitem>
+        </itemizedlist>
+
+<programlisting language=""><![CDATA[select s from Sale s ORDER BY s.amount DESC]]></programlisting>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    order by
+        sale0_.amount DESC
+ -found result:date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }
+ -found result:date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }]]></programlisting>                            
+        <itemizedlist>
+            <listitem><para>Note the DESC order on amount</para></listitem>
+        </itemizedlist>
     </section>
+
+
+
+
 
     <section id="jpa-query-jpaql-function-aggregate">
         <title>Aggregate Functions</title>

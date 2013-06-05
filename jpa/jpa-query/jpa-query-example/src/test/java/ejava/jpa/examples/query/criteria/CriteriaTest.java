@@ -1003,6 +1003,41 @@ public class CriteriaTest extends QueryBase {
         assertEquals("unexpected number of rows", 2, rows);
     }
     
+    /**
+     * This test method provides a demonstration of order by capability.
+     */
+    @Test
+    public void testOrderBy() {
+        log.info("*** testOrderBy() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Sale> qdef = cb.createQuery(Sale.class);
+        Root<Sale> s = qdef.from(Sale.class);
+        qdef.select(s);
+
+        //select s from Sale s ORDER BY s.amount ASC
+        qdef.orderBy(cb.asc(s.get("amount")));
+        List<Sale> results = executeQuery(qdef); 
+        assertEquals("unexpected number of rows", 2, results.size());
+        assertEquals("unexpected first element", 
+                100, 
+                results.get(0).getAmount().intValue());
+        assertEquals("unexpected first element", 
+                150, 
+                results.get(1).getAmount().intValue());
+
+        
+        //select s from Sale s ORDER BY s.amount DESC
+        qdef.orderBy(cb.desc(s.get("amount")));
+        results = executeQuery(qdef); 
+        assertEquals("unexpected number of rows", 2, results.size());
+        assertEquals("unexpected first element", 
+                150, 
+                results.get(0).getAmount().intValue());
+        assertEquals("unexpected first element", 
+                100, 
+                results.get(1).getAmount().intValue());
+    }
     
     
 }

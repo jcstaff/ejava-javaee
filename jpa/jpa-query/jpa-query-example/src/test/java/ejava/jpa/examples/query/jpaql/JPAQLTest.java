@@ -701,6 +701,39 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 2, rows);
     }
     
+    
+    /**
+     * This test method provides a demonstration of order by capability.
+     */
+    @Test
+    public void testOrderBy() {
+        log.info("*** testOrderBy() ***");
+
+        List<Sale> results = executeQuery(
+            "select s from Sale s ORDER BY s.amount ASC", Sale.class); 
+        assertEquals("unexpected number of rows", 2, results.size());
+        assertEquals("unexpected first element", 
+                100, 
+                results.get(0).getAmount().intValue());
+        assertEquals("unexpected first element", 
+                150, 
+                results.get(1).getAmount().intValue());
+
+        
+        results = executeQuery(
+                "select s from Sale s ORDER BY s.amount DESC", Sale.class); 
+        assertEquals("unexpected number of rows", 2, results.size());
+        assertEquals("unexpected first element", 
+                150, 
+                results.get(0).getAmount().intValue());
+        assertEquals("unexpected first element", 
+                100, 
+                results.get(1).getAmount().intValue());
+    }
+
+    
+    
+    
     @Test
     public void testCount() {        
         log.info("*** testCount() ***");
@@ -741,30 +774,5 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected result", 125, results.get(0).intValue());
     }
     
-    @Test
-    public void testOrderBy() {
-        log.info("*** testOrderBy() ***");
-
-        List<Sale> results = executeQuery(
-            "select s from Sale s ORDER BY s.amount ASC", Sale.class); 
-        assertEquals("unexpected number of rows", 2, results.size());
-        assertEquals("unexpected first element", 
-                100, 
-                results.get(0).getAmount().intValue());
-        assertEquals("unexpected first element", 
-                150, 
-                results.get(1).getAmount().intValue());
-
-        
-        results = executeQuery(
-                "select s from Sale s ORDER BY s.amount DESC", Sale.class); 
-        assertEquals("unexpected number of rows", 2, results.size());
-        assertEquals("unexpected first element", 
-                150, 
-                results.get(0).getAmount().intValue());
-        assertEquals("unexpected first element", 
-                100, 
-                results.get(1).getAmount().intValue());
-    }
 
 }
