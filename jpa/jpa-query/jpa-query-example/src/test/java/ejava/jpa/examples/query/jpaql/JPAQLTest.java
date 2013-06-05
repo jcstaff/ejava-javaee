@@ -552,7 +552,8 @@ public class JPAQLTest extends QueryBase {
     
     
     /**
-     * This test provides a demonstration for using the ALL criteria.
+     * This test provides a demonstration for using the ALL subquery
+     * result evaluation.
      */
     @Test
     public void testAll() {
@@ -574,7 +575,11 @@ public class JPAQLTest extends QueryBase {
                Clerk.class);       
         assertEquals("unexpected number of rows", 1, results.size());
     }
-        
+    
+    /**
+     * This test provides a demonstration for using the ANY subquery
+     * result evaluation
+     */
     @Test
     public void testAny() {
 		List<Clerk> results = executeQuery(
@@ -582,12 +587,14 @@ public class JPAQLTest extends QueryBase {
                 "where 125 < ANY " +
                 "   (select s.amount from c.sales s)",
                Clerk.class);       
-        results = executeQuery(
+        assertEquals("unexpected number of rows", 2, results.size());
+
+		results = executeQuery(
                 "select c from Clerk c " +
                 "where 125 > ANY " +
                 "   (select s.amount from c.sales s)",
                Clerk.class);       
-        //assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected number of rows", 1, results.size());
      }
 
     

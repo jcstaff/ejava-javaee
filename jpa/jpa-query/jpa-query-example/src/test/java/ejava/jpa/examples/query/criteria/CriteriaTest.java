@@ -9,7 +9,6 @@ import static org.junit.Assert.fail;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
@@ -28,7 +26,6 @@ import javax.persistence.criteria.Subquery;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.LazyInitializationException;
-import org.hibernate.annotations.Where;
 import org.junit.Test;
 
 import ejava.jpa.examples.query.Clerk;
@@ -791,7 +788,8 @@ public class CriteriaTest extends QueryBase {
     }
     
     /**
-     * This test provides a demonstration for using the ALL criteria.
+     * This test provides a demonstration for using the ALL subquery
+     * result evaluation.
      */
     @Test
     public void testAll() {
@@ -831,5 +829,45 @@ public class CriteriaTest extends QueryBase {
         assertEquals("unexpected number of rows", 1, results2.size());
     }
     
+    
+    /**
+     * This test provides a demonstration for using the ANY subquery
+     * result evaluation
+     */
+    @Test
+    public void testAny() {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Clerk> qdef = cb.createQuery(Clerk.class);
+        Root<Clerk> c = qdef.from(Clerk.class);
+        qdef.select(c);
+        
+        //select c from Clerk c
+        //where 125 < ANY " +
+        //(select s.amount from c.sales s)",
+        Subquery<BigDecimal> sqdef = qdef.subquery(BigDecimal.class);
+        Root<Clerk> c1 = sqdef.from(Clerk.class);
+        Join<Clerk,Sale> s = c1.join("sales");
+        sqdef.select(s.<BigDecimal>get("amount"))
+             .where(cb.equal(c, c1));
+
+        Predicate p1 = cb.lessThan(
+        		cb.literal(new BigDecimal(125)), 
+        		cb.any(sqdef));
+
+        qdef.where(p1);
+        List<Clerk> results1 = executeQuery(qdef);
+        assertEquals("unexpected number of rows", 2, results1.size());
+
+        //select c from Clerk c
+        //where 125 > ANY
+        //(select s.amount from c.sales s)
+        Predicate p2 = cb.greaterThan(
+        		cb.literal(new BigDecimal(125)), 
+        		cb.any(sqdef));
+        
+        qdef.where(p2);
+        List<Clerk> results2 = executeQuery(qdef);
+        assertEquals("unexpected number of rows", 1, results2.size());
+     }
     
 }

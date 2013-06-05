@@ -614,6 +614,10 @@ Hibernate:
 select c from Clerk c
 where 125 < ALL
 (select s.amount from c.sales s)]]></programlisting>
+        <itemizedlist>
+            <listitem><para>List all clerks that have all sales above $125.00 or none at all</para></listitem>
+            <listitem><para>-or- List all clerks with no sale <= $125.00</para></listitem>
+        </itemizedlist>
 
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
@@ -651,6 +655,10 @@ Hibernate:
 select c from Clerk c
 where 125 > ALL
 (select s.amount from c.sales s)]]></programlisting>
+        <itemizedlist>
+            <listitem><para>List all clerks that have all sales below $125.00 or none at all</para></listitem>
+            <listitem><para>-or- List all clerks with no sale >= $125.00</para></listitem>
+        </itemizedlist>
 
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
@@ -676,13 +684,101 @@ Hibernate:
         )
 
  -found result:firstName=Jack, lastName=Pep, hireDate=1973-03-01, termDate=null, sales(0)={}]]></programlisting>                            
-            <itemizedlist>
-                <listitem><para>Manny excluded because has 1 sale above $125.00</para></listitem>
-                <listitem><para>Moe excluded because has only $150.00 sale</para></listitem>
-                <listitem><para>Jack included because has no sales that fail criteria</para></listitem>
-            </itemizedlist>
+        <itemizedlist>
+            <listitem><para>Manny excluded because has 1 sale above $125.00</para></listitem>
+            <listitem><para>Moe excluded because has only $150.00 sale</para></listitem>
+            <listitem><para>Jack included because has no sales that fail criteria</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jpa-query-jpaql-where-any">
+        <title>Any</title>
+        <itemizedlist>
+            <listitem><para>Any matching value meets criteria (i.e., one match and you are in)</para></listitem>
+            <listitem><para>Zero values fails to meet the criteria (i.e., must have at least one matching value)</para></listitem>
+        </itemizedlist>
+  
+<programlisting language=""><![CDATA[select c from Clerk c
+where 125 < ANY
+(select s.amount from c.sales s)]]></programlisting>
+        <itemizedlist>
+            <listitem><para>List all clerks that have at least one sale above $125.00</para></listitem>
+        </itemizedlist>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+ -executing query:select c from Clerk c where 125 < ANY    (select s.amount from c.sales s)
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        125<any (
+            select
+                sale2_.amount 
+            from
+                JPAQL_SALE_CLERK_LINK sales1_,
+                JPAQL_SALE sale2_ 
+            where
+                clerk0_.CLERK_ID=sales1_.CLERK_ID 
+                and sales1_.SALE_ID=sale2_.SALE_ID
+        )
+...
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
+...
+ -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }
+]]></programlisting>                            
+        <itemizedlist>
+            <listitem><para>Manny included because has 1 sale above $125.00</para></listitem>
+            <listitem><para>Moe included because $150.00 sale qualifies him as well</para></listitem>
+            <listitem><para>Jack excluded because has no sales that meet criteria</para></listitem>
+        </itemizedlist>
+
+<programlisting language=""><![CDATA[select c from Clerk c
+where 125 > ANY
+(select s.amount from c.sales s)]]></programlisting>
+        <itemizedlist>
+            <listitem><para>List all clerks that have at least one sale below $125.00</para></listitem>
+        </itemizedlist>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+ -executing query:select c from Clerk c where 125 > ANY    (select s.amount from c.sales s)
+Hibernate: 
+    select
+        clerk0_.CLERK_ID as CLERK1_2_,
+        clerk0_.FIRST_NAME as FIRST2_2_,
+        clerk0_.HIRE_DATE as HIRE3_2_,
+        clerk0_.LAST_NAME as LAST4_2_,
+        clerk0_.TERM_DATE as TERM5_2_ 
+    from
+        JPAQL_CLERK clerk0_ 
+    where
+        125>any (
+            select
+                sale2_.amount 
+            from
+                JPAQL_SALE_CLERK_LINK sales1_,
+                JPAQL_SALE sale2_ 
+            where
+                clerk0_.CLERK_ID=sales1_.CLERK_ID 
+                and sales1_.SALE_ID=sale2_.SALE_ID
+        )
+
+ -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }]]></programlisting>                            
+        <itemizedlist>
+            <listitem><para>Manny included because has 1 sale below $125.00</para></listitem>
+            <listitem><para>Moe excluded because his only $150.00 sale above criteria</para></listitem>
+            <listitem><para>Jack excluded because has no sales that meet criteria</para></listitem>
+        </itemizedlist>
 
     </section>
+
 
 
     <section id="jpa-query-jpaql-where-">
