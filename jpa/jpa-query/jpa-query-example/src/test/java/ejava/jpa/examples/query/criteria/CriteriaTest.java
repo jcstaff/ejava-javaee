@@ -1039,5 +1039,71 @@ public class CriteriaTest extends QueryBase {
                 results.get(1).getAmount().intValue());
     }
     
+    /**
+     * This test provides a demonstration of the COUNT aggregate function
+     */    
+    @Test
+    public void testCount() {        
+        log.info("*** testCount() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> qdef = cb.createQuery(Number.class);
+        Root<Sale> s = qdef.from(Sale.class);
+        
+        //select COUNT(s) from Sale s
+        qdef.select(cb.count(s));
+
+        List<Number> results= executeQuery(qdef);
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 2, results.get(0).intValue());
+    }
+    
+    /**
+     * This test provides a demonstration of the MIN and MAX aggregate functions
+     */
+    @Test
+    public void testMaxMin() {        
+        log.info("*** testMaxMin() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> qdef = cb.createQuery(Number.class);
+        Root<Sale> s = qdef.from(Sale.class);
+
+        //select max(s.amount) from Sale s
+        qdef.select(cb.max(s.<BigDecimal>get("amount")));
+        List<Number> results= executeQuery(qdef);
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 150, results.get(0).intValue());
+        
+        //select min(s.amount) from Sale s
+        qdef.select(cb.min(s.<BigDecimal>get("amount")));
+        results= executeQuery(qdef);
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 100, results.get(0).intValue());
+    }
+
+    /**
+     * This test provides a demonstration of the SUM and AVE aggregate functions
+     */
+    @Test
+    public void testSumAve() {        
+        log.info("*** testSumAve() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> qdef = cb.createQuery(Number.class);
+        Root<Sale> s = qdef.from(Sale.class);
+
+        //select sum(s.amount) from Sale s
+        qdef.select(cb.sum(s.<BigDecimal>get("amount")));
+        List<Number> results=executeQuery(qdef);
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 250, results.get(0).intValue());
+        
+        //select avg(s.amount) from Sale s
+        qdef.select(cb.avg(s.<BigDecimal>get("amount")));
+        results= executeQuery(qdef);
+        assertEquals("unexpected number of rows", 1, results.size());
+        assertEquals("unexpected result", 125, results.get(0).intValue());
+    }
     
 }

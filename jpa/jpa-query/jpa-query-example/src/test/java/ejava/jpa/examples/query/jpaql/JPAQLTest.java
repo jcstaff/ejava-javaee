@@ -732,8 +732,9 @@ public class JPAQLTest extends QueryBase {
     }
 
     
-    
-    
+    /**
+     * This test provides a demonstration of the COUNT aggregate function
+     */    
     @Test
     public void testCount() {        
         log.info("*** testCount() ***");
@@ -744,6 +745,9 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected result", 2, results.get(0).intValue());
     }
     
+    /**
+     * This test provides a demonstration of the MIN and MAX aggregate functions
+     */
     @Test
     public void testMaxMin() {        
         log.info("*** testMaxMin() ***");
@@ -759,6 +763,9 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected result", 100, results.get(0).intValue());
     }
 
+    /**
+     * This test provides a demonstration of the SUM and AVE aggregate functions
+     */
     @Test
     public void testSumAve() {        
         log.info("*** testSumAve() ***");

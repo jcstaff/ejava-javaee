@@ -373,20 +373,72 @@ Hibernate:
 
     <section id="jpa-query-jpaql-function-aggregate">
         <title>Aggregate Functions</title>
-        <para></para>
   
+        <section id="jpa-query-jpaql-function-aggregate-count">
+            <title>COUNT</title>
+            
+<programlisting language=""><![CDATA[select COUNT(s) from Sale s]]></programlisting>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>
-
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
-
-        <para>Runtime output</para>
+Hibernate: 
+    select
+        count(*) as col_0_0_ 
+    from
+        JPAQL_SALE sale0_
+        
+ -found result:2]]></programlisting>                            
+        </section>    
+  
+        <section id="jpa-query-jpaql-function-aggregate-minmax">
+            <title>MIN/MAX</title>
+            
+<programlisting language=""><![CDATA[select min(s.amount) from Sale s]]></programlisting>
+            <para>Runtime output</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>                            
+Hibernate: 
+    select
+        min(sale0_.amount) as col_0_0_ 
+    from
+        JPAQL_SALE sale0_
+ -found result:100.00]]></programlisting>                            
+
+
+<programlisting language=""><![CDATA[select max(s.amount) from Sale s]]></programlisting>
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        max(sale0_.amount) as col_0_0_ 
+    from
+        JPAQL_SALE sale0_
+ -found result:150.00]]></programlisting>                            
+        </section>    
+  
+        <section id="jpa-query-jpaql-function-aggregate-sumave">
+            <title>SUM/AVE</title>
+            
+<programlisting language=""><![CDATA[select sum(s.amount) from Sale s]]></programlisting>
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sum(sale0_.amount) as col_0_0_ 
+    from
+        JPAQL_SALE sale0_
+ -found result:250.00]]></programlisting>                           
+ 
+<programlisting language=""><![CDATA[select ave(s.amount) from Sale s]]></programlisting>
+
+            <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        avg(cast(sale0_.amount as double)) as col_0_0_ 
+    from
+        JPAQL_SALE sale0_
+ -found result:125.0]]></programlisting>                            
+        </section>    
     </section>
 
     <section id="jpa-query-jpaql-function-having">
