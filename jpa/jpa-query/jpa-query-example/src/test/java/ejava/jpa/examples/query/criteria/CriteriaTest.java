@@ -19,6 +19,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
@@ -1130,6 +1131,38 @@ public class CriteriaTest extends QueryBase {
         	log.info("found=" + Arrays.toString(result));
         }
         assertEquals("unexpected number of rows", 3, results.size());
+    }
+    
+
+
+    /**
+     * This test provides an example usage of the HAVING aggregate query
+     * function.
+     */
+    @Test
+    public void testHaving() {
+        log.info("*** testHaving() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
+        Root<Clerk> c = qdef.from(Clerk.class);
+        Join<Clerk,Sale> s = c.join("sales", JoinType.LEFT);
+        
+        //select c, COUNT(s) from Clerk c
+        //LEFT JOIN c.sales s
+        //GROUP BY c " +
+        //HAVING COUNT(S) <= 1
+        qdef.select(cb.array(c, cb.count(s)))
+        	.groupBy(c)
+        	.having(cb.le(cb.count(s), 1));
+             
+        List<Object[]> results= em.createQuery(qdef)
+                .getResultList();        
+
+        for (Object[] result : results) {
+            log.info("found=" + Arrays.toString(result));
+        }
+        assertEquals("unexpected number of rows", 2, results.size());
     }
     
 }

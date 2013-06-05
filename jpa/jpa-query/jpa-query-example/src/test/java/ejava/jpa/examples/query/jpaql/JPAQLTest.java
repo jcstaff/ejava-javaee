@@ -801,4 +801,23 @@ public class JPAQLTest extends QueryBase {
     }
     
 
+    /**
+     * This test provides an example usage of the HAVING aggregate query
+     * function.
+     */
+    @Test
+    public void testHaving() {
+        log.info("*** testHaving() ***");
+    	
+        List<Object[]> results= em.createQuery(
+                "select c, COUNT(s) from Clerk c " +
+                "LEFT JOIN c.sales s " +
+                "GROUP BY c " +
+                "HAVING COUNT(S) <= 1", Object[].class)
+                .getResultList();
+        for (Object[] result : results) {
+        	log.info("found=" + Arrays.toString(result));
+        }
+        assertEquals("unexpected number of rows", 2, results.size());
+    }
 }
