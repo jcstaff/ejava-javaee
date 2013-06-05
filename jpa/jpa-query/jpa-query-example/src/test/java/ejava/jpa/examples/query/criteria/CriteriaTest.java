@@ -962,5 +962,47 @@ public class CriteriaTest extends QueryBase {
         rows = executeQuery(qdef).size();
         assertEquals("unexpected number of rows:" + rows, 1, rows);
     }
+ 
+    /**
+     * This test method demonstrates using date functions.
+     */
+    @Test
+    public void testDates() {        
+        log.info("*** testDates() ***");
+        
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Sale> qdef = cb.createQuery(Sale.class);
+        Root<Sale> s = qdef.from(Sale.class);
+        qdef.select(s);
+
+        //select s from Sale s
+        //where s.date < CURRENT_DATE
+        qdef.where(cb.lessThan(s.<Date>get("date"), cb.currentDate()));        
+        int rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows", 2, rows);
+        
+        //select s from Sale s
+        //where s.date = CURRENT_DATE
+        qdef.where(cb.equal(s.<Date>get("date"), cb.currentDate()));        
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows", 0, rows);
+
+        //no bulk query capability in Criteria API
+        rows = em.createQuery(
+                "update Sale s " +
+                "set s.date = CURRENT_DATE").executeUpdate();
+        assertEquals("unexpected number of rows", 2, rows);
+        
+        em.getTransaction().commit();
+        em.clear(); //remove stale objects in cache
+        
+        //select s from Sale s
+        //where s.date = CURRENT_DATE
+        qdef.where(cb.equal(s.<Date>get("date"), cb.currentDate()));        
+        rows = executeQuery(qdef).size();
+        assertEquals("unexpected number of rows", 2, rows);
+    }
+    
+    
     
 }

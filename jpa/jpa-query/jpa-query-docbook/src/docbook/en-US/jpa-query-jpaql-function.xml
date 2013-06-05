@@ -218,21 +218,101 @@ Hibernate:
 
     <section id="jpa-query-jpaql-function-date">
         <title>Date Functions</title>
-        <para></para>
-  
-<programlisting language=""><![CDATA[
-]]></programlisting>
-
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>CURRENT_DATE</para></listitem>
+            <listitem><para>CURRENT_TIME</para></listitem>
+            <listitem><para>CURRENT_TIMESTAMP</para></listitem>
         </itemizedlist>
+  
+<programlisting language=""><![CDATA[select s from Sale s
+where s.date < CURRENT_DATE]]></programlisting>
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        sale0_.date<CURRENT_DATE
+...
+ -found result:date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }
+...
+ -found result:date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
+        <itemizedlist>
+            <listitem><para>Located two Sales that occurred prior to today's date</para></listitem>
+        </itemizedlist>
+
+<programlisting language=""><![CDATA[select s from Sale s
+where s.date = CURRENT_DATE]]></programlisting>
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        sale0_.date=CURRENT_DATE]]></programlisting>                            
+        <itemizedlist>
+            <listitem><para>Located no sales on today's date</para></listitem>
+        </itemizedlist>
+
+<programlisting language=""><![CDATA[update Sale s
+set s.date = CURRENT_DATE]]></programlisting>
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+Hibernate: 
+    update
+        JPAQL_SALE 
+    set
+        date=CURRENT_DATE]]></programlisting>                            
+        <itemizedlist>
+            <listitem><para>Update all sales to today</para></listitem>
+        </itemizedlist>
+
+<programlisting language=""><![CDATA[select s from Sale s
+where s.date = CURRENT_DATE]]></programlisting>
 
         <para>Runtime output</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>                            
+ -executing query:select s from Sale s where s.date = CURRENT_DATE
+Hibernate: 
+    select
+        sale0_.SALE_ID as SALE1_1_,
+        sale0_.amount as amount1_,
+        sale0_.BUYER_ID as BUYER3_1_,
+        sale0_.date as date1_,
+        sale0_.SALE_STORE as SALE5_1_ 
+    from
+        JPAQL_SALE sale0_ 
+    where
+        sale0_.date=CURRENT_DATE
+...
+ -found result:date=2013-06-05 00:00:00, amount=$100.00, buyer=1, clerks(1)={1, }
+...
+ -found result:date=2013-06-05 00:00:00, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
+        <itemizedlist>
+            <listitem><para>Now locating sales for today's date</para></listitem>
+        </itemizedlist>
+        
+        <note>
+            <para>Bulk commands (i.e., update) invalidate cached entities. You must refresh their
+                state with the database or detach/clear them from the persistence context to 
+                avoid using out-dated information.</para>
+        </note>
     </section>
+
+
+
 
 
     <section id="jpa-query-jpaql-function-orderby">

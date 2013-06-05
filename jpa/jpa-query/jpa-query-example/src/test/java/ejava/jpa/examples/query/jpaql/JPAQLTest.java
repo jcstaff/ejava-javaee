@@ -667,6 +667,9 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 1, rows);        
     }
 
+    /**
+     * This test method demonstrates using date functions.
+     */
     @Test
     public void testDates() {        
         log.info("*** testDates() ***");
@@ -689,8 +692,7 @@ public class JPAQLTest extends QueryBase {
         assertEquals("unexpected number of rows", 2, rows);
         
         em.getTransaction().commit();
-        em.clear();
-        em.getTransaction().begin();
+        em.clear(); //remove stale objects in cache
         
         rows = executeQuery(
                 "select s from Sale s " +
