@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -1104,6 +1105,31 @@ public class CriteriaTest extends QueryBase {
         results= executeQuery(qdef);
         assertEquals("unexpected number of rows", 1, results.size());
         assertEquals("unexpected result", 125, results.get(0).intValue());
+    }
+    
+    /**
+     * This test method provides an example of using group by 
+     */
+    @Test
+    public void testGroupBy() {
+        log.info("*** testGroupBy() ***");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
+        Root<Clerk> c = qdef.from(Clerk.class);
+        Join<Clerk,Sale> s = c.join("sales", JoinType.LEFT);
+	        //select c, COUNT(s) from Clerk c
+	        //LEFT JOIN c.sales s
+	        //GROUP BY c
+        qdef.select(cb.array(c, cb.count(s)))
+            .groupBy(c);
+        
+        List<Object[]> results= em.createQuery(qdef)
+                				  .getResultList();
+        for (Object[] result : results) {
+        	log.info("found=" + Arrays.toString(result));
+        }
+        assertEquals("unexpected number of rows", 3, results.size());
     }
     
 }

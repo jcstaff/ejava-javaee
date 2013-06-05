@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -779,6 +780,24 @@ public class JPAQLTest extends QueryBase {
                 "select avg(s.amount) from Sale s", Number.class);
         assertEquals("unexpected number of rows", 1, results.size());
         assertEquals("unexpected result", 125, results.get(0).intValue());
+    }
+    
+    /**
+     * This test method provides an example of using group by 
+     */
+    @Test
+    public void testGroupBy() {
+        log.info("*** testGroupBy() ***");
+    	
+        List<Object[]> results= em.createQuery(
+                "select c, COUNT(s) from Clerk c " +
+                "LEFT JOIN c.sales s " +
+                "GROUP BY c", Object[].class)
+                .getResultList();
+        for (Object[] result : results) {
+        	log.info("found=" + Arrays.toString(result));
+        }
+        assertEquals("unexpected number of rows", 3, results.size());
     }
     
 
