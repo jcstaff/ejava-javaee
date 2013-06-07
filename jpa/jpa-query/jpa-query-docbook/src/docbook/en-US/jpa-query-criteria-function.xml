@@ -496,7 +496,7 @@ Hibernate:
         <title>Aggregate Functions</title>
         <para></para>
   
-        <section id="jpa-query-jpaql-function-aggregate-count">
+        <section id="jpa-query-criteria-function-aggregate-count">
             <title>COUNT</title>
             
 <programlisting language=""><![CDATA[select COUNT(s) from Sale s]]></programlisting>
@@ -505,7 +505,7 @@ Hibernate:
 ]]></programlisting>                            
         </section>    
   
-        <section id="jpa-query-jpaql-function-aggregate-minmax">
+        <section id="jpa-query-criteria-function-aggregate-minmax">
             <title>MIN/MAX</title>
             
 <programlisting language=""><![CDATA[select min(s.amount) from Sale s]]></programlisting>
@@ -530,7 +530,7 @@ Hibernate:
  -found result:150.00]]></programlisting>                            
         </section>    
   
-        <section id="jpa-query-jpaql-function-aggregate-sumave">
+        <section id="jpa-query-criteria-function-aggregate-sumave">
             <title>SUM/AVE</title>
             
 <programlisting language=""><![CDATA[select sum(s.amount) from Sale s]]></programlisting>
