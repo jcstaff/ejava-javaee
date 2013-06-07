@@ -35,6 +35,7 @@ public class QueryBase {
 
     @After
     public void tearDown() throws Exception {
+    	if (em==null || !em.isOpen()) { return; }
         try {
             log.debug("tearDown() started, em=" + em);
             if (!em.getTransaction().isActive()) {
@@ -45,7 +46,7 @@ public class QueryBase {
             } else {
             	em.getTransaction().rollback();
             }
-            em.close();
+            em.close(); em=null;
             log.debug("tearDown() complete, em=" + em);
         }
         catch (Exception ex) {
@@ -57,7 +58,7 @@ public class QueryBase {
     @AfterClass
     public static void tearDownClass() {
         log.debug("closing entity manager factory");
-        if (emf!=null) { emf.close(); }
+        if (emf!=null) { emf.close(); emf=null; }
     }
     
     public static void cleanup(EntityManager em) {

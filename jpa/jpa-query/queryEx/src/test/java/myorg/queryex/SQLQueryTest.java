@@ -3,15 +3,10 @@ package myorg.queryex;
 import static org.junit.Assert.*;
 
 
-import java.util.Date;
 import java.util.List;
-
-import javax.persistence.EntityResult;
-import javax.persistence.FieldResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SQLQueryTest extends QueryBase {

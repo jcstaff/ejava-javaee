@@ -167,8 +167,8 @@ public class Movie implements Comparable<Movie>{
 		}
 		
 		if (director==null) {
-			if (rhs.director != null) { return false; }
-		} else if (!director.equals(rhs.director)) {
+			if (rhs.getDirector() != null) { return false; }
+		} else if (!director.equals(rhs.getDirector())) {
 			return false;
 		}
 		

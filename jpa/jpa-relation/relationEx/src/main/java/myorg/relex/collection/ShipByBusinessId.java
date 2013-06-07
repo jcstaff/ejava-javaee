@@ -1,8 +1,6 @@
 package myorg.relex.collection;
 
 
-import java.text.DateFormat;
-
 import javax.persistence.*;
 
 /**

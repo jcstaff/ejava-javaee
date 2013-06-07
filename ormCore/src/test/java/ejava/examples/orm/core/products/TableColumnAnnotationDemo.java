@@ -10,7 +10,6 @@ import javax.persistence.PersistenceException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
 
 import ejava.examples.orm.core.annotated.Car;
 

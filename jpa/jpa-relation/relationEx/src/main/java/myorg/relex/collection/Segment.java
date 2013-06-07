@@ -1,6 +1,5 @@
 package myorg.relex.collection;
 
-import java.util.Comparator;
 import javax.persistence.*;
 
 import org.apache.commons.logging.Log;

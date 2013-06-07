@@ -42,6 +42,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>1.1.1.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -100,6 +107,27 @@
                             </includes>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+
+            <!-- add generated JPA metamodel classes to classpath -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                   <execution>
+                       <id>add-metamodel-classes</id>
+                       <phase>process-sources</phase>
+                       <goals>
+                           <goal>add-source</goal>
+                       </goals>
+                       <configuration>
+                           <sources>
+                               <source>target/generated-sources/annotations</source>
+                           </sources>
+                       </configuration>
+                   </execution>
                 </executions>
             </plugin>
         </plugins>

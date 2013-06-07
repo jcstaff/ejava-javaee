@@ -36,6 +36,23 @@ public class MovieRole {
 		this.actor = actor;
 		return this;
 	}
+	
+	@Override
+	public int hashCode() {
+		return (role==null?0:role.hashCode()) + (actor==null?0:actor.hashCode());
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		try {
+			if (this == obj) { return true; }
+			if (obj == null) { return false; }
+			MovieRole rhs = (MovieRole)obj;
+			if (role==null && rhs.role!=null) { return false; }
+			if (actor==null && rhs.actor!=null) { return false; }
+			return role.equals(rhs.role) && actor.equals(rhs.actor); 
+		} catch (Exception ex) { return false; }
+	}
 
 	@Override
 	public String toString() {

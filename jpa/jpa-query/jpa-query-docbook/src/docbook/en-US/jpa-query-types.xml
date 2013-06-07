@@ -1,0 +1,494 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-query-types">
+    <title>JPA Query Types</title>
+    <para>Three fundamental query types within JPA</para>
+        
+    <section id="jpa-query-types-jpaql">
+        <title>JPA Query Language (JPAQL) Queries</title>
+        <para>JPA provides access to the entity model using a SQL-like 
+           text query language which expresses queries at entity abstraction 
+           level</para>
+
+<programlisting language="java"><![CDATA[
+String jpaqlString =
+    "select c from Customer c " +
+    "where c.firstName = :firstName " +
+    "order by c.lastName ASC"; 
+//use query string to build query
+TypedQuery<Customer> query = em
+        .createQuery(jpaqlString,Customer.class);
+
+//at this point we are query-type agnostic
+List<Customer> customers = query
+        .setParameter("firstName", "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+       <orderedlist>
+            <listitem><para>"c" is part of root query</para></listitem>
+            <listitem><para>"c" represents rows from Customer entity table(s)</para></listitem>
+            <listitem><para>"c.lastName" is path off root term</para></listitem>
+            <listitem><para>":firstName" is parameter placeholder</para></listitem>
+            <listitem><para>"c.firstName" is path off root term</para></listitem>
+       </orderedlist>
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+select
+    customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+    customer0_.FIRST_NAME as FIRST2_3_,
+    customer0_.LAST_NAME as LAST3_3_ 
+from
+    JPAQL_CUSTOMER customer0_ 
+where
+    customer0_.FIRST_NAME=? 
+order by
+    customer0_.LAST_NAME ASC
+    
+-result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]></programlisting>                        
+
+        <para>Consolidated form</para>
+<programlisting language="java"><![CDATA[
+List<Customer> customers = em.createQuery(
+    "select c from Customer c " +
+    "where c.firstName = :firstName " +
+    "order by c.lastName ASC",
+    Customer.class)
+        .setParameter("firstName", "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());
+]]></programlisting>                        
+
+        <itemizedlist>
+            <listitem><para>Pros</para>
+                <itemizedlist>
+                    <listitem><para>More concise (than other query forms)</para></listitem>
+                    <listitem><para>Familiar to SQL users</para></listitem>
+                    <listitem><para>Abstracts query away from table, column, primary key, and relationship mapping</para></listitem>
+                    <listitem><para>Can be defined within XML deployment descriptors</para></listitem>
+                    <listitem><para>Produces portable SQL</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Cons</para>
+                <itemizedlist>
+                    <listitem><para>Not type-safe</para></listitem>
+                    <listitem><para>No help from Java compiler in constructing query expression</para></listitem>
+                    <listitem><para>Don't find out most errors until runtime</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jpa-query-types-sql">
+        <title>Native SQL Queries</title>
+        <para>JPA provides access to all the power of working with native SQL
+            and database vendor extensions</para>
+  
+<programlisting language="java"><![CDATA[
+Table table = Customer.class.getAnnotation(Table.class);
+String sqlString =
+    "select c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME " +                        
+    String.format("from %s c ", table.name()) +
+    "where c.FIRST_NAME = ? " +
+    "order by c.LAST_NAME ASC";    
+//use query string to build query
+Query query = em.createNativeQuery(sqlString,Customer.class);
+
+//at this point we are query-type agnostic (mostly)
+@SuppressWarnings("unchecked")
+List<Customer> customers = query
+        .setParameter(1, "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>"c" represents rows in table</para></listitem>
+            <listitem><para>specific columns (or *) are return for each row</para></listitem>
+            <listitem><para>"?" marks a positional parameter -- non-portable to use named parameters in native SQL queries</para></listitem>
+            <listitem><para>TypedQuery&lt;T&gt;s not supported in native SQL queries because of a conflict with legacy JPA 1.0 API</para></listitem>
+        </itemizedlist>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+select
+    c.CUSTOMER_ID,
+    c.FIRST_NAME,
+    c.LAST_NAME 
+from
+    JPAQL_CUSTOMER c 
+where
+    c.FIRST_NAME = ? 
+order by
+    c.LAST_NAME ASC
+
+-result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]></programlisting>                        
+
+        <para>Consolidated form</para>
+<programlisting language="java"><![CDATA[
+@SuppressWarnings("unchecked")
+List<Customer> customers = em.createNativeQuery(
+    "select c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME " +                        
+    "from JPAQL_CUSTOMER c " +
+    "where c.FIRST_NAME = ? " +
+    "order by c.LAST_NAME ASC",
+    Customer.class)
+        .setParameter(1, "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+
+        <itemizedlist>
+            <listitem><para>Pros</para>
+                <itemizedlist>
+                    <listitem><para>Provides full access to native SQL power</para></listitem>
+                    <listitem><para>Provides fill access to database-vendor SQL extensions</para></listitem>
+                    <listitem><para>Easy to see when native SQL is being used within application -- target for portability review</para></listitem>
+                    <listitem><para>Ability to produce managed entity as result of query</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Cons</para>
+                <itemizedlist>
+                    <listitem><para>Portability of SQL not addressed by JPA</para></listitem>
+                    <listitem><para>Not type-safe</para></listitem>
+                    <listitem><para>No help from Java compiler in constructing query expression</para></listitem>
+                    <listitem><para>Don't find out most errors until runtime</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+
+
+
+
+
+
+    <section id="jpa-query-types-criteria">
+        <title>Criteria API Queries</title>
+        <para>JPA provides a somewhat parallel capability to JPAQL -- to 
+            build the overall query using Java types (demonstrated here with "string accessors").</para>
+  
+<programlisting language="java"><![CDATA[
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+Root<Customer> c = qdef.from(Customer.class);
+qdef.select(c)
+    .where(cb.equal(c.get("firstName"), 
+                    cb.parameter(String.class,"firstName")))
+    .orderBy(cb.asc(c.get("lastName")));
+//build query from criteria definition
+TypedQuery<Customer> query = em.createQuery(qdef);
+
+//at this point we are query-type agnostic
+List<Customer> customers = query
+        .setParameter("firstName", "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>
+                        
+        <itemizedlist>
+            <listitem><para>"CriteriaBuilder" used as starting point to build objects within the query tree</para></listitem>
+            <listitem><para>"CriteriaQuery&lt;T&gt;" used to hold the definition of query</para></listitem>
+            <listitem><para>"Root&lt;T&gt;" used to reference root level query terms</para></listitem>
+            <listitem><para>"CriteriaBuilder.from()" used to designate the entity that represents root query term. Result used to create path references for body of query</para></listitem>
+            <listitem><para>"CriteriaBuilder.select()" officially lists the objects returned from query</para></listitem>
+            <listitem><para>"CriteriaBuilder.where()" builds a decision predicate of which entities to include</para></listitem>
+            <listitem><para>"CriteriaBuilder.equal()" builds an equals predicate for the where clause</para></listitem>
+            <listitem><para>"Root&lt;T&gt;.get()" returns the property referenced in path expression</para></listitem>
+            <listitem><para>"CriteriaBuilder.parameter()" builds a parameter placeholder within query. Useful with @Temporal date comparisons</para></listitem>
+        </itemizedlist>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+    select
+        customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+        customer0_.FIRST_NAME as FIRST2_3_,
+        customer0_.LAST_NAME as LAST3_3_ 
+    from
+        JPAQL_CUSTOMER customer0_ 
+    where
+        customer0_.FIRST_NAME=? 
+    order by
+        customer0_.LAST_NAME asc
+        
+ -result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]]></programlisting>                        
+
+        <para>Consolidated form</para>
+<programlisting language="java"><![CDATA[
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+Root<Customer> c = qdef.from(Customer.class);
+
+List<Customer> customers = em.createQuery(qdef.select(c)
+    .where(cb.equal(c.get("firstName"), "thing"))
+    .orderBy(cb.asc(c.get("lastName"))))
+    .getResultList();
+
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+
+        <itemizedlist>
+            <listitem><para>Pros</para>
+                <itemizedlist>
+                    <listitem><para>Structure of query is type-safe</para></listitem>
+                    <listitem><para>Allows object-level manipulation of the query versus manipulation of a query string -- useful when building total query based on runtime properties</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Cons</para>
+                <itemizedlist>
+                    <listitem><para>Complex -- looses familiarity with SQL</para></listitem>
+                    <listitem><para>Cannot be expressed in XML deployment descriptor</para></listitem>
+                    <listitem><para>Access to properties not type-safe (addressed by Canonical Metamodel)</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <section id="jpa-query-types-strong">
+        <title>Strongly Typed Queries</title>
+        <para></para>
+  
+        <section id="jpa-query-types-strong-metamodel">
+            <title>Metamodel API</title>
+            <para>JPA Metamodel provides access to the persistent model 
+                backing each entity and its properties.</para>
+      
+        <para>Consolidated form</para>
+<programlisting language="java"><![CDATA[
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+Root<Customer> c = qdef.from(Customer.class);
+EntityType<Customer> c_ = c.getModel();
+
+log.info(String.format("%7s, %10s:%-30s", 
+        c_.getPersistenceType(), 
+        c_.getName(), 
+        c_.getJavaType()));
+for (Attribute<? super Customer, ?> p: c_.getAttributes()) {
+    log.info(String.format("%7s, %10s:%-30s", 
+            p.getPersistentAttributeType(), 
+            p.getName(), 
+            p.getJavaType()));          
+}]]></programlisting>                        
+<programlisting language=""><![CDATA[
+ - ENTITY,   Customer:class ejava.jpa.examples.query.Customer
+ -  BASIC,  firstName:class java.lang.String        
+ -  BASIC,         id:long                          
+ -  BASIC,   lastName:class java.lang.String]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Provides ability to construct type-safe queries</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-query-types-strong-query">
+            <title>Strongly Typed Query</title>
+            <para></para>
+      
+<programlisting language="java"><![CDATA[
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+Root<Customer> c = qdef.from(Customer.class);
+EntityType<Customer> c_ = c.getModel();
+qdef.select(c) //we are returning a single root object
+    .where(cb.equal(
+            c.get(c_.getSingularAttribute("firstName", String.class)), 
+            cb.parameter(String.class,"firstName")))
+    .orderBy(cb.asc(c.get(c_.getSingularAttribute("lastName", String.class))));
+TypedQuery<Customer> query = em.createQuery(qdef);
+
+//at this point we are query-type agnostic
+List<Customer> customers = query
+        .setParameter("firstName", "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());
+]]></programlisting>
+       <itemizedlist>
+            <listitem><para>Access to properties within entities done through type-safe accessors</para></listitem>
+       </itemizedlist>
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+select
+    customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+    customer0_.FIRST_NAME as FIRST2_3_,
+    customer0_.LAST_NAME as LAST3_3_ 
+from
+    JPAQL_CUSTOMER customer0_ 
+where
+    customer0_.FIRST_NAME=? 
+order by
+    customer0_.LAST_NAME asc
+-result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]></programlisting>                        
+                        
+        <para>Consolidated form</para>
+<programlisting language="java"><![CDATA[
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+Root<Customer> c = qdef.from(Customer.class);
+EntityType<Customer> c_ = c.getModel();
+List<Customer> customers = em.createQuery(qdef.select(c)
+    .where(cb.equal(
+            c.get(c_.getSingularAttribute("firstName", String.class)), "thing"))
+    .orderBy(cb.asc(c.get(c_.getSingularAttribute("lastName", String.class)))))
+    .getResultList();
+
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>      
+                  
+            <itemizedlist>
+                <listitem><para>Pros</para>
+                    <itemizedlist>
+                        <listitem><para>Access properties in type-safe manner</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Cons</para>
+                    <itemizedlist>
+                        <listitem><para>Complex</para></listitem>
+                        <listitem><para>No compiler warning of entity type re-factoring</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-query-types-strong-canonicalmm">
+            <title>Canonical Metamodel</title>
+            <para>Complexities of metamodel cab be simplified using metamodel classes</para>
+      
+<programlisting language="java"><![CDATA[
+package ejava.jpa.examples.query;
+
+import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.StaticMetamodel;
+
+@StaticMetamodel(Customer.class)
+public abstract class Customer_ {
+    public static volatile SingularAttribute<Customer, Long> id;
+    public static volatile SingularAttribute<Customer, String> lastName;
+    public static volatile SingularAttribute<Customer, String> firstName;
+}]]></programlisting>                        
+
+
+<programlisting language="java"><![CDATA[
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+Root<Customer> c = qdef.from(Customer.class);
+
+qdef.select(c) //we are returning a single root object
+    .where(cb.equal(
+            c.get(Customer_.firstName), 
+            cb.parameter(String.class,"firstName")))
+    .orderBy(cb.asc(c.get(Customer_.lastName)));
+TypedQuery<Customer> query = em.createQuery(qdef);
+
+//at this point we are query-type agnostic
+List<Customer> customers = query
+        .setParameter("firstName", "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Use canonical metamodel class to provide type-safe, easy access to properties ("Customer_.firstName")</para></listitem>
+            </itemizedlist>
+
+
+
+        <para>Runtime output</para>
+<programlisting language=""><![CDATA[
+select
+    customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+    customer0_.FIRST_NAME as FIRST2_3_,
+    customer0_.LAST_NAME as LAST3_3_ 
+from
+    JPAQL_CUSTOMER customer0_ 
+where
+    customer0_.FIRST_NAME=? 
+order by
+    customer0_.LAST_NAME asc
+-result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]></programlisting>      
+
+        <para>Consolidated form</para>
+<programlisting language="java"><![CDATA[
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
+Root<Customer> c = qdef.from(Customer.class);
+
+List<Customer> customers = em.createQuery(qdef.select(c)
+    .where(cb.equal(c.get(Customer_.firstName),"thing"))
+    .orderBy(cb.asc(c.get(Customer_.lastName))))
+    .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+                        
+            <itemizedlist>
+                <listitem><para>Pros</para>
+                    <itemizedlist>
+                        <listitem><para>Easy, type-safe access to entity model</para></listitem>
+                        <listitem><para>Java compiler can alert of mismatch between query and entity model</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Cons</para>
+                    <itemizedlist>
+                        <listitem><para>Requires either manual construct or auto-generation of separate metamodel class</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+
+    </section>
+
+    <section id="jpa-query-types-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para>Three basic forms for query expression</para>
+                <itemizedlist>
+                    <listitem><para>JPAQL</para></listitem>
+                    <listitem><para>Native SQL</para></listitem>
+                    <listitem><para>Criteria API</para>
+                        <itemizedlist>
+                            <listitem><para>String-based Accessors</para></listitem>
+                            <listitem><para>Metamodel Accessors</para></listitem>
+                            <listitem><para>Canonical Metamodel Accessors</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Entity model provides portability</para>
+                <itemizedlist>
+                    <listitem><para>JPAQL</para></listitem>
+                    <listitem><para>Criteria API</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Native SQL provides direct access to</para>
+                <itemizedlist>
+                    <listitem><para>full power of SQL</para></listitem>
+                    <listitem><para>full access to database-specific extensions</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Criteria API provides type-safe construct of query structure</para></listitem>
+            <listitem><para>JPA Metamodel provides type-safe access to entity properties</para></listitem>
+            <listitem><para>JPA Canonical Metamodel provides type-safe access to model-specific entity properties</para>
+                <itemizedlist>
+                    <listitem><para>Produces compilation error when query our of sync with entity model</para></listitem>
+                    <listitem><para>Provides convenient access to model-specific properties</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>       
+    </section>    
+</chapter>
+  
