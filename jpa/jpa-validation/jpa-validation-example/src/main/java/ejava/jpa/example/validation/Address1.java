@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name="VALIDATION_ADDRESS")
+@CityStateOrZip(groups=PreCheck.class)
 public class Address1 {
 	@Id @GeneratedValue
 	private int id;

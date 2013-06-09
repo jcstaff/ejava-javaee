@@ -392,6 +392,7 @@ public @interface ValidName {
         </section>
     </section>
 
+
     <section id="jpa-validation-core-sequences">
         <title>Group Sequences</title>
         <para>Define a sequence of validation groups to be tested in order and short-circuit upon failure</para>
@@ -416,7 +417,7 @@ public interface ValidationSequence {}]]></programlisting>
             </itemizedlist>
         </section>
 
-        <section id="jpa-validation-core-sequences-groups">
+        <section id="jpa-validation-core-sequences-annotation">
             <title>Assign Constraints from Sequence</title>
             <itemizedlist>
                 <listitem>
@@ -469,6 +470,57 @@ public class Address {]]></programlisting>
             </itemizedlist>
         </section>                        
     </section>
+
+
+    <section id="jpa-validation-custom-type">
+        <title>Validating Types</title>
+        <para>Look across properties of type</para>
+  
+        <section id="jpa-validation-custom-type-annotation">
+            <title>Annotation</title>
+<programlisting language="java"><![CDATA[
+...
+@Documented
+@Constraint(validatedBy={CityStateOrZipValidator.class})
+@Target({TYPE, ANNOTATION_TYPE})
+@Retention(RUNTIME)
+public @interface CityStateOrZip {
+    String message() default "must have city and state or zip code";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default{};
+}]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-custom-type-validator">
+            <title>Validator</title>
+<programlisting language="java"><![CDATA[
+public class CityStateOrZipValidator implements ConstraintValidator<CityStateOrZip, Address1>{
+    @Override
+    public void initialize(CityStateOrZip constraintAnnotation) {}
+    @Override
+    public boolean isValid(Address1 address, ConstraintValidatorContext context) {
+        if (address==null) { return true; }
+        return (address.getCity()!=null && address.getState()!=null) ||
+                address.getZip()!=null;
+    }
+}]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-custom-type-validation">
+            <title>Validator</title>
+<programlisting language="java"><![CDATA[
+Address1 a1 = new Address1()
+    .setStreet("1600")
+    .setCity("Washington");
+Set<ConstraintViolation<Address1>> violations = val.validate(a1,PreCheck.class);
+...
+assertEquals("unexpected violation", 1, violations.size());]]></programlisting>                        
+<programlisting language=""><![CDATA[
+ -:1600 Washington, null null, must have city and state or zip code]]></programlisting>                        
+        </section>
+    </section>
+
+
 
 
     <section id="jpa-validation-core-">
