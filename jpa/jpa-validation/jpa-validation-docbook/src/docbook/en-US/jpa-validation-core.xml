@@ -392,6 +392,67 @@ public @interface ValidName {
         </section>
     </section>
 
+    <section id="jpa-validation-core-sequences">
+        <title>Group Sequences</title>
+
+        <section id="jpa-validation-core-sequences-definition">
+            <title>Define Validation Based on Cost and Value (within context)</title>
+      
+            <itemizedlist>
+                <listitem><para>A set of Constraint Groups defined based on complexity/cost</para>
+<programlisting language="java"><![CDATA[
+//Default
+public interface DBChecks {} //checks whether data will fit within DB
+public interface DataChecks {} //more detailed content checks]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Constraints are assigned to Constraint Groups</para>
+<programlisting language="java"><![CDATA[
+    @Column(name="STREET", length=32, nullable=false)
+    @NotNull(message="street not supplied")
+    @Size(max=32, message="street name too large", groups=DBChecks.class)
+    @Pattern(regexp="^[0-9A-Za-z\\ ]+$", groups=DataChecks.class, 
+             message="street must be numbers and letters")
+    private String street;]]></programlisting>                        
+                </listitem>
+    
+                <listitem><para>Group Sequence defined for class -- which in this case -- 
+                    overrides the Default group</para>
+<programlisting language="java"><![CDATA[
+@GroupSequence({Address.class, DBChecks.class, DataChecks.class})
+public class Address {
+]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-validation-core-sequences-validation">
+            <title>Sample Execution</title>
+      
+            <itemizedlist>
+                <listitem><para>We cause an error in the data size and content</para>
+<programlisting language="java"><![CDATA[
+Address a = new Address()
+    .setStreet("1600$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    .setCity("Washington")
+    .setState("DC")
+    .setZip("20500");
+Set<ConstraintViolation<Address>> violations = val.validate(a);
+...
+//we should only get violations from the DB group
+assertEquals("unexpected number of violations", 1, violations.size());]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+
+            <itemizedlist>
+                <listitem><para>Notice Default passed, DBChecks failed, and DataChecks not attempted</para>
+<programlisting language="java"><![CDATA[
+ -street:1600$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ street name too large]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+    </section>
 
 
     <section id="jpa-validation-core-">
