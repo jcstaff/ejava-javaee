@@ -3,12 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ejava.jpa</groupId>
-        <artifactId>jpa-parent</artifactId>
+        <artifactId>jpa-validation</artifactId>
         <version>3.0.2013.1-SNAPSHOT</version>
-        <relativePath></relativePath>
     </parent>
 
-    <groupId>ejava.jpa</groupId>
     <artifactId>jpa-validation-example</artifactId>
 
     <name>jpa-validation-example</name>
@@ -21,15 +19,33 @@
         <dependency>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
-          <scope>compile</scope>
         </dependency>
     
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>                
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>javax.el</artifactId>
+            <scope>test</scope>
+        </dependency>        
+
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
@@ -40,7 +56,7 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
-
+            
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

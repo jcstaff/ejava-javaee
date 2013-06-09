@@ -1,0 +1,80 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-validation-maven">
+    <title>Validation API Build/Maven Aspects</title>
+    <para></para>
+        
+    <section id="jpa-validation-maven">
+        <title>Adding POM dependencies</title>
+        <para></para>
+  
+        <itemizedlist>
+            <listitem><para>API Dependency</para>
+<programlisting language="xml"><![CDATA[
+<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>1.1.0.Final</version>
+    <scope>compile</scope>
+</dependency>]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Implementation Dependency (includes API dependency)</para>
+<programlisting language=""><![CDATA[
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>5.0.1.Final</version>
+    <scope>test</scope>
+</dependency>]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Hibernate Implementation Dependency for @Pattern constraints</para>
+<programlisting language=""><![CDATA[
+<dependency>
+    <groupId>javax.el</groupId>
+    <artifactId>javax.el-api</artifactId>
+    <version>2.2.4</version>
+    <scope>compile</scope>
+</dependency>
+<dependency>
+    <groupId>org.glassfish.web</groupId>
+    <artifactId>javax.el</artifactId>
+    <version>2.2.4</version>
+    <scope>test</scope>
+</dependency>]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+        
+        <para></para>
+    </section>
+
+    <section id="jpa-validation-section2">
+        <title>jpa-validation Section 2</title>
+        <para></para>
+  
+        <itemizedlist>
+
+            <listitem><para></para>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+        
+        <para></para>
+    </section>
+
+
+    <section id="jpa-validation-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

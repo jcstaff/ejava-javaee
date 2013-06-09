@@ -13,9 +13,14 @@
     <persistence-unit name="jpa-validation-example-test">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
-        <class>ejava.jpa.example.validation.Auto</class>
+        <class>ejava.jpa.example.validation.Person</class>
+
+        <validation-mode>CALLBACK</validation-mode>
         <properties>
-           <!-- defined in src/test/resources/hibernate.properties -->
+            <property name="javax.persistence.validation.group.pre-persist" 
+                      value="ejava.jpa.example.validation.Drivers"/>
+            <property name="javax.persistence.validation.group.pre-update" 
+                      value="ejava.jpa.example.validation.Drivers"/>
         </properties>
     </persistence-unit>            
 </persistence>

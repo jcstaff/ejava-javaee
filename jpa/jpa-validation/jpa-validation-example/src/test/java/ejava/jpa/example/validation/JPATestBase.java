@@ -1,9 +1,5 @@
 package ejava.jpa.example.validation;
 
-import static org.junit.Assert.*;
-
-import static org.junit.Assert.*;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -13,14 +9,13 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 
-public class AutoTest {
-    private static Log log = LogFactory.getLog(Auto.class);
+public class JPATestBase {
+    private static Log log = LogFactory.getLog(JPATestBase.class);
     private static final String PERSISTENCE_UNIT = "jpa-validation-example-test";
-    private static EntityManagerFactory emf;
-    private EntityManager em;    
+    protected static EntityManagerFactory emf;
+    protected EntityManager em;    
 
     @BeforeClass
     public static void setUpClass() {
@@ -32,7 +27,6 @@ public class AutoTest {
     public void setUp() throws Exception {
         log.debug("creating entity manager");
         em = emf.createEntityManager();
-        cleanup();
         em.getTransaction().begin();
     }
 
@@ -61,32 +55,5 @@ public class AutoTest {
     public static void tearDownClass() {
         log.debug("closing entity manager factory");
         if (emf!=null) { emf.close(); }
-    }
-    
-    public void cleanup() {
-        em.getTransaction().begin();
-        List<Auto> autos = em.createQuery("select a from Auto a", Auto.class)
-            .getResultList();
-        for (Auto a: autos) {
-            em.remove(a);
-        }
-        em.getTransaction().commit();
-        log.info("removed " + autos.size() + " autos");
-    }
-
-    @Test
-    public void testCreate() {
-        log.info("testCreate");
-        
-        Auto car = new Auto();
-        car.setMake("Chrysler");
-        car.setModel("Gold Duster");
-        car.setColor("Gold");
-        car.setMileage(60*1000);
-        
-        log.info("creating auto:" + car);                        
-        em.persist(car);        
-        
-        assertNotNull("car not found", em.find(Auto.class,car.getId()));
     }
 }
