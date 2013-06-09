@@ -394,34 +394,40 @@ public @interface ValidName {
 
     <section id="jpa-validation-core-sequences">
         <title>Group Sequences</title>
+        <para>Define a sequence of validation groups to be tested in order and short-circuit upon failure</para>
 
-        <section id="jpa-validation-core-sequences-definition">
-            <title>Define Validation Based on Cost and Value (within context)</title>
+        <section id="jpa-validation-core-sequences-groups">
+            <title>Validation Groups and Sequence</title>
       
             <itemizedlist>
-                <listitem><para>A set of Constraint Groups defined based on complexity/cost</para>
+                <listitem>
 <programlisting language="java"><![CDATA[
-//Default
 public interface DBChecks {} //checks whether data will fit within DB
-public interface DataChecks {} //more detailed content checks]]></programlisting>                        
+public interface DataChecks {} //more detailed content checks]]></programlisting>
+                    <para>A set of Constraint Groups defined based on complexity/cost</para>                        
                 </listitem>
 
-                <listitem><para>Constraints are assigned to Constraint Groups</para>
+                <listitem>
+<programlisting language="java"><![CDATA[
+@GroupSequence({Default.class, DBChecks.class, DataChecks.class})
+public interface ValidationSequence {}]]></programlisting>
+                    <para>A Group Sequence defines the order</para>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-validation-core-sequences-groups">
+            <title>Assign Constraints from Sequence</title>
+            <itemizedlist>
+                <listitem>
 <programlisting language="java"><![CDATA[
     @Column(name="STREET", length=32, nullable=false)
     @NotNull(message="street not supplied")
     @Size(max=32, message="street name too large", groups=DBChecks.class)
     @Pattern(regexp="^[0-9A-Za-z\\ ]+$", groups=DataChecks.class, 
              message="street must be numbers and letters")
-    private String street;]]></programlisting>                        
-                </listitem>
-    
-                <listitem><para>Group Sequence defined for class -- which in this case -- 
-                    overrides the Default group</para>
-<programlisting language="java"><![CDATA[
-@GroupSequence({Address.class, DBChecks.class, DataChecks.class})
-public class Address {
-]]></programlisting>                        
+    private String street;]]></programlisting>
+                    <para>Constraints are assigned to Constraint Groups</para>                        
                 </listitem>
             </itemizedlist>
         </section>
@@ -437,7 +443,7 @@ Address a = new Address()
     .setCity("Washington")
     .setState("DC")
     .setZip("20500");
-Set<ConstraintViolation<Address>> violations = val.validate(a);
+Set<ConstraintViolation<Address>> violations = val.validate(a, ValidationSequence.class);
 ...
 //we should only get violations from the DB group
 assertEquals("unexpected number of violations", 1, violations.size());]]></programlisting>                        
@@ -451,7 +457,17 @@ assertEquals("unexpected number of violations", 1, violations.size());]]></progr
                 </listitem>
             </itemizedlist>
         </section>
-
+    
+        <section id="jpa-validation-core-sequences-default">
+            <title>Optionally Assign Sequence to be Default for Class</title>
+            <itemizedlist>
+                <listitem>
+<programlisting language="java"><![CDATA[
+@GroupSequence({Address.class, DBChecks.class, DataChecks.class})
+public class Address {]]></programlisting>
+                    <para>Must list self within list</para></listitem>
+            </itemizedlist>
+        </section>                        
     </section>
 
 

@@ -14,13 +14,11 @@ import org.apache.commons.logging.Log;
 import org.junit.Test;
 
 /**
- * This test case demonstrates a validation using a group sequence. We can validate 
- * the specific groups -- but with this feature we can cause them to be called 
- * in a chain and stop if/when one of the groups fails without calling the downstream
- * validators.
+ * This test case demonstrates a class that has had its Default validation replaced
+ * by a group sequence.
  */
-public class GroupSequenceTest {
-	private static final Log log = LogFactory.getLog(GroupSequenceTest.class);
+public class DefaultGroupSequenceTest {
+	private static final Log log = LogFactory.getLog(DefaultGroupSequenceTest.class);
 	private static final ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
 	private static final Validator val = vf.getValidator();
 
@@ -32,9 +30,9 @@ public class GroupSequenceTest {
 	public void testDefaultError() {
 		log.debug("*** testDefaultError ***");
 		
-		Address1 a = new Address1();
-		Set<ConstraintViolation<Address1>> violations = val.validate(a, ValidationSequence.class);
-		for (ConstraintViolation<Address1> v: violations) {
+		Address2 a = new Address2();
+		Set<ConstraintViolation<Address2>> violations = val.validate(a);
+		for (ConstraintViolation<Address2> v: violations) {
 			log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
 		}
 		
@@ -50,11 +48,11 @@ public class GroupSequenceTest {
 	public void testDefaultSomeError() {
 		log.debug("*** testDefaultSomeError ***");
 		
-		Address1 a = new Address1()
+		Address2 a = new Address2()
 		    .setStreet("$$%%^&#$$$$$$$$$$$$$$$$")
 		    .setState("BIIIIIIIIIIIIIIIIIIIIG");
-		Set<ConstraintViolation<Address1>> violations = val.validate(a, ValidationSequence.class);
-		for (ConstraintViolation<Address1> v: violations) {
+		Set<ConstraintViolation<Address2>> violations = val.validate(a);
+		for (ConstraintViolation<Address2> v: violations) {
 			log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
 		}
 		
@@ -70,13 +68,13 @@ public class GroupSequenceTest {
 	public void testOneDBError() {
 		log.debug("*** testOneDBError ***");
 		
-		Address1 a = new Address1()
+		Address2 a = new Address2()
 		    .setStreet("1600$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 		    .setCity("Washington")
 		    .setState("DC")
 		    .setZip("20500");
-		Set<ConstraintViolation<Address1>> violations = val.validate(a, ValidationSequence.class);
-		for (ConstraintViolation<Address1> v: violations) {
+		Set<ConstraintViolation<Address2>> violations = val.validate(a);
+		for (ConstraintViolation<Address2> v: violations) {
 			log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
 		}
 		
@@ -92,13 +90,13 @@ public class GroupSequenceTest {
 	public void testDataError() {
 		log.debug("*** testDataError ***");
 		
-		Address1 a = new Address1()
+		Address2 a = new Address2()
 		    .setStreet("1600$")
 		    .setCity("Washington")
 		    .setState("DC")
 		    .setZip("20500");
-		Set<ConstraintViolation<Address1>> violations = val.validate(a, ValidationSequence.class);
-		for (ConstraintViolation<Address1> v: violations) {
+		Set<ConstraintViolation<Address2>> violations = val.validate(a);
+		for (ConstraintViolation<Address2> v: violations) {
 			log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
 		}
 		
@@ -110,13 +108,13 @@ public class GroupSequenceTest {
 	public void testSuccess() {
 		log.debug("*** testSuccess ***");
 		
-		Address1 a = new Address1()
+		Address2 a = new Address2()
 		    .setStreet("1600")
 		    .setCity("Washington")
 		    .setState("DC")
 		    .setZip("20500");
-		Set<ConstraintViolation<Address1>> violations = val.validate(a, ValidationSequence.class);
-		for (ConstraintViolation<Address1> v: violations) {
+		Set<ConstraintViolation<Address2>> violations = val.validate(a);
+		for (ConstraintViolation<Address2> v: violations) {
 			log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
 		}
 		

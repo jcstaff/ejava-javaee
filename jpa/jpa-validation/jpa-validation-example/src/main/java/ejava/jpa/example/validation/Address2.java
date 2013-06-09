@@ -17,8 +17,8 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name="VALIDATION_ADDRESS")
 //sequence of checks which will stop on failure before advancing to next group
-@GroupSequence({Address.class, DBChecks.class, DataChecks.class})
-public class Address {
+@GroupSequence({Address2.class, DBChecks.class, DataChecks.class})
+public class Address2 {
 	@Id @GeneratedValue
 	private int id;
 		
@@ -54,25 +54,25 @@ public class Address {
 	public int getId() { return id; }
 
 	public String getStreet() { return street; }
-	public Address setStreet(String street) {
+	public Address2 setStreet(String street) {
 		this.street = street;
 		return this;
 	}
 
 	public String getCity() { return city; }
-	public Address setCity(String city) {
+	public Address2 setCity(String city) {
 		this.city = city;
 		return this;
 	}
 
 	public String getState() { return state; }
-	public Address setState(String state) {
+	public Address2 setState(String state) {
 		this.state = state;
 		return this;
 	}
 
 	public String getZip() { return zip; }
-	public Address setZip(String zip) {
+	public Address2 setZip(String zip) {
 		this.zip = zip;
 		return this;
 	}
