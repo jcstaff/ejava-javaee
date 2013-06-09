@@ -127,7 +127,7 @@ public class PredefinedValidationTest {
 		}
 		
 		log.debug("invalid named-sized person=" + p);
-		assertEquals("unexpected number of violations", 2, violations.size());
+		assertEquals("unexpected number of violations", 3, violations.size());
 	}
 	
 	/**

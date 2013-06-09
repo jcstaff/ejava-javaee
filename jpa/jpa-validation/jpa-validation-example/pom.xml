@@ -9,7 +9,7 @@
 
     <artifactId>jpa-validation-example</artifactId>
 
-    <name>jpa-validation-example</name>
+    <name>JPA Validation::Examples</name>
     <description>
         This project provides a starting point for developing JPA modules.
     </description>
@@ -122,33 +122,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>webdev</id>
-            <name>ejava webdev repository</name>
-            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>webdev-snapshot</id>
-            <name>ejava webdev snapshot repository</name>
-            <url>http://webdev.apl.jhu.edu/~jcs/maven2-snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <profiles>
         <profile>
             <id>testing</id>
@@ -164,6 +137,21 @@
                         <!-- runs schema against the DB -->
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>sql-maven-plugin</artifactId>        
+
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.h2database</groupId>
+                                <artifactId>h2</artifactId>
+                                <version>${h2db.version}</version>
+                            </dependency>
+                        </dependencies>
+                    
+                        <configuration>
+                            <username>${jdbc.user}</username>
+                            <password>${jdbc.password}</password>
+                            <driver>${jdbc.driver}</driver>
+                            <url>${jdbc.url}</url>          
+                        </configuration>
                     
                         <executions>
                             <execution>
