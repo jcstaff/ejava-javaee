@@ -44,10 +44,11 @@ public class CustomValidatorTest {
 
 	@Test
 	public void testMinAgeInValid() {
-		log.info("*** testMinAge ***");
+		log.info("*** testMinAgeInvalid ***");
 		
 		Calendar fifteen = new GregorianCalendar();
-		fifteen.add(Calendar.DAY_OF_YEAR, -2);
+		fifteen.add(Calendar.YEAR, -16);
+		fifteen.add(Calendar.DAY_OF_YEAR, 2);
 		
 		Person p = new Person()
 			.setFirstName("Bob")
@@ -56,11 +57,27 @@ public class CustomValidatorTest {
 	
 		Set<ConstraintViolation<Person>> violations = val.validate(p, Drivers.class);
 		for (ConstraintViolation<Person> v : violations) {
-			log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+			log.debug(v.getPropertyPath() + ":" + v.getInvalidValue() + ", " + v.getMessage());
 		}
 
 		log.debug(p + ", violations=" + violations);
 		assertFalse("valid driver", violations.isEmpty());
 	}
 
+	@Test
+	public void testComposite() {
+		log.info("*** testComposite ***");
+		
+		Person p = new Person()
+			.setFirstName("Bob")
+			.setLastName("Smithhhhhhhhhhhhhhhhhh$%$%$$$$$$$$$$$$$$$$");
+	
+		Set<ConstraintViolation<Person>> violations = val.validate(p);
+		for (ConstraintViolation<Person> v : violations) {
+			log.debug(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+		}
+
+		log.debug(p + ", violations=" + violations);
+		assertFalse("valid driver", violations.isEmpty());
+	}
 }

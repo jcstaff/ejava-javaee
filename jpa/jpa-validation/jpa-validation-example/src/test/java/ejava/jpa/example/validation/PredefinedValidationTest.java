@@ -62,7 +62,7 @@ public class PredefinedValidationTest {
 		}
 		
 		log.debug("invalid null-named person=" + p);
-		assertEquals("unexpected number of violations", 3, violations.size());
+		assertEquals("unexpected number of violations", 4, violations.size());
 	}
 	
 	/**
@@ -137,10 +137,14 @@ public class PredefinedValidationTest {
 	public void testGroups() {
 		log.info("*** testGroups ***");
 		
+		Calendar seventeen = new GregorianCalendar();
+		seventeen.add(Calendar.YEAR, -17);
+		
 		Person p = new Person()
 			.setFirstName("Bob")
 			.setLastName("Smith")
-			.setEmail("bob.smith@gmail.com");
+			.setEmail("bob.smith@gmail.com")
+			.setBirthDate(seventeen.getTime());
 		
 		Set<ConstraintViolation<Person>> validPerson = val.validate(p, Default.class);
 		Set<ConstraintViolation<Person>> validDriver = val.validate(p, Drivers.class);
@@ -155,8 +159,8 @@ public class PredefinedValidationTest {
 		log.debug("validPOC=" + validPOC);
 		
 		assertTrue("not validPerson", validPerson.isEmpty());
-		assertFalse("validDriver", validDriver.isEmpty());
-		assertTrue("not validPerson", validPOC.isEmpty());
+		assertTrue("validDriver", validDriver.isEmpty());
+		assertFalse("not validPOC", validPOC.isEmpty());
 	}
 	
 }

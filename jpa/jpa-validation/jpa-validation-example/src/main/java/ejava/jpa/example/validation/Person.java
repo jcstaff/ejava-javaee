@@ -21,21 +21,26 @@ public class Person {
 	private int id;
 	
 	@Column(name="FIRST_NAME", length=12, nullable=false)
-	@NotNull(groups={POCs.class, Drivers.class})
-	@Size(min=1,max=12)
-	@Pattern(regexp="^[a-zA-Z\\ \\-]+$")
+	//@NotNull
+	//@Size(min=1,max=12)
+	//@Pattern(regexp="^[a-zA-Z\\ \\-]+$", message="invalid characters in name")
+	@ValidName(min=1, max=12, regexp="^[a-zA-Z\\ \\-]+$", message="invalid first name")
 	private String firstName;
 	
 	@Column(name="LAST_NAME", length=20, nullable=false)
-	@NotNull(groups={POCs.class, Drivers.class})
-	@Size(min=1,max=20)
-	@Pattern(regexp="^[a-zA-Z\\ \\-]+$")
+	//@NotNull
+	//@Size(min=1,max=20)
+	//@Pattern(regexp="^[a-zA-Z\\ \\-]+$", message="invalid characters in name")
+	@ValidName(min=1, max=20, regexp="^[a-zA-Z\\ \\-]+$", message="invalid last name")
 	private String lastName;
 	
 	@Temporal(TemporalType.DATE)
-	@NotNull(groups=Drivers.class)
+	@NotNull(groups={Drivers.class, POCs.class})
 	@Past(groups=Drivers.class)
-	@MinAge(minAge=16, groups=Drivers.class)
+	@MinAge.List({
+		@MinAge(age=18, groups=POCs.class),
+		@MinAge(age=16, groups=Drivers.class)
+	})
 	private Date birthDate;
 	
 	@Column(name="EMAIL", length=50)
