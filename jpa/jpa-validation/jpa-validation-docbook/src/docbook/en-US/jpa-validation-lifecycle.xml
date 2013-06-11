@@ -1,0 +1,85 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-validation-chapter">
+    <title>JPA Persistence Lifecycle</title>
+    <para>Provide access to persistence lifecycle events</para>
+        
+    <section id="jpa-validation-callbacks">
+        <title>Callbacks</title>
+        <para>Persistence lifecycle events provided to class methods</para>
+<programlisting language="java"><![CDATA[
+@Entity 
+@Table(name="ORMLISTEN_PERSON")
+public class Person {
+    @Id @GeneratedValue 
+    private long id;
+    private String name;
+    @OneToOne(mappedBy="person", optional=true, cascade=CascadeType.ALL)
+    private Residence residence;
+    
+    @PrePersist public void prePersist() {
+    }
+    @PostPersist public void postPersist() {
+    }
+    @PostLoad public void postLoad() {
+    }
+    @PreUpdate public void preUpdate() {
+    }
+    @PostUpdate public void postUpdate() {
+    }
+    @PreRemove public void preRemove() {
+    }
+    @PostRemove public void postRemove() {
+    }]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Could be used to log or validate instance at certain stages of lifecycle</para></listitem>
+            <listitem><para>JPA prohibits calling EntityManager within callback methods</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jpa-validation-listeners">
+        <title>Listeners</title>
+        <para>Persistence lifecycle events provided to external class</para>
+  
+<programlisting language="java"><![CDATA[
+@Entity 
+@Table(name="ORMLISTEN_PERSON")
+@EntityListeners(Listener.class)
+public class Person {]]></programlisting>                        
+  
+<programlisting language="java"><![CDATA[
+public class Listener {
+    @PrePersist public void prePersist(Object entity) {
+    }
+    @PostPersist public void postPersist(Object entity) {
+    }
+    @PostLoad public void postLoad(Object entity) {
+    }
+    @PreUpdate public void preUpdate(Object entity) {
+    }
+    @PostUpdate public void postUpdate(Object entity) {
+    }
+    @PreRemove public void preRemove(Object entity) {
+    }
+    @PostRemove public void postRemove(Object entity) {
+    }
+}
+]]></programlisting>                        
+        <itemizedlist>
+            <listitem><para>Same Listener class may listen to multiple entity types</para></listitem>
+            <listitem><para>Good for when Listener has specific purpose that is type-agnostic</para></listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="jpa-validation-lifecycle-summary">
+        <title>Summary</title>
+        <itemizedlist>
+            <listitem><para>Access to stages of persistence lifecycle</para></listitem>
+            <listitem><para>@PrePersist, @PreUpdate, and @PreRemove good candidates for validation</para></listitem>
+            <listitem><para>JPA provides direct support for Validation API and these events</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  
