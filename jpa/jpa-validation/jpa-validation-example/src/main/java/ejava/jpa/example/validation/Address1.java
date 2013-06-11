@@ -1,7 +1,6 @@
 package ejava.jpa.example.validation;
 
 import javax.persistence.*;
-import javax.validation.GroupSequence;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;

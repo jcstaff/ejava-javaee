@@ -1,14 +1,11 @@
 package ejava.jpa.example.validation;
 
 import java.util.Calendar;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
