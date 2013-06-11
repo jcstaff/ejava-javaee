@@ -3,12 +3,10 @@
 
 <chapter id="jpa-validation-maven">
     <title>Validation API Build/Maven Aspects</title>
-    <para></para>
         
     <section id="jpa-validation-maven-dependencies">
-        <title>Adding POM dependencies</title>
-        <para></para>
-  
+        <title>Adding POM Dependencies</title>
+
         <itemizedlist>
             <listitem><para>API Dependency</para>
 <programlisting language="xml"><![CDATA[
@@ -19,9 +17,8 @@
     <scope>compile</scope>
 </dependency>]]></programlisting>                        
             </listitem>
-
             <listitem><para>Implementation Dependency (includes API dependency)</para>
-<programlisting language=""><![CDATA[
+<programlisting language="xml"><![CDATA[
 <dependency>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator</artifactId>
@@ -31,7 +28,7 @@
             </listitem>
 
             <listitem><para>Hibernate Implementation Dependency for @Pattern constraints</para>
-<programlisting language=""><![CDATA[
+<programlisting language="xml"><![CDATA[
 <dependency>
     <groupId>javax.el</groupId>
     <artifactId>javax.el-api</artifactId>
@@ -45,36 +42,36 @@
     <scope>test</scope>
 </dependency>]]></programlisting>                        
             </listitem>
-
         </itemizedlist>
         
         <para></para>
     </section>
 
-    <section id="jpa-validation-maven-section2">
-        <title>jpa-validation Section 2</title>
-        <para></para>
+    <section id="jpa-validation-maven-plugins">
+        <title>Adding Plugin Dependencies</title>
   
         <itemizedlist>
-
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+            <listitem><para>Add validator to schema generation pluginManagement</para>
+<programlisting language="xml"><![CDATA[
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>hibernate3-maven-plugin</artifactId>
+    <version>${hibernate3-maven-plugin.version}</version>
+    <extensions>true</extensions>
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+        </dependency>
+    </dependencies>]]></programlisting>                        
             </listitem>
-
         </itemizedlist>
-        
-        <para></para>
     </section>
-
-
-    <section id="jpa-validation-maven-summary">
-       <title>Summary</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
-    </section>    
 </chapter>
   
