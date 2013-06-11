@@ -11,21 +11,41 @@
             <listitem><para>Independent of other APIs (e.g., persistence, web-tier)</para></listitem>
             <listitem><para>Available server-side and client-side</para></listitem>
             <listitem><para>Provide validation metadata thru annotations and XML descriptors</para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
         </itemizedlist>
     </section>
 
 
     <section id="jpa-validation-core-constraints">
         <title>Constraints</title>
-        <para></para>
+        <para>Applied to FIELDs, METHODs, TYPEs, etc.</para>
   
         <section id="jpa-validation-core-constraints-annotation">
             <title>Annotating Class</title>
             <itemizedlist>
                 <listitem><para></para>
-<programlisting language=""><![CDATA[
+<programlisting language="java"><![CDATA[
+import javax.validation.constraints.*;
+
+public class Person {
+    private int id;
+    
+    @NotNull
+    @Size(min=1,max=12)
+    @Pattern(regexp="^[a-zA-Z\\ \\-]+$", message="invalid characters in name")
+    private String firstName;
+    
+    @NotNull
+    @Size(min=1,max=20)
+    @Pattern(regexp="^[a-zA-Z\\ \\-]+$", message="invalid characters in name")
+    private String lastName;
+    
+    @Past
+    private Date birthDate;
+    
+    @Column(name="EMAIL", length=50)
+    @Size(min=7,max=50)
+    @Pattern(regexp="^.+@.+\\..+$")
+    private String email;
 ]]></programlisting>                        
                 </listitem>
             </itemizedlist>
@@ -35,13 +55,30 @@
             <title>Validating Instances</title>
             <itemizedlist>
                 <listitem><para></para>
-<programlisting language=""><![CDATA[
+<programlisting language="java"><![CDATA[
+Person p = new Person()
+    .setFirstName("Bob2")
+    .setLastName("Smith")
+    .setEmail("bob2");
+
+Set<ConstraintViolation<Person>> violations = val.validate(p);
+for (ConstraintViolation<Person> v : violations) {
+    log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+}
+
+assertEquals("unexpected number of violations", 3, violations.size());
 ]]></programlisting>                        
+<programlisting language=""><![CDATA[
+ -email:bob2 size must be between 7 and 50
+ -email:bob2 must match "^.+@.+\..+$"
+ -firstName:Bob2 invalid first name]]></programlisting>                        
                 </listitem>
             </itemizedlist>
         </section>
-
     </section>
+
+
+
 
     <section id="jpa-validation-core-groups">
         <title>Constraint Groups</title>
@@ -49,9 +86,9 @@
         <section id="jpa-validation-core-groups-what">
             <title>Uses</title>
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Logical grouping of constraints</para></listitem>
+                <listitem><para>Used to define which constraints and activated when</para></listitem>
+                <listitem><para>Can be used to define sequences -- with short-circuit</para></listitem>
             </itemizedlist>
         </section>
 
@@ -73,22 +110,38 @@ public interface POCs extends Default {}
 
         <section id="jpa-validation-core-groups-applied">
             <title>Groups Applied to Classes</title>
-            <itemizedlist>
-                <listitem><para></para>
 <programlisting language=""><![CDATA[
+public class Person {
+...
+    @NotNull(groups={Drivers.class, POCs.class})
+    @Past(groups=Drivers.class)
+    private Date birthDate;
+    
+    @NotNull(groups=POCs.class)
+    @Size(min=7,max=50)
+    @Pattern(regexp="^.+@.+\\..+$")
+    private String email;
 ]]></programlisting>                        
-                </listitem>
-            </itemizedlist>
         </section>
 
         <section id="jpa-validation-core-groups-validation">
             <title>Validating with Groups</title>
-            <itemizedlist>
-                <listitem><para></para>
+            <para>Validate named groups of constraints</para>
 <programlisting language=""><![CDATA[
+        Person p = new Person()
+            .setFirstName("Bob")
+            .setLastName("Smith")
+            .setEmail("bob.smith@gmail.com")
+            .setBirthDate(seventeen.getTime());
+        
+        Set<ConstraintViolation<Person>> validPerson = val.validate(p, Default.class);
+        Set<ConstraintViolation<Person>> validDriver = val.validate(p, Drivers.class);
+        Set<ConstraintViolation<Person>> validPOC = val.validate(p, POCs.class);
+        
+        assertTrue("not validPerson", validPerson.isEmpty());
+        assertTrue("validDriver", validDriver.isEmpty());
+        assertFalse("not validPOC", validPOC.isEmpty());
 ]]></programlisting>                        
-                </listitem>
-            </itemizedlist>
         </section>
 
 
@@ -191,10 +244,11 @@ public class MinAgeValidator implements ConstraintValidator<MinAge, Date>{
     @Override
     public boolean isValid(Date date, ConstraintValidatorContext ctx) {
         if (date==null) { return true; }
-
+        //get today's date
         Calendar latestBirthDate = new GregorianCalendar();
         latestBirthDate.add(Calendar.YEAR, -1*minAge);
         
+        //get calendate date of object
         Calendar birthDate = new GregorianCalendar();
         birthDate.setTime(date);
 
@@ -209,17 +263,15 @@ public class MinAgeValidator implements ConstraintValidator<MinAge, Date>{
             return true;
         }
     }
+    
+    private int getAge(Calendar birth) {
+    ...
 ...
 }]]></programlisting>                        
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>
         </section>
 
         <section id="jpa-validation-core-custom-applied">
-            <title>Applied to Class</title>
+            <title>Annotating Class</title>
 <programlisting language="java"><![CDATA[
 public class Person {
 ...
@@ -230,11 +282,6 @@ public class Person {
     })
     private Date birthDate;
 ...]]></programlisting>                        
-            <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>
         </section>
 
         <section id="jpa-validation-core-custom-validation">
@@ -305,14 +352,11 @@ public class Person {
     @ValidName(min=1, max=20, regexp="^[a-zA-Z\\ \\-]+$", message="invalid last name")
     private String lastName;
 ]]></programlisting>                        
-            <itemizedlist>
-                <listitem><para>Would like to replace with something simpler</para></listitem>
-            </itemizedlist>
         </section>
 
 
         <section id="jpa-validation-core-composite-annotation">
-            <title></title>
+            <title>Composite Annotation</title>
 <programlisting language="java"><![CDATA[
 ...
 /**
@@ -379,6 +423,7 @@ for (ConstraintViolation<Person> v : violations) {
 @NotNull
 @Size
 @Pattern(regexp="")
+
 @ReportAsSingleViolation
 
 ...
@@ -549,7 +594,7 @@ public class Purchase {
         <section id="jpa-validation-core-bean">
             <title>POJO Bean Class</title>
             <para>Constraints need not be defined within bean class</para>
-<programlisting language="xml"><![CDATA[
+<programlisting language="java"><![CDATA[
 public class Book {
     private int id;
     
@@ -608,9 +653,11 @@ public class Book {
     <section id="jpa-validation-core-summary">
        <title>Summary</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Validation API provides framework for bean validation</para></listitem>
+            <listitem><para>Independent of other frameworks (e.g., JPA, JAXB)</para></listitem>
+            <listitem><para>Validation groups</para></listitem>
+            <listitem><para>Validation for appropriate levels (client, service, DAO)</para></listitem>
+            <listitem><para>Integrates with other frameworks</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>

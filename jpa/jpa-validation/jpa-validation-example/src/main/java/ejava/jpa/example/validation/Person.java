@@ -1,6 +1,7 @@
 package ejava.jpa.example.validation;
 
 import java.text.DateFormat;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
