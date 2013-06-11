@@ -3,13 +3,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
 
-    <!-- this persistence.xml file is hosted within the src/test 
-         directory and is meant to test the entity mapping designs
-         and then be replaced by downstream persistence units that
-         are more specific to the deployment environment. Since it 
-         is not hosted in the src/main tree - the individual entities
-         must be individually named below for schema generation to 
-         work correctly -->
     <persistence-unit name="jpa-validation-example-test">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 

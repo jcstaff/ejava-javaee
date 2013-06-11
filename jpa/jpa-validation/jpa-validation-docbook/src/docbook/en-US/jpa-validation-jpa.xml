@@ -5,46 +5,137 @@
     <title>Validation API/JPA Integration</title>
     <para></para>
         
-    <section id="jpa-validation-jpa-x">
-        <title></title>
-        <para></para>
+    <section id="jpa-validation-jpa-entity">
+        <title>Entity Class</title>
+        <para>JPA and Validation API annotations can be mixed together</para>
   
-        <itemizedlist>
-
-            <listitem><para></para>
 <programlisting language=""><![CDATA[
+@Entity
+@Table(name="VALIDATION_PERSON")
+public class Person {
+    @Id @GeneratedValue
+    private int id;
+    
+    @Column(name="FIRST_NAME", length=12, nullable=false)
+    @ValidName(min=1, max=12, regexp="^[a-zA-Z\\ \\-]+$", message="invalid first name")
+    private String firstName;
+    
+    @Column(name="LAST_NAME", length=20, nullable=false)
+    @ValidName(min=1, max=20, regexp="^[a-zA-Z\\ \\-]+$", message="invalid last name")
+    private String lastName;
+    
+    @Temporal(TemporalType.DATE)
+    @NotNull(groups={Drivers.class, POCs.class})
+    @Past(groups=Drivers.class)
+    @MinAge.List({
+        @MinAge(age=18, groups=POCs.class),
+        @MinAge(age=16, groups=Drivers.class)
+    })
+    private Date birthDate;
+    
+    @Column(name="EMAIL", length=50)
+    @NotNull(groups=POCs.class)
+    @Size(min=7,max=50)
+    @Pattern(regexp="^.+@.+\\..+$")
+    private String email;
+...
 ]]></programlisting>                        
-            </listitem>
-
-        </itemizedlist>
-        
-        <para></para>
     </section>
 
         
-    <section id="jpa-validation-jpa-">
-        <title></title>
-        <para></para>
-  
+    <section id="jpa-validation-jpa-persistencexml">
+        <title>Persistence Unit</title>
+<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence ...
+
+    <persistence-unit name="jpa-validation-example-test">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+        <validation-mode>AUTO</validation-mode>
+        <properties>
+            <property name="javax.persistence.validation.group.pre-persist" 
+                      value="ejava.jpa.example.validation.Drivers"/>
+            <property name="javax.persistence.validation.group.pre-update" 
+                      value="ejava.jpa.example.validation.Drivers"/>
+        </properties>
+    </persistence-unit>            
+</persistence>]]></programlisting>
         <itemizedlist>
-
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+            <listitem><para>validation-mode</para>
+                <itemizedlist>
+                    <listitem><para>AUTO - enable if validator present in classpath</para></listitem>
+                    <listitem><para>CALLBACK - turn on and report error if no validator found in classpath</para></listitem>
+                    <listitem><para>NONE - turn off</para></listitem>
+                    <listitem><para>Can also be set using javax.persistence.validation.mode property</para></listitem>
+                </itemizedlist>
             </listitem>
-
+            <listitem><para>validation groups</para>
+                <itemizedlist>
+                    <listitem><para>javax.persistence.validation.group.pre-persist - defines groups to call during @PrePersist phase</para></listitem>
+                    <listitem><para>javax.persistence.validation.group.pre-update - defines groups to call during @PreUpdate phase</para></listitem>
+                    <listitem><para>javax.persistence.validation.group.pre-remove - defines groups to call during @PreRemove phase</para></listitem>
+                    <listitem><para>default behavior</para>
+                        <itemizedlist>
+                            <listitem><para>Default group for @PrePersist and @PreUpdate</para></listitem>
+                            <listitem><para>Nothing for @PreRemove</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
         </itemizedlist>
+                        
+    </section>
         
-        <para></para>
+    <section id="jpa-validation-jpa-validation">
+        <title>Validation</title>
+<programlisting language="java"><![CDATA[
+Person p = new Person()
+    .setFirstName("Bob")
+    .setLastName("Smith")
+    .setBirthDate(new Date());
+try {
+    em.persist(p);
+} catch (ConstraintViolationException ex) {
+    log.info("caught expected exception:" + ex);
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+ -caught expected exception:javax.validation.ConstraintViolationException: 
+     Validation failed for classes [ejava.jpa.example.validation.Person] 
+     during persist time for groups [ejava.jpa.example.validation.Drivers, ]
+List of constraint violations:[
+    ConstraintViolationImpl{
+        interpolatedMessage='too young', 
+        propertyPath=birthDate, 
+        rootBeanClass=class ejava.jpa.example.validation.Person, 
+        messageTemplate='too young'}
+    ConstraintViolationImpl{
+        interpolatedMessage='0 is younger than minimum 16', 
+        propertyPath=birthDate, 
+        rootBeanClass=class ejava.jpa.example.validation.Person, 
+        messageTemplate='0 is younger than minimum 16'}
+]]]></programlisting>                        
+    </section>
+
+        
+    <section id="jpa-validation-jpa-rules">
+        <title>Validation with JPA</title>
+        
+        <itemizedlist>
+            <listitem><para>Validation is not automatically cascaded (@Valid) across relationships</para></listitem>
+            <listitem><para>Validation will occur for related entity during its appropriate lifecycle phases</para></listitem>
+            <listitem><para>Groups could be divided into client, service, DAO-insert, DAO-update, DAO-delete</para></listitem>
+            <listitem><para>Permits errors to be automatically detected without transaction going into rollback state</para></listitem>
+        </itemizedlist>
     </section>
 
 
     <section id="jpa-validation-jpa-summary">
        <title>Summary</title>
        <orderedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Validation API is independent of JPA specification</para></listitem>
+            <listitem><para>JPA provides specific hooks to integrate Validation API</para></listitem>
        </orderedlist>
     </section>    
 </chapter>
