@@ -1,0 +1,111 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-serverside-resources">
+    <title>Server-side Resources</title>
+    <para></para>
+        
+    <section id="jpa-serverside-resources-datasource">
+        <title>SQL DataSource</title>
+        <itemizedlist>
+            <listitem><para>Physical connections to database are placed into a pool</para></listitem>
+            <listitem><para>Logical connections are borrowed and returned from the pool</para></listitem>
+        </itemizedlist>
+  
+        <itemizedlist>
+            <listitem><para>javax.sql.DataSource configured into server through admin capabilities</para>
+<programlisting language="xml"><![CDATA[
+<subsystem xmlns="urn:jboss:domain:datasources:1.0">
+    <datasources>
+        <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+            <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+            <driver>h2</driver>
+            <security>
+                <user-name>sa</user-name>
+                <password>sa</password>
+            </security>
+        </datasource>
+        <drivers>
+            <driver name="h2" module="com.h2database.h2">
+                <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+            </driver>
+        </drivers>
+    </datasources>
+</subsystem>]]></programlisting>                        
+            </listitem>
+
+
+            <listitem><para>Persistence Unit configured to use DataSource</para>
+<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence ...>
+
+    <persistence-unit name="webejb-customer">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        
+        <properties>
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
+        </properties>
+    </persistence-unit>        
+    
+</persistence>
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+    </section>
+
+
+    <section id="jpa-serverside-resources-">
+        <title>JAR Files</title>
+        <para>Standard deployments permit portable reference to entity jar-files</para>
+  
+        <itemizedlist>
+            <listitem><para>Entity JAR files will be in known location within server-side deployment</para>
+<programlisting language=""><![CDATA[
+EAR
+|-- ejbsessionBankEJB.jar
+|-- ejbsessionBankWAR-3.0.2013.1-SNAPSHOT.war
+|-- lib
+|   |-- ejava-util-3.0.2013.1-SNAPSHOT.jar
+|   `-- ejbsessionBankImpl-3.0.2013.1-SNAPSHOT.jar
+`-- META-INF
+    `-- application.xml
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Can make portable reference to jar-file rather than enumerate each entity class</para>
+<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence ...>
+
+    <persistence-unit name="ejbsessionbank">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>        
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        
+        <jar-file>lib/ejbsessionBankImpl-${project.version}.jar</jar-file>
+        
+        <properties>
+            <property name="hibernate.dialect" value="${hibernate.dialect}"/>
+        </properties>
+    </persistence-unit>        
+    
+</persistence>
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+    </section>
+
+
+    <section id="jpa-serverside-resources-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para>Replace JDBC ConnectionManager properties with sharable DataSource reference</para></listitem>
+            <listitem><para>Replace entity class enumerations with jar-file reference</para></listitem>
+        </itemizedlist>       
+    </section>    
+</chapter>
+  
