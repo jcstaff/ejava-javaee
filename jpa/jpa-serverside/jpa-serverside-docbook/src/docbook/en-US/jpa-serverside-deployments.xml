@@ -1,0 +1,144 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-serverside-deployments">
+    <title>Server-side Deployments</title>
+        
+    <section id="jpa-serverside-chapter-ejbear">
+        <title>EJB/EAR Deployment</title>
+        <para>Traditional approach</para>
+  
+        <itemizedlist>
+
+            <listitem><para>Entity classes and XML mapping files packaged within jar-file</para>
+<programlisting language=""><![CDATA[
+$ jar tf lib/ejbsessionBankImpl-3.0.2013.1-SNAPSHOT.jar 
+
+ejava/examples/ejbsessionbank/bo/Ledger.class
+ejava/examples/ejbsessionbank/bo/Account.class
+ejava/examples/ejbsessionbank/bo/Owner.class
+META-INF/orm.xml]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>persistence.xml packaged with EJB module</para>
+<programlisting language=""><![CDATA[
+$ jar tf ejbsessionBankEJB.jar 
+
+ejava/examples/ejbsessionbank/ejb/StatsLocal.class
+ejava/examples/ejbsessionbank/ejb/TellerLocal.class
+ejava/examples/ejbsessionbank/ejb/Stats.class
+ejava/examples/ejbsessionbank/ejb/TellerRemote.class
+ejava/examples/ejbsessionbank/ejb/StatsRemote.class
+ejava/examples/ejbsessionbank/ejb/TellerEJB.class
+ejava/examples/ejbsessionbank/ejb/StatsEJB.class
+ejava/examples/ejbsessionbank/dto/OwnerDTO.class
+META-INF/persistence.xml
+META-INF/ejb-jar.xml]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Entity jar-file and EJB module packaged within EAR</para>
+<programlisting language=""><![CDATA[
+|-- ejbsessionBankEJB.jar
+|-- ejbsessionBankWAR-3.0.2013.1-SNAPSHOT.war
+|-- lib
+|   |-- ejava-util-3.0.2013.1-SNAPSHOT.jar
+|   `-- ejbsessionBankImpl-3.0.2013.1-SNAPSHOT.jar
+`-- META-INF
+    `-- application.xml
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+        
+        <para></para>
+    </section>
+
+    <section id="jpa-serversideside-deployments-war">
+        <title>WAR Deployment</title>
+        <para>Traditional EJB-less approach</para>
+  
+        <itemizedlist>
+
+            <listitem><para>persistence.xml placed in WEB-INF/classes/META-INF or within WEB-INF/lib/(archive)/META-INF</para>
+<programlisting language=""><![CDATA[
+jaxrsInventoryWAR                                                                                                                                                                             
+|-- index.html                                                                                                                                                                                
+|-- META-INF                                                                                                                                                                                  
+`-- WEB-INF                                                                                                                                                                                   
+    |-- beans.xml                                                                                                                                                                             
+    |-- classes                                                                                                                                                                               
+    |   |-- ejava                                                                                                                                                                             
+    |   |   `-- examples                                                                                                                                                                      
+    |   |       `-- ejbwar                                                                                                                                                                    
+    |   |           `-- inventory
+    |   |               |-- bo
+    |   |               |   |-- Categories.class
+    |   |               |   |-- Category.class
+    |   |               |   |-- InventoryRepresentation.class
+    |   |               |   |-- Product.class
+    |   |               |   `-- Products.class
+...
+    |   `-- META-INF
+    |       `-- persistence.xml
+    `-- web.xml
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+        
+        <para></para>
+    </section>
+
+
+    <section id="jpa-serverside-deployments-ejbwar">
+        <title>EJB/WAR Deployment</title>
+        <para>Newer, flexible-deployment approach</para>
+  
+        <itemizedlist>
+
+            <listitem><para>EJB either exploded within WAR or packaged as JAR</para>
+<programlisting language=""><![CDATA[
+jaxrsInventoryWAR
+|-- index.html
+|-- META-INF
+`-- WEB-INF
+    |-- beans.xml
+    |-- classes
+    |   |-- ejava
+    |   |   `-- examples
+    |   |       `-- ejbwar
+    |   |           `-- inventory
+    |   |               |-- bo
+    |   |               |   |-- Categories.class
+    |   |               |   |-- Category.class
+    |   |               |   |-- InventoryRepresentation.class
+    |   |               |   |-- Product.class
+    |   |               |   `-- Products.class
+    |   |               |-- dao
+    |   |               |   |-- InventoryDAO.class
+    |   |               |   `-- InventoryDAOImpl.class
+    |   |               |-- ejb
+    |   |               |   |-- InventoryMgmtEJB.class
+    |   |               |   `-- InventoryResources.class
+...
+    |   `-- META-INF
+    |       `-- persistence.xml
+    |-- lib
+    |   `-- webejbCustomerEJB-3.0.2013.1-SNAPSHOT.jar
+    `-- web.xml
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+    </section>
+
+    <section id="jpa-serverside-deployments-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para>EJB/EAR (traditional) deployment</para></listitem>
+            <listitem><para>WAR (traditional non-EJB) deployment</para></listitem>
+            <listitem><para>EJB/WAR "flexible deployment"</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

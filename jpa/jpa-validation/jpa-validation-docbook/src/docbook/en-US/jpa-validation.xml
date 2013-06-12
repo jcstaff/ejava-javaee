@@ -1,0 +1,23 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-validation">
+    <bookinfo>
+        <title>Validation</title>
+        <subtitle></subtitle>
+    </bookinfo>
+    <preface id="jpa-validation-purpose">
+        <title>Purpose</title>
+        <itemizedlist>
+            <listitem><para>Explore capabilities of Validation API</para></listitem>
+            <listitem><para>Introduce the JPA persistence lifecycle</para></listitem>
+            <listitem><para>Demonstrate Validation API integration with JPA lifecycle</para></listitem>
+            <listitem><para>Integrate validation into Maven builds</para></listitem>
+        </itemizedlist>
+    </preface>
+
+    <xi:include href="jpa-validation-core.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-validation-lifecycle.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-validation-jpa.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-validation-maven.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

@@ -1,0 +1,664 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-validation-core">
+    <title>Core Validation API</title>
+    <para></para>
+        
+    <section id="jpa-validation-core-goals">
+        <title>Validation Goals</title>
+        <itemizedlist>
+            <listitem><para>Independent of other APIs (e.g., persistence, web-tier)</para></listitem>
+            <listitem><para>Available server-side and client-side</para></listitem>
+            <listitem><para>Provide validation metadata thru annotations and XML descriptors</para></listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="jpa-validation-core-constraints">
+        <title>Constraints</title>
+        <para>Applied to FIELDs, METHODs, TYPEs, etc.</para>
+  
+        <section id="jpa-validation-core-constraints-annotation">
+            <title>Annotating Class</title>
+            <itemizedlist>
+                <listitem><para></para>
+<programlisting language="java"><![CDATA[
+import javax.validation.constraints.*;
+
+public class Person {
+    private int id;
+    
+    @NotNull
+    @Size(min=1,max=12)
+    @Pattern(regexp="^[a-zA-Z\\ \\-]+$", message="invalid characters in name")
+    private String firstName;
+    
+    @NotNull
+    @Size(min=1,max=20)
+    @Pattern(regexp="^[a-zA-Z\\ \\-]+$", message="invalid characters in name")
+    private String lastName;
+    
+    @Past
+    private Date birthDate;
+    
+    @Column(name="EMAIL", length=50)
+    @Size(min=7,max=50)
+    @Pattern(regexp="^.+@.+\\..+$")
+    private String email;
+]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-validation-core-constraints-validation">
+            <title>Validating Instances</title>
+            <itemizedlist>
+                <listitem><para></para>
+<programlisting language="java"><![CDATA[
+Person p = new Person()
+    .setFirstName("Bob2")
+    .setLastName("Smith")
+    .setEmail("bob2");
+
+Set<ConstraintViolation<Person>> violations = val.validate(p);
+for (ConstraintViolation<Person> v : violations) {
+    log.info(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+}
+
+assertEquals("unexpected number of violations", 3, violations.size());
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+ -email:bob2 size must be between 7 and 50
+ -email:bob2 must match "^.+@.+\..+$"
+ -firstName:Bob2 invalid first name]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+
+
+
+    <section id="jpa-validation-core-groups">
+        <title>Constraint Groups</title>
+
+        <section id="jpa-validation-core-groups-what">
+            <title>Uses</title>
+            <itemizedlist>
+                <listitem><para>Logical grouping of constraints</para></listitem>
+                <listitem><para>Used to define which constraints and activated when</para></listitem>
+                <listitem><para>Can be used to define sequences -- with short-circuit</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-validation-core-groups-definition">
+            <title>Defining Groups</title>
+<programlisting language="java"><![CDATA[
+package ejava.jpa.example.validation;
+import javax.validation.groups.Default;
+
+public interface Drivers extends Default {}
+]]></programlisting>                        
+<programlisting language="java"><![CDATA[
+package ejava.jpa.example.validation;
+import javax.validation.groups.Default;
+
+public interface POCs extends Default {}
+]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-core-groups-applied">
+            <title>Groups Applied to Classes</title>
+<programlisting language=""><![CDATA[
+public class Person {
+...
+    @NotNull(groups={Drivers.class, POCs.class})
+    @Past(groups=Drivers.class)
+    private Date birthDate;
+    
+    @NotNull(groups=POCs.class)
+    @Size(min=7,max=50)
+    @Pattern(regexp="^.+@.+\\..+$")
+    private String email;
+]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-core-groups-validation">
+            <title>Validating with Groups</title>
+            <para>Validate named groups of constraints</para>
+<programlisting language=""><![CDATA[
+        Person p = new Person()
+            .setFirstName("Bob")
+            .setLastName("Smith")
+            .setEmail("bob.smith@gmail.com")
+            .setBirthDate(seventeen.getTime());
+        
+        Set<ConstraintViolation<Person>> validPerson = val.validate(p, Default.class);
+        Set<ConstraintViolation<Person>> validDriver = val.validate(p, Drivers.class);
+        Set<ConstraintViolation<Person>> validPOC = val.validate(p, POCs.class);
+        
+        assertTrue("not validPerson", validPerson.isEmpty());
+        assertTrue("validDriver", validDriver.isEmpty());
+        assertFalse("not validPOC", validPOC.isEmpty());
+]]></programlisting>                        
+        </section>
+
+
+    </section>
+
+    <section id="jpa-validation-core-custom">
+        <title>Custom Validators</title>
+
+        <section id="jpa-validation-core-custom-annotation">
+            <title>Annotation</title>
+<programlisting language="java"><![CDATA[
+package ejava.jpa.example.validation;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
+import javax.validation.Constraint;
+import javax.validation.Payload;
+
+/**
+ * Defines a constraint annotation for expressing a minimum age.
+ */
+@Documented
+@Constraint(validatedBy={MinAgeValidator.class})
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
+@Retention(RUNTIME)
+public @interface MinAge {
+    String message() default "too young";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default{};
+    int age() default 0;
+}]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>@Documented adds this spec to API spec of what it annotates</para></listitem>
+                <listitem><para>@Constraint defines validator class</para></listitem>
+                <listitem><para>@Target defines what can be assigned to</para>
+                    <itemizedlist>
+                        <listitem><para>FIELD - attributes</para></listitem>
+                        <listitem><para>METHOD - getters</para></listitem>
+                        <listitem><para>TYPE - classes</para></listitem>
+                        <listitem><para>ANNOTATION_TYPE - constraints composing other constraints</para></listitem>
+                        <listitem><para>PARAMETER - no support required by spec</para></listitem>
+                        <listitem><para>CONSTRUCTOR - no support required by spec</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Several reserved properties</para>
+                    <itemizedlist>
+                        <listitem><para>message() - used to create error message</para></listitem>
+                        <listitem><para>groups() - defines which groups constraint member of. Defaults to Default group</para></listitem>
+                        <listitem><para>payload() - defines association for constraint</para>
+                            <itemizedlist>
+                                <listitem><para></para>
+ <programlisting language=""><![CDATA[@MinAge(age=16, payload=Severity.Critical.class)
+private Date birthDate;]]></programlisting>                        
+ <programlisting language=""><![CDATA[@NotNull(payload=Severity.Warning.class)
+private Date voterRegistrationDate;]]></programlisting>                                                        
+                                </listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para>names starting with "valid" - reserved/not allowed</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Define use-specific properties (i.e., age)</para></listitem>
+                <listitem><para>Optionally define annotation for multiple annotations</para>
+<programlisting language="java"><![CDATA[
+public @interface MinAge {
+...
+    /**
+     * Defines an array of annotations so that more than one can be applied.
+     */
+    @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
+    @Retention(RUNTIME)
+    @Documented
+    public @interface List {
+        MinAge[] value();
+    } 
+}]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-validation-core-custom-validator">
+            <title>Validator</title>
+<programlisting language="java"><![CDATA[
+package ejava.jpa.example.validation;
+...
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+public class MinAgeValidator implements ConstraintValidator<MinAge, Date>{
+    int minAge;
+
+    @Override
+    public void initialize(MinAge constraint) {
+        this.minAge = constraint.age();
+    }
+
+    @Override
+    public boolean isValid(Date date, ConstraintValidatorContext ctx) {
+        if (date==null) { return true; }
+        //get today's date
+        Calendar latestBirthDate = new GregorianCalendar();
+        latestBirthDate.add(Calendar.YEAR, -1*minAge);
+        
+        //get calendate date of object
+        Calendar birthDate = new GregorianCalendar();
+        birthDate.setTime(date);
+
+        if (birthDate.after(latestBirthDate)) {
+            String errorMsg = String.format("%d is younger than minimum %d", 
+                    getAge(birthDate), 
+                    minAge);
+            ctx.buildConstraintViolationWithTemplate(errorMsg)
+                .addConstraintViolation();
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    private int getAge(Calendar birth) {
+    ...
+...
+}]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-core-custom-applied">
+            <title>Annotating Class</title>
+<programlisting language="java"><![CDATA[
+public class Person {
+...
+    @NotNull(groups={Drivers.class, POCs.class})
+    @MinAge.List({
+        @MinAge(age=18, groups=POCs.class),
+        @MinAge(age=16, groups=Drivers.class)
+    })
+    private Date birthDate;
+...]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-core-custom-validation">
+            <title>Example Usage</title>
+<programlisting language="java"><![CDATA[
+Calendar fifteen = new GregorianCalendar();
+fifteen.add(Calendar.YEAR, -16);
+fifteen.add(Calendar.DAY_OF_YEAR, 2);
+
+Person p = new Person()
+    .setFirstName("Bob")
+    .setLastName("Smith")
+    .setBirthDate(fifteen.getTime());
+
+Set<ConstraintViolation<Person>> violations = val.validate(p, Drivers.class);
+for (ConstraintViolation<Person> v : violations) {
+    log.debug(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+}
+...
+assertFalse("valid driver", violations.isEmpty());]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+<programlisting language=""><![CDATA[
+ -birthDate:Wed Jun 11 01:06:33 EDT 1997, 15 is younger than minimum 16
+ -birthDate:Wed Jun 11 01:06:33 EDT 1997, too young
+]]></programlisting>                        
+        </section>
+
+    </section>
+
+
+    <section id="jpa-validation-core-composite">
+        <title>Composite Constraints</title>
+        
+        <section id="jpa-validation-core-composite-multiple">
+            <title>Multiple Constraints</title>
+<programlisting language="java"><![CDATA[
+public class Person {
+...
+    @NotNull
+    @Size(min=1,max=12)
+    @Pattern(regexp="^[a-zA-Z\\ \\-]+$", message="invalid characters in name")
+    private String firstName;
+    
+    @NotNull
+    @Size(min=1,max=20)
+    @Pattern(regexp="^[a-zA-Z\\ \\-]+$", message="invalid characters in name")
+    private String lastName;
+]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Multiple constraints makeup complete definition</para></listitem>
+                <listitem><para>Verbose and tedious to define multiple times</para></listitem>
+            </itemizedlist>
+        </section>
+
+
+        <section id="jpa-validation-core-composite-single">
+            <title>Replace With Composite</title>
+<programlisting language="java"><![CDATA[
+public class Person {
+...
+    @ValidName(min=1, max=12, regexp="^[a-zA-Z\\ \\-]+$", message="invalid first name")
+    private String firstName;    
+...
+    @ValidName(min=1, max=20, regexp="^[a-zA-Z\\ \\-]+$", message="invalid last name")
+    private String lastName;
+]]></programlisting>                        
+        </section>
+
+
+        <section id="jpa-validation-core-composite-annotation">
+            <title>Composite Annotation</title>
+<programlisting language="java"><![CDATA[
+...
+/**
+ * Defines a validation composition
+ */
+@NotNull
+@Size
+@Pattern(regexp="")
+
+@Documented
+@Constraint(validatedBy={})
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
+@Retention(RUNTIME)
+public @interface ValidName {
+    String message() default "invalid name";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default{};
+    @OverridesAttribute(constraint=Size.class, name="min") int min() default 0;
+    @OverridesAttribute(constraint=Size.class, name="max") int max() default Integer.MAX_VALUE;
+    @OverridesAttribute(constraint=Pattern.class, name="regexp") String regexp() default ".*";
+
+    /**
+     * Defines an array of annotations so that more than one can be applied.
+     */
+    @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
+    @Retention(RUNTIME)
+    @Documented
+    public @interface List {
+        ValidName[] value();
+    } 
+}]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Annotate a composite constraint annotation with the building blocks</para></listitem>
+                <listitem><para>Define attribute overrides as appropriate</para></listitem>
+            </itemizedlist>
+        </section>
+
+
+
+        <section id="jpa-validation-core-composite-">
+            <title>Composed Validations Individually Reported</title>
+<programlisting language="java"><![CDATA[
+Person p = new Person()
+    .setFirstName("Bob")
+    .setLastName("Smithhhhhhhhhhhhhhhhhh$%$%$$$$$$$$$$$$$$$$");
+
+Set<ConstraintViolation<Person>> violations = val.validate(p);
+for (ConstraintViolation<Person> v : violations) {
+    log.debug(v.getPropertyPath() + ":" + v.getInvalidValue() + " " + v.getMessage());
+}
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+-lastName:Smithhhhhhhhhhhhhhhhhh$%$%$$$$$$$$$$$$$$$$ size must be between 1 and 20
+-lastName:Smithhhhhhhhhhhhhhhhhh$%$%$$$$$$$$$$$$$$$$ must match "^[a-zA-Z\ \-]+$"]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Bean failed two composed constraints</para></listitem>
+            </itemizedlist>
+        </section>
+
+
+        <section id="jpa-validation-core-composite-singlex">
+            <title>@ReportAsSingleViolation</title>
+<programlisting language="java"><![CDATA[
+@NotNull
+@Size
+@Pattern(regexp="")
+
+@ReportAsSingleViolation
+
+...
+public @interface ValidName {
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+ -lastName:Smithhhhhhhhhhhhhhhhhh$%$%$$$$$$$$$$$$$$$$ invalid last name]]></programlisting>                        
+            <itemizedlist>
+                <listitem><para>Bean failed single composite constraint</para></listitem>
+            </itemizedlist>
+        </section>
+    </section>
+
+
+    <section id="jpa-validation-core-sequences">
+        <title>Group Sequences</title>
+        <para>Define a sequence of validation groups to be tested in order and short-circuit upon failure</para>
+
+        <section id="jpa-validation-core-sequences-groups">
+            <title>Validation Groups and Sequence</title>
+      
+            <itemizedlist>
+                <listitem>
+<programlisting language="java"><![CDATA[
+public interface DBChecks {} //checks whether data will fit within DB
+public interface DataChecks {} //more detailed content checks]]></programlisting>
+                    <para>A set of Constraint Groups defined based on complexity/cost</para>                        
+                </listitem>
+
+                <listitem>
+<programlisting language="java"><![CDATA[
+@GroupSequence({Default.class, DBChecks.class, DataChecks.class})
+public interface ValidationSequence {}]]></programlisting>
+                    <para>A Group Sequence defines the order</para>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-validation-core-sequences-annotation">
+            <title>Assign Constraints from Sequence</title>
+            <itemizedlist>
+                <listitem>
+<programlisting language="java"><![CDATA[
+    @Column(name="STREET", length=32, nullable=false)
+    @NotNull(message="street not supplied")
+    @Size(max=32, message="street name too large", groups=DBChecks.class)
+    @Pattern(regexp="^[0-9A-Za-z\\ ]+$", groups=DataChecks.class, 
+             message="street must be numbers and letters")
+    private String street;]]></programlisting>
+                    <para>Constraints are assigned to Constraint Groups</para>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-validation-core-sequences-validation">
+            <title>Sample Execution</title>
+      
+            <itemizedlist>
+                <listitem><para>We cause an error in the data size and content</para>
+<programlisting language="java"><![CDATA[
+Address a = new Address()
+    .setStreet("1600$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    .setCity("Washington")
+    .setState("DC")
+    .setZip("20500");
+Set<ConstraintViolation<Address>> violations = val.validate(a, ValidationSequence.class);
+...
+//we should only get violations from the DB group
+assertEquals("unexpected number of violations", 1, violations.size());]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+
+            <itemizedlist>
+                <listitem><para>Notice Default passed, DBChecks failed, and DataChecks not attempted</para>
+<programlisting language="java"><![CDATA[
+ -street:1600$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ street name too large]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </section>
+    
+        <section id="jpa-validation-core-sequences-default">
+            <title>Optionally Assign Sequence to be Default for Class</title>
+            <itemizedlist>
+                <listitem>
+<programlisting language="java"><![CDATA[
+@GroupSequence({Address.class, DBChecks.class, DataChecks.class})
+public class Address {]]></programlisting>
+                    <para>Must list self within list</para></listitem>
+            </itemizedlist>
+        </section>                        
+    </section>
+
+
+    <section id="jpa-validation-custom-type">
+        <title>Validating Types</title>
+        <para>Look across properties of type</para>
+  
+        <section id="jpa-validation-custom-type-annotation">
+            <title>Annotation</title>
+<programlisting language="java"><![CDATA[
+...
+@Documented
+@Constraint(validatedBy={CityStateOrZipValidator.class})
+@Target({TYPE, ANNOTATION_TYPE})
+@Retention(RUNTIME)
+public @interface CityStateOrZip {
+    String message() default "must have city and state or zip code";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default{};
+}]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-custom-type-validator">
+            <title>Validator</title>
+<programlisting language="java"><![CDATA[
+public class CityStateOrZipValidator implements ConstraintValidator<CityStateOrZip, Address1>{
+    @Override
+    public void initialize(CityStateOrZip constraintAnnotation) {}
+    @Override
+    public boolean isValid(Address1 address, ConstraintValidatorContext context) {
+        if (address==null) { return true; }
+        return (address.getCity()!=null && address.getState()!=null) ||
+                address.getZip()!=null;
+    }
+}]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-custom-type-validation">
+            <title>Validator</title>
+<programlisting language="java"><![CDATA[
+Address1 a1 = new Address1()
+    .setStreet("1600")
+    .setCity("Washington");
+Set<ConstraintViolation<Address1>> violations = val.validate(a1,PreCheck.class);
+...
+assertEquals("unexpected violation", 1, violations.size());]]></programlisting>                        
+<programlisting language=""><![CDATA[
+ -:1600 Washington, null null, must have city and state or zip code]]></programlisting>                        
+        </section>
+    </section>
+
+    <section id="jpa-validation-core-cascade">
+        <title>Cascade Validation</title>
+        <para>Traverse validation across relationships</para>
+  
+        <section id="jpa-validation-core-cascade-annotation">
+            <title>Trigger Validation Cascade with @Valid</title>
+<programlisting language="java"><![CDATA[
+public class Purchase {
+    @Valid
+    private Set<PurchaseItem> items;]]></programlisting>                        
+        </section>
+        
+        <section id="jpa-validation-core-cascade-validation">
+            <title>Validation</title>
+<programlisting language="java"><![CDATA[
+ -items[].amount:null item amount is required
+ -items[].description:null item description is required
+]]></programlisting>                        
+        </section>
+    </section>
+
+
+    <section id="jpa-validation-core-xml">
+        <title>XML Descriptor</title>
+        <para>Define Constraints external to Bean Class</para>
+  
+        <section id="jpa-validation-core-bean">
+            <title>POJO Bean Class</title>
+            <para>Constraints need not be defined within bean class</para>
+<programlisting language="java"><![CDATA[
+public class Book {
+    private int id;
+    
+    //@NotNull(message="title is required")
+    //@Size(max=32, message="title too long")
+    private String title;
+    //@Min(value=1, message="pages are required")
+    private int pages;]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-core-validationxml">
+            <title>META-INF/validation.xml</title>
+            <para></para>
+<programlisting language="xml"><![CDATA[
+<validation-config xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration">
+    
+    <default-provider>org.hibernate.validator.HibernateValidator</default-provider>
+
+    <constraint-mapping>META-INF/book-constraints.xml</constraint-mapping>
+</validation-config>]]></programlisting>                        
+        </section>
+
+        <section id="jpa-validation-core-">
+            <title>Constraint Mapping</title>
+            <para></para>
+<programlisting language="xml"><![CDATA[
+<constraint-mappings 
+    xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jbss.org/xml/ns/javax/validation/mapping
+        http://jboss.org/xml/ns/javax/validation/mapping/validation-mapping-1.0.xsd">
+
+    <bean class="ejava.jpa.example.validation.Book">
+        <field name="title">
+            <constraint annotation="javax.validation.constraints.NotNull">
+                <message>title is required</message>
+            </constraint>
+            <constraint annotation="javax.validation.constraints.Size">
+                <message>title is required</message>
+                <element name="max">32</element>
+            </constraint>
+        </field>
+        <field name="pages">
+            <constraint annotation="javax.validation.constraints.Min">
+                <message>pages are required</message>
+                <element name="value">1</element>
+            </constraint>
+        </field>
+    </bean>
+</constraint-mappings>]]></programlisting>                        
+        </section>
+      </section>
+
+    <section id="jpa-validation-core-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para>Validation API provides framework for bean validation</para></listitem>
+            <listitem><para>Independent of other frameworks (e.g., JPA, JAXB)</para></listitem>
+            <listitem><para>Validation groups</para></listitem>
+            <listitem><para>Validation for appropriate levels (client, service, DAO)</para></listitem>
+            <listitem><para>Integrates with other frameworks</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

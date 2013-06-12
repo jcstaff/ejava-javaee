@@ -47,7 +47,21 @@
         </dependency>
         <dependency>
             <groupId>ejava.jpa</groupId>
+            <artifactId>jpa-validation-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+       </dependency>
+        <dependency>
+            <groupId>ejava.jpa</groupId>
             <artifactId>jpa-query-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+       </dependency>
+        <dependency>
+            <groupId>ejava.jpa</groupId>
+            <artifactId>jpa-serverside-docbook</artifactId>
             <version>${project.version}</version>
             <type>war</type>
             <scope>runtime</scope>
@@ -125,7 +139,19 @@
                </overlay>
                 <overlay>
                     <groupId>ejava.jpa</groupId>
+                    <artifactId>jpa-validation-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.jpa</groupId>
                     <artifactId>jpa-query-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.jpa</groupId>
+                    <artifactId>jpa-serverside-docbook</artifactId>
                     <type>war</type>
                     <targetPath>../site/docs/content</targetPath>
                </overlay>
