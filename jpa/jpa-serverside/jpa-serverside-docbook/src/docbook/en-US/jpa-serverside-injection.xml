@@ -1,0 +1,186 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-serverside-injection">
+    <title>Persistence Unit/Context Injection</title>
+    <para></para>
+        
+    <section id="jpa-serverside-injection-inject">
+        <title>Annotated Injection</title>
+        <para>Simplest, most-common approach</para>
+  
+        <itemizedlist>
+
+            <listitem><para>Define injection using annotation</para>
+<programlisting language="java"><![CDATA[
+@Stateless
+public class TellerEJB implements TellerLocal, TellerRemote {
+    @PersistenceContext(unitName="ejbsessionbank")
+    protected EntityManager em;
+
+    protected Teller teller;
+    
+    @PostConstruct
+    public void init() {
+        teller = new TellerImpl();
+        AccountDAO dao = new JPAAccountDAO();            
+        ((JPAAccountDAO)dao).setEntityManager(em);
+        ((TellerImpl)teller).setAcctDAO(dao);
+    }
+
+    public Account createAccount(String accountNumber) throws BankException {
+        try {
+            Account account = teller.createAccount(accountNumber);
+            return account;
+        }
+        catch (DAOException ex) {
+            ctx.setRollbackOnly();
+            log.fatal("internal error creating account", ex);
+            throw new BankException("internal error creating account:" + ex);
+        }
+    }
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+    </section>
+
+
+    <section id="jpa-serverside-injection-jndi">
+        <title>JNDI Approach</title>
+        <para>Older manual technique</para>
+  
+        <itemizedlist>
+
+            <listitem><para></para>
+<programlisting language="java"><![CDATA[
+@Stateless
+public class BakeSchedulerEJB implements BakeSchedulerRemote {
+    private EntityManager em;
+
+    @Resource
+    protected SessionContext ctx;
+
+    @PostConstruct
+    public void init() {        
+        em = (EntityManager)ctx.lookup("persistence/jndidemo");
+    }
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+    </section>
+
+
+
+    <section id="jpa-serverside-injection-xml">
+        <title>ejb-jar.xml injection</title>
+        <para>Older injection technique</para>
+  
+        <itemizedlist>
+
+            <listitem><para></para>
+<programlisting language="java"><![CDATA[
+@Stateless
+public class AidSchedulerEJB extends SchedulerBase
+    implements AidSchedulerLocal, AidSchedulerRemote {
+        
+    private EntityManager em;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para></para>
+<programlisting language="xml"><![CDATA[
+<?xml version="1.0"?>
+ <ejb-jar xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+      version="3.1">
+          
+    <enterprise-beans>
+        <session>
+            <ejb-name>AidSchedulerEJB</ejb-name>
+            <persistence-context-ref>
+                <persistence-context-ref-name>
+                    persistence/jndidemo
+                </persistence-context-ref-name>
+                <persistence-unit-name>jndidemo</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+                <injection-target>
+                    <injection-target-class>
+                        ejava.examples.jndidemo.ejb.AidSchedulerEJB
+                    </injection-target-class>
+                    <injection-target-name>em</injection-target-name>
+                </injection-target>
+            </persistence-context-ref>
+            ...
+        </session>
+]]></programlisting>                        
+            </listitem>
+
+        </itemizedlist>
+    </section>
+
+
+    <section id="jpa-serverside-injection-section2">
+        <title>Context and Dependency Injection (CDI)</title>
+        <para>Newer technique -- JavaEE's answer to Spring Configuration</para>
+  
+        <itemizedlist>
+
+            <listitem><para>Define qualifier annotation</para>
+<programlisting language="java"><![CDATA[
+package ejava.examples.jndidemo;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.*;
+import javax.inject.Qualifier;
+
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface JndiDemo {
+}]]></programlisting>                        
+            </listitem>
+
+
+            <listitem><para>Define producer of Persistence Context</para>
+<programlisting language="java"><![CDATA[
+import javax.enterprise.inject.Produces;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+public class SchedulerResources {
+    @PersistenceContext(name="jndidemo")
+    @Produces
+    @JndiDemo
+    public EntityManager em;
+]]></programlisting>                        
+            </listitem>
+
+            <listitem><para>Define injection point</para>
+<programlisting language="java"><![CDATA[
+@Stateless
+public class TrainSchedulerEJB 
+    extends SchedulerBase implements TrainSchedulerRemote {
+
+    @Inject @JndiDemo
+    private EntityManager em;
+]]></programlisting>                        
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jpa-serverside-injection-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para>Annotation</para></listitem>
+            <listitem><para>JNDI lookup</para></listitem>
+            <listitem><para>XML injection</para></listitem>
+            <listitem><para>CDI injection</para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

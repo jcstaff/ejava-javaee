@@ -1,6 +1,7 @@
 package ejava.examples.jndidemo;
 
 import javax.annotation.Resource;
+
 import javax.ejb.EJB;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
