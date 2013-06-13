@@ -42,7 +42,6 @@ public class Person {
     @Past
     private Date birthDate;
     
-    @Column(name="EMAIL", length=50)
     @Size(min=7,max=50)
     @Pattern(regexp="^.+@.+\\..+$")
     private String email;
@@ -54,7 +53,14 @@ public class Person {
         <section id="jpa-validation-core-constraints-validation">
             <title>Validating Instances</title>
             <itemizedlist>
-                <listitem><para></para>
+                <listitem><para>Obtain instance of Validator from ValidationFactory</para>
+<programlisting language="java"><![CDATA[
+private ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
+private Validator val = vf.getValidator();
+]]></programlisting>                        
+                </listitem>
+
+                <listitem><para>Validate bean instances</para>
 <programlisting language="java"><![CDATA[
 Person p = new Person()
     .setFirstName("Bob2")
@@ -132,16 +138,21 @@ public class Person {
             .setFirstName("Bob")
             .setLastName("Smith")
             .setEmail("bob.smith@gmail.com")
-            .setBirthDate(seventeen.getTime());
+            .setBirthDate(new Date(System.currentTimeMillis()+100000));
         
         Set<ConstraintViolation<Person>> validPerson = val.validate(p, Default.class);
         Set<ConstraintViolation<Person>> validDriver = val.validate(p, Drivers.class);
         Set<ConstraintViolation<Person>> validPOC = val.validate(p, POCs.class);
         
         assertTrue("not validPerson", validPerson.isEmpty());
-        assertTrue("validDriver", validDriver.isEmpty());
-        assertFalse("not validPOC", validPOC.isEmpty());
-]]></programlisting>                        
+        assertFalse("validDriver", validDriver.isEmpty());
+        assertTrue("not validPOC", validPOC.isEmpty());
+]]></programlisting>
+            <itemizedlist>
+                <listitem><para>Drivers group fails because birthDate in future</para></listitem>
+                <listitem><para>POC does not yet have a birthDate constraint</para></listitem>
+            </itemizedlist>
+                            
         </section>
 
 
@@ -303,9 +314,7 @@ for (ConstraintViolation<Person> v : violations) {
 ...
 assertFalse("valid driver", violations.isEmpty());]]></programlisting>                        
             <itemizedlist>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Bob is too young to be a valid driver</para></listitem>
             </itemizedlist>
 <programlisting language=""><![CDATA[
  -birthDate:Wed Jun 11 01:06:33 EDT 1997, 15 is younger than minimum 16
