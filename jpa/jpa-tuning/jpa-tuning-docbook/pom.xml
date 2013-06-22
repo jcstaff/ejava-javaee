@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.jpa</groupId>
+        <artifactId>jpa-tuning</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jpa-tuning-docbook</artifactId>
+    <packaging>pom</packaging>
+
+    <name>JPA Tuning::Notes</name>
+    <description>
+        This module contains documentation for performance topics related to JPA and SQL.
+    </description>
+    
+    <properties>
+       <doc.base>jpa-tuning</doc.base>
+       <docbook.pubdate>2013-06-21</docbook.pubdate>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
