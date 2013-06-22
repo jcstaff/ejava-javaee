@@ -98,6 +98,7 @@
             	<column unique="true"/>
             </basic>
             <many-to-many name="accounts">
+                <join-table name="EJBSESSIONBANK_OWNER_ACCOUNTS"/>
             	<cascade>
             		<cascade-persist/>
             		<cascade-merge/>
