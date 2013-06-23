@@ -252,6 +252,28 @@
             </itemizedlist>
         </section>    
         
+        <section id="jpa-tuning-sql-index-sort">
+            <title>Non-Null Indexed Columns Speed Sort</title>
+            <figure>
+                <title>Non-Null Indexed Columns Speed Sort</title>
+                <graphic scale="70" fileref="images/jpa-tuning-index-sort-nonnull.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>"Sort By" column index accessed using Full scan because column not-nullable and is in requested sort order</para></listitem>
+                <listitem><para>Table accessed using RowId scan to get row data in the order of the indexed column</para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Nullable Indexed Columns Unusable by Sort</title>
+                <graphic scale="70" fileref="images/jpa-tuning-index-sort-null.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>"Where clause" column index accessed using Range Scan to locate matching values</para></listitem>
+                <listitem><para>Table accessed using RowId scan to get row data</para></listitem>
+                <listitem><para>Result is sorted</para></listitem>
+            </itemizedlist>
+        </section>    
+
     </section>    
 
     <section id="jpa-tuning-sql-summary">

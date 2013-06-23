@@ -38,7 +38,7 @@ public class Movie implements Comparable<Movie>{
 	@Column(name="ID", length=36)
 	private String id;
 	
-	@Column(name="TITLE", length=32)
+	@Column(name="TITLE", length=32, nullable=false)
 	private String title;
 	
 	@Temporal(TemporalType.DATE)
