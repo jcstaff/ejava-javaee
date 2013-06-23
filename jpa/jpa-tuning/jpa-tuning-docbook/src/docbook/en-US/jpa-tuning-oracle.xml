@@ -1,29 +1,234 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-tuning-sql">
-    <title>SQL Tuning</title>
-    <para></para>
+<chapter id="jpa-tuning-oracle">
+    <title>Oracle SQL Tuning</title>
         
-    <section id="jpa-tuning-sql-section1">
-        <title>jpa-tuning Section 1</title>
-        <para></para>
-  
-        <itemizedlist>
-
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+    <section id="jpa-tuning-oracle-reasonsbad">
+        <title>Reasons for Inefficient SQL Performance</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Stale or missing optimizer statistics</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Cost-based optimizer (CBO) needs accurate view of database to generate optimal execution plans</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Data sizes</para></listitem>
+                            <listitem><para>Table distribution</para></listitem>
+                            <listitem><para>Indexes distribution</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
             </listitem>
-
+            <listitem><para>Missing access structures</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Indexes</para></listitem>
+                    <listitem><para>Materialized views</para></listitem>
+                    <listitem><para>Partitions</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Sub-optimal execution plan</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Incorrect estimates of cost, cardinality, or predictive selectivity</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Poorly constructed SQL</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Cartesian JOINs</para></listitem>
+                    <listitem><para>Expensive SQL constructs like UNION versus UNION ALL</para></listitem>
+                </itemizedlist>
+            </listitem>
         </itemizedlist>
-        
-        <para></para>
     </section>
+    
+    <section id="jpa-tuning-oracle-execplan">
+       <title>Execution Plan</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Output of the optimizer</para></listitem>
+            <listitem><para>Instructions of what execution engine must perform to complete query</para></listitem>
+            <listitem><para>Parent-child relationship between steps showing</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Ordering of tables referenced</para></listitem>
+                    <listitem><para>Table access methods used</para></listitem>
+                    <listitem><para>Join methods used</para></listitem>
+                    <listitem><para>Data operations (e.g., filter, sort, aggregation)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Cost and cardinality (number of estimated rows)</para></listitem>
+            <listitem><para>Partition access</para></listitem>
+            <listitem><para>Parallel execution</para></listitem>
+        </itemizedlist>
+    </section>    
+    
 
-    <section id="jpa-tuning-sql-summary">
+    <section id="jpa-tuning-oracle-tools">
+       <title>Diagnostic Tools</title>
+
+        <section id="jpa-tuning-oracle-tools-explainplan">
+           <title>EXPLAIN PLAN</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Helps you determine which execution plan selected by optimizer</para></listitem>
+                <listitem><para>Statement is not executed</para></listitem>
+                <listitem><para>Plan is theoretical</para></listitem>
+            </itemizedlist>
+            <figure>
+                <title>EXPLAIN PLAN Example with Oracle SQL Developer</title>
+                <graphic scale="70" fileref="images/jpa-tuning-explain-plan.png"/>
+            </figure>
+            <figure>
+                <title>EXPLAIN PLAN Example using Text SQL Commands</title>
+<programlisting language=""><![CDATA[
+EXPLAIN PLAN 
+FOR
+select m.title, p.first_name, p.last_name
+from queryex_person p
+join queryex_director d on d.person_id = p.id
+join queryex_movie m on m.director_id = d.person_id
+order by m.title desc;
+
+SET LINESIZE 100
+SET PAGESIZE 0
+select * from table(DBMS_XPLAN.DISPLAY());
+]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+plan FOR succeeded.
+Plan hash value: 1054686195                                                                         
+                                                                                                    
+--------------------------------------------------------------------------------------              
+| Id  | Operation           | Name           | Rows  | Bytes | Cost (%CPU)| Time     |              
+--------------------------------------------------------------------------------------              
+|   0 | SELECT STATEMENT    |                |     7 |  1974 |     8  (25)| 00:00:01 |              
+|   1 |  SORT ORDER BY      |                |     7 |  1974 |     8  (25)| 00:00:01 |              
+|*  2 |   HASH JOIN         |                |     7 |  1974 |     7  (15)| 00:00:01 |              
+|*  3 |    TABLE ACCESS FULL| QUERYEX_MOVIE  |     7 |   980 |     3   (0)| 00:00:01 |              
+|   4 |    TABLE ACCESS FULL| QUERYEX_PERSON |    10 |  1420 |     3   (0)| 00:00:01 |              
+--------------------------------------------------------------------------------------              
+                                                                                                    
+Predicate Information (identified by operation id):                                                 
+---------------------------------------------------                                                 
+                                                                                                    
+   2 - access("M"."DIRECTOR_ID"="P"."ID")                                                           
+   3 - filter("M"."DIRECTOR_ID" IS NOT NULL)                                                        
+                                                                                                    
+Note                                                                                                
+-----                                                                                               
+   - dynamic sampling used for this statement (level=2)                                             
+
+ 21 rows selected]]></programlisting>                        
+    </figure>
+    <figure>
+                <title>EXPLAIN PLAN Example using Named Plan</title>
+<programlisting language=""><![CDATA[
+EXPLAIN PLAN 
+SET STATEMENT_ID='myplan01'
+FOR
+select m.title, p.first_name, p.last_name
+...]]></programlisting>                        
+<programlisting language=""><![CDATA[select * from table(DBMS_XPLAN.DISPLAY('PLAN_TABLE','myplan01','typical',null));]]></programlisting>                        
+    </figure>
+        </section>    
+        <section id="jpa-tuning-oracle-tools-autotrace">
+           <title>AUTOTRACE</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Produces execution plan and statistics after running statement(s)</para></listitem>
+                <listitem><para>Statement(s) are actually run -- not theoretical like EXPLAIN PLAN</para></listitem>
+            </itemizedlist>
+            <figure>
+                <title>AUTOTRACE Example with Oracle SQL Developer IDE</title>
+                <graphic scale="70" fileref="images/jpa-tuning-autotrace.png"/>
+            </figure>
+            <note>
+                <title>AUTO TRACE Requires Special Role and Permission</title>
+<programlisting language=""><![CDATA[grant SELECT_CATALOG_ROLE to EJAVA;
+grant SELECT ANY DICTIONARY to EJAVA;]]></programlisting>                        
+            </note>
+            <itemizedlist spacing="compact">
+                <listitem><para>AUTOTRACE Statistics</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>recursive calls - calls generated at user and system level</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>User SQL calls trigger system SQL calls</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para>db block gets - number of times a CURRENT block was requested</para></listitem>
+                        <listitem><para>consistent gets - number of times a consistent read requested for a block</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>READ forced to REDO log for consistent data because of dirty data block being written to</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para>physical reads - nmumber of data blocks read from disk</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Equals "physical reads direct" plus reads into buffer cache</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para>redo size - number of redo bytes generated</para></listitem>
+                        <listitem><para>bytes received via SQL*Net from client - total number of bytes received by Oracle DB</para></listitem>
+                        <listitem><para>bytes sent via SQL*Net to client - total number of bytes received by Oracle DB</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+            
+        </section>    
+
+        <section id="jpa-tuning-oracle-vplan">
+           <title>Display Cursor Execution Plan within V$PLAN</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Runtime cursors store execution plans within V$PLAN</para></listitem>
+            </itemizedlist>
+            <note>
+                <para>DISPLAY_CURSOR requires select privileges on: V$SQL_PLAN, V$SESSION and V$SQL_PLAN_STATISTICS_ALL</para>
+            </note>
+    <figure>
+        <title>Example: Connection Generates SQL Commands</title>
+<programlisting language=""><![CDATA[
+select poo.first_name, poo.last_name
+from queryex_person poo;]]></programlisting>                        
+    </figure>
+
+    <figure>
+        <title>Example: SQL Commands of Interest Located in V$PLAN</title>
+<programlisting language=""><![CDATA[select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from queryex_person poo%';]]></programlisting>                        
+<programlisting language=""><![CDATA[
+87d246wux9qag   "select poo.first_name, poo.last_name from queryex_person poo"
+9bzam4xu5q7p5   select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from queryex_person poo%']]></programlisting>                        
+            </figure>
+        
+            <figure>
+                <title>Example: SQL_ID from V$PLAN Used to Display Execution Plan</title>
+<programlisting language=""><![CDATA[
+select PLAN_TABLE_OUTPUT from
+TABLE(DBMS_XPLAN.DISPLAY_CURSOR('87d246wux9qag',null, 'TYPICAL'));]]></programlisting>                        
+<programlisting language=""><![CDATA[
+SQL_ID  87d246wux9qag, child number 0
+-------------------------------------
+select poo.first_name, poo.last_name from queryex_person poo
+ 
+Plan hash value: 1628338048
+ 
+------------------------------------------------------------------------------------
+| Id  | Operation         | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |                |       |       |     3 (100)|          |
+|   1 |  TABLE ACCESS FULL| QUERYEX_PERSON |    10 |   680 |     3   (0)| 00:00:01 |
+------------------------------------------------------------------------------------
+ 
+Note
+-----
+   - dynamic sampling used for this statement (level=2)]]></programlisting>                        
+            </figure>
+            <figure>
+                <title>Example: DISPLAY_CURSOR witin Single Command</title>
+<programlisting language=""><![CDATA[
+SELECT t.*
+FROM v$sql s, table(DBMS_XPLAN.DISPLAY_CURSOR(s.sql_id, s.child_number)) t WHERE sql_text LIKE '%QUERYEX_MOVIEGENRE%';]]></programlisting>                        
+            </figure>
+            
+        </section>    
+    </section>    
+
+
+    <section id="jpa-tuning-oracle-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>

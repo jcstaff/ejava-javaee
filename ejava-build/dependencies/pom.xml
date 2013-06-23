@@ -89,6 +89,7 @@
         <maven-jaxb2-plugin.version>0.7.1</maven-jaxb2-plugin.version>
         <mysql-connector-java.version>5.0.5</mysql-connector-java.version>
         <netty.version>3.2.6.Final</netty.version>
+        <ojdbc6.version>11.2.0.3</ojdbc6.version>
         <resteasy.version>2.3.4.Final</resteasy.version>
         <servlet-api.version>2.5</servlet-api.version>
         <slf4j.version>1.6.1</slf4j.version>
@@ -401,6 +402,11 @@
                 <artifactId>h2</artifactId>
                 <version>${h2db.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${ojdbc6.version}</version>
+            </dependency>       
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>

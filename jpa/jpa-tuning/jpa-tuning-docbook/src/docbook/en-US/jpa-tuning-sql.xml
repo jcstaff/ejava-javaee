@@ -1,0 +1,266 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-tuning-sql">
+    <title>SQL Tuning</title>
+        
+    <section id="jpa-tuning-sql-goals">
+        <title>Goals</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Start with table with the most restrictive filter</para></listitem>
+            <listitem><para>Look to pass fewest rows to next step</para></listitem>
+            <listitem><para>Appropriate JOIN method selected for number of rows returned</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Oracle Nested Loop Join (thru indexes) less efficient for large number of rows</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Eliminate Cartesian JOINs</para></listitem>
+            <listitem><para>Look for tables accessed efficiently</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Beware of full table scans when a "where" clause is present</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="jpa-tuning-sql-table">
+        <title>Table Access</title>
+         <itemizedlist spacing="compact">
+            <listitem><para>Access paths - strategies used to access data within table</para></listitem>
+            <listitem><para>Indexes - good for when accessing small amounts of data out of much larger data set</para></listitem>
+            <listitem><para>Full table scans - good for small tables and unrestricted row access</para></listitem>
+            <listitem><para>Any row can be *functionally* accessed with either method</para></listitem>
+            <listitem><para>Use execution plans to help use the appropriate technique</para></listitem>
+        </itemizedlist>
+
+        <section id="jpa-tuning-sql-table-fullscan">
+            <title>Full Table Scan</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Performs multi-blocks reads -- including read of deleted rows</para></listitem>
+                <listitem><para>May filter rows</para></listitem>
+                <listitem><para>Faster than "INDEX RANGE SCANS" for large amounts of data</para></listitem>
+                <listitem><para>Uses</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>No suitable index</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Function used on indexed column (ex. lower(FIRST_NAME)=:fname)</para></listitem>
+                                <listitem><para>Like clauses starting with wildcard (ex. '%term%')</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para>Low(/no) selectivity filters</para></listitem>
+                        <listitem><para>Small tables</para></listitem>
+                        <listitem><para>High degree of parallelism</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Hint <code>/*+ full(table_var) */</code></para></listitem>
+            </itemizedlist>
+            <note>
+                <title>Normalize Data or Use Function Indexes</title>
+                <para>If you perform functions on indexed data -- such as lower(COLUMN_NAME), either
+                    add a function index or normalize data prior to inserting/updating database.</para>
+            </note>
+            
+            <section id="jpa-tuning-sql-table-fullscan-unrestricted">
+                <title>Full Table Scan - Unrestricted</title>
+                <figure>
+                    <title>Unrestricted Where Clause causes Full Table Scan</title>
+                    <graphic scale="70" fileref="images/jpa-tuning-full-table-scan-unrestricted.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Table accessed using full table scan to locate and obtain row data</para></listitem>
+                    <listitem><para>No where clause provided causes non-use of index</para></listitem>
+                </itemizedlist>
+            </section>    
+            
+            <section id="jpa-tuning-sql-table-fullscan-function">
+                <title>Full Table Scan - Function</title>
+                <figure>
+                    <title>Function Applied to Index Column causes Full Table Scan</title>
+                    <graphic scale="70" fileref="images/jpa-tuning-full-table-scan-function.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Table accessed using full table scan to locate and obtain row data</para></listitem>
+                    <listitem><para>Function performed on indexed column negates use of index</para></listitem>
+                </itemizedlist>
+                <figure>
+                    <title>Normalized Data allows use of Index</title>
+                    <graphic scale="70" fileref="images/jpa-tuning-full-table-scan-normalized.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Index accessed using Range Scan because function removed from column</para></listitem>
+                    <listitem><para>Table accessed using RowId Scan to obtain row data</para></listitem>
+                    <listitem><para>Function performed on indexed column negates use of index</para></listitem>
+                </itemizedlist>
+            </section>    
+
+            <section id="jpa-tuning-sql-table-fullscan-wildcard">
+                <title>Full Table Scan - Like Wildcards</title>
+                <figure>
+                    <title>Like Clauses Starting with Wildcard causes Full Table Scan</title>
+                    <graphic scale="70" fileref="images/jpa-tuning-full-table-scan-left-wildcard.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Table accessed using full table scan to locate and obtain row data</para></listitem>
+                    <listitem><para>Strings starting with wildcard characters are not valid for use with index</para></listitem>
+                </itemizedlist>
+                <figure>
+                    <title>Like Clauses not Starting with Wildcard allows use of Index</title>
+                    <graphic scale="70" fileref="images/jpa-tuning-full-table-scan-right-wildcard.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Index accessed using Range Scan because string does not start with wildcard</para></listitem>
+                    <listitem><para>Table accessed using RowId Scan to obtain row data</para></listitem>
+                    <listitem><para>Strings starting with wildcard characters are not valid for use with index</para></listitem>
+                </itemizedlist>
+            </section>    
+
+            <section id="jpa-tuning-sql-table-fullscan-hint">
+                <title>Full Table Scan - Hint</title>
+                <figure>
+                    <title>Hint can Force Full Table Scan</title>
+                    <graphic scale="70" fileref="images/jpa-tuning-full-table-scan-hint.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Hints can be added to SQL Select to influence execution plan</para></listitem>
+                </itemizedlist>
+            </section>    
+        </section>    
+ 
+        <section id="jpa-tuning-sql-table-rowid">
+            <title>Row Id Scan</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>RowId specifies data file, data block, and row location</para></listitem>
+                <listitem><para>Fastest technique to locate specific row</para></listitem>
+                <listitem><para>Primarily obtained from index scans</para></listitem>
+                <listitem><para>Can be eliminated (with minimal benefit) using a composite index</para></listitem>
+                <listitem><para>Updated rows can get re-located to another block -- causing extra expense
+                    in RowId scan performance due to rowId indirection</para></listitem>
+            </itemizedlist>
+            
+                <section id="jpa-tuning-sql-table-rowid-index">
+                    <title>RowId Scan used by Index Scan</title>
+                    <figure>
+                        <title>RowId Scan used by Index Scan</title>
+                        <graphic scale="70" fileref="images/jpa-tuning-rowid-scan-index.png"/>
+                    </figure>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Index accessed using Range Scan for values in where clause</para></listitem>
+                        <listitem><para>RowId obtained from index</para></listitem>
+                        <listitem><para>Table accessed using RowId Scan to fetch row data to satisfy select clause</para></listitem>
+                    </itemizedlist>
+                </section>    
+
+                <section id="jpa-tuning-sql-table-rowid-composite">
+                    <title>RowId Scan skipped using Composite Index</title>
+                    <figure>
+                        <title>RowId Scan skipped using Composite Index</title>
+                        <graphic scale="70" fileref="images/jpa-tuning-rowid-scan-composite.png"/>
+                    </figure>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Index accessed using Range Scan for values in where and select clauses</para></listitem>
+                        <listitem><para>No need to access row/table</para></listitem>
+                        <listitem><para>Eliminates need for RowId scan</para></listitem>
+                    </itemizedlist>
+                </section>    
+
+                <section id="jpa-tuning-sql-table-rowid-composite-2ndterm">
+                    <title>RowId Scan replaced with Full Index Scan - Non-matching Where</title>
+                    <figure>
+                        <title>RowId Scan replaced with Full Index Scan - Non-matching Where</title>
+                        <graphic scale="70" fileref="images/jpa-tuning-rowid-scan-composite-2nd-term.png"/>
+                    </figure>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Index accessed using Full Scan for values in where and select clauses</para></listitem>
+                        <listitem><para>Range Scan not used since index not fully aligned with where clause</para></listitem>
+                    </itemizedlist>
+                </section>    
+        </section>    
+    </section>    
+
+    <section id="jpa-tuning-sql-index">
+        <title>Index Access</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Logically and physically independent from table data</para></listitem>
+            <listitem><para>May provide faster access to data</para></listitem>
+            <listitem><para>Incur storage and (update) processing costs</para></listitem>
+            <listitem><para>Can be unique or non-unique</para></listitem>
+            <listitem><para>Can be simple or composite (Oracle maximum is 32)</para></listitem>
+            <listitem><para>Can be normal (ascending), reverse key (descending), or function-based</para></listitem>
+        </itemizedlist>
+        <note>
+            <title>B*-tree Indexes Need to be Balanced</title>
+            <para>A B(alanced)*-tree index based on a monotonically incrementing sequence 
+                value will become un-balanced and be of limited use. "Reverse Keys" are 
+                used to mix up the bits of the value to appear more random and help keep 
+                the index tree balanced. This, obviously, can work for equality tests
+                but not for relative comparisons.</para>
+            <para>An un-balanced or sparse index can be corrected with 
+                <code>ALTER INDEX (index-name) (COALESCE | REBUILD)</code>.</para>                
+                <itemizedlist spacing="compact">
+                    <listitem><para>COALESCE - repairs index in-place, good for small repairs</para></listitem>
+                    <listitem><para>REBUILD - totally rebuilds index, good for large repairs</para></listitem>
+                </itemizedlist>
+        </note>
+        
+        <section id="jpa-tuning-sql-index-unique">
+            <title>Index Unique Scan</title>
+            <figure>
+                <title>Index Unique Scan</title>
+                <graphic scale="70" fileref="images/jpa-tuning-index-unique-scan.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Index accessed using Unique Scan for values in where clause</para></listitem>
+                <listitem><para>Index Unique Scan returns, at most, one rowId</para></listitem>
+                <listitem><para>Table accessed using RowId Scan to fetch row data to satisfy select clause</para></listitem>
+            </itemizedlist>
+        </section>    
+        
+        <section id="jpa-tuning-sql-index-range">
+            <title>Index Range Scan</title>
+            <figure>
+                <title>Index Range Scan</title>
+                <graphic scale="70" fileref="images/jpa-tuning-index-range-scan.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Index accessed using Range Scan for values in where clause</para></listitem>
+                <listitem><para>Index Range Scan returns zero to many rowIds</para></listitem>
+                <listitem><para>Table accessed using RowId Scan to fetch row data to satisfy select clause</para></listitem>
+            </itemizedlist>
+        </section>    
+        
+        <section id="jpa-tuning-sql-index-null">
+            <title>Indexes Contain non-Null Values</title>
+            <figure>
+                <title>Unable to Index Range Scan with Null Value</title>
+                <graphic scale="70" fileref="images/jpa-tuning-index-null-scan.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Table accessed using Full Scan for values in where and select clauses</para></listitem>
+                <listitem><para>Index Range Scan not performed because index contains only non-null values</para></listitem>
+            </itemizedlist>
+        </section>    
+
+        <section id="jpa-tuning-sql-index-left-wildcard">
+            <title>Index Not Searched for Starting Wildcards</title>
+            <figure>
+                <title>Index Not Searched for Starting Wildcards</title>
+                <graphic scale="70" fileref="images/jpa-tuning-full-table-scan-left-wildcard.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Table accessed using Full Scan for values in where and select clauses</para></listitem>
+                <listitem><para>Index Range Scan not performed because search term starts with wildcard</para></listitem>
+            </itemizedlist>
+        </section>    
+        
+    </section>    
+
+    <section id="jpa-tuning-sql-summary">
+       <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  
