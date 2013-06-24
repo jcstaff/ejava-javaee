@@ -227,6 +227,39 @@
                 <listitem><para>Table accessed using RowId Scan to fetch row data to satisfy select clause</para></listitem>
             </itemizedlist>
         </section>    
+
+        <section id="jpa-tuning-sql-index-function">
+            <title>Function Index for non-Normalized Data</title>
+
+            <figure>
+                <title>Non-function Access to Data</title>
+                <graphic scalefit="1" fileref="images/jpa-tuning-index-function-nofunction.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Column index accessed thru Range Scan to locate match</para></listitem>
+                <listitem><para>Table accessed thru RowId Scan to get row data</para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Function Access to Data w/o Function Index</title>
+                <graphic scalefit="1" fileref="images/jpa-tuning-index-function-function.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Table accessed using Full Scan to locate match and get row data</para></listitem>
+                <listitem><para>Column index not used because function applied to column</para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Function Access to Data with Function Index</title>
+                <graphic scalefit="1" fileref="images/jpa-tuning-index-function-function-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Function(column) index accessed thru Range Scan to locate match using normalized value</para></listitem>
+                <listitem><para>Table accessed thru RowId Scan to get row data</para></listitem>
+            </itemizedlist>
+        </section>
+        
+
         
         <section id="jpa-tuning-sql-index-null">
             <title>Indexes Contain non-Null Values</title>
