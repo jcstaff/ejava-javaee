@@ -4,24 +4,43 @@
 <chapter id="jpa-tuning-sql">
     <title>SQL Tuning</title>
         
-    <section id="jpa-tuning-sql-goals">
-        <title>Goals</title>
+    <section id="jpa-tuning-sql-guidelines">
+       <title>General Guidelines</title>
         <itemizedlist spacing="compact">
-            <listitem><para>Start with table with the most restrictive filter</para></listitem>
-            <listitem><para>Look to pass fewest rows to next step</para></listitem>
-            <listitem><para>Appropriate JOIN method selected for number of rows returned</para>
+            <listitem><para>Keep the number of indexes down to a minimal amount</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>Oracle Nested Loop Join (thru indexes) less efficient for large number of rows</para></listitem>
+                    <listitem><para>Create indexes on tables when accessing small (15%) percentage of total rows</para></listitem>
+                    <listitem><para>Create indexes on foreign keys when using in JOIN statements in queries</para></listitem>
+                    <listitem><para>Small tables do not need indexes</para></listitem>
+                    <listitem><para>Queries without where clauses do not need indexes</para></listitem>
+                    <listitem><para>Queries for null values do not use indexes</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para>Eliminate Cartesian JOINs</para></listitem>
-            <listitem><para>Look for tables accessed efficiently</para>
+            <listitem><para>Order columns of index to best match order within where clauses</para></listitem>
+            <listitem><para>Consider NOLOGGING indexes that so not write to redo logs (thus cannot be restored)</para></listitem>
+            <listitem><para>Look for improper SQL</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>Beware of full table scans when a "where" clause is present</para></listitem>
+                    <listitem><para>Start with table with the most restrictive filter. Look to pass fewest rows to next step.</para></listitem>
+                    <listitem><para>Look for tables accessed efficiently</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Beware of full table scans when a "where" clause is present</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Look for data type mis-matches</para></listitem>
+                    <listitem><para>Eliminate cartesian JOINs</para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Look for inefficient indexes</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Monotonically incrementing values lead to un-balanced B*-trees</para></listitem>
+                    <listitem><para>Out-dated statistics can negatively impact optimizer</para></listitem>
+                    <listitem><para></para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>
-    </section>
+    </section>    
+    
     
     <section id="jpa-tuning-sql-table">
         <title>Table Access</title>
@@ -227,13 +246,69 @@
                 <listitem><para>Table accessed using RowId Scan to fetch row data to satisfy select clause</para></listitem>
             </itemizedlist>
         </section>    
+        
+        <section id="jpa-tuning-sql-index-sort">
+            <title>Index Full Scan</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Can used when one of the columns in index is non-null</para></listitem>
+                <listitem><para>Can replace table access if all columns in query also within index</para></listitem>
+            </itemizedlist>
+            <note>
+                <para>OracleDB permits the entire table to be defined as a B*-tree index. Using this feature
+                    for some tables can provide efficient access to data while saving overhead of duplicating 
+                    columns within a separate index.
+                </para>
+<programlisting language=""><![CDATA[create table MOVIE(...) organization index;]]></programlisting>
+                <para>H2 always tries to store data tables as B*-trees.</para>                        
+            </note>
+            <figure>
+                <title>Non-Null Indexed Columns Speed Sort</title>
+                <graphic scale="70" fileref="images/jpa-tuning-index-sort-nonnull.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>"Sort By" column index accessed using Full scan because column not-nullable and is in requested sort order</para></listitem>
+                <listitem><para>Table accessed using RowId scan to get row data in the order of the indexed column</para></listitem>
+            </itemizedlist>
 
+            <figure>
+                <title>Nullable Indexed Columns Unusable by Sort</title>
+                <graphic scale="70" fileref="images/jpa-tuning-index-sort-null.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>"Where clause" column index accessed using Range Scan to locate matching values</para></listitem>
+                <listitem><para>Table accessed using RowId scan to get row data</para></listitem>
+                <listitem><para>Result is sorted</para></listitem>
+            </itemizedlist>
+        </section>    
+        
+        <section id="jpa-tuning-sql-index-composite">
+            <title>Composite Index</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Index multiple columns in single index</para></listitem>
+                <listitem><para>Column order should align primarily with where clause and optionally contain columns from select clause</para></listitem>
+                <listitem><para>Can be used to bypass table access when all query terms contained in index</para></listitem>
+            </itemizedlist>
+            <figure>
+                <title>Composite Index Bypasses Table Access and Sort</title>
+                <graphic scale="70" fileref="images/jpa-tuning-index-full-scan-composite.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Composite index accessed thru Range Scan to locate matches and select term(s)</para></listitem>
+                <listitem><para>Table bypassed because select term(s) present in index</para></listitem>
+                <listitem><para>Sort bypassed because index order used</para></listitem>
+            </itemizedlist>
+        </section>    
+        
         <section id="jpa-tuning-sql-index-function">
-            <title>Function Index for non-Normalized Data</title>
+            <title>Function Index</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Used when applying function to column data within query</para></listitem>
+                <listitem><para>Reduces need to normalize data during insert/update</para></listitem>
+            </itemizedlist>
 
             <figure>
                 <title>Non-function Access to Data</title>
-                <graphic scalefit="1" fileref="images/jpa-tuning-index-function-nofunction.png"/>
+                <graphic scale="70" fileref="images/jpa-tuning-index-function-nofunction.png"/>
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Column index accessed thru Range Scan to locate match</para></listitem>
@@ -242,7 +317,7 @@
 
             <figure>
                 <title>Function Access to Data w/o Function Index</title>
-                <graphic scalefit="1" fileref="images/jpa-tuning-index-function-function.png"/>
+                <graphic scale="70" fileref="images/jpa-tuning-index-function-function.png"/>
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Table accessed using Full Scan to locate match and get row data</para></listitem>
@@ -251,7 +326,7 @@
 
             <figure>
                 <title>Function Access to Data with Function Index</title>
-                <graphic scalefit="1" fileref="images/jpa-tuning-index-function-function-index.png"/>
+                <graphic scale="70" fileref="images/jpa-tuning-index-function-function-index.png"/>
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Function(column) index accessed thru Range Scan to locate match using normalized value</para></listitem>
@@ -284,30 +359,21 @@
                 <listitem><para>Index Range Scan not performed because search term starts with wildcard</para></listitem>
             </itemizedlist>
         </section>    
-        
-        <section id="jpa-tuning-sql-index-sort">
-            <title>Non-Null Indexed Columns Speed Sort</title>
-            <figure>
-                <title>Non-Null Indexed Columns Speed Sort</title>
-                <graphic scale="70" fileref="images/jpa-tuning-index-sort-nonnull.png"/>
-            </figure>
-            <itemizedlist spacing="compact">
-                <listitem><para>"Sort By" column index accessed using Full scan because column not-nullable and is in requested sort order</para></listitem>
-                <listitem><para>Table accessed using RowId scan to get row data in the order of the indexed column</para></listitem>
-            </itemizedlist>
-
-            <figure>
-                <title>Nullable Indexed Columns Unusable by Sort</title>
-                <graphic scale="70" fileref="images/jpa-tuning-index-sort-null.png"/>
-            </figure>
-            <itemizedlist spacing="compact">
-                <listitem><para>"Where clause" column index accessed using Range Scan to locate matching values</para></listitem>
-                <listitem><para>Table accessed using RowId scan to get row data</para></listitem>
-                <listitem><para>Result is sorted</para></listitem>
-            </itemizedlist>
-        </section>    
-
     </section>    
+    
+    <section id="jpa-tuning-sql-sql">
+        <title>SQL Tuning</title>
+        
+        <section id="jpa-tuning-sql-sql-">
+            <title></title>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+        </section>
+        
+    </section>
 
     <section id="jpa-tuning-sql-summary">
        <title>Summary</title>
