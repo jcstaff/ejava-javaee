@@ -250,7 +250,7 @@
         <section id="jpa-tuning-sql-index-sort">
             <title>Index Full Scan</title>
             <itemizedlist spacing="compact">
-                <listitem><para>Can used when one of the columns in index is non-null</para></listitem>
+                <listitem><para>Can be used when one of the columns in index is non-null</para></listitem>
                 <listitem><para>Can replace table access if all columns in query also within index</para></listitem>
             </itemizedlist>
             <note>
@@ -364,6 +364,60 @@
     <section id="jpa-tuning-sql-sql">
         <title>SQL Tuning</title>
         
+        <section id="jpa-tuning-sql-sql-semijoins">
+            <title>Semi-Join</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Used to return single parent table row without extra overhead of an INNER JOIN</para></listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>Inner Join (without Index)</title>
+                <graphic scale="70" fileref="images/jpa-tuning-semi-join-innerjoin.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Both tables accessed using Full Table Scan</para></listitem>
+                <listitem><para>Data from both tables JOINed using Hash Join</para></listitem>
+                <listitem><para>Inner Join inefficient</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>If just want parent rows that have children</para></listitem>
+                        <listitem><para>For large parent tables (parent rows repeated for each child)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>Inner Join (with Index)</title>
+                <graphic scale="70" fileref="images/jpa-tuning-semi-join-innerjoin-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>Semi Join (without Index)</title>
+                <graphic scale="70" fileref="images/jpa-tuning-semi-join.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Parent table accessed using Full Table Scan</para></listitem>
+                <listitem><para>Primary Key Index of child table accessed using Fast Full Scan</para></listitem>
+                <listitem><para>Child table does not need to be accessed</para></listitem>
+                <listitem><para>Single instance of each parent row returned without duplication</para></listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>Semi Join (with Index)</title>
+                <graphic scale="70" fileref="images/jpa-tuning-semi-join-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Parent table accessed using Full Table scan to get row data</para></listitem>
+                <listitem><para>Foreign key index of child table access using Range Scan to locate *first* match against parent</para></listitem>
+                <listitem><para>Most efficient if only want parent rows that have children</para></listitem>
+            </itemizedlist>
+            
+        </section>
+
         <section id="jpa-tuning-sql-sql-">
             <title></title>
             <itemizedlist spacing="compact">
