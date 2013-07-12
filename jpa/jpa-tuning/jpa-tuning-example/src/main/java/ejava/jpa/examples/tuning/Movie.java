@@ -10,7 +10,7 @@ import java.util.TreeSet;
 import javax.persistence.*;
 
 @Entity
-@Table(name="QUERYEX_MOVIE")
+@Table(name="JPATUNE_MOVIE")
 @NamedQueries({ 
 	@NamedQuery(name="Movie.findByTitle", query=
 		"select m from Movie m " +
@@ -47,10 +47,17 @@ public class Movie implements Comparable<Movie>{
 		
 	@Enumerated(EnumType.STRING)
 	@Column(name="RATING", length=6)
-	private MovieRating rating;
+	private String rating;
+	
+	@Transient
+	private MovieRating mrating; 
+	@PostLoad private void fromDB() { mrating=MovieRating.getFromMpaa(rating); }
 	
 	@Column(name="MINUTES")
-	private int minutes;
+	private Integer minutes;
+	
+	@Column(name="PLOT", length=4000)
+	private String plot;
 	
 	@ElementCollection
     @CollectionTable(
@@ -89,14 +96,15 @@ public class Movie implements Comparable<Movie>{
 		return this;
 	}
 
-	public MovieRating getRating() { return rating; }
+	public MovieRating getRating() { return mrating; }
 	public Movie setRating(MovieRating rating) {
-		this.rating = rating;
+		this.mrating = rating;
+		this.rating = rating==null ? null : rating.mpaa();
 		return this;
 	}
 
-	public int getMinutes() { return minutes; }
-	public Movie setMinutes(int minutes) {
+	public Integer getMinutes() { return minutes; }
+	public Movie setMinutes(Integer minutes) {
 		this.minutes = minutes;
 		return this;
 	}
@@ -148,7 +156,7 @@ public class Movie implements Comparable<Movie>{
 	@Override
 	public int hashCode() {
 		return (director== null ? 0 : director.hashCode()) +
-				minutes +
+				(minutes==null ? 0 : minutes) +
 				(rating==null? 0 : rating.hashCode()) +
 				(releaseDate==null? 0 : releaseDate.hashCode()) +
 				(title==null ? 0 : title.hashCode());
@@ -178,7 +186,9 @@ public class Movie implements Comparable<Movie>{
 			return false;
 		}
 		
-		if (minutes != rhs.minutes) {
+		if (minutes == null) {
+			if (rhs.minutes != null) { return false; }
+		} else if (!minutes.equals(rhs.minutes)) {
 			return false; 
 		} 
 		

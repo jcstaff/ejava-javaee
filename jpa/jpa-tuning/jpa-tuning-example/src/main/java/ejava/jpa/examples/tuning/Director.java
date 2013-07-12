@@ -7,7 +7,7 @@ import java.util.TreeSet;
 import javax.persistence.*;
 
 @Entity
-@Table(name="QUERYEX_DIRECTOR")
+@Table(name="JPATUNE_DIRECTOR")
 public class Director {
 	@Id
 	private String id;
@@ -30,9 +30,11 @@ public class Director {
 	public Person getPerson() { return person; }
 	public String getFirstName() { return person==null?null : person.getFirstName(); }
 	public String getLastName() { return person==null?null : person.getLastName(); }
+	public String getModName() { return person==null?null : person.getModName(); }
 	public Date getBirthDate() { return person==null?null : person.getBirthDate(); }
 	public Director setFirstName(String name) { if (person!=null){ person.setFirstName(name);} return this;}
 	public Director setLastName(String name) { if (person!=null){ person.setLastName(name);} return this;}
+	public Director setModName(String name) { if (person!=null){ person.setModName(name);} return this;}
 	public Director setBirthDate(Date date) { if (person!=null){ person.setBirthDate(date);} return this;}
 
 	public Set<Movie> getMovies() {

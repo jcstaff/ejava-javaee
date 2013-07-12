@@ -666,8 +666,9 @@
         <profile> 
             <id>oracledb</id> <!-- Oracle server-based DB -->
             <properties>
+                  <oracle.host>oracledb</oracle.host>
                   <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
-                  <jdbc.url>jdbc:oracle:thin:@oracledb:1521:orcl</jdbc.url>
+                  <jdbc.url>jdbc:oracle:thin:@${oracle.host}:1521:orcl</jdbc.url>
                   <jdbc.user>ejava</jdbc.user>
                   <jdbc.password>password</jdbc.password>
                   <hibernate.dialect>

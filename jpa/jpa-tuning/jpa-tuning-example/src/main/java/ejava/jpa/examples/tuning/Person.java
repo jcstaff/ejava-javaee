@@ -5,18 +5,21 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Entity
-@Table(name="QUERYEX_PERSON")
+@Table(name="JPATUNE_PERSON")
 public class Person {
 	@Id 
 	@Column(name="ID", length=36)
 	private String id;
 	
-	@Column(name="FIRST_NAME", length=16)
+	@Column(name="FIRST_NAME", length=128)
 	private String firstName;
 	
-	@Column(name="LAST_NAME", length=16)
+	@Column(name="LAST_NAME", length=128)
 	private String lastName;
 	
+	@Column(name="MOD_NAME", length=32)
+	private String modName;
+
 	@Temporal(TemporalType.DATE)
 	@Column(name="BIRTH_DATE")
 	private Date birthDate;
@@ -39,6 +42,12 @@ public class Person {
 		return this;
 	}
 	
+	public String getModName() { return modName; }
+	public Person setModName(String modName) {
+		this.modName = modName;
+		return this;
+	}
+	
 	public Date getBirthDate() { return birthDate; }
 	public Person setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
@@ -49,6 +58,7 @@ public class Person {
 	public int hashCode() {
 		return (firstName==null?0:firstName.hashCode()) + 
 				(lastName==null?0:lastName.hashCode()) +
+				(modName==null?0:modName.hashCode()) +
 				(birthDate==null?0:birthDate.hashCode());
 	}
 	
@@ -58,14 +68,16 @@ public class Person {
 			if (this == obj) { return true; }
 			if (obj==null) { return false; }
 			Person rhs = (Person)obj;
-			if (firstName!=null && lastName!=null && birthDate!=null) {
+			if (firstName!=null && lastName!=null && modName!=null && birthDate!=null) {
 				return firstName.equals(rhs.firstName) && 
 						lastName.equals(rhs.lastName) &&
+						modName.equals(rhs.modName) &&
 						birthDate.equals(rhs.birthDate) &&
 						id==null?true:id.equals(rhs.id);
 			}
 			if ((firstName==null && rhs.firstName!=null) ||
 					(lastName==null && rhs.lastName!=null) ||
+					(modName==null && rhs.lastName!=null) ||
 					(birthDate==null && rhs.birthDate!=null)) { 
 				return false; 
 			}
@@ -75,7 +87,12 @@ public class Person {
 	
 	@Override
 	public String toString() {
-		return firstName + " " + lastName;
+		StringBuilder text = new StringBuilder();
+		if (firstName != null) { text.append(firstName); }
+		if (firstName != null && lastName!=null) { text.append(" "); }
+		if (lastName != null) { text.append(lastName); }
+		if (modName != null) { text.append(" (").append(modName).append(")"); }
+		return text.toString();
 	}
 	
 }

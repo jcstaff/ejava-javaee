@@ -62,18 +62,6 @@ public class QueryBase {
     
     public static void cleanup(EntityManager em) {
     	em.getTransaction().begin();
-    	for (Movie movie : em.createQuery("from Movie", Movie.class).getResultList()) {
-    		em.remove(movie);
-    	}
-    	for (Actor actor: em.createQuery("from Actor", Actor.class).getResultList()) {
-    		em.remove(actor);
-    	}
-    	for (Director director: em.createQuery("from Director", Director.class).getResultList()) {
-    		em.remove(director);
-    	}
-    	for (Person person: em.createQuery("from Person", Person.class).getResultList()) {
-    		em.remove(person);
-    	}
     	em.getTransaction().commit();
     }
     

@@ -3,7 +3,7 @@ package ejava.jpa.examples.tuning;
 import javax.persistence.*;
 
 @Entity
-@Table(name="QUERYEX_MOVIEROLE")
+@Table(name="JPATUNE_MOVIEROLE")
 @IdClass(MovieRolePK.class)
 public class MovieRole {
 	@Id
@@ -12,7 +12,7 @@ public class MovieRole {
 	private Movie movie;
 
 	@Id
-	@Column(name="MOVIE_ROLE", length=32)
+	@Column(name="MOVIE_ROLE", length=32, nullable=false)
 	private String role;
 	
 	@ManyToOne(optional=false, fetch=FetchType.EAGER,
