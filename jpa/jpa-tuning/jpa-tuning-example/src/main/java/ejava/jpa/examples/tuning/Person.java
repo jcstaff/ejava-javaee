@@ -5,7 +5,10 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Entity
-@Table(name="JPATUNE_PERSON")
+@Table(name="JPATUNE_PERSON",
+		uniqueConstraints={
+			@UniqueConstraint(columnNames={"LAST_NAME","FIRST_NAME","MOD_NAME"})
+})
 public class Person {
 	@Id 
 	@Column(name="ID", length=36)

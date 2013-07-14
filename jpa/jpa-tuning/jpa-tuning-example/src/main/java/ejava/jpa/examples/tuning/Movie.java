@@ -45,7 +45,6 @@ public class Movie implements Comparable<Movie>{
 	@Column(name="RELEASE_DATE")
 	private Date releaseDate;
 		
-	@Enumerated(EnumType.STRING)
 	@Column(name="RATING", length=6)
 	private String rating;
 	

@@ -2,11 +2,14 @@ package ejava.jpa.examples.tuning;
 
 import static org.junit.Assert.*;
 
+
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.TemporalType;
@@ -14,12 +17,18 @@ import javax.persistence.TypedQuery;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class QueryTest extends QueryBase {
 	private static final Log log = LogFactory.getLog(QueryTest.class);
-	
+    protected EntityManager em;    
+
+    @Before public void setUp() { em=emf.createEntityManager(); }
+    @After public void tearDown() { em.close(); }
+    
 	/**
 	 * This test method demonstrates retrieving zero to many matching entities
 	 * from a database.
@@ -78,6 +87,7 @@ public class QueryTest extends QueryBase {
 		em.createQuery(
 				"select m from Movie m " +
 				"where m.rating='R'", Movie.class)
+				.setMaxResults(2) //indicates we are expecting a problem
 				.getSingleResult();
 		log.debug("query did not produce expected exception");
 	}
@@ -235,47 +245,62 @@ public class QueryTest extends QueryBase {
 		}
 		//assertEquals("unexpected number of results", 7, results.size());
 	}
+    
 	
-    @Test @Ignore
+    @Test
     public void kevinBacon1() {
     	log.info("*** kevinBacon1 ***");
     	
     	//get the Kevin Bacon who played in the movie "Tremors"
-    	Person kevinBacon = em.createQuery(
-    			"select r.actor.person " +
+    	String id = em.createQuery(
+    			"select r.actor.person.id " +
     			"from MovieRole r " +
     			"where r.movie.title = 'Tremors' and " +
     			"r.actor.person.lastName='Bacon' and " +
-    			"r.actor.person.firstName='Kevin'", Person.class)
+    			"r.actor.person.firstName='Kevin'", String.class)
     			.getSingleResult();
-    	log.info("kevin=" + kevinBacon);
+    	log.info("kevin=" + id);
     	
     	//find people who are 1 step from Kevin Bacon
-    	Actor a = em.createQuery(
-    			"select a from Actor a " +
-   			    "where a.person=:kevin", Actor.class)
-   			        .setParameter("kevin", kevinBacon)
-    			    .getSingleResult();
-    	log.debug("actor=" + a);
-    	/*
-    	List<Movie> movies = em.createQuery(
-    			"select m from Movie m " +
-    			"join m.cast r " +
-   			    "where r.actor.person=:kevin", Movie.class)
-    			 .setParameter("kevin", kevinBacon)
-    			.getResultList();
-    	log.debug("movies.size=" + movies.size());
     	List<Person> people = em.createQuery(
     			"select a.person from Actor a " +
     			"join a.roles ar " +
+    			"join a.person ap " +
     			"where ar.movie in (select m from Movie m " +
-    			    "join m.cast r " +
-    		        "join r.actor a " +
-    			    "where a.person=:kevinBacon))" +
-    			 "and ! a.person = :kevinBacon", Person.class)
-    			 .setParameter("kevinBacon", kevinBacon)
+    			    "inner join m.cast mr " +
+    		        "inner join mr.actor ma " +
+    		        "inner join ma.person mp " +
+    			    "where mp.id = :id))" +
+    			 "and ap.id not = :id", Person.class)
+    			 .setParameter("id", id)
     			.getResultList();
-    			*/
-    	//log.info("1 step=" + people.size());
+    	log.info("1 step=" + people.size());
+    }
+
+    @Test
+    public void kevinBacon2() {
+    	log.info("*** kevinBacon2 ***");
+    	
+    	//find people who are 1 step from Kevin Bacon
+    	List<Person> people = em.createQuery(
+    			"select a.person from Actor a " +
+    			"join a.roles ar " +
+    			"join a.person ap " +
+    			"where ar.movie in (select m from Movie m " +
+    			    "inner join m.cast mr " +
+    		        "inner join mr.actor ma " +
+    		        "inner join ma.person mp " +
+    			    "where mp in (select r.actor.person " +
+		    			"from MovieRole r " +
+		    			"where r.movie.title = 'Tremors' and " +
+		    			"r.actor.person.lastName='Bacon' and " +
+		    			"r.actor.person.firstName='Kevin')))" +
+    			 "and ap not in (select r.actor.person " +
+	    			"from MovieRole r " +
+	    			"where r.movie.title = 'Tremors' and " +
+	    			"r.actor.person.lastName='Bacon' and " +
+	    			"r.actor.person.firstName='Kevin')", Person.class)
+    			.getResultList();
+    	log.info("1 step=" + people.size());
     }
 }
