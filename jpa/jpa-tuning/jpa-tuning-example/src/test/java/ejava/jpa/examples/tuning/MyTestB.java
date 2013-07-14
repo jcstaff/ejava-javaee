@@ -15,7 +15,7 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 
 
 @AxisRange(min = 0, max = 4)
-@BenchmarkMethodChart(filePrefix="target/MyTestB")
+//@BenchmarkMethodChart(filePrefix="target/MyTestB")
 public class MyTestB extends TestBase {
 	private static final Log log = LogFactory.getLog(MyTestB.class);
 	

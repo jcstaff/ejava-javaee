@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="JPATUNE_PERSON",
 		uniqueConstraints={
-			@UniqueConstraint(columnNames={"LAST_NAME","FIRST_NAME","MOD_NAME"})
+			@UniqueConstraint(name="PERSON_NAMES_UNIQUE", columnNames={"LAST_NAME","FIRST_NAME","MOD_NAME"})
 })
 public class Person {
 	@Id 
@@ -17,7 +17,7 @@ public class Person {
 	@Column(name="FIRST_NAME", length=128)
 	private String firstName;
 	
-	@Column(name="LAST_NAME", length=128)
+	@Column(name="LAST_NAME", length=128, nullable=false)
 	private String lastName;
 	
 	@Column(name="MOD_NAME", length=32)

@@ -30,13 +30,10 @@ public class QueryBase {
     }
     
     public static void cleanup(EntityManager em) {
-    	em.getTransaction().begin();
-    	em.getTransaction().commit();
+    	new MovieFactory().setEntityManager(em).cleanup();
     }
     
     public static void populate(EntityManager em) {
-    	em.getTransaction().begin();
     	new MovieFactory().setEntityManager(em).populate();
-    	em.getTransaction().commit();
     }
 }

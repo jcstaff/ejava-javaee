@@ -27,20 +27,14 @@ public class MyTestSuiteTest {
 	@BeforeClass
 	public static void setUpClass() {
 		log.info("@BeforeClass.Suite");
+		System.setProperty("jub.customkey", "MyTestSuiteTest");
 	}
 
-	@Before
-	public void setUp() {
-		log.info("@Before.Suite -- not called");
-	}
-
-	@After
-	public void tearDown() {
-		log.info("@After.Suite -- not called");
-	}
-	
 	@AfterClass
 	public static void tearDownClass() {
 		log.info("@AfterClass.Suite");
 	}
+
+	@Before public void setUp() { log.info("@Before.Suite -- not called"); }
+	@After public void tearDown() { log.info("@After.Suite -- not called"); }
 }
