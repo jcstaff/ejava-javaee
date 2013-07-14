@@ -1,4 +1,4 @@
-package ejava.jpa.examples.tuning;
+package ejava.jpa.examples.tuning.stuff;
 
 import static org.junit.Assert.*;
 
@@ -22,6 +22,11 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import ejava.jpa.examples.tuning.bo.Movie;
+import ejava.jpa.examples.tuning.bo.MovieRating;
+import ejava.jpa.examples.tuning.bo.Person;
+
+@Ignore
 public class QueryTest extends QueryBase {
 	private static final Log log = LogFactory.getLog(QueryTest.class);
     protected EntityManager em;    

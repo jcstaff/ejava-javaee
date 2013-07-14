@@ -10,12 +10,12 @@
          is not hosted in the src/main tree - the individual entities
          must be individually named below for schema generation to 
          work correctly -->
-    <persistence-unit name="queryEx-test">
+    <persistence-unit name="movietune-test">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <class>ejava.jpa.examples.tuning.Person</class>
-        <class>ejava.jpa.examples.tuning.Actor</class>
-        <class>ejava.jpa.examples.tuning.Director</class>
-        <class>ejava.jpa.examples.tuning.Movie</class>
-        <class>ejava.jpa.examples.tuning.MovieRole</class>
+        <class>ejava.jpa.examples.tuning.bo.Person</class>
+        <class>ejava.jpa.examples.tuning.bo.Actor</class>
+        <class>ejava.jpa.examples.tuning.bo.Director</class>
+        <class>ejava.jpa.examples.tuning.bo.Movie</class>
+        <class>ejava.jpa.examples.tuning.bo.MovieRole</class>
     </persistence-unit>            
 </persistence>

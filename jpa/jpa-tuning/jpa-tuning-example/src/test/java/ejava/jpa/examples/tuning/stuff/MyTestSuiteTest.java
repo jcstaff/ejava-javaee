@@ -1,6 +1,4 @@
-package ejava.jpa.examples.tuning;
-
-import junit.framework.TestSuite;
+package ejava.jpa.examples.tuning.stuff;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -8,14 +6,12 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 
-
+@Ignore
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	MyTestA.class,

@@ -1,4 +1,4 @@
-package ejava.jpa.examples.tuning;
+package ejava.jpa.examples.tuning.stuff;
 
 import static org.junit.Assert.*;
 
@@ -27,6 +27,9 @@ import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 
+import ejava.jpa.examples.tuning.bo.Person;
+
+@Ignore
 @AxisRange(min = 0, max = 10)
 @BenchmarkMethodChart(filePrefix = "benchmark-lists")
 @BenchmarkOptions(warmupRounds=1, benchmarkRounds=3, concurrency=1)

@@ -1,4 +1,4 @@
-package ejava.jpa.examples.tuning;
+package ejava.jpa.examples.tuning.stuff;
 
 import javax.persistence.EntityManager;
 
@@ -8,8 +8,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+
+import ejava.jpa.examples.tuning.MovieFactory;
 
 
+@Ignore
 public class QueryBase {
     private static Log log = LogFactory.getLog(QueryBase.class);
     private static final String PERSISTENCE_UNIT = "queryEx-test";

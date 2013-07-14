@@ -1,4 +1,4 @@
-package ejava.jpa.examples.tuning;
+package ejava.jpa.examples.tuning.stuff;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -13,7 +14,10 @@ import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 
+import ejava.jpa.examples.tuning.TestBase;
 
+
+@Ignore
 @AxisRange(min = 0, max = 4)
 //@BenchmarkMethodChart(filePrefix="target/MyTestB")
 public class MyTestB extends TestBase {

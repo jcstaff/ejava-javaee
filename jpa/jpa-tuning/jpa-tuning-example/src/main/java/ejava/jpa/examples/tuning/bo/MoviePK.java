@@ -1,4 +1,4 @@
-package ejava.jpa.examples.tuning;
+package ejava.jpa.examples.tuning.bo;
 
 import java.io.Serializable;
 import java.util.Date;
