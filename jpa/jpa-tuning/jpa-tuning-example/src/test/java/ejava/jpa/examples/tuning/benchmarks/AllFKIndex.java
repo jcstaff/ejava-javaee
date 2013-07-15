@@ -5,23 +5,39 @@ import javax.persistence.EntityManager;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+
 import ejava.jpa.examples.tuning.MovieFactory;
 import ejava.jpa.examples.tuning.TestBase;
+import ejava.jpa.examples.tuning.TestLabel;
 import ejava.jpa.examples.tuning.bo.Person;
+import ejava.jpa.examples.tuning.suites.ForeignKeyIndexTest;
 
+@AxisRange(min=ForeignKeyIndexTest.AXIS_MIN, max=ForeignKeyIndexTest.AXIS_MAX)
+@TestLabel(label="FKs Enabled")
 public class AllFKIndex extends TestBase {
 	private static Person kevinBacon;
+	
+	public AllFKIndex() {
+		super("All Foreign Keys Enabled");
+	}
 	
 	@BeforeClass
 	public static void setUpClass() {
 		EntityManager em=getEMF().createEntityManager();
-		new MovieFactory().setEntityManager(em).createFKIndexes();
 		kevinBacon = getDAO().getKevinBacon();
+		new MovieFactory().setEntityManager(em).createFKIndexes().flush();
 		em.close();
 	}
 	
-	@Test
-	public void kevin1Step() {
+	@TestLabel(label="Single JOIN")
+	@Test public void getKevin() {
+		log.info("*** getKevin() ***");
+		getDAO().getKevinBacon();
+	}
+	
+	@TestLabel(label="Multiple JOINs")
+	@Test public void kevin1Step() {
 		log.info("*** kevin1Step ***");
 		getDAO().oneStepFromPerson(kevinBacon, null, null);
 	}

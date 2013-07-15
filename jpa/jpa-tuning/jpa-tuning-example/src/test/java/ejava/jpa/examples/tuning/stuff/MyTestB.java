@@ -23,6 +23,10 @@ import ejava.jpa.examples.tuning.TestBase;
 public class MyTestB extends TestBase {
 	private static final Log log = LogFactory.getLog(MyTestB.class);
 	
+	public MyTestB() {
+		super("B");
+	}
+	
 	@BeforeClass
 	public static void setUpClass() {
 		log.trace("@BeforeClass.TestB");

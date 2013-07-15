@@ -1,5 +1,12 @@
 package ejava.jpa.examples.tuning;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -7,27 +14,76 @@ import javax.persistence.Persistence;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
+import com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
-import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+import com.carrotsearch.junitbenchmarks.IResultsConsumer;
+import com.carrotsearch.junitbenchmarks.Result;
+import com.carrotsearch.junitbenchmarks.WriterConsumer;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
+import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 import ejava.jpa.examples.tuning.dao.MovieDAOImpl;
 
-@BenchmarkOptions(warmupRounds=1, benchmarkRounds=3)
+@BenchmarkOptions(warmupRounds=1, benchmarkRounds=2)
+//@BenchmarkMethodChart
 @BenchmarkHistoryChart
-@AxisRange(min=0, max=10)
 public class TestBase {
     protected static Log log = LogFactory.getLog(TestBase.class);
     private static final String PERSISTENCE_UNIT = "movietune-test";
     protected static EntityManagerFactory emf;
     private static EntityManager em_;
 	private static MovieDAOImpl dao;
+	private static H2Consumer h2;
+	private static final ResultsConsumer resultsConsumer;
+	static {
+		System.setProperty("jub.db.file", "target/benchmarks");
+		System.setProperty(BenchmarkOptionsSystemProperties.CHARTS_DIR_PROPERTY, "target/charts");
+		h2=new H2Consumer();
+		resultsConsumer=new ResultsConsumer();
+	}
 	
-	public @Rule BenchmarkRule benchmarkRun = new BenchmarkRule();
+	public static class ResultsConsumer implements IResultsConsumer {
+		private List<Result> results = new LinkedList<Result>();
+		@Override
+		public void accept(Result result) throws IOException {
+			results.add(result);
+		}
+		public List<Result> getResults() { return results; }
+	};
+
+	public @Rule BenchmarkRule benchmarkRun;
+	public static ResultsConsumer getResultsConsumer() { return resultsConsumer; }
+	protected static String getLabel(Object o) {
+		if (o instanceof Class<?>) {
+			Class<?> type = (Class<?>)o;
+			TestLabel label = type.getAnnotation(TestLabel.class);
+			return label != null ? label.label() : type.getSimpleName();
+		} else if (o instanceof Method) {
+			Method m = (Method)o;
+			TestLabel label = m.getAnnotation(TestLabel.class);
+			return label != null ? label.label() : m.getName();
+		}
+		return o.toString();
+	}
+	public static void printResults() {
+		StringBuilder text = new StringBuilder();
+		text.append("\n=========================================================================\n\n");
+		for (Result r : TestBase.getResultsConsumer().getResults()) {
+			text.append(String.format("%s.%s:", getLabel(r.getTestClass()), getLabel(r.getTestMethod())));
+			text.append(String.format("warmups=%d",r.warmupRounds));
+			text.append(String.format(", rounds=%d",r.benchmarkRounds));
+			text.append(String.format(", ave=%s",r.roundAverage.toString()));
+			text.append("\n");
+		}
+		text.append("\n=========================================================================");
+		log.info(text.toString());
+	}
 	
 	protected static EntityManagerFactory getEMF() {
 		if (emf==null) {
@@ -43,16 +99,20 @@ public class TestBase {
 		}
 		return dao;
 	}
-
+	
 	@BeforeClass
-    public static void setUpBase() {
+    public static void setUpBaseClass() {
         EntityManager em = getEMF().createEntityManager();
         cleanup(em);
         em.close();
     }
 	
+	public TestBase(String dbKey) {
+		benchmarkRun=new BenchmarkRule(resultsConsumer, new WriterConsumer(), h2);
+	}
+	
 	@AfterClass
-	public static void tearDownBase() {
+	public static void tearDownBaseClass() {
 		if (em_ != null) {
 			em_.close(); 
 			em_ = null;

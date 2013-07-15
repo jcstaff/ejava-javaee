@@ -89,7 +89,25 @@ public class MovieFactory {
 		}
 	}
 
-	public void dropFKIndexes() {
+	protected void executeSQL(String[] sql, boolean failOnError) {
+		for (String s: sql) {
+			EntityTransaction tx = em.getTransaction();
+			tx.begin();
+			try {
+				em.createNativeQuery(s).executeUpdate();
+			} catch (Exception ex) {
+				if (failOnError) {
+					log.error("failed:" + s, ex);
+					throw new RuntimeException("failed:" + s, ex);
+				}
+			}
+			if (!tx.getRollbackOnly()) { tx.commit(); }
+			else { tx.rollback(); }
+		}
+	}
+	
+	
+	public MovieFactory dropFKIndexes() {
 		SQLStatement sql[] = new SQLStatement[]{
 			new SQLStatement(MOVIE_DIRECTOR_FKX, false),
 			new SQLStatement(GENRE_MOVIE_FKX, false),
@@ -97,9 +115,10 @@ public class MovieFactory {
 			new SQLStatement(MOVIEROLE_MOVIE_FKX, false)
 		};
 		executeSQL(sql, true);
+		return this;
 	}
 	
-	public void createFKIndexes() {
+	public MovieFactory createFKIndexes() {
 		SQLStatement sql[] = new SQLStatement[]{
 				new SQLStatement(MOVIE_DIRECTOR_FKX, true), 
 				new SQLStatement(GENRE_MOVIE_FKX, true),
@@ -107,5 +126,14 @@ public class MovieFactory {
 				new SQLStatement(MOVIEROLE_MOVIE_FKX, true)
 			};
 			executeSQL(sql, false);
+			return this;
+	}
+	
+	public MovieFactory flush() {
+		executeSQL(new String[]{
+				//"alter system flush shared_pool",
+				//"alter system flush buffer_cache"
+		}, true);
+		return this;
 	}
 }
