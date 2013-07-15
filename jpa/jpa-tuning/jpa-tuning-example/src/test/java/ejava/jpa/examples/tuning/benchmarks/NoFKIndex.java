@@ -19,15 +19,11 @@ import ejava.jpa.examples.tuning.suites.ForeignKeyIndexTest;
 public class NoFKIndex extends TestBase {
 	private static Person kevinBacon;
 	
-	public NoFKIndex() {
-		super("No Foreign Keys Enabled");
-	}
-	
 	@BeforeClass
 	public static void setUpClass() {
 		EntityManager em=getEMF().createEntityManager();
 		kevinBacon = getDAO().getKevinBacon();
-		new MovieFactory().setEntityManager(em).dropFKIndexes().flush();
+		new MovieFactory().setEntityManager(em).dropIndexes().flush();
 		em.close();
 	}
 	

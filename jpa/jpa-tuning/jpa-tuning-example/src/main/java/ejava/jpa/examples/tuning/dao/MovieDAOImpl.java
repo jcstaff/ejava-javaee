@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import ejava.jpa.examples.tuning.bo.Movie;
+import ejava.jpa.examples.tuning.bo.MovieRating;
 import ejava.jpa.examples.tuning.bo.Person;
 
 public class MovieDAOImpl {
@@ -40,7 +42,13 @@ public class MovieDAOImpl {
     			.getSingleResult();
 	}
 
-	//find people who are 1 step from Kevin Bacon
+	/**
+	 * Find people who are 1 step from Kevin Bacon.
+	 * @param p
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
     public List<Person> oneStepFromPerson(Person p, Integer offset, Integer limit) {
     	return withPaging(em.createQuery(
 			"select a.person from Actor a " +
@@ -55,4 +63,68 @@ public class MovieDAOImpl {
 			 .setParameter("id", p.getId()), offset, limit)
 			.getResultList();
     }
+
+    /**
+     * Returns a bulk, unordered page of movies. This will cause a full
+     * table scan since there is no reason to consult the index.
+     * @param offset
+     * @param limit
+     * @return
+     */
+	public List<Movie> getMovies(Integer offset, Integer limit) {
+		return withPaging(em.createQuery(
+				"select m from Movie m", Movie.class), 
+				offset, limit).getResultList();
+	}
+	
+	/**
+	 * Returns an unordered page of movies matching the supplied rating -- but
+	 * calling upper() on the DB value. This will cause an index to be bypassed 
+	 * except for an upper() function index.
+	 * @param rating
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	public List<Movie> getMoviesByRatingUpperFunction(MovieRating rating, Integer offset, Integer limit) {
+		return withPaging(em.createQuery(
+				"select m from Movie m " +
+				"where upper(m.rating) = :rating", Movie.class)
+				.setParameter("rating", rating.mpaa().toUpperCase()), 
+				offset, limit).getResultList();
+	}
+
+	/**
+	 * Returns an unordered page of movies matching the supplied rating -- but
+	 * calling lower() on the DB value. This will cause an index to be bypassed
+	 * except for a lower() function index.
+	 * @param rating
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	public List<Movie> getMoviesByRatingLowerFunction(MovieRating rating, Integer offset, Integer limit) {
+		return withPaging(em.createQuery(
+				"select m from Movie m " +
+				"where lower(m.rating) = :rating", Movie.class)
+				.setParameter("rating", rating.mpaa().toLowerCase()), 
+				offset, limit).getResultList();
+	}
+
+	/**
+	 * Returns an unordered page of movies matching the supplied rating --
+	 * without calling any function()s on the stored data. If the column 
+	 * contains an index, it will be used. 
+	 * @param rating
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	public List<Movie> getMoviesByRatingValue(MovieRating rating, Integer offset, Integer limit) {
+		return withPaging(em.createQuery(
+				"select m from Movie m " +
+				"where m.rating = :rating", Movie.class)
+				.setParameter("rating", rating.mpaa()), 
+				offset, limit).getResultList();
+	}
 }

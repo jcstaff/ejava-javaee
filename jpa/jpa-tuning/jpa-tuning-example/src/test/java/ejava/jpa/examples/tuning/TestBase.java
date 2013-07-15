@@ -1,9 +1,7 @@
 package ejava.jpa.examples.tuning;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,7 +12,6 @@ import javax.persistence.Persistence;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 
@@ -25,13 +22,11 @@ import com.carrotsearch.junitbenchmarks.IResultsConsumer;
 import com.carrotsearch.junitbenchmarks.Result;
 import com.carrotsearch.junitbenchmarks.WriterConsumer;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
-import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 import ejava.jpa.examples.tuning.dao.MovieDAOImpl;
 
 @BenchmarkOptions(warmupRounds=1, benchmarkRounds=2)
-//@BenchmarkMethodChart
 @BenchmarkHistoryChart
 public class TestBase {
     protected static Log log = LogFactory.getLog(TestBase.class);
@@ -107,7 +102,7 @@ public class TestBase {
         em.close();
     }
 	
-	public TestBase(String dbKey) {
+	public TestBase() {
 		benchmarkRun=new BenchmarkRule(resultsConsumer, new WriterConsumer(), h2);
 	}
 	

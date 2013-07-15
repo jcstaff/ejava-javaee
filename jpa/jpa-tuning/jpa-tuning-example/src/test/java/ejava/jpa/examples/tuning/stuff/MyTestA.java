@@ -21,9 +21,6 @@ import ejava.jpa.examples.tuning.TestBase;
 public class MyTestA extends TestBase {
 	private static final Log log = LogFactory.getLog(MyTestA.class);
 	
-	public MyTestA() {
-		super("A");
-	}
 	@BeforeClass
 	public static void setUpClass() {
 		log.trace("@BeforeClass.TestA");

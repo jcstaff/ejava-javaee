@@ -18,10 +18,6 @@ import ejava.jpa.examples.tuning.suites.ForeignKeyIndexTest;
 public class AllFKIndex extends TestBase {
 	private static Person kevinBacon;
 	
-	public AllFKIndex() {
-		super("All Foreign Keys Enabled");
-	}
-	
 	@BeforeClass
 	public static void setUpClass() {
 		EntityManager em=getEMF().createEntityManager();
