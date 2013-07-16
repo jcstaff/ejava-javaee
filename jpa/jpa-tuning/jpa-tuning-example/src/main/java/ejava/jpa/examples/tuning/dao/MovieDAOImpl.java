@@ -127,4 +127,36 @@ public class MovieDAOImpl {
 				.setParameter("rating", rating.mpaa()), 
 				offset, limit).getResultList();
 	}
+
+	/**
+	 * Returns an unordered page of movies that have a title "like" the one passed
+	 * in. Note the difference in index behavior when there is a wildcard at the 
+	 * beginning or end of the searched title
+	 * @param title
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	public List<Movie> getMoviesLikeTitle(String title, Integer offset, Integer limit) {
+		return withPaging(em.createQuery(
+				"select m from Movie m " +
+				"where m.title like :title", Movie.class)
+				.setParameter("title", title), 
+				offset, limit).getResultList();
+	}
+
+	/**
+	 * Returns movies exactly matching the provided title.
+	 * @param title
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	public List<Movie> getMoviesEqualsTitle(String title, Integer offset, Integer limit) {
+		return withPaging(em.createQuery(
+				"select m from Movie m " +
+				"where m.title = :title", Movie.class)
+				.setParameter("title", title), 
+				offset, limit).getResultList();
+	}
 }

@@ -58,6 +58,7 @@ public class MovieFactory {
 	public SQLIndex MOVIE_DIRECTOR_FKX = new SQLIndex("movie_director_fkx", "create index movie_director_fkx on jpatune_movie(director_id)");
 	public SQLIndex MOVIE_RATING_IDX = new SQLIndex("movie_rating_idx", "create index movie_rating_idx on jpatune_movie(rating)");
 	public SQLIndex MOVIE_RATING_LOWER_IDX = new SQLIndex("movie_rating_lower_idx", "create index movie_rating_lower_idx on jpatune_movie(lower(rating))");
+	public SQLIndex MOVIE_TITLE_IDX = new SQLIndex("movie_title_idx", "create index movie_title_idx on jpatune_movie(title)");
 	public SQLIndex GENRE_MOVIE_FKX = new SQLIndex("genre_movie_fkx", "create index genre_movie_fkx on jpatune_moviegenre(movie_id)");
 	public SQLIndex MOVIEROLE_ACTOR_FKX = new SQLIndex("movierole_actor_fkx", "create index movierole_actor_fkx on jpatune_movierole(actor_id)");
 	public SQLIndex MOVIEROLE_MOVIE_FKX = new SQLIndex("movierole_movie_fkx", "create index movierole_movie_fkx on jpatune_movierole(movie_id)");
@@ -140,7 +141,8 @@ public class MovieFactory {
 			new SQLStatement(MOVIEROLE_ACTOR_FKX, false),
 			new SQLStatement(MOVIEROLE_MOVIE_FKX, false),
 			new SQLStatement(MOVIE_RATING_IDX, false),
-			new SQLStatement(MOVIE_RATING_LOWER_IDX, false)
+			new SQLStatement(MOVIE_RATING_LOWER_IDX, false),
+			new SQLStatement(MOVIE_TITLE_IDX, false)
 		};
 		executeSQL(sql, true);
 		return this;

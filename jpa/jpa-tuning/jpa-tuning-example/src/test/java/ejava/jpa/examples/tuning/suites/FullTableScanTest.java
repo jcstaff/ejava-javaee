@@ -13,6 +13,6 @@ import ejava.jpa.examples.tuning.benchmarks.FullTableScan;
 })
 public class FullTableScanTest extends SuiteBase {
 	public static final int AXIS_MIN=0;
-	public static final int AXIS_MAX=10;
-	public static final int MAX_ROWS=7000;
+	public static final int AXIS_MAX=1;
+	public static final int MAX_ROWS=1000;
 }

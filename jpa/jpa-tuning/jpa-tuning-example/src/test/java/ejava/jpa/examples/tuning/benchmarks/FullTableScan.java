@@ -13,7 +13,6 @@ import ejava.jpa.examples.tuning.MovieFactory;
 import ejava.jpa.examples.tuning.MovieFactory.SQLConstruct;
 import ejava.jpa.examples.tuning.TestBase;
 import ejava.jpa.examples.tuning.TestLabel;
-import ejava.jpa.examples.tuning.MovieFactory.SQLStatement;
 import ejava.jpa.examples.tuning.bo.MovieRating;
 import ejava.jpa.examples.tuning.suites.FullTableScanTest;
 
@@ -29,7 +28,8 @@ public class FullTableScan extends TestBase {
 		MovieFactory mf = new MovieFactory().setEntityManager(em);
 		SQLConstruct[] constructs = new SQLConstruct[]{
 				mf.MOVIE_RATING_IDX,
-				mf.MOVIE_RATING_LOWER_IDX
+				mf.MOVIE_RATING_LOWER_IDX,
+				mf.MOVIE_TITLE_IDX
 		};
 		mf.executeSQL(constructs).assertConstructs(constructs).flush();
 		em.close();
@@ -57,5 +57,37 @@ public class FullTableScan extends TestBase {
 	@Test
 	public void indexedFunctionAccess() {
 		assertEquals(MAX_ROWS,getDAO().getMoviesByRatingLowerFunction(MovieRating.R, 0,MAX_ROWS).size());
+	}
+
+	@TestLabel(label="Ending Wildcard")
+	@Test
+	public void endingWildcard() {
+		assertEquals(1,getDAO().getMoviesLikeTitle("Natural Disasters: Forces of Nature%", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Mystic River: From Page to Scree%", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Seventeen: The Faces for Fal%", 0, MAX_ROWS).size());
+	}
+
+	@TestLabel(label="Leading Wildcard")
+	@Test
+	public void leadingWildcard() {
+		assertEquals(1,getDAO().getMoviesLikeTitle("%atural Disasters: Forces of Nature", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("%ystic River: From Page to Screen", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("%eventeen: The Faces for Fall", 0, MAX_ROWS).size());
+	}
+
+	@TestLabel(label="Exact Like")
+	@Test
+	public void exactLike() {
+		assertEquals(1,getDAO().getMoviesLikeTitle("Natural Disasters: Forces of Nature", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Mystic River: From Page to Screen", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Seventeen: The Faces for Fall", 0, MAX_ROWS).size());
+	}
+
+	@TestLabel(label="Exact Equals")
+	@Test
+	public void exactEquals() {
+		assertEquals(1,getDAO().getMoviesEqualsTitle("Natural Disasters: Forces of Nature", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesEqualsTitle("Mystic River: From Page to Screen", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesEqualsTitle("Seventeen: The Faces for Fall", 0, MAX_ROWS).size());
 	}
 }
