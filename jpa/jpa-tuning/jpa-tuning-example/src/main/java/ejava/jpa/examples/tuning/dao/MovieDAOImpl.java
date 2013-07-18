@@ -159,4 +159,21 @@ public class MovieDAOImpl {
 				.setParameter("title", title), 
 				offset, limit).getResultList();
 	}
+
+	/**
+	 * Returns an unordered page of titles that match a specified rating. This query
+	 * will be impacted by a presence of an index on the rating column and the presence
+	 * of the title column with the rating column as a part of a composite index.
+	 * @param rating
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	public List<String> getTitlesByRating(MovieRating rating, Integer offset, Integer limit) {
+		return withPaging(em.createQuery(
+				"select m.title from Movie m " +
+				"where m.rating = :rating", String.class)
+				.setParameter("rating", rating.mpaa()), 
+				offset, limit).getResultList();
+	}
 }

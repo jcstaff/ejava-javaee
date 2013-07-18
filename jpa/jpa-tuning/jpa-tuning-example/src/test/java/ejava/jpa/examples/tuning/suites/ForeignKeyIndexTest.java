@@ -1,11 +1,12 @@
 package ejava.jpa.examples.tuning.suites;
 
 import org.junit.runner.RunWith;
+
 import org.junit.runners.Suite;
 
 import ejava.jpa.examples.tuning.SuiteBase;
-import ejava.jpa.examples.tuning.benchmarks.AllFKIndex;
-import ejava.jpa.examples.tuning.benchmarks.NoFKIndex;
+import ejava.jpa.examples.tuning.env.AllFKIndex;
+import ejava.jpa.examples.tuning.env.NoFKIndex;
 
 
 @RunWith(Suite.class)
