@@ -73,11 +73,13 @@ public class MovieFactory {
 	}
 
 	public MovieFactory executeSQL(SQLConstruct[] constructs) {
+		log.info("------------------------------------------------------------");
 		SQLStatement[] statements = new SQLStatement[constructs.length];
 		for (int i=0; i< constructs.length; i++) {
 			statements[i] = new SQLStatement(constructs[i], true);
 		}
 		executeSQL(statements, false);
+		log.info("------------------------------------------------------------");
 		return this;
 	}
 
@@ -88,16 +90,19 @@ public class MovieFactory {
 			try {
 				boolean exists = s.sql.exists();
 				StringBuilder text = new StringBuilder(drop ? s.sql.getDrop() : s.sql.getCreate());
+				boolean debug=true;
 				if (!drop && !exists) {
 					em.createNativeQuery(s.sql.getCreate()).executeUpdate();
-					text.append(" (created)");
+					//text.append(" (created)");
+					debug = false;
 				} else if (drop && exists) {
 					em.createNativeQuery(s.sql.getDrop()).executeUpdate();
-					text.append(" (dropped)");
+					//text.append(" (dropped)");
 				} else {
 					text.append(" (noop)");
 				}
-				log.debug(text);
+				if (debug) { log.debug(text); }
+				else       { log.info(text); }
 			} catch (Exception ex) {
 				if (s.required) {
 					log.error("failed:" + s.sql, ex);
@@ -152,14 +157,14 @@ public class MovieFactory {
 	}
 	
 	public MovieFactory createFKIndexes() {
-		SQLStatement sql[] = new SQLStatement[]{
-				new SQLStatement(MOVIE_DIRECTOR_FKX, true), 
-				new SQLStatement(GENRE_MOVIE_FKX, true),
-				new SQLStatement(MOVIEROLE_ACTOR_FKX, true),
-				new SQLStatement(MOVIEROLE_MOVIE_FKX, true)
-			};
-			executeSQL(sql, false);
-			return this;
+		SQLConstruct sql[] = new SQLConstruct[]{
+				MOVIE_DIRECTOR_FKX, 
+				GENRE_MOVIE_FKX,
+				MOVIEROLE_ACTOR_FKX,
+				MOVIEROLE_MOVIE_FKX
+		};
+		executeSQL(sql);
+		return this;
 	}
 	
 	public MovieFactory flush() {

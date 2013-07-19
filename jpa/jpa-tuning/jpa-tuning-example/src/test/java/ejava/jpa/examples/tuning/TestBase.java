@@ -11,6 +11,7 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -26,7 +27,7 @@ import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 import ejava.jpa.examples.tuning.dao.MovieDAOImpl;
 
-@BenchmarkOptions(warmupRounds=1, benchmarkRounds=2)
+@BenchmarkOptions(warmupRounds=0, benchmarkRounds=1)
 @BenchmarkHistoryChart
 public class TestBase {
     protected static Log log = LogFactory.getLog(TestBase.class);
@@ -104,6 +105,11 @@ public class TestBase {
 	
 	public TestBase() {
 		benchmarkRun=new BenchmarkRule(resultsConsumer, new WriterConsumer(), h2);
+	}
+	
+	@After
+	public void setUpBase() {
+		log.debug("");
 	}
 	
 	@AfterClass
