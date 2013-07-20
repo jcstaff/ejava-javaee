@@ -15,18 +15,338 @@
         <title>Full Table Scan</title>
         <para></para>
   
-        <itemizedlist>
+        <section id="jpa-tuning-table-fullscan-unconstrained">
+            <title>Full Table Scan: Unconstrained Access</title>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
 
-            <listitem><para></para>
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m", limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scale="80" fileref="images/jpatune-plan-fulltable-unrestricted.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DB scans table as a part of getting data to resolve select clause</para></listitem>
+                <listitem><para>No added cost for where or order-by clauses</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+FullTableScanIndex.unrestrictedScan: [measured 1 out of 1 rounds, threads: 1 (sequential)]
+ round: 0.91 [+- 0.00], round.block: 0.00 [+- 0.00], round.gc: 0.00 [+- 0.00], GC.calls: 0, GC.time: 0.00, time.total: 0.91, time.warmup: 0.01, time.bench: 0.90
+]]></programlisting>                        
+            </figure>
+        </section>
+
+        <section id="jpa-tuning-table-fullscan-where-noindex">
+            <title>Full Table Scan: Using Where (without Index)</title>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.RATING=? ) 
+where
+    rownum <= ?
+]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scale="80" fileref="images/jpatune-plan-fulltable-where-noindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Where constraint adds cost to unconstrained query</para></listitem>
+                <listitem><para>DB must scan the rows in the table for a match to query</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+FullTableScanNoIndex.valueAccess: [measured 1 out of 1 rounds, threads: 1 (sequential)]
+ round: 2.82 [+- 0.00], round.block: 0.00 [+- 0.00], round.gc: 0.00 [+- 0.00], GC.calls: 0, GC.time: 0.00, time.total: 2.82, time.warmup: 0.00, time.bench: 2.82
+]]></programlisting>                        
+            </figure>
+        </section>
+
+        <section id="jpa-tuning-table-fullscan-whereindex">
+            <title>RowId Scan: Using Where (with Index)</title>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>DB Indexes</title>
+<programlisting language=""><![CDATA[create index movie_rating_idx on jpatune_movie(rating)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.RATING=? ) 
+where
+    rownum <= ?
+]]></programlisting>                        
+            </figure>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scale="80" fileref="images/jpatune-plan-rowid-where-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Index on where clause search term avoids scanning table -- index scanned instead</para></listitem>
+                <listitem><para>DB row is accessed to satisfy select clause</para></listitem>
+                <listitem><para>DB row is located by rowId from index</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
 <programlisting language=""><![CDATA[
 ]]></programlisting>                        
-            </listitem>
+            </figure>
+        </section>
 
-        </itemizedlist>
+
+        <section id="jpa-tuning-table-fullscan-function-noindex">
+            <title>Full Table Scan: Function applied to Column</title>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>DB Indexes</title>
+<programlisting language=""><![CDATA[create index movie_rating_idx on jpatune_movie(rating)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        upper(movie0_.RATING)=? ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scale="80" fileref="images/jpatune-plan-fulltable-where-function-noindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Applying function to column indexed by value invalidates use of index</para></listitem>
+                <listitem><para>DB reverts to full table scan to locate row</para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+        </section>
+
+
+
+
+
+
+        <section id="jpa-tuning-table-fullscan-function-findex">
+            <title>RowId Scan: Function applied to Column (with Function Index)</title>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>DB Indexes</title>
+<programlisting language=""><![CDATA[create index movie_rating_lower_idx on jpatune_movie(lower(rating))]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        lower(movie0_.RATING)=? ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scale="80" fileref="images/jpatune-plan-fulltable-where-function-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Where clause satisfied by scanning function index</para></listitem>
+                <listitem><para>DB row accessed to satisfy select clause</para></listitem>
+                <listitem><para>DB row accessed by RowId</para></listitem>
+                <listitem><para>COST is within range of non-function index</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+        </section>
+
+
+
+
+
+
+        <section id="jpa-tuning-table-fullscan-">
+            <title>Full Table Scan: </title>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>DB Indexes</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scale="80" fileref="images/jpatune-plan-fulltable-.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+        </section>
+
+
+
         
-        <para></para>
     </section>
-
 
     <section id="jpa-tuning-table-rowid">
         <title>Table By RowId</title>

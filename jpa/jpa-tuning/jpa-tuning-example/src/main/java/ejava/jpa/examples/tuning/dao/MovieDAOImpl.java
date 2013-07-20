@@ -33,6 +33,8 @@ public class MovieDAOImpl {
 	private class QueryLogger<T> {
 		private TypedQuery<T> query;
 		private String jpaql;
+		private Integer offset;
+		private Integer limit;
 		private Map<String, Object> params = new HashMap<String, Object>();
 		
 		public QueryLogger(String jpaql, Class<T> resultType) {
@@ -46,19 +48,35 @@ public class MovieDAOImpl {
 		}
 		public QueryLogger<T> setFirstResult(int offset) {
 			query.setFirstResult(offset);
+			this.offset = offset;
 			return this;
 		}
 		public QueryLogger<T> setMaxResults(int limit) {
 			query.setMaxResults(limit);
+			this.limit=limit;
 			return this;
 		}
 		public T getSingleResult() {
-			log.info(jpaql + ", " + params);
+			log.info(toString());
 			return query.getSingleResult();
 		}
 		public List<T> getResultList() {
-			log.info(jpaql + ", " + params);
+			log.info(toString());
 			return query.getResultList();
+		}
+		public String toString() {
+			StringBuilder text = new StringBuilder();
+			text.append("\"").append(jpaql).append("\"");
+			if (!params.isEmpty()) {
+				text.append(", params=").append(params);
+			}
+			if (offset != null) {
+				text.append(", offset=").append(offset);
+			}
+			if (limit != null) {
+				text.append(", limit=").append(limit);
+			}
+			return text.toString();
 		}
 	}
 	

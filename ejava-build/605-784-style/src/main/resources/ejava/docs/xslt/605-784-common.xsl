@@ -33,7 +33,7 @@
    
    <!-- Placement of titles -->
    <xsl:param name="formal.title.placement">
-      figure after example before equation before table before procedure before
+      figure before example before equation before table before procedure before
    </xsl:param>
    
    <!-- Callouts -->
