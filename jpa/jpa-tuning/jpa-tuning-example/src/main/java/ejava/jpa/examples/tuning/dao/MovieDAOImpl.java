@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 
@@ -31,42 +32,60 @@ public class MovieDAOImpl {
 	}
 	
 	private class QueryLogger<T> {
-		private TypedQuery<T> query;
+		private Class<T> resultType;
 		private String jpaql;
+		private String orderBy;
 		private Integer offset;
 		private Integer limit;
 		private Map<String, Object> params = new HashMap<String, Object>();
 		
 		public QueryLogger(String jpaql, Class<T> resultType) {
-			query = em.createQuery(jpaql, resultType);
+			this.resultType = resultType;
 			this.jpaql = jpaql;
 		}
 		public QueryLogger<T> setParameter(String key, Object value) {
-			params.put(key,  value);
-			query.setParameter(key, value);
+			params.put(key, value);
 			return this;
 		}
 		public QueryLogger<T> setFirstResult(int offset) {
-			query.setFirstResult(offset);
 			this.offset = offset;
 			return this;
 		}
 		public QueryLogger<T> setMaxResults(int limit) {
-			query.setMaxResults(limit);
 			this.limit=limit;
 			return this;
 		}
+		public void setOrderBy(String orderBy) {
+			this.orderBy = orderBy;
+		}
 		public T getSingleResult() {
 			log.info(toString());
-			return query.getSingleResult();
+			return makeQuery().getSingleResult();
 		}
 		public List<T> getResultList() {
 			log.info(toString());
-			return query.getResultList();
+			return makeQuery().getResultList();
+		}
+		protected TypedQuery<T> makeQuery() {
+			TypedQuery<T> query = em.createQuery(jpaql + " order by " + orderBy, resultType);
+			for (Entry<String, Object> param: params.entrySet()) {
+				query.setParameter(param.getKey(), param.getValue());
+			}
+			if (offset != null) {
+				query.setFirstResult(offset);
+			}
+			if (limit != null) {
+				query.setMaxResults(limit);
+			}
+			return query;
 		}
 		public String toString() {
 			StringBuilder text = new StringBuilder();
-			text.append("\"").append(jpaql).append("\"");
+			text.append("\"").append(jpaql);
+			if (orderBy != null) {
+				text.append(" order by ").append(orderBy);
+			}
+			text.append("\"");
 			if (!params.isEmpty()) {
 				text.append(", params=").append(params);
 			}
@@ -97,12 +116,15 @@ public class MovieDAOImpl {
 	 * @param limit
 	 * @return
 	 */
-	protected <T> QueryLogger<T> withPaging(QueryLogger<T> query, Integer offset, Integer limit) {
+	protected <T> QueryLogger<T> withPaging(QueryLogger<T> query, Integer offset, Integer limit, String orderBy) {
     	if (offset != null && offset > 0) {
     		query.setFirstResult(offset);
     	}
     	if (limit != null && limit > 0) {
     		query.setMaxResults(limit);
+    	}
+    	if (orderBy != null) {
+    		query.setOrderBy(orderBy);
     	}
     	return query;
 	}
@@ -140,7 +162,7 @@ public class MovieDAOImpl {
 		        "inner join ma.person mp " +
 			    "where mp.id = :id))" +
 			 "and ap.id not = :id", Person.class)
-			 .setParameter("id", p.getId()), offset, limit)
+			 .setParameter("id", p.getId()), offset, limit, null)
 			.getResultList();
     }
 
@@ -149,12 +171,13 @@ public class MovieDAOImpl {
      * table scan since there is no reason to consult the index.
      * @param offset
      * @param limit
+     * @param orderBy
      * @return
      */
-	public List<Movie> getMovies(Integer offset, Integer limit) {
+	public List<Movie> getMovies(Integer offset, Integer limit, String orderBy) {
 		return withPaging(createQuery(
 				"select m from Movie m", Movie.class), 
-				offset, limit).getResultList();
+				offset, limit, orderBy).getResultList();
 	}
 	
 	/**
@@ -171,7 +194,7 @@ public class MovieDAOImpl {
 				"select m from Movie m " +
 				"where upper(m.rating) = :rating", Movie.class)
 				.setParameter("rating", rating.mpaa().toUpperCase()), 
-				offset, limit).getResultList();
+				offset, limit, null).getResultList();
 	}
 
 	/**
@@ -188,7 +211,7 @@ public class MovieDAOImpl {
 				"select m from Movie m " +
 				"where lower(m.rating) = :rating", Movie.class)
 				.setParameter("rating", rating.mpaa().toLowerCase()), 
-				offset, limit).getResultList();
+				offset, limit, null).getResultList();
 	}
 
 	/**
@@ -198,14 +221,15 @@ public class MovieDAOImpl {
 	 * @param rating
 	 * @param offset
 	 * @param limit
+	 * @param orderBy
 	 * @return
 	 */
-	public List<Movie> getMoviesByRatingValue(MovieRating rating, Integer offset, Integer limit) {
+	public List<Movie> getMoviesByRatingValue(MovieRating rating, Integer offset, Integer limit, String orderBy) {
 		return withPaging(createQuery(
 				"select m from Movie m " +
 				"where m.rating = :rating", Movie.class)
 				.setParameter("rating", rating.mpaa()), 
-				offset, limit).getResultList();
+				offset, limit, orderBy).getResultList();
 	}
 
 	/**
@@ -215,14 +239,15 @@ public class MovieDAOImpl {
 	 * @param title
 	 * @param offset
 	 * @param limit
+	 * @param sortBy
 	 * @return
 	 */
-	public List<Movie> getMoviesLikeTitle(String title, Integer offset, Integer limit) {
+	public List<Movie> getMoviesLikeTitle(String title, Integer offset, Integer limit, String sortBy) {
 		return withPaging(createQuery(
 				"select m from Movie m " +
 				"where m.title like :title", Movie.class)
 				.setParameter("title", title), 
-				offset, limit).getResultList();
+				offset, limit, sortBy).getResultList();
 	}
 
 	/**
@@ -237,7 +262,7 @@ public class MovieDAOImpl {
 				"select m from Movie m " +
 				"where m.title = :title", Movie.class)
 				.setParameter("title", title), 
-				offset, limit).getResultList();
+				offset, limit, null).getResultList();
 	}
 
 	/**
@@ -254,6 +279,6 @@ public class MovieDAOImpl {
 				"select m.title from Movie m " +
 				"where m.rating = :rating", String.class)
 				.setParameter("rating", rating.mpaa()), 
-				offset, limit).getResultList();
+				offset, limit, null).getResultList();
 	}
 }

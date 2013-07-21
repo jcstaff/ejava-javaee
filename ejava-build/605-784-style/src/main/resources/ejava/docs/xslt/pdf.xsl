@@ -105,7 +105,7 @@
 </xsl:attribute-set>
 
    <xsl:param name="programlisting.font" select="'verdana,helvetica,sans-serif'" />
-   <xsl:param name="programlisting.font.size" select="'90%'" />
+   <xsl:param name="programlisting.font.size" select="'80%'" />
    
    <!-- Change to monospace font for programlisting, needed to workaround crappy callouts -->
    <!-- <xsl:param name="programlisting.font" select="$monospace.font.family" /> -->

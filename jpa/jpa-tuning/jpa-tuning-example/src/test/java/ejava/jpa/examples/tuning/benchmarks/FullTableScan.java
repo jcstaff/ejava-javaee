@@ -2,13 +2,8 @@ package ejava.jpa.examples.tuning.benchmarks;
 
 import static org.junit.Assert.*;
 
-import javax.persistence.EntityManager;
-
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ejava.jpa.examples.tuning.MovieFactory;
-import ejava.jpa.examples.tuning.MovieFactory.SQLConstruct;
 import ejava.jpa.examples.tuning.TestBase;
 import ejava.jpa.examples.tuning.TestLabel;
 import ejava.jpa.examples.tuning.bo.MovieRating;
@@ -18,19 +13,6 @@ import ejava.jpa.examples.tuning.suites.FullTableScanTest;
 public class FullTableScan extends TestBase {
 	private static int MAX_ROWS=FullTableScanTest.MAX_ROWS;
 	
-
-	@BeforeClass
-	public static void setUpClass() {
-		EntityManager em=getEMF().createEntityManager();
-		MovieFactory mf = new MovieFactory().setEntityManager(em);
-		SQLConstruct[] constructs = new SQLConstruct[]{
-				mf.MOVIE_RATING_IDX,
-				mf.MOVIE_RATING_LOWER_IDX,
-		};
-		mf.executeSQL(constructs).assertConstructs(constructs).flush();
-		em.close();
-	}
-
 	/**
 	 * This test shows the speed at which a full table scan can work when there
 	 * are no constraints on the rows returned.
@@ -38,17 +20,17 @@ public class FullTableScan extends TestBase {
 	@TestLabel(label="Unrestricted Scan")
 	@Test
 	public void unrestrictedScan() {
-		assertEquals(MAX_ROWS,getDAO().getMovies(0,MAX_ROWS).size());
+		assertEquals(MAX_ROWS,getDAO().getMovies(0,MAX_ROWS, null).size());
 	}
 	
 	/**
 	 * This test demonstrates the speed at which a page of rows are returned when the
 	 * rows are selected by a criteria on an indexed column. 
 	 */
-	@TestLabel(label="Indexed Value Access")
+	@TestLabel(label="Value Access")
 	@Test
 	public void valueAccess() {
-		assertEquals(MAX_ROWS,getDAO().getMoviesByRatingValue(MovieRating.R, 0,MAX_ROWS).size());
+		assertEquals(MAX_ROWS,getDAO().getMoviesByRatingValue(MovieRating.R, 0,MAX_ROWS, null).size());
 	}
 
 	/**
@@ -71,7 +53,35 @@ public class FullTableScan extends TestBase {
 		assertEquals(MAX_ROWS,getDAO().getMoviesByRatingLowerFunction(MovieRating.R, 0,MAX_ROWS).size());
 	}
 
+	@TestLabel(label="OrderBy Non-Null Column")
+	@Test
+	public void orderByUsingNonNullColumn() {
+		assertEquals(MAX_ROWS,getDAO().getMovies(0,MAX_ROWS, "title ASC").size());
+	}
+	
+	@TestLabel(label="OrderBy Nullable Column")
+	@Test
+	public void orderByUsingNullableColumn() {
+		assertEquals(MAX_ROWS,getDAO().getMovies(0,MAX_ROWS, "rating ASC").size());
+	}
+	
+	@TestLabel(label="OrderBy Non-null Non-Where Column")
+	@Test
+	public void orderByUsingNonNullNonWhereColumn() {
+		assertEquals(MAX_ROWS,getDAO().getMoviesByRatingValue(MovieRating.R, 0,MAX_ROWS,"title ASC").size());
+	}
 
+	@TestLabel(label="OrderBy Non-null Where Column ASC")
+	@Test
+	public void orderByUsingNonNullWhereColumnAsc() {
+		assertEquals(MAX_ROWS,getDAO().getMoviesLikeTitle("A%", 0, MAX_ROWS, "title ASC").size());
+	}
+	
+	@TestLabel(label="OrderBy Non-null Where Column DESC")
+	@Test
+	public void orderByUsingNonNullWhereColumnDesc() {
+		assertEquals(MAX_ROWS,getDAO().getMoviesLikeTitle("A%", 0, MAX_ROWS, "title DESC").size());
+	}
 	
 	/**
 	 * This test demonstrates how a trailing wildcard does not invalidate an index
@@ -79,9 +89,9 @@ public class FullTableScan extends TestBase {
 	@TestLabel(label="Ending Wildcard")
 	@Test
 	public void endingWildcard() {
-		assertEquals(1,getDAO().getMoviesLikeTitle("Natural Disasters: Forces of Nature%", 0, MAX_ROWS).size());
-		assertEquals(1,getDAO().getMoviesLikeTitle("Mystic River: From Page to Scree%", 0, MAX_ROWS).size());
-		assertEquals(1,getDAO().getMoviesLikeTitle("Seventeen: The Faces for Fal%", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Natural Disasters: Forces of Nature%", 0, MAX_ROWS, null).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Mystic River: From Page to Scree%", 0, MAX_ROWS, null).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Seventeen: The Faces for Fal%", 0, MAX_ROWS, null).size());
 	}
 
 	/**
@@ -90,9 +100,9 @@ public class FullTableScan extends TestBase {
 	@TestLabel(label="Leading Wildcard")
 	@Test
 	public void leadingWildcard() {
-		assertEquals(1,getDAO().getMoviesLikeTitle("%atural Disasters: Forces of Nature", 0, MAX_ROWS).size());
-		assertEquals(1,getDAO().getMoviesLikeTitle("%ystic River: From Page to Screen", 0, MAX_ROWS).size());
-		assertEquals(1,getDAO().getMoviesLikeTitle("%eventeen: The Faces for Fall", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("%atural Disasters: Forces of Nature", 0, MAX_ROWS, null).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("%ystic River: From Page to Screen", 0, MAX_ROWS, null).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("%eventeen: The Faces for Fall", 0, MAX_ROWS, null).size());
 	}
 
 	/**
@@ -102,9 +112,9 @@ public class FullTableScan extends TestBase {
 	@TestLabel(label="Exact Like")
 	@Test
 	public void exactLike() {
-		assertEquals(1,getDAO().getMoviesLikeTitle("Natural Disasters: Forces of Nature", 0, MAX_ROWS).size());
-		assertEquals(1,getDAO().getMoviesLikeTitle("Mystic River: From Page to Screen", 0, MAX_ROWS).size());
-		assertEquals(1,getDAO().getMoviesLikeTitle("Seventeen: The Faces for Fall", 0, MAX_ROWS).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Natural Disasters: Forces of Nature", 0, MAX_ROWS, null).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Mystic River: From Page to Screen", 0, MAX_ROWS, null).size());
+		assertEquals(1,getDAO().getMoviesLikeTitle("Seventeen: The Faces for Fall", 0, MAX_ROWS, null).size());
 	}
 
 	/*

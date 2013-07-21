@@ -57,8 +57,11 @@ public class MovieFactory {
 	
 	public SQLIndex MOVIE_DIRECTOR_FKX = new SQLIndex("movie_director_fkx", "create index movie_director_fkx on jpatune_movie(director_id)");
 	public SQLIndex MOVIE_RATING_IDX = new SQLIndex("movie_rating_idx", "create index movie_rating_idx on jpatune_movie(rating)");
+	public SQLIndex MOVIE_RATING_RIDX = new SQLIndex("movie_rating_ridx", "create index movie_rating_ridx on jpatune_movie(rating desc)");
 	public SQLIndex MOVIE_RATING_LOWER_IDX = new SQLIndex("movie_rating_lower_idx", "create index movie_rating_lower_idx on jpatune_movie(lower(rating))");
+	public SQLIndex MOVIE_RATING_LOWER_RIDX = new SQLIndex("movie_rating_lower_ridx", "create index movie_rating_lower_ridx on jpatune_movie(lower(rating) desc)");
 	public SQLIndex MOVIE_TITLE_IDX = new SQLIndex("movie_title_idx", "create index movie_title_idx on jpatune_movie(title)");
+	public SQLIndex MOVIE_TITLE_RIDX = new SQLIndex("movie_title_ridx", "create index movie_title_ridx on jpatune_movie(title desc)");
 	public SQLIndex MOVIE_RATING_TITLE_IDX = new SQLIndex("movie_rating_title_idx", "create index movie_rating_title_idx on jpatune_movie(rating, title)");
 	public SQLIndex GENRE_MOVIE_FKX = new SQLIndex("genre_movie_fkx", "create index genre_movie_fkx on jpatune_moviegenre(movie_id)");
 	public SQLIndex MOVIEROLE_ACTOR_FKX = new SQLIndex("movierole_actor_fkx", "create index movierole_actor_fkx on jpatune_movierole(actor_id)");
@@ -87,9 +90,9 @@ public class MovieFactory {
 		for (SQLStatement s: sql) {
 			EntityTransaction tx = em.getTransaction();
 			tx.begin();
+			StringBuilder text = new StringBuilder(drop ? s.sql.getDrop() : s.sql.getCreate());
 			try {
 				boolean exists = s.sql.exists();
-				StringBuilder text = new StringBuilder(drop ? s.sql.getDrop() : s.sql.getCreate());
 				boolean debug=true;
 				if (!drop && !exists) {
 					em.createNativeQuery(s.sql.getCreate()).executeUpdate();
@@ -105,6 +108,7 @@ public class MovieFactory {
 				else       { log.info(text); }
 			} catch (Exception ex) {
 				if (s.required) {
+					log.error(text);
 					log.error("failed:" + s.sql, ex);
 					throw new RuntimeException("failed:" + s.sql, ex);
 				}
@@ -148,8 +152,11 @@ public class MovieFactory {
 			new SQLStatement(MOVIEROLE_ACTOR_FKX, false),
 			new SQLStatement(MOVIEROLE_MOVIE_FKX, false),
 			new SQLStatement(MOVIE_RATING_IDX, false),
+			new SQLStatement(MOVIE_RATING_RIDX, false),
 			new SQLStatement(MOVIE_RATING_LOWER_IDX, false),
+			new SQLStatement(MOVIE_RATING_LOWER_RIDX, false),
 			new SQLStatement(MOVIE_TITLE_IDX, false),
+			new SQLStatement(MOVIE_TITLE_RIDX, false),
 			new SQLStatement(MOVIE_RATING_TITLE_IDX, false)
 		};
 		executeSQL(sql, true);
