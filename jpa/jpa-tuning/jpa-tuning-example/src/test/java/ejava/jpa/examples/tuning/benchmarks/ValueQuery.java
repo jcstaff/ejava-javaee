@@ -18,11 +18,20 @@ public class ValueQuery extends TestBase {
 	private static int MAX_ROWS=2000;
 	
 	/**
-	 * This test demonstrates how a trailing wildcard does not invalidate an index
+	 * This test demonstrates getting a value based on a criteria term
 	 */
 	@TestLabel(label="Query for Value")
 	@Test
 	public void queryForValue() {
-		assertEquals(MAX_ROWS,getDAO().getTitlesByRating(MovieRating.R, 0, MAX_ROWS).size());
+		assertEquals(2,getDAO().getRatingsByTitle("Tremors", 0, MAX_ROWS, null).size());
+	}
+
+	/**
+	 * This test demonstrates getting many rows for a column back from a criteria.
+	 */
+	@TestLabel(label="Query for Values")
+	@Test
+	public void queryForValues() {
+		assertEquals(MAX_ROWS,getDAO().getRatingsLikeTitle("A%", 0, MAX_ROWS, null).size());
 	}
 }

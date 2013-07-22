@@ -1,0 +1,375 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-tuning-index">
+    <title>Indexes</title>
+    <para></para>
+        
+    <section id="jpa-tuning-index-rangescan">
+        <title>Index Range Scan (Unlimited)</title>
+        <para></para>
+        <para>Request N rows matching a specific criteria using a non-unique index</para>
+
+        <figure>    
+            <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
+        </figure>
+        <para>* "utitle" was added as the concatenation of title(id) to create a unique column</para>
+
+        <figure>
+            <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.title = :title", 
+params={title=Tremors(m836199)}]]></programlisting>                        
+        </figure>
+        
+        <figure>    
+            <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_,
+    movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+    movie0_.MINUTES as MINUTES2_2_,
+    movie0_.PLOT as PLOT3_2_,
+    movie0_.RATING as RATING4_2_,
+    movie0_.RELEASE_DATE as RELEASE5_2_,
+    movie0_.utitle as utitle6_2_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.utitle=?]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Explain Plan</title>
+            <graphic scalefit="1" fileref="images/jpatune-plan-index-rangescan.png"/>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Matching row located using index</para></listitem>
+            <listitem><para>Since index is non-unique multiple entries must be scanned</para></listitem>
+        </itemizedlist>
+
+        <figure>    
+            <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+
+        <tip>
+            <title></title>
+            <para></para>
+        </tip>
+    </section>
+
+
+    <section id="jpa-tuning-index-rangescan-limit">
+        <title>Index Range Scan (limit=1)</title>
+        <para></para>
+        <para>Request 1st row matching a specific criteria using a non-unique index</para>
+
+        <figure>    
+            <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.title = :title", 
+params={title=Tremors(m836199)}, limit=1]]></programlisting>                        
+        </figure>
+        
+        <figure>    
+            <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.utitle as utitle6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.utitle=? ) 
+where
+    rownum <= ?]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Explain Plan</title>
+            <graphic scalefit="1" fileref="images/jpatune-plan-index-rangescan-limit.png"/>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Cost analysis cannot factor in limit as parameter</para></listitem>
+            <listitem><para>Row limits appear to be applied after index range scan completes</para></listitem>
+        </itemizedlist>
+
+        <figure>    
+            <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+
+        <tip>
+            <title></title>
+            <para></para>
+        </tip>
+    </section>
+
+
+
+
+    <section id="jpa-tuning-index-uniquescan">
+        <title>Unique Scan</title>
+        <para></para>
+        <para>Request N rows matching a specific criteria using a unique index</para>
+
+        <figure>    
+            <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.title = :title", 
+params={title=Tremors(m836199)}]]></programlisting>                        
+        </figure>
+        
+        <figure>    
+            <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_,
+    movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+    movie0_.MINUTES as MINUTES2_2_,
+    movie0_.PLOT as PLOT3_2_,
+    movie0_.RATING as RATING4_2_,
+    movie0_.RELEASE_DATE as RELEASE5_2_,
+    movie0_.utitle as utitle6_2_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.utitle=?]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Explain Plan</title>
+            <graphic scalefit="1" fileref="images/jpatune-plan-index-uniquescan.png"/>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Index used to locate table rowId</para></listitem>
+            <listitem><para>Unique index scan used since index contains unique values</para></listitem>
+        </itemizedlist>
+
+        <figure>    
+            <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+
+        <tip>
+            <title>Unique Indexes are more Efficient than Non-Unique Indexes for Specific Value Search</title>
+            <para>DB knows there can be only a single match and stops index scan after first match found</para>
+        </tip>
+    </section>
+
+
+
+
+
+    <section id="jpa-tuning-index-composite">
+        <title>Bypassing Table Access with Composite Index</title>
+
+        <section id="jpa-tuning-index-composite-query">
+            <title>Query Parts</title>
+            <para>Selecting N columns from M rows matching Q criteria terms</para>
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m.rating from Movie m 
+where m.title like :title", 
+params={title=A%}, limit=2000]]></programlisting>                        
+            </figure>
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from
+    ( select
+        movie0_.RATING as col_0_0_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.TITLE like ? ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+        </section>    
+            
+        
+        <section id="jpa-tuning-index-composite-rangescan">
+           <title>Option: Use Range Scan and RowId Access</title>
+           <para></para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_idx on jpatune_movie(title)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-index-rangescan-value.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Where clause satisfied using an index range scan</para></listitem>
+                <listitem><para>Select clause satisfied using table access by rowId from index</para></listitem>
+            </itemizedlist>
+            
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+        </section>    
+
+        
+        <section id="jpa-tuning-index-composite-complete">
+           <title>Option: Use Range Scan Alone with Composite Index</title>
+           <para></para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_rating_idx on jpatune_movie(title, rating)]]></programlisting>                        
+            </figure>
+            <para>* this index contains columns from both the where and select clauses</para>
+            
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-index-rangescan-complete.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Where clause satisfied using an index range scan</para></listitem>
+                <listitem><para>Select clause satisfied using same index since composite index also contains all necessary columns</para></listitem>
+            </itemizedlist>
+            
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Add Columns from Select to Composite Index to Bypass Table Access</title>
+                <para>DB will bypass rowId access to row if index already contains all columns necessary
+                    to satisfy the select clause.</para>
+            </tip>
+        </section>    
+
+        
+        <section id="jpa-tuning-index-composite-alt">
+           <title>Option: Use Range Scan and RowId Access</title>
+           <para></para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_rating_title_idx on jpatune_movie(rating, title)]]></programlisting>                        
+            </figure>
+            <para>* this index is the mirror image of previous example and contains columns from both the select and where clauses</para>
+            
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-index-rangescan-complete-inverted.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Index did not start with terms from where clause, but usable</para></listitem>
+                <listitem><para>Where clause satisfied using a fast full scan of composite index</para></listitem>
+                <listitem><para>Select clause satisfied using same index since composite index also contains all necessary columns</para></listitem>
+            </itemizedlist>
+            
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+        </section>    
+        
+
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <section id="jpa-tuning-index-">
+        <title>Template</title>
+        <para>Request N rows matching ...</para>
+
+        <figure>    
+            <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>JPA Query</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+        
+        <figure>    
+            <title>Generated SQL</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Explain Plan</title>
+            <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-.png"/>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+
+        <figure>    
+            <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+        </figure>
+
+        <tip>
+            <title></title>
+            <para></para>
+        </tip>
+    </section>
+
+
+
+    <section id="jpa-tuning-index-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

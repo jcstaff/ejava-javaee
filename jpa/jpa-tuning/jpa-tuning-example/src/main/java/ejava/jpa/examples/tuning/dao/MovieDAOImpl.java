@@ -67,7 +67,8 @@ public class MovieDAOImpl {
 			return makeQuery().getResultList();
 		}
 		protected TypedQuery<T> makeQuery() {
-			TypedQuery<T> query = em.createQuery(jpaql + " order by " + orderBy, resultType);
+			String queryString = orderBy==null ? jpaql : jpaql + " order by " + orderBy;
+			TypedQuery<T> query = em.createQuery(queryString, resultType);
 			for (Entry<String, Object> param: params.entrySet()) {
 				query.setParameter(param.getKey(), param.getValue());
 			}
@@ -239,15 +240,15 @@ public class MovieDAOImpl {
 	 * @param title
 	 * @param offset
 	 * @param limit
-	 * @param sortBy
+	 * @param orderBy
 	 * @return
 	 */
-	public List<Movie> getMoviesLikeTitle(String title, Integer offset, Integer limit, String sortBy) {
+	public List<Movie> getMoviesLikeTitle(String title, Integer offset, Integer limit, String orderBy) {
 		return withPaging(createQuery(
 				"select m from Movie m " +
 				"where m.title like :title", Movie.class)
 				.setParameter("title", title), 
-				offset, limit, sortBy).getResultList();
+				offset, limit, orderBy).getResultList();
 	}
 
 	/**
@@ -263,6 +264,38 @@ public class MovieDAOImpl {
 				"where m.title = :title", Movie.class)
 				.setParameter("title", title), 
 				offset, limit, null).getResultList();
+	}
+
+	/**
+	 * Returns a list of ratings for movies that exactly match the provided title.
+	 * @param title
+	 * @param offset
+	 * @param limit
+	 * @param orderBy
+	 * @return
+	 */
+	public List<String> getRatingsByTitle(String title, Integer offset, Integer limit, String orderBy) {
+		return withPaging(createQuery(
+				"select m.rating from Movie m " +
+				"where m.title = :title", String.class)
+				.setParameter("title", title), 
+				offset, limit, orderBy).getResultList();
+	}
+
+	/**
+	 * Returns ratings that match the title like criteria.
+	 * @param title
+	 * @param offset
+	 * @param limit
+	 * @param orderBy
+	 * @return
+	 */
+	public List<String> getRatingsLikeTitle(String title, Integer offset, Integer limit, String orderBy) {
+		return withPaging(createQuery(
+				"select m.rating from Movie m " +
+				"where m.title like :title", String.class)
+				.setParameter("title", title), 
+				offset, limit, orderBy).getResultList();
 	}
 
 	/**

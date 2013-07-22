@@ -295,6 +295,73 @@ where
             </tip>
             
         </section>
+
+
+
+        <section id="jpa-tuning-table-fullscan-wildcards">
+            <title>Full Table Scan: Invalidating Index by using Leading Wildcards</title>
+            <para>Request N rows of data matching a like condition containing a leading wildcard</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_idx on jpatune_movie(title)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.title like :title", 
+params={title=%eventeen: The Faces for Fall}, limit=1000]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select * from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    where
+        movie0_.TITLE like ? ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-leading-wildcard.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Row located using full table scan</para></listitem>
+                <listitem><para>Leading wildcard in like invalidates use of indexed column</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+            
+            <tip>
+                <title>Avoid Leading Wildcards when using Like</title>
+                <para>Leading wildcards invalidate the use of column indexes. Non-leading wildcards
+                    continue to indexes.</para>
+            </tip>
+            
+        </section>
+
+
+
+
+
+
+
     </section>
     
     
@@ -541,78 +608,10 @@ where
                 <para>Ascending indexes can be efficiently traversed in ascending and descending order.</para>
             </tip>
         </section>
-
-
-
-
-
-
-
-
-        <section id="jpa-tuning-table-fullscan-">
-            <title>Full Table Scan: </title>
-            <para>Request N rows of data matching ...</para>
-
-            <figure>    
-                <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </figure>
-
-            <figure>
-                <title>JPA Query</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </figure>
-            
-            <figure>    
-                <title>Generated SQL</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </figure>
-
-            <figure>
-                <title>Explain Plan</title>
-                <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-.png"/>
-            </figure>
-            <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-            </itemizedlist>
-
-            <figure>    
-                <title>Benchmark</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </figure>
-
-            <tip>
-                <title></title>
-                <para></para>
-            </tip>
-        </section>
-
-
-
-        
     </section>
 
-    <section id="jpa-tuning-table-rowid">
-        <title>Table By RowId</title>
-        <para></para>
-  
-        <itemizedlist>
 
-            <listitem><para></para>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </listitem>
 
-        </itemizedlist>
-        
-        <para></para>
-    </section>
 
     <section id="jpa-tuning-table-summary">
        <title>Summary</title>

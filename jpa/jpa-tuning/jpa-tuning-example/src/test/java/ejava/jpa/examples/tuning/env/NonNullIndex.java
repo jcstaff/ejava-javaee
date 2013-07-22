@@ -17,6 +17,7 @@ public class NonNullIndex extends ByIndex {
 		MovieFactory mf = new MovieFactory().setEntityManager(em);
 		SQLConstruct[] constructs = new SQLConstruct[]{
 				mf.MOVIE_UTITLE,
+				mf.MOVIE_UTITLE_NONNULL,
 				mf.MOVIE_UTITLE_IDX
 		};
 		mf.executeSQL(constructs).assertConstructs(constructs).flush();
