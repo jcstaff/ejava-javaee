@@ -95,8 +95,8 @@
   <xsl:attribute name="space-after.optimum">1em</xsl:attribute>
   <xsl:attribute name="space-after.minimum">0.8em</xsl:attribute>
   <xsl:attribute name="space-after.maximum">1em</xsl:attribute>
-  <xsl:attribute name="padding-bottom">12pt</xsl:attribute>
-  <xsl:attribute name="padding-top">12pt</xsl:attribute>
+  <xsl:attribute name="padding-bottom">2pt</xsl:attribute>
+  <xsl:attribute name="padding-top">2pt</xsl:attribute>
   <xsl:attribute name="padding-right">12pt</xsl:attribute>
   <xsl:attribute name="padding-left">12pt</xsl:attribute>
   <xsl:attribute name="margin-left">
@@ -289,12 +289,12 @@ Reason: This includes the callout.icon.size attribute for SVGs, we also add padd
 </xsl:attribute-set>
 
 <xsl:attribute-set name="verbatim.properties">
-  <xsl:attribute name="space-before.minimum">0.0em</xsl:attribute>
-  <xsl:attribute name="space-before.optimum">0.1em</xsl:attribute>
-  <xsl:attribute name="space-before.maximum">0.1em</xsl:attribute>
-  <xsl:attribute name="space-after.minimum">0.0em</xsl:attribute>
-  <xsl:attribute name="space-after.optimum">0.1em</xsl:attribute>
-  <xsl:attribute name="space-after.maximum">0.1em</xsl:attribute>
+  <xsl:attribute name="space-before.minimum">0.8em</xsl:attribute>
+  <xsl:attribute name="space-before.optimum">1em</xsl:attribute>
+  <xsl:attribute name="space-before.maximum">1.2em</xsl:attribute>
+  <xsl:attribute name="space-after.minimum">0.8em</xsl:attribute>
+  <xsl:attribute name="space-after.optimum">1em</xsl:attribute>
+  <xsl:attribute name="space-after.maximum">1.2em</xsl:attribute>
   <xsl:attribute name="hyphenate">false</xsl:attribute>
   <xsl:attribute name="wrap-option">wrap</xsl:attribute>
   <xsl:attribute name="white-space-collapse">false</xsl:attribute>
@@ -1509,8 +1509,8 @@ Version:1.72
               linefeed-treatment="preserve"
               white-space-collapse="false"
               white-space-treatment="preserve"
-              padding-bottom="12pt"
-              padding-top="12pt"
+              padding-bottom="2pt"
+              padding-top="2pt"
               padding-right="12pt"
               padding-left="12pt">
 

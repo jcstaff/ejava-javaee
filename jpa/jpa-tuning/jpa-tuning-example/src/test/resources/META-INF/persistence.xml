@@ -18,4 +18,15 @@
         <class>ejava.jpa.examples.tuning.bo.Movie</class>
         <class>ejava.jpa.examples.tuning.bo.MovieRole</class>
     </persistence-unit>            
+
+    <!-- this persistence unit maps the title column to a column with unique values -->
+    <persistence-unit name="movietune-test-utitle">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>jpa/orm-utitle.xml</mapping-file>
+        <class>ejava.jpa.examples.tuning.bo.Person</class>
+        <class>ejava.jpa.examples.tuning.bo.Actor</class>
+        <class>ejava.jpa.examples.tuning.bo.Director</class>
+        <class>ejava.jpa.examples.tuning.bo.Movie</class>
+        <class>ejava.jpa.examples.tuning.bo.MovieRole</class>
+    </persistence-unit>            
 </persistence>

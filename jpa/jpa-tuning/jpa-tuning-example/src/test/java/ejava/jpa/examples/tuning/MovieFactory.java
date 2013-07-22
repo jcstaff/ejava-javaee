@@ -30,14 +30,17 @@ public class MovieFactory {
 		protected String name;
 		protected String create;
 		protected String drop;
+		protected String populate;
 		protected boolean required;
 		public SQLConstruct(String name)             { this.name = name; }
 		public SQLConstruct setCreate(String create) { this.create = create; return this; }
 		public SQLConstruct setDrop(String drop)     { this.drop = drop; return this; }
+		public SQLConstruct setPopulate(String populate) { this.populate = populate; return this; }		
 		public SQLConstruct setRequired(boolean required) { this.required = required; return this; }
 		public String getName()     { return name; }
 		public String getCreate()   { return create; }
 		public String getDrop()     { return drop; }
+		public String getPopulate() { return populate; }
 		public boolean isRequired() { return required; }
 		public abstract boolean exists();
 	}
@@ -54,25 +57,86 @@ public class MovieFactory {
 			        .getSingleResult()).intValue()==1;
 		}
 	}
+	public class SQLColumn extends SQLConstruct {
+		private String table;
+		private String column;
+		public SQLColumn(String table, String column, String create, String populate) {
+			super(table+"."+column);
+			this.table=table;
+			this.column=column;
+			setCreate(create);
+			setDrop(String.format("alter table %s drop column %s", table, column));
+			setPopulate(populate);
+		}
+		public boolean exists() {
+			return ((Number)em.createNativeQuery(
+					"select count(*) from user_tab_cols where table_name=?1 and column_name=?2")
+					.setParameter(1, table.toUpperCase())
+					.setParameter(2, column.toUpperCase())
+			        .getSingleResult()).intValue()==1;
+		}
+	}
+	public class SQLConstraintNonNull extends SQLConstruct {
+		private String table;
+		private String column;
+		public SQLConstraintNonNull(String table, String column) {
+			super(table+"."+column+" not null");
+			this.table=table;
+			this.column=column;
+			setCreate(String.format("alter table %s modify %s not null", table, column));
+			setDrop(  String.format("alter table %s modify %s null", table, column));
+		}
+		@Override
+		public boolean exists() {
+			return ((Number)em.createNativeQuery(
+					"select count(*) from user_tab_cols where table_name=?1 and column_name=?2 and nullable='N'")
+					.setParameter(1, table.toUpperCase())
+					.setParameter(2, column.toUpperCase())
+			        .getSingleResult()).intValue()==1;
+		}
+	}
+	/*
+	public class SQLConstraintUnique extends SQLConstruct {
+		public SQLConstraintUnique(String name, String table, String column) { 
+			super(name);
+			setCreate(String.format("alter table %s add constraint %s unique (%s)", table, name, column));
+			setDrop(  String.format("alter table %s drop constraint %s", table, name));
+		}
+		public boolean exists() {
+			return ((Number)em.createNativeQuery(
+					"select count(*) from user_indexes where index_name=?1")
+					.setParameter(1, name.toUpperCase())
+			        .getSingleResult()).intValue()==1;
+		}
+		
+	}
+	*/
 	
-	public SQLIndex MOVIE_DIRECTOR_FKX = new SQLIndex("movie_director_fkx", "create index movie_director_fkx on jpatune_movie(director_id)");
-	public SQLIndex MOVIE_RATING_IDX = new SQLIndex("movie_rating_idx", "create index movie_rating_idx on jpatune_movie(rating)");
-	public SQLIndex MOVIE_RATING_RIDX = new SQLIndex("movie_rating_ridx", "create index movie_rating_ridx on jpatune_movie(rating desc)");
-	public SQLIndex MOVIE_RATING_LOWER_IDX = new SQLIndex("movie_rating_lower_idx", "create index movie_rating_lower_idx on jpatune_movie(lower(rating))");
-	public SQLIndex MOVIE_RATING_LOWER_RIDX = new SQLIndex("movie_rating_lower_ridx", "create index movie_rating_lower_ridx on jpatune_movie(lower(rating) desc)");
-	public SQLIndex MOVIE_TITLE_IDX = new SQLIndex("movie_title_idx", "create index movie_title_idx on jpatune_movie(title)");
-	public SQLIndex MOVIE_TITLE_RIDX = new SQLIndex("movie_title_ridx", "create index movie_title_ridx on jpatune_movie(title desc)");
-	public SQLIndex MOVIE_RATING_TITLE_IDX = new SQLIndex("movie_rating_title_idx", "create index movie_rating_title_idx on jpatune_movie(rating, title)");
-	public SQLIndex GENRE_MOVIE_FKX = new SQLIndex("genre_movie_fkx", "create index genre_movie_fkx on jpatune_moviegenre(movie_id)");
-	public SQLIndex MOVIEROLE_ACTOR_FKX = new SQLIndex("movierole_actor_fkx", "create index movierole_actor_fkx on jpatune_movierole(actor_id)");
-	public SQLIndex MOVIEROLE_MOVIE_FKX = new SQLIndex("movierole_movie_fkx", "create index movierole_movie_fkx on jpatune_movierole(movie_id)");
+	public SQLConstruct MOVIE_DIRECTOR_FKX = new SQLIndex("movie_director_fkx", "create index movie_director_fkx on jpatune_movie(director_id)");
+	public SQLConstruct MOVIE_RATING_IDX = new SQLIndex("movie_rating_idx", "create index movie_rating_idx on jpatune_movie(rating)");
+	public SQLConstruct MOVIE_RATING_RIDX = new SQLIndex("movie_rating_ridx", "create index movie_rating_ridx on jpatune_movie(rating desc)");
+	public SQLConstruct MOVIE_RATING_LOWER_IDX = new SQLIndex("movie_rating_lower_idx", "create index movie_rating_lower_idx on jpatune_movie(lower(rating))");
+	public SQLConstruct MOVIE_RATING_LOWER_RIDX = new SQLIndex("movie_rating_lower_ridx", "create index movie_rating_lower_ridx on jpatune_movie(lower(rating) desc)");
+	public SQLConstruct MOVIE_TITLE_IDX = new SQLIndex("movie_title_idx", "create index movie_title_idx on jpatune_movie(title)");
+	public SQLConstruct MOVIE_TITLE_RIDX = new SQLIndex("movie_title_ridx", "create index movie_title_ridx on jpatune_movie(title desc)");
+	public SQLConstruct MOVIE_RATING_TITLE_IDX = new SQLIndex("movie_rating_title_idx", "create index movie_rating_title_idx on jpatune_movie(rating, title)");
+	public SQLConstruct GENRE_MOVIE_FKX = new SQLIndex("genre_movie_fkx", "create index genre_movie_fkx on jpatune_moviegenre(movie_id)");
+	public SQLConstruct MOVIEROLE_ACTOR_FKX = new SQLIndex("movierole_actor_fkx", "create index movierole_actor_fkx on jpatune_movierole(actor_id)");
+	public SQLConstruct MOVIEROLE_MOVIE_FKX = new SQLIndex("movierole_movie_fkx", "create index movierole_movie_fkx on jpatune_movierole(movie_id)");
+
+	public SQLConstruct MOVIE_UTITLE = new SQLColumn("jpatune_movie", "utitle", "alter table jpatune_movie add utitle varchar2(256)",
+			                                                                    "update jpatune_movie set utitle=concat(concat(concat(title,'('),id),')')");
+	public SQLConstruct MOVIE_UTITLE_NONNULL = new SQLConstraintNonNull("jpatune_movie", "utitle");
+	public SQLConstruct MOVIE_UTITLE_IDX = new SQLIndex("movie_utitle_idx", "create index movie_utitle_idx on jpatune_movie(utitle)");
+	public SQLConstruct MOVIE_UTITLE_UDX = new SQLIndex("movie_utitle_udx", "create unique index movie_utitle_udx on jpatune_movie(utitle)");
+	//public SQLConstruct MOVIE_UTITLE_UNIQUE = new SQLConstraintUnique("movie_utitle_unique", "jpatune_movie", "utitle");
 	
 	
 	public void populate() {
 	}
 
 	public void cleanup() {
-		dropIndexes();
+		dropConstructs();
 	}
 
 	public MovieFactory executeSQL(SQLConstruct[] constructs) {
@@ -93,19 +157,21 @@ public class MovieFactory {
 			StringBuilder text = new StringBuilder(drop ? s.sql.getDrop() : s.sql.getCreate());
 			try {
 				boolean exists = s.sql.exists();
-				boolean debug=true;
 				if (!drop && !exists) {
+					log.info(text);
 					em.createNativeQuery(s.sql.getCreate()).executeUpdate();
-					//text.append(" (created)");
-					debug = false;
+					if (s.sql.getPopulate()!=null) {
+						text=new StringBuilder(s.sql.getPopulate());
+						log.info(text);
+						em.createNativeQuery(s.sql.getPopulate()).executeUpdate();
+					}
 				} else if (drop && exists) {
+					log.info(text);
 					em.createNativeQuery(s.sql.getDrop()).executeUpdate();
-					//text.append(" (dropped)");
 				} else {
 					text.append(" (noop)");
+					log.debug(text);
 				}
-				if (debug) { log.debug(text); }
-				else       { log.info(text); }
 			} catch (Exception ex) {
 				if (s.required) {
 					log.error(text);
@@ -145,7 +211,7 @@ public class MovieFactory {
 	}
 	
 	
-	public MovieFactory dropIndexes() {
+	public MovieFactory dropConstructs() {
 		SQLStatement sql[] = new SQLStatement[]{
 			new SQLStatement(MOVIE_DIRECTOR_FKX, false),
 			new SQLStatement(GENRE_MOVIE_FKX, false),
@@ -157,7 +223,11 @@ public class MovieFactory {
 			new SQLStatement(MOVIE_RATING_LOWER_RIDX, false),
 			new SQLStatement(MOVIE_TITLE_IDX, false),
 			new SQLStatement(MOVIE_TITLE_RIDX, false),
-			new SQLStatement(MOVIE_RATING_TITLE_IDX, false)
+			new SQLStatement(MOVIE_RATING_TITLE_IDX, false),
+			new SQLStatement(MOVIE_UTITLE_IDX, false),
+			new SQLStatement(MOVIE_UTITLE_NONNULL, false),
+			new SQLStatement(MOVIE_UTITLE_IDX, false),
+			new SQLStatement(MOVIE_UTITLE_UDX, false)
 		};
 		executeSQL(sql, true);
 		return this;

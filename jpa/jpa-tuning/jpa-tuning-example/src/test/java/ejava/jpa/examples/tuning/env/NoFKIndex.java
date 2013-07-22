@@ -17,7 +17,7 @@ public class NoFKIndex extends ForeignKeys {
 	public static void setUpClass() {
 		EntityManager em=getEMF().createEntityManager();
 		kevinBacon = getDAO().getKevinBacon();
-		new MovieFactory().setEntityManager(em).dropIndexes().flush();
+		new MovieFactory().setEntityManager(em).dropConstructs().flush();
 		em.close();
 	}
 

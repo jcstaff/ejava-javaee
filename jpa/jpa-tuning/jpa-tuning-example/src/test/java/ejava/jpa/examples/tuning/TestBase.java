@@ -31,7 +31,7 @@ import ejava.jpa.examples.tuning.dao.MovieDAOImpl;
 @BenchmarkHistoryChart
 public class TestBase {
     protected static Log log = LogFactory.getLog(TestBase.class);
-    private static final String PERSISTENCE_UNIT = "movietune-test";
+    protected static String PERSISTENCE_UNIT = "movietune-test";
     protected static EntityManagerFactory emf;
     private static EntityManager em_;
 	private static MovieDAOImpl dao;
