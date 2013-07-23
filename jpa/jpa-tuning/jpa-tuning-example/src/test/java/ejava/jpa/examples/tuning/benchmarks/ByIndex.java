@@ -2,22 +2,28 @@ package ejava.jpa.examples.tuning.benchmarks;
 
 import static org.junit.Assert.*;
 
-import javax.persistence.Persistence;
-
-
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ejava.jpa.examples.tuning.TestBase;
 import ejava.jpa.examples.tuning.TestLabel;
-import ejava.jpa.examples.tuning.suites.IndexTest;
 
 @TestLabel(label="Table Access")
 public class ByIndex extends TestBase {
-	private static int MAX_ROWS=IndexTest.MAX_ROWS;
-	static { //add a new mapping to the persistence unit
-		emf.close(); emf=null;
+	private static String originalPU;
+	@BeforeClass
+	public static void setUpBenchmarkClass() {
+		TestBase.tearDownBaseClass();
+		originalPU = PERSISTENCE_UNIT;
 	    PERSISTENCE_UNIT = "movietune-test-utitle";
         getDAO();
+		TestBase.tearDownBaseClass();
+	}
+	
+	@AfterClass
+	public static void tearDownBenchmarkClass() {
+	    PERSISTENCE_UNIT = originalPU;
 	}
 	
 	/**

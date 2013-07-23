@@ -108,7 +108,7 @@ public class TestBase {
 	}
 	
 	@After
-	public void setUpBase() {
+	public void tearDownBase() {
 		log.debug("");
 	}
 	
@@ -118,6 +118,9 @@ public class TestBase {
 			em_.close(); 
 			em_ = null;
 			dao = null;
+		}
+		if (emf!=null) {
+			emf.close(); emf=null;
 		}
 	}
 
