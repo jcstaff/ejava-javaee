@@ -1,0 +1,666 @@
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+drop index movie_title_idx
+------------------------------------------------------------
+create index movie_title_rating_idx on jpatune_movie(title, rating)
+------------------------------------------------------------
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+drop index movie_title_rating_idx
+------------------------------------------------------------
+create index movie_rating_title_idx on jpatune_movie(rating, title)
+------------------------------------------------------------
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title = :title", params={title=Tremors}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+"select m.rating from Movie m where m.title like :title", params={title=A%}, limit=2000
+
+=========================================================================
+
+Dual Indexes.Get By Term2 and Term1:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Dual Indexes.Get By Extra Term:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Dual Indexes.Get By First Term:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Dual Indexes.Get By Second Term:warmups=2, rounds=10, ave=0.04 [+- 0.01]
+Dual Indexes.Get By Second and Extra Term:warmups=2, rounds=10, ave=0.11 [+- 0.00]
+Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Compound Index.Get By Term2 and Term1:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Compound Index.Get By Extra Term:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Compound Index.Get By First Term:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Compound Index.Get By Second Term:warmups=2, rounds=10, ave=0.04 [+- 0.00]
+Compound Index.Get By Second and Extra Term:warmups=2, rounds=10, ave=0.13 [+- 0.01]
+Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Regular Index.Values By Index:warmups=2, rounds=10, ave=0.06 [+- 0.00]
+Regular Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.06 [+- 0.01]
+Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.06 [+- 0.00]
+Nullable Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.06 [+- 0.00]
+No Column Indexes.Query for Value:warmups=2, rounds=10, ave=0.27 [+- 0.01]
+No Column Indexes.Query for Values:warmups=2, rounds=10, ave=1.14 [+- 0.10]
+Where Column Index.Query for Value:warmups=2, rounds=10, ave=0.01 [+- 0.00]
+Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.09 [+- 0.04]
+Where, Select Index.Query for Value:warmups=2, rounds=10, ave=0.01 [+- 0.00]
+Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.08 [+- 0.06]
+Select, Where Index.Query for Value:warmups=2, rounds=10, ave=0.01 [+- 0.00]
+Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.03 [+- 0.05]
+
+=========================================================================
+drop index movie_rating_title_idx
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+------------------------------------------------------------
+create index movie_rating_idx on jpatune_movie(rating)
+create index movie_rating_lower_idx on jpatune_movie(lower(rating))
+create index movie_title_idx on jpatune_movie(title)
+------------------------------------------------------------
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m", limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by title ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m order by rating ASC", limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.rating = :rating order by title ASC", params={rating=R}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title ASC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title order by title DESC", params={title=A%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Scree%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fal%}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%atural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%ystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=%eventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title like :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Natural Disasters: Forces of Nature}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Mystic River: From Page to Screen}, limit=1000
+"select m from Movie m where m.title = :title", params={title=Seventeen: The Faces for Fall}, limit=1000
+
+=========================================================================
+
+Dual Indexes.Get By Term2 and Term1:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Dual Indexes.Get By Extra Term:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Dual Indexes.Get By First Term:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Dual Indexes.Get By Second Term:warmups=2, rounds=10, ave=0.04 [+- 0.01]
+Dual Indexes.Get By Second and Extra Term:warmups=2, rounds=10, ave=0.11 [+- 0.00]
+Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Compound Index.Get By Term2 and Term1:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Compound Index.Get By Extra Term:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Compound Index.Get By First Term:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Compound Index.Get By Second Term:warmups=2, rounds=10, ave=0.04 [+- 0.00]
+Compound Index.Get By Second and Extra Term:warmups=2, rounds=10, ave=0.13 [+- 0.01]
+Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Regular Index.Values By Index:warmups=2, rounds=10, ave=0.06 [+- 0.00]
+Regular Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.06 [+- 0.01]
+Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.06 [+- 0.00]
+Nullable Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.06 [+- 0.00]
+No Column Indexes.Query for Value:warmups=2, rounds=10, ave=0.27 [+- 0.01]
+No Column Indexes.Query for Values:warmups=2, rounds=10, ave=1.14 [+- 0.10]
+Where Column Index.Query for Value:warmups=2, rounds=10, ave=0.01 [+- 0.00]
+Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.09 [+- 0.04]
+Where, Select Index.Query for Value:warmups=2, rounds=10, ave=0.01 [+- 0.00]
+Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.08 [+- 0.06]
+Select, Where Index.Query for Value:warmups=2, rounds=10, ave=0.01 [+- 0.00]
+Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.03 [+- 0.05]
+Table Access without Index.Value Access:warmups=2, rounds=10, ave=1.81 [+- 0.06]
+Table Access without Index.Unrestricted Scan:warmups=2, rounds=10, ave=0.53 [+- 0.03]
+Table Access without Index.Unindexed Function Access:warmups=2, rounds=10, ave=1.82 [+- 0.03]
+Table Access without Index.Indexed Function Access:warmups=2, rounds=10, ave=1.79 [+- 0.05]
+Table Access without Index.OrderBy Non-Null Column:warmups=2, rounds=10, ave=3.45 [+- 0.06]
+Table Access without Index.OrderBy Nullable Column:warmups=2, rounds=10, ave=2.19 [+- 0.08]
+Table Access without Index.OrderBy Non-null Non-Where Column:warmups=2, rounds=10, ave=1.16 [+- 0.03]
+Table Access without Index.OrderBy Non-null Where Column ASC:warmups=2, rounds=10, ave=3.36 [+- 0.72]
+Table Access without Index.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.52 [+- 0.06]
+Table Access without Index.Ending Wildcard:warmups=2, rounds=10, ave=1.05 [+- 0.01]
+Table Access without Index.Leading Wildcard:warmups=2, rounds=10, ave=1.19 [+- 0.24]
+Table Access without Index.Exact Like:warmups=2, rounds=10, ave=1.05 [+- 0.01]
+Table Access without Index.Exact Equals:warmups=2, rounds=10, ave=0.83 [+- 0.01]
+Table Access with Single Indexes.Value Access:warmups=2, rounds=10, ave=0.90 [+- 0.03]
+Table Access with Single Indexes.Unrestricted Scan:warmups=2, rounds=10, ave=0.53 [+- 0.01]
+Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=10, ave=2.08 [+- 0.87]
+Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=10, ave=0.91 [+- 0.02]
+Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=10, ave=2.88 [+- 0.09]
+Table Access with Single Indexes.OrderBy Nullable Column:warmups=2, rounds=10, ave=2.28 [+- 0.30]
+Table Access with Single Indexes.OrderBy Non-null Non-Where Column:warmups=2, rounds=10, ave=0.91 [+- 0.03]
+Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=10, ave=2.82 [+- 0.16]
+Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.37 [+- 0.72]
+Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=10, ave=0.02 [+- 0.00]
+Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=10, ave=0.40 [+- 0.01]
+Table Access with Single Indexes.Exact Like:warmups=2, rounds=10, ave=0.02 [+- 0.00]
+Table Access with Single Indexes.Exact Equals:warmups=2, rounds=10, ave=0.02 [+- 0.00]
+
+=========================================================================

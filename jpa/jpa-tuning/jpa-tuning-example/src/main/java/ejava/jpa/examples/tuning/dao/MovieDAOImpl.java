@@ -1,5 +1,7 @@
 package ejava.jpa.examples.tuning.dao;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +33,27 @@ public class MovieDAOImpl {
 		this.em = em;
 	}
 	
+	private class DateParam {
+		public final Date date;
+		public final TemporalType ttype;
+		public DateParam(Date date, TemporalType ttype) {
+			this.date = date;
+			this.ttype = ttype;
+		}
+		@Override
+		public String toString() {
+			if (date==null) { return null; }
+			switch (ttype) {
+			case DATE:
+				return new SimpleDateFormat("yyyy-MM-dd").format(date);
+			case TIME:
+				return new SimpleDateFormat("HH:mm:ss.SSS").format(date);
+			case TIMESTAMP:
+				return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(date);
+			}
+			return null;
+		}
+	}
 	private class QueryLogger<T> {
 		private Class<T> resultType;
 		private String jpaql;
@@ -45,6 +68,10 @@ public class MovieDAOImpl {
 		}
 		public QueryLogger<T> setParameter(String key, Object value) {
 			params.put(key, value);
+			return this;
+		}
+		public QueryLogger<T> setParameter(String key, Date value, TemporalType ttype) {
+			params.put(key, new DateParam(value, ttype));
 			return this;
 		}
 		public QueryLogger<T> setFirstResult(int offset) {
@@ -70,7 +97,12 @@ public class MovieDAOImpl {
 			String queryString = orderBy==null ? jpaql : jpaql + " order by " + orderBy;
 			TypedQuery<T> query = em.createQuery(queryString, resultType);
 			for (Entry<String, Object> param: params.entrySet()) {
-				query.setParameter(param.getKey(), param.getValue());
+				if (param.getValue() instanceof DateParam) {
+					DateParam dparam = (DateParam)param.getValue();
+					query.setParameter(param.getKey(), dparam.date, dparam.ttype);
+				} else {
+					query.setParameter(param.getKey(), param.getValue());
+				}
 			}
 			if (offset != null) {
 				query.setFirstResult(offset);
@@ -312,6 +344,52 @@ public class MovieDAOImpl {
 				"select m.title from Movie m " +
 				"where m.rating = :rating", String.class)
 				.setParameter("rating", rating.mpaa()), 
+				offset, limit, null).getResultList();
+	}
+
+
+	public List<Movie> getMoviesByTitleAndReleaseDate(String title, Date releaseDate, Integer offset, Integer limit) {
+		return withPaging(createQuery(
+				"select m from Movie m " +
+				"where m.title = :title and m.releaseDate = :releaseDate", Movie.class)
+				.setParameter("title", title) 
+				.setParameter("releaseDate", releaseDate, TemporalType.DATE),
+				offset, limit, null).getResultList();
+	}
+
+	public List<Movie> getMoviesByReleaseDateAndTitle(String title, Date releaseDate, Integer offset, Integer limit) {
+		return withPaging(createQuery(
+				"select m from Movie m " +
+				"where m.releaseDate = :releaseDate and m.title = :title", Movie.class)
+				.setParameter("title", title)
+				.setParameter("releaseDate", releaseDate, TemporalType.DATE),
+				offset, limit, null).getResultList();
+	}
+
+	public List<Movie> getMoviesByTitleAndReleaseDateAndRating(String title, Date releaseDate, MovieRating rating, Integer offset, Integer limit) {
+		return withPaging(createQuery(
+				"select m from Movie m " +
+				"where m.title = :title and m.releaseDate = :releaseDate and m.rating=:rating", Movie.class)
+				.setParameter("title", title) 
+				.setParameter("releaseDate", releaseDate, TemporalType.DATE)
+				.setParameter("rating", rating.mpaa()),
+				offset, limit, null).getResultList();
+	}
+
+	public List<Movie> getMoviesByReleaseDate(Date releaseDate, Integer offset, Integer limit) {
+		return withPaging(createQuery(
+				"select m from Movie m " +
+				"where m.releaseDate = :releaseDate", Movie.class)
+				.setParameter("releaseDate", releaseDate, TemporalType.DATE),
+				offset, limit, null).getResultList();
+	}
+
+	public List<Movie> getMoviesByReleaseDateAndRating(Date releaseDate, MovieRating rating, Integer offset, Integer limit) {
+		return withPaging(createQuery(
+				"select m from Movie m " +
+				"where m.releaseDate = :releaseDate and m.rating=:rating", Movie.class)
+				.setParameter("releaseDate", releaseDate, TemporalType.DATE)
+				.setParameter("rating", rating.mpaa()),
 				offset, limit, null).getResultList();
 	}
 }

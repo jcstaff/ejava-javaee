@@ -122,7 +122,7 @@ where
 
 
     <section id="jpa-tuning-index-uniquescan">
-        <title>Unique Scan</title>
+        <title>Unique Index Scan</title>
         <para></para>
         <para>Request N rows matching a specific criteria using a unique index</para>
 
@@ -176,13 +176,99 @@ where
     </section>
 
 
-
-
-
     <section id="jpa-tuning-index-composite">
-        <title>Bypassing Table Access with Composite Index</title>
+        <title>Composite Index</title>
 
         <section id="jpa-tuning-index-composite-query">
+            <title>Query Parts</title>
+            <para>Selecting N columns for M rows matching two (2) criteria terms</para>
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA[
+"select m from Movie m 
+where m.title = :title and m.releaseDate = :releaseDate", 
+params={title=Apollo 13, releaseDate=1995-07-01}
+]]></programlisting>                        
+            </figure>
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_,
+    movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+    movie0_.MINUTES as MINUTES2_2_,
+    movie0_.PLOT as PLOT3_2_,
+    movie0_.RATING as RATING4_2_,
+    movie0_.RELEASE_DATE as RELEASE5_2_,
+    movie0_.TITLE as TITLE6_2_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.TITLE=? 
+    and movie0_.RELEASE_DATE=?]]></programlisting>                        
+            </figure>
+        </section>
+        
+        <section id="jpa-tuning-index-composite-singleindex">
+            <title>First Term Indexed</title>
+            <para>First term of a two term where clause indexed</para>
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_idx on jpatune_movie(title)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-dualterms-singleindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Candidate rows located using a range scan of the index on first condition</para></listitem>
+                <listitem><para>Final rows filtered from candidate rows using second condition</para></listitem>
+            </itemizedlist>
+            
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[Dual Indexes.Get By Term1, Term2:warmups=1, rounds=5, ave=0.22 [+- 0.01]]]></programlisting>                        
+            </figure>
+        </section>    
+
+        <section id="jpa-tuning-index-composite-compositeindex">
+            <title>First and Second Term Indexed (using Composite Index)</title>
+            <para>All terms in the where clause part of same composite index</para>
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-dualterms-compositeindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Rows located using range scan of the composite index, applying the two conditions</para></listitem>
+                <listitem><para>Select clause satisfied using table rows accessed by rowId</para></listitem>
+            </itemizedlist>
+            
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[Compound Index.Get By Term1, Term2:warmups=1, rounds=5, ave=0.24 [+- 0.02]]]></programlisting>                        
+            </figure>
+            
+            <tip>
+                <title>Use All Terms of Where Clause in Composite Indexes</title>
+                <para>Adding all terms of the where clause to the index can help efficiency over using
+                    a single column index.</para>
+            </tip>
+        </section>    
+    </section>
+
+
+
+    <section id="jpa-tuning-index-fastforward">
+        <title>Index Fast Full Scan (with Composite Index)</title>
+
+        <section id="jpa-tuning-index-fastforward-query">
             <title>Query Parts</title>
             <para>Selecting N columns from M rows matching Q criteria terms</para>
             <figure>
@@ -204,16 +290,10 @@ params={title=A%}, limit=2000]]></programlisting>
 where
     rownum <= ?]]></programlisting>                        
             </figure>
-            
-            <figure>    
-                <title>Benchmark</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-            </figure>
         </section>    
             
         
-        <section id="jpa-tuning-index-composite-rangescan">
+        <section id="jpa-tuning-index-fastforward-rangescan">
            <title>Option: Use Range Scan and RowId Access</title>
            <para></para>
 
@@ -234,12 +314,13 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Where Column Index.Query for Values:warmups=1, rounds=5, ave=1.04 [+- 0.02]
 ]]></programlisting>                        
             </figure>
         </section>    
 
         
-        <section id="jpa-tuning-index-composite-complete">
+        <section id="jpa-tuning-index-fastforward-complete">
            <title>Option: Use Range Scan Alone with Composite Index</title>
            <para></para>
 
@@ -261,6 +342,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Where, Select Index.Query for Values:warmups=1, rounds=5, ave=1.04 [+- 0.03]
 ]]></programlisting>                        
             </figure>
 
@@ -272,8 +354,8 @@ where
         </section>    
 
         
-        <section id="jpa-tuning-index-composite-alt">
-           <title>Option: Use Range Scan and RowId Access</title>
+        <section id="jpa-tuning-index-fastforward-alt">
+           <title>Option: Fast Forward Scan</title>
            <para></para>
 
             <figure>    
@@ -295,6 +377,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Select, Where Index.Query for Values:warmups=1, rounds=5, ave=1.06 [+- 0.04]
 ]]></programlisting>                        
             </figure>
         </section>    
