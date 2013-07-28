@@ -3,7 +3,31 @@
 
 <chapter id="jpa-tuning-index">
     <title>Indexes</title>
-    <para></para>
+    <itemizedlist spacing="compact">
+        <listitem><para>Can be unique or non-unique</para></listitem>
+        <listitem><para>Can be simple or composite (Oracle maximum is 32)</para></listitem>
+        <listitem><para>Can be normal (ascending) or descending</para></listitem>
+        <listitem><para>Can be reverse key (for monotonically incrementing column values) to balance B*-tree</para></listitem>
+        <listitem><para>Can be function-based (to address normalization uses)</para></listitem>
+        <listitem><para>Can be used to implement sort for "order by"</para></listitem>
+        <listitem><para>Can be used to implement the entire table (Index-organized Table(IOT))</para></listitem>
+        <listitem><para>Can be traversed in different ways</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Unique Scan - used with "unique" or "primary key" indexes to return a single value</para></listitem>
+                <listitem><para>Range Scan - used with "unique" and "non-unique" indexes to return multiple matching rows</para></listitem>
+                <listitem><para>Full Scan - used with composite indexes where leading where column is not part of index (i.e., can use col2 of composite)</para></listitem>
+                <listitem><para>Fast Full Scan - used when all columns of query (where and select) are contained within composite index -- table is skipped</para></listitem>
+                <listitem><para>...</para></listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>Can be coalesced or rebuilt with</para>
+<programlisting language=""><![CDATA[ALTER INDEX (index-name) (COALESCE | REBUILD)]]></programlisting>
+            <itemizedlist spacing="compact">
+                <listitem><para>Coalesce - repairs index in place. Good for small repairs</para></listitem>
+                <listitem><para>Rebuild - totally rebuilds index. Good for large repairs</para></listitem>
+            </itemizedlist>
+        </listitem>
+    </itemizedlist>
         
     <section id="jpa-tuning-index-rangescan">
         <title>Index Range Scan (Unlimited)</title>
@@ -388,55 +412,11 @@ Select, Where Index.Query for Values:warmups=1, rounds=5, ave=1.06 [+- 0.04]
 
 
 
+    <section id="jpa-tuning-index-notes">
+        <title>Index Notes</title>
 
-
-
-
-
-
-
-
-
-
-
-
-    <section id="jpa-tuning-index-">
-        <title>Template</title>
-        <para>Request N rows matching ...</para>
-
-        <figure>    
-            <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-        </figure>
-
-        <figure>
-            <title>JPA Query</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-        </figure>
         
-        <figure>    
-            <title>Generated SQL</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-        </figure>
 
-        <figure>
-            <title>Explain Plan</title>
-            <graphic scalefit="1" fileref="images/jpatune-plan-fulltable-.png"/>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
-
-        <figure>    
-            <title>Benchmark</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
-        </figure>
 
         <tip>
             <title></title>

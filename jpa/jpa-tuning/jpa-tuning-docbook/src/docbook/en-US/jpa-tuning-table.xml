@@ -18,6 +18,27 @@
         <section id="jpa-tuning-table-fullscan-unconstrained">
             <title>Full Table Scan: Unconstrained Access</title>
             <para>Request N rows of data from a table with no defined order</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Full Table Scan selected when:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>There is no where clause</para></listitem>
+                        <listitem><para>There is no suitable index</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>calling functions on row data (ex. upper(title)='TREMORS')</para></listitem>
+                                <listitem><para>comparing column against data type requiring conversion</para></listitem>
+                                <listitem><para>using wildcard in leading character (ex. title like '%emors')</para></listitem>
+                                <listitem><para>searching for null column values (ex. rating is null) with single column indexes</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>Full Table Scan optimal when:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Using small tables</para></listitem>
+                        <listitem><para>Majority of the rows in a larger table must be read (e.g., no where clause)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
 
             <figure>
                 <title>JPA Query</title>
@@ -121,6 +142,11 @@ FullTableScanNoIndex.valueAccess: [measured 1 out of 1 rounds, threads: 1 (seque
         <section id="jpa-tuning-table-fullscan-whereindex">
             <title>RowId Scan: Using Where (with Index)</title>
             <para>Request N rows of data matching a condition on an indexed column</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Uses an exact location for a row -- normally obtained from an index</para></listitem>
+                <listitem><para>Fastest way to locate an individual row in a table</para></listitem>
+                <listitem><para>Note: rows can be moved during an update -- requiring multiple locations to be accessed when using former rowId</para></listitem>
+            </itemizedlist>
 
             <figure>    
                 <title>DB Index(es)</title>
