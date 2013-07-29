@@ -26,6 +26,17 @@
             </listitem>
             <listitem><para>JPA performance pitfalls</para></listitem>
         </itemizedlist>
+        <note>
+            <title></title>
+            <para>The material in this paper is geared towards developers working with 
+                SQL and JPA. The topic of performance is much larger than the scope 
+                covered here and should involve DBAs, Hardware Engineers, etc. when
+                working through the complete solution. However, the material covered 
+                in this paper should be an excellent start for developers to better 
+                understand what costs what, how you can better know when there are
+                issues or success, and where to look for solutions. Some topics were
+                purposely left out to help concentrate on the primary scenarios.</para>
+        </note>
     </preface>
 
     <xi:include href="jpa-tuning-oracle.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
@@ -35,6 +46,23 @@
     <xi:include href="jpa-tuning-jpa.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 <!-- 
     <xi:include href="jpa-tuning-sql.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
- -->    
-    
+ -->
+ 
+     <chapter id="jpa-tuning-summary">
+        <title>JPA/SQL Tuning Summary</title>
+        
+        <section id="jpa-tuning-summary-other">
+            <title>Other Topics</title>
+            <para>Some topics of possible interest that we did not cover.</para>
+            
+            <itemizedlist spacing="compact">
+                <listitem><para>Cluster Indexes - structurally organize parent and child tables 
+                    within same data block when commonly accessed together through join operations
+                    and rarely alone.</para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+        </section>
+     </chapter>    
+        
 </book>
