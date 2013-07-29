@@ -6,11 +6,11 @@
     
     <section id="jpa-tuning-join-fkey">
         <title>Foreign Keys</title>
-        <para></para>
+        <para>Improving performance of foreign key joins.</para>
 
         <section id="jpa-tuning-join-fkey-query">
             <title>Query Parts</title>
-            <para></para>
+            <para>Select N properties for object M matching certain criteria</para>
 
             <figure>
                 <title>JPA Query</title>
@@ -44,11 +44,6 @@ where
             <title>No Indexes</title>
             <para>Perform query without any index support for where, select, or join clauses</para>
 
-            <figure>    
-                <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[(none except PK indexes)]]></programlisting>                        
-            </figure>
-
             <figure>
                 <title>Explain Plan</title>
                 <graphic scalefit="1" fileref="images/jpatune-plan-fkey-noindexes.png"/>
@@ -56,8 +51,8 @@ where
             <itemizedlist spacing="compact">
                 <listitem><para>Full table scan of Movie to satisfy where clause and to obtain movie_id for join</para></listitem>
                 <listitem><para>Full table scan of MovieRole to locate MovieRoles.movie_id and to obtain rows to satisfy select clause</para></listitem>
-                <listitem><para>Large portion of cost spent looking for children</para></listitem>
             </itemizedlist>
+            <para>* Large portion of cost spent looking for children</para>
 
             <figure>    
                 <title>Benchmark</title>
@@ -65,15 +60,17 @@ where
             </figure>
 
             <tip>
-                <title></title>
-                <para></para>
+                <title>Full Table Scans (for children) Magified by Multiple Parent Selection</title>
+                <para>The cost of performing a full table scan of the child table looking for children 
+                    to match a specific parent is magnified when the overall query selects multiple parent 
+                    rows. The child table must be scanned for each parent.</para>
             </tip>
         </section>
 
 
         <section id="jpa-tuning-join-fkey-indexed">
-            <title>Perform query with support for foreign key index</title>
-            <para></para>
+            <title>Perform Query with Support for Foreign Key Index</title>
+            <para>Address the biggest cost item in the execution plan by adding an index on the foreign key column.</para>
 
             <figure>    
                 <title>DB Index(es)</title>
@@ -88,9 +85,8 @@ where
                 <listitem><para>Full table scan of Movie to satisfy where clause and to obtain movie_id for join</para></listitem>
                 <listitem><para>Range scan of foreign key index used to locate MovieRoles.movie_id</para></listitem>
                 <listitem><para>MovieRole rows accessed by rowId to satisfy select clause</para></listitem>
-                <listitem><para>Eliminated much of the cost to locate children</para></listitem>
-                <listitem><para>Still have cost to locate parent</para></listitem>
             </itemizedlist>
+            <para>* Eliminated much of the cost to locate children. Still have cost to locate parent</para>
 
             <figure>    
                 <title>Benchmark</title>
@@ -98,8 +94,9 @@ where
             </figure>
 
             <tip>
-                <title></title>
-                <para></para>
+                <title>Add Indexes to Foreign Key Columns Joined with Parent</title>
+                <para>Add indexes to foreign key columns of child tables when the child table is frequently
+                    joined with parent rows. The index will go unused if the child is simply searched alone.</para>
             </tip>
         </section>
 
@@ -123,9 +120,8 @@ create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisti
                 <listitem><para>(remaining steps are same as prior approach)</para></listitem>
                 <listitem><para>Range scan of foreign key index used to locate MovieRoles.movie_id</para></listitem>
                 <listitem><para>MovieRole rows accessed by rowId to satisfy select clause</para></listitem>
-                <listitem><para>Eliminated much of the cost to locate children</para></listitem>
-                <listitem><para>Still have cost small cost obtaining Movie.id</para></listitem>
             </itemizedlist>
+            <para>* Eliminated much of the cost to locate children. Still have cost small cost obtaining Movie.id</para>
 
             <figure>    
                 <title>Benchmark</title>
@@ -158,8 +154,8 @@ create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisti
                 <listitem><para>(remaining steps are same as prior approach)</para></listitem>
                 <listitem><para>Range scan of foreign key index used to locate MovieRoles.movie_id</para></listitem>
                 <listitem><para>MovieRole rows accessed by rowId to satisfy select clause</para></listitem>
-                <listitem><para>The last rowId access is necessary to return the full MovieRole object</para></listitem>
             </itemizedlist>
+            <para>* The last rowId access is necessary to return the full MovieRole object</para>
 
             <figure>    
                 <title>Benchmark</title>
@@ -167,8 +163,12 @@ create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisti
             </figure>
 
             <tip>
-                <title></title>
-                <para></para>
+                <title>Adding Join Column to Index Speeds Joins</title>
+                <para>By adding the join column of the parent to the composite index used to locate
+                   the parent rows, you can save row accesses to the parent table (looking for the join
+                   column value). This is a small improvement relative to the other indexes added 
+                   earlier because you are only eliminating an already efficient (but not the most efficient) 
+                   means of locating row data.</para>
             </tip>
         </section>
     </section>
@@ -236,11 +236,6 @@ where
         <section id="jpa-tuning-join-nestedloop-fulltablescan">
             <title>Nested Loop with Full Table Scan</title>
             <para>No indexes on where clause or foreign key columns</para>
-
-            <figure>    
-                <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[(just PK indexes)]]></programlisting>                        
-            </figure>
 
             <figure>
                 <title>Explain Plan</title>
@@ -413,6 +408,8 @@ offset=1000, limit=2
 params={role=V%} 
 ]]></programlisting>                        
             </figure>
+            <para>* Used multiple forms of query since Hash algorithm seemed to better detect an early
+                completion limit than the nested loop approach.</para>
 
             <figure>    
                 <title>Generated SQL</title>
@@ -440,7 +437,7 @@ where
             </section>    
 
         <section id="jpa-tuning-join-hashjoin-fulltablescan">
-            <title>Nested Loop with Full Table Scan</title>
+            <title>Hash Join with Full Table Scan</title>
             <para>No indexes on where clause or foreign key columns</para>
             <itemizedlist spacing="compact">
                 <listitem><para>Used When:</para>
@@ -451,11 +448,6 @@ where
                 </listitem>
             </itemizedlist>
             
-
-            <figure>    
-                <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[(just PK indexes)]]></programlisting>                        
-            </figure>
 
             <figure>
                 <title>Explain Plan</title>
@@ -520,7 +512,7 @@ Table Indexes Only.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=46.52
         </section>
 
         <section id="jpa-tuning-join-hashjoin-composite-fkx">
-            <title>Nested Loop with Composite FK Index</title>
+            <title>Hash Join with Composite FK Index</title>
             <para>Single composite index containing columns from where clause and foreign key</para>
 
             <figure>    
@@ -533,7 +525,6 @@ Table Indexes Only.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=46.52
                 <graphic scalefit="1" fileref="images/jpatune-plan-hashjoin-compositefk.png"/>
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
                 <listitem><para>Range scan on composite index of MovieRoles used to satisfy where clause</para></listitem>
                 <listitem><para>Composite index provides movie_id without having to access MovieRole row</para></listitem>
                 <listitem><para>(from here is is the same as the previous cases)</para></listitem>
@@ -577,23 +568,20 @@ Composite with FK Index.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=
                     <listitem><para>Ordered rows from both tables are then merged</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para></para></listitem>  
         </itemizedlist>
         
             <figure>    
                 <title>Altered SQL</title>
-<programlisting language=""><![CDATA[
-    select
-        * 
-    from
-        ( select /*+ use_merge(cast1_ movie0_) */
-            movie0_.ID as ID1_2_,
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select /*+ use_merge(cast1_ movie0_) */
+        movie0_.ID as ID1_2_,
 ...
-        where
-            cast1_.MOVIE_ROLE like ? ) 
     where
-        rownum <= ?
-]]></programlisting>                        
+        cast1_.MOVIE_ROLE like ? ) 
+where
+    rownum <= ?]]></programlisting>                        
             </figure>
 
             <figure>
@@ -615,13 +603,12 @@ Composite with FK Index.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=
     </section>
 
 
-
     <section id="jpa-tuning-join-summary">
        <title>Summary</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Add indexes to foreign keys when child is joined with parent in queries</para></listitem>
+            <listitem><para>Foreign key indexes not used when navigating from child table</para></listitem>
+            <listitem><para>Type of join used depends on driving table size and comparison type of join (equijoin or non-equijoin)</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>

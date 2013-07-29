@@ -7,17 +7,7 @@
     <section id="jpa-tuning-oracle-reasonsbad">
         <title>Reasons for Inefficient SQL Performance</title>
         <itemizedlist spacing="compact">
-            <listitem><para>Stale or missing optimizer statistics</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>Cost-based optimizer (CBO) needs accurate view of database to generate optimal execution plans</para>
-                        <itemizedlist spacing="compact">
-                            <listitem><para>Data sizes</para></listitem>
-                            <listitem><para>Table distribution</para></listitem>
-                            <listitem><para>Indexes distribution</para></listitem>
-                        </itemizedlist>
-                    </listitem>
-                </itemizedlist>
-            </listitem>
+            <listitem><para>Stale or missing optimizer statistics</para></listitem>
             <listitem><para>Missing access structures</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Indexes</para></listitem>
@@ -30,12 +20,7 @@
                     <listitem><para>Incorrect estimates of cost, cardinality, or predictive selectivity</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para>Poorly constructed SQL</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>Cartesian JOINs</para></listitem>
-                    <listitem><para>Expensive SQL constructs like UNION versus UNION ALL</para></listitem>
-                </itemizedlist>
-            </listitem>
+            <listitem><para>Poorly constructed SQL</para></listitem>
         </itemizedlist>
     </section>
     
@@ -52,7 +37,8 @@
                     <listitem><para>Data operations (e.g., filter, sort, aggregation)</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para>Cost and cardinality (number of estimated rows)</para></listitem>
+            <listitem><para>Cardinality = number of rows selected (based on count of unique columns)</para></listitem>
+            <listitem><para>Cost = disk access, I/O and CPU cost estimates for number of rows selected</para></listitem>
             <listitem><para>Partition access</para></listitem>
             <listitem><para>Parallel execution</para></listitem>
         </itemizedlist>
@@ -75,8 +61,7 @@
             </figure>
             <figure>
                 <title>EXPLAIN PLAN Example using Text SQL Commands</title>
-<programlisting language=""><![CDATA[
-EXPLAIN PLAN 
+<programlisting language=""><![CDATA[EXPLAIN PLAN 
 FOR
 select m.title, p.first_name, p.last_name
 from queryex_person p
@@ -86,11 +71,9 @@ order by m.title desc;
 
 SET LINESIZE 100
 SET PAGESIZE 0
-select * from table(DBMS_XPLAN.DISPLAY());
-]]></programlisting>                        
+select * from table(DBMS_XPLAN.DISPLAY());]]></programlisting>                        
 
-<programlisting language=""><![CDATA[
-plan FOR succeeded.
+<programlisting language=""><![CDATA[plan FOR succeeded.
 Plan hash value: 1054686195                                                                         
                                                                                                     
 --------------------------------------------------------------------------------------              
@@ -99,8 +82,8 @@ Plan hash value: 1054686195
 |   0 | SELECT STATEMENT    |                |     7 |  1974 |     8  (25)| 00:00:01 |              
 |   1 |  SORT ORDER BY      |                |     7 |  1974 |     8  (25)| 00:00:01 |              
 |*  2 |   HASH JOIN         |                |     7 |  1974 |     7  (15)| 00:00:01 |              
-|*  3 |    TABLE ACCESS FULL| QUERYEX_MOVIE  |     7 |   980 |     3   (0)| 00:00:01 |              
-|   4 |    TABLE ACCESS FULL| QUERYEX_PERSON |    10 |  1420 |     3   (0)| 00:00:01 |              
+|*  3 |    TABLE ACCESS FULL| JPATUNE_MOVIE  |     7 |   980 |     3   (0)| 00:00:01 |              
+|   4 |    TABLE ACCESS FULL| JPATUNE_PERSON |    10 |  1420 |     3   (0)| 00:00:01 |              
 --------------------------------------------------------------------------------------              
                                                                                                     
 Predicate Information (identified by operation id):                                                 
@@ -117,8 +100,7 @@ Note
     </figure>
     <figure>
                 <title>EXPLAIN PLAN Example using Named Plan</title>
-<programlisting language=""><![CDATA[
-EXPLAIN PLAN 
+<programlisting language=""><![CDATA[EXPLAIN PLAN 
 SET STATEMENT_ID='myplan01'
 FOR
 select m.title, p.first_name, p.last_name
@@ -138,8 +120,8 @@ select m.title, p.first_name, p.last_name
             </figure>
             <note>
                 <title>AUTO TRACE Requires Special Role and Permission</title>
-<programlisting language=""><![CDATA[grant SELECT_CATALOG_ROLE to EJAVA;
-grant SELECT ANY DICTIONARY to EJAVA;]]></programlisting>                        
+<programlisting language=""><![CDATA[grant SELECT_CATALOG_ROLE to (user);
+grant SELECT ANY DICTIONARY to (user);]]></programlisting>                        
             </note>
             <itemizedlist spacing="compact">
                 <listitem><para>AUTOTRACE Statistics</para>
@@ -179,23 +161,20 @@ grant SELECT ANY DICTIONARY to EJAVA;]]></programlisting>
             </note>
     <figure>
         <title>Example: Connection Generates SQL Commands</title>
-<programlisting language=""><![CDATA[
-select poo.first_name, poo.last_name
+<programlisting language=""><![CDATA[select poo.first_name, poo.last_name
 from queryex_person poo;]]></programlisting>                        
     </figure>
 
     <figure>
         <title>Example: SQL Commands of Interest Located in V$PLAN</title>
 <programlisting language=""><![CDATA[select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from queryex_person poo%';]]></programlisting>                        
-<programlisting language=""><![CDATA[
-87d246wux9qag   "select poo.first_name, poo.last_name from queryex_person poo"
+<programlisting language=""><![CDATA[87d246wux9qag   "select poo.first_name, poo.last_name from queryex_person poo"
 9bzam4xu5q7p5   select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from queryex_person poo%']]></programlisting>                        
             </figure>
         
             <figure>
                 <title>Example: SQL_ID from V$PLAN Used to Display Execution Plan</title>
-<programlisting language=""><![CDATA[
-select PLAN_TABLE_OUTPUT from
+<programlisting language=""><![CDATA[select PLAN_TABLE_OUTPUT from
 TABLE(DBMS_XPLAN.DISPLAY_CURSOR('87d246wux9qag',null, 'TYPICAL'));]]></programlisting>                        
 <programlisting language=""><![CDATA[
 SQL_ID  87d246wux9qag, child number 0
@@ -208,7 +187,7 @@ Plan hash value: 1628338048
 | Id  | Operation         | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
 ------------------------------------------------------------------------------------
 |   0 | SELECT STATEMENT  |                |       |       |     3 (100)|          |
-|   1 |  TABLE ACCESS FULL| QUERYEX_PERSON |    10 |   680 |     3   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS FULL| JPATUNE_PERSON |    10 |   680 |     3   (0)| 00:00:01 |
 ------------------------------------------------------------------------------------
  
 Note
@@ -217,9 +196,8 @@ Note
             </figure>
             <figure>
                 <title>Example: DISPLAY_CURSOR witin Single Command</title>
-<programlisting language=""><![CDATA[
-SELECT t.*
-FROM v$sql s, table(DBMS_XPLAN.DISPLAY_CURSOR(s.sql_id, s.child_number)) t WHERE sql_text LIKE '%QUERYEX_MOVIEGENRE%';]]></programlisting>                        
+<programlisting language=""><![CDATA[SELECT t.*
+FROM v$sql s, table(DBMS_XPLAN.DISPLAY_CURSOR(s.sql_id, s.child_number)) t WHERE sql_text LIKE '%JPATUNE_MOVIEGENRE%';]]></programlisting>                        
             </figure>
             
         </section>    
@@ -229,9 +207,9 @@ FROM v$sql s, table(DBMS_XPLAN.DISPLAY_CURSOR(s.sql_id, s.child_number)) t WHERE
     <section id="jpa-tuning-oracle-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>SQL implementations can be inefficient for many reasons</para></listitem>
+            <listitem><para>Looking at executions plans can aid discovery of issues and solutions</para></listitem>
+            <listitem><para>Administrative and Developer tools available to access execution plans</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>

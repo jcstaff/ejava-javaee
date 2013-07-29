@@ -38,7 +38,9 @@
             <title>DB Index(es)</title>
 <programlisting language=""><![CDATA[create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
         </figure>
-        <para>* "utitle" was added as the concatenation of title(id) to create a unique column</para>
+        
+        <para>* "utitle" was added as the concatenation of title(id) to create a unique column.</para>
+        <para>** we are not yet taking advantage of the uniqueness of the column</para>
 
         <figure>
             <title>JPA Query</title>
@@ -137,8 +139,10 @@ where
         </figure>
 
         <tip>
-            <title></title>
-            <para></para>
+            <title>Explain Plans provide Execution Plans without knowing Parameter Values</title>
+            <para>The Explain plan -- based on theoretical parameter values -- may result in 
+                an execution plan that is significantly different than what occurs at runtime.
+                The AUTOTRACE capability can mitigate this, but requires additional permissions.</para>
         </tip>
     </section>
 
@@ -154,6 +158,7 @@ where
             <title>DB Index(es)</title>
 <programlisting language=""><![CDATA[create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
         </figure>
+        <para>* we are now taking advantage of the unique column values.</para>
 
         <figure>
             <title>JPA Query</title>
@@ -202,17 +207,17 @@ where
 
     <section id="jpa-tuning-index-composite">
         <title>Composite Index</title>
+        <para>Indexes with multiple columns to match the where clause and optionally the 
+            select and join clauses as well.</para>
 
         <section id="jpa-tuning-index-composite-query">
             <title>Query Parts</title>
             <para>Selecting N columns for M rows matching two (2) criteria terms</para>
             <figure>
                 <title>JPA Query</title>
-<programlisting language=""><![CDATA[
-"select m from Movie m 
+<programlisting language=""><![CDATA["select m from Movie m 
 where m.title = :title and m.releaseDate = :releaseDate", 
-params={title=Apollo 13, releaseDate=1995-07-01}
-]]></programlisting>                        
+params={title=Apollo 13, releaseDate=1995-07-01}]]></programlisting>                        
             </figure>
 
             <figure>    
@@ -254,6 +259,12 @@ where
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[Dual Indexes.Get By Term1, Term2:warmups=1, rounds=5, ave=0.22 [+- 0.01]]]></programlisting>                        
             </figure>
+            
+            <tip>
+                <title>Most Selective Column Should be Indexed</title>
+                <para>DB will re-order the query to try to take advantage of an index that will
+                    result in the least number of rows moving forward to next step.</para>
+            </tip>
         </section>    
 
         <section id="jpa-tuning-index-composite-compositeindex">
@@ -261,8 +272,7 @@ where
             <para>All terms in the where clause part of same composite index</para>
             <figure>    
                 <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+<programlisting language=""><![CDATA[create index movie_title_rdate_idx on jpatune_movie(title, release_date)]]></programlisting>                        
             </figure>
 
             <figure>
@@ -291,6 +301,7 @@ where
 
     <section id="jpa-tuning-index-fastforward">
         <title>Index Fast Full Scan (with Composite Index)</title>
+        <para>Incorporate terms from select clause into composite index to bypass table access.</para>
 
         <section id="jpa-tuning-index-fastforward-query">
             <title>Query Parts</title>
@@ -380,7 +391,7 @@ Where, Select Index.Query for Values:warmups=1, rounds=5, ave=1.04 [+- 0.03]
         
         <section id="jpa-tuning-index-fastforward-alt">
            <title>Option: Fast Forward Scan</title>
-           <para></para>
+           <para>DB can make use of secondary terms within composite index.</para>
 
             <figure>    
                 <title>DB Index(es)</title>
@@ -404,6 +415,12 @@ Where, Select Index.Query for Values:warmups=1, rounds=5, ave=1.04 [+- 0.03]
 Select, Where Index.Query for Values:warmups=1, rounds=5, ave=1.06 [+- 0.04]
 ]]></programlisting>                        
             </figure>
+            
+            <tip>
+                <title>DB Can make use of Secondary Columns of Composite Index</title>
+                <para>Consider leveraging secondary columns of an existing composite index 
+                    (over adding another index) to satisfy low-priority queries.</para>
+            </tip>
         </section>    
         
 
@@ -414,9 +431,11 @@ Select, Where Index.Query for Values:warmups=1, rounds=5, ave=1.06 [+- 0.04]
     <section id="jpa-tuning-index-summary">
        <title>Summary</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Indexes speed access to specific rows</para></listitem>
+            <listitem><para>Indexes should match where clause of high priority queries</para></listitem>
+            <listitem><para>Composite indexes can be formed with multiple terms from the where and select clause</para></listitem>
+            <listitem><para>Secondary columns of composite indexes can be used (over creating additional index) in lower priority queries</para></listitem>
+            <listitem><para>Unique indexes can be searched faster than non-unique indexes -- take advantage of unique column values</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>

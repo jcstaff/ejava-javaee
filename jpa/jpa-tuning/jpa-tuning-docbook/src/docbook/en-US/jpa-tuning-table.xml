@@ -92,7 +92,9 @@ FullTableScanIndex.unrestrictedScan: [measured 1 out of 1 rounds, threads: 1 (se
 
             <figure>
                 <title>JPA Query</title>
-<programlisting language=""><![CDATA["select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000]]></programlisting>                        
+<programlisting language=""><![CDATA["select m from Movie m
+where m.rating = :rating", 
+params={rating=R}, limit=1000]]></programlisting>                        
             </figure>
             
             <figure>    
@@ -155,7 +157,9 @@ FullTableScanNoIndex.valueAccess: [measured 1 out of 1 rounds, threads: 1 (seque
 
             <figure>
                 <title>JPA Query</title>
-<programlisting language=""><![CDATA["select m from Movie m where m.rating = :rating", params={rating=R}, limit=1000]]></programlisting>                        
+<programlisting language=""><![CDATA["select m from Movie m 
+where m.rating = :rating", 
+params={rating=R}, limit=1000]]></programlisting>                        
             </figure>
             
             <figure>    
@@ -213,7 +217,9 @@ where
 
             <figure>
                 <title>JPA Query</title>
-<programlisting language=""><![CDATA["select m from Movie m where upper(m.rating) = :rating", params={rating=R}, limit=1000]]></programlisting>                        
+<programlisting language=""><![CDATA["select m from Movie m 
+where upper(m.rating) = :rating", 
+params={rating=R}, limit=1000]]></programlisting>                        
             </figure>
             
             <figure>    
@@ -274,7 +280,9 @@ where
 
             <figure>
                 <title>JPA Query</title>
-<programlisting language=""><![CDATA["select m from Movie m where lower(m.rating) = :rating", params={rating=r}, limit=1000]]></programlisting>                        
+<programlisting language=""><![CDATA["select m from Movie m 
+where lower(m.rating) = :rating", 
+params={rating=r}, limit=1000]]></programlisting>                        
             </figure>
             
             <figure>    
@@ -376,8 +384,8 @@ where
             
             <tip>
                 <title>Avoid Leading Wildcards when using Like</title>
-                <para>Leading wildcards invalidate the use of column indexes. Non-leading wildcards
-                    continue to indexes.</para>
+                <para>Leading wildcards invalidate the use of column indexes. Indexes are still used
+                    with non-leading wildcards.</para>
             </tip>
             
         </section>
@@ -407,7 +415,9 @@ where
 
             <figure>
                 <title>JPA Query</title>
-<programlisting language=""><![CDATA["select m from Movie m order by title ASC", limit=1000]]></programlisting>                        
+<programlisting language=""><![CDATA["select m from Movie m 
+order by title ASC", 
+limit=1000]]></programlisting>                        
             </figure>
             
             <figure>    
@@ -558,9 +568,7 @@ where
                 <graphic scalefit="1" fileref="images/jpatune-plan-rowid-where-index-desc.png"/>
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Normal (ASC) indexes can be efficiently traversed in DESC order</para></listitem>
             </itemizedlist>
 
             <figure>    
@@ -642,9 +650,21 @@ where
     <section id="jpa-tuning-table-summary">
        <title>Summary</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Full table scans efficient when required to access most rows</para></listitem>
+            <listitem><para>Indexes access more efficient when selecting small subset of table</para></listitem>
+            <listitem><para>Indexes can be invalidated - resulting in full table scans</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>using functions on columns (without a function index)</para></listitem>
+                    <listitem><para>using leading wildcards</para></listitem>
+                    <listitem><para>searching/counting for null column values (single column indexes do not store null values)</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Indexes can be used to bypass expensive sort operations. Either:</para>
+               <orderedlist spacing="compact">
+                    <listitem><para>Column must be non-nullable</para></listitem>
+                    <listitem><para>Where clause excludes null values</para></listitem>
+               </orderedlist>
+            </listitem>
         </itemizedlist>
     </section>    
 </chapter>
