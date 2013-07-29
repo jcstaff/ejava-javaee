@@ -1,0 +1,628 @@
+<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-tuning-join">
+    <title>Joins</title>
+    
+    <section id="jpa-tuning-join-fkey">
+        <title>Foreign Keys</title>
+        <para></para>
+
+        <section id="jpa-tuning-join-fkey-query">
+            <title>Query Parts</title>
+            <para></para>
+
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select r from MovieRole r 
+join r.movie m 
+where m.title=:title and m.releaseDate=:releaseDate", 
+params={title=Tremors, releaseDate=1990-07-01}
+]]></programlisting>                        
+            </figure>
+            
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movierole0_.ID as ID1_3_,
+    movierole0_.ACTOR_ID as ACTOR3_3_,
+    movierole0_.MOVIE_ID as MOVIE4_3_,
+    movierole0_.MOVIE_ROLE as MOVIE2_3_ 
+from
+    JPATUNE_MOVIEROLE movierole0_ 
+inner join
+    JPATUNE_MOVIE movie1_ 
+        on movierole0_.MOVIE_ID=movie1_.ID 
+where
+    movie1_.TITLE=? 
+    and movie1_.RELEASE_DATE=?]]></programlisting>                        
+            </figure>
+        </section>
+
+
+        <section id="jpa-tuning-join-fkey-noindexes">
+            <title>No Indexes</title>
+            <para>Perform query without any index support for where, select, or join clauses</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[(none except PK indexes)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fkey-noindexes.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Full table scan of Movie to satisfy where clause and to obtain movie_id for join</para></listitem>
+                <listitem><para>Full table scan of MovieRole to locate MovieRoles.movie_id and to obtain rows to satisfy select clause</para></listitem>
+                <listitem><para>Large portion of cost spent looking for children</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[No Indexes.Get Children:warmups=1, rounds=1, ave=0.91 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title></title>
+                <para></para>
+            </tip>
+        </section>
+
+
+        <section id="jpa-tuning-join-fkey-indexed">
+            <title>Perform query with support for foreign key index</title>
+            <para></para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fkey-indexed.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Full table scan of Movie to satisfy where clause and to obtain movie_id for join</para></listitem>
+                <listitem><para>Range scan of foreign key index used to locate MovieRoles.movie_id</para></listitem>
+                <listitem><para>MovieRole rows accessed by rowId to satisfy select clause</para></listitem>
+                <listitem><para>Eliminated much of the cost to locate children</para></listitem>
+                <listitem><para>Still have cost to locate parent</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[FKs Indexed.Get Children:warmups=1, rounds=1, ave=0.18 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title></title>
+                <para></para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-join-fkey-fktable-indexed">
+            <title>Foreign Key and Where Columns Indexed</title>
+            <para></para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_rdate_idx on jpatune_movie(title, release_date)
+create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fkey-table-indexed.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan of composite used to satisfy where clause</para></listitem>
+                <listitem><para>Movie rows accessed by rowId to obtain Movie.id for join</para></listitem>
+                <listitem><para>(remaining steps are same as prior approach)</para></listitem>
+                <listitem><para>Range scan of foreign key index used to locate MovieRoles.movie_id</para></listitem>
+                <listitem><para>MovieRole rows accessed by rowId to satisfy select clause</para></listitem>
+                <listitem><para>Eliminated much of the cost to locate children</para></listitem>
+                <listitem><para>Still have cost small cost obtaining Movie.id</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[FKs and Where Indexed.Get Children:warmups=1, rounds=1, ave=0.01 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title></title>
+                <para></para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-join-fkey-fktable-join-indexed">
+            <title>Foreign Key, Where, and Join Columns Indexed</title>
+            <para></para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_title_rdate_id_idx on jpatune_movie(title, release_date, id)
+create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-fkey-table-join-indexed.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan of composite used to satisfy where clause and obtain Movie.id for join</para></listitem>
+                <listitem><para>No access to Movie table required</para></listitem>
+                <listitem><para>(remaining steps are same as prior approach)</para></listitem>
+                <listitem><para>Range scan of foreign key index used to locate MovieRoles.movie_id</para></listitem>
+                <listitem><para>MovieRole rows accessed by rowId to satisfy select clause</para></listitem>
+                <listitem><para>The last rowId access is necessary to return the full MovieRole object</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[FKs, Where, and Join Indexed.Get Children:warmups=1, rounds=1, ave=0.02 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title></title>
+                <para></para>
+            </tip>
+        </section>
+    </section>
+    
+
+
+
+
+
+
+
+    
+    <section id="jpa-tuning-join-joins">
+        <title>Join Types</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Nested Loop Join - small driving table, join condition used to access second table</para></listitem>
+            <listitem><para>Hash Join - larger data joins based on equality matches through hashing functions</para></listitem>
+            <listitem><para>Sort-merge Join - larger data joins based on non-equality joins</para></listitem>
+        </itemizedlist>
+    
+    <section id="jpa-tuning-join-nestedloop">
+        <title>Nested Loop Join</title>
+        <para>Used when driving table is small and join condition used to access second table</para>
+
+        <section id="jpa-tuning-join-nestedloop-query">
+            <title>Query Parts</title>
+            <para>Select all from table M joined with table P where P.cols match narrow condition</para>
+            
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA["select m from Movie m 
+join m.cast as r 
+where r.role=:role", 
+params={role=Valentine McKee}, 
+limit=2]]></programlisting>                        
+            </figure>
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    inner join
+        JPATUNE_MOVIEROLE cast1_ 
+            on movie0_.ID=cast1_.MOVIE_ID 
+    where
+        cast1_.MOVIE_ROLE=? ) 
+where
+    rownum <= ?]]></programlisting>                        
+            </figure>
+        </section>    
+
+
+
+        <section id="jpa-tuning-join-nestedloop-fulltablescan">
+            <title>Nested Loop with Full Table Scan</title>
+            <para>No indexes on where clause or foreign key columns</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[(just PK indexes)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-nestedloop-noindexes.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Full table scan of MovieRoles table performed to satisfy role from where clause</para></listitem>
+                <listitem><para>Nested Loop using driving table (MovieRole) foreign key (MovieRole.movie_id)</para></listitem>
+                <listitem><para>Unique Scan of Movie PK Index (SYS_C0012387) used to locate join rows (MovieRole.movie_id = Movie.id)</para></listitem>
+                <listitem><para>RowId scan used to access row data for Movie</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[No Table or FK Indexes.Small Driving Table:warmups=1, rounds=1, ave=0.15 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Lacking an Index to Match Where Clause Slows Query</title>
+                <para>Most of the time spent within this query plan is attributed to the 
+                    full table scan due to the lack of an index matching the where clause.</para>
+            </tip>
+        </section>
+
+
+
+        <section id="jpa-tuning-join-nestedloop-nofkindex">
+            <title>Nested Loop with NoFK Index</title>
+            <para>Single index on where clause column(s)</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_role_idx on jpatune_movierole(movie_role)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-nestedloop-tableindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan on index of MovieRoles.roles column used to satisfy where clause</para></listitem>
+                <listitem><para>MoveRoles row accessed using RowId from MoviesRoles.roles index to obtain movie_id</para></listitem>
+                <listitem><para>(from here is is the same as the previous full table scan case)</para></listitem>
+
+                <listitem><para>Nested Loop using driving table (MovieRole) foreign key (MovieRole.movie_id)</para></listitem>
+                <listitem><para>Unique Scan of Movie PK Index (SYS_C0012387) used to locate join rows (MovieRole.movie_id = Movie.id)</para></listitem>
+                <listitem><para>RowId scan used to access row data for Movie</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[Table Indexes Only.Small Driving Table:warmups=1, rounds=1, ave=0.06 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Consider adding FKs to Indexes to Speed up Joins</title>
+                <para>Adding the foreign key to an (composite) index will eliminate need to access row for foreign key during join.</para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-join-nestedloop-separate-fkx">
+            <title>Nested Loop with Separate FK Index</title>
+            <para>Separate indexes; one for where clause and second for FK for join</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_role_idx on jpatune_movierole(movie_role)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-nestedloop-table-fk-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>There is no difference between this and the previous case</para></listitem>
+                <listitem><para>Foreign Key indexes help locate child rows when join coming from parent</para></listitem>
+                <listitem><para>Index identifies rowId of the child having the parent value -- not the rowId of the parent</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[Individual Table and FK Indexes.Small Driving Table:warmups=1, rounds=1, ave=0.06 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Foreign Key Indexes used to Locate Child RowId -- not Parent</title>
+                <para>A foreign key index (from the child to the parent) is not used when the child is the driving
+                   table and the parent is being located. In this case, the primary key index of the parent
+                   is used instead.</para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-join-nestedloop-composite-fkx">
+            <title>Nested Loop with Composite FK Index</title>
+            <para>Single composite index containing columns from where clause and foreign key</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_role_movie_cdx on jpatune_movierole(movie_role, movie_id)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-nestedloop-compositefk-index.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan on composite index of MovieRoles used to satisfy where clause</para></listitem>
+                <listitem><para>Composite index provides movie_id without having to access MovieRole row</para></listitem>
+                <listitem><para>(from here is is the same as the previous cases)</para></listitem>
+
+                <listitem><para>Nested Loop using driving table (MovieRole) foreign key (MovieRole.movie_id)</para></listitem>
+                <listitem><para>Unique Scan of Movie PK Index (SYS_C0012387) used to locate join rows (MovieRole.movie_id = Movie.id)</para></listitem>
+                <listitem><para>RowId scan used to access row data for Movie</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[Composite with FK Index.Small Driving Table:warmups=1, rounds=1, ave=0.07 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Adding Foreign Key to Composite Index Speeds up Join</title>
+                <para>Adding the foreign key column to an index used to satisfy the where clause
+                    can eliminate the need for the DB to access the row for the foreign key during
+                    a join operation.</para>
+            </tip>
+        </section>
+
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <section id="jpa-tuning-join-hashjoin">
+        <title>Hash Join</title>
+        <para>Used when driving table too large to fit into memory and join based on equality</para>        
+    
+        <section id="jpa-tuning-join-hashjoin-query">
+            <title>Query Parts</title>
+            <para>Select all from table M joined with table P where P.cols match broad condition</para>
+            
+            <figure>
+                <title>JPA Query</title>
+<programlisting language=""><![CDATA[-- Bounded
+"select m 
+from Movie m 
+join m.cast as r 
+where r.role like :role", 
+params={role=V%}, 
+limit=2
+
+-- Offset Bounded
+...
+offset=1000, limit=2
+
+-- Unbounded
+...
+params={role=V%} 
+]]></programlisting>                        
+            </figure>
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        movie0_.ID as ID1_2_,
+        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
+        movie0_.MINUTES as MINUTES2_2_,
+        movie0_.PLOT as PLOT3_2_,
+        movie0_.RATING as RATING4_2_,
+        movie0_.RELEASE_DATE as RELEASE5_2_,
+        movie0_.TITLE as TITLE6_2_ 
+    from
+        JPATUNE_MOVIE movie0_ 
+    inner join
+        JPATUNE_MOVIEROLE cast1_ 
+            on movie0_.ID=cast1_.MOVIE_ID 
+    where
+        cast1_.MOVIE_ROLE like ? ) 
+where
+    rownum <= ?]]></programlisting>                        
+                </figure>
+            </section>    
+
+        <section id="jpa-tuning-join-hashjoin-fulltablescan">
+            <title>Nested Loop with Full Table Scan</title>
+            <para>No indexes on where clause or foreign key columns</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Used When:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Joining large amounts of data</para></listitem>
+                        <listitem><para>Joining on equality (equi-join) and not relative or function-based</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+            
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[(just PK indexes)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-hashjoin-noindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Full table scan of MovieRoles table performed to satisfy role from where clause</para></listitem>
+                <listitem><para>DB creates in-memory hash table of foreign key values (i.e., multiple rows/FKs may hash into single hash entry)</para></listitem>
+                <listitem><para>Full table scan of Movie table performed to locate and hash(movie.id) -- primary key index is not used</para></listitem>
+                <listitem><para>Unique rows located within each hash bucket -- empties discarded</para></listitem>
+                <listitem><para>Matching Movies forwarded to next level</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[No Table or FK Indexes.Large Driving Table (Bounded):warmups=1, rounds=1, ave=0.01 [+- 0.00]
+No Table or FK Indexes.Large Driving Table Offset (Bounded):warmups=1, rounds=1, ave=0.03 [+- 0.00]
+No Table or FK Indexes.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=48.43 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title></title>
+                <para></para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-join-hashjoin-nofkindex">
+            <title>Hash Join with NoFK Index</title>
+            <para>Single index on where clause column(s)</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_role_idx on jpatune_movierole(movie_role)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-hashjoin-tableindex.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan on index of MovieRoles.roles column used to satisfy where clause</para></listitem>
+                <listitem><para>MoveRoles row accessed using RowId from MoviesRoles.roles index to obtain movie_id</para></listitem>
+                <listitem><para>DB creates in-memory hash table of foreign key values</para></listitem>
+                <listitem><para>(from here is is the same as the previous full table scan case)</para></listitem>
+
+                <listitem><para>Full table scan of Movie table performed to locate and hash(movie.id) -- primary key index is not used</para></listitem>
+                <listitem><para>Unique rows located within each hash bucket -- empties discarded</para></listitem>
+                <listitem><para>Matching Movies forwarded to next level</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[Table Indexes Only.Large Driving Table (Bounded):warmups=1, rounds=1, ave=0.01 [+- 0.00]
+Table Indexes Only.Large Driving Table Offset (Bounded):warmups=1, rounds=1, ave=0.02 [+- 0.00]
+Table Indexes Only.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=46.52 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title></title>
+                <para></para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-join-hashjoin-composite-fkx">
+            <title>Nested Loop with Composite FK Index</title>
+            <para>Single composite index containing columns from where clause and foreign key</para>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movie_role_movie_cdx on jpatune_movierole(movie_role, movie_id)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-hashjoin-compositefk.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para>Range scan on composite index of MovieRoles used to satisfy where clause</para></listitem>
+                <listitem><para>Composite index provides movie_id without having to access MovieRole row</para></listitem>
+                <listitem><para>(from here is is the same as the previous cases)</para></listitem>
+
+                <listitem><para>Full table scan of Movie table performed to locate and hash(movie.id) -- primary key index is not used</para></listitem>
+                <listitem><para>Unique rows located within each hash bucket -- empties discarded</para></listitem>
+                <listitem><para>Matching Movies forwarded to next level</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[Composite with FK Index.Large Driving Table (Bounded):warmups=1, rounds=1, ave=0.01 [+- 0.00]
+Composite with FK Index.Large Driving Table Offset (Bounded):warmups=1, rounds=1, ave=0.04 [+- 0.00]
+Composite with FK Index.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=45.45 [+- 0.00]]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title></title>
+                <para></para>
+            </tip>
+        </section>
+
+    </section>
+    
+    
+    
+    
+    <section id="jpa-tuning-join-sortmerge">
+        <title>Sort Merge Join</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Used:</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Over Nested Loops when no suitable driving table can be selected (i.e. fit in memory)</para></listitem>
+                    <listitem><para>Over Hash Join when join is by non-equality comparison</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Basic Algorithm</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>No driving table selected</para></listitem>
+                    <listitem><para>Both tables ordered according to a common key</para></listitem>
+                    <listitem><para>Ordered rows from both tables are then merged</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para></para></listitem>  
+        </itemizedlist>
+        
+            <figure>    
+                <title>Altered SQL</title>
+<programlisting language=""><![CDATA[
+    select
+        * 
+    from
+        ( select /*+ use_merge(cast1_ movie0_) */
+            movie0_.ID as ID1_2_,
+...
+        where
+            cast1_.MOVIE_ROLE like ? ) 
+    where
+        rownum <= ?
+]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-sortmerge-compositefk.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Results from MovieRole (movie_role=:role) and Movie (id=MovieRole.id) sorted at considerable cost</para></listitem>
+                <listitem><para>Sorted results merged to form result</para></listitem>
+            </itemizedlist>
+
+            <tip>
+                <title>Non-equijoins of Large Tables are Expensive</title>
+                <para>Non-equijoins eliminate DB-flexibility to locate matching rows between tables and force
+                    the database to order tables based on the key column prior to forming joined result.</para>
+            </tip>
+        
+        </section>
+    </section>
+
+
+
+    <section id="jpa-tuning-join-summary">
+       <title>Summary</title>
+        <itemizedlist>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+    </section>    
+</chapter>
+  

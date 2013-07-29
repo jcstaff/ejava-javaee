@@ -8,20 +8,20 @@ import ejava.jpa.examples.tuning.MovieFactory.SQLConstruct;
 import ejava.jpa.examples.tuning.benchmarks.ForeignKeys;
 
 /**
- * This environment sets up the queries with indexes on foreign keys between tables.
+ * This environment sets up the queries with indexes on foreign keys and columns
+ * without adding the ID to the composite index
  */
-@TestLabel(label="FKs, Where, and Join Indexed")
-public class AllFKIndex extends ForeignKeys {
+@TestLabel(label="FKs and Where Indexed")
+public class TableFKIndexes extends ForeignKeys {
 
 	@BeforeClass
 	public static void setUpClass() {
 		EntityManager em=getEMF().createEntityManager();
 		MovieFactory mf = new MovieFactory().setEntityManager(em);
-		kevinBacon = getDAO().getKevinBacon();
 		SQLConstruct[] constructs = new SQLConstruct[]{
-				mf.MOVIE_TITLE_RDATE_ID_IDX
+				mf.MOVIE_TITLE_RDATE_IDX
 		};
-		mf.executeSQL(constructs).createFKIndexes().flush();
+		mf.executeSQL(constructs).createFKIndexes().assertConstructs(constructs).flush();
 		em.close();
 	}
 }

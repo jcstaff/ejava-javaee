@@ -5,23 +5,23 @@ import org.junit.BeforeClass;
 import ejava.jpa.examples.tuning.MovieFactory;
 import ejava.jpa.examples.tuning.TestLabel;
 import ejava.jpa.examples.tuning.MovieFactory.SQLConstruct;
-import ejava.jpa.examples.tuning.benchmarks.ForeignKeys;
+import ejava.jpa.examples.tuning.benchmarks.JoinQuery;
 
 /**
- * This environment sets up the queries with indexes on foreign keys between tables.
+ * This test environment sets up the queries with separate table and FK indexes.
  */
-@TestLabel(label="FKs, Where, and Join Indexed")
-public class AllFKIndex extends ForeignKeys {
-
+@TestLabel(label="Individual Table and FK Indexes")
+public class JoinTableFKIndexes extends JoinQuery {
 	@BeforeClass
 	public static void setUpClass() {
 		EntityManager em=getEMF().createEntityManager();
 		MovieFactory mf = new MovieFactory().setEntityManager(em);
-		kevinBacon = getDAO().getKevinBacon();
 		SQLConstruct[] constructs = new SQLConstruct[]{
-				mf.MOVIE_TITLE_RDATE_ID_IDX
+				mf.MOVIE_ROLE_IDX,
+				mf.MOVIE_ROLE_MOVIE_FDX
 		};
-		mf.executeSQL(constructs).createFKIndexes().flush();
+		mf.executeSQL(constructs).assertConstructs(constructs).flush();
+		new MovieFactory().setEntityManager(em).flush();
 		em.close();
 	}
 }

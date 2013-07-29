@@ -122,6 +122,7 @@ public class MovieFactory {
 	public SQLConstruct MOVIE_RATING_TITLE_IDX = new SQLIndex("movie_rating_title_idx", "create index movie_rating_title_idx on jpatune_movie(rating, title)");
 	public SQLConstruct MOVIE_TITLE_RATING_IDX = new SQLIndex("movie_title_rating_idx", "create index movie_title_rating_idx on jpatune_movie(title, rating)");
 	public SQLConstruct MOVIE_TITLE_RDATE_IDX = new SQLIndex("movie_title_rdate_idx", "create index movie_title_rdate_idx on jpatune_movie(title, release_date)");
+	public SQLConstruct MOVIE_TITLE_RDATE_ID_IDX = new SQLIndex("movie_title_rdate_id_idx", "create index movie_title_rdate_id_idx on jpatune_movie(title, release_date, id)");
 	public SQLConstruct MOVIE_RDATE_IDX = new SQLIndex("movie_rdate_idx", "create index movie_rdate_idx on jpatune_movie(release_date)");
 	public SQLConstruct GENRE_MOVIE_FKX = new SQLIndex("genre_movie_fkx", "create index genre_movie_fkx on jpatune_moviegenre(movie_id)");
 	public SQLConstruct MOVIEROLE_ACTOR_FKX = new SQLIndex("movierole_actor_fkx", "create index movierole_actor_fkx on jpatune_movierole(actor_id)");
@@ -134,6 +135,10 @@ public class MovieFactory {
 	public SQLConstruct MOVIE_UTITLE_UDX = new SQLIndex("movie_utitle_udx", "create unique index movie_utitle_udx on jpatune_movie(utitle)");
 	//public SQLConstruct MOVIE_UTITLE_UNIQUE = new SQLConstraintUnique("movie_utitle_unique", "jpatune_movie", "utitle");
 	
+	public SQLConstruct MOVIE_ROLE_IDX = new SQLIndex("movie_role_idx", "create index movie_role_idx on jpatune_movierole(movie_role)");
+	public SQLConstruct MOVIE_ROLE_MOVIE_FDX = new SQLIndex("movie_role_movie_fdx", "create index movie_role_movie_fdx on jpatune_movierole(movie_id)");
+	public SQLConstruct MOVIE_ROLE_MOVIE_CDX = new SQLIndex("movie_role_movie_cdx", "create index movie_role_movie_cdx on jpatune_movierole(movie_role, movie_id)");
+
 	
 	public void populate() {
 	}
@@ -233,7 +238,11 @@ public class MovieFactory {
 			new SQLStatement(MOVIE_UTITLE_IDX, false),
 			new SQLStatement(MOVIE_UTITLE_UDX, false),
 			new SQLStatement(MOVIE_TITLE_RDATE_IDX, false),
-			new SQLStatement(MOVIE_RDATE_IDX, false)
+			new SQLStatement(MOVIE_TITLE_RDATE_ID_IDX, false),
+			new SQLStatement(MOVIE_RDATE_IDX, false),
+			new SQLStatement(MOVIE_ROLE_IDX, false),
+			new SQLStatement(MOVIE_ROLE_MOVIE_FDX, false),
+			new SQLStatement(MOVIE_ROLE_MOVIE_CDX, false)
 		};
 		executeSQL(sql, true);
 		return this;

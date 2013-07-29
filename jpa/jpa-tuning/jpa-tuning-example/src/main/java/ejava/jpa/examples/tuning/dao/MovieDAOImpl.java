@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ejava.jpa.examples.tuning.bo.Movie;
 import ejava.jpa.examples.tuning.bo.MovieRating;
+import ejava.jpa.examples.tuning.bo.MovieRole;
 import ejava.jpa.examples.tuning.bo.Person;
 
 public class MovieDAOImpl {
@@ -391,5 +392,33 @@ public class MovieDAOImpl {
 				.setParameter("releaseDate", releaseDate, TemporalType.DATE)
 				.setParameter("rating", rating.mpaa()),
 				offset, limit, null).getResultList();
+	}
+	
+	public List<Movie> getMoviesByRole(String role, Integer offset, Integer limit, String orderBy) {
+		return withPaging(createQuery(
+				"select m from Movie m " +
+				"join m.cast as r " +
+				"where r.role=:role", Movie.class)
+				.setParameter("role", role),
+				offset, limit, orderBy).getResultList();
+	}
+
+	public List<Movie> getMoviesByLikeRole(String role, Integer offset, Integer limit, String orderBy) {
+		return withPaging(createQuery(
+				"select m from Movie m " +
+				"join m.cast as r " +
+				"where r.role like :role", Movie.class)
+				.setParameter("role", role),
+				offset, limit, orderBy).getResultList();
+	}
+
+	public List<MovieRole> getRolesByMovie(String title, Date releaseDate, Integer offset, Integer limit, String orderBy) {
+		return withPaging(createQuery(
+				"select r from MovieRole r " +
+				"join r.movie m " +
+				"where m.title=:title and m.releaseDate=:releaseDate", MovieRole.class)
+				.setParameter("title", title)
+				.setParameter("releaseDate", releaseDate, TemporalType.DATE),
+				offset, limit, orderBy).getResultList();
 	}
 }
