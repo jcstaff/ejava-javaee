@@ -74,8 +74,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-FullTableScanIndex.unrestrictedScan: [measured 1 out of 1 rounds, threads: 1 (sequential)]
- round: 0.91 [+- 0.00], round.block: 0.00 [+- 0.00], round.gc: 0.00 [+- 0.00], GC.calls: 0, GC.time: 0.00, time.total: 0.91, time.warmup: 0.01, time.bench: 0.90
+Table Access without Index.Unrestricted Scan:warmups=2, rounds=10, ave=0.55 [+- 0.02]
 ]]></programlisting>                        
             </figure>
 
@@ -129,8 +128,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-FullTableScanNoIndex.valueAccess: [measured 1 out of 1 rounds, threads: 1 (sequential)]
- round: 2.82 [+- 0.00], round.block: 0.00 [+- 0.00], round.gc: 0.00 [+- 0.00], GC.calls: 0, GC.time: 0.00, time.total: 2.82, time.warmup: 0.00, time.bench: 2.82
+Table Access without Index.Value Access:warmups=2, rounds=10, ave=1.83 [+- 0.04]
 ]]></programlisting>                        
             </figure>
 
@@ -195,6 +193,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Table Access with Single Indexes.Value Access:warmups=2, rounds=10, ave=1.00 [+- 0.09]
 ]]></programlisting>                        
             </figure>
 
@@ -253,6 +252,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=10, ave=1.84 [+- 0.03]
 ]]></programlisting>                        
             </figure>
 
@@ -318,6 +318,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=10, ave=1.02 [+- 0.05]
 ]]></programlisting>                        
             </figure>
             
@@ -379,6 +380,10 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=10, ave=0.02 [+- 0.00]
+Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=10, ave=0.39 [+- 0.01]
+Table Access with Single Indexes.Exact Like:warmups=2, rounds=10, ave=0.02 [+- 0.00]
+Table Access with Single Indexes.Exact Equals:warmups=2, rounds=10, ave=0.02 [+- 0.00]
 ]]></programlisting>                        
             </figure>
             
@@ -451,6 +456,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=10, ave=3.20 [+- 0.74]
 ]]></programlisting>                        
             </figure>
             
@@ -513,6 +519,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=10, ave=2.93 [+- 0.05]
 ]]></programlisting>                        
             </figure>
             
@@ -574,6 +581,7 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.19 [+- 0.06]
 ]]></programlisting>                        
             </figure>
         </section>
@@ -629,12 +637,12 @@ where
                     functions are used as access/filter conditions as they’re the functions implemented in the function-based index"                     
                     <ulink url="http://richardfoote.wordpress.com/category/descending-indexes/"></ulink></citation></para>
                     </listitem>
-                <listitem><para></para></listitem>
             </itemizedlist>
 
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Table Access with Single Indexes DESC.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.35 [+- 0.04]
 ]]></programlisting>                        
             </figure>
             <tip>

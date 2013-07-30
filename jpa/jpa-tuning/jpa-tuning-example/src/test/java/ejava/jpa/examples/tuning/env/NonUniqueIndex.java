@@ -8,7 +8,7 @@ import ejava.jpa.examples.tuning.MovieFactory.SQLConstruct;
 import ejava.jpa.examples.tuning.TestLabel;
 import ejava.jpa.examples.tuning.benchmarks.ByIndex;
 
-@TestLabel(label="Regular Index")
+@TestLabel(label="Non-Unique Index")
 public class NonUniqueIndex extends ByIndex {
 
 	@BeforeClass
@@ -23,3 +23,4 @@ public class NonUniqueIndex extends ByIndex {
 		em.close();
 	}
 }
+

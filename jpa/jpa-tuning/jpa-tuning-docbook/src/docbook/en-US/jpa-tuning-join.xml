@@ -56,7 +56,9 @@ where
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[No Indexes.Get Children:warmups=1, rounds=1, ave=0.91 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+No Indexes.Get Children:warmups=2, rounds=10, ave=0.91 [+- 0.02]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -90,7 +92,9 @@ where
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[FKs Indexed.Get Children:warmups=1, rounds=1, ave=0.18 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+FKs Indexed.Get Children:warmups=2, rounds=10, ave=0.17 [+- 0.02]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -125,7 +129,9 @@ create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisti
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[FKs and Where Indexed.Get Children:warmups=1, rounds=1, ave=0.01 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+FKs and Where Indexed.Get Children:warmups=2, rounds=10, ave=0.02 [+- 0.00]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -159,7 +165,9 @@ create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisti
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[FKs, Where, and Join Indexed.Get Children:warmups=1, rounds=1, ave=0.02 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+FKs, Where, and Join Indexed.Get Children:warmups=2, rounds=10, ave=0.02 [+- 0.00]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -250,7 +258,9 @@ where
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[No Table or FK Indexes.Small Driving Table:warmups=1, rounds=1, ave=0.15 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+No Table or FK Indexes.Small Driving Table:warmups=2, rounds=10, ave=0.15 [+- 0.00]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -287,7 +297,9 @@ where
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[Table Indexes Only.Small Driving Table:warmups=1, rounds=1, ave=0.06 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+Table Indexes Only.Small Driving Table:warmups=2, rounds=10, ave=0.06 [+- 0.01]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -318,7 +330,9 @@ create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlist
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[Individual Table and FK Indexes.Small Driving Table:warmups=1, rounds=1, ave=0.06 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+Individual Table and FK Indexes.Small Driving Table:warmups=2, rounds=10, ave=0.06 [+- 0.00]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -354,7 +368,9 @@ create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlist
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[Composite with FK Index.Small Driving Table:warmups=1, rounds=1, ave=0.07 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+Composite with FK Index.Small Driving Table:warmups=2, rounds=10, ave=0.20 [+- 0.18]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -463,9 +479,11 @@ where
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[No Table or FK Indexes.Large Driving Table (Bounded):warmups=1, rounds=1, ave=0.01 [+- 0.00]
-No Table or FK Indexes.Large Driving Table Offset (Bounded):warmups=1, rounds=1, ave=0.03 [+- 0.00]
-No Table or FK Indexes.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=48.43 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+No Table or FK Indexes.Large Driving Table (Bounded):warmups=2, rounds=10, ave=0.01 [+- 0.00]
+No Table or FK Indexes.Large Driving Table Offset (Bounded):warmups=2, rounds=10, ave=0.03 [+- 0.00]
+No Table or FK Indexes.Large Driving Table (Unbounded:warmups=2, rounds=10, ave=47.09 [+- 1.15]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -500,9 +518,11 @@ No Table or FK Indexes.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=4
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[Table Indexes Only.Large Driving Table (Bounded):warmups=1, rounds=1, ave=0.01 [+- 0.00]
-Table Indexes Only.Large Driving Table Offset (Bounded):warmups=1, rounds=1, ave=0.02 [+- 0.00]
-Table Indexes Only.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=46.52 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+Table Indexes Only.Large Driving Table (Bounded):warmups=2, rounds=10, ave=0.01 [+- 0.00]
+Table Indexes Only.Large Driving Table Offset (Bounded):warmups=2, rounds=10, ave=0.02 [+- 0.00]
+Table Indexes Only.Large Driving Table (Unbounded:warmups=2, rounds=10, ave=46.95 [+- 1.44]
+]]></programlisting>                        
             </figure>
 
             <tip>
@@ -536,9 +556,11 @@ Table Indexes Only.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=46.52
 
             <figure>    
                 <title>Benchmark</title>
-<programlisting language=""><![CDATA[Composite with FK Index.Large Driving Table (Bounded):warmups=1, rounds=1, ave=0.01 [+- 0.00]
-Composite with FK Index.Large Driving Table Offset (Bounded):warmups=1, rounds=1, ave=0.04 [+- 0.00]
-Composite with FK Index.Large Driving Table (Unbounded:warmups=1, rounds=1, ave=45.45 [+- 0.00]]]></programlisting>                        
+<programlisting language=""><![CDATA[
+Composite with FK Index.Large Driving Table (Bounded):warmups=2, rounds=10, ave=0.01 [+- 0.00]
+Composite with FK Index.Large Driving Table Offset (Bounded):warmups=2, rounds=10, ave=0.04 [+- 0.00]
+Composite with FK Index.Large Driving Table (Unbounded:warmups=2, rounds=10, ave=49.09 [+- 1.50]
+]]></programlisting>                        
             </figure>
 
             <tip>

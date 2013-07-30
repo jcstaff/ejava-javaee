@@ -261,8 +261,8 @@ public class MovieFactory {
 	
 	public MovieFactory flush() {
 		executeSQL(new String[]{
-				//"alter system flush shared_pool",
-				//"alter system flush buffer_cache"
+				"alter system flush shared_pool",
+				"alter system flush buffer_cache"
 		}, true);
 		return this;
 	}

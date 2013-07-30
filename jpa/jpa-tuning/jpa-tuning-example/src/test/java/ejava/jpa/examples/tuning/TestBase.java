@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 
@@ -25,6 +26,7 @@ import com.carrotsearch.junitbenchmarks.WriterConsumer;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
+import ejava.jpa.examples.tuning.MovieFactory.SQLConstruct;
 import ejava.jpa.examples.tuning.dao.MovieDAOImpl;
 
 @BenchmarkOptions(warmupRounds=2, benchmarkRounds=10)
@@ -107,6 +109,12 @@ public class TestBase {
 		benchmarkRun=new BenchmarkRule(resultsConsumer, new WriterConsumer(), h2);
 	}
 	
+	@Before
+	public void setUpBase() {
+        EntityManager em = getEMF().createEntityManager();
+		new MovieFactory().setEntityManager(em).flush();
+		em.close();
+	}
 	@After
 	public void tearDownBase() {
 		log.debug("");
