@@ -74,7 +74,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access without Index.Unrestricted Scan:warmups=2, rounds=10, ave=0.55 [+- 0.02]
+Table Access without Index.Unrestricted Scan:warmups=2, rounds=10, ave=0.83 [+- 0.04]
+Table Access without Index.Unrestricted Scan:warmups=2, rounds=10, ave=0.79 [+- 0.05]
 ]]></programlisting>                        
             </figure>
 
@@ -128,7 +129,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access without Index.Value Access:warmups=2, rounds=10, ave=1.83 [+- 0.04]
+Table Access without Index.Value Access:warmups=2, rounds=10, ave=1.22 [+- 0.03]
+Table Access without Index.Value Access:warmups=2, rounds=10, ave=1.42 [+- 0.83]
 ]]></programlisting>                        
             </figure>
 
@@ -193,7 +195,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.Value Access:warmups=2, rounds=10, ave=1.00 [+- 0.09]
+Table Access with Single Indexes.Value Access:warmups=2, rounds=10, ave=1.63 [+- 0.86]
+Table Access with Single Indexes.Value Access:warmups=2, rounds=10, ave=1.22 [+- 0.13]
 ]]></programlisting>                        
             </figure>
 
@@ -252,7 +255,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=10, ave=1.84 [+- 0.03]
+Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=10, ave=2.08 [+- 0.03]
+Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=10, ave=2.02 [+- 0.04]
 ]]></programlisting>                        
             </figure>
 
@@ -318,7 +322,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=10, ave=1.02 [+- 0.05]
+Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=10, ave=1.35 [+- 0.10]
+Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=10, ave=1.39 [+- 0.45]
 ]]></programlisting>                        
             </figure>
             
@@ -380,10 +385,15 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=10, ave=0.02 [+- 0.00]
-Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=10, ave=0.39 [+- 0.01]
-Table Access with Single Indexes.Exact Like:warmups=2, rounds=10, ave=0.02 [+- 0.00]
-Table Access with Single Indexes.Exact Equals:warmups=2, rounds=10, ave=0.02 [+- 0.00]
+Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Table Access with Single Indexes.Exact Equals:warmups=2, rounds=10, ave=0.22 [+- 0.03]
+Table Access with Single Indexes.Exact Like:warmups=2, rounds=10, ave=0.21 [+- 0.01]
+Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=10, ave=0.72 [+- 0.15]
+---
+Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=10, ave=0.38 [+- 0.11]
+Table Access with Single Indexes.Exact Like:warmups=2, rounds=10, ave=0.41 [+- 0.21]
+Table Access with Single Indexes.Exact Equals:warmups=2, rounds=10, ave=0.33 [+- 0.07]
+Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=10, ave=1.34 [+- 0.30]
 ]]></programlisting>                        
             </figure>
             
@@ -456,7 +466,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=10, ave=3.20 [+- 0.74]
+Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=10, ave=3.15 [+- 0.11]
+Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=10, ave=4.03 [+- 0.90]
 ]]></programlisting>                        
             </figure>
             
@@ -519,7 +530,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=10, ave=2.93 [+- 0.05]
+Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=10, ave=3.14 [+- 0.30]
+Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=10, ave=3.57 [+- 0.73]
 ]]></programlisting>                        
             </figure>
             
@@ -581,7 +593,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.19 [+- 0.06]
+Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.39 [+- 0.03]
+Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.57 [+- 0.10]
 ]]></programlisting>                        
             </figure>
         </section>
@@ -642,7 +655,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes DESC.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.35 [+- 0.04]
+Table Access with Single Indexes DESC.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.72 [+- 0.17]
+Table Access with Single Indexes DESC.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=3.38 [+- 0.69]
 ]]></programlisting>                        
             </figure>
             <tip>

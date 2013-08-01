@@ -77,7 +77,8 @@ where
         <figure>    
             <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Non-Unique Index.Values By Index:warmups=2, rounds=10, ave=0.06 [+- 0.00]
+Non-Unique Index.Values By Index:warmups=2, rounds=10, ave=0.23 [+- 0.01]
+Non-Unique Index.Values By Index:warmups=2, rounds=10, ave=0.24 [+- 0.02]
 ]]></programlisting>                        
         </figure>
 
@@ -136,7 +137,8 @@ where
         <figure>    
             <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.07 [+- 0.02]
+Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.24 [+- 0.01]
+Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.24 [+- 0.02]
 ]]></programlisting>                        
         </figure>
 
@@ -197,12 +199,13 @@ where
         <figure>    
             <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Nullable Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.06 [+- 0.00]
+Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.25 [+- 0.04]
+Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.25 [+- 0.03]
 ]]></programlisting>                        
         </figure>
 
         <tip>
-            <title>Unique Indexes are more Efficient than Non-Unique Indexes for Specific Value Search</title>
+            <title>Unique Indexes can be more Efficient than Non-Unique Indexes</title>
             <para>DB knows there can be only a single match and stops index scan after first match found</para>
         </tip>
     </section>
@@ -261,7 +264,8 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.11 [+- 0.03]
+Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.42 [+- 0.04]
+Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.29 [+- 0.04]
 ]]></programlisting>                        
             </figure>
             
@@ -292,14 +296,16 @@ Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.11 [+- 0.03]
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.46 [+- 0.41]
+Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.40 [+- 0.02]
+Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.38 [+- 0.01]
 ]]></programlisting>                        
             </figure>
             
             <tip>
-                <title>Use All Terms of Where Clause in Composite Indexes</title>
-                <para>Adding all terms of the where clause to the index can help efficiency over using
-                    a single column index.</para>
+                <title>Composite Indexes have Minimal Performance Improvement</title>
+                <para>Adding all terms from the where clause may add some efficiency over a single term index -- 
+                    but not a significant upgrade from a single index when the contents of the row must be 
+                    returned anyway.</para>
             </tip>
         </section>    
     </section>
@@ -357,6 +363,7 @@ where
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
 Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.12 [+- 0.04]
+Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.31 [+- 0.05]
 ]]></programlisting>                        
             </figure>
         </section>    
@@ -384,7 +391,8 @@ Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.12 [+- 0.04]
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.12 [+- 0.07]
+Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.85 [+- 0.89]
+Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.43 [+- 0.35]
 ]]></programlisting>                        
             </figure>
 
@@ -419,7 +427,8 @@ Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.12 [+- 0.07]
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.13 [+- 0.06]
+Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.55 [+- 0.35]
+Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.37 [+- 0.23]
 ]]></programlisting>                        
             </figure>
             
