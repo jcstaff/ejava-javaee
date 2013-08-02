@@ -109,6 +109,26 @@
                     </execution>
                 </executions>
             </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                       <includes>
+                           <!-- 
+                           -->
+                           <include>**/FullTableScanTest.java</include>
+                           <!-- 
+                            -->
+                           <include>**/CompositeIndexTest.java</include>
+                           <include>**/IndexTest.java</include>
+                           <include>**/ValueQueryTest.java</include>
+                           <!-- 
+                            -->
+                            <include>**/JoinTest.java</include>
+                            <include>**/ForeignKeyIndexTest.java</include>
+                       </includes>
+                    </configuration>
+                </plugin>
         </plugins>
     </build>
 

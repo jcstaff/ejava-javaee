@@ -79,6 +79,8 @@ where
 <programlisting language=""><![CDATA[
 Non-Unique Index.Values By Index:warmups=2, rounds=10, ave=0.23 [+- 0.01]
 Non-Unique Index.Values By Index:warmups=2, rounds=10, ave=0.24 [+- 0.02]
+
+Non-Unique Index.Values By Index:warmups=2, rounds=11, ave=0.17 [+- 0.01]
 ]]></programlisting>                        
         </figure>
 
@@ -139,6 +141,8 @@ where
 <programlisting language=""><![CDATA[
 Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.24 [+- 0.01]
 Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.24 [+- 0.02]
+
+Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=11, ave=0.18 [+- 0.02]
 ]]></programlisting>                        
         </figure>
 
@@ -201,6 +205,8 @@ where
 <programlisting language=""><![CDATA[
 Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.25 [+- 0.04]
 Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.25 [+- 0.03]
+
+Nullable Unique Index.Values By Index:warmups=2, rounds=11, ave=0.18 [+- 0.01]
 ]]></programlisting>                        
         </figure>
 
@@ -266,6 +272,8 @@ where
 <programlisting language=""><![CDATA[
 Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.42 [+- 0.04]
 Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.29 [+- 0.04]
+
+Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=11, ave=0.21 [+- 0.01]
 ]]></programlisting>                        
             </figure>
             
@@ -298,6 +306,8 @@ Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.29 [+- 0.04]
 <programlisting language=""><![CDATA[
 Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.40 [+- 0.02]
 Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.38 [+- 0.01]
+
+Compound Index.Get By Term1 and Term2:warmups=2, rounds=11, ave=0.25 [+- 0.02]
 ]]></programlisting>                        
             </figure>
             
@@ -364,6 +374,8 @@ where
 <programlisting language=""><![CDATA[
 Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.12 [+- 0.04]
 Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.31 [+- 0.05]
+
+Where Column Index.Query for Values:warmups=2, rounds=11, ave=1.25 [+- 0.06]
 ]]></programlisting>                        
             </figure>
         </section>    
@@ -393,6 +405,8 @@ Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.31 [+- 0.05]
 <programlisting language=""><![CDATA[
 Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.85 [+- 0.89]
 Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.43 [+- 0.35]
+
+Where, Select Index.Query for Values:warmups=2, rounds=11, ave=1.26 [+- 0.06]
 ]]></programlisting>                        
             </figure>
 
@@ -405,7 +419,7 @@ Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.43 [+- 0.35]
 
         
         <section id="jpa-tuning-index-fastforward-alt">
-           <title>Option: Fast Forward Scan</title>
+           <title>Option: Fast Full Scan</title>
            <para>DB can make use of secondary terms within composite index.</para>
 
             <figure>    
@@ -429,6 +443,8 @@ Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.43 [+- 0.35]
 <programlisting language=""><![CDATA[
 Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.55 [+- 0.35]
 Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.37 [+- 0.23]
+
+Select, Where Index.Query for Values:warmups=2, rounds=11, ave=1.35 [+- 0.04]
 ]]></programlisting>                        
             </figure>
             

@@ -13,9 +13,9 @@ import ejava.jpa.examples.tuning.env.UniqueIndex;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	NonUniqueIndex.class,
-	//NonNullIndex.class,
+	//-NonNullIndex.class,
 	UniqueIndex.class,
-	//NonNullUniqueIndex.class
+	//-NonNullUniqueIndex.class
 })
 public class IndexTest extends SuiteBase {
 	public static final int MAX_ROWS = 1000;

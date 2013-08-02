@@ -29,4 +29,16 @@
         <class>ejava.jpa.examples.tuning.bo.Movie</class>
         <class>ejava.jpa.examples.tuning.bo.MovieRole</class>
     </persistence-unit>            
+
+    <!-- this persistence unit scales down the size of the movie to determine if performance
+         numbers thrown off by retrieval of large data sizes -->
+    <persistence-unit name="movietune-test-thin">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>jpa/orm-thinmovie.xml</mapping-file>
+        <class>ejava.jpa.examples.tuning.bo.Person</class>
+        <class>ejava.jpa.examples.tuning.bo.Actor</class>
+        <class>ejava.jpa.examples.tuning.bo.Director</class>
+        <class>ejava.jpa.examples.tuning.bo.Movie</class>
+        <class>ejava.jpa.examples.tuning.bo.MovieRole</class>
+    </persistence-unit>            
 </persistence>

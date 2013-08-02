@@ -1,6 +1,7 @@
 package ejava.jpa.examples.tuning;
 
 import java.io.IOException;
+
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,14 +27,13 @@ import com.carrotsearch.junitbenchmarks.WriterConsumer;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
-import ejava.jpa.examples.tuning.MovieFactory.SQLConstruct;
 import ejava.jpa.examples.tuning.dao.MovieDAOImpl;
 
-@BenchmarkOptions(warmupRounds=2, benchmarkRounds=10)
+@BenchmarkOptions(warmupRounds=2, benchmarkRounds=11)
 @BenchmarkHistoryChart
 public class TestBase {
     protected static Log log = LogFactory.getLog(TestBase.class);
-    protected static String PERSISTENCE_UNIT = "movietune-test";
+    protected static String PERSISTENCE_UNIT = "movietune-test-thin";
     protected static EntityManagerFactory emf;
     private static EntityManager em_;
 	private static MovieDAOImpl dao;
