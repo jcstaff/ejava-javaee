@@ -447,11 +447,14 @@ public class MovieDAOImpl {
 	}
 	
 	public Movie getMovieFetchedById(String id) {
-		List<Movie> movies = em.createQuery(
+		List<Movie> movies = createQuery(
 				"select m from Movie m " +
-				"join fetch m.genres " +
-				"join fetch m.cast " +
-				"join fetch m.director " +
+				"left join fetch m.genres " +
+				"left join fetch m.director d " +
+				"left join fetch d.person " +
+				"left join fetch m.cast role " +
+				"left join fetch role.actor a " +
+				"left join fetch a.person " +
 				"where m.id=:id", Movie.class)
 				.setParameter("id", id)
 				.getResultList();

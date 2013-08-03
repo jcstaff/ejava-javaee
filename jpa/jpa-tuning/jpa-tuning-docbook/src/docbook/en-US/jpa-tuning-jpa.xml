@@ -5,6 +5,397 @@
     <title>JPA</title>
     <para>Avoiding inefficient uses of JPA.</para>
         
+    <section id="jpa-tuning-jpa-fetch">
+        <title>Lazy and Eager Fetching</title>
+        <para>Cost impacts of lazy and eager fetch joins</para>
+        
+
+        <section id="jpa-tuning-jpa-fetch-parent">
+            <title>Get Parent</title>
+            <para>Get just the root parent of an object graph</para>
+
+            <section id="jpa-tuning-jpa-fetch-parent-query">
+                <title>Query Basics</title>
+    
+                <figure>    
+                    <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+    
+                <figure>    
+                    <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+                </figure>
+
+                <figure>    
+                    <title>DAO Code</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+                </figure>
+
+            </section>    
+
+
+            
+            <section id="jpa-tuning-jpa-fetch-parent-lazy">
+                <title>Get Parent with Lazy Load</title>
+                <para>Get just the root parent of an object graph with fetch=LAZY relationships</para>
+
+                <figure>    
+                    <title>Relationships</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title></title>
+                    <para></para>
+                </tip>
+            </section>    
+
+
+
+            <section id="jpa-tuning-jpa-fetch-parent-eager">
+               <title>Get Parent with Eager Load</title>
+               <para>Get just the root parent of an object graph with fetch=EAGER relationships</para>
+
+                <figure>    
+                    <title>Relationships</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title></title>
+                    <para></para>
+                </tip>
+            </section>    
+        </section>    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        <section id="jpa-tuning-jpa-fetch-children">
+            <title>Get Parent and Children</title>
+            <para>Get parent and children in an object graph</para>
+            
+
+            <section id="jpa-tuning-jpa-fetch-children-query">
+                <title>Query Basics</title>
+    
+                <figure>    
+                    <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+    
+                <figure>    
+                    <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+                </figure>
+
+                <figure>    
+                    <title>DAO Code</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+                </figure>
+
+            </section>    
+
+
+
+
+
+
+
+
+
+            <section id="jpa-tuning-jpa-fetch-children-lazy">
+               <title>Get Parent and Children with Lazy Load</title>
+               <para>Get parent and children in an object graph with fetch=LAZY relationships</para>
+
+
+                <figure>    
+                    <title>Relationships</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title></title>
+                    <para></para>
+                </tip>
+            </section>    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <section id="jpa-tuning-jpa-fetch-children-eager">
+                <title>Get Parent and Children with Eager Load</title>
+                <para>Get parent and children in an object graph with fetch=EAGER relationships</para>
+
+                <figure>    
+                    <title>Relationships</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title></title>
+                    <para></para>
+                </tip>
+            </section>    
+
+
+
+            <section id="jpa-tuning-jpa-fetch-children-joinfetch">
+                <title>Get Parent and Children with JOIN FETCH Query</title>
+                <para>Get parent and children in an object graph with JOIN FETCH query</para>
+
+                <figure>    
+                    <title>Relationships</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+<programlisting language="xml"><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                    <listitem><para></para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title></title>
+                    <para></para>
+                </tip>
+            </section>    
+        </section>    
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <section id="jpa-tuning-jpa-collectionsize">
         <title>Counting Rows to Obtain Size</title>
         <para>Pulling back entire rows from table rather than just the count</para>
@@ -15,14 +406,9 @@
         <para>Performing separate subqueries off initial query</para>
     </section>
     
-    <section id="jpa-tuning-jpa-queryloops">
+    <section id="jpa-tuning-jpa-paging">
         <title>Paging</title>
         <para>Placing reasonable limits on amount of data returned</para>
-    </section>
-
-    <section id="jpa-tuning-jpa-overeager-load">
-        <title>Over-Eager Loading</title>
-        <para>Performing JOIN FETCHs with Large Parents</para>
     </section>
 
     <section id="jpa-tuning-jpa-summary">

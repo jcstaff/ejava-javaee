@@ -55,5 +55,6 @@ public class Fetch extends TestBase {
 				if (role.getActor()!=null) { role.getActor().getPerson().getLastName(); }
 			}
 		}
+		log.debug("");
 	}
 }
