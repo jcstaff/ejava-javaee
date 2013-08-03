@@ -21,7 +21,7 @@ public class MovieRole {
 	@Column(name="MOVIE_ROLE", length=32, nullable=false)
 	private String role;
 	
-	@ManyToOne(optional=false, fetch=FetchType.EAGER,
+	@ManyToOne(optional=false, fetch=FetchType.LAZY,
 			cascade={CascadeType.DETACH})
 	@JoinColumn(name="ACTOR_ID")
 	private Actor actor;

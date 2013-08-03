@@ -177,6 +177,26 @@ public class MovieDAOImpl {
     			"r.actor.person.firstName='Kevin'", Person.class)
     			.getSingleResult();
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<String> getKevinBaconMovieIds(Integer offset, Integer limit, String orderBy) {
+		TypedQuery<String> query = (TypedQuery<String>) em.createNativeQuery(
+			String.format(
+				"select m.id from JPATUNE_MOVIE m " +
+				"join JPATUNE_MOVIEROLE role on role.movie_id = m.id " +
+				"join JPATUNE_ACTOR a on a.person_id = role.actor_id " +
+				"join JPATUNE_PERSON p on p.id = a.person_id " +
+				"where p.last_name='Bacon' and p.first_name='Kevin' and m.plot is not null " +
+				"%s", orderBy==null ? "" : " order by " + orderBy)
+				);
+		if (offset!=null) {
+			query.setFirstResult(offset);
+		}
+		if (limit!=null) {
+			query.setMaxResults(limit);
+		}
+		return query.getResultList();
+	}
 
 	/**
 	 * Find people who are 1 step from Kevin Bacon.
@@ -420,5 +440,21 @@ public class MovieDAOImpl {
 				.setParameter("title", title)
 				.setParameter("releaseDate", releaseDate, TemporalType.DATE),
 				offset, limit, orderBy).getResultList();
+	}
+
+	public Movie getMovieById(String id) {
+		return em.find(Movie.class, id);
+	}
+	
+	public Movie getMovieFetchedById(String id) {
+		List<Movie> movies = em.createQuery(
+				"select m from Movie m " +
+				"join fetch m.genres " +
+				"join fetch m.cast " +
+				"join fetch m.director " +
+				"where m.id=:id", Movie.class)
+				.setParameter("id", id)
+				.getResultList();
+		return movies.isEmpty() ? null : movies.get(0);
 	}
 }

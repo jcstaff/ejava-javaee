@@ -41,4 +41,28 @@
         <class>ejava.jpa.examples.tuning.bo.Movie</class>
         <class>ejava.jpa.examples.tuning.bo.MovieRole</class>
     </persistence-unit>            
+
+    <!-- this persistence unit declares eager fetch for relationships 
+        and does not map the plot -->
+    <persistence-unit name="movietune-test-thineager">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>jpa/orm-thineager.xml</mapping-file>
+        <class>ejava.jpa.examples.tuning.bo.Person</class>
+        <class>ejava.jpa.examples.tuning.bo.Actor</class>
+        <class>ejava.jpa.examples.tuning.bo.Director</class>
+        <class>ejava.jpa.examples.tuning.bo.Movie</class>
+        <class>ejava.jpa.examples.tuning.bo.MovieRole</class>
+    </persistence-unit>            
+
+    <!-- this persistence unit declares eager fetch for relationships 
+        and does map the plot-->
+    <persistence-unit name="movietune-test-thickeager">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>jpa/orm-thickeager.xml</mapping-file>
+        <class>ejava.jpa.examples.tuning.bo.Person</class>
+        <class>ejava.jpa.examples.tuning.bo.Actor</class>
+        <class>ejava.jpa.examples.tuning.bo.Director</class>
+        <class>ejava.jpa.examples.tuning.bo.Movie</class>
+        <class>ejava.jpa.examples.tuning.bo.MovieRole</class>
+    </persistence-unit>            
 </persistence>

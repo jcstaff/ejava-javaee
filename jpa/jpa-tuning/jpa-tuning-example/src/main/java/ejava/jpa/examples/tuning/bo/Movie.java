@@ -60,7 +60,7 @@ public class Movie implements Comparable<Movie>{
 	
 	@ElementCollection
     @CollectionTable(
-        name="QUERYEX_MOVIEGENRE",
+        name="JPATUNE_MOVIEGENRE",
           joinColumns=@JoinColumn(name="MOVIE_ID"), 
           uniqueConstraints=@UniqueConstraint(columnNames={"MOVIE_ID", "GENRE"}))
     @Column(name="GENRE", length=20)
@@ -127,6 +127,11 @@ public class Movie implements Comparable<Movie>{
 		return this;
 	}
 	
+	public String getPlot() { return plot; }
+	public Movie setPlot(String plot) {
+		this.plot = plot;
+		return this;
+	}
 
 	public Director getDirector() { return director; }
 	public Movie setDirector(Director director) {
