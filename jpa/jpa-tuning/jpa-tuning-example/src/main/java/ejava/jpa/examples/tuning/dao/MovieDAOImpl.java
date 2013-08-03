@@ -470,4 +470,40 @@ public class MovieDAOImpl {
 				.getResultList();
 		return movies.isEmpty() ? null : movies.get(0);
 	}
+	
+	public int getMovieCastCountByDAORelation(String movieId) {
+		Movie m = em.find(Movie.class, movieId);
+		return m==null ? 0 : m.getCast().size();
+	}
+
+	public int getMovieCastCountByDAO(String movieId) {
+		return createQuery(
+				"select role " +
+				"from Movie m " +
+				"join m.cast role " +
+				"where m.id=:id", MovieRole.class)
+				.setParameter("id", movieId)
+				.getResultList().size();
+	}
+	
+	public int getMovieCastCountByDB(String movieId) {
+		return createQuery(
+				"select count(role) " +
+				"from Movie m " +
+				"join m.cast role " +
+				"where m.id=:id", Number.class)
+				.setParameter("id", movieId)
+				.getSingleResult().intValue();
+	}
+
+	public int getCastCountForMovie(String movieId) {
+		return createQuery(
+				"select count(*) " +
+				"from MovieRole role " +
+				"where role.movie.id=:id", Number.class)
+				.setParameter("id", movieId)
+				.getSingleResult().intValue();
+	}
+	
+	
 }

@@ -757,10 +757,349 @@ Fetch Eager Thick Parent.Get Parent with Fetched Children:warmups=2, rounds=10, 
 
 
 
-    <section id="jpa-tuning-jpa-collectionsize">
-        <title>Counting Rows to Obtain Size</title>
+    <section id="jpa-tuning-jpa-count">
+        <title>Obtaining Instance Counts</title>
         <para>Pulling back entire rows from table rather than just the count</para>
+
+        <section id="jpa-tuning-jpa-count-query">
+            <title>Query Basics</title>
+
+            <figure>    
+                <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[alter table jpatune_moviegenre add constraint moviegenre_unique UNIQUE (movie_id, genre)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
+            </figure>
+
+            <figure>    
+                <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[for (String movieId: movieIds) {
+    dao.getMovieCastCount(movieId);
+}]]></programlisting>                        
+            </figure>
+
+        </section>    
+
+
+
+        <section id="jpa-tuning-jpa-count-dao-relation-size">
+            <title>Collection Size in DAO from Relation</title>
+            <para>Get size of a relationship collection.</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public int getMovieCastCountByDAORelation(String movieId) {
+    Movie m = em.find(Movie.class, movieId);
+    return m==null ? 0 : m.getCast().size();
+}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DAO first gets Movie by primary key</para></listitem>
+                <listitem><para>DAO follows up by accessing size of relationship</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL - Fetch=LAZY</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_0_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_0_,
+    movie0_.MINUTES as MINUTES2_2_0_,
+    movie0_.RATING as RATING3_2_0_,
+    movie0_.RELEASE_DATE as RELEASE4_2_0_,
+    movie0_.TITLE as TITLE5_2_0_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.ID=?]]></programlisting>                        
+<programlisting language=""><![CDATA[select
+    cast0_.MOVIE_ID as MOVIE4_2_1_,
+    cast0_.ID as ID1_4_1_,
+    cast0_.ID as ID1_4_0_,
+    cast0_.ACTOR_ID as ACTOR3_4_0_,
+    cast0_.MOVIE_ID as MOVIE4_4_0_,
+    cast0_.MOVIE_ROLE as MOVIE2_4_0_ 
+from
+    JPATUNE_MOVIEROLE cast0_ 
+where
+    cast0_.MOVIE_ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider will issue follow-on query for all entities in relation</para></listitem>
+                <listitem><para>Entity data not used by DAO -- i.e. wasted</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL - Fetch=EAGER</title>
+                <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-sql">Same as fetch=EAGER SQL shown above</link>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider will issue one query for entire object graph, to include entities in relation</para></listitem>
+                <listitem><para>Entity data not used by DAO -- i.e. even more data is wasted</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+Size Lazy.DAO Relation Count:warmups=2, rounds=10, ave=1.83 [+- 0.82]
+Size Eager.DAO Relation Count:warmups=2, rounds=10, ave=5.40 [+- 0.83]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Using Relation Collections to Just Obtain Size is Inefficient</title>
+                <para>Pulling back relationship graphs to just obtain the count in that 
+                    relationship is inefficient and requires DB to do much more work 
+                    than it has to.</para>
+            </tip>
+        </section>
+
+
+
+
+
+
+
+
+        <section id="jpa-tuning-jpa-count-dao-row-size">
+            <title>Row Count in DAO from Query</title>
+            <para>Query for relationships and count resulting rows</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public int getMovieCastCountByDAO(String movieId) {
+    return createQuery(
+            "select role " +
+            "from Movie m " +
+            "join m.cast role " +
+            "where m.id=:id", MovieRole.class)
+            .setParameter("id", movieId)
+            .getResultList().size();
+}]]></programlisting>                        
+<programlisting language=""><![CDATA["select role from Movie m join m.cast role where m.id=:id", params={id=m48306}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DAO forms query for just related entities</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL - Fetch=LAZY</title>
+<programlisting language=""><![CDATA[select
+    cast1_.ID as ID1_4_,
+    cast1_.ACTOR_ID as ACTOR3_4_,
+    cast1_.MOVIE_ID as MOVIE4_4_,
+    cast1_.MOVIE_ROLE as MOVIE2_4_ 
+from
+    JPATUNE_MOVIE movie0_ 
+inner join
+    JPATUNE_MOVIEROLE cast1_ 
+        on movie0_.ID=cast1_.MOVIE_ID 
+where
+    movie0_.ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider forms query for related entities</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL - Fetch=EAGER</title>
+<programlisting language=""><![CDATA[select
+    cast1_.ID as ID1_4_,
+    cast1_.ACTOR_ID as ACTOR3_4_,
+    cast1_.MOVIE_ID as MOVIE4_4_,
+    cast1_.MOVIE_ROLE as MOVIE2_4_ 
+from
+    JPATUNE_MOVIE movie0_ 
+inner join
+    JPATUNE_MOVIEROLE cast1_ 
+        on movie0_.ID=cast1_.MOVIE_ID 
+where
+    movie0_.ID=?]]></programlisting>                        
+
+<programlisting language=""><![CDATA[--this is repeated for each MovieRole.actor
+select
+    actor0_.PERSON_ID as PERSON1_0_0_ 
+from
+    JPATUNE_ACTOR actor0_ 
+where
+    actor0_.PERSON_ID=?
+
+select
+    person0_.ID as ID1_5_0_,
+    person0_.BIRTH_DATE as BIRTH2_5_0_,
+    person0_.FIRST_NAME as FIRST3_5_0_,
+    person0_.LAST_NAME as LAST4_5_0_,
+    person0_.MOD_NAME as MOD5_5_0_ 
+from
+    JPATUNE_PERSON person0_ 
+where
+    person0_.ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Provider forms query for related entities and fetch=EAGER relationship specification 
+                    causes additional MovieRole.actor to be immediately obtained -- except through separate queries
+                    by primary key.</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+Size Lazy.DAO Count:warmups=2, rounds=10, ave=1.37 [+- 0.03]
+Size Eager.DAO Count:warmups=2, rounds=10, ave=16.82 [+- 1.33]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Using fetch=EAGER Relationships can Magnify Data Retrieval Issues</title>
+                <para>When the entity model over-uses fetch=EAGER, the negative results can 
+                    be magnified when pulling back unnecessary information from the database.</para>
+            </tip>
+        </section>
+
+
+
+
+
+
+
+
+        <section id="jpa-tuning-jpa-count-db-count-query">
+            <title>Row Count in DB using Count Query</title>
+            <para>Issue query to DB to return relationship count</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public int getMovieCastCountByDB(String movieId) {
+    return createQuery(
+            "select count(role) " +
+            "from Movie m " +
+            "join m.cast role " +
+            "where m.id=:id", Number.class)
+            .setParameter("id", movieId)
+            .getSingleResult().intValue();
+}]]></programlisting>                        
+<programlisting language=""><![CDATA["select count(role) from Movie m join m.cast role where m.id=:id", params={id=m48306}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Requesting count(role) rather than returning all roles and counting in DAO.</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    count(cast1_.ID) as col_0_0_ 
+from
+    JPATUNE_MOVIE movie0_ 
+inner join
+    JPATUNE_MOVIEROLE cast1_ 
+        on movie0_.ID=cast1_.MOVIE_ID 
+where
+    movie0_.ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Produces a single result/row</para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-count-db-query.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DB has already optimized the query to remove unnecessary JOIN</para></listitem>
+            </itemizedlist>
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+Size Lazy.DB Count:warmups=2, rounds=10, ave=0.50 [+- 0.04]
+Size Eager.DB Count:warmups=2, rounds=10, ave=0.45 [+- 0.02]
+]]></programlisting>                        
+            </figure>
+            <para>* fetch=LAZY or EAGER has no impact in this solution</para>
+
+            <tip>
+                <title>Perform Counts within DB</title>
+                <para>It is much more efficient to perform counts within database than to count rows 
+                     from data returned.</para>
+            </tip>
+        </section>
+
+
+
+
+        <section id="jpa-tuning-jpa-count-dao-count-query-nojoin">
+            <title>Row Count in DB using Count Query without JOIN</title>
+            <para>Restructure query to DB to count relations without JOIN</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public int getCastCountForMovie(String movieId) {
+    return createQuery(
+            "select count(*) " +
+            "from MovieRole role " +
+            "where role.movie.id=:id", Number.class)
+            .setParameter("id", movieId)
+            .getSingleResult().intValue();
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA["select count(*) from MovieRole role where role.movie.id=:id", params={id=m48306}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Querying from MovieRole side allows removal of unnecessary JOIN</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    count(*) as col_0_0_ 
+from
+    JPATUNE_MOVIEROLE movierole0_ 
+where
+    movierole0_.MOVIE_ID=?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-count-db-query.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>No improvement in execution plan since DB already performed this optimization in our last attempt</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+Size Lazy.DB Count no Join:warmups=2, rounds=10, ave=0.47 [+- 0.01]
+Size Eager.DB Count no Join:warmups=2, rounds=10, ave=0.44 [+- 0.02]
+]]></programlisting>                        
+            </figure>
+            <para>* fetch=LAZY or EAGER has no impact in this solution</para>
+
+            <tip>
+                <title>Look to Remove Unnecessary JOINs</title>
+                <para>Although in this and the previous case the DB looks to have already 
+                    optimized the query, try to eliminate unnecessary complexity within the query.</para>
+            </tip>
+        </section>
     </section>
+    
+    
+    
+    
+    
     
     <section id="jpa-tuning-jpa-queryloops">
         <title>Query Loops</title>
