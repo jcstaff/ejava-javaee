@@ -19,20 +19,23 @@
     
                 <figure>    
                     <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+<programlisting language=""><![CDATA[alter table jpatune_moviegenre add constraint moviegenre_unique UNIQUE (movie_id, genre)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
                 </figure>
     
                 <figure>    
                     <title>Service Tier Code</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
+<programlisting language="java"><![CDATA[for (String id: movieIds) {
+    Movie m = dao.getMovieById(id);
+    m.getTitle();
+}]]></programlisting>                        
                 </figure>
 
                 <figure>    
                     <title>DAO Code</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
+<programlisting language="java"><![CDATA[public Movie getMovieById(String id) {
+    return em.find(Movie.class, id);
+}]]></programlisting>                        
                 </figure>
 
             </section>    
@@ -43,52 +46,80 @@
                 <title>Get Parent with Lazy Load</title>
                 <para>Get just the root parent of an object graph with fetch=LAZY relationships</para>
 
-                <figure>    
+                <figure id="jpa-tuning-jpa-fetch-parent-lazy-figure-relations">    
                     <title>Relationships</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-<programlisting language="xml"><![CDATA[
-]]></programlisting>                        
+<programlisting language="java"><![CDATA[public class Movie {
+...
+    @ElementCollection(fetch=FetchType.LAZY)
+    @CollectionTable(
+        name="JPATUNE_MOVIEGENRE",
+          joinColumns=@JoinColumn(name="MOVIE_ID"), 
+          uniqueConstraints=@UniqueConstraint(columnNames={"MOVIE_ID", "GENRE"}))
+    @Column(name="GENRE", length=20)
+    private Set<String> genres;
+
+    @ManyToOne(fetch=FetchType.LAZY,
+            cascade={CascadeType.PERSIST, CascadeType.DETACH})
+    @JoinColumn(name="DIRECTOR_ID")
+    private Director director;
+    
+    @OneToMany(fetch=FetchType.LAZY,mappedBy="movie", 
+            cascade={CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REMOVE})  
+    private Set<MovieRole> cast;]]></programlisting>                        
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Two one-to-many relationships (cast and genres) -- genres is a non-entity ElementCollection</para></listitem>
+                    <listitem><para>One one-to-one relationship (director) </para></listitem>
+                    <listitem><para>All use fetch=LAZY</para></listitem>
                 </itemizedlist>
 
 
                 <figure>    
                     <title>Generated SQL</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_0_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_0_,
+    movie0_.MINUTES as MINUTES2_2_0_,
+    movie0_.RATING as RATING3_2_0_,
+    movie0_.RELEASE_DATE as RELEASE4_2_0_,
+    movie0_.TITLE as TITLE5_2_0_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.ID=?]]></programlisting>                        
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Only parent table is queried</para></listitem>
+                    <listitem><para>Children are lazily loaded</para></listitem>
                 </itemizedlist>
 
 
                 <figure>
                     <title>Explain Plan</title>
-                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-parent-lazy.png"/>
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Unique scan of Movie primary key index to satisfy where clause and locate rowId</para></listitem>
+                    <listitem><para>Row access by rowId to satisfy select clause</para></listitem>
                 </itemizedlist>
 
 
                 <figure>    
                     <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Fetch Lazy Thin Parent.Get Parent:warmups=2, rounds=10, ave=0.32 [+- 0.03]
+Fetch Lazy Thick Parent.Get Parent:warmups=2, rounds=10, ave=0.58 [+- 0.03]
 ]]></programlisting>                        
                 </figure>
+                <para>* "Thick" parent has an extra Movie.plot text property mapped to potentially make
+                    child joins more expensive. Thin parent does not have Movie plot mapped so the 
+                    results can focus on access to smaller, related entities.</para>
     
                 <tip>
-                    <title></title>
-                    <para></para>
+                    <title>Fetch=LAZY Speeds Access to Single Entity Core Information</title>
+                    <para>Choosing fetch=LAZY for relationships allows efficient access to the core
+                        information for that entity without paying a price for loading 
+                        unnecessary relations.</para>
                 </tip>
             </section>    
 
@@ -98,39 +129,230 @@
                <title>Get Parent with Eager Load</title>
                <para>Get just the root parent of an object graph with fetch=EAGER relationships</para>
 
+                <figure id="jpa-tuning-jpa-fetch-parent-eager-figure-rels">    
+                    <title>Relationships</title>
+<programlisting language="xml"><![CDATA[<entity class="ejava.jpa.examples.tuning.bo.Movie">
+    <attributes>
+        <many-to-one name="director" fetch="EAGER">
+            <join-column name="DIRECTOR_ID"/>
+        </many-to-one>
+        <one-to-many name="cast" fetch="EAGER" mapped-by="movie"/>
+        
+        <element-collection name="genres" fetch="EAGER">
+            <column name="GENRE"/>
+            <collection-table name="JPATUNE_MOVIEGENRE">
+                <join-column name="MOVIE_ID"/>
+                <unique-constraint>
+                    <column-name>MOVIE_ID</column-name>
+                    <column-name>GENRE</column-name>
+                </unique-constraint>
+            </collection-table>
+        </element-collection>
+
+        <transient name="plot"/>
+    </attributes>
+</entity>]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[public class MovieRole {
+...
+    @ManyToOne(optional=false, fetch=FetchType.LAZY,
+            cascade={CascadeType.DETACH})
+    @JoinColumn(name="ACTOR_ID")
+    private Actor actor;
+]]></programlisting>    
+
+<programlisting language="xml"><![CDATA[<entity class="ejava.jpa.examples.tuning.bo.MovieRole">
+    <attributes>
+        <many-to-one name="actor" fetch="EAGER">
+            <join-column name="ACTOR_ID"/>
+        </many-to-one>
+    </attributes>
+</entity>]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[public class Actor {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER,
+            cascade={CascadeType.PERSIST, CascadeType.DETACH})
+    @MapsId
+    @JoinColumn(name="PERSON_ID")
+    private Person person;
+]]></programlisting>    
+<programlisting language="java"><![CDATA[public class Director {
+...
+    @OneToOne(optional=false, fetch=FetchType.EAGER,
+            cascade={CascadeType.PERSIST, CascadeType.DETACH})
+    @JoinColumn(name="PERSON_ID")
+    @MapsId
+    private Person person;
+]]></programlisting>    
+                    
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Movie.director, Movie.genres, Movie.cast relationships overridden in XML to be fetch=EAGER</para></listitem>
+                    <listitem><para>MovieRole.actor relationship overridden in XML to be fetch=EAGER</para></listitem>
+                    <listitem><para>Director.person and Actor.person already fetch=EAGER</para></listitem>
+                </itemizedlist>
+
+
+                <figure id="jpa-tuning-jpa-fetch-parent-eager-figure-sql">    
+                    <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_5_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_5_,
+    movie0_.MINUTES as MINUTES2_2_5_,
+    movie0_.RATING as RATING3_2_5_,
+    movie0_.RELEASE_DATE as RELEASE4_2_5_,
+    movie0_.TITLE as TITLE5_2_5_,
+    cast1_.MOVIE_ID as MOVIE4_2_7_,
+    cast1_.ID as ID1_4_7_,
+    cast1_.ID as ID1_4_0_,
+    cast1_.ACTOR_ID as ACTOR3_4_0_,
+    cast1_.MOVIE_ID as MOVIE4_4_0_,
+    cast1_.MOVIE_ROLE as MOVIE2_4_0_,
+    actor2_.PERSON_ID as PERSON1_0_1_,
+    person3_.ID as ID1_5_2_,
+    person3_.BIRTH_DATE as BIRTH2_5_2_,
+    person3_.FIRST_NAME as FIRST3_5_2_,
+    person3_.LAST_NAME as LAST4_5_2_,
+    person3_.MOD_NAME as MOD5_5_2_,
+    director4_.PERSON_ID as PERSON1_1_3_,
+    person5_.ID as ID1_5_4_,
+    person5_.BIRTH_DATE as BIRTH2_5_4_,
+    person5_.FIRST_NAME as FIRST3_5_4_,
+    person5_.LAST_NAME as LAST4_5_4_,
+    person5_.MOD_NAME as MOD5_5_4_,
+    genres6_.MOVIE_ID as MOVIE1_2_8_,
+    genres6_.GENRE as GENRE2_3_8_ 
+from
+    JPATUNE_MOVIE movie0_ 
+left outer join
+    JPATUNE_MOVIEROLE cast1_ 
+        on movie0_.ID=cast1_.MOVIE_ID 
+left outer join
+    JPATUNE_ACTOR actor2_ 
+        on cast1_.ACTOR_ID=actor2_.PERSON_ID 
+left outer join
+    JPATUNE_PERSON person3_ 
+        on actor2_.PERSON_ID=person3_.ID 
+left outer join
+    JPATUNE_DIRECTOR director4_ 
+        on movie0_.DIRECTOR_ID=director4_.PERSON_ID 
+left outer join
+    JPATUNE_PERSON person5_ 
+        on director4_.PERSON_ID=person5_.ID 
+left outer join
+    JPATUNE_MOVIEGENRE genres6_ 
+        on movie0_.ID=genres6_.MOVIE_ID 
+where
+    movie0_.ID=?]]></programlisting>                        
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Single query (as before), but this time it also brings in the entire object graph</para></listitem>
+                </itemizedlist>
+
+
+                <figure id="jpa-tuning-jpa-fetch-parent-eager-figure-explain">
+                    <title>Explain Plan</title>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-parent-eager.png"/>
+                </figure>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Explain plan shows use of indexes and no full table scans (a missing FK index for MovieRole.movie could have been costly)</para></listitem>
+                    <listitem><para>Execution plan is significantly more costly than lazy alternative</para></listitem>
+                </itemizedlist>
+
+
+                <figure>    
+                    <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+Fetch Eager Thin Parent.Get Parent:warmups=2, rounds=10, ave=2.43 [+- 0.47]
+Fetch Eager Thick Parent.Get Parent:warmups=2, rounds=10, ave=2.59 [+- 0.06]
+]]></programlisting>                        
+                </figure>
+    
+                <tip>
+                    <title>Fetch=EAGER for Single Entity adds Noticeable Overhead</title>
+                    <para>Choosing fetch=EAGER for relationships will make access to 
+                        a single entity within the relationship more expensive to access.
+                        Consider creating a value query, value query with a result class,
+                        or a native query when querying for only single entity under these 
+                        conditions.
+                    </para>
+                </tip>
+            </section>
+            
+            
+            <section id="jpa-tuning-jpa-fetch-parent-eager-resultclass">
+               <title>Get Parent with NativeQuery and Result Class</title>
+               <para>Get just the root parent and *ONLY* the parent of an object graph with fetch=EAGER 
+                   relationships by using a NativeQuery and Result Class</para>
+                   
+                <note>
+                    <title>Result Classes are Unmanaged</title>
+                    <para>Result Classes for value queries provide convenient type-safe
+                        access to results. However, they are unmanaged and cannot be 
+                        used for follow-on entity operations.</para>
+                </note>
+
                 <figure>    
                     <title>Relationships</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-<programlisting language="xml"><![CDATA[
-]]></programlisting>                        
+                    <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-rels">Same as fetch=EAGER example above</link>
+                </figure>
+                
+                <figure>    
+                    <title>DAO Code</title>
+<programlisting language="java"><![CDATA[public Movie getMovieByIdUnfetched(String id) {
+    List<Movie> movies=createQuery(
+            String.format("select new %s(m.id, m.minutes, m.rating, m.releaseDate, m.title) ", Movie.class.getName()) +
+            "from Movie m " +
+            "where id=:id", Movie.class)
+            .setParameter("id", id)
+            .getResultList();
+    return movies.isEmpty() ? null : movies.get(0);
+}]]></programlisting>                        
+<programlisting language="java"><![CDATA[public Movie(String id, Integer minutes, String rating, Date releaseDate, String title) {
+    this.id=id;
+    this.minutes = minutes;
+    this.rating=rating;
+    this.mrating=MovieRating.getFromMpaa(rating);
+    this.releaseDate = releaseDate;
+    this.title=title;
+}]]></programlisting>                        
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>We define an alternate native SQL query for provider to use that does not include relationships</para></listitem>
+                    <listitem><para>Single entity in the result set -- so mappings can be expressed as a single Movie.class</para></listitem>
+                    <listitem><para>Movie entity already defines table/column mappings -- we are just limiting the supplied set</para></listitem>
                 </itemizedlist>
-
 
                 <figure>    
-                    <title>Generated SQL</title>
+                    <title>Generated JPAQL and SQL</title>
 <programlisting language=""><![CDATA[
-]]></programlisting>                        
+"select new ejava.jpa.examples.tuning.bo.Movie(m.id, m.minutes, m.rating, m.releaseDate, m.title) 
+from Movie m where id=:id", 
+params={id=m270003}
+]]></programlisting>                 
+       
+<programlisting language=""><![CDATA[select
+    movie0_.ID as col_0_0_,
+    movie0_.MINUTES as col_1_0_,
+    movie0_.RATING as col_2_0_,
+    movie0_.RELEASE_DATE as col_3_0_,
+    movie0_.TITLE as col_4_0_ 
+from
+    JPATUNE_MOVIE movie0_ 
+where
+    movie0_.ID=?]]></programlisting>                        
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Value query with result class constructor permits a bypass of fetch=EAGER relationships</para></listitem>
                 </itemizedlist>
-
-
+                
                 <figure>
                     <title>Explain Plan</title>
-                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-parent-eager-resultclass.png"/>
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Execution plan identical to fetch=LAZY case</para></listitem>
                     <listitem><para></para></listitem>
                 </itemizedlist>
 
@@ -138,27 +360,31 @@
                 <figure>    
                     <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Fetch Eager Thin Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
+Fetch Eager Thick Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
+Fetch Lazy Thin Parent.Get Just Parent:warmups=2, rounds=10, ave=0.34 [+- 0.03]
+Fetch Lazy Thick Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
 ]]></programlisting>                        
                 </figure>
+                <para>* Thick/Thin or Eager/Lazy should not matter to this approach since we only access
+                    a specific set of fields in the Movie that does not include Movie.plot.</para>
     
                 <tip>
-                    <title></title>
-                    <para></para>
+                    <title>Use JPA Value or Native Queries to Override Relationship Definitions</title>
+                    <para>JPA provides many escape hatches to achieve desired results. Use JPAQL value 
+                        queries with Object[], Tuple, or custom result class -or- use SQL to provide
+                        efficient override of fetch=EAGER definitions. 
+                    </para>
                 </tip>
-            </section>    
+                <note>
+                    <title>Custom Result Instances are not Managed</title>
+                    <para>Even though we used an entity class in this example, it is being used as 
+                        a simple POJO and the returned instance is not managed.</para>
+                </note>
+                
+            </section>            
+                
         </section>    
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -178,93 +404,182 @@
     
                 <figure>    
                     <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+<programlisting language=""><![CDATA[alter table jpatune_moviegenre add constraint moviegenre_unique UNIQUE (movie_id, genre)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
                 </figure>
     
                 <figure>    
                     <title>Service Tier Code</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
+<programlisting language="java"><![CDATA[for (String id: movieIds) {
+    Movie m = dao.getMovieById(id);
+    if (m.getDirector()!=null) { m.getDirector().getPerson().getLastName(); }
+    m.getGenres().iterator().next();
+    for (MovieRole role: m.getCast()) {
+        if (role.getActor()!=null) { role.getActor().getPerson().getLastName(); }
+    }
+}]]></programlisting>                        
                 </figure>
 
                 <figure>    
                     <title>DAO Code</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
+<programlisting language="java"><![CDATA[public Movie getMovieById(String id) {
+    return em.find(Movie.class, id);
+}]]></programlisting>                        
                 </figure>
 
             </section>    
-
-
-
-
-
-
 
 
 
             <section id="jpa-tuning-jpa-fetch-children-lazy">
-               <title>Get Parent and Children with Lazy Load</title>
-               <para>Get parent and children in an object graph with fetch=LAZY relationships</para>
+                <title>Get Parent and Children with Lazy Load</title>
+                <para>Get parent and children in an object graph with fetch=LAZY relationships</para>
 
-
-                <figure>    
-                    <title>Relationships</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-<programlisting language="xml"><![CDATA[
-]]></programlisting>                        
-                </figure>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>
-
-
-                <figure>    
+                <section id="jpa-tuning-jpa-fetch-children-lazy-sqlexplain">
                     <title>Generated SQL</title>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Query for parent</para>
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_0_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_0_,
+    movie0_.MINUTES as MINUTES2_2_0_,
+    movie0_.RATING as RATING3_2_0_,
+    movie0_.RELEASE_DATE as RELEASE4_2_0_,
+    movie0_.TITLE as TITLE5_2_0_
+from
+    JPATUNE_MOVIE movie0_
+where
+    movie0_.ID=?]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-movie.png"/>
+                        </figure>
+                    </listitem>
+
+
+
+
+                    <listitem><para>Query for Movie.director role</para>
+<programlisting language=""><![CDATA[select
+    director0_.PERSON_ID as PERSON1_1_0_
+from
+    JPATUNE_DIRECTOR director0_
+where
+    director0_.PERSON_ID=?;]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-dir.png"/>
+                        </figure>
+                    </listitem>
+            
+            
+                    <listitem><para>Query for Movie.director.person identity</para>
+<programlisting language=""><![CDATA[select
+    person0_.ID as ID1_5_0_,
+    person0_.BIRTH_DATE as BIRTH2_5_0_,
+    person0_.FIRST_NAME as FIRST3_5_0_,
+    person0_.LAST_NAME as LAST4_5_0_,
+    person0_.MOD_NAME as MOD5_5_0_
+from
+    JPATUNE_PERSON person0_
+where
+    person0_.ID=?;]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-person.png"/>
+                        </figure>
+                    </listitem>
+            
+            
+            
+                    <listitem><para>Query for Movie.genre values</para>
+<programlisting language=""><![CDATA[select
+    genres0_.MOVIE_ID as MOVIE1_2_0_,
+    genres0_.GENRE as GENRE2_3_0_
+from
+    JPATUNE_MOVIEGENRE genres0_
+where
+    genres0_.MOVIE_ID=?;]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-genre.png"/>
+                        </figure>
+                    </listitem>
+            
+            
+                    <listitem><para>Query for Movie.cast entities</para>
 <programlisting language=""><![CDATA[
-]]></programlisting>                        
-                </figure>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+select
+    cast0_.MOVIE_ID as MOVIE4_2_1_,
+    cast0_.ID as ID1_4_1_,
+    cast0_.ID as ID1_4_0_,
+    cast0_.ACTOR_ID as ACTOR3_4_0_,
+    cast0_.MOVIE_ID as MOVIE4_4_0_,
+    cast0_.MOVIE_ROLE as MOVIE2_4_0_
+from
+    JPATUNE_MOVIEROLE cast0_
+where
+    cast0_.MOVIE_ID=?;]]></programlisting>                        
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-cast.png"/>
+                        </figure>
+                    </listitem>
+                    
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[select
+    actor0_.PERSON_ID as PERSON1_0_0_
+from
+    JPATUNE_ACTOR actor0_
+where
+    actor0_.PERSON_ID=?
+...   
+--repeated for each member of the Movie.cast]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-actor.png"/>
+                        </figure>
+                    </listitem>
+
+                    <listitem><para></para>
+<programlisting language=""><![CDATA[
+select
+    person0_.ID as ID1_5_0_,
+    person0_.BIRTH_DATE as BIRTH2_5_0_,
+    person0_.FIRST_NAME as FIRST3_5_0_,
+    person0_.LAST_NAME as LAST4_5_0_,
+    person0_.MOD_NAME as MOD5_5_0_
+from
+    JPATUNE_PERSON person0_
+where
+    person0_.ID=?;
+...   
+--repeated for each member of the Movie.cast]]></programlisting>
+                        <figure>
+                            <title>Explain Plan</title>
+                            <graphic scalefit="1" fileref="images/jpatune-plan-jpa-fetch-children-lazy-person.png"/>
+                        </figure>
+                    </listitem>
                 </itemizedlist>
+                </section>
 
 
-                <figure>
-                    <title>Explain Plan</title>
-                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
-                </figure>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>
-
-
-                <figure>    
+                <section id="jpa-tuning-jpa-fetch-children-lazy-benchmark">
                     <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Fetch Lazy Thin Parent.Get Parent and Children:warmups=2, rounds=10, ave=7.25 [+- 0.91]
+Fetch Lazy Thick Parent.Get Parent and Children:warmups=2, rounds=10, ave=7.25 [+- 0.92]
 ]]></programlisting>                        
-                </figure>
-    
-                <tip>
-                    <title></title>
-                    <para></para>
-                </tip>
+                    <tip>
+                        <title>Make Sparse use of Object Graphs when using fetch=LAZY</title>
+                        <para>Fetch=LAZY is intended for access to a minimal set of objects within
+                             a graph. Although each individual query by primary key is quite 
+                             inexpensive, the sum total (factoring in cardinality) is significant.
+                             Consider adding a JOIN FETCH query to your DAO when accessing entire 
+                             object graph declared with fetch=LAZY.</para>
+                    </tip>
+                </section>
             </section>    
-
-
-
-
-
-
-
-
 
 
 
@@ -277,51 +592,36 @@
                 <para>Get parent and children in an object graph with fetch=EAGER relationships</para>
 
                 <figure>    
-                    <title>Relationships</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-<programlisting language="xml"><![CDATA[
-]]></programlisting>                        
-                </figure>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>
-
-
-                <figure>    
                     <title>Generated SQL</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+                    <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-sql">Same as previous fetch=EAGER example</link>
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Loading of the object graph occurs in single DB call</para></listitem>
                 </itemizedlist>
 
 
                 <figure>
                     <title>Explain Plan</title>
-                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                    <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-explain">Same as previous fetch=EAGER example</link>
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Same cost loading  object graph -- whether accessing single or all entities</para></listitem>
                 </itemizedlist>
 
 
                 <figure>    
                     <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Fetch Eager Thin Parent.Get Parent and Children:warmups=2, rounds=10, ave=2.26 [+- 0.06]
+Fetch Eager Thick Parent.Get Parent and Children:warmups=2, rounds=10, ave=2.57 [+- 0.06]
 ]]></programlisting>                        
                 </figure>
     
                 <tip>
-                    <title></title>
-                    <para></para>
+                    <title>Fetch=EAGER Efficient when Accessing Relations</title>
+                    <para>Use fetch=EAGER if related entity *always*/*mostly* accessed. Suggest 
+                        using a JOIN FETCH query when fetch=LAZY is defined and need entire object
+                        graph.</para>
                 </tip>
             </section>    
 
@@ -333,50 +633,111 @@
 
                 <figure>    
                     <title>Relationships</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-<programlisting language="xml"><![CDATA[
-]]></programlisting>                        
+                    <link linkend="jpa-tuning-jpa-fetch-parent-lazy-figure-relations">Relationships defined as fetch=LAZY</link>
+                </figure>
+
+                <figure>    
+                    <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public Movie getMovieFetchedByIdFetched(String id) {
+    List<Movie> movies = createQuery(
+            "select m from Movie m " +
+            "left join fetch m.genres " +
+            "left join fetch m.director d " +
+            "left join fetch d.person " +
+            "left join fetch m.cast role " +
+            "left join fetch role.actor a " +
+            "left join fetch a.person " +
+            "where m.id=:id", Movie.class)
+            .setParameter("id", id)
+            .getResultList();
+    return movies.isEmpty() ? null : movies.get(0);
+}]]></programlisting>                        
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>EAGER aspects adding by query adding FETCH to JOIN query construct</para></listitem>
                 </itemizedlist>
 
 
                 <figure>    
                     <title>Generated SQL</title>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+<programlisting language=""><![CDATA[select
+    movie0_.ID as ID1_2_0_,
+    director2_.PERSON_ID as PERSON1_1_1_,
+    person3_.ID as ID1_5_2_,
+    cast4_.ID as ID1_4_3_,
+    actor5_.PERSON_ID as PERSON1_0_4_,
+    person6_.ID as ID1_5_5_,
+    movie0_.DIRECTOR_ID as DIRECTOR6_2_0_,
+    movie0_.MINUTES as MINUTES2_2_0_,
+    movie0_.RATING as RATING3_2_0_,
+    movie0_.RELEASE_DATE as RELEASE4_2_0_,
+    movie0_.TITLE as TITLE5_2_0_,
+    genres1_.MOVIE_ID as MOVIE1_2_0__,
+    genres1_.GENRE as GENRE2_3_0__,
+    person3_.BIRTH_DATE as BIRTH2_5_2_,
+    person3_.FIRST_NAME as FIRST3_5_2_,
+    person3_.LAST_NAME as LAST4_5_2_,
+    person3_.MOD_NAME as MOD5_5_2_,
+    cast4_.ACTOR_ID as ACTOR3_4_3_,
+    cast4_.MOVIE_ID as MOVIE4_4_3_,
+    cast4_.MOVIE_ROLE as MOVIE2_4_3_,
+    cast4_.MOVIE_ID as MOVIE4_2_1__,
+    cast4_.ID as ID1_4_1__,
+    person6_.BIRTH_DATE as BIRTH2_5_5_,
+    person6_.FIRST_NAME as FIRST3_5_5_,
+    person6_.LAST_NAME as LAST4_5_5_,
+    person6_.MOD_NAME as MOD5_5_5_ 
+from
+    JPATUNE_MOVIE movie0_ 
+left outer join
+    JPATUNE_MOVIEGENRE genres1_ 
+        on movie0_.ID=genres1_.MOVIE_ID 
+left outer join
+    JPATUNE_DIRECTOR director2_ 
+        on movie0_.DIRECTOR_ID=director2_.PERSON_ID 
+left outer join
+    JPATUNE_PERSON person3_ 
+        on director2_.PERSON_ID=person3_.ID 
+left outer join
+    JPATUNE_MOVIEROLE cast4_ 
+        on movie0_.ID=cast4_.MOVIE_ID 
+left outer join
+    JPATUNE_ACTOR actor5_ 
+        on cast4_.ACTOR_ID=actor5_.PERSON_ID 
+left outer join
+    JPATUNE_PERSON person6_ 
+        on actor5_.PERSON_ID=person6_.ID 
+where
+    movie0_.ID=?;]]></programlisting>                        
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
+                    <listitem><para>Query identical to fetch=EAGER case</para></listitem>
                 </itemizedlist>
 
 
                 <figure>
                     <title>Explain Plan</title>
-                    <graphic scalefit="1" fileref="images/jpatune-plan-jpa-"/>
+                    <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-explain">Same query plan as fetch=EAGER</link>
                 </figure>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                    <listitem><para></para></listitem>
-                </itemizedlist>
 
 
                 <figure>    
                     <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Fetch Lazy Thin Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.56 [+- 0.80]
+Fetch Lazy Thick Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.54 [+- 0.08]
+Fetch Eager Thin Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.24 [+- 0.06]
+Fetch Eager Thick Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.58 [+- 0.05]
 ]]></programlisting>                        
                 </figure>
     
                 <tip>
-                    <title></title>
-                    <para></para>
+                    <title>Make use of JPA Queries to Achieve Tuned-for-Use Query</title>
+                    <para>JPA provides several means to access an entity and its relationships. The 
+                        properties defined for the relationship help define the default query
+                        semantics -- which may not be appropriate for all uses. Leverage JOIN FETCH
+                        queries when needing to fully load specific relationships prior to 
+                        ending the transaction.</para>
                 </tip>
             </section>    
         </section>    

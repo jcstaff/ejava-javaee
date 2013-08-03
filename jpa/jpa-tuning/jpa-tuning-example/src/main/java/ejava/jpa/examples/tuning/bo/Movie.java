@@ -58,7 +58,7 @@ public class Movie implements Comparable<Movie>{
 	@Column(name="PLOT", length=4000)
 	private String plot;
 	
-	@ElementCollection
+	@ElementCollection(fetch=FetchType.LAZY)
     @CollectionTable(
         name="JPATUNE_MOVIEGENRE",
           joinColumns=@JoinColumn(name="MOVIE_ID"), 
@@ -71,7 +71,7 @@ public class Movie implements Comparable<Movie>{
 	@JoinColumn(name="DIRECTOR_ID")
 	private Director director;
 	
-	@OneToMany(mappedBy="movie", 
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="movie", 
 			cascade={CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REMOVE})	
 	private Set<MovieRole> cast;
 
@@ -79,6 +79,14 @@ public class Movie implements Comparable<Movie>{
 	protected Movie() {}	
 	public Movie(String id) {
 		this.id = id;
+	}
+	public Movie(String id, Integer minutes, String rating, Date releaseDate, String title) {
+		this.id=id;
+		this.minutes = minutes;
+		this.rating=rating;
+		this.mrating=MovieRating.getFromMpaa(rating);
+		this.releaseDate = releaseDate;
+		this.title=title;
 	}
 	
 	public String getId() { return id; }

@@ -446,7 +446,17 @@ public class MovieDAOImpl {
 		return em.find(Movie.class, id);
 	}
 	
-	public Movie getMovieFetchedById(String id) {
+	public Movie getMovieByIdUnfetched(String id) {
+		List<Movie> movies=createQuery(
+				String.format("select new %s(m.id, m.minutes, m.rating, m.releaseDate, m.title) ", Movie.class.getName()) +
+				"from Movie m " +
+				"where id=:id", Movie.class)
+				.setParameter("id", id)
+				.getResultList();
+		return movies.isEmpty() ? null : movies.get(0);
+	}
+	
+	public Movie getMovieFetchedByIdFetched(String id) {
 		List<Movie> movies = createQuery(
 				"select m from Movie m " +
 				"left join fetch m.genres " +
