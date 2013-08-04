@@ -32,8 +32,8 @@ public class LoopEager extends LoopQuery {
 		EntityManager em=getEMF().createEntityManager();
 		MovieFactory mf = new MovieFactory().setEntityManager(em);
 		SQLConstruct[] constructs = new SQLConstruct[]{
-				mf.MOVIE_ROLE_MOVIE_FDX,
-				mf.MOVIE_ROLE_ACTOR_MOVIE_CDX
+				mf.MOVIE_ROLE_ACTOR_MOVIE_CDX,
+				mf.MOVIE_ROLE_MOVIE_ACTOR_CDX
 		};
 		mf.executeSQL(constructs).assertConstructs(constructs).flush();
 		

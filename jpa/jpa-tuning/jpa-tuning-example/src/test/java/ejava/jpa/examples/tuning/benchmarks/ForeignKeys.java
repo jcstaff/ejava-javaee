@@ -26,15 +26,15 @@ public class ForeignKeys extends TestBase {
 	}
 	
 	@TestLabel(label = "Single JOIN")
-	@Test
+	//@Test
 	public void getKevin() {
 		getDAO().getKevinBacon();
 	}
 
 	@TestLabel(label = "Multiple JOINs")
-	@Test
+	//@Test
 	public void kevin1Step() {
-		getDAO().oneStepFromPerson(kevinBacon, null, null);
+		getDAO().oneStepFromPersonByDB(kevinBacon, null, null, null);
 	}
 
 }

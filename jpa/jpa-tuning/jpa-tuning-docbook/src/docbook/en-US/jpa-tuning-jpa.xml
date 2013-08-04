@@ -1100,14 +1100,323 @@ Size Eager.DB Count no Join:warmups=2, rounds=10, ave=0.44 [+- 0.02]
     
     
     
+    
+    
+    
     <section id="jpa-tuning-jpa-queryloops">
         <title>Query Loops</title>
         <para>Performing separate subqueries off initial query</para>
+
+        <section id="jpa-tuning-jpa-queryloops-query">
+            <title>Query Basics</title>
+            <para>Get people who have acted in same movie as a specific actor</para>
+            
+                <figure>    
+                    <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[create index movierole_actor_movie_cdx on jpatune_movierole(actor_id, movie_id)
+create index movierole_movie_actor_cdx on jpatune_movierole(movie_id, actor_id)]]></programlisting>                        
+                </figure>
+    
+                <figure>    
+                    <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[List<Person> actors=dao.oneStepFromPerson(kevinBacon);]]></programlisting>                        
+                </figure>
+        </section>
+
+        <section id="jpa-tuning-jpa-queryloops-dao">
+            <title>Query Loops in DAO</title>
+            <para>Using DAO to perform initial query and follow-on queries based on results</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public Collection<Person> oneStepFromPersonByDAO(Person p) {
+    Collection<Person> result = new HashSet<Person>();
+    //performing core query
+    List<String> movieIds = createQuery(
+            "select role.movie.id from MovieRole role " +
+            "where role.actor.person.id=:personId", String.class)
+            .setParameter("personId", p.getId())
+            .getResultList();
+    
+    //loop through results and issue sub-queries
+    for (String mid: movieIds) {
+        List<Person> people = createQuery(
+                "select role.actor.person from MovieRole role " +
+                "where role.movie.id=:movieId", Person.class)
+                .setParameter("movieId", mid)
+                .getResultList();
+        result.addAll(people);
+    }
+    return result;
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA["select role.movie.id from MovieRole role where role.actor.person.id=:personId", params={personId=p73897}]]></programlisting>                        
+<programlisting language=""><![CDATA[//repeated for each returned movie above
+"select role.actor.person from MovieRole role where role.movie.id=:movieId", params={movieId=m239584}]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>DAO makes N separate queries based on results of first query</para></listitem>
+                <listitem><para>Distinct was not required in query since it was issued per-movie. Distinct 
+                    was handed within the DAO using a Java Set to hold the results and hashcode()/equals()
+                    implemented within Person class.</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    movierole0_.MOVIE_ID as col_0_0_ 
+from
+    JPATUNE_MOVIEROLE movierole0_,
+    JPATUNE_ACTOR actor1_ 
+where
+    movierole0_.ACTOR_ID=actor1_.PERSON_ID 
+    and actor1_.PERSON_ID=?]]></programlisting>                        
+<programlisting language=""><![CDATA[--repeated for each returned movie above
+select
+    person2_.ID as ID1_5_,
+    person2_.BIRTH_DATE as BIRTH2_5_,
+    person2_.FIRST_NAME as FIRST3_5_,
+    person2_.LAST_NAME as LAST4_5_,
+    person2_.MOD_NAME as MOD5_5_ 
+from
+    JPATUNE_MOVIEROLE movierole0_,
+    JPATUNE_ACTOR actor1_ 
+inner join
+    JPATUNE_PERSON person2_ 
+        on actor1_.PERSON_ID=person2_.ID 
+where
+    movierole0_.ACTOR_ID=actor1_.PERSON_ID 
+    and movierole0_.MOVIE_ID=?
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>SQL generated queries single table</para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan (Initial Query)</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-loop-dao-outer-lazy.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan of compound index(actor_id, person_id) used to satisfy the person_id in where clause and movie_id for select clause</para></listitem>
+            </itemizedlist>
+            <para>* Query was optimized to bypass Actor table</para>
+
+            <figure>
+                <title>Explain Plan (Follow-on/Repeated Query)</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-loop-dao-inner-lazy.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan on compound_index(movie_id, actor_id) to satisfy where condition for Movie.id and locate MovieRole rowId</para></listitem>
+                <listitem><para>Unique scan of Person primary key index to obtain rowId for Person.id=MovieRole.actor.id</para></listitem>
+                <listitem><para>Person row accessed by rowId to satisfy select clause</para></listitem>
+            </itemizedlist>
+            <para>* Query was optimized to bypass Actor table</para>
+            <para>** Compound index(movie_id, actor_id) permitted MovieRole table and lookup of MovieRole.actorId to be bypassed.</para>
+
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+-3924 people found
+Loop Lazy.DAO Loop:warmups=2, rounds=10, ave=4.91 [+- 0.88]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Beware of Query Loops Driven from Query Results</title>
+                <para>Query loops driven off of previous query results can be a sign the 
+                    follow-queries could have been combined with the initial query to be 
+                    accomplished within the database within a single statement.</para>
+                <para>Also beware of how the loop size can grow over the lifetime 
+                    of the application. The number may grow significantly after
+                    testing/initial deployment to a significant size (i.e., from 100 to 100K loops).
+                    Defining as a single statement and applying paging limits can 
+                    help speed the originally flawed implementation.</para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-jpa-queryloops-db">
+            <title>Query Loops using DB Subquery</title>
+            <para>Expressing nest query as subquery to resolve within database.</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public List<Person> oneStepFromPersonByDB(Person p) {
+    return createQuery(
+            "select distinct role.actor.person from MovieRole role " +
+            "where role.movie.id in (" +
+                "select m.id from Movie m " +
+                "join m.cast role2 " +
+                "where role2.actor.person.id=:id)", Person.class)
+         .setParameter("id", p.getId())
+         .getResultList();
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+"select distinct role.actor.person from MovieRole role 
+where role.movie.id in (
+    select m.id from Movie m join m.cast role2 
+    where role2.actor.person.id=:id
+    )", 
+params={id=p73897}
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Distinct was required to remove duplicates</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    distinct person2_.ID as ID1_5_,
+    person2_.BIRTH_DATE as BIRTH2_5_,
+    person2_.FIRST_NAME as FIRST3_5_,
+    person2_.LAST_NAME as LAST4_5_,
+    person2_.MOD_NAME as MOD5_5_ 
+from
+    JPATUNE_MOVIEROLE movierole0_,
+    JPATUNE_ACTOR actor1_ 
+inner join
+    JPATUNE_PERSON person2_ 
+        on actor1_.PERSON_ID=person2_.ID 
+where
+    movierole0_.ACTOR_ID=actor1_.PERSON_ID 
+    and (
+        movierole0_.MOVIE_ID in (
+            select
+                movie3_.ID 
+            from
+                JPATUNE_MOVIE movie3_ 
+            inner join
+                JPATUNE_MOVIEROLE cast4_ 
+                    on movie3_.ID=cast4_.MOVIE_ID,
+                JPATUNE_ACTOR actor5_ 
+            where
+                cast4_.ACTOR_ID=actor5_.PERSON_ID 
+                and actor5_.PERSON_ID=?
+        )
+    )]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>SQL generated uses a non-correlated subquery</para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-loop-db-lazy.png"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Range scan of MovieRole composite(actor_id, movie_id) used to satisfy subquery where clause for person_id and obtain movie_id</para></listitem>
+                <listitem><para>Range scan of MovieRole composite(movie_id, actor_id) used to join movie_ids with root query and obtain person_id</para></listitem>
+                <listitem><para>Unique scan of Person primary key index to locate rowId</para></listitem>
+                <listitem><para>Person row accessed by rowId</para></listitem>
+            </itemizedlist>
+            <para>* cast4_ and movierole0_ are both MovieRoles. cast4_ is joined with Movie and subject Person in subquery. 
+            movierole0_ is joined with Movie and associated Person in root query.</para>
+            <para>** execution plan indicates subquery could have been re-written as a JOIN</para>
+
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+-3924 people found
+Loop Lazy.DB Loop Distinct:warmups=2, rounds=10, ave=2.52 [+- 0.09]
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title>Delegate Query Logic to Database</title>
+                <para>If possible, express query as a single transaction to the database rather than
+                     pulling data back and re-issuing subqueries from the DAO. Apply paging constraints
+                     in order to address issues with excess growth over time.</para>
+            </tip>
+        </section>
+        
+        
+        
     </section>
+    
+    
+    
+    
+    
     
     <section id="jpa-tuning-jpa-paging">
         <title>Paging</title>
         <para>Placing reasonable limits on amount of data returned</para>
+
+        <section id="jpa-tuning-jpa-paging-query">
+            <title>Query Basics</title>
+            <para></para>
+            
+                <figure>    
+                    <title>DB Index(es)</title>
+<programlisting language=""><![CDATA[alter table jpatune_moviegenre add constraint moviegenre_unique UNIQUE (movie_id, genre)
+create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlisting>                        
+                </figure>
+    
+                <figure>    
+                    <title>Service Tier Code</title>
+<programlisting language="java"><![CDATA[]]></programlisting>                        
+                </figure>
+        </section>
+
+
+        <section id="jpa-tuning-jpa-paging-eager">
+            <title>XXXXX</title>
+            <para></para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[
+]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <graphic scalefit="1" fileref="images/jpatune-plan"/>
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+                <listitem><para></para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Benchmark</title>
+<programlisting language=""><![CDATA[
+]]></programlisting>                        
+            </figure>
+
+            <tip>
+                <title></title>
+                <para></para>
+            </tip>
+        </section>
+
     </section>
 
     <section id="jpa-tuning-jpa-summary">
