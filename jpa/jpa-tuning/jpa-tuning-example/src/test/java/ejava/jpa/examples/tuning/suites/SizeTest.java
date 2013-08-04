@@ -9,7 +9,8 @@ import ejava.jpa.examples.tuning.env.SizeEager;
 import ejava.jpa.examples.tuning.env.SizeLazy;
 
 /**
- * This test suite evaluates the use of a composite index.
+ * This test suite evaluates the use of getting the counnt of a collection
+ * in various ways.
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

@@ -2,9 +2,13 @@ package ejava.jpa.examples.tuning.dao;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,14 +21,24 @@ import javax.persistence.LockModeType;
 import javax.persistence.Parameter;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.AbstractQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ejava.jpa.examples.tuning.bo.Actor;
 import ejava.jpa.examples.tuning.bo.Movie;
 import ejava.jpa.examples.tuning.bo.MovieRating;
 import ejava.jpa.examples.tuning.bo.MovieRole;
 import ejava.jpa.examples.tuning.bo.Person;
+import ejava.jpa.examples.tuning.dao.MovieDAOImpl.Pair;
 
 public class MovieDAOImpl {
 	private static final Log log = LogFactory.getLog(MovieDAOImpl.class);
@@ -205,7 +219,7 @@ public class MovieDAOImpl {
 	 * @param limit
 	 * @return
 	 */
-    public List<Person> oneStepFromPerson(Person p, Integer offset, Integer limit) {
+    public List<Person> oneStepFromPerson0(Person p, Integer offset, Integer limit) {
     	return withPaging(createQuery(
 			"select a.person from Actor a " +
 			"join a.roles ar " +
@@ -219,7 +233,202 @@ public class MovieDAOImpl {
 			 .setParameter("id", p.getId()), offset, limit, null)
 			.getResultList();
     }
+    
+    public Collection<Person> oneStepFromPersonBrute(Person person, int step, int max) {
+    	Collection<Person> result = new HashSet<Person>();
+    	//performing core query
+    	List<Movie> movies = createQuery(
+    			"select role.movie from MovieRole role " +
+    			"where role.actor.person.id=:personId", Movie.class)
+    			.setParameter("personId", person.getId())
+    			.getResultList();
+    	
+    	//loop through results and issue sub-queries
+    	for (Movie m :movies) {
+    	    List<Person> people = createQuery(
+    	    		"select role.actor.person from MovieRole role " +
+    	    		"where role.movie.id=:movieId", Person.class)
+    	    		.setParameter("movieId", m.getId())
+    	    		.getResultList();
+    	    result.addAll(people);
+    	}
+    	return result;
+    }
 
+    public List<Person> oneStepFromPerson(Person p, Integer offset, Integer limit) {
+    	return withPaging(createQuery(
+    			"select role.actor.person from MovieRole role " +
+    			"where role.movie.id in (" +
+    			    "select m.id from Movie m " +
+    			    "join m.cast role2 " +
+    			    "where role2.actor.person.id=:id)", Person.class), offset, limit, null)
+   			 .setParameter("id", p.getId())
+    	     .getResultList();
+    }
+
+    protected static class Pair<T,U> {
+    	public final T query;   //main part of query
+    	public final U queryTerm; //where queryTerm ...
+    	public Pair(T first, U second) { this.query=first; this.queryTerm=second; }
+    }
+
+    //find Movies person acted in
+    protected Pair<Subquery<Movie>,Void> getMoviesForPerson(AbstractQuery<String> parentQuery, Person person) {
+    	CriteriaBuilder cb = em.getCriteriaBuilder();
+    	Subquery<Movie> qdef = parentQuery.subquery(Movie.class);
+    	Root<Movie> m = qdef.from(Movie.class);
+    	Join<Movie, MovieRole> role = m.join("cast", JoinType.INNER);
+    	Join<MovieRole, Actor> a = role.join("actor", JoinType.INNER);
+    	Join<Actor, Person> p = a.join("person", JoinType.INNER);
+    	qdef.select(m)
+    	  .where(cb.equal(p.get("id"), person.getId()));
+    	return new Pair<Subquery<Movie>,Void>(qdef,null);
+    }
+
+    //find Movies people acted in
+    protected Pair<Subquery<Movie>, Join<Actor, Person>> getMoviesForPersonIds(AbstractQuery<?> parentQuery) {
+    	Subquery<Movie> qdef = parentQuery.subquery(Movie.class);
+    	Root<Movie> m = qdef.from(Movie.class);
+    	Join<Movie, MovieRole> role = m.join("cast", JoinType.INNER);
+    	Join<MovieRole, Actor> a = role.join("actor", JoinType.INNER);
+    	Join<Actor, Person> p = a.join("person", JoinType.INNER);
+    	qdef.select(m);
+    	
+    	//qdef.where(cb.in(p.get("id")).value(subq));
+    	return new Pair<Subquery<Movie>,Join<Actor, Person>>(qdef, p);
+    }
+
+    //find People.id who acted in Movies                      
+    protected Pair<Subquery<String>,Join<MovieRole, Movie>> getPersonIdsInMovie(AbstractQuery<?> parentQuery) {
+    	Subquery<String> qdef = parentQuery.subquery(String.class);    	
+    	Root<MovieRole> role = qdef.from(MovieRole.class);    	
+    	Join<MovieRole, Movie> m = role.join("movie", JoinType.INNER);
+    	Join<MovieRole, Actor> a = role.join("actor", JoinType.INNER);
+    	Join<Actor, Person> p = a.join("person", JoinType.INNER);
+    	qdef.select(p.<String>get("id"));
+    	
+    	//qdef.where(cb.in(m).value(subq));
+    	return new Pair<Subquery<String>,Join<MovieRole, Movie>>(qdef,m);
+    }
+
+    /*
+    protected Pair<Subquery<String>,Join<MovieRole, Movie>> nthRemoved(AbstractQuery<?> parentQuery, Path<Movie> parentTerm, Person person, int step, int steps) {
+    	CriteriaBuilder cb = em.getCriteriaBuilder();
+
+    	if (++step < steps) {
+	    	//subquery that returns Movies for Person.ids
+			Pair<Subquery<Movie>,Join<Actor, Person>> mq = getMoviesForPersonIds(parentQuery);
+			parentQuery.where(cb.in(parentTerm).value(mq.query));
+	
+	    	//subquery that returns Person.ids for Movies
+			Pair<Subquery<String>,Join<MovieRole, Movie>> pq = getPersonIdsInMovie(mq.query);
+	    	mq.query.where(cb.in(mq.queryTerm.get("id")).value(pq.query));
+	    	
+    		//make another pass
+	    	Pair<Subquery<String>, Join<MovieRole, Movie>> subquery = nthRemoved(pq.query, pq.queryTerm, person, step, steps);
+
+	    	parentTerm = pq.queryTerm;
+	    	parentQuery = pq.query;
+    	}
+
+    	if (++step < steps) {
+	    	xxx = subquery.queryTerm;
+		} else {
+			//subquery that returns Movies for target Person
+			Pair<Subquery<Movie>, Void> tq = getMoviesForPerson(parentQuery, person);
+			parentQuery.where(cb.in(parentTerm).value(tq.query));
+		}
+
+
+		return pq;
+    }
+
+    
+    protected CriteriaQuery<Person> getPeopleQuery2(Person person, int steps) {
+    	CriteriaBuilder cb = em.getCriteriaBuilder();
+    	CriteriaQuery<Person> rootq = cb.createQuery(Person.class);
+    	Root<Person> p = rootq.from(Person.class);
+    	rootq.select(p);
+    	
+		//3rd removed
+    	//subquery that returns Person.ids for Movies
+		Pair<Subquery<String>,Join<MovieRole, Movie>> pq3 = getPersonIdsInMovie(rootq);
+    	rootq.where(cb.in(p.get("id")).value(pq3.query));
+
+		//qdef.where(cb.in(p.get("id")).value(subq));
+    	//subquery that returns Movies for Person.ids
+		Pair<Subquery<Movie>,Join<Actor, Person>> mq2 = getMoviesForPersonIds(pq3.query);
+		pq3.query.where(cb.in(pq3.queryTerm).value(mq2.query));
+    	
+		//2nd removed
+    	//subquery that returns Person.ids for Movies
+		Pair<Subquery<String>,Join<MovieRole, Movie>> pq2 = getPersonIdsInMovie(mq2.query);
+    	mq2.query.where(cb.in(mq2.queryTerm.get("id")).value(pq2.query));
+
+		//qdef.where(cb.in(p.get("id")).value(subq));
+    	//subquery that returns Movies for Person.ids
+		Pair<Subquery<Movie>,Join<Actor, Person>> mq1 = getMoviesForPersonIds(pq2.query);
+		pq2.query.where(cb.in(pq2.queryTerm).value(mq1.query));
+		
+    	//1st removed
+		//subquery that returns Person.ids for Movies
+		Pair<Subquery<String>,Join<MovieRole, Movie>> pq1 = getPersonIdsInMovie(mq1.query);
+    	mq1.query.where(cb.in(mq1.queryTerm.get("id")).value(pq1.query));
+		
+		//subquery that returns Movies for target Person
+		Pair<Subquery<Movie>, Void> tq = getMoviesForPerson(pq1.query, person);
+		pq1.query.where(cb.in(pq1.queryTerm).value(tq.query));
+    	
+    	return rootq;
+    }
+    */
+    
+    
+    
+    protected CriteriaQuery<Person> getPeopleQuery(Person person, int steps) {
+    	CriteriaBuilder cb = em.getCriteriaBuilder();
+    	CriteriaQuery<Person> rootq = cb.createQuery(Person.class);
+    	Root<Person> p = rootq.from(Person.class);
+    	rootq.select(p);
+    	
+		//3rd removed
+    	//subquery that returns Person.ids for Movies
+		Pair<Subquery<String>,Join<MovieRole, Movie>> pq3 = getPersonIdsInMovie(rootq);
+    	rootq.where(cb.in(p.get("id")).value(pq3.query));
+
+    	//subquery that returns Movies for Person.ids
+		Pair<Subquery<Movie>,Join<Actor, Person>> mq2 = getMoviesForPersonIds(pq3.query);
+		pq3.query.where(cb.in(pq3.queryTerm).value(mq2.query));
+    	
+		//2nd removed
+    	//subquery that returns Person.ids for Movies
+		Pair<Subquery<String>,Join<MovieRole, Movie>> pq2 = getPersonIdsInMovie(mq2.query);
+    	mq2.query.where(cb.in(mq2.queryTerm.get("id")).value(pq2.query));
+
+    	//subquery that returns Movies for Person.ids
+		Pair<Subquery<Movie>,Join<Actor, Person>> mq1 = getMoviesForPersonIds(pq2.query);
+		pq2.query.where(cb.in(pq2.queryTerm).value(mq1.query));
+    	
+    	//1st removed
+		//subquery that returns Person.ids for Movies
+		Pair<Subquery<String>,Join<MovieRole, Movie>> pq1 = getPersonIdsInMovie(mq1.query);
+    	mq1.query.where(cb.in(mq1.queryTerm.get("id")).value(pq1.query));
+		
+		//subquery that returns Movies for target Person
+		Pair<Subquery<Movie>, Void> tq = getMoviesForPerson(pq1.query, person);
+		pq1.query.where(cb.in(pq1.queryTerm).value(tq.query));
+    	
+    	return rootq;
+    }
+    
+    public List<Person> stepsFromPerson(Person person, int steps, Integer offset, Integer limit) {
+    	CriteriaQuery<Person> qdef= getPeopleQuery(person, steps);
+    	TypedQuery<Person> query = em.createQuery(qdef);
+    	if (offset!=null) { query.setFirstResult(offset); }
+    	if (limit!=null)  { query.setMaxResults(limit); }
+    	return query.getResultList();
+    }
+    
     /**
      * Returns a bulk, unordered page of movies. This will cause a full
      * table scan since there is no reason to consult the index.
@@ -504,6 +713,8 @@ public class MovieDAOImpl {
 				.setParameter("id", movieId)
 				.getSingleResult().intValue();
 	}
+	
+	
 	
 	
 }

@@ -12,7 +12,8 @@ import ejava.jpa.examples.tuning.env.FetchLazyThin;
 import ejava.jpa.examples.tuning.env.FetchLazyThick;
 
 /**
- * This test suite evaluates the use of a composite index.
+ * This test suite evaluates the use of different uses of fetch=LAZY and
+ * fetch=EAGER
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

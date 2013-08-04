@@ -353,7 +353,6 @@ where
                 </figure>
                 <itemizedlist spacing="compact">
                     <listitem><para>Execution plan identical to fetch=LAZY case</para></listitem>
-                    <listitem><para></para></listitem>
                 </itemizedlist>
 
 
@@ -526,7 +525,7 @@ where
                         </figure>
                     </listitem>
                     
-                    <listitem><para></para>
+                    <listitem><para>Query for MovieRole.actor entity</para>
 <programlisting language=""><![CDATA[select
     actor0_.PERSON_ID as PERSON1_0_0_
 from
@@ -541,7 +540,7 @@ where
                         </figure>
                     </listitem>
 
-                    <listitem><para></para>
+                    <listitem><para>Query for Actor.person entity</para>
 <programlisting language=""><![CDATA[
 select
     person0_.ID as ID1_5_0_,
@@ -969,7 +968,7 @@ Size Eager.DAO Count:warmups=2, rounds=10, ave=16.82 [+- 1.33]
 
 
         <section id="jpa-tuning-jpa-count-db-count-query">
-            <title>Row Count in DB using Count Query</title>
+            <title>Row Count in DB using Count() Query</title>
             <para>Issue query to DB to return relationship count</para>
 
             <figure>    
@@ -1066,7 +1065,7 @@ where
     movierole0_.MOVIE_ID=?]]></programlisting>                        
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
+                <listitem><para>SQL generated queries single table</para></listitem>
             </itemizedlist>
 
 

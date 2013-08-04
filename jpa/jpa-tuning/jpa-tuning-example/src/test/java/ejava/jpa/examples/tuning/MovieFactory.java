@@ -138,7 +138,7 @@ public class MovieFactory {
 	public SQLConstruct MOVIE_ROLE_IDX = new SQLIndex("movie_role_idx", "create index movie_role_idx on jpatune_movierole(movie_role)");
 	public SQLConstruct MOVIE_ROLE_MOVIE_FDX = new SQLIndex("movie_role_movie_fdx", "create index movie_role_movie_fdx on jpatune_movierole(movie_id)");
 	public SQLConstruct MOVIE_ROLE_MOVIE_CDX = new SQLIndex("movie_role_movie_cdx", "create index movie_role_movie_cdx on jpatune_movierole(movie_role, movie_id)");
-
+    public SQLConstruct MOVIE_ROLE_ACTOR_MOVIE_CDX = new SQLIndex("movierole_actor_movie_cdx", "create index movierole_actor_movie_cdx on jpatune_movierole(actor_id, movie_id)");
 	
 	public void populate() {
 	}
@@ -242,7 +242,8 @@ public class MovieFactory {
 			new SQLStatement(MOVIE_RDATE_IDX, false),
 			new SQLStatement(MOVIE_ROLE_IDX, false),
 			new SQLStatement(MOVIE_ROLE_MOVIE_FDX, false),
-			new SQLStatement(MOVIE_ROLE_MOVIE_CDX, false)
+			new SQLStatement(MOVIE_ROLE_MOVIE_CDX, false),
+			new SQLStatement(MOVIE_ROLE_ACTOR_MOVIE_CDX, false)
 		};
 		executeSQL(sql, true);
 		return this;
