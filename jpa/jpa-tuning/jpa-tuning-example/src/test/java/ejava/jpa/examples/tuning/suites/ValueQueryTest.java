@@ -12,9 +12,9 @@ import ejava.jpa.examples.tuning.env.WhereColumnIndex;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	NoColumnIndex.class,
-	WhereColumnIndex.class,
-	CompositeWhereSelect.class,
-	CompositeSelectWhere.class
+	//WhereColumnIndex.class,
+	//CompositeWhereSelect.class,
+	//CompositeSelectWhere.class
 })
 public class ValueQueryTest extends SuiteBase {
 }

@@ -5,8 +5,9 @@
     <bookinfo>
         <title>JPA Tuning</title>
         <subtitle>Performance Topics Related to JPA and SQL</subtitle>
-        <pubdate>${docbook.pubdate}</pubdate>
+        <pubdate>August 2013</pubdate>
         <!--
+        <pubdate>${docbook.pubdate}</pubdate>
         <copyright>
             <year>${copyright.year}</year>
             <holder>${copyright.holder}</holder>
@@ -17,7 +18,9 @@
         <title>Topics</title>
         <itemizedlist spacing="compact">
             <listitem><para>Why DB access can be inefficient</para></listitem>
-            <listitem><para>How to analyze execution plans</para></listitem>
+            <listitem><para>What is an execution plan</para></listitem>
+            <listitem><para>How to access an execution plan</para></listitem>
+            <listitem><para>How to analyze an execution plan</para></listitem>
             <listitem><para>Impact of Indexes</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>to access tables</para></listitem>
@@ -27,11 +30,12 @@
             <listitem><para>JPA performance pitfalls</para></listitem>
         </itemizedlist>
         <note>
-            <title></title>
+            <title>Target Audience: JPA/SQL Developers</title>
             <para>The material in this paper is geared towards developers working with 
-                SQL and JPA. The topic of performance is much larger than the scope 
-                covered here and should involve DBAs, Hardware Engineers, etc. when
-                working through the complete solution. However, the material covered 
+                JPA and SQL. The topic of performance is much larger than the scope 
+                covered here and should involve DBAs, Hardware Engineers, System 
+                Architects, etc. when working through the complete solution. 
+                However, the material covered 
                 in this paper should be an excellent start for developers to better 
                 understand what costs what, how you can better know when there are
                 issues or success, and where to look for solutions. Some topics were
@@ -40,10 +44,12 @@
     </preface>
 
     <xi:include href="jpa-tuning-oracle.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-domain.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-tuning-table.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-tuning-index.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-tuning-join.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jpa-tuning-jpa.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-tuning-h2.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 <!-- 
     <xi:include href="jpa-tuning-sql.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
  -->

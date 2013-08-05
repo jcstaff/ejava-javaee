@@ -7,20 +7,26 @@
     <section id="jpa-tuning-oracle-reasonsbad">
         <title>Reasons for Inefficient SQL Performance</title>
         <itemizedlist spacing="compact">
-            <listitem><para>Stale or missing optimizer statistics</para></listitem>
+            <listitem><para>Poorly constructed data model</para></listitem>
+            <listitem><para>Poorly constructed SQL</para></listitem>
             <listitem><para>Missing access structures</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Indexes</para></listitem>
                     <listitem><para>Materialized views</para></listitem>
-                    <listitem><para>Partitions</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Missing constraints</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Unique Constraints</para></listitem>
+                    <listitem><para>NOT null</para></listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>Sub-optimal execution plan</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Incorrect estimates of cost, cardinality, or predictive selectivity</para></listitem>
+                    <listitem><para>Stale or missing optimizer statistics</para></listitem>
                 </itemizedlist>
             </listitem>
-            <listitem><para>Poorly constructed SQL</para></listitem>
         </itemizedlist>
     </section>
     
@@ -48,6 +54,16 @@
     <section id="jpa-tuning-oracle-tools">
        <title>Diagnostic Tools</title>
 
+        <section id="jpa-tuning-oracle-tools-clientbenchmark">
+            <title>Client/DAO Benchmark</title>
+    <figure>
+        <title>JUnit Benchmark</title>
+<programlisting language=""><![CDATA[NoColumnIndex.queryForMovieAndDir: [measured 1 out of 1 rounds, threads: 1 (sequential)]
+ round: 3.85 [+- 0.00], round.block: 0.00 [+- 0.00], round.gc: 0.00 [+- 0.00], GC.calls: 0, GC.time: 0.00, time.total: 3.85, time.warmup: 0.00, time.bench: 3.85]]></programlisting>                        
+    </figure>
+        
+        </section>
+
         <section id="jpa-tuning-oracle-tools-explainplan">
            <title>EXPLAIN PLAN</title>
             <itemizedlist spacing="compact">
@@ -57,53 +73,64 @@
             </itemizedlist>
             <figure>
                 <title>EXPLAIN PLAN Example with Oracle SQL Developer</title>
-                <graphic scale="70" fileref="images/jpa-tuning-explain-plan.png"/>
+                <graphic scalefit="1" fileref="images/jpa-tuning-explain-plan.png"/>
             </figure>
             <figure>
                 <title>EXPLAIN PLAN Example using Text SQL Commands</title>
-<programlisting language=""><![CDATA[EXPLAIN PLAN 
-FOR
-select m.title, p.first_name, p.last_name
-from queryex_person p
-join queryex_director d on d.person_id = p.id
-join queryex_movie m on m.director_id = d.person_id
-order by m.title desc;
-
+<programlisting language=""><![CDATA[ 
+EXPLAIN PLAN FOR
+select * from
+    ( select
+        movie0_.TITLE as col_0_0_,
+        person2_.FIRST_NAME as col_1_0_,
+        person2_.LAST_NAME as col_2_0_ 
+    from JPATUNE_MOVIE movie0_ 
+    inner join JPATUNE_DIRECTOR director1_ on movie0_.DIRECTOR_ID=director1_.PERSON_ID 
+    inner join JPATUNE_PERSON person2_ on director1_.PERSON_ID=person2_.ID 
+    order by title DESC ) 
+where
+    rownum <= :limit;
 SET LINESIZE 100
 SET PAGESIZE 0
 select * from table(DBMS_XPLAN.DISPLAY());]]></programlisting>                        
 
 <programlisting language=""><![CDATA[plan FOR succeeded.
-Plan hash value: 1054686195                                                                         
-                                                                                                    
---------------------------------------------------------------------------------------              
-| Id  | Operation           | Name           | Rows  | Bytes | Cost (%CPU)| Time     |              
---------------------------------------------------------------------------------------              
-|   0 | SELECT STATEMENT    |                |     7 |  1974 |     8  (25)| 00:00:01 |              
-|   1 |  SORT ORDER BY      |                |     7 |  1974 |     8  (25)| 00:00:01 |              
-|*  2 |   HASH JOIN         |                |     7 |  1974 |     7  (15)| 00:00:01 |              
-|*  3 |    TABLE ACCESS FULL| JPATUNE_MOVIE  |     7 |   980 |     3   (0)| 00:00:01 |              
-|   4 |    TABLE ACCESS FULL| JPATUNE_PERSON |    10 |  1420 |     3   (0)| 00:00:01 |              
---------------------------------------------------------------------------------------              
-                                                                                                    
-Predicate Information (identified by operation id):                                                 
----------------------------------------------------                                                 
-                                                                                                    
-   2 - access("M"."DIRECTOR_ID"="P"."ID")                                                           
-   3 - filter("M"."DIRECTOR_ID" IS NOT NULL)                                                        
-                                                                                                    
-Note                                                                                                
------                                                                                               
-   - dynamic sampling used for this statement (level=2)                                             
-
- 21 rows selected]]></programlisting>                        
+Plan hash value: 857441453
+ 
+----------------------------------------------------------------------------------------------------
+| Id  | Operation                 | Name           | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT          |                |   774K|   477M|       | 25766   (1)| 00:05:10 |
+|*  1 |  COUNT STOPKEY            |                |       |       |       |            |          |
+|   2 |   VIEW                    |                |   774K|   477M|       | 25766   (1)| 00:05:10 |
+|*  3 |    SORT ORDER BY STOPKEY  |                |   774K|    45M|    53M| 25766   (1)| 00:05:10 |
+|*  4 |     HASH JOIN             |                |   774K|    45M|    11M| 14333   (1)| 00:02:52 |
+|*  5 |      HASH JOIN            |                |   271K|  8746K|  5568K|  5115   (1)| 00:01:02 |
+|   6 |       INDEX FAST FULL SCAN| DIRECTOR_PK    |   271K|  2385K|       |   191   (1)| 00:00:03 |
+|   7 |       TABLE ACCESS FULL   | JPATUNE_PERSON |  1637K|    37M|       |  1854   (1)| 00:00:23 |
+|*  8 |      TABLE ACCESS FULL    | JPATUNE_MOVIE  |   774K|    20M|       |  7169   (1)| 00:01:27 |
+----------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter(ROWNUM<=TO_NUMBER(:LIMIT))
+   3 - filter(ROWNUM<=TO_NUMBER(:LIMIT))
+   4 - access("MOVIE0_"."DIRECTOR_ID"="DIRECTOR1_"."PERSON_ID")
+   5 - access("DIRECTOR1_"."PERSON_ID"="PERSON2_"."ID")
+   8 - filter("MOVIE0_"."DIRECTOR_ID" IS NOT NULL)
+]]></programlisting>                        
     </figure>
     <figure>
                 <title>EXPLAIN PLAN Example using Named Plan</title>
 <programlisting language=""><![CDATA[EXPLAIN PLAN 
 SET STATEMENT_ID='myplan01'
 FOR
-select m.title, p.first_name, p.last_name
+select * from
+    ( select
+        movie0_.TITLE as col_0_0_,
+        person2_.FIRST_NAME as col_1_0_,
+        person2_.LAST_NAME as col_2_0_ 
 ...]]></programlisting>                        
 <programlisting language=""><![CDATA[select * from table(DBMS_XPLAN.DISPLAY('PLAN_TABLE','myplan01','typical',null));]]></programlisting>                        
     </figure>
@@ -116,7 +143,7 @@ select m.title, p.first_name, p.last_name
             </itemizedlist>
             <figure>
                 <title>AUTOTRACE Example with Oracle SQL Developer IDE</title>
-                <graphic scale="70" fileref="images/jpa-tuning-autotrace.png"/>
+                <graphic scalefit="1" fileref="images/jpa-tuning-autotrace.png"/>
             </figure>
             <note>
                 <title>AUTO TRACE Requires Special Role and Permission</title>

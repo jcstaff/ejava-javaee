@@ -739,6 +739,16 @@ public class MovieDAOImpl {
 				.setParameter("id", movieId)
 				.getSingleResult().intValue();
 	}
+
+	public List<Object[]> getMovieAndDirector(Integer offset, Integer limit, String orderBy) {
+		return withPaging(createQuery(
+				"select m.title, p.firstName, p.lastName " +
+				"from Movie m " +
+				"join m.director d " +
+				"join d.person p", Object[].class),
+				offset, limit, orderBy)
+				.getResultList();
+	}
 	
 	
 	
