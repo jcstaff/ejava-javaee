@@ -150,32 +150,6 @@ select * from
 <programlisting language=""><![CDATA[grant SELECT_CATALOG_ROLE to (user);
 grant SELECT ANY DICTIONARY to (user);]]></programlisting>                        
             </note>
-            <itemizedlist spacing="compact">
-                <listitem><para>AUTOTRACE Statistics</para>
-                    <itemizedlist spacing="compact">
-                        <listitem><para>recursive calls - calls generated at user and system level</para>
-                            <itemizedlist spacing="compact">
-                                <listitem><para>User SQL calls trigger system SQL calls</para></listitem>
-                            </itemizedlist>
-                        </listitem>
-                        <listitem><para>db block gets - number of times a CURRENT block was requested</para></listitem>
-                        <listitem><para>consistent gets - number of times a consistent read requested for a block</para>
-                            <itemizedlist spacing="compact">
-                                <listitem><para>READ forced to REDO log for consistent data because of dirty data block being written to</para></listitem>
-                            </itemizedlist>
-                        </listitem>
-                        <listitem><para>physical reads - nmumber of data blocks read from disk</para>
-                            <itemizedlist spacing="compact">
-                                <listitem><para>Equals "physical reads direct" plus reads into buffer cache</para></listitem>
-                            </itemizedlist>
-                        </listitem>
-                        <listitem><para>redo size - number of redo bytes generated</para></listitem>
-                        <listitem><para>bytes received via SQL*Net from client - total number of bytes received by Oracle DB</para></listitem>
-                        <listitem><para>bytes sent via SQL*Net to client - total number of bytes received by Oracle DB</para></listitem>
-                    </itemizedlist>
-                </listitem>
-            </itemizedlist>
-            
         </section>    
 
         <section id="jpa-tuning-oracle-vplan">
@@ -235,8 +209,8 @@ FROM v$sql s, table(DBMS_XPLAN.DISPLAY_CURSOR(s.sql_id, s.child_number)) t WHERE
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>SQL implementations can be inefficient for many reasons</para></listitem>
-            <listitem><para>Looking at executions plans can aid discovery of issues and solutions</para></listitem>
             <listitem><para>Administrative and Developer tools available to access execution plans</para></listitem>
+            <listitem><para>Looking at executions plans can aid discovery of issues and solutions</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>
