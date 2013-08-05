@@ -1162,7 +1162,7 @@ create index movierole_movie_actor_cdx on jpatune_movierole(movie_id, actor_id)]
             </itemizedlist>
 
 
-            <figure>    
+            <figure id="jpa-tuning-jpa-queryloops-dao-figure-sql">    
                 <title>Generated SQL</title>
 <programlisting language=""><![CDATA[select
     movierole0_.MOVIE_ID as col_0_0_ 
@@ -1195,7 +1195,7 @@ where
             </itemizedlist>
 
 
-            <figure>
+            <figure id="jpa-tuning-jpa-queryloops-dao-figure-execplan">
                 <title>Explain Plan (Initial Query)</title>
                 <graphic scalefit="1" fileref="images/jpatune-plan-jpa-loop-dao-outer-lazy.png"/>
             </figure>
@@ -1362,58 +1362,219 @@ create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlist
     
                 <figure>    
                     <title>Service Tier Code</title>
-<programlisting language="java"><![CDATA[]]></programlisting>                        
+<programlisting language="java"><![CDATA[dao.oneStepFromPerson(kevinBacon, offset, PAGE_SIZE, "role.actor.person.lastName ASC")]]></programlisting>                        
                 </figure>
+                <para>* Service tier provides not only offset and limit information, but would also benefit from
+                    using a sort. The DAO would have to pull back all rows in order to implement the sort within
+                    the DAO -- while the DB-based solution can leave all data within the database. Sort will only 
+                    be implemented here in the DB-based solution.</para>
         </section>
 
 
-        <section id="jpa-tuning-jpa-paging-eager">
-            <title>XXXXX</title>
-            <para></para>
+        <section id="jpa-tuning-jpa-paging-dao">
+            <title>Paging within DAO</title>
+            <para>Implementing paging within the DAO</para>
 
             <figure>    
                 <title>DAO Code/JPAQL</title>
-<programlisting language="java"><![CDATA[
-]]></programlisting>                        
-
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
+<programlisting language="java"><![CDATA[public Collection<Person> oneStepFromPersonByDAO(Person p, Integer offset, Integer limit, String orderBy) {
+    Collection<Person> result = new HashSet<Person>();
+    //performing core query
+    List<String> movieIds = createQuery(
+            "select role.movie.id from MovieRole role " +
+            "where role.actor.person.id=:personId", String.class)
+            .setParameter("personId", p.getId())
+            .getResultList();
+    
+    //loop through results and issue sub-queries
+    int pos=0;
+    for (String mid: movieIds) {
+        List<Person> people = createQuery(
+                "select role.actor.person from MovieRole role " +
+                "where role.movie.id=:movieId", Person.class)
+                .setParameter("movieId", mid)
+                .getResultList();
+        if (offset==null || (offset!=null && pos+people.size() > offset)) {
+            for(Person pp: people) {
+                if (offset==null || pos>=offset) {
+                    result.add(pp);
+                    if (limit!=null && result.size() >= limit) { break; }
+                }
+                pos+=1; 
+            }
+        } else {
+            pos+=people.size();
+        }
+        if (limit!=null && result.size() >= limit) { break; }
+    }
+    return result;
+}]]></programlisting>                        
             </figure>
             <itemizedlist spacing="compact">
+                <listitem><para>DAO logic gets complicated when self-implementing paging.</para></listitem>
+                <listitem><para>OrderBy is not implemented by this DAO algorithm. All rows in the table would 
+                   be required in order to perform ordering within the DAO.</para></listitem>
                 <listitem><para></para></listitem>
             </itemizedlist>
 
 
             <figure>    
                 <title>Generated SQL</title>
+                <link linkend="jpa-tuning-jpa-queryloops-dao-figure-sql">The generated schema is the same as the looping/subquery example</link>
+            </figure>
+
+
+            <figure>
+                <title>Explain Plan</title>
+                <link linkend="jpa-tuning-jpa-queryloops-dao-figure-execplan">The execution plan is the same as the looping/subquery example</link>
+            </figure>
+
+
+            <figure>    
+                <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Loop Lazy.DAO Page 0:warmups=1, rounds=10, ave=0.39 [+- 0.09]
+Loop Lazy.DAO Page 10:warmups=1, rounds=10, ave=1.01 [+- 0.45]
+Loop Lazy.DAO Page 50:warmups=1, rounds=10, ave=2.80 [+- 0.79]
+
+Loop Eager.DAO Page 0:warmups=1, rounds=10, ave=0.38 [+- 0.10]
+Loop Eager.DAO Page 10:warmups=1, rounds=10, ave=1.10 [+- 0.64]
+Loop Eager.DAO Page 50:warmups=1, rounds=10, ave=2.53 [+- 0.06]
 ]]></programlisting>                        
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
+                <listitem><para>This example performs better or equal to previous loop/subquery example when 
+                    earlier pages are requested -- thus fewer rows returned</para></listitem>
+                <listitem><para>fetch=EAGER/LAZY have no impact on this test since the 
+                    entity queried for has no relationships</para></listitem>
+            </itemizedlist>
+
+            <tip>
+                <title>Performance Degrades in DAO as Row Sizes Increase</title>
+                <para>Paging within the Java code starts off near equivalent to the database
+                    solution for small row sizes but gradually get worse when row sizes 
+                    increase and later pages are requested.</para>
+            </tip>
+        </section>
+
+        <section id="jpa-tuning-jpa-paging-db">
+            <title>Paging within DB</title>
+            <para>Implementing paging within the database</para>
+
+            <figure>    
+                <title>DAO Code/JPAQL</title>
+<programlisting language="java"><![CDATA[public List<Person> oneStepFromPersonByDB(Person p, Integer offset, Integer limit, String orderBy) {
+    return withPaging(createQuery(
+            "select distinct role.actor.person from MovieRole role " +
+            "where role.movie.id in (" +
+                "select m.id from Movie m " +
+                "join m.cast role2 " +
+                "where role2.actor.person.id=:id)", Person.class), offset, limit, orderBy)
+         .setParameter("id", p.getId())
+         .getResultList();
+}]]></programlisting>                        
+<programlisting language=""><![CDATA[
+"select distinct role.actor.person from MovieRole role 
+where role.movie.id in (
+    select m.id from Movie m join m.cast role2 
+    where role2.actor.person.id=:id
+) order by role.actor.person.lastName ASC", 
+params={id=p73897}, offset=500, limit=50
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>JPA calls to TypedQuery.setFirstResult(), setMaxResults(), and adding the 
+                    orderBy to the text of the query are abstracted behind withQuery() and createQuery() 
+                    helper functions within the DAO example class and are not shown here</para></listitem>
+            </itemizedlist>
+
+
+            <figure>    
+                <title>Generated SQL</title>
+<programlisting language=""><![CDATA[select
+    * 
+from
+    ( select
+        row_.*,
+        rownum rownum_ 
+    from
+        ( select
+            distinct person2_.ID as ID1_5_,
+            person2_.BIRTH_DATE as BIRTH2_5_,
+            person2_.FIRST_NAME as FIRST3_5_,
+            person2_.LAST_NAME as LAST4_5_,
+            person2_.MOD_NAME as MOD5_5_ 
+        from
+            JPATUNE_MOVIEROLE movierole0_,
+            JPATUNE_ACTOR actor1_ 
+        inner join
+            JPATUNE_PERSON person2_ 
+                on actor1_.PERSON_ID=person2_.ID,
+            JPATUNE_PERSON person7_ 
+        where
+            movierole0_.ACTOR_ID=actor1_.PERSON_ID 
+            and actor1_.PERSON_ID=person7_.ID 
+            and (
+                movierole0_.MOVIE_ID in (
+                    select
+                        movie3_.ID 
+                    from
+                        JPATUNE_MOVIE movie3_ 
+                    inner join
+                        JPATUNE_MOVIEROLE cast4_ 
+                            on movie3_.ID=cast4_.MOVIE_ID,
+                        JPATUNE_ACTOR actor5_ 
+                    where
+                        cast4_.ACTOR_ID=actor5_.PERSON_ID 
+                        and actor5_.PERSON_ID=?
+                )
+            ) 
+        order by
+            person7_.LAST_NAME ASC ) row_ 
+        where
+            rownum <= ?) 
+    where
+        rownum_ > ?]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Generated SQL is essentially the same as the looping/subquery example except with the 
+                    addition of "order by" and paging constructs.</para></listitem>
             </itemizedlist>
 
 
             <figure>
                 <title>Explain Plan</title>
-                <graphic scalefit="1" fileref="images/jpatune-plan"/>
+                <graphic scalefit="1" fileref="images/jpatune-plan-jpa-paging-db-lazy.png"/>
             </figure>
             <itemizedlist spacing="compact">
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
+                <listitem><para>Execution plan is similar as described in the looping/subquery example</para></listitem>
+                <listitem><para>Extra cost to sort rows prior to paging operation added</para></listitem>
             </itemizedlist>
 
 
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
+Loop Lazy.DB Page 0:warmups=1, rounds=10, ave=0.32 [+- 0.02]
+Loop Lazy.DB Page 10:warmups=1, rounds=10, ave=0.31 [+- 0.01]
+Loop Lazy.DB Page 50:warmups=1, rounds=10, ave=0.32 [+- 0.01]
+
+Loop Eager.DB Page 0:warmups=1, rounds=10, ave=0.32 [+- 0.01]
+Loop Eager.DB Page 10:warmups=1, rounds=10, ave=0.32 [+- 0.01]
+Loop Eager.DB Page 50:warmups=1, rounds=10, ave=0.32 [+- 0.00]
 ]]></programlisting>                        
             </figure>
 
             <tip>
-                <title></title>
-                <para></para>
+                <title>DB-based Paging Scales</title>
+                <para>Since only the requested page of rows is returned, delegating paging to the 
+                    database provides consistent performance for varying row quantities.</para>
+            </tip>
+            <tip>
+                <title>Doing Paging within DB enables Sorting</title>
+                <para>Implementing paging across multiple subquery calls to the database can get 
+                    ugly and error-prone. Implementing paging for a single query issued to the 
+                    database is quite trivial.</para>
             </tip>
         </section>
 
@@ -1422,9 +1583,10 @@ create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlist
     <section id="jpa-tuning-jpa-summary">
        <title>Summary</title>
         <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Hidden performance costs for fetch and resolving with JOIN FETCH and value queries</para></listitem>
+            <listitem><para>Hidden performance costs for row counts and resolving with a query function</para></listitem>
+            <listitem><para>Performance costs when issuing repeated queries of an initial query from DAO and resolving using subqueries in database</para></listitem>
+            <listitem><para>Performance and functional costs when implementing paging in DAO and resolving by delegating paging to database</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>

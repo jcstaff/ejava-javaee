@@ -14,7 +14,7 @@ import ejava.jpa.examples.tuning.env.LoopLazy;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	LoopLazy.class,
-	//LoopEager.class
+	LoopEager.class
 })
 public class LoopTest extends SuiteBase {
 }

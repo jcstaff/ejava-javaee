@@ -29,6 +29,7 @@ public class LoopQuery extends TestBase {
 		dao=getDAO();
 	}
 	
+	/*
 	@TestLabel(label="DAO Loop")
 	@Test
 	public void daoLoop() {
@@ -40,48 +41,46 @@ public class LoopQuery extends TestBase {
 	public void dbLoopDistinct() {
 		log.info("" + dao.oneStepFromPersonByDB(kevinBacon).size() + " people found");
 	}
-
-	/*
+*/
 	private static int PAGE_SIZE=50;
 	
-	@TestLabel(label="DAO Page 1")
+	@TestLabel(label="DAO Page 0")
 	@Test
-	public void daoPage1() {
+	public void daoPage0() {
 		final int offset=0*PAGE_SIZE;
 		assertEquals(PAGE_SIZE,dao.oneStepFromPersonByDAO(kevinBacon, offset, PAGE_SIZE, "role.actor.person.lastName ASC").size());
 	}
-	@TestLabel(label="DB Page 1")
+	@TestLabel(label="DB Page 0")
 	@Test
-	public void dbPage1() {
+	public void dbPage0() {
 		final int offset=0*PAGE_SIZE;
 		assertEquals(PAGE_SIZE,dao.oneStepFromPersonByDB(kevinBacon, offset, PAGE_SIZE, "role.actor.person.lastName ASC").size());
 	}
 	
-	@TestLabel(label="DAO Page 3")
+	@TestLabel(label="DAO Page 10")
 	@Test
-	public void daoPage3() {
-		final int offset=3*PAGE_SIZE;
+	public void daoPage10() {
+		final int offset=10*PAGE_SIZE;
 		assertEquals(PAGE_SIZE,dao.oneStepFromPersonByDAO(kevinBacon, offset, PAGE_SIZE, "role.actor.person.lastName ASC").size());
 	}
-	@TestLabel(label="DB Page 3")
+	@TestLabel(label="DB Page 10")
 	@Test
-	public void dbPage3() {
-		final int offset=3*PAGE_SIZE;
+	public void dbPage10() {
+		final int offset=10*PAGE_SIZE;
 		assertEquals(PAGE_SIZE,dao.oneStepFromPersonByDB(kevinBacon, offset, PAGE_SIZE, "role.actor.person.lastName ASC").size());
 	}
 	
-	@TestLabel(label="DAO Page 5")
+	@TestLabel(label="DAO Page 50")
 	@Test
-	public void daoPage5() {
-		final int offset=5*PAGE_SIZE;
+	public void daoPage50() {
+		final int offset=50*PAGE_SIZE;
 		assertEquals(PAGE_SIZE,dao.oneStepFromPersonByDAO(kevinBacon, offset, PAGE_SIZE, "role.actor.person.lastName ASC").size());
 	}
-	@TestLabel(label="DB Page 5")
+	@TestLabel(label="DB Page 50")
 	@Test
-	public void dbPage5() {
-		final int offset=5*PAGE_SIZE;
+	public void dbPage50() {
+		final int offset=50*PAGE_SIZE;
 		assertEquals(PAGE_SIZE,dao.oneStepFromPersonByDB(kevinBacon, offset, PAGE_SIZE, "role.actor.person.lastName ASC").size());
 	}
-	*/
 	
 }
