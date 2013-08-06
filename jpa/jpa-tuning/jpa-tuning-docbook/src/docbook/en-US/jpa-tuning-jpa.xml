@@ -15,7 +15,7 @@
             <para>Get just the root parent of an object graph</para>
 
             <section id="jpa-tuning-jpa-fetch-parent-query">
-                <title>Query Basics</title>
+                <title>Query Parts</title>
     
                 <figure>    
                     <title>DB Index(es)</title>
@@ -286,13 +286,6 @@ Fetch Eager Thick Parent.Get Parent:warmups=2, rounds=10, ave=2.59 [+- 0.06]
                <para>Get just the root parent and *ONLY* the parent of an object graph with fetch=EAGER 
                    relationships by using a NativeQuery and Result Class</para>
                    
-                <note>
-                    <title>Result Classes are Unmanaged</title>
-                    <para>Result Classes for value queries provide convenient type-safe
-                        access to results. However, they are unmanaged and cannot be 
-                        used for follow-on entity operations.</para>
-                </note>
-
                 <figure>    
                     <title>Relationships</title>
                     <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-rels">Same as fetch=EAGER example above</link>
@@ -376,9 +369,11 @@ Fetch Lazy Thick Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
                     </para>
                 </tip>
                 <note>
-                    <title>Custom Result Instances are not Managed</title>
+                    <title>Result Class Instances are not Managed</title>
                     <para>Even though we used an entity class in this example, it is being used as 
-                        a simple POJO and the returned instance is not managed.</para>
+                        a simple POJO and the returned instance is not managed. Result Classes for 
+                        value queries provide convenient type-safe access to results. However, 
+                        they are unmanaged and cannot be used for follow-on entity operations.</para>
                 </note>
                 
             </section>            
@@ -399,7 +394,7 @@ Fetch Lazy Thick Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
             
 
             <section id="jpa-tuning-jpa-fetch-children-query">
-                <title>Query Basics</title>
+                <title>Query Parts</title>
     
                 <figure>    
                     <title>DB Index(es)</title>
@@ -761,7 +756,7 @@ Fetch Eager Thick Parent.Get Parent with Fetched Children:warmups=2, rounds=10, 
         <para>Pulling back entire rows from table rather than just the count</para>
 
         <section id="jpa-tuning-jpa-count-query">
-            <title>Query Basics</title>
+            <title>Query Parts</title>
 
             <figure>    
                 <title>DB Index(es)</title>
@@ -1108,7 +1103,7 @@ Size Eager.DB Count no Join:warmups=2, rounds=10, ave=0.44 [+- 0.02]
         <para>Performing separate subqueries off initial query</para>
 
         <section id="jpa-tuning-jpa-queryloops-query">
-            <title>Query Basics</title>
+            <title>Query Parts</title>
             <para>Get people who have acted in same movie as a specific actor</para>
             
                 <figure>    
@@ -1351,8 +1346,7 @@ Loop Lazy.DB Loop Distinct:warmups=2, rounds=10, ave=2.52 [+- 0.09]
         <para>Placing reasonable limits on amount of data returned</para>
 
         <section id="jpa-tuning-jpa-paging-query">
-            <title>Query Basics</title>
-            <para></para>
+            <title>Query Parts</title>
             
                 <figure>    
                     <title>DB Index(es)</title>
@@ -1414,7 +1408,6 @@ create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlist
                 <listitem><para>DAO logic gets complicated when self-implementing paging.</para></listitem>
                 <listitem><para>OrderBy is not implemented by this DAO algorithm. All rows in the table would 
                    be required in order to perform ordering within the DAO.</para></listitem>
-                <listitem><para></para></listitem>
             </itemizedlist>
 
 
