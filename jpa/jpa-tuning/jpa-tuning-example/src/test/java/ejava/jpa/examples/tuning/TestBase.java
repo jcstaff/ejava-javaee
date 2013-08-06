@@ -29,7 +29,7 @@ import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 import ejava.jpa.examples.tuning.dao.MovieDAOImpl;
 
-@BenchmarkOptions(warmupRounds=0, benchmarkRounds=1)
+@BenchmarkOptions(warmupRounds=2, benchmarkRounds=10)
 @BenchmarkHistoryChart
 public class TestBase {
     protected static Log log = LogFactory.getLog(TestBase.class);

@@ -36,7 +36,9 @@
 
         <figure>    
             <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
+<programlisting language=""><![CDATA[alter table jpatune_movie add utitle varchar2(256)
+update jpatune_movie set utitle=concat(concat(concat(title,'('),id),')')
+create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
         </figure>
         
         <para>* "utitle" was added as the concatenation of title(id) to create a unique column.</para>
@@ -77,9 +79,6 @@ where
         <figure>    
             <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Non-Unique Index.Values By Index:warmups=2, rounds=10, ave=0.23 [+- 0.01]
-Non-Unique Index.Values By Index:warmups=2, rounds=10, ave=0.24 [+- 0.02]
-
 Non-Unique Index.Values By Index:warmups=2, rounds=11, ave=0.17 [+- 0.01]
 ]]></programlisting>                        
         </figure>
@@ -139,9 +138,6 @@ where
         <figure>    
             <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.24 [+- 0.01]
-Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=10, ave=0.24 [+- 0.02]
-
 Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=11, ave=0.18 [+- 0.02]
 ]]></programlisting>                        
         </figure>
@@ -164,7 +160,7 @@ Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=11, ave=0.18 [+- 0.
 
         <figure>    
             <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
+<programlisting language=""><![CDATA[create unique index movie_utitle_udx on jpatune_movie(utitle)]]></programlisting>                        
         </figure>
         <para>* we are now taking advantage of the unique column values.</para>
 
@@ -203,15 +199,14 @@ where
         <figure>    
             <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.25 [+- 0.04]
-Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.25 [+- 0.03]
-
-Nullable Unique Index.Values By Index:warmups=2, rounds=11, ave=0.18 [+- 0.01]
+Nullable Unique Index.Values By Index:warmups=2, rounds=10, ave=0.18 [+- 0.01]
 ]]></programlisting>                        
         </figure>
+        <para>* the measurements in this test do not prove the following assertion
+            which was based on the execution plan.</para>
 
         <tip>
-            <title>Unique Indexes can be more Efficient than Non-Unique Indexes</title>
+            <title>Unique Indexes *can* be more Efficient than Non-Unique Indexes</title>
             <para>DB knows there can be only a single match and stops index scan after first match found</para>
         </tip>
     </section>
@@ -270,9 +265,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.42 [+- 0.04]
-Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.29 [+- 0.04]
-
 Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=11, ave=0.21 [+- 0.01]
 ]]></programlisting>                        
             </figure>
@@ -304,9 +296,6 @@ Dual Indexes.Get By Term1 and Term2:warmups=2, rounds=11, ave=0.21 [+- 0.01]
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.40 [+- 0.02]
-Compound Index.Get By Term1 and Term2:warmups=2, rounds=10, ave=0.38 [+- 0.01]
-
 Compound Index.Get By Term1 and Term2:warmups=2, rounds=11, ave=0.25 [+- 0.02]
 ]]></programlisting>                        
             </figure>
@@ -372,9 +361,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.12 [+- 0.04]
-Where Column Index.Query for Values:warmups=2, rounds=10, ave=1.31 [+- 0.05]
-
 Where Column Index.Query for Values:warmups=2, rounds=11, ave=1.25 [+- 0.06]
 ]]></programlisting>                        
             </figure>
@@ -403,9 +389,6 @@ Where Column Index.Query for Values:warmups=2, rounds=11, ave=1.25 [+- 0.06]
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.85 [+- 0.89]
-Where, Select Index.Query for Values:warmups=2, rounds=10, ave=1.43 [+- 0.35]
-
 Where, Select Index.Query for Values:warmups=2, rounds=11, ave=1.26 [+- 0.06]
 ]]></programlisting>                        
             </figure>
@@ -441,9 +424,6 @@ Where, Select Index.Query for Values:warmups=2, rounds=11, ave=1.26 [+- 0.06]
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.55 [+- 0.35]
-Select, Where Index.Query for Values:warmups=2, rounds=10, ave=1.37 [+- 0.23]
-
 Select, Where Index.Query for Values:warmups=2, rounds=11, ave=1.35 [+- 0.04]
 ]]></programlisting>                        
             </figure>
