@@ -4,11 +4,33 @@
 <chapter id="jpa-tuning-domain">
     <title>Example Domain Model: Movies</title>
         
-    <section id="jpa-tuning-domain-section1">
-        <title></title>
-        <para></para>
-  
+    <section id="jpa-tuning-domain-classmodel">
+        <title>Class Model</title>
+        <figure>
+            <title>Class Model</title>
+            <graphic scalefit="1" fileref="images/jpa-queryex-classmodel.png"/>
+        </figure>
     </section>
+
+    <section id="jpa-tuning-domain-database-schema">
+        <title>Database Schema</title>
+        <figure>
+            <title>Database Schema</title>
+            <graphic scalefit="1" fileref="images/jpa-queryex-database.png"/>
+        </figure>
+    </section>
+    
+    <section id="jpa-tuning-domain-database-size">
+        <title>Database Size</title>
+        <figure>
+            <title>Row Counts</title>
+<programlisting language=""><![CDATA[    MOVIES  DIRECTORS     GENRES MOVIEROLES     ACTORS    PERSONS
+---------- ---------- ---------- ---------- ---------- ----------
+    911972     271409    1435326    5115827    1445027    1637666]]></programlisting>                        
+        </figure>
+    </section>
+
+    
     
     <section id="jpa-tuning-domain-prep">
         <title>Prepare DB Between Tests</title>
@@ -18,6 +40,10 @@
 <programlisting language=""><![CDATA[alter system flush shared_pool
 alter system flush buffer_cache]]></programlisting>                        
         </figure>
+        
+        <note>
+            <para>Requires "ALTER SYSTEM" role granted</para>
+        </note>
   
     </section>
 </chapter>

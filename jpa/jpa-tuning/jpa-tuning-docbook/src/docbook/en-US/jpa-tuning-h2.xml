@@ -8,8 +8,48 @@
     <section id="jpa-tuning-h2-section1">
         <title></title>
         <para></para>
-  
+      <figure>
+        <title></title>
+<programlisting language=""><![CDATA[EXPLAIN
+select m.title, role.movie_role from queryex_movie m
+join queryex_movierole role on role.movie_id = m.id]]></programlisting>                        
+        </figure>
+    
+        <figure>
+            <title></title>
+<programlisting language=""><![CDATA[PLAN  
+SELECT
+    M.TITLE,
+    ROLE.MOVIE_ROLE
+FROM PUBLIC.QUERYEX_MOVIEROLE ROLE
+    /* PUBLIC.QUERYEX_MOVIEROLE.tableScan */
+INNER JOIN PUBLIC.QUERYEX_MOVIE M
+    /* PUBLIC.PRIMARY_KEY_C7B: ID = ROLE.MOVIE_ID */
+    ON 1=1
+WHERE ROLE.MOVIE_ID = M.ID]]></programlisting>                        
+        </figure>
+
+    <figure>
+        <title></title>
+<programlisting language=""><![CDATA[create index movierole_movie_fkx on QUERYEX_MOVIEROLE(movie_id);]]></programlisting>                        
+    </figure>
+
     </section>
+
+    <figure>
+        <title></title>
+<programlisting language=""><![CDATA[PLAN  
+SELECT
+    M.TITLE,
+    ROLE.MOVIE_ROLE
+FROM PUBLIC.QUERYEX_MOVIEROLE ROLE
+    /* PUBLIC.QUERYEX_MOVIEROLE.tableScan */
+INNER JOIN PUBLIC.QUERYEX_MOVIE M
+    /* PUBLIC.PRIMARY_KEY_C7B: ID = ROLE.MOVIE_ID */
+    ON 1=1
+WHERE ROLE.MOVIE_ID = M.ID]]></programlisting>                        
+    </figure>
+
 
     <section id="jpa-tuning-h2-summary">
        <title>Summary</title>
