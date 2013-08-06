@@ -13,7 +13,8 @@
         
     <section id="jpa-tuning-table-fullscan">
         <title>Full Table Scan</title>
-        <para></para>
+        <para>Database engine derives all information from the table directly from the physical 
+            storage location for the table. Table storage is not arranged in any guaranteed order.</para>
   
         <section id="jpa-tuning-table-fullscan-unconstrained">
             <title>Full Table Scan: Unconstrained Access</title>
@@ -74,9 +75,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access without Index.Unrestricted Scan:warmups=2, rounds=10, ave=0.83 [+- 0.04]
-Table Access without Index.Unrestricted Scan:warmups=2, rounds=10, ave=0.79 [+- 0.05]
-
 Table Access without Index.Unrestricted Scan:warmups=2, rounds=11, ave=0.73 [+- 0.03]
 ]]></programlisting>                        
             </figure>
@@ -131,9 +129,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access without Index.Value Access:warmups=2, rounds=10, ave=1.22 [+- 0.03]
-Table Access without Index.Value Access:warmups=2, rounds=10, ave=1.42 [+- 0.83]
-
 Table Access without Index.Value Access:warmups=2, rounds=11, ave=0.80 [+- 0.04]
 ]]></programlisting>                        
             </figure>
@@ -199,9 +194,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.Value Access:warmups=2, rounds=10, ave=1.63 [+- 0.86]
-Table Access with Single Indexes.Value Access:warmups=2, rounds=10, ave=1.22 [+- 0.13]
-
 Table Access with Single Indexes.Value Access:warmups=2, rounds=11, ave=0.75 [+- 0.03]
 ]]></programlisting>                        
             </figure>
@@ -261,9 +253,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=10, ave=2.08 [+- 0.03]
-Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=10, ave=2.02 [+- 0.04]
-
 Table Access with Single Indexes.Unindexed Function Access:warmups=2, rounds=11, ave=0.79 [+- 0.04]
 ]]></programlisting>                        
             </figure>
@@ -330,9 +319,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=10, ave=1.35 [+- 0.10]
-Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=10, ave=1.39 [+- 0.45]
-
 Table Access with Single Indexes.Indexed Function Access:warmups=2, rounds=11, ave=0.76 [+- 0.04]
 ]]></programlisting>                        
             </figure>
@@ -395,17 +381,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=10, ave=0.21 [+- 0.01]
-Table Access with Single Indexes.Exact Equals:warmups=2, rounds=10, ave=0.22 [+- 0.03]
-Table Access with Single Indexes.Exact Like:warmups=2, rounds=10, ave=0.21 [+- 0.01]
-Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=10, ave=0.72 [+- 0.15]
----
-Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=10, ave=0.38 [+- 0.11]
-Table Access with Single Indexes.Exact Like:warmups=2, rounds=10, ave=0.41 [+- 0.21]
-Table Access with Single Indexes.Exact Equals:warmups=2, rounds=10, ave=0.33 [+- 0.07]
-Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=10, ave=1.34 [+- 0.30]
-
----
 Table Access with Single Indexes.Ending Wildcard:warmups=2, rounds=11, ave=0.22 [+- 0.04]
 Table Access with Single Indexes.Exact Equals:warmups=2, rounds=11, ave=0.20 [+- 0.02]
 Table Access with Single Indexes.Exact Like:warmups=2, rounds=11, ave=0.22 [+- 0.05]
@@ -434,7 +409,7 @@ Table Access with Single Indexes.Leading Wildcard:warmups=2, rounds=11, ave=0.66
     
     <section id="jpa-tuning-table-orderby">
         <title>Order By</title>
-        <para></para>
+        <para>Order returned results by one or more columns</para>
 
         <section id="jpa-tuning-table-fullscan-orderby">
             <title>Order By using Sort</title>
@@ -483,9 +458,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=10, ave=3.15 [+- 0.11]
-Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=10, ave=4.03 [+- 0.90]
-
 Table Access with Single Indexes.OrderBy Non-Null Column:warmups=2, rounds=11, ave=0.76 [+- 0.03]
 ]]></programlisting>                        
             </figure>
@@ -549,9 +521,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=10, ave=3.14 [+- 0.30]
-Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=10, ave=3.57 [+- 0.73]
-
 Table Access with Single Indexes.OrderBy Non-null Where Column ASC:warmups=2, rounds=11, ave=0.69 [+- 0.02]
 ]]></programlisting>                        
             </figure>
@@ -614,9 +583,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.39 [+- 0.03]
-Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.57 [+- 0.10]
-
 Table Access with Single Indexes.OrderBy Non-null Where Column DESC:warmups=2, rounds=11, ave=0.72 [+- 0.04]
 ]]></programlisting>                        
             </figure>
@@ -678,9 +644,6 @@ where
             <figure>    
                 <title>Benchmark</title>
 <programlisting language=""><![CDATA[
-Table Access with Single Indexes DESC.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=2.72 [+- 0.17]
-Table Access with Single Indexes DESC.OrderBy Non-null Where Column DESC:warmups=2, rounds=10, ave=3.38 [+- 0.69]
-
 Table Access with Single Indexes DESC.OrderBy Non-null Where Column DESC:warmups=2, rounds=11, ave=0.99 [+- 0.03]
 ]]></programlisting>                        
             </figure>

@@ -7,7 +7,6 @@ import org.junit.Test;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import ejava.jpa.examples.tuning.TestBase;
 import ejava.jpa.examples.tuning.TestLabel;
-import ejava.jpa.examples.tuning.bo.MovieRating;
 import ejava.jpa.examples.tuning.dao.MovieDAOImpl;
 
 /**

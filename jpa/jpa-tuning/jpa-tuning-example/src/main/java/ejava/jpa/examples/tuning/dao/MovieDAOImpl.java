@@ -1,24 +1,16 @@
 package ejava.jpa.examples.tuning.dao;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 
 import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
-import javax.persistence.Parameter;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.AbstractQuery;
@@ -38,7 +30,6 @@ import ejava.jpa.examples.tuning.bo.Movie;
 import ejava.jpa.examples.tuning.bo.MovieRating;
 import ejava.jpa.examples.tuning.bo.MovieRole;
 import ejava.jpa.examples.tuning.bo.Person;
-import ejava.jpa.examples.tuning.dao.MovieDAOImpl.Pair;
 
 public class MovieDAOImpl {
 	private static final Log log = LogFactory.getLog(MovieDAOImpl.class);
