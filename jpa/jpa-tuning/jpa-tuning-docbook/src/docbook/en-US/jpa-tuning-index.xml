@@ -30,7 +30,7 @@
     </itemizedlist>
         
     <section id="jpa-tuning-index-rangescan">
-        <title>Index Range Scan (Unlimited)</title>
+        <title>Index Range Scan</title>
         <para></para>
         <para>Request N rows matching a specific criteria using a non-unique index</para>
 
@@ -89,66 +89,6 @@ Non-Unique Index.Values By Index:warmups=2, rounds=11, ave=0.17 [+- 0.01]
         </tip>
     </section>
 
-
-    <section id="jpa-tuning-index-rangescan-limit">
-        <title>Index Range Scan (limit=1)</title>
-        <para></para>
-        <para>Request 1st row matching a specific criteria using a non-unique index</para>
-
-        <figure>    
-            <title>DB Index(es)</title>
-<programlisting language=""><![CDATA[create index movie_utitle_idx on jpatune_movie(utitle)]]></programlisting>                        
-        </figure>
-
-        <figure>
-            <title>JPA Query</title>
-<programlisting language=""><![CDATA["select m from Movie m 
-where m.title = :title", 
-params={title=Tremors(m836199)}, limit=1]]></programlisting>                        
-        </figure>
-        
-        <figure>    
-            <title>Generated SQL</title>
-<programlisting language=""><![CDATA[select * from
-    ( select
-        movie0_.ID as ID1_2_,
-        movie0_.DIRECTOR_ID as DIRECTOR7_2_,
-        movie0_.MINUTES as MINUTES2_2_,
-        movie0_.PLOT as PLOT3_2_,
-        movie0_.RATING as RATING4_2_,
-        movie0_.RELEASE_DATE as RELEASE5_2_,
-        movie0_.utitle as utitle6_2_ 
-    from
-        JPATUNE_MOVIE movie0_ 
-    where
-        movie0_.utitle=? ) 
-where
-    rownum <= ?]]></programlisting>                        
-        </figure>
-
-        <figure>
-            <title>Explain Plan</title>
-            <graphic scalefit="1" fileref="images/jpatune-plan-index-rangescan-limit.png"/>
-        </figure>
-        <itemizedlist spacing="compact">
-            <listitem><para>Cost analysis cannot factor in limit as parameter</para></listitem>
-            <listitem><para>Row limits appear to be applied after index range scan completes</para></listitem>
-        </itemizedlist>
-
-        <figure>    
-            <title>Benchmark</title>
-<programlisting language=""><![CDATA[
-Non-Unique Index.Values By Index (limit=1):warmups=2, rounds=11, ave=0.18 [+- 0.02]
-]]></programlisting>                        
-        </figure>
-
-        <tip>
-            <title>Explain Plans provide Execution Plans without knowing Parameter Values</title>
-            <para>The Explain plan -- based on theoretical parameter values -- may result in 
-                an execution plan that is significantly different than what occurs at runtime.
-                The AUTOTRACE capability can mitigate this, but requires additional permissions.</para>
-        </tip>
-    </section>
 
 
 
