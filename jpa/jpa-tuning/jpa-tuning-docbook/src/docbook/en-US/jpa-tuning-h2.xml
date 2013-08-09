@@ -5,59 +5,68 @@
     <title>H2 Execution Plans</title>
     <para></para>
         
-    <section id="jpa-tuning-h2-section1">
-        <title></title>
-        <para></para>
+    <section id="jpa-tuning-h2-columnindex">
+        <title>Column Index</title>
       <figure>
-        <title></title>
-<programlisting language=""><![CDATA[EXPLAIN
-select m.title, role.movie_role from queryex_movie m
-join queryex_movierole role on role.movie_id = m.id]]></programlisting>                        
+        <title>Explain Plan: Where Column Not Indexed</title>
+<programlisting language=""><![CDATA[
+EXPLAIN 
+select m.title, role.movie_role 
+from queryex_movie m 
+join queryex_movierole role on role.movie_id = m.id 
+where m.rating='R' and role.movie_role='Chip Diller';
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+PLAN  
+SELECT
+    M.TITLE,
+    ROLE.MOVIE_ROLE
+FROM PUBLIC.QUERYEX_MOVIEROLE ROLE
+    /* PUBLIC.QUERYEX_MOVIEROLE.tableScan */
+    /* WHERE ROLE.MOVIE_ROLE = 'Chip Diller'
+    */
+INNER JOIN PUBLIC.QUERYEX_MOVIE M
+    /* PUBLIC.PRIMARY_KEY_C7B: ID = ROLE.MOVIE_ID */
+    ON 1=1
+WHERE (ROLE.MOVIE_ID = M.ID)
+    AND ((M.RATING = 'R')
+    AND (ROLE.MOVIE_ROLE = 'Chip Diller'))
+]]></programlisting>                        
         </figure>
     
         <figure>
-            <title></title>
-<programlisting language=""><![CDATA[PLAN  
-SELECT
-    M.TITLE,
-    ROLE.MOVIE_ROLE
-FROM PUBLIC.QUERYEX_MOVIEROLE ROLE
-    /* PUBLIC.QUERYEX_MOVIEROLE.tableScan */
-INNER JOIN PUBLIC.QUERYEX_MOVIE M
-    /* PUBLIC.PRIMARY_KEY_C7B: ID = ROLE.MOVIE_ID */
-    ON 1=1
-WHERE ROLE.MOVIE_ID = M.ID]]></programlisting>                        
+            <title>Index Where Column</title>
+<programlisting language=""><![CDATA[create index movierole_role_movie_idx on queryex_movierole(movie_role)]]></programlisting>                        
         </figure>
-
-    <figure>
-        <title></title>
-<programlisting language=""><![CDATA[create index movierole_movie_fkx on QUERYEX_MOVIEROLE(movie_id);]]></programlisting>                        
-    </figure>
-
-    </section>
-
-    <figure>
-        <title></title>
+    
+        </section>
+    
+        <figure>
+            <title>Explain Plan: Where Column Indexed</title>
 <programlisting language=""><![CDATA[PLAN  
 SELECT
     M.TITLE,
     ROLE.MOVIE_ROLE
 FROM PUBLIC.QUERYEX_MOVIEROLE ROLE
-    /* PUBLIC.QUERYEX_MOVIEROLE.tableScan */
+    /* PUBLIC.MOVIEROLE_ROLE_MOVIE_IDX: MOVIE_ROLE = 'Chip Diller' */
+    /* WHERE ROLE.MOVIE_ROLE = 'Chip Diller'
+    */
 INNER JOIN PUBLIC.QUERYEX_MOVIE M
     /* PUBLIC.PRIMARY_KEY_C7B: ID = ROLE.MOVIE_ID */
     ON 1=1
-WHERE ROLE.MOVIE_ID = M.ID]]></programlisting>                        
-    </figure>
-
-
-    <section id="jpa-tuning-h2-summary">
-       <title>Summary</title>
-        <itemizedlist>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
-    </section>    
+WHERE (ROLE.MOVIE_ID = M.ID)
+    AND ((M.RATING = 'R')
+    AND (ROLE.MOVIE_ROLE = 'Chip Diller'))
+]]></programlisting>                        
+        </figure>
+    
+    
+        <section id="jpa-tuning-h2-summary">
+           <title>Summary</title>
+            <itemizedlist>
+                <listitem><para>Execution plans differ across databases</para></listitem>
+                <listitem><para>Some key concepts apply (e.g., Column Indexes, FK indexes)</para></listitem>
+            </itemizedlist>
+        </section>    
 </chapter>
   

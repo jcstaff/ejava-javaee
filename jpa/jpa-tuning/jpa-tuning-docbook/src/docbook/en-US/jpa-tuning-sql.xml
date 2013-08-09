@@ -203,7 +203,7 @@
             <listitem><para>May provide faster access to data</para></listitem>
             <listitem><para>Incur storage and (update) processing costs</para></listitem>
             <listitem><para>Can be unique or non-unique</para></listitem>
-            <listitem><para>Can be simple or composite (Oracle maximum is 32)</para></listitem>
+            <listitem><para>Can be simple or composite</para></listitem>
             <listitem><para>Can be normal (ascending), reverse key (descending), or function-based</para></listitem>
         </itemizedlist>
         <note>
@@ -254,7 +254,7 @@
                 <listitem><para>Can replace table access if all columns in query also within index</para></listitem>
             </itemizedlist>
             <note>
-                <para>OracleDB permits the entire table to be defined as a B*-tree index. Using this feature
+                <para>Entire table could be defined as a B*-tree index. Using this feature
                     for some tables can provide efficient access to data while saving overhead of duplicating 
                     columns within a separate index.
                 </para>

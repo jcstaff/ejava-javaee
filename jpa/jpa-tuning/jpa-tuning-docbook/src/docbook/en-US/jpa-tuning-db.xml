@@ -1,10 +1,10 @@
 <!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-tuning-oracle">
-    <title>Oracle SQL Tuning</title>
+<chapter id="jpa-tuning-db">
+    <title>SQL Tuning</title>
         
-    <section id="jpa-tuning-oracle-reasonsbad">
+    <section id="jpa-tuning-db-reasonsbad">
         <title>Reasons for Inefficient SQL Performance</title>
         <itemizedlist spacing="compact">
             <listitem><para>Poorly constructed data model</para></listitem>
@@ -30,7 +30,7 @@
         </itemizedlist>
     </section>
     
-    <section id="jpa-tuning-oracle-execplan">
+    <section id="jpa-tuning-db-execplan">
        <title>Execution Plan</title>
         <itemizedlist spacing="compact">
             <listitem><para>Output of the optimizer</para></listitem>
@@ -51,10 +51,10 @@
     </section>    
     
 
-    <section id="jpa-tuning-oracle-tools">
+    <section id="jpa-tuning-db-tools">
        <title>Diagnostic Tools</title>
 
-        <section id="jpa-tuning-oracle-tools-clientbenchmark">
+        <section id="jpa-tuning-db-tools-clientbenchmark">
             <title>Client/DAO Benchmark</title>
     <figure>
         <title>JUnit Benchmark</title>
@@ -64,7 +64,7 @@
         
         </section>
 
-        <section id="jpa-tuning-oracle-tools-explainplan">
+        <section id="jpa-tuning-db-tools-explainplan">
            <title>EXPLAIN PLAN</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Helps you determine which execution plan selected by optimizer</para></listitem>
@@ -72,7 +72,7 @@
                 <listitem><para>Plan is theoretical</para></listitem>
             </itemizedlist>
             <figure>
-                <title>EXPLAIN PLAN Example with Oracle SQL Developer</title>
+                <title>EXPLAIN PLAN Example with GUI</title>
                 <graphic scalefit="1" fileref="images/jpa-tuning-explain-plan.png"/>
             </figure>
             <figure>
@@ -135,14 +135,14 @@ select * from
 <programlisting language=""><![CDATA[select * from table(DBMS_XPLAN.DISPLAY('PLAN_TABLE','myplan01','typical',null));]]></programlisting>                        
     </figure>
         </section>    
-        <section id="jpa-tuning-oracle-tools-autotrace">
+        <section id="jpa-tuning-db-tools-autotrace">
            <title>AUTOTRACE</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Produces execution plan and statistics after running statement(s)</para></listitem>
                 <listitem><para>Statement(s) are actually run -- not theoretical like EXPLAIN PLAN</para></listitem>
             </itemizedlist>
             <figure>
-                <title>AUTOTRACE Example with Oracle SQL Developer IDE</title>
+                <title>AUTOTRACE Example with GUI</title>
                 <graphic scalefit="1" fileref="images/jpa-tuning-autotrace.png"/>
             </figure>
             <note>
@@ -152,7 +152,7 @@ grant SELECT ANY DICTIONARY to (user);]]></programlisting>
             </note>
         </section>    
 
-        <section id="jpa-tuning-oracle-vplan">
+        <section id="jpa-tuning-db-vplan">
            <title>Display Cursor Execution Plan within V$PLAN</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Runtime cursors store execution plans within V$PLAN</para></listitem>
@@ -205,7 +205,7 @@ FROM v$sql s, table(DBMS_XPLAN.DISPLAY_CURSOR(s.sql_id, s.child_number)) t WHERE
     </section>    
 
 
-    <section id="jpa-tuning-oracle-summary">
+    <section id="jpa-tuning-db-summary">
        <title>Summary</title>
         <itemizedlist spacing="compact">
             <listitem><para>SQL implementations can be inefficient for many reasons</para></listitem>
