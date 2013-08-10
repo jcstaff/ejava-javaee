@@ -114,16 +114,20 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                        <includes>
-                           <include>**/FullTableScanTest.java</include>
+                            <!-- exclude all tests since they are run against a special DB instance -->
+                           <include>**/Nothing.java</include>
                            <!-- 
+                           <include>**/FullTableScanTest.java</include>
                             -->
+                           <!-- 
                             <include>**/JoinTest.java</include>
                             <include>**/ForeignKeyIndexTest.java</include>
-                           <!-- 
                            -->
+                           <!--
                            <include>**/CompositeIndexTest.java</include>
                            <include>**/IndexTest.java</include>
                            <include>**/ValueQueryTest.java</include>
+                           -->
                        </includes>
                     </configuration>
                 </plugin>
