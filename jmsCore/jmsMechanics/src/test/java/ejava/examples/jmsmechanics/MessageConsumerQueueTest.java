@@ -92,6 +92,12 @@ public class MessageConsumerQueueTest extends JMSTestBase {
                     false, Session.CLIENT_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
 
+            //create a client to synchronously poll for messages with 
+            //receive calls
+            syncConsumer = session.createConsumer(destination);
+            SyncClient syncClient = new SyncClient(syncConsumer);
+            clients.add(syncClient);
+            
             //create a client to asynchronous receive messages through 
             //onMessage() callbacks
             asyncConsumer = session.createConsumer(destination);
@@ -99,17 +105,12 @@ public class MessageConsumerQueueTest extends JMSTestBase {
             asyncConsumer.setMessageListener(asyncClient);
             clients.add(asyncClient);
 
-            //create a client to synchronously poll for messages with 
-            //receive calls
-            syncConsumer = session.createConsumer(destination);
-            SyncClient syncClient = new SyncClient(syncConsumer);
-            clients.add(syncClient);
-            
             producer = session.createProducer(destination);
             Message message = session.createMessage();
             producer.send(message);
             log.info("sent msgId=" + message.getJMSMessageID());
             
+            //make sure someone received the message
             connection.start();
             int receivedCount=0;
             for(int i=0; i<10; i++) {
@@ -146,6 +147,12 @@ public class MessageConsumerQueueTest extends JMSTestBase {
                     false, Session.CLIENT_ACKNOWLEDGE);
             List<MyClient> clients = new ArrayList<MyClient>();
 
+            //create a client to synchronously poll for messages with 
+            //receive calls
+            syncConsumer = session.createConsumer(destination);
+            SyncClient syncClient = new SyncClient(syncConsumer);
+            clients.add(syncClient);
+            
             //create a client to asynchronous receive messages through 
             //onMessage() callbacks
             asyncConsumer = session.createConsumer(destination);
@@ -153,12 +160,6 @@ public class MessageConsumerQueueTest extends JMSTestBase {
             asyncConsumer.setMessageListener(asyncClient);
             clients.add(asyncClient);
 
-            //create a client to synchronously poll for messages with 
-            //receive calls
-            syncConsumer = session.createConsumer(destination);
-            SyncClient syncClient = new SyncClient(syncConsumer);
-            clients.add(syncClient);
-            
             producer = session.createProducer(destination);
             Message message = session.createMessage();
             for (int i=0; i<msgCount; i++) {

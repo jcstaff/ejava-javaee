@@ -10,6 +10,9 @@
             <entry name="ConnectionFactory"/>
             <entry name="/jms/RemoteConnectionFactory"/>
         </entries>
+
+        <!-- makes sure clients do not buffer messages and get better round-robin -->
+        <consumer-window-size>0</consumer-window-size>
     </connection-factory>
 
     <!-- topics used by client(s) 
