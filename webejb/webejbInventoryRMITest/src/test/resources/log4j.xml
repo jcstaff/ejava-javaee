@@ -8,8 +8,9 @@
             <!-- The default pattern: Date Priority [Category] Messagen -->
             <!--
             <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
-            -->
             <param name="ConversionPattern" value="(%F:%L): %m%n"/>
+            -->
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} %-5p (%F:%L) -%m%n"/>
          </layout>
    </appender>
 
@@ -26,6 +27,9 @@
 
    <logger name="ejava">
       <level value="debug"/>
+   </logger>
+   <logger name="org.jboss.ejb.client">
+      <level value="trace"/>
    </logger>
    <root>
       <priority value="fatal"/>    

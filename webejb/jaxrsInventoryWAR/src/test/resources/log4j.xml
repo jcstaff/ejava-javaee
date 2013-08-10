@@ -5,7 +5,10 @@
          <param name="Target" value="System.out"/>
    
          <layout class="org.apache.log4j.PatternLayout">
+         <!--
             <param name="ConversionPattern" value=" -%m%n"/>
+            -->
+            <param name="ConversionPattern" value="%-5p %d{HH:mm:ss,SSS} [%c] (%F:%L) -%m%n"/>
          </layout>
    </appender>
 
@@ -15,13 +18,16 @@
       <param name="MaxFileSize" value="100KB"/>
       <param name="MaxBackupIndex" value="1"/>
       <layout class="org.apache.log4j.PatternLayout">
-         <param name="ConversionPattern" value="%-5p %d{dd-MM HH:mm:ss,SSS} [%c] (%F:%M:%L)  -%m%n"/>
+         <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} %-5p (%F:%L) -%m%n"/>
       </layout>
       
    </appender>
 
    <logger name="ejava">
       <level value="debug"/>
+   </logger>
+   <logger name="org.jboss.ejb.client">
+      <level value="trace"/>
    </logger>
    <root>
       <priority value="fatal"/>    
