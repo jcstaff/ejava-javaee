@@ -3,19 +3,19 @@ package ejava.examples.ejbwar.inventory.dao;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import ejava.examples.ejbwar.inventory.bo.Category;
 import ejava.examples.ejbwar.inventory.bo.Product;
+import ejava.examples.ejbwar.inventory.cdi.Inventory;
 
 /**
  * This DAO implementation uses JPA and an injected entity manager to 
  * perform CRUD operations on inventory data.
  */
 public class InventoryDAOImpl implements InventoryDAO {
-	@Inject @Named("inventory")
+	@Inject @Inventory
 	private EntityManager em;
 	
 	public void setEntityManager(EntityManager em) {
