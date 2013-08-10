@@ -55,7 +55,7 @@ where
             <para>* Large portion of cost spent looking for children</para>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 No Indexes.Get Children:warmups=2, rounds=11, ave=1.10 [+- 0.07]
 ]]></programlisting>                        
@@ -91,7 +91,7 @@ No Indexes.Get Children:warmups=2, rounds=11, ave=1.10 [+- 0.07]
             <para>* Eliminated much of the cost to locate children. Still have cost to locate parent</para>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 FKs Indexed.Get Children:warmups=2, rounds=11, ave=0.34 [+- 0.03]
 ]]></programlisting>                        
@@ -128,7 +128,7 @@ create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisti
             <para>* Eliminated much of the cost to locate children. Still have cost small cost obtaining Movie.id</para>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 FKs and Where Indexed.Get Children:warmups=2, rounds=11, ave=0.18 [+- 0.01]
 ]]></programlisting>                        
@@ -164,7 +164,7 @@ create index movierole_movie_fkx on jpatune_movierole(movie_id)]]></programlisti
             <para>* The last rowId access is necessary to return the full MovieRole object</para>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 FKs, Where, and Join Indexed.Get Children:warmups=2, rounds=11, ave=0.20 [+- 0.01]
 ]]></programlisting>                        
@@ -257,7 +257,7 @@ where
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 No Table or FK Indexes.Small Driving Table:warmups=2, rounds=11, ave=0.28 [+- 0.04]
 ]]></programlisting>                        
@@ -296,7 +296,7 @@ No Table or FK Indexes.Small Driving Table:warmups=2, rounds=11, ave=0.28 [+- 0.
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Table Indexes Only.Small Driving Table:warmups=2, rounds=11, ave=0.18 [+- 0.03]
 ]]></programlisting>                        
@@ -329,7 +329,7 @@ create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlist
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Individual Table and FK Indexes.Small Driving Table:warmups=2, rounds=11, ave=0.19 [+- 0.03]
 ]]></programlisting>                        
@@ -367,7 +367,7 @@ Individual Table and FK Indexes.Small Driving Table:warmups=2, rounds=11, ave=0.
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Composite with FK Index.Small Driving Table:warmups=2, rounds=11, ave=0.19 [+- 0.03]
 ]]></programlisting>                        
@@ -475,7 +475,7 @@ where
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 No Table or FK Indexes.Large Driving Table (Bounded):warmups=2, rounds=11, ave=0.17 [+- 0.01]
 No Table or FK Indexes.Large Driving Table Offset (Bounded):warmups=2, rounds=11, ave=0.26 [+- 0.02]
@@ -514,7 +514,7 @@ No Table or FK Indexes.Large Driving Table (Unbounded:warmups=2, rounds=11, ave=
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Table Indexes Only.Large Driving Table (Bounded):warmups=2, rounds=11, ave=0.19 [+- 0.03]
 Table Indexes Only.Large Driving Table Offset (Bounded):warmups=2, rounds=11, ave=0.26 [+- 0.04]
@@ -552,7 +552,7 @@ Table Indexes Only.Large Driving Table (Unbounded:warmups=2, rounds=11, ave=31.4
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Composite with FK Index.Large Driving Table (Bounded):warmups=2, rounds=11, ave=0.18 [+- 0.01]
 Composite with FK Index.Large Driving Table Offset (Bounded):warmups=2, rounds=11, ave=0.22 [+- 0.03]

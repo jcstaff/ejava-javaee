@@ -105,7 +105,7 @@ where
 
 
                 <figure>    
-                    <title>Benchmark</title>
+                    <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Fetch Lazy Thin Parent.Get Parent:warmups=2, rounds=10, ave=0.32 [+- 0.03]
 Fetch Lazy Thick Parent.Get Parent:warmups=2, rounds=10, ave=0.58 [+- 0.03]
@@ -262,7 +262,7 @@ where
 
 
                 <figure>    
-                    <title>Benchmark</title>
+                    <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Fetch Eager Thin Parent.Get Parent:warmups=2, rounds=10, ave=2.43 [+- 0.47]
 Fetch Eager Thick Parent.Get Parent:warmups=2, rounds=10, ave=2.59 [+- 0.06]
@@ -350,7 +350,7 @@ where
 
 
                 <figure>    
-                    <title>Benchmark</title>
+                    <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Fetch Eager Thin Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
 Fetch Eager Thick Parent.Get Just Parent:warmups=2, rounds=10, ave=0.32 [+- 0.02]
@@ -559,7 +559,7 @@ where
 
 
                 <section id="jpa-tuning-jpa-fetch-children-lazy-benchmark">
-                    <title>Benchmark</title>
+                    <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Fetch Lazy Thin Parent.Get Parent and Children:warmups=2, rounds=10, ave=7.25 [+- 0.91]
 Fetch Lazy Thick Parent.Get Parent and Children:warmups=2, rounds=10, ave=7.25 [+- 0.92]
@@ -604,7 +604,7 @@ Fetch Lazy Thick Parent.Get Parent and Children:warmups=2, rounds=10, ave=7.25 [
 
 
                 <figure>    
-                    <title>Benchmark</title>
+                    <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Fetch Eager Thin Parent.Get Parent and Children:warmups=2, rounds=10, ave=2.26 [+- 0.06]
 Fetch Eager Thick Parent.Get Parent and Children:warmups=2, rounds=10, ave=2.57 [+- 0.06]
@@ -716,7 +716,7 @@ where
 
 
                 <figure>    
-                    <title>Benchmark</title>
+                    <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Fetch Lazy Thin Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.56 [+- 0.80]
 Fetch Lazy Thick Parent.Get Parent with Fetched Children:warmups=2, rounds=10, ave=2.54 [+- 0.08]
@@ -835,7 +835,7 @@ where
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Size Lazy.DAO Relation Count:warmups=2, rounds=10, ave=1.83 [+- 0.82]
 Size Eager.DAO Relation Count:warmups=2, rounds=10, ave=5.40 [+- 0.83]
@@ -941,7 +941,7 @@ where
 
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Size Lazy.DAO Count:warmups=2, rounds=10, ave=1.37 [+- 0.03]
 Size Eager.DAO Count:warmups=2, rounds=10, ave=16.82 [+- 1.33]
@@ -1010,7 +1010,7 @@ where
             </itemizedlist>
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Size Lazy.DB Count:warmups=2, rounds=10, ave=0.50 [+- 0.04]
 Size Eager.DB Count:warmups=2, rounds=10, ave=0.45 [+- 0.02]
@@ -1074,7 +1074,7 @@ where
 
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Size Lazy.DB Count no Join:warmups=2, rounds=10, ave=0.47 [+- 0.01]
 Size Eager.DB Count no Join:warmups=2, rounds=10, ave=0.44 [+- 0.02]
@@ -1213,7 +1213,7 @@ where
 
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 -3924 people found
 Loop Lazy.DAO Loop:warmups=2, rounds=10, ave=4.91 [+- 0.88]
@@ -1317,7 +1317,7 @@ where
 
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 -3924 people found
 Loop Lazy.DB Loop Distinct:warmups=2, rounds=10, ave=2.52 [+- 0.09]
@@ -1424,7 +1424,7 @@ create index movie_role_movie_fdx on jpatune_movierole(movie_id)]]></programlist
 
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Loop Lazy.DAO Page 0:warmups=1, rounds=10, ave=0.39 [+- 0.09]
 Loop Lazy.DAO Page 10:warmups=1, rounds=10, ave=1.01 [+- 0.45]
@@ -1546,7 +1546,7 @@ from
 
 
             <figure>    
-                <title>Benchmark</title>
+                <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
 Loop Lazy.DB Page 0:warmups=1, rounds=10, ave=0.32 [+- 0.02]
 Loop Lazy.DB Page 10:warmups=1, rounds=10, ave=0.31 [+- 0.01]
