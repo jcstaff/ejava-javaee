@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.jpa</groupId>
+        <artifactId>jpa-root</artifactId>
+        <version>3.0.2013.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jpa-jdbc</artifactId>
+    <packaging>pom</packaging>
+
+    <name>JPA JDBC</name>
+    <description>
+        This project provides the home for JDBC/SQL topics related
+        to JPA.
+    </description>
+
+    <modules>
+        <module>jdbcDAO</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>docs</id>
+            <modules>
+            </modules>
+        </profile>
+        <profile>
+            <id>all-modules</id>
+            <modules>
+            </modules>
+        </profile>
+    </profiles>
+
+</project>

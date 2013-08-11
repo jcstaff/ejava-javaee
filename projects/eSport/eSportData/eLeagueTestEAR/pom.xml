@@ -2,7 +2,7 @@
     <parent>
         <groupId>ejava.javaee.projects.eSport</groupId>
         <artifactId>eSportData</artifactId>
-        <version>2.0.2012.1-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -31,66 +31,52 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
-    </build>
-
-<profiles>
-    <!-- this profiles allow the EAR to be undeployed before it is deleted
-        during the clean target. This behavior requires the EAR to be
-        present, so it cannot be part of the default behavior. It is
-        only activated when -Dundeploy or -Pundeploy is present so that
-        normal cleans do not fail.  -->
-<profile>
-    <id>undeploy</id>
-    <activation>
-        <property>
-            <name>undeploy</name>
-            <value>true</value>
-        </property>
-    </activation>    
-    <build>
         <plugins>
-        <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.0.2</version>
-            <configuration>
-                <container>
-                    <containerId>jboss4x</containerId>
-                    <type>remote</type>                
-                </container>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>undeploy-ear</id>
-                    <phase>pre-clean</phase>
-                    <goals>
-                        <goal>undeploy</goal>
-                    </goals>
-                    <configuration>
-                        <configuration>
-                            <type>runtime</type>
-                            <properties>
-                            <cargo.remote.username>${jboss.user}</cargo.remote.username>
-                            <cargo.remote.password>${jboss.password}</cargo.remote.password>
-                            </properties>
-                        </configuration>
-                        <deployer>
-                            <type>remote</type>
-                            <deployables>
-                                <deployable>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <type>ear</type>
-                                </deployable>
-                            </deployables>
-                        </deployer>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>                    
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <!-- eliminates use of version in EAR JNDI name portion -->
+                    <applicationName>${project.artifactId}</applicationName>
+                    <modules>
+                        <!-- eliminates use of the version in the EJB JNDI name -->
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>eLeagueTestEJB</artifactId>
+                            <bundleFileName>eLeagueTestEJB.jar</bundleFileName>
+                        </ejbModule>
+                    </modules>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-</profile>
+
+    <profiles>
+        <!-- this profile allows the EAR to be undeployed before it is deleted
+            during the clean target. This behavior requires the EAR to be
+            present, so it cannot be part of the default behavior. It is
+            only activated when -Dundeploy or -Pundeploy is present so that
+            normal cleans do not fail.  -->
+        <profile>
+            <id>undeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>undeploy-ear</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>undeploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>                    
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

@@ -1,12 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>ejava.javaee.projects.eSport</groupId>
+        <groupId>ejava.javaee.projects.eSport.eLeague</groupId>
         <artifactId>eLeague</artifactId>
-        <version>2.0.2012.1-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ejava.javaee.projects.eSport.eLeague</groupId>
     <artifactId>eLeagueBO</artifactId>
 
     <name>eLeague BO</name>
@@ -25,6 +24,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- true test dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -37,42 +42,4 @@
             <scope>test</scope>
         </dependency>        
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>                                
-                    </systemProperties>                                
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>jboss5</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>jboss6</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate.javax.persistence</groupId>
-                    <artifactId>hibernate-jpa-2.0-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

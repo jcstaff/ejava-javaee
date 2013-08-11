@@ -2,12 +2,12 @@
     <parent>
         <groupId>ejava.javaee.projects.eSport</groupId>
         <artifactId>eSportData</artifactId>
-        <version>2.0.2012.1-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eLeagueDTO</artifactId>
-    <version>2.0.2012.1rc1</version>
+    <version>3.0.2013.1</version>
 
     <name>eLeague DTO</name>
     <description>
@@ -61,18 +61,6 @@
             <scope>test</scope>
         </dependency>    
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <profiles>
         <profile> <!-- place in profile to limit when code generated -->

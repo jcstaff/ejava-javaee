@@ -2,12 +2,12 @@
     <parent>
         <groupId>ejava.javaee.projects.eSport</groupId>
         <artifactId>eSportData</artifactId>
-	    <version>2.0.2012.1-SNAPSHOT</version>
+        <version>3.0.2013.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eLeagueTestUtil</artifactId>
-    <version>2.0.2012.1rc1</version>
+    <version>3.0.2013.1</version>
 
     <name>eLeague TestUtil</name>
     <description>
@@ -34,15 +34,6 @@
             This approach makes it easier on the user that does not care
             what implementation to use and could override it if needed. -->
 
-        <!-- JAXB Reference Impl (com.sun.xml.bind.v2.ContextFactory) 
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.1.12</version>
-            <scope>compile</scope>
-        </dependency>
-        -->
-
         <!--  this is what JBoss AS 5.1.0.GA is using  
         -->
         <dependency>
@@ -52,21 +43,6 @@
         </dependency>
         
 
-        <!-- StAX Impl (javax.xml.stream.XMLInputFactory) 
-        <dependency>
-            <groupId>stax</groupId>
-            <artifactId>stax</artifactId>
-            <version>1.2.0</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>stax</groupId>
-                    <artifactId>stax-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        -->
-        
         <!-- added a dependency on Xerces to hopefully stablize the
             lexical representation of gMonth formats when changing
             JRE versions.
@@ -112,13 +88,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>${surefire.argLine}</argLine>
-                    <systemProperties>                                
-                        <property>
-                            <name>inputDir</name>
-                            <value>target/classes/xml</value>
-                        </property>
-                    </systemProperties>                                
+                    <systemPropertyVariables>                                
+                        <inputDir>target/classes/xml</inputDir>
+                    </systemPropertyVariables>                                
                 </configuration>
             </plugin>
         </plugins>
