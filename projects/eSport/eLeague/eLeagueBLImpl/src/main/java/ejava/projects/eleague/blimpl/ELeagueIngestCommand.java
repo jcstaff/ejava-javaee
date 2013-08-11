@@ -26,6 +26,7 @@ public class ELeagueIngestCommand {
 	private static final String inputFile = 
 		System.getProperty("inputFile");
 	
+	@SuppressWarnings("resource") //"is" is closed in main()
 	private static InputStream getInputStream() throws Exception {
 		InputStream is = null;
 

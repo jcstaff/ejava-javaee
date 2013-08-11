@@ -25,15 +25,9 @@
 
     <dependencies>
         <dependency>
-          <groupId>javax.javaee</groupId>
-          <artifactId>javaee</artifactId>
-          <version>5</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eLeagueDTO</artifactId>
-	        <version>2.0.2012.1rc1</version>
+	        <version>3.0.2013.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -109,22 +103,6 @@
                 </includes>
             </testResource>
         </testResources>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <!--
-                    <excludes>
-                        <exclude>**/*.java</exclude>
-                    </excludes>
-                    -->
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
     <profiles>
@@ -153,11 +131,13 @@
                     <artifactId>hibernate-entitymanager</artifactId>
                     <scope>test</scope>
                 </dependency>
+                <!-- 
                 <dependency>
                     <groupId>hsqldb</groupId>
                     <artifactId>hsqldb</artifactId>
                     <scope>test</scope>
                 </dependency>       
+                 -->
                 <dependency>
                     <groupId>oracle</groupId>
                     <artifactId>ojdbc</artifactId>
