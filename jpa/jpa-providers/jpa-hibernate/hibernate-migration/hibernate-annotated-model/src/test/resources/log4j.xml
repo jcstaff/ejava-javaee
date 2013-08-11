@@ -6,14 +6,14 @@
    
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
         <param name="Target" value="System.out"/>
+        <param name="Threshold" value="INFO"/>
 
         <layout class="org.apache.log4j.PatternLayout">
         <!--
             <param name="ConversionPattern" 
                    value="(%F:%M:%L)  -%m%n"/>
                    -->
-            <param name="ConversionPattern" 
-                   value=" -%m%n"/>
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} %-5p (%F:%L) -%m%n"/>
         </layout>
     </appender>
 
@@ -30,6 +30,10 @@
 
    <logger name="ejava">
       <level value="debug"/>
+      <appender-ref ref="logfile"/>  
+   </logger>
+   <logger name="org.hibernate.SQL">
+      <level value="DEBUG"/>
       <appender-ref ref="logfile"/>  
    </logger>
 
