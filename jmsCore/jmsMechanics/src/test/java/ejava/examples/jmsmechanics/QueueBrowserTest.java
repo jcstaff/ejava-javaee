@@ -73,7 +73,7 @@ public class QueueBrowserTest extends JMSTestBase {
                 log.debug("browsing message (" + msgs + 
                         ")=" + m.getJMSMessageID());
             }
-            assertEquals("unexpected number if queue browser messages", 
+            assertEquals("unexpected number nf queue browser messages", 
                     msgCount, msgs);
             
             //queues will hold messages waiting for delivery
