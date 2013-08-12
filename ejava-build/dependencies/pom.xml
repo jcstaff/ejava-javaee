@@ -927,34 +927,22 @@
                                 <goals>
                                      <goal>start</goal>
                                 </goals>
+                                <configuration>
+                                    <timeout>60000</timeout>
+                                </configuration>
                             </execution>
-                             <execution>
-                                 <id>cargo-post</id>
-                                 <phase>post-integration-test</phase>
-                                 <goals>
+                            <execution>
+                                <id>cargo-post</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
                                      <goal>undeploy</goal>
                                      <goal>stop</goal>
-                                 </goals>
-                             </execution>
+                                </goals>
+                                <configuration>
+                                    <timeout>60000</timeout>
+                                </configuration>
+                            </execution>
                          </executions>
-                      </plugin>
-                      <plugin>
-                          <groupId>org.apache.maven.plugins</groupId>
-                          <artifactId>maven-antrun-plugin</artifactId>
-                          <executions>
-                              <execution>
-                                  <phase>post-integration-test</phase>
-                                  <configuration>
-                                      <target>
-                                          <echo>Pausing 30sec for container to fully shutdown</echo>
-                                          <sleep seconds="30"/>
-                                      </target>
-                                  </configuration>
-                                  <goals>
-                                      <goal>run</goal>
-                                  </goals>
-                              </execution>
-                          </executions>
                       </plugin>
                     </plugins>            
                 </pluginManagement>
