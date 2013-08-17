@@ -4,7 +4,6 @@ import javax.annotation.Resource;
 
 import javax.ejb.EJB;
 import javax.enterprise.inject.Produces;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
@@ -32,20 +31,9 @@ public class SchedulerResources {
      */
 	@PersistenceContext(name="jndidemo")
 	@Produces
-	@Named("jndidemo")	
+	@JndiDemo
 	public EntityManager em;
 
-	/**
-	 * Gets a persistence context using a method and produces it for any
-	 * bean injecting an EntityManager qualified with @JndiDemo annotation.
-	 * @return
-	 */
-	@Produces
-	@JndiDemo
-	public EntityManager getEM() {
-		return em;
-	}
-	
 	/**
 	 * A String for any bean injecting a String qualified by @JndiDemo 
 	 * annotation. 

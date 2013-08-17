@@ -2,6 +2,10 @@ package ejava.examples.ejbwar.inventory;
 
 import static org.junit.Assert.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -25,6 +29,7 @@ public class InventoryRMIIT {
 	private static final Log log = LogFactory.getLog(InventoryRMIIT.class);
 	private InventoryClient inventoryClient;
 	private CustomerMgmtRemote customerClient;
+	private static final DateFormat df = new SimpleDateFormat("HH:mm:ss.SSSZ");
 	
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -33,6 +38,12 @@ public class InventoryRMIIT {
 			long waitTime=15000;
 	    	log.info(String.format("pausing %d secs for server deployment to complete", waitTime/1000));
 	    	Thread.sleep(waitTime);
+		}
+		for (int i=0; i<3; i++) {
+			Date date = new Date();
+			log.warn("++pausing..." + i);
+			System.out.println(df.format(date) + "--pausing..." + i);
+			Thread.sleep(1000);
 		}
 	}
 
@@ -50,6 +61,7 @@ public class InventoryRMIIT {
 	public void cleanup() throws Exception {
 		Categories categories = inventoryClient.findCategoryByName("", 0, 0);
 		assertNotNull("error getting categories", categories);
+		System.out.println(df.format(new Date()) + String.format("deleting %d categories", categories.getCategories().size()));
 		log.info(String.format("deleting %d categories", categories.getCategories().size()));
 		for (Category c: categories.getCategories()) {
 			inventoryClient.deleteCategory(c.getId());
@@ -60,6 +72,7 @@ public class InventoryRMIIT {
 		
 		Products products = inventoryClient.findProductsByName("", 0, 0);
 		assertNotNull("error getting products", categories);
+		System.out.println(df.format(new Date()) + String.format("deleting %d products", products.getProducts().size()));
 		log.info(String.format("deleting %d products", products.getProducts().size()));
 		for (Product p: products.getProducts()) {
 			inventoryClient.deleteProduct(p.getId());

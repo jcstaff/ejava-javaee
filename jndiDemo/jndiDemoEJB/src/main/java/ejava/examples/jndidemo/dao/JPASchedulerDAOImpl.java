@@ -5,22 +5,20 @@ import java.util.List;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 
 
+import ejava.examples.jndidemo.JndiDemo;
 import ejava.examples.jndidemo.bo.Task;
 
 /**
  * This class represents a single JPA DAO implementation for tasks.
  */
 @Typed({SchedulerDAO.class, JPASchedulerDAOImpl.class})
-public class JPASchedulerDAOImpl 
-	extends JPADAOBase<Task> 
-	implements SchedulerDAO {
+public class JPASchedulerDAOImpl extends JPADAOBase<Task> implements SchedulerDAO {
 	
-	@Inject @Named("jndidemo")
-	public void setEntityManager(EntityManager em) {
+	@Inject 
+	public void setEntityManager(@JndiDemo EntityManager em) {
 		super.em = em;
 	}
 	

@@ -33,6 +33,14 @@
             <artifactId>commons-logging</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- This will also bring in the appropriate JPA API
+             * make it a compile dependency to assure it gets into WAR -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>compile</scope>
+        </dependency>
         
         <!-- this brings in interfaces, BO, and core business logic -->
         <dependency>
@@ -63,25 +71,6 @@
     
     
     <profiles>
-        <profile> <!-- defines our default persistence provider -->
-            <id>hibernate</id>
-            <activation>
-                <property> <!-- use this property to name alt persistence provider -->
-                    <name>!jpa</name>
-                </property>
-            </activation>
-
-            <dependencies>
-                <!-- This will also bring in the appropriate JPA API
-                     * make it a compile dependency to assure it gets into WAR -->
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <scope>compile</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
         <profile>
             <id>jetty</id>
             <build>

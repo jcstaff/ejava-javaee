@@ -27,9 +27,11 @@
 
    <logger name="ejava">
       <level value="debug"/>
+      <appender-ref ref="logfile"/>  
    </logger>
    <logger name="org.jboss.ejb.client">
       <level value="trace"/>
+      <appender-ref ref="logfile"/>  
    </logger>
    <root>
       <priority value="fatal"/>    

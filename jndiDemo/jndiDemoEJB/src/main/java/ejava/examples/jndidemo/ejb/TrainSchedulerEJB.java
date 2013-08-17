@@ -1,6 +1,7 @@
 package ejava.examples.jndidemo.ejb;
 
 import javax.annotation.PostConstruct;
+
 import javax.annotation.Resource;
 
 import javax.ejb.SessionContext;
@@ -8,7 +9,6 @@ import javax.ejb.Stateless;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
@@ -28,15 +28,9 @@ public class TrainSchedulerEJB
     /**
      * This will inject a persistence context using a textual name qualifier 
      */
-    @Inject @Named("jndidemo")
+    @Inject @JndiDemo
     private EntityManager em;
     
-    /**
-     * This will inject a persistence context using a Java annotation qualifier
-     */
-    @Inject @JndiDemo
-    private EntityManager em2;
-
     /**
      * This will inject a javax.sql.DataSource
      */
@@ -89,7 +83,6 @@ public class TrainSchedulerEJB
         log.info("******************* TrainScheduler Created ******************");
         log.debug("ctx=" + ctx);
         log.debug("em=" + em);
-        log.debug("em=" + em2);
         log.debug("ds=" + ds);
         log.debug("message=" + message);
         log.debug("cook=" + cook);

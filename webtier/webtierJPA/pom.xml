@@ -29,6 +29,17 @@
         <scope>provided</scope>
     </dependency>
 
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-entitymanager</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <scope>test</scope>
+    </dependency>
+
     <!-- contains the core business objects passed between tiers -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -70,28 +81,4 @@
 
   </build>
 
-    <profiles>
-        <profile> <!-- defines our default persistence provider -->
-            <id>hibernate</id>
-            <activation>
-                <property> <!-- use this property to name alt persistence provider -->
-                    <name>!jpa</name>
-                </property>
-            </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-    </profiles>
 </project>
