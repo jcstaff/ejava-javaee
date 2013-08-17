@@ -23,10 +23,10 @@ import ejava.projects.esales.xml.ESalesParser;
 
 @Stateless
 public class ParserTestEJB implements ParserTestRemote {
-	@Resource(name="vals/xmlFile")
-	private static String xmlFile;
-	
 	private static final Log log = LogFactory.getLog(ParserTestEJB.class);
+
+	@Resource(name="vals/xmlFile")
+	private String xmlFile;
 	
 	@PostConstruct
 	public void init() {
