@@ -258,11 +258,17 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
         Context jndi=null;
         try {
         	jndi=runAs(null, null);
+        	//log.info("jndi.env=" + jndi.getEnvironment());
         	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             log.info(ejb.pingUser());
             fail("didn't detect anonymous user");
         }
+        //depending on how we are invoking this test, we either get denied 
+        //at the JNDI or EJB level -- but at least one will stop us
         catch (NamingException ex) {
+            log.info("expected exception thrown:" + ex);
+        }
+        catch (EJBAccessException ex) {
             log.info("expected exception thrown:" + ex);
         }
         catch (Exception ex) {
@@ -334,6 +340,9 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
         catch (NamingException ex) {
             log.info("expected exception thrown:" + ex);
         }
+        catch (EJBAccessException ex) {
+            log.info("expected exception thrown:" + ex);
+        }
         catch (Exception ex) {
         	fail("unexpected exception type:" + ex);
         }        
@@ -403,6 +412,9 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
             fail("didn't detect excluded");
         }
         catch (NamingException ex) {
+            log.info("expected exception thrown:" + ex);
+        }
+        catch (EJBAccessException ex) {
             log.info("expected exception thrown:" + ex);
         }
         catch (Exception ex) {
