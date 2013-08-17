@@ -6,8 +6,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.naming.NamingException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +33,7 @@ public class InventoryRMIIT {
 	private InventoryClient inventoryClient;
 	private CustomerMgmtRemote customerClient;
 	private static final DateFormat df = new SimpleDateFormat("HH:mm:ss.SSSZ");
+	private InventoryRMITestConfig config;
 	
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -49,10 +53,15 @@ public class InventoryRMIIT {
 
 	@Before
 	public void setUp() throws Exception {
-		InventoryRMITestConfig config = new InventoryRMITestConfig("/it.properties");
+		config = new InventoryRMITestConfig("/it.properties");
 		inventoryClient = config.inventoryClient();
 		customerClient = config.customerClient();
 		cleanup();
+	}
+	
+	@After
+	public void tearDown() throws NamingException {
+		config.close();
 	}
 	
 	/**

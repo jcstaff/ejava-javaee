@@ -53,6 +53,13 @@ public class InventoryRMITestConfig {
 		return jndi;
 	}
 	
+	public void close() throws NamingException {
+		if (jndi!=null) {
+			jndi.close();
+			jndi=null;
+		}
+	}
+	
 	/**
 	 * Return the JNDI name for the inventory management EJB RMI facade.
 	 * @return
