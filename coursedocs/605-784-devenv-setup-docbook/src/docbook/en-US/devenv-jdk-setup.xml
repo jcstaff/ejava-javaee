@@ -4,17 +4,19 @@
 <chapter id="devenv-jdk-setup">
     <title>Java JDK Setup</title>
     <para>
-        You will need a copy of the Java 7 SDK installed. JavaEE 6 only 
-        requires JDK 6 but but JDK 6 will soon hit its end-of-life. 
+        You will need a copy of either Java 6 or Java 7 SDK installed. 
+        JavaEE 6 only requires JDK 6 but but JDK 6 will soon hit its end-of-life.
+        The instructions describe downloading JDK 7.
     </para>
     <note>
         <title>Java 6 source environment/Java 7 target environment</title>
         <para>
-            The build environment configured for class will require 
-            source code to be Java 6-compliant while targeting a 
-            Java 7 runtime. This should give us a decent fallback option
-            between the two versions during this transition period
-            by supporting products.
+            The Maven configuration for class will default to 
+            Java 6-compliant source while targeting a Java 7 runtime.
+            This should give us a decent fallback option between the 
+            two versions during this transition period. To use a Java 6 runtime,
+            simply override the default "java.target.version=1.7" property
+            using your Maven .m2/settings.xml. 
         </para>
     </note>
     <note>
@@ -27,19 +29,18 @@
 
     <section id="devenv-jdk-install">
         <title>Download and Install JDK</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem>
                 <para>
-                    Linux Users: The alternate JDKs (e.g., OpenJDK)
-                    available from your package manager will work fine for
-                    class.
+                    Linux Users: The alternate JDKs (e.g., OpenJDK) available 
+                    from your package manager will work fine for class.
                 </para>
             </listitem>
             <listitem>
                 <para>
                     Windows Users: Install the Java 7 JDK from Sun/Oracle
                 </para>
-                <orderedlist>
+                <orderedlist spacing="compact">
                     <listitem>
                         <para>
                             Download a copy of the Java 7 JDK
@@ -62,7 +63,7 @@
                             <para>
                                 The Oracle Windows JDK installer will attempt to place
                                 the JDK and JRE in a directory with spaces. Be sure to
-                                interrupt the installer defaults when it prompts you for 
+                                override the installer defaults when it prompts you for 
                                 installation directory.    
                             </para>
                         </note>
@@ -80,22 +81,24 @@
 
     <section id="devenv-jdk-verify">
     <title>Verify your JDK is installed</title>
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Depending on how you performed the installation, you may need to a</para></listitem>
-        <listitem><para>ex. Fedora</para>
- <programlisting language=""><![CDATA[
-$ java -version                                                  
-java version "1.7.0_09-icedtea"                                                                                
-OpenJDK Runtime Environment (fedora-2.3.4.fc17-x86_64)                                                         
-OpenJDK 64-Bit Server VM (build 23.2-b09, mixed mode) 
+        <listitem><figure>
+            <title>Fedora Example</title>
+ <programlisting language=""><![CDATA[$ java -version
+java version "1.7.0_25"
+OpenJDK Runtime Environment (fedora-2.3.10.3.fc17-x86_64)
+OpenJDK 64-Bit Server VM (build 23.7-b01, mixed mode)
 
 $ javac -version
-javac 1.7.0_09
+javac 1.7.0_25
 ]]></programlisting>
+            </figure>
+
         </listitem>        
-        <listitem><para>ex. Windows XP</para>
- <programlisting language=""><![CDATA[
->java -version
+        <listitem><figure>
+            <title>Windows XP Example</title>
+ <programlisting language=""><![CDATA[> java -version
 java version "1.7.0_11"
 Java(TM) SE Runtime Environment (build 1.7.0_11-b21)
 Java HotSpot(TM) Client VM (build 23.6-b04, mixed mode, sharing)
@@ -103,11 +106,10 @@ Java HotSpot(TM) Client VM (build 23.6-b04, mixed mode, sharing)
 >javac -version
 javac 1.7.0_11
 ]]></programlisting>
+            </figure>
+
         </listitem>        
     </itemizedlist>
-    
-    <programlisting><![CDATA[
-]]></programlisting>
     </section>    
 </chapter>
   

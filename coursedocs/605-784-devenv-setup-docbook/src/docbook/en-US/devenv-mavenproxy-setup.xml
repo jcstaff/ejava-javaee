@@ -11,7 +11,7 @@
         However, if you were part of a larger development team you would
         not want each separate developer reaching out the Internet to 
         locate a common dependency. There is both a speed and failure
-        issue at risk with that type of setup.
+        issue with that type of setup.
     </para>
     <para> 
         The steps listed in this chapter are not necessary
@@ -55,7 +55,7 @@
             a manual setup of all items. Use this approach if you 
             want a minor amount of experience in setting up the sever.
         </para>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem>
                 <para>
                     Download the Nexus OSS Software from Sonatype
@@ -70,16 +70,13 @@
                     caches (<code>sonatype-work</code>)
                 </para>
         <programlisting><![CDATA[
-$ unzip ~/Downloads/nexus-2.0.3-bundle.zip 
-Archive:  /home/user/Downloads/nexus-2.0.3-bundle.zip
-   creating: nexus-2.0.3/
-   creating: nexus-2.0.3/nexus/
-  inflating: nexus-2.0.3/LICENSE.txt  
+$ tar tzf ~/Downloads/nexus-2.6.1-02-bundle.tar.gz 
+nexus-2.6.1-02/nexus/WEB-INF/plugin-repository/nexus-healthcheck-oss-plugin-2.6.1-02/nexus-healthcheck-oss-plugin-2.6.1-02.jar
 ...
 
 
-$ ls nexus-2.0.3/ sonatype-work/
-nexus-2.0.3/:
+$ ls nexus-2.6.1-02/ sonatype-work/
+nexus-2.6.1-02/:
 bin  conf  lib  LICENSE.txt  logs  nexus  NOTICE.txt  tmp
 
 sonatype-work/:
@@ -91,10 +88,10 @@ nexus  README.txt
                 <para>
                     The server will listen on port 8081 on all interfaces 
                     (0.0.0.0) by default. Modify
-                    <code>nexus-2.0.3/conf/nexus.properties</code> if 
+                    <code>nexus-2.6.1-02/conf/nexus.properties</code> if 
                     you want something different.</para>
         <programlisting><![CDATA[
-$ more nexus-2.0.3/conf/nexus.properties                                                                                                                                       
+$ more nexus-2.6.1-02/conf/nexus.properties                                                                                                                                       
 ...
 # Jetty section
 application-port=8081
@@ -107,7 +104,7 @@ application-host=0.0.0.0
                     Locate the startup script in the NEXUS_HOME/bin directory.
                 </para>
         <programlisting><![CDATA[
-$ ls nexus-2.0.3/bin/
+$ ls nexus-2.6.1-02/bin/
 jsw  nexus  nexus.bat                 
 ]]></programlisting>
             <tip>
@@ -115,7 +112,10 @@ jsw  nexus  nexus.bat
                     Linux users might want to register this script
                     in /etc/init.d. If you also configure it to automatically
                     start at boot -- supply a value for <code>RUN_AS_USER</code>
-                    to keep the server from running as root.</para>
+                    to keep the server from running as root. I also needed to 
+                    change "su - $RUN_AS_USER" to "su -m $RUN_AS_USER..." 
+                    because of the way my legacy nexus account was setup
+                    for nologin.</para>
             </tip>                        
             </listitem>
             <listitem>
@@ -124,10 +124,10 @@ jsw  nexus  nexus.bat
                     to start and perform other controls on the server.
                 </para>
         <programlisting><![CDATA[
-$ nexus-2.0.3/bin/nexus
-Usage: nexus-2.0.3/bin/nexus { console | start | stop | restart | status | dump }
+$ nexus-2.6.1-02/bin/nexus
+Usage: nexus-2.6.1-02/bin/nexus { console | start | stop | restart | status | dump }
 
-$ nexus-2.0.3/bin/nexus start
+$ nexus-2.6.1-02/bin/nexus start
 Starting Nexus OSS...
 Started Nexus OSS.
 ]]></programlisting>
@@ -138,7 +138,7 @@ Started Nexus OSS.
                     register nexus as a service, you can optionally
                     run it as an interactive command.
         <programlisting><![CDATA[                    
-$ nexus-2.0.3/bin/nexus console
+$ nexus-2.6.1-02/bin/nexus console
 /etc/init.d/nexus console
 Running Nexus OSS...
 wrapper  | --> Wrapper Started as Console
@@ -159,9 +159,9 @@ wrapper | The nexus-webapp service is not installed - The specified service does
                 <ulink url="http://localhost:8081/nexus">http://localhost:8081/nexus</ulink>
             </para></listitem>                    
             <listitem><para>Login with the default account of admin/admin123</para></listitem>
-            <listitem><para>Change the admin password using Security-&gt;Change Password</para></listitem>
+            <listitem><para>Change the admin password (or not) using Security-&gt;Change Password</para></listitem>
             <listitem><para>Add remote repositories</para>
-                <orderedlist>
+                <orderedlist spacing="compact">
                     <listitem><para>Click on Views/Repositories-&gt;Repositories</para></listitem>
                     <listitem><para>Click the +Add...Proxy Repository</para></listitem>
                     <listitem><para>Fill in the data for the repositories in the 
@@ -217,18 +217,16 @@ wrapper | The nexus-webapp service is not installed - The specified service does
                 </table>
                 <note>
                     <para>
-                        If the provided list is missing any sources, checkout
+                        If the provided list is missing any sources, check
                         for a current list of repositories and plugin repositories
-                        in ejava-build/dependencies/pom.xml and add those as well.
+                        in ejava-build/dependencies/pom.xml from the class source
+                        tree and add those as well.
                     </para>
                 </note>
                 <note>
                     <para>
                         Nexus will check each repository as they are
-                        added. In the various installations I performed
-                        I had to restart the nexus server in several instances
-                        in order to get the new repositories to transition to the 
-                        Available state. 
+                        added. Try restarting if things get stuck. 
                     </para>
         <programlisting><![CDATA[
 $ service nexus restart
@@ -240,13 +238,13 @@ Started Nexus OSS.
                 </note>
             </listitem>
             <listitem><para>Add the created repositories to the Public Repositories</para>
-                <orderedlist>
+                <orderedlist spacing="compact">
                     <listitem><para>Select <code>Public Repositories</code> line
                         towards the top of the repositories list.</para></listitem>
                     <listitem><para>Select repositories form the right Available
                     column and add them to the left column. Specify them last
                     in the following order</para>
-                    <orderedlist>
+                    <orderedlist spacing="compact">
                         <listitem><para>JBoss Nexus</para></listitem>
                         <listitem><para>Exoplatform</para></listitem>
                         <listitem><para>Ejava Nexus</para></listitem>
@@ -264,7 +262,7 @@ Started Nexus OSS.
              
      <section id="devenv-mavenproxy-settings.xml">
         <title>Integrate Proxy with Maven</title>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem>
                 <para>
                     Add the following to the <code>.m2/settings.xml</code> file

@@ -4,24 +4,52 @@
     
 <chapter id="devenv-jboss-setup">
     <title>JBoss Setup</title>    
+    <note>
+        <title>JBoss Application Server (AS) and JBoss Enterprise Application Platform (EAP)</title>
+        <para>JBoss has a community version (JBoss AS) and commercial version (JBoss EAP) of 
+            their JavaEE application server. Both are open source and built off the same code base. 
+            In theory, changes propagate through the community version first in daily changes and 
+            short iterations. In theory, commercial version is a roll-up of a stable version of the 
+            community version with the ability to purchase support on that specific version. With  
+            commercial version support -- you can receive patches for a specific issue prior to 
+            upgrading to the latest release. With the community version -- you pretty much need to 
+            keep up with the latest release to get any patches. Of course, with either version you
+            are free to perform your own support and code changes, but you can only get this 
+            commercially with the EAP release.</para>        
+        <para>JBoss has recently changed its distribution policy. It now makes the EAP version 
+            available for *development* use. You will be asked to download EAP and accept licensing
+            terms that forbids you from using the software in production and using whatever support
+            you receive from them on that product from setting up your own re-selling business.</para>
+        <para>JBoss AS version numbers are ahead of JBoss EAP because not every community version
+            becomes a commercial version. JBoss AS 6 was skipped entirely by EAP. There is a
+            <ulink url="https://access.redhat.com/site/articles/112673">good article</ulink> on the 
+            pairings between the two product lines on the RedHat Customer Portal</para>
+    </note>
+    <note>
+        <title>JBoss AS 7.2.0.Final &lt;= JBoss EAP 6.1.0.Final</title>
+        <para>We will be downloading JBoss EAP server for class use since that is the most stable release 
+            available. Build dependencies will use the community version since those versions are 
+            available from an Internet-accessible Nexus repository. If that becomes an issue, we can 
+            switch versions without much issue. 
+            </para>
+    </note>
 
     <section id="devenv-jboss-install">
-        <title>Download and Install JBoss Application Server 7</title>
-        <orderedlist>
-            <listitem><para>Download JBoss AS 7.1.1.Final
+        <title>Download and Install JBoss EAP 6.1.0.Final</title>
+        <orderedlist spacing="compact">
+            <listitem><para>Download JBoss 6.1.0 EAP
                 <ulink url="http://www.jboss.org/jbossas/downloads">http://www.jboss.org/jbossas/downloads</ulink>.
                 The 'Quickstarts' examples are also helpful but class notes, exercises, and guidance
                 may have simplified, generalized, or alternative approaches to what is contained in the guides.</para>
             </listitem>
             <listitem>
                 <para>
-                    Install JBoss AS into a directory that does not
-                    have any spaces in its path.
+                    Install JBoss into a directory that does not have any spaces in its path.
                 </para>
                 <programlisting><![CDATA[
-$ unzip ~/Downloads/jboss-as-7.1.1.Final.zip                
+$ unzip ~/Downloads/jboss-eap-6.1.0.Final.zip                
                 
-$ ls jboss-as-7.1.1.Final/
+$ ls jboss-eap-6.1.0.Final/
 ]]></programlisting>                        
             </listitem>
             <listitem>
@@ -30,30 +58,28 @@ $ ls jboss-as-7.1.1.Final/
                     configuration installation.
                 </para>
                 <programlisting><![CDATA[
-$ jboss-as-7.1.1.Final/bin/bin/standalone.sh
-user@ubuntu:/opt$ ./jboss-as-7.1.1.Final/bin/standalone.sh 
-=========================================================================
-
-  JBoss Bootstrap Environment
-
-  JBOSS_HOME: /opt/jboss-as-7.1.1.Final
-
-  JAVA: java
-
-  JAVA_OPTS:  -server -XX:+TieredCompilation -Xms64m -Xmx512m -XX:MaxPermSize=256m 
-  -Djava.net.preferIPv4Stack=true -Dorg.jboss.resolver.warning=true 
-  -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 
-  -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true 
-  -Djboss.server.default.config=standalone.xml
+$ ./jboss-eap-6.1.0.Final/bin/standalone.sh 
+=========================================================================                                                                                                                     
+                                                                                                                                                                                              
+  JBoss Bootstrap Environment                                                                                                                                                                 
+                                                                                                                                                                                              
+  JBOSS_HOME: /opt/jboss-eap-6.1                                                                                                                                                              
+                                                                                                                                                                                              
+  JAVA: /usr/bin/java                                                                                                                                                                         
+                                                                                                                                                                                              
+  JAVA_OPTS:  -server -XX:+UseCompressedOops -Xms1303m -Xmx1303m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true 
+      -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true 
 
 =========================================================================
 
-22:41:07,659 INFO  [org.jboss.modules] JBoss Modules version 1.1.1.GA
-22:41:08,223 INFO  [org.jboss.msc] JBoss MSC version 1.0.2.GA
+13:26:53,149 INFO  [org.jboss.modules] (main) JBoss Modules version 1.2.0.Final-redhat-1
+13:26:53,423 INFO  [org.jboss.msc] (main) JBoss MSC version 1.0.4.GA-redhat-1
+13:26:53,554 INFO  [org.jboss.as] (MSC service thread 1-3) JBAS015899: JBoss EAP 6.1.0.GA (AS 7.2.0.Final-redhat-8) starting
 ...
-22:41:49,257 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
-22:41:49,258 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss AS 7.1.1.Final "Brontes" 
-started in 7908ms - Started 133 of 208 services (74 services are passive or on-demand)
+13:26:59,008 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015961: Http management interface listening on http://127.0.0.1:9990/management
+13:26:59,009 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
+13:26:59,010 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss EAP 6.1.0.GA (AS 7.2.0.Final-redhat-8) started in 6349ms - 
+    Started 146 of 217 services (70 services are passive or on-demand)
 ]]></programlisting>                        
                 <note>
                     <para>There are .sh version of scripts for *nix platforms
@@ -63,7 +89,7 @@ started in 7908ms - Started 133 of 208 services (74 services are passive or on-d
                 </note>
             </listitem>
             <listitem><para>Verify you can access the server</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Main Page:<ulink url="http://localhost:8080">http://localhost:8080</ulink></para></listitem>
                     <listitem><para>Admin Page:<ulink url="http://localhost:9990/console">http://localhost:9990/console</ulink>
                     This will fail until the admin account is added.</para></listitem>
@@ -74,17 +100,17 @@ started in 7908ms - Started 133 of 208 services (74 services are passive or on-d
     
     <section id="devenv-jboss-configure">
         <title>Configure JBoss Server</title>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem><para>Shutdown the server using Control-C</para></listitem>
             <listitem><para>Copy over the class example server files from what 
                 you cloned and built from github earlier.</para>
 <programlisting language=""><![CDATA[
-//using the built .zip file from the module target directory
-$ cd .../jboss-as-7.1.1.Final/
+#using the built .zip file from the module target directory
+$ cd .../jboss-eap-6.1.0.Final/
 $ ls 
 standalone  domain  ...
 
-$ unzip .../ejava-javaee/servers/ejava-jboss711/target/ejava-jboss711-xxx-server.zip
+$ unzip .../ejava-javaee/servers/ejava-jboss61eap/target/ejava-jboss61eap-xxx-server.zip
 ]]></programlisting>
             </listitem>
             <listitem><para>Restart the server</para></listitem>
@@ -93,11 +119,12 @@ $ unzip .../ejava-javaee/servers/ejava-jboss711/target/ejava-jboss711-xxx-server
     
     <section id="add-jboss-admin">
         <title>Add JBoss Admin Account</title>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem><para>Use the batch script to add an admin user to 
-                the system.</para>
+                the system. Note the password must have at least one 
+                digit and one non-alphanumeric character.</para>
                 <programlisting><![CDATA[
-user@ubuntu:/opt$ ./jboss-as-7.1.1.Final/bin/add-user.sh 
+/opt$ ./jboss-eap-6.1.0.Final/bin/add-user.sh 
 
 What type of user do you wish to add? 
  a) Management User (mgmt-users.properties) 
@@ -113,8 +140,8 @@ The username 'admin' is easy to guess
 Are you sure you want to add user 'admin' yes/no? yes
 About to add user 'admin' for realm 'ManagementRealm'
 Is this correct yes/no? yes
-Added user 'admin' to file '/opt/jboss-as-7.1.1.Final/standalone/configuration/mgmt-users.properties'
-Added user 'admin' to file '/opt/jboss-as-7.1.1.Final/domain/configuration/mgmt-users.properties'
+Added user 'admin' to file '/opt/jboss-eap-6.1.0.Final/standalone/configuration/mgmt-users.properties'
+Added user 'admin' to file '/opt/jboss-eap-6.1.0.Final/domain/configuration/mgmt-users.properties'
 ]]></programlisting>                        
             </listitem>
             <listitem>
@@ -128,7 +155,7 @@ Added user 'admin' to file '/opt/jboss-as-7.1.1.Final/domain/configuration/mgmt-
     <section id="enable-jboss-debug">
         <title>Enable JBoss Remote Debugging</title>
         <para>Prepare your server for remote debugging for later.</para>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem><para>Uncomment the following line in either 
             bin/standalone.conf (Linux) or bin/standalone.conf.bat (Windows)</para>
                 <programlisting><![CDATA[
@@ -139,13 +166,13 @@ JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspen
             <listitem><para>Restart the server and notice the additional listen
                 output. Use control-C to stop the server.</para>
                 <programlisting><![CDATA[
-$ ./jboss-as-7.1.1.Final/bin/standalone.sh 
+$ ./jboss-eap-6.1.0.Final/bin/standalone.sh 
 =========================================================================
 ...
 
 Listening for transport dt_socket at address: 8787
-23:01:50,460 INFO  [org.jboss.modules] JBoss Modules version 1.1.1.GA
-23:01:51,688 INFO  [org.jboss.msc] JBoss MSC version 1.0.2.GA
+13:26:53,149 INFO  [org.jboss.modules] (main) JBoss Modules version 1.2.0.Final-redhat-1
+13:26:53,423 INFO  [org.jboss.msc] (main) JBoss MSC version 1.0.4.GA-redhat-1
 ]]></programlisting>                        
             </listitem>
             
@@ -174,11 +201,18 @@ Listening for transport dt_socket at address: 8787
 ]]></programlisting>                        
             </listitem>
         </orderedlist>
+        <note>
+            <para>Note that I said "If..." above. You only need to modify the network 
+                information if you are running into a conflict on your development 
+                platform. Change is not hard, but keeping the default is the simplest
+                way to go.
+            </para>
+        </note>
     </section>
     
     <section id="devenv-jboss-maven">
         <title>Define JBoss Maven Properties in settings.xml</title>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem>
                 <para>
                     Provide a specification to maven where your JBoss server
@@ -192,7 +226,7 @@ Listening for transport dt_socket at address: 8787
             <id>jboss7</id>
             <properties>
                 <jboss.host>127.0.0.1</jboss.host>
-                <jboss.home>/opt/jboss-as-7.1.1.Final</jboss.home>
+                <jboss.home>/opt/jboss-eap-6.1.0.Final</jboss.home>
             </properties>
         </profile>
     </profiles>
