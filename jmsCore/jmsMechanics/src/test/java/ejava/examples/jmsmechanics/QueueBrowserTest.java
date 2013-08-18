@@ -23,7 +23,6 @@ import org.junit.Test;
  * functionality. This object can walk through a JMS queue and perform 
  * an inspection of pending messages.
  *
- * @author jcstaff
  */
 public class QueueBrowserTest extends JMSTestBase {
     static Log log = LogFactory.getLog(QueueBrowserTest.class);
@@ -66,12 +65,18 @@ public class QueueBrowserTest extends JMSTestBase {
             
             QueueBrowser qbrowser = session.createBrowser((Queue)destination);
             int msgs=0;
-            for (Enumeration<?> e = qbrowser.getEnumeration(); 
-                 e.hasMoreElements(); ) {
-                Message m = (Message) e.nextElement();
-                msgs += 1;
-                log.debug("browsing message (" + msgs + 
-                        ")=" + m.getJMSMessageID());
+            //pause here in case server is running a bit slow
+            for(int tries=0;tries<3;tries++) {
+	            for (Enumeration<?> e = qbrowser.getEnumeration(); e.hasMoreElements(); ) {
+	                Message m = (Message) e.nextElement();
+	                msgs += 1;
+	                log.debug("browsing message (" + msgs + ")=" + m.getJMSMessageID());
+	            }
+	            if (msgs==msgCount) { break; }
+	            else { 
+	                log.debug("retrying queueBrowser, got " + msgs + " out of " + msgCount);
+	            	msgs=0; 
+	            }
             }
             assertEquals("unexpected number nf queue browser messages", 
                     msgCount, msgs);
