@@ -60,7 +60,7 @@
       code highlighting routine. This causes the callouts to appear on different lines from the code they relate to. -->
   <xsl:param name="chunker.output.indent" select="'no'"/>
 
-  <xsl:param name="html.stylesheet" select="'css/jbossorg.css'"/>
+  <xsl:param name="html.stylesheet" select="'css/ejava.css'"/>
   <xsl:param name="html.stylesheet.type" select="'text/css'"/>
   <xsl:param name="html.cleanup" select="1"/>
   <xsl:param name="html.ext" select="'.html'"/>

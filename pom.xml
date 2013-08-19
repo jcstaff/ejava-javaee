@@ -407,6 +407,9 @@
                 <sourceDocumentName>${doc.base}.xml</sourceDocumentName>
                 <htmlName>${doc.base}.html</htmlName>
                 <pdfName>${doc.base}.pdf</pdfName>
+                <copyright.holder>jim stafford</copyright.holder>
+                <datePattern>yyyy-MM-dd HH:mm z</datePattern>
+                <timeZone>EST</timeZone>
             </properties>
 
             <pluginRepositories>
@@ -563,6 +566,7 @@
                                     <resources>          
                                         <resource>
                                             <directory>${basedir}/src/docbook</directory>
+                                            <filtering>true</filtering>
                                         </resource>
                                     </resources>              
                                 </configuration>            
@@ -574,6 +578,29 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
                         <executions>
+                            <execution>
+                                <id>generate-pubdate</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>timestamp-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>docbook.pubdate</name>
+                                    <pattern>${datePattern}</pattern>
+                                    <timeZone>${timeZone}</timeZone>
+                                </configuration>
+                           </execution>
+                           <execution>
+                                <id>generate-copyright-date</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>timestamp-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>copyright.year</name>
+                                    <pattern>yyyy</pattern>
+                                </configuration>
+                          </execution>
                           <execution>
                             <id>attach-war</id>
                             <phase>package</phase>
