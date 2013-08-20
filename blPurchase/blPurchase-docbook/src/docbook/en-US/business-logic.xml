@@ -1,11 +1,24 @@
 <?xml version='1.0'?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<book>
+<book id="business-logic">
     <bookinfo>
         <title>Business Logic</title>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation introduces the concept of the business logic tier,
+                using it to form a user facade around the capabilities of the service, 
+                and to leverage business logic interfaces and tests as a form
+                of executable requirements.
+            </para>
+        </abstract>
     </bookinfo>
-    <preface id="bl-purpose">
+    <preface id="business-logic-purpose">
         <title>Purpose</title>
 
         <section id="business-logic-goals">
