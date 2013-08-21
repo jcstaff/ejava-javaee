@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <document>
   <properties>
-    <title>Enterprise Java (605.784.31) Spring 2013</title>
+    <title>Enterprise Java (605.784.31) Fall 2013</title>
     <author email="jcstaff@apl.jhu.edu">jcstaff@apl.jhu.edu</author>
   </properties>
   <body>
@@ -27,10 +27,6 @@
       <subsection name="What's New" id="whatsnew">
       <ul>
       <!--
-          -->
-          <li>2013-06-12: Posted Validation API Material (after semester)</li>
-          <li>2013-06-06: Posted JPA Query Material with JPAQL and Criteria API (after semester)</li>
-          <li>2013-05-21: Posted JPA Query Exercise (after semester)</li>
           <li>2013-05-01: Posted Async TODOs</li>
           <li>2013-05-01: Posted JMS TODOs</li>
           <li>2013-04-16: Posted Security TODOs</li>
@@ -45,35 +41,32 @@
           <li>2013-02-19: Posted Core JPA TODOs and (In-Progress DRAFT) Entity Mapping Exercise</li>
           <li>2013-02-12: Posted EntityManager Materials</li>
           <li>2013-02-05: Posted Business Logic and Data Tier Topics</li>
-          <li>2013-01-28: Posted initial class site</li>
+          -->
+          <li>2013-08-xx: Posted initial class site</li>
       </ul>
       </subsection>
       <subsection name="Class To Do" id="todo">
       <ul>
 
-      <!--
-      -->
-
-      </ul>
-      </subsection>
-
-      <subsection name="Things you should have finished!" id="completed">
-      <ul>
-      <li><ul> <!-- week 13: Async -->
-          <li>Setup and deploy your JMS publisher code to eSales. All
+      <!-- week 13: Async 
+           -->
+      <li><ul>
+          <li>Setup and deploy your JMS publisher code to eLeague. All
           resources should be injected by the container.</li>
-          <li>Setup and implement a JMS MDB in the eBidbot to receive 
-          updates published by eSales.</li>
-          <li>Setup and deploy your JMS publisher code to eBidbotEJB.
+          <li>Setup and implement a JMS MDB in the eClub to receive 
+          updates published by eLeague.</li>
+          <li>Setup and deploy your JMS publisher code to eClubEJB.
           Again - all resources should be injected by the container.</li>
-          <li>Verify that the eSales JMS JSE Subscriber from last
-          week receives published messages from eSalesEJB.</li>
+          <li>Verify that the eLeague JMS JSE Subscriber from last
+          week receives published messages from eLeagueEJB.</li>
           <li>Implement an EJBTimer to perform scheduled work within
-          eSalesEJB and eBidbotEJB.</li>
+          eLeagueEJB and eClubEJB.</li>
           <li>Test, cleanup, document, and turn in project 3</li> 
       </ul></li>
 
-      <li><ul> <!-- week 12: JMS -->
+      <!-- week 12: JMS 
+           -->
+      <li><ul> 
           <li>Security
               <ul>
                   <li>Finish security configuration, implementation, and testing</li>
@@ -107,19 +100,13 @@
               </ul>
           </li>
       </ul></li>
-      <li><ul> <!-- week 11: Security -->
-            <li>Web/Project
+
+
+      <!-- week 11: Security 
+           -->
+      <li><ul>
+            <li>Project
                 <ul>
-                  <li>Add a WAR project to eSales. Add in the controller,
-                      handler, and supporting JSP implementations.</li>
-                  <li>Add a WAR project to eBidbot and deploy your eBidbot
-                      EJBs within that WAR - either embedded or included from a 
-                      separate module. See the webejb example</li>
-                  <li>Add in the controller, handler, and supporting
-                      JSP implementations for eBidbot.  This WAR may obtain
-                      functionality implemented by eSalesEJB. However, it should not
-                      directly communicate with eSalesEJB. eBidbotEJB should act as a
-                      facade for all behavior performed on behalf of eBidbotWAR</li>
                   <li>Complete your project 2, finish testing, and turn in.</li>
                   <li>Start project 3</li>
                 </ul>
@@ -162,20 +149,10 @@
               </ul>
           </li>
       </ul></li>
-      <li><ul> <!-- week 10: Web -->
-            <li>Transactions/Project
-                <ul>
-                   <!-- week 09: Transactions -->
-                  <li>Add @Transaction declarations</li>
-                  <li>Implement the transaction test requirement. You may
-                  want to place logic for the transaction test within 
-                  the TestUtilEJB if you end up with undesirable business
-                  logic in order to demonstrate the rollback of a transaction.
-                  Remember, your entities must actually hit the DB and be rolled
-                  back as part of the transaction. Simply rejecting bad data does
-                  not satisfy the project transaction rollback demo requirement.</li>
-                </ul>
-            </li>
+
+      <!-- week 10: Web 
+           -->
+      <li><ul>
             <li>Exercises
                 <ul>
                   <li>Complete through Part G</li>
@@ -186,11 +163,45 @@
                   <li>Look over Web UI parts of the ejbsessionBank.</li>
                   <li>The webejb example shows an example of RMI and JAX-RS
                       being used as a remote facade. You may use either technique 
-                      for eBidbot. eSales should use RMI.</li>
+                      for eClub. eLeague should use RMI.</li>
+                </ul>
+            </li>
+            <li>Web/Project
+                <ul>
+                  <li>Add a WAR project to eLeague. Add in the controller,
+                      handler, and supporting JSP implementations.</li>
+                  <li>Add a WAR project to eClub and deploy your eClub
+                      EJBs within that WAR - either embedded or included from a 
+                      separate module. See the webejb example</li>
+                  <li>Add in the controller, handler, and supporting
+                      JSP implementations for eClub.  This WAR may obtain
+                      functionality implemented by eLeagueEJB. However, it should not
+                      directly communicate with eLeagueEJB. eClubEJB should act as a
+                      facade for all behavior performed on behalf of eClubWAR</li>
                 </ul>
             </li>
       </ul></li>
-      <li><ul> <!-- week 08: JNDI and CDI -->
+
+      <!-- week 09: Transactions 
+           -->
+      <li><ul> 
+            <li>Transactions
+                <ul>
+                  <li>Add @Transaction declarations</li>
+                  <li>Implement the transaction test requirement. You may
+                  want to place logic for the transaction test within 
+                  the TestUtilEJB if you end up with undesirable business
+                  logic in order to demonstrate the rollback of a transaction.
+                  Remember, your entities must actually hit the DB and be rolled
+                  back as part of the transaction. Simply rejecting bad data does
+                  not satisfy the project transaction rollback demo requirement.</li>
+                </ul>
+            </li>
+      </ul></li>
+
+      <!-- week 08: JNDI and CDI 
+           -->
+      <li><ul>
             <li>Exercises
                 <ul>
                   <li>Complete through (Optional) Part E</li>
@@ -198,7 +209,7 @@
             </li>
             <li>Project
                 <ul>
-                  <li>Design your remote interfaces and DTO classes for the eSales</li>
+                  <li>Design your remote interfaces and DTO classes for the eLeague</li>
                   <li>Begin adding the other session beans, remote interfaces,
                   business logic integration, and RMI tests for project 2.</li>
                   <li>Finish implementing EJB use cases for eSales end-to-end testing.</li>
@@ -206,7 +217,26 @@
             </li>
       </ul></li>
 
-      <li><ul> <!-- week 07: Session Beans -->
+      <!-- week 07: SQL Tuning and Session Beans 
+           -->
+      <li><ul> 
+            <li>DAOs
+                <ul>
+                  <li>Add indexes to your DB schema to at least account for where 
+                      clauses used in queries and foreign keys used in relationship joins.</li>
+                </ul>
+            </li>
+            <li>Project
+                <ul>
+                  <li>Perform any desired post-submission refactoring of your 
+                  project 1 implementation prior to re-use within project 2.</li>
+                  <li>Look over the specification for project 2.</li>
+                  <li>Apply the maven, EJB, EAR, RMI Test, and remote interface
+                  concepts from the exercises to your project 2.</li>
+                  <li>Have one end-to-end thread through eSalesTest, EJB, and project 1
+                  operational</li>
+                </ul>
+            </li>
             <li>Examples
                 <ul>
                   <li>The class examples have been updated to include the 
@@ -223,30 +253,27 @@
                   <li>Start working through the Java EE exercises.
                   It is highly recommended that you go through this since it
                   takes you through many of the use cases and common issues
-                  related to project 2.  Complete through Part D.</li>
-                </ul>
-            </li>
-            <li>Project
-                <ul>
-                  <li>Perform any desired post-submission refactoring of your 
-                  project 1 implementation prior to re-use within project 2.</li>
-                  <li>Look over the specification for project 2.</li>
-                  <li>Apply the maven, EJB, EAR, RMI Test, and remote interface
-                  concepts from the exercises to your project 2.</li>
-                  <li>Have one end-to-end thread through eSalesTest, EJB, and project 1
-                  operational</li>
+                  related to project 2.  Stop after completng Part D.</li>
                 </ul>
             </li>
       </ul></li>
 
-      <li><ul> <!-- week 06: JPAQL -->
-            <li>Refactor or implement any necessary functionality using
-              Queries and JPA-QL.</li>
-            <li>Finish adding required business logic for end-to-end 
-              testing.</li>
-
+      <!-- week 06: JPAQL 
+           -->
+      <li><ul> 
+            <li>Exercises
+                <ul>
+                  <li>Go through the Query Exercise if you have time.</li>          
+                </ul>
+            </li>
+            <li>DAOs
+                <ul>
+                    <li>Refactor or implement any necessary functionality using Queries and JPA-QL.</li>
+                </ul>
+            </li>
             <li>Project
                 <ul>
+                  <li>Finish adding required business logic for end-to-end testing.</li>
                   <li>Finish up project 1 and submit to the grader according
                   to the submission criteria.</li>
                   <li>Perform any desired post-submission refactoring of your 
@@ -254,16 +281,20 @@
                   <li>Look over the specification for project 2.</li>
                 </ul>
             </li>
+      </ul></li>
+
+      <!-- week 05: JPA Relationships 
+           -->
+      <li><ul> 
             <li>Exercises
                 <ul>
-                  <li>Start working through the Java EE exercises.
-                  It is highly recommended that you go through this since it
-                  takes you through many of the use cases and common issues
-                  related to project 2.  Complete through Part D.</li>
+                  <li>Go through the Relationship Mapping Exercise. This exercise covers 
+                      issues that come up when mapping Java class relationships to an RDBMs 
+                      using JPA. There is more there than one could possibly ever finish
+                      in the time alloted. Pick and choose which sections are relevant 
+                      to your project and use it as a reference to refer back to later.</li>          
                 </ul>
             </li>
-      </ul></li>
-      <li><ul> <!-- week 05: JPA Relationships -->
             <li>JPA Entities
                 <ul>
                   <li>Enhance your business objects to include JPA relationships.
@@ -305,39 +336,39 @@
                 </ul>
             </li>
       </ul></li>
-      <li><ul> <!-- week 04: JPA Core -->
-            <li>Examples
+
+      <!-- week 04: JPA Core 
+            -->
+      <li><ul> 
+            <li>Exercises
                 <ul>
-                  <li>An Entity Mapping Exercise has been posted.
-                      It attempts to cover most of this week's TODOs
-                      and is OPTIONAL. If you choose to go through it,
-                      please know that it is new and I
-                      could use as much feedback as you can give on
-                      its current state.  I especially would like to
-                      know how the archetype worked out and whether the
-                      multi-usecase database setup collides too much
-                      with earlier class instructions.</li>
+                  <li>Go through the Entity Mapping Exercise. This exercise covers issues that
+                      come up when mapping Java classes to an RDBMs using JPA.</li>          
                 </ul>
             </li>
             <li>JPA Entities
                 <ul>
                   <li>Create the remainder of your business objects for the project.</li>
                   <li>Declare the business objects as @Entities and map the classes
-                  to tables and columns in your database. Your schema file(s) and JPA
-                  DAOs should be using the same database tables at this point.
-                  Mark relationships and problem fields as @Transient at this point 
-                  in time.</li>
+                      to tables and columns in your database. Your schema file(s) and JPA
+                      DAOs should be using the same database tables at this point.
+                      Mark relationships and problem fields as @Transient at this point 
+                      in time.</li>
+                  <li>Add additional bean validation rules to your business objects
+                      to address any non-null, minimum, maximum, and pattern constraints
+                      you may have.</li>
                   <li>Create unit tests for any non-trivial business rules implemented
-                  within the business object classes.</li>
+                      within the business object classes.</li>
                 </ul>
             </li>
             <li>JPA DAOs
                 <ul>
                   <li>Create unit tests for the ability to create your business objects
-                  and get them by primary key.
-                  Pay attention to the business rules your application has for ordering
-                  the creation (e.g., must have Auction before having Bid).
-                  Solve dependency issues with sensible pre-conditions for child objects.</li>
+                      and get them by primary key.
+                      Pay attention to the business rules your application has for ordering
+                      the creation (e.g., must have Club before having a Club Rep).
+                      Solve dependency issues with sensible pre-conditions for child objects.</li>
+                  <li>Enact your bean validation rules for @PrePersist and @PreUpdate</li>
                 </ul>
             </li>
             <li>Business Logic
@@ -345,16 +376,34 @@
                   <li>Create unit test for injest and begin implementation of injest
                   for at least one of the types in your model and provided test data.
                   Try to avoid using classes with required relationships at this point.
+                  This goal has been achieved when you have instantiated the provided 
+                  parser within a unit test, read in the provided XML data file, streamed
+                  through the data file looking for objects of early interest from the parser, 
+                  and persisted the objects using one of your DAOs.
                   </li>
                 </ul>
             </li>
       </ul></li>
-      <li><ul> <!-- week 03: DAOs and EntityManager -->
-            <li>Examples
+
+      <!-- week 03: DAOs and EntityManager 
+           -->
+      <li><ul> 
+            <li>Project Sanity Check
             <ul>
-              <li>Go through the EntityManager Exercise</li>          
+              <li>Correct and complete your project structure based on comments from your early submission
+                   last week. Turn in by due date unless your early submission was previously accepted.</li>          
+              <li>Only business logic interfaces and skeletal business objects are required for the 
+                   project sanity check. Data tier/JPA topics listed below are not a required part.</li>          
+            </ul>
+            </li>
+
+            <li>Exercises and Examples
+            <ul>
+              <li>Go through the EntityManager Exercise. This exercise is just as much about covering
+                  the details to create a maven module for data tier classes as it is about the JPA 
+                  EntityManager.</li>          
               <li>Look over the class project example implementation under the 
-                projects/eMarket/eSales directory as it relates to integrating
+                projects/eSport/eLeague directory as it relates to integrating
                 JPA within the individual modules.
               </li>
             </ul>
@@ -364,7 +413,8 @@
                 <ul>
                   <li>Design a draft DB schema for your business object. This should go in 
                     the module hosting your DAOs.</li>
-                  <li>Implement a way to create your schema in the DB as a part of your DAO testing.</li>
+                  <li>Implement a way to create your schema in the DB as a part of your DAO testing. Factor
+                      in reuse across multiple modules, multiple test cases, and multiple test methods.</li>
                 </ul>
             </li>
 
@@ -413,44 +463,59 @@
             </li>
       </ul></li>
 
-      <li><ul> <!-- week 02: DevEnv and Business Logic -->
-          <li>Look over the class project 1 and post any questions.</li>
 
-          <li>Establish your project directory structure and perform a build from the root.</li>
-          <li>Create the business logic interfaces and define the operations that will
-              satisfy the end-to-end scenario. Create skeletal business object classes
-              necessary to express the business logic interfaces.</li>
-          <li>Create a JUnit unit test for the business logic to address the requirements 
-              for the end-to-end scenario.  Place this unit test in with the module
-              containing your business logic 
-              and use it to help scope your future work on the project.</li>
-          <li>Create a set of business logic classes to implement the busines logic
-              interfaces. Stub out each call for now so the end-to-end test will
-              execute.</li>
-
-          <li>Design and implement the details of at least one business object 
-              used in the business logic interface above.</li>
-          <li>Design and implement a JUnit unit test for that business object. Place
-              this unit test within the module containing your business object.</li>
-
-          <b>
-          <li>Send me a copy of your project, in a stable, known state,
-          sometime this week; ideally by early Monday evening. You should have
-          a project structure in place that can build from the root, a good 
-          start on the items mentioned above, and a list of issues or questions
-          that you would like answered about how to move forward.
-          This will be used as feedback to the class.</li>
-          </b>
+      <!-- week 02: DevEnv and Business Logic 
+           -->
+      <li><ul> 
+            <li>Project
+                <ul>
+                  <li>Look over the class project 1 and post any questions.</li>
+                  <li>Establish your project directory structure and perform a build from the root.</li>
+                  <b><li>Send me an early submission of your project sometime this week 
+                      (ideally by Mon evening) in a stable, known but not necessarily complete state. 
+                      You should have a project structure in place that can build from the root, a good 
+                      start on the items mentioned above, and a list of issues or questions
+                      that you would like answered about how to move forward.
+                      This will be used as feedback to the class.</li></b>
+                </ul>
+            </li>
+            <li>Business Logic
+                <ul>
+                  <li>Create the business logic interfaces and define the operations that will
+                      satisfy the end-to-end scenario.</li>
+                  <li>Create a JUnit unit test for the business logic to address the requirements 
+                      for the end-to-end scenario.  Place this unit test in with the module
+                      containing your business logic 
+                      and use it to help scope your future work on the project.</li>
+                  <li>Create a set of business logic classes to implement the busines logic
+                      interfaces. Stub out each call for now so the end-to-end test will
+                      execute.</li>
+                </ul>
+            </li>
+            <li>Business Objects
+                <ul>
+                  <li>Create skeletal business object classes necessary to express the vocabulary 
+                      of the business logic interfaces.</li>
+                  <li>Design and implement the basics of a JUnit unit test for a business object (just one). 
+                      Place this unit test within the module containing your business objects.</li>
+                </ul>
+            </li>
       </ul></li>
 
-      <li><ul> <!-- week 01: Course Intro -->
-          <li>register for newsgroup and setup e-mail handling (all
-          e-mails will have ejava_class in subject)</li>
+      <!-- week 01: Course Intro 
+           -->
+      <li><ul> 
+          <li>register for newsgroup and setup e-mail handling (all e-mails will have ejava_class in subject)</li>
           <li>post at least 1 test message to newsgroup</li>
           <li>setup development environment by going through exercises 0 and 1</li>
           <li>post your weekly newsgroup contribution based on development environment setup</li>
       </ul></li>
 
+      </ul>
+      </subsection>
+
+      <subsection name="Things you should have finished!" id="completed">
+      <ul>
       <li><ul>
           <li>had a nice break!</li>
       </ul></li>
