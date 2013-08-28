@@ -65,17 +65,17 @@ Project1: eMarket Data Access Tier and Initial Business Logic
 
     The work done during this project will focus on the business
     objects (BOs), the data access objects (DAOs) of the data access
-    tier, and some initial business logic interfaces (BL) and business
+    tier, some initial business logic interfaces (BL), and business
     logic implementations (BLImpl). The DAOs will be based on the Java
     Persistence API (JPA).  How you partition the implementations into
-    separate physical sub-projects is up to you.  A suggested starting
+    separate physical sub-modules is up to you.  A suggested starting
     point is provided at the end of this project description.
 
     The business objects encapsulate the core business data and
     rules of the applications. You will design the business objects
     and then map them to the database.
     You are required to implement full CRUD (Create, Read, Update, and
-    Delete), capability with JPA. You will be required to encapsulate
+    Delete), capability with JPA. You are required to encapsulate
     all object to relational (O/R) mapping within the DAOs, descriptor
     files, and business object annotations.  You will be given a set of
     {{{https://github.com/jcstaff/ejava-javaee/blob/master/projects/eMarket/eMarketData/eSalesTestUtil/src/main/resources/xml/}
@@ -83,7 +83,7 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     of data for the ingest requirement. To use the data, you will ingest 
     using a parser supplied by the instructor. There is a sample thread
     in the projects/eMarket/eSales directory that shows how to use the 
-    parser as well as other aspects technology within the project.  
+    parser as well as other technology within the project.  
 
     The business logic will provide a set of classes with concise methods
     that map easily to use cases. The business logic will ensure proper
@@ -144,8 +144,8 @@ Project1: eMarket Data Access Tier and Initial Business Logic
     jcs.sales, jcs.bidbot), JNDI names, DB tables, etc. 
 
     [Note:] There should be no use of System.out.println() in the code and all
-    implementations must use the jakarta commons logging API with the 
-    log4j logging provider.  You may leave debug in your code, but this 
+    implementations must use a logging API with the log4j logging provider.  
+    You may leave debug in your code, but this 
     should be able to be turned on/off with the proper logging priority
     changes in the log4j.xml configuration.
 
