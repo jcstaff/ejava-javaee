@@ -32,7 +32,7 @@ public class JNDIUtil {
 	 * mechanisms and want to keep them separate by forming the jndi.properties
 	 * in memory.
 	 * @param prefix
-	 * @return
+	 * @return Properties object that can be used during a new InitialContext(env)
 	 * @throws IOException
 	 */
     public static Properties getJNDIProperties(String prefix) throws IOException {
@@ -72,7 +72,7 @@ public class JNDIUtil {
      * @param type
      * @param name
      * @param waitSecs
-     * @return
+     * @return Object resolved from the lookup
      * @throws NamingException 
      */
     @SuppressWarnings("unchecked")
@@ -98,15 +98,24 @@ public class JNDIUtil {
     	log.debug("object=" + object);
     	return object;
     }
-	
-	
-	
-	
-	
+		
+	/**
+     * Produces a debug string listing the JNDI contents of the current, default 
+     * Context.
+     * @return String describing contents of context
+	 * @throws NamingException
+	 */
     public String dump() throws NamingException {
         return dump(new InitialContext(),"");
     }
 
+    /**
+     * Produces a debug string listing the JNDI contents of the specified 
+     * Context.
+     * @param context
+     * @param name
+     * @return String describing contents of context
+     */
     public String dump(Context context, String name) {
         StringBuilder text = new StringBuilder();
         if (name==null) { name = ""; }

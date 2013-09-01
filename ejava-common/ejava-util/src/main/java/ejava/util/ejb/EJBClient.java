@@ -19,7 +19,7 @@ public class EJBClient {
      * @param ejbClassName
      * @param remoteInterface
      * @param version
-     * @return
+     * @return String jndi name that can be used for lookup
      */
 	public static String getEJBClientLookupName(
     		String earName,
@@ -60,7 +60,7 @@ ejb:(ear)/(module)/(distinctName)/(ejbClass)!(remoteInterface)?stateful
 	 * @param distinctName
 	 * @param ejbClassName
 	 * @param remoteInterface
-	 * @return
+	 * @return String jndi name that can be used for lookup
 	 */
     public static String getEJBClientLookupName(
     		String earNameVersion,
@@ -96,7 +96,7 @@ java:jboss/exported/(ear)/(module)/(ejbClass)!(remoteInterface)
      * @param ejbModuleNameVersion
      * @param ejbClassName
      * @param remoteInterface
-     * @return
+     * @return String jndi name that can be used for lookup
      */
     public static String getRemoteLookupName(
     		String earNameVersion,
@@ -126,7 +126,7 @@ java:jboss/exported/(war)/(ejbClass)!(remoteInterface)
      * @param moduleNameVersion
      * @param ejbClassName
      * @param remoteInterface
-     * @return
+     * @return String jndi name that can be used for lookup
      */
     public static String getRemoteLookupName(
     		String moduleNameVersion,
