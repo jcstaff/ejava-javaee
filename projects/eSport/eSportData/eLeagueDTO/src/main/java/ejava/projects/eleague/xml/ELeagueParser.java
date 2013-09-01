@@ -106,8 +106,8 @@ public class ELeagueParser {
 	 * being used. That won't work to great when two namespaces declare a common
 	 * local-name. Should be easily fixable when needed.
 	 * 
-	 * @param element
-	 * @return
+	 * @param elements an vararg of element names you wish to pull from document
+	 * @return The next element that matches one of the element names in elements.
 	 * @throws XMLStreamException
 	 * @throws JAXBException
 	 */
