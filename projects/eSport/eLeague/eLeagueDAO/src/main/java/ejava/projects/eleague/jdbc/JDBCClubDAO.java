@@ -65,6 +65,7 @@ public class JDBCClubDAO implements ClubDAO {
                 long id = rs.getLong(1);
                 setId.invoke(venue.getAddress(), id);
             }
+            rs.close();
 		    
 			statement3 = connection.prepareStatement(
                 "INSERT INTO ELEAGUE_VEN (ID, NAME, ADDR_ID) " +

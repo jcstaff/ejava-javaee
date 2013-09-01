@@ -81,6 +81,7 @@ public class JDBCClubDAOTest extends JDBCDAOTestBase {
     	    else {
     	    	fail("no venue found");
     	    }
+    	    rs.close();
     	    
     	    rs = statement.executeQuery(
     	    	"SELECT CITY " +
