@@ -7,16 +7,16 @@
     
      <section id="jpa-overview-background">
         <title>Background</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Earlier versions of EJB Spec defined persistence as part of <code>javax.ejb.EntityBean</code></para></listitem>
 
             <listitem><para>JavaEE 5 moved persistence to its own specification</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Java Persistence API (JPA) version 1.0</para></listitem>
                     <listitem><para>javax.persistence</para></listitem>
                     <listitem><para>Ease of use API above JDBC</para></listitem>
                     <listitem><para>Provides</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Object/Relational Mapping (ORM) Engine</para></listitem>
                             <listitem><para>Query Language (JPA-QL) - SQL-like - main carryover from EJB 2.x</para></listitem>
                         </itemizedlist>                   
@@ -25,7 +25,7 @@
             </listitem>
 
             <listitem><para>JavaEE 6 advanced specification</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Java Persistence API (JPA) version 2.0</para></listitem>
                     <listitem><para>More mapping capabilities</para></listitem>
                     <listitem><para>More entity manager capabilities</para></listitem>
@@ -38,11 +38,11 @@
 
     <section id="jpa-overview-em">
         <title>EntityManager</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Replaced EJB 2.x Home Functionality</para></listitem>
             <listitem><para>Handles O/R Mapping to the database</para></listitem>
             <listitem><para>Provides APIs for</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Inserting into database</para></listitem>
                     <listitem><para>Updating entities in database</para></listitem>
                     <listitem><para>Finding and querying for entities in database</para></listitem>
@@ -57,9 +57,9 @@
 
     <section id="jpa-overview-entity">
         <title>Entity</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Plain Old Java Objects (POJOs)</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Nothing special happens when calling new()</para>
 <programlisting language="java"><![CDATA[
 Author author = new Author();
@@ -95,7 +95,7 @@ public class Author implements Serializable {
 }        
         ]]></programlisting>
         <para>Entity minimum requirements:</para>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Annotated as entity or declared in orm.xml</para></listitem>
             <listitem><para>Unique identity (form primary key(s))</para></listitem>
             <listitem><para>Non-private default constructor</para></listitem>
@@ -136,7 +136,7 @@ log.debug("em.contains(author)=" + em.contains(author));
         
         <section id="jpa-entity-state-attached">
             <title>Managed</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Associated with persistence context</para></listitem>
                 <listitem><para>Has identity</para></listitem>
                 <listitem><para>Changes to the entity will impact the database</para></listitem>
@@ -146,12 +146,12 @@ log.debug("em.contains(author)=" + em.contains(author));
 
         <section id="jpa-entity-state-detached">
             <title>Detached</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Has identity but not associated with persistence context</para></listitem>
                 <listitem><para>Changes to entity will not impact the database</para></listitem>
                 <listitem><para>Method <code>em.contains(entity)</code> returns false</para></listitem>
                 <listitem><para>An entity becomes detached when:</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>Has not yet been persisted</para></listitem>
                         <listitem><para>After a transaction-scoped transaction is committed</para></listitem>
                         <listitem><para>After a transaction rollback</para></listitem>
@@ -170,11 +170,11 @@ log.debug("em.contains(author)=" + em.contains(author));
  
      <section id="jpa-overview-persistencecontext">
         <title>Persistence Context</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>A set of managed instances managed by an EntityManager</para></listitem>
             <listitem><para>All entities become detached once closed</para></listitem>
             <listitem><para>Two types:</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Extended</para>
                                 <programlisting language="java"><![CDATA[
 Author author = new Author();
@@ -191,7 +191,7 @@ em.getTransaction().begin();
 author.setFirstName("bar");
 em.getTransaction().commit();
 ]]></programlisting>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Live beyond a single transaction</para></listitem>
                             <listitem><para>Allow long-lived algorithms to process without tying up a database transaction</para></listitem>
                         </itemizedlist>
@@ -208,7 +208,7 @@ public Author createAuthor(...) {
     return author;
 }
 ]]></programlisting>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Begin/end at transaction boundaries</para></listitem>
                             <listitem><para>Injected by containers</para></listitem>
                         </itemizedlist>
@@ -221,7 +221,7 @@ public Author createAuthor(...) {
 
     <section id="jpa-overview-pu">
         <title>Persistence Unit</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>A set of classes that are mapped to the database</para></listitem>
             <listitem><para>Defined in META-INF/persistence.xml</para></listitem>
             <listitem><para>Entity classes may be named in persistence.xml or searched for</para></listitem>
@@ -320,7 +320,7 @@ version="2.0">
 
         <section id="jpa-overview-hibernate-properties">
             <title>Optional hibernate.properties</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Can be used to specify connection properties outside of persistence.xml</para></listitem>
                 <listitem><para>Useful in separating production mapping information from runtime connection properties</para></listitem>
             </itemizedlist>                   
@@ -378,7 +378,7 @@ version="2.0">
                 <varlistentry>
                     <term><filename>provider</filename></term>
                     <listitem><para>Fully qualified name of javax.persistence.PersistenceProvider</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Not needed if provider is in classpath</para></listitem>
                         </itemizedlist>
                     </listitem>
@@ -407,7 +407,7 @@ version="2.0">
                 <varlistentry>
                     <term><filename>class</filename></term>
                     <listitem><para>Fully qualified package name of entity class</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>One source of entity information</para></listitem>
                         </itemizedlist>
                     </listitem>
@@ -428,16 +428,16 @@ version="2.0">
         
         <section id="jpa-overview-entity-discover">
             <title>Entity Discovery</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Classes with @Entity annotation</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>In persistence.xml's JAR file</para></listitem>
                         <listitem><para>Contained in any JAR listed in persistence.xml#jar-file element</para></listitem>
                     </itemizedlist>                   
                 </listitem>
                                 
                 <listitem><para>Classes mapped</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>With a META-INF/orm.xml file</para></listitem>
                         <listitem><para>With custom mapping files</para></listitem>
                     </itemizedlist>                   
@@ -452,9 +452,9 @@ version="2.0">
 
     <section id="jpa-overview-steps">
         <title>Basic Steps</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>setUp</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Create EntityManagerFactory</para>
                     <programlisting language="java"><![CDATA[
 public class javax.persistence.Persistence extends java.lang.Object{
@@ -494,7 +494,7 @@ public void setUp() throws Exception {
             </listitem>
 
             <listitem><para>Runtime</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Start Transaction</para>
                     <programlisting language="java"><![CDATA[
 em.getTransaction().begin();
@@ -516,7 +516,7 @@ em.getTransaction().commit();
             </listitem>
             
             <listitem><para>tearDown</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Close EntityManager</para>
                     <programlisting language="java"><![CDATA[
 @After

@@ -8,7 +8,7 @@
         <title>EJB/EAR Deployment</title>
         <para>Traditional approach</para>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
 
             <listitem><para>Entity classes and XML mapping files packaged within jar-file</para>
 <programlisting language=""><![CDATA[
@@ -57,7 +57,7 @@ META-INF/ejb-jar.xml]]></programlisting>
         <title>WAR Deployment</title>
         <para>Traditional EJB-less approach</para>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
 
             <listitem><para>persistence.xml placed in WEB-INF/classes/META-INF or within WEB-INF/lib/(archive)/META-INF</para>
 <programlisting language=""><![CDATA[
@@ -94,7 +94,7 @@ jaxrsInventoryWAR
         <title>EJB/WAR Deployment</title>
         <para>Newer, flexible-deployment approach</para>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
 
             <listitem><para>EJB either exploded within WAR or packaged as JAR</para>
 <programlisting language=""><![CDATA[
@@ -134,7 +134,7 @@ jaxrsInventoryWAR
 
     <section id="jpa-serverside-deployments-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>EJB/EAR (traditional) deployment</para></listitem>
             <listitem><para>WAR (traditional non-EJB) deployment</para></listitem>
             <listitem><para>EJB/WAR "flexible deployment"</para></listitem>

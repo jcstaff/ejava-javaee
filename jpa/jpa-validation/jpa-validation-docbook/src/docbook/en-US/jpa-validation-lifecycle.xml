@@ -32,7 +32,7 @@ public class Person {
     }
     @PostRemove public void postRemove() {
     }]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Could be used to log or validate instance at certain stages of lifecycle</para></listitem>
             <listitem><para>JPA prohibits calling EntityManager within callback methods</para></listitem>
         </itemizedlist>
@@ -66,7 +66,7 @@ public class Listener {
     }
 }
 ]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Same Listener class may listen to multiple entity types</para></listitem>
             <listitem><para>Good for when Listener has specific purpose that is type-agnostic</para></listitem>
         </itemizedlist>
@@ -75,7 +75,7 @@ public class Listener {
 
     <section id="jpa-validation-lifecycle-summary">
         <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Access to stages of persistence lifecycle</para></listitem>
             <listitem><para>@PrePersist, @PreUpdate, and @PreRemove good candidates for validation</para></listitem>
             <listitem><para>JPA provides direct support for Validation API and these events</para></listitem>

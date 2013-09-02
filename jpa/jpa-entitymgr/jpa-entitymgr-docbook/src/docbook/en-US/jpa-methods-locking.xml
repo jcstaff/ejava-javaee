@@ -6,9 +6,9 @@
     
     <section id="jpa-locking-types">
         <title>Primary Lock Types</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Optimistic</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Entity assumed not to have concurrent access</para></listitem>
                     <listitem><para>No active database locks are obtained at start</para></listitem>
                     <listitem><para>Success judged based on entity state at end</para></listitem>
@@ -16,7 +16,7 @@
                 </itemizedlist>                   
             </listitem>
             <listitem><para>Pessimistic</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Entity requires mitigation for concurrent access</para></listitem>
                     <listitem><para>Active database locks are obtained at start of transaction</para></listitem>
                 </itemizedlist>                   
@@ -27,15 +27,15 @@
     
     <section id="jpa-locking-lockmode">
         <title>LockModeType</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>NONE</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>No locks</para></listitem>
                 </itemizedlist>                   
             </listitem>
 
             <listitem><para>OPTIMISTIC (was READ)</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Requires entity to have a <code>@Version</code> property</para></listitem>
                     <listitem><para>Prevent dirty reads</para></listitem>
                     <listitem><para>Prevent non-repeatable reads</para></listitem>
@@ -43,7 +43,7 @@
             </listitem>
 
             <listitem><para>OPTIMISTIC_FORCE_INCREMENT (was WRITE)</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Requires entity to have a <code>@Version</code> property</para></listitem>
                     <listitem><para>Update only occurs if change has proper version</para></listitem>
                     <listitem><para>Version is incremented upon update</para></listitem>
@@ -52,7 +52,7 @@
             </listitem>
 
             <listitem><para>PESSIMISTIC_READ</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Supported with or without <code>@Version</code> property</para></listitem>
                     <listitem><para>Obtains active database lock</para></listitem>
                     <listitem><para>Provides repeatable reads</para></listitem>
@@ -61,14 +61,14 @@
             </listitem>
 
             <listitem><para>PESSIMISTIC_WRITE</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Supported with or without <code>@Version</code> property</para></listitem>
                     <listitem><para>Forces serialization of entity updates among transactions</para></listitem>
                 </itemizedlist>                   
             </listitem>
 
             <listitem><para>PESSIMISTIC_FORCE_INCREMENT</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Requires entity to have a <code>@Version</code> property</para></listitem>
                     <listitem><para>PESSIMISTIC_WRITE lock with increment of <code>@Version</code></para></listitem>
                 </itemizedlist>                   
@@ -84,7 +84,7 @@
 void lock(Object entity, javax.persistence.LockModeType);
 void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> properties);
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Requests lock on entity</para></listitem>
         </itemizedlist>                   
     </section>
@@ -95,7 +95,7 @@ void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> pro
 <T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType);
 <T> T find(Class<T> entityClass, Object primaryKey, javax.persistence.LockModeType, Map<String, Object> properties);
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Find object by primary key and lock</para></listitem>
         </itemizedlist>                   
     </section>
@@ -106,7 +106,7 @@ void lock(Object entity, javax.persistence.LockModeType, Map<String, Object> pro
 void refresh(Object, javax.persistence.LockModeType);
 void refresh(Object, javax.persistence.LockModeType, Map<String, Object> properties);
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Refresh entity state and obtain lock</para></listitem>
         </itemizedlist>                   
     </section>
@@ -117,7 +117,7 @@ void refresh(Object, javax.persistence.LockModeType, Map<String, Object> propert
         <programlisting language="java"><![CDATA[
 javax.persistence.LockModeType getLockMode(Object entity);
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Get lock mode for entity</para></listitem>
         </itemizedlist>                   
     </section>

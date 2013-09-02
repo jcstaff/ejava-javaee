@@ -8,7 +8,7 @@
         Java class annotations. It will also take you through the steps to define
         a POJO class legal to be used as JPA entity class.</para>
     <para>JPA Classes are required to ...</para>
-   <itemizedlist>
+   <itemizedlist spacing="compact">
         <listitem><para>Be identified as being a JPA entity class</para></listitem>
         <listitem><para>Have a default constructor</para></listitem>
         <listitem><para>At least have one property defined as the primary key</para></listitem>
@@ -228,7 +228,7 @@ javax.persistence.PersistenceException: org.hibernate.InstantiationException: No
 
             <listitem><para>Rebuild the module. It should now pass because you have 
                 defined and registered a compliant entity class. The class was</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Registered as an entity using and orm.xml deployment descriptor
                        wired into the persistence unit through a mapping-file reference in the 
                        persistence.xml</para></listitem>
@@ -370,7 +370,7 @@ $ cat
 
             <listitem><para>If you would like to observe the data in the database, do two things</para>
 
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Turn off the hibernate.hbm2ddl.auto=create option by commenting it out
                         in hibernate.properties</para>
 <programlisting language=""><![CDATA[

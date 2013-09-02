@@ -6,7 +6,7 @@
     
     <section id="bl-sessionfacade-context">
         <title>Context</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Multi-tiered application</para></listitem>
             <listitem><para>Non-trivial business logic and data</para></listitem>
         </itemizedlist>                   
@@ -14,7 +14,7 @@
 
     <section id="bl-sessionfacade-problem">
         <title>Problem</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Potential tight coupling between clients and complex business objects</para></listitem>
             <listitem><para>Too many method invocations between clients and business objects</para></listitem>
             <listitem><para>Business methods exposed for misuse by clients</para></listitem>
@@ -28,7 +28,7 @@
 
     <section id="bl-sessionfacade-forces">
         <title>Forces</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Hide complex interactions behind a simple client interface</para></listitem>
             <listitem><para>Reduce the number of business objects exposed to the client across the network</para></listitem>
             <listitem><para>Hide implementation, interactions, and dependencies of business components</para></listitem>
@@ -37,7 +37,7 @@
 
     <section id="bl-sessionfacade-solution">
         <title>Solution</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Use a business logic class to encapsulate the interactions required with the business objects</para></listitem>
         </itemizedlist>                   
         <figure>
@@ -52,10 +52,10 @@
 
     <section id="bl-sessionfacade-consequences">
         <title>Consequences</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Simplifies complex systems</para></listitem>
             <listitem><para>May appear to be a no value pass-thru in simple systems</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Should involve more than one business object per facade</para></listitem>
                     <listitem><para>Should have more than one facade per system</para></listitem>
                 </itemizedlist>                   

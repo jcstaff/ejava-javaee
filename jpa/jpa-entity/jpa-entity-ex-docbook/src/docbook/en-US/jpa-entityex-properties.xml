@@ -5,7 +5,7 @@
     <title>Mapping Class Properties</title>
     <para>In this chapter we will create custom class/database mappings
         for some class properties</para>
-   <itemizedlist>
+   <itemizedlist spacing="compact">
         <listitem><para>Map a class to a specific table</para></listitem>
         <listitem><para>Map a property to a specific column</para></listitem>
         <listitem><para>Define constraints for properties</para></listitem>
@@ -239,7 +239,7 @@ $ more target/classes/ddl/*
     );
 ]]></programlisting>
                 <para>Notice how</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>All defaults not overwritten are preserved (e.g., column names)</para></listitem>
                     <listitem><para>The Cat and Cat2 entities have been mapped to the ENTITYEX_CAT table.</para></listitem>
                     <listitem><para>The id property has been mapped to the CAT_ID column</para></listitem>
@@ -475,7 +475,7 @@ Hibernate:
     <section id="jpa-entityex-property-summary">
        <title>Summary</title>
        <para>In this chapter you performed some core class/database table mappings that allowed you to</para>
-       <itemizedlist>
+       <itemizedlist spacing="compact">
         <listitem><para>Define the name of the table used to store instances of the entity class</para></listitem>
         <listitem><para>Define the column name used to store properties within the entity class</para></listitem>
         <listitem><para>Define property constraints to require a property to exist or continue to be optional</para></listitem>

@@ -3,7 +3,7 @@
 
 <chapter id="devenv-mgmt">
     <title>Dependency/Plugin Management</title>
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Defines what is possible without actively imposing the 
             dependency or plugin defined</para></listitem>
         <listitem><para>Placed in a parent of multi-module project</para></listitem>
@@ -12,7 +12,7 @@
     
     <section id="devenv-mgmt-dependency">
         <title>Dependency Management</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Consolidate management of dependency versions 
                 without adding active dependencies to all inheriting children</para>
                 <programlisting language="xml"><![CDATA[<properties>
@@ -92,7 +92,7 @@
 
     <section id="devenv-mgmt-plugin">
         <title>Plugin Management</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Consolidate management of plugin versions and
                 default configuration without adding activations to all inheriting children</para>
             <programlisting language="xml"><![CDATA[<build>

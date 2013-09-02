@@ -12,7 +12,7 @@
         <para>Alternate, abbreviated form</para>                        
 <programlisting language=""><![CDATA[select c from Customer c]]></programlisting>                        
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>"select" defines root query objects -- all path references must start from this set</para></listitem>
             <listitem><para>"from" defines source of root query terms</para></listitem>
             <listitem><para>"as" (optional) identifies a variable assignment of entity in from clause</para></listitem>
@@ -47,7 +47,7 @@ Hibernate:
   
 <programlisting language=""><![CDATA[select c.lastName from Customer c]]></programlisting>
 
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Allows return of simple property</para></listitem>
             <listitem><para>"c.lastName" is called a "path"</para></listitem>
             <listitem><para>All paths based from root query terms</para></listitem>
@@ -59,7 +59,7 @@ Hibernate:
 TypedQuery<String> query = em.createQuery(
         "select c.lastName from Customer c", String.class);
 List<String> results = query.getResultList();]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Query result is a List&lt;String&gt; because "c.lastName" is a String</para></listitem>
         </itemizedlist>
 
@@ -83,7 +83,7 @@ Hibernate:
            <title>Multi-select Query with Object[]</title>
 <programlisting language=""><![CDATA[select c.firstName, c.hireDate from Clerk c]]></programlisting>
 
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Select specifies multiple terms</para></listitem>
                 <listitem><para>Terms are expressed thru a path expression</para></listitem>
                 <listitem><para>Terms must be based off paths from root terms in the FROM (or JOIN) clause</para></listitem>
@@ -102,7 +102,7 @@ for(Object[] result : results) {
     log.info("firstName=" + firstName + " hireDate=" + hireDate);
 }
 ]]></programlisting>                            
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Query defined to return elements of select in Object[]</para></listitem>
             </itemizedlist>
 
@@ -124,7 +124,7 @@ Hibernate:
 
 <programlisting language=""><![CDATA[select c.firstName as firstName, c.hireDate as hireDate from Clerk c]]></programlisting>
 
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Aliases may be assigned to select terms for named-access to results</para></listitem>
         </itemizedlist>
 
@@ -140,10 +140,10 @@ for(Tuple result : results) {
     Date hireDate = result.get("hireDate", Date.class);
     log.info("firstName=" + firstName + " hireDate=" + hireDate);
 }]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Query defined to return instances of Tuple class</para></listitem>
             <listitem><para>Tuples provide access using</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>get(index) - simular to Object[]</para></listitem>
                     <listitem><para>get(index, Class&lt;T&gt; resultType) - typed access by index</para></listitem>
                     <listitem><para>get(alias) - access by alias</para></listitem>
@@ -172,7 +172,7 @@ Hibernate:
 select new ejava.jpa.examples.query.Receipt(s.id, s.buyerId, s.date, s.amount)
 from Sale s]]></programlisting>
 
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Individual elements of select are matched up against class constructor</para></listitem>
         </itemizedlist>
 
@@ -196,7 +196,7 @@ public class Receipt {
         this.amount = amount;
     }
 ...]]></programlisting>                        
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Constructed class may be simple POJO -- no need to be an entity</para></listitem>
         <listitem><para>Instances are not managed</para></listitem>
         <listitem><para>Suitable for use as Data Transfer Objects (DTOs)</para></listitem>
@@ -213,7 +213,7 @@ for(Receipt receipt : results) {
     assertNotNull("no receipt", receipt);
     log.info("receipt=" + receipt);
 }]]></programlisting>
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Each row returned as instance of provided class</para></listitem>
     </itemizedlist>
                             
@@ -239,7 +239,7 @@ Hibernate:
         <section id="jpa-query-jpaql-paths-single">
             <title>Single Element Path Expressions</title>  
 <programlisting language=""><![CDATA[select s.id, s.store.name from Sale s]]></programlisting>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>All paths based off root-level FROM (or JOIN) terms</para></listitem>
                 <listitem><para>Paths use dot (".") notation to change contexts</para></listitem>
                 <listitem><para>Paths -- used this way -- must always express a single element. Must use JOINs for paths involving collections</para></listitem>
@@ -273,7 +273,7 @@ Hibernate:
         
  -sale.id=1, sale.store.name=Big Al's
  -sale.id=2, sale.store.name=Big Al's]]></programlisting>
-             <itemizedlist>
+             <itemizedlist spacing="compact">
                 <listitem><para>Automatic INNER JOIN formed between Sale and Store because of the cross-entity path</para></listitem>
             </itemizedlist>
                             
@@ -292,7 +292,7 @@ Hibernate:
 <programlisting language=""><![CDATA[select sale.date from Clerk c JOIN c.sales sale]]></programlisting>
         <para>Alternate, legacy EJBQL form</para>                        
 <programlisting language=""><![CDATA[select sale.date from Clerk c, IN (c.sales) sale]]></programlisting>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Collection ("sales") is brought in as a root term ("sale") of the query through a JOIN expression</para></listitem>
                     <listitem><para>JOINs will match entities by their defined primary/foreign keys</para></listitem>
                     <listitem><para>INNER JOIN will return only those entities where there is a match</para></listitem>
@@ -315,7 +315,7 @@ Hibernate:
  -found result:1998-04-10 10:13:35.0
  -found result:1999-06-11 14:15:10.0
  -found result:1999-06-11 14:15:10.0]]></programlisting>                            
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>(Many-to-Many) Link table used during JOIN</para></listitem>
                     <listitem><para>Tables automatically joined on primary keys</para></listitem>
                     <listitem><para>Only Sales sold by our Clerks are returned</para></listitem>
@@ -338,7 +338,7 @@ select c.id, c.firstName, sale.amount
 from Clerk c
 LEFT JOIN c.sales sale
 ]]></programlisting>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>LEFT OUTER JOIN will return root with or without related entities</para></listitem>
                 </itemizedlist>
     
@@ -362,7 +362,7 @@ Hibernate:
  -clerk.id=1, clerk.firstName=Manny, amount=150.00
  -clerk.id=2, clerk.firstName=Moe, amount=150.00
  -clerk.id=3, clerk.firstName=Jack, amount=null]]></programlisting>                            
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>(Many-to-Many) Link table used during JOIN</para></listitem>
                     <listitem><para>Tables automatically joined on primary keys</para></listitem>
                     <listitem><para>All clerks, with or without a Sale, are returned</para></listitem>
@@ -372,7 +372,7 @@ Hibernate:
             <section id="jpa-query-jpaql-paths-collections-crossjoin">
                 <title>Explicit Collection Path Expressions</title>
 <programlisting language=""><![CDATA[select c from Sale s, Customer c where c.id = s.buyerId]]></programlisting>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Permits JOINs without relationship in entity model</para></listitem>
                 </itemizedlist>
     
@@ -392,7 +392,7 @@ Hibernate:
         
  -found result:firstName=cat, lastName=inhat
  -found result:firstName=thing, lastName=one]]></programlisting>                            
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Returns all Customers that are identified by a Sale</para></listitem>
                 </itemizedlist>
             </section>  
@@ -409,7 +409,7 @@ Hibernate:
            <title>Lazy Fetch Problem</title>
 <programlisting language=""><![CDATA[select s from Store s JOIN s.sales
 where s.name='Big Al''s']]></programlisting>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>A normal JOIN (implicit or explicit) may honor the fetch=LAZY property setting of the relation</para></listitem>
                 <listitem><para>Can be exactly what is desired</para></listitem>
                 <listitem><para>Can also cause problems or extra work if not desired</para></listitem>
@@ -425,7 +425,7 @@ public class Store {
             fetch=FetchType.LAZY)
     private List<Sale> sales = new ArrayList<Sale>();
 ]]></programlisting>                            
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Sales are lazily fetched when obtaining Store</para></listitem>
     </itemizedlist>
 
@@ -442,7 +442,7 @@ try {
 } catch (LazyInitializationException expected) {
     log.info("caught expected exception:" + expected);
 }]]></programlisting>                            
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Accessing the Sale properties causes a LazyInitializationException when persistence context no longer active or accessible</para></listitem>
     </itemizedlist>
 
@@ -478,7 +478,7 @@ Hibernate:
             <title>Adding Eager Fetch during Query</title>
 <programlisting language=""><![CDATA[select s from Store s JOIN FETCH s.sales
 where s.name='Big Al''s']]></programlisting>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>A JOIN FETCH used to eager load related entities as side-effect of query</para></listitem>
                 <listitem><para>Can be used as substitute for fetch=EAGER specification on relation</para></listitem>
             </itemizedlist>
@@ -503,7 +503,7 @@ Hibernate:
             on store0_.STORE_ID=sales1_.SALE_STORE 
     where
         store0_.name='Big Al''s']]></programlisting>                            
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Sales are eagerly fetched when obtaining Store</para></listitem>
             </itemizedlist>
             <note>
@@ -522,7 +522,7 @@ Hibernate:
         <para></para>
   
 <programlisting language=""><![CDATA[select DISTINCT c.lastName from Customer c]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Limits output to unique value combinations</para></listitem>
         </itemizedlist>
 
@@ -555,7 +555,7 @@ Hibernate:
 
     <section id="jpa-query-jpaql-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>

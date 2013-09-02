@@ -61,9 +61,9 @@ log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());
 ]]></programlisting>                        
 
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Pros</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>More concise (than other query forms)</para></listitem>
                     <listitem><para>Familiar to SQL users</para></listitem>
                     <listitem><para>Abstracts query away from table, column, primary key, and relationship mapping</para></listitem>
@@ -72,7 +72,7 @@ assertEquals("unexpected number of results", 2, customers.size());
                 </itemizedlist>
             </listitem>
             <listitem><para>Cons</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Not type-safe</para></listitem>
                     <listitem><para>No help from Java compiler in constructing query expression</para></listitem>
                     <listitem><para>Don't find out most errors until runtime</para></listitem>
@@ -103,7 +103,7 @@ List<Customer> customers = query
         .getResultList();
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>"c" represents rows in table</para></listitem>
             <listitem><para>specific columns (or *) are return for each row</para></listitem>
             <listitem><para>"?" marks a positional parameter -- non-portable to use named parameters in native SQL queries</para></listitem>
@@ -139,9 +139,9 @@ List<Customer> customers = em.createNativeQuery(
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
 
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Pros</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Provides full access to native SQL power</para></listitem>
                     <listitem><para>Provides fill access to database-vendor SQL extensions</para></listitem>
                     <listitem><para>Easy to see when native SQL is being used within application -- target for portability review</para></listitem>
@@ -149,7 +149,7 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
                 </itemizedlist>
             </listitem>
             <listitem><para>Cons</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Portability of SQL not addressed by JPA</para></listitem>
                     <listitem><para>Not type-safe</para></listitem>
                     <listitem><para>No help from Java compiler in constructing query expression</para></listitem>
@@ -189,7 +189,7 @@ List<Customer> customers = query
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>
                         
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>"CriteriaBuilder" used as starting point to build objects within the query tree</para></listitem>
             <listitem><para>"CriteriaQuery&lt;T&gt;" used to hold the definition of query</para></listitem>
             <listitem><para>"Root&lt;T&gt;" used to reference root level query terms</para></listitem>
@@ -230,15 +230,15 @@ List<Customer> customers = em.createQuery(qdef.select(c)
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
 
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Pros</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Structure of query is type-safe</para></listitem>
                     <listitem><para>Allows object-level manipulation of the query versus manipulation of a query string -- useful when building total query based on runtime properties</para></listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>Cons</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Complex -- looses familiarity with SQL</para></listitem>
                     <listitem><para>Cannot be expressed in XML deployment descriptor</para></listitem>
                     <listitem><para>Access to properties not type-safe (addressed by Canonical Metamodel)</para></listitem>
@@ -290,7 +290,7 @@ for (Attribute<? super Customer, ?> p: c_.getAttributes()) {
  -  BASIC,  firstName:class java.lang.String        
  -  BASIC,         id:long                          
  -  BASIC,   lastName:class java.lang.String]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Provides ability to construct type-safe queries</para></listitem>
             </itemizedlist>
         </section>
@@ -318,7 +318,7 @@ List<Customer> customers = query
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());
 ]]></programlisting>
-       <itemizedlist>
+       <itemizedlist spacing="compact">
             <listitem><para>Access to properties within entities done through type-safe accessors</para></listitem>
        </itemizedlist>
 
@@ -351,14 +351,14 @@ List<Customer> customers = em.createQuery(qdef.select(c)
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>      
                   
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Pros</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>Access properties in type-safe manner</para></listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem><para>Cons</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>Complex</para></listitem>
                         <listitem><para>No compiler warning of entity type re-factoring</para></listitem>
                     </itemizedlist>
@@ -402,7 +402,7 @@ List<Customer> customers = query
         .getResultList();
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Use canonical metamodel class to provide type-safe, easy access to properties ("Customer_.firstName")</para></listitem>
             </itemizedlist>
 
@@ -435,15 +435,15 @@ List<Customer> customers = em.createQuery(qdef.select(c)
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
                         
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Pros</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>Easy, type-safe access to entity model</para></listitem>
                         <listitem><para>Java compiler can alert of mismatch between query and entity model</para></listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem><para>Cons</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>Requires either manual construct or auto-generation of separate metamodel class</para></listitem>
                     </itemizedlist>
                 </listitem>
@@ -454,13 +454,13 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
 
     <section id="jpa-query-types-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Three basic forms for query expression</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>JPAQL</para></listitem>
                     <listitem><para>Native SQL</para></listitem>
                     <listitem><para>Criteria API</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>String-based Accessors</para></listitem>
                             <listitem><para>Metamodel Accessors</para></listitem>
                             <listitem><para>Canonical Metamodel Accessors</para></listitem>
@@ -469,13 +469,13 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
                 </itemizedlist>
             </listitem>
             <listitem><para>Entity model provides portability</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>JPAQL</para></listitem>
                     <listitem><para>Criteria API</para></listitem>
                 </itemizedlist>
             </listitem>
             <listitem><para>Native SQL provides direct access to</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>full power of SQL</para></listitem>
                     <listitem><para>full access to database-specific extensions</para></listitem>
                 </itemizedlist>
@@ -483,7 +483,7 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
             <listitem><para>Criteria API provides type-safe construct of query structure</para></listitem>
             <listitem><para>JPA Metamodel provides type-safe access to entity properties</para></listitem>
             <listitem><para>JPA Canonical Metamodel provides type-safe access to model-specific entity properties</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Produces compilation error when query our of sync with entity model</para></listitem>
                     <listitem><para>Provides convenient access to model-specific properties</para></listitem>
                 </itemizedlist>

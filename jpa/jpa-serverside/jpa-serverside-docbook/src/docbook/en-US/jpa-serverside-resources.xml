@@ -6,12 +6,12 @@
         
     <section id="jpa-serverside-resources-datasource">
         <title>SQL DataSource</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Physical connections to database are placed into a pool</para></listitem>
             <listitem><para>Logical connections are borrowed and returned from the pool</para></listitem>
         </itemizedlist>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>javax.sql.DataSource configured into server through admin capabilities</para>
 <programlisting language="xml"><![CDATA[
 <subsystem xmlns="urn:jboss:domain:datasources:1.0">
@@ -61,7 +61,7 @@
         <title>JAR Files</title>
         <para>Standard deployments permit portable reference to entity jar-files</para>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Entity JAR files will be in known location within server-side deployment</para>
 <programlisting language=""><![CDATA[
 EAR
@@ -101,7 +101,7 @@ EAR
 
     <section id="jpa-serverside-resources-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Replace JDBC ConnectionManager properties with sharable DataSource reference</para></listitem>
             <listitem><para>Replace entity class enumerations with jar-file reference</para></listitem>
         </itemizedlist>       

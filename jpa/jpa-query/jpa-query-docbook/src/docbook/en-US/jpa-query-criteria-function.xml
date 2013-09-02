@@ -21,7 +21,7 @@ Root<Customer> c = qdef.from(Customer.class);
 
 qdef.select(c)
     .where(cb.equal(c.get("firstName"),"CAT"));]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Using an untyped CriteriaQuery to be able to switch
                  between different query output types within example</para></listitem>
         </itemizedlist>
@@ -38,7 +38,7 @@ Hibernate:
         JPAQL_CUSTOMER customer0_ 
     where
         customer0_.FIRST_NAME=?]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>No rows found because 'CAT' does not match anything because of case</para></listitem>
             </itemizedlist>
         </section>
@@ -67,7 +67,7 @@ Hibernate:
         customer0_.FIRST_NAME=lower(?)
 
  -found result:firstName=cat, lastName=inhat]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>One customer found because case-sensitive compare now correct</para></listitem>
             </itemizedlist>
         </section>
@@ -94,7 +94,7 @@ Hibernate:
         customer0_.FIRST_NAME=lower(?)
 
  -found result:CAT]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>First name of customer located returned in upper case</para></listitem>
             </itemizedlist>
         </section>          
@@ -122,7 +122,7 @@ Hibernate:
     where
         customer0_.FIRST_NAME=?
  -found result:at]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Customer's name, excluding initial 'c' character, returned</para></listitem>
             </itemizedlist>
         </section>
@@ -157,7 +157,7 @@ Hibernate:
         )=?
 
  -found result:firstName=cat, lastName=inhat]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Customer located after concatenation of fields yields match</para></listitem>
             </itemizedlist>
         </section>            
@@ -186,7 +186,7 @@ Hibernate:
         length(customer0_.FIRST_NAME)=3
 
  -found result:firstName=cat, lastName=inhat]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Customer found where length of firstName matches specified length criteria</para></listitem>
         </itemizedlist>
     </section>
@@ -213,7 +213,7 @@ Hibernate:
         JPAQL_CUSTOMER customer0_ 
     where
         locate(?, customer0_.FIRST_NAME, 2)>0]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>No firstName found with 'cat' starting at position=2</para></listitem>
             </itemizedlist>
         
@@ -239,7 +239,7 @@ Hibernate:
         locate(?, customer0_.FIRST_NAME, 2)>1
 
  -found result:firstName=cat, lastName=inhat]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>firstName found with 'at' starting at a position 2</para></listitem>
         </itemizedlist>
     </section>
@@ -268,7 +268,7 @@ Hibernate:
         customer0_.FIRST_NAME=?
 
  -found result:at]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Return the two character substring of firstName starting at position two</para></listitem>
             </itemizedlist>
 
@@ -294,7 +294,7 @@ Hibernate:
     where
         substring(customer0_.FIRST_NAME, 2, 2)=?
  -found result:firstName=cat, lastName=inhat]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Find the customer with a two characters starting a position two of firstName equaling  'at'</para></listitem>
             </itemizedlist>
         </section>
@@ -306,7 +306,7 @@ Hibernate:
 
     <section id="jpa-query-criteria-function-date">
         <title>Date Functions</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>CriteriaBuilder.currentDate()</para></listitem>
             <listitem><para>CriteriaBuilder.currentTime()</para></listitem>
             <listitem><para>CriteriaBuilder.currentTimestamp()</para></listitem>
@@ -341,7 +341,7 @@ Hibernate:
  -found result:date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }
 ...
  -found result:date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Located two Sales that occurred prior to today's date</para></listitem>
         </itemizedlist>
 
@@ -366,7 +366,7 @@ Hibernate:
         JPAQL_SALE sale0_ 
     where
         sale0_.date=current_date()]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Located no sales on today's date</para></listitem>
         </itemizedlist>
 
@@ -379,7 +379,7 @@ Hibernate:
         JPAQL_SALE 
     set
         date=CURRENT_DATE]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Update all sales to today</para></listitem>
         </itemizedlist>
         <note>
@@ -414,7 +414,7 @@ Hibernate:
  -found result:date=2013-06-05 00:00:00, amount=$100.00, buyer=1, clerks(1)={1, }
 ...
  -found result:date=2013-06-05 00:00:00, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Now locating sales for today's date</para></listitem>
         </itemizedlist>
         
@@ -428,7 +428,7 @@ Hibernate:
 
     <section id="jpa-query-criteria-function-orderby">
         <title>Order By</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>ASC - ascending order</para></listitem>
             <listitem><para>DESC - descending order</para></listitem>
         </itemizedlist>
@@ -461,7 +461,7 @@ Hibernate:
  -found result:date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }
 ...
  -found result:date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Note the ASC order on amount</para></listitem>
         </itemizedlist>
 
@@ -487,7 +487,7 @@ Hibernate:
         sale0_.amount DESC
  -found result:date=1999-06-11 14:15:10, amount=$150.00, buyer=2, clerks(2)={1, 2, }
  -found result:date=1998-04-10 10:13:35, amount=$100.00, buyer=1, clerks(1)={1, }]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Note the DESC order on amount</para></listitem>
         </itemizedlist>
     </section>
@@ -574,7 +574,7 @@ Join<Clerk,Sale> s = c.join("sales", JoinType.LEFT);
 
 qdef.select(cb.array(c, cb.count(s)))
     .groupBy(c);]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Get count of sales for each clerk</para></listitem>
         </itemizedlist>
 
@@ -630,7 +630,7 @@ Join<Clerk,Sale> s = c.join("sales", JoinType.LEFT);
 qdef.select(cb.array(c, cb.count(s)))
     .groupBy(c)
     .having(cb.le(cb.count(s), 1));]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Provide a list of Clerks and their count of Sales for counts &lt;= 1</para></listitem>
         </itemizedlist>
 
@@ -661,7 +661,7 @@ Hibernate:
  -found=[firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }, 1]
 ...
  -found=[firstName=Jack, lastName=Pep, hireDate=1973-03-01, termDate=null, sales(0)={}, 0]]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Wed matched on Moe (1 sale) and Jack (0 sales)</para></listitem>
         </itemizedlist>
     </section>
@@ -680,7 +680,7 @@ Hibernate:
 <programlisting language="java"><![CDATA[
 ]]></programlisting>                        
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
@@ -698,7 +698,7 @@ Hibernate:
 
     <section id="jpa-query-criteria-function-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>

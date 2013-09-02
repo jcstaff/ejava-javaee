@@ -26,7 +26,7 @@ org/hibernate/cfg/Configuration: org.hibernate.cfg.Configuration
             <title>Cause: Missing dependency on hibernate-entitymanager</title>
             <para>The error occurs because the plugin has no hibernate artifact to provide it the necessary classes.
                 That could be due to....</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>The dependency on hibernate-entitymanager was either missing or declared scope=test or
                          provided.</para>
 <programlisting language="xml"><![CDATA[

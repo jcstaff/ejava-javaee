@@ -107,7 +107,7 @@ Hibernate:
         </orderedlist>
         <para>You have completed issuing a native SQL query using the entity manager. 
             Native SQL queries support many of the same features as JPAQL queries</para>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Single/Multiple Results</para></listitem>
                 <listitem><para>Parameters -- although the JPA spec limits this to ordinal parameters. 
                     Using named parameters for native SQL queries is not portable.</para></listitem>
@@ -152,7 +152,7 @@ public void testSQLResultMapping() {
     assertEquals("unexpected number of movies", 2, movies.size());
 }]]></programlisting>
                 <para>Notice...</para>                        
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>The native SQL query is free to do whatever it takes to identify the entity of interest</para></listitem>
                     <listitem><para>The native SQL query is required to supply all columns required by the entity</para></listitem>
                     <listitem><para>The returned entity is managed</para></listitem>
@@ -292,7 +292,7 @@ public void testSQLMultiResultMapping() {
     assertEquals("unexpected number of movies", 2, results.size());
 }]]></programlisting>                        
                     <para>Notice...</para>              
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>We have replaced the specification of the Movie.class entity
                             with a SqlResultSetMapping that includes Movie.class and several other
                             entities</para></listitem>

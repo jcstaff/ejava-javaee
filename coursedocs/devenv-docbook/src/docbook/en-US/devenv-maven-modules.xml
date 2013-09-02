@@ -3,9 +3,9 @@
 
 <chapter id="devenv-mavenmodules">
     <title>Maven Modules</title>
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Maven modules boundaries are highly influenced by the re-usable artifacts that must be produced</para>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>If you have many .jars, you likely have many maven modules</para></listitem>
                 <listitem><para>If you have few but large .jars, you likely have few but large maven modules</para></listitem>
                 <listitem><para>If you require different types of artifacts, you likely have different maven modules</para></listitem>
@@ -18,7 +18,7 @@
     
     <section id="devenv-mavenmodules-parent">
         <title>POM Inheritance</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Common properties can be defined in parent pom</para>
         <programlisting language=""><![CDATA[<project>
     <modelVersion>4.0.0</modelVersion>
@@ -74,7 +74,7 @@
     
     <section id="devenv-mavenmodules-sub">
         <title>Submodules</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Parent modules can be created to delegate build commands to a group of child modules</para></listitem>
             <listitem><para>Child modules can be physically placed anywhere, but commonly in immediate sub-directories
                 named after their artifactId</para></listitem>

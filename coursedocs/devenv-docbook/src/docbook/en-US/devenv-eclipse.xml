@@ -6,7 +6,7 @@
     
     <section id="devenv-eclipse-org">
         <title>Project Organization</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Working sets can be quite helpful organizing multi-modules</para></listitem>
             <listitem><para>You can control their contents, order them, and hide them</para></listitem>
         </itemizedlist>                   
@@ -22,7 +22,7 @@
     
         <section id="devenv-eclipse-test-mvn">
             <title>Maven test from Eclipse</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Maven builds can be directly launched from within Eclipse</para></listitem>
                 <listitem><para>No significant difference from normal command line</para></listitem>
                 <listitem><para>Can create custom launchers for common targets and pin for easy recall</para></listitem>
@@ -35,7 +35,7 @@
 
         <section id="devenv-eclipse-test-junit">
             <title>Raw JUnit within Eclipse</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Unit tests can be directly executed within Eclipse without Maven</para></listitem>
             </itemizedlist>                   
             <figure>
@@ -62,7 +62,7 @@
 
     <section id="devenv-eclipse-debugging">
         <title>Program Debugging</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Necessary evil in application development</para></listitem>
             <listitem><para>Powerful capabilities should not be ignored</para></listitem>
         </itemizedlist>
@@ -75,7 +75,7 @@
 
         <section id="devenv-eclipse-debugging-junit">
             <title>Debugging within Eclipse</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>If runnable directly from Eclipse -- use debug option</para></listitem>
             </itemizedlist>                   
             <figure>
@@ -88,7 +88,7 @@
         <section id="devenv-eclipse-debugging-mvn">
             <title>Debugging Maven test from Eclipse</title>
             <subtitle>Remote Debugging</subtitle>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>If not runnable within Eclipse -- use remote debugging option</para></listitem>
             </itemizedlist>                   
             <figure>
@@ -100,7 +100,7 @@
                 <graphic scalefit="1" fileref="images/devenv-eclipse-remotedebugger-stop.png"/>
             </figure>
             
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Remote debugging requires special system properties issued to JVM</para></listitem>
             <listitem><para>surefire and failsafe can be setup to optionally pass system properties to JUnit JVM</para>
                 <programlisting language=""><![CDATA[<plugin>

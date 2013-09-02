@@ -163,7 +163,7 @@ RELATIONEX_PLAYER, for columns: [org.hibernate.mapping.Column(person).
                 
                 <listitem><para>Add a JPA @OneToOne relationship mapping from the Player to Person.
                     Also include a definitions to...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>Make the Person required for the Player</para></listitem>
                         <listitem><para>Specify the Person must be also fetched when obtaining the Player</para></listitem>
                         <listitem><para>Specify a foreign key column in the Player table that references the Person table</para></listitem>
@@ -196,7 +196,7 @@ RELATIONEX_PLAYER, for columns: [org.hibernate.mapping.Column(person).
         foreign key (PERSON_ID) 
         references RELATIONEX_PERSON;
 ]]></programlisting>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>The Player table contains a foreign key referencing the Person table. Note
                             the foreign key *value* (PERSON_ID) is not modeled within the Player entity class. Only the
                             *relationship* to the Person has been depicted within the Player. If we want the person
@@ -639,7 +639,7 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
         references RELATIONEX_PERSON;
 ]]></programlisting>       
                     <para>Note...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>The provider derived names for the Person.id and Member.id foreign keys in the join table</para></listitem>
                         <listitem><para>The "id" column of the join table is the primary key and has a primary key
                             join relationship with the dependent's table.</para></listitem>
@@ -662,7 +662,7 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
     )
     private Person person;
 ]]></programlisting>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>The JoinTable.name property was used to name the table</para></listitem>
                         <listitem><para>The JoinTable.joinColumns property was used define column(s) pointing to this dependent entity</para></listitem>
                         <listitem><para>The JoinTable.inverseJoinColumns property was used to define column(s) pointing to the parent entity</para></listitem>
@@ -979,7 +979,7 @@ public class Employee {
 }
 ]]></programlisting>
                     <para>Note...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>The dependent entity has an @Id property compatible with the type in the parent entity @Id</para></listitem>
                         <listitem><para>The dependent entity @Id is not generated -- it must be assigned</para></listitem>
                         <listitem><para>The relationship to the parent entity is defined as being realized through the
@@ -2291,7 +2291,7 @@ Hibernate:
             a change at the Java and mapping levels.</para>
         
         <para>In bi-directional relationships, it is important to understand there are two sides/types to the relationship; owning side and inverse side.</para>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>The owning side of the relation defines the mapping to the database. This is what we did for the uni-directional sections above</para></listitem>
             <listitem><para>The inverse side of the relation must refer to its owning side mapping through the "mappedBy" property of the @XxxToXxx annotation</para></listitem>
             <listitem><para>For OneToOne relationships, the owning side contains the foreign key or defines the join table</para></listitem>
@@ -2433,7 +2433,7 @@ org.hibernate.MappingException: Could not determine type for: myorg.relex.one2on
 RELATIONEX_APPLICANT, for columns: [org.hibernate.mapping.Column(application)]
 ]]></programlisting>
                     <para>The error occurs because...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>The entity uses FIELD access and an un-annotated field property was 
                             found that has no default mapping</para></listitem>
                         <listitem><para>The referenced Application entity does not implement Serializable
@@ -2477,7 +2477,7 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
         references RELATIONEX_APPLICANT;
 ]]></programlisting>
                     <para>Currently we are seeing...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>The inverse/parent Applicant entity table has no reference to the owning/dependent Application since it is @Transient</para></listitem>
                         <listitem><para>The owning/dependent Application entity table has a foreign key reference to the inverse Applicant entity table.</para></listitem>
                         <listitem><para>The owning/dependent Application entity is realizing the relation through a foreign key join rather than a primary key join.</para></listitem>
@@ -2608,7 +2608,7 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
         references RELATIONEX_APPLICANT;
 ]]></programlisting>                        
                     <para>We now have...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>The parent Applicant entity table has a generated PK</para></listitem>
                         <listitem><para>The parent/inverse Applicant entity table has no foreign key reference to the 
                             dependent/owning Application entity table.</para></listitem>
@@ -2977,7 +2977,7 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
         references RELATIONEX_AUTO;
 ]]></programlisting>
                     <para>We now have...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>An inverse/parent entity table (AUTO) with no reference to the owning/dependent entity table (DRIVER)</para></listitem>
                         <listitem><para>The owning/dependent entity table (DRIVER) has a foreign key separate from its primary key to reference the inverse/parent 
                             entity class (AUTO)</para></listitem>
@@ -3089,7 +3089,7 @@ Hibernate:
                     For some reason, the provider makes two selects to fully resolve both the 
                     owning and inverse sides of the relationship using EAGER fetch mode from the 
                     inverse side. If you look closely at the where clauses...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>the first appears to be attempting to locate the specific 
                             Driver we were looking for in the find()</para></listitem>
                         <listitem><para>the second appears to be populating the required Auto property
@@ -3319,7 +3319,7 @@ public class Driver2 {
             
                 <listitem><para>Build the module and observe the generated database schema.
                     I have included both versions below. Notice...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>The foreign key has switched from the Driver entity table to the
                             Auto entity table.</para></listitem>
                         <listitem><para>The foreign key is nullable when defined in the Auto entity
@@ -4939,7 +4939,7 @@ Hibernate:
                 referencing entity and the target entity only exists to support that referencing entity. This is different from 
                 cascade=DELETE. In this case the referencing entity is not being deleted. It is de-referencing the parent.
                 The basic rules are as follows.</para>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Referencing entity removes (nulls in the case of OneToOne) its relationship to the target entity</para></listitem>
                 <listitem><para>em.remove() on the orphaned target entity is applied</para></listitem>
                 <listitem><para>Orphaned target entity must not be reassigned to new child. It exists for the sole use of the referencing entity.</para></listitem>
@@ -5294,7 +5294,7 @@ Hibernate:
        <para>In this chapter we mapped two entity classes through a one-to-one relationship
            using multiple techniques and under different situations. 
       </para>
-      <itemizedlist>
+      <itemizedlist spacing="compact">
           <listitem><para>Uni-directional and Bi-directional Relationships</para></listitem>
           <listitem><para>Simple and Composite Primary/Foreign Key</para></listitem>
           <listitem><para>Primary Key, Foreign Key and Link Table Joins</para></listitem>

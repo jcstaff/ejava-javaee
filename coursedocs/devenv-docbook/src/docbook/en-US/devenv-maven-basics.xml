@@ -6,7 +6,7 @@
     
     <section id="devenv-mavenbasics-dirs">
         <title>Directory Structure</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Follows a standard layout by convention</para></listitem>
             <listitem><para>Can be customized</para></listitem>
             <listitem><para>Root directory stays fairly clean</para></listitem>
@@ -37,7 +37,7 @@
             <varlistentry>
                 <term><filename>pom.xml</filename></term>
                 <listitem><para>Defines the build</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>Managed by CM along with src tree</para></listitem>
                         <listitem><para>Related artifacts normally placed in src/compile, etc.</para></listitem>
                     </itemizedlist>
@@ -47,7 +47,7 @@
         
         <section id="devenv-mavenbasics-src">
             <title>Source Tree</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Managed by CM</para></listitem>
                 <listitem><para>Should not contain any auto-generated artifacts</para></listitem>
             </itemizedlist>                   
@@ -72,7 +72,7 @@
                 <varlistentry>
                     <term><filename>main</filename></term>
                     <listitem><para>Contains production artifacts for module</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Built artifacts from this tree are generally placed in the produced archive</para>
                             <programlisting language=""><![CDATA[
 jar tf target/ex1-1.0-SNAPSHOT.jar 
@@ -92,7 +92,7 @@ myorg/mypackage/ex1/App.class
                 <varlistentry>
                     <term><filename>test</filename></term>
                     <listitem><para>Contains test artifacts for module</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Built artifacts from this tree are not generally placed in the produced archive</para></listitem>
                             <listitem><para>A separate archive of built test artifacts can be optionally generated for reuse</para></listitem>
                         </itemizedlist>
@@ -102,7 +102,7 @@ myorg/mypackage/ex1/App.class
                 <varlistentry>
                     <term><filename>[main or test]/java</filename></term>
                     <listitem><para>Contains Java classes</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Placed in a directory that matches the Java package for the class</para></listitem>
                         </itemizedlist>
                     </listitem>
@@ -111,7 +111,7 @@ myorg/mypackage/ex1/App.class
                 <varlistentry>
                     <term><filename>[main or test]/resources</filename></term>
                     <listitem><para>Contains property or other data files</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Generally copied target tree as-is or optionally filtered by the build</para></listitem>
                         </itemizedlist>
                     </listitem>
@@ -121,7 +121,7 @@ myorg/mypackage/ex1/App.class
         
         <section id="devenv-mavenbasics-target">
             <title>Build Tree</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Not managed by CM</para></listitem>
                 <listitem><para>Contains auto-generated artifacts</para></listitem>
                 <listitem><para>Can be deleted at any time</para></listitem>
@@ -149,7 +149,7 @@ target
                 <varlistentry>
                     <term><filename>classes</filename></term>
                     <listitem><para>An exploded directory tree for built artifacts to be placed into the module archive</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Mixture of java and resource artifacts</para></listitem>
                         </itemizedlist>
                     </listitem>
@@ -158,7 +158,7 @@ target
                 <varlistentry>
                     <term><filename>test-classes</filename></term>
                     <listitem><para>An exploded directory tree for built artifacts used for test</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Mixture of java and resource artifacts</para></listitem>
                             <listitem><para>Part of the test classpath</para></listitem>
                         </itemizedlist>
@@ -168,7 +168,7 @@ target
                 <varlistentry>
                     <term><filename>*-reports</filename></term>
                     <listitem><para>Results of unit and integration testing</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para><filename>surefire-reports</filename> unit test results</para></listitem>
                             <listitem><para><filename>failsafe-reports</filename> integration test results</para></listitem>
                             <listitem><para>Locate details of test pass/failures within this directory</para>
@@ -203,7 +203,7 @@ java.lang.AssertionError: app didn't return 0
                 <varlistentry>
                     <term><filename>{artifactId}-{version}.jar</filename></term>
                     <listitem><para>Results of unit and integration testing</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Archive with contents of target/classes</para></listitem>
                             <listitem><para>Can be installed into local Maven repo by build</para></listitem>
                         </itemizedlist>
@@ -213,7 +213,7 @@ java.lang.AssertionError: app didn't return 0
                 <varlistentry>
                     <term><filename>log4j-out.txt</filename></term>
                     <listitem><para>An example output file of the build/tests written to the target directory</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Produced by log4j following configuration in src/test/resources/log4j.xml</para></listitem>
                         </itemizedlist>
                     </listitem>
@@ -224,7 +224,7 @@ java.lang.AssertionError: app didn't return 0
     
     <section id="devenv-mavenbasics-pom">
         <title>Maven POM</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Defines the artifact for dependents</para></listitem>
             <listitem><para>Defines the build of the local module</para></listitem>
         </itemizedlist>                   
@@ -260,7 +260,7 @@ java.lang.AssertionError: app didn't return 0
         <section id="devenv-mavenbasics-packaging">
             <title>Packaging</title>
             <para>Defines the type of module and automatically enacts a profile of plugs (default=jar)</para>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>packaging=jar - primary artifact is a Java archive</para></listitem>
                 <listitem><para>packaging=ejb - primary artifact is a JavaEE EJB</para></listitem>
                 <listitem><para>packaging=war - primary artifact is a JavaEE WAR</para></listitem>
@@ -282,7 +282,7 @@ java.lang.AssertionError: app didn't return 0
                 <varlistentry>
                     <term><filename>groupId</filename></term>
                     <listitem><para>Hierarchical name used to group a set of one or more artifacts</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Represented as a directory structure in repositories</para>
             <programlisting language=""><![CDATA[myorg/
 `-- myproject
@@ -310,7 +310,7 @@ java.lang.AssertionError: app didn't return 0
                 <varlistentry>
                     <term><filename>version</filename></term>
                     <listitem><para>Version ID for the artifact</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Release: 1.0</para></listitem>
                             <listitem><para>Snapshot: 1.0-SNAPSHOT</para></listitem>
                         </itemizedlist>                   
@@ -320,7 +320,7 @@ java.lang.AssertionError: app didn't return 0
 
             <section id="devenv-mavenbasics-gav-snapshots">
                 <title>Snapshot Versions</title>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Timestamped release that does not change name</para></listitem>
                     <listitem><para>Useful for active development not yet ready for release</para></listitem>
                     <listitem><para>Dependents poll for new snapshots and get the latest version</para></listitem>
@@ -335,11 +335,11 @@ java.lang.AssertionError: app didn't return 0
 
             <section id="devenv-mavenbasics-gav-releases">
                 <title>Releases</title>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Fixed-named version of the artifact</para></listitem>
                     <listitem><para>Contents should not change -- allows caches bypass updates</para></listitem>
                     <listitem><para>No formal numbering schme except for lack of SNAPSHOT in name</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Plugins and community work best with major.minor.x.y dotted numbering scheme</para></listitem>
                         </itemizedlist>                   
                     </listitem>
@@ -350,7 +350,7 @@ java.lang.AssertionError: app didn't return 0
         
         <section id="devenv-mavenbasics-repositories">
             <title>Maven Repositories</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Locations where Maven stores and locates artifacts</para></listitem>
                 <listitem><para>Each user has a local repository referenced by <code>${settings.localRepository}</code>.
                     This defaults to $HOME/.m2/repository</para>
@@ -430,7 +430,7 @@ java.lang.AssertionError: app didn't return 0
 
         <section id="devenv-mavenbasics-props">
             <title>Properties</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Provide a means to define behavior of the build</para></listitem>
                 <listitem><para>Provide a means to define values onces and re-use acoss the build</para></listitem>
                 <listitem><para>Promotes consistency</para></listitem>
@@ -441,14 +441,14 @@ java.lang.AssertionError: app didn't return 0
     <java.source.version>1.6</java.source.version>
     <java.target.version>1.7</java.target.version>
 </properties>]]></programlisting>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Properties can also be expressed using <code>-Dkey=value</code> system properties</para></listitem>
             </itemizedlist>                   
         </section>
 
         <section id="devenv-mavenbasics-deps">
             <title>Dependencies</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Modules depend on artifacts from other modules</para></listitem>
             </itemizedlist>                   
             <programlisting language="xml"><![CDATA[<dependencies>
@@ -475,7 +475,7 @@ java.lang.AssertionError: app didn't return 0
                 <varlistentry>
                     <term><filename>scope</filename></term>
                     <listitem><para>Defines when the dependency applies (default=compile)</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>scope=compile - classpath of src/main, src/test, and dependents</para></listitem>
                             <listitem><para>scope=provided - classpath of src/main, src/test but not dependents</para></listitem>
                             <listitem><para>scope=test - classpath of src/test but not src/main and dependents</para></listitem>
@@ -487,7 +487,7 @@ java.lang.AssertionError: app didn't return 0
                 <varlistentry>
                     <term><filename>type</filename></term>
                     <listitem><para>Defines the artifact type of ther module (default=jar)</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>type=jar - java archive</para></listitem>
                             <listitem><para>type=ejb - javaee EJB archive</para></listitem>
                             <listitem><para>type=war - javaee WAR archive</para></listitem>
@@ -501,7 +501,7 @@ java.lang.AssertionError: app didn't return 0
                 <varlistentry>
                     <term><filename>classifier</filename></term>
                     <listitem><para>Defines a special type of artifact/custom from a module</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>classifier=tests - tests java archive</para></listitem>
                             <listitem><para>type=... - custom classifiers</para></listitem>
                         </itemizedlist>
@@ -512,14 +512,14 @@ java.lang.AssertionError: app didn't return 0
 
         <section id="devenv-mavenbasics-build">
             <title>Build Definition</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Provides specific instructions for build</para></listitem>
                 <listitem><para>Usually does the right thing by default when possible</para></listitem>
             </itemizedlist>                   
     
             <section id="devenv-mavenbasics-plugins">
                 <title>Build Plugins</title>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>All actions of the build are directed by plugins</para></listitem>
                     <listitem><para>Even the simplest commands will result in plugin downloads when you first start</para></listitem>
                     <listitem><para>Specific plugins are wired into the build by the module packaging type</para></listitem>
@@ -548,7 +548,7 @@ java.lang.AssertionError: app didn't return 0
             </configuration>
         </plugin>
         ...]]></programlisting>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>New plugins can be added, but will need to be wired into a specific 
                         <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">lifecycle phase</ulink>
                         of the build.
@@ -588,7 +588,7 @@ java.lang.AssertionError: app didn't return 0
         
     <section id="devenv-mavenbasics-cmds">
         <title>Maven Commands</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Maven build broken into <ulink url="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">phases</ulink></para></listitem>
             <listitem><para>Plugins are added to the build and their goals execute during a specific phase</para></listitem>
             <listitem><para>Build invoked using the <code>mvn</code> command</para></listitem>
@@ -596,7 +596,7 @@ java.lang.AssertionError: app didn't return 0
         <programlisting language=""><![CDATA[
 $ mvn (phase) (plugin:goal) -D(system-property) -P(profile)
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>phase</para>
                 <variablelist>
                     <varlistentry>
@@ -630,13 +630,13 @@ $ mvn (phase) (plugin:goal) -D(system-property) -P(profile)
                 </variablelist>
             </listitem>
             <listitem><para>(plugin:goal)</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Manually trigger a plugin goal without a specific build lifecycle</para></listitem>
                     <listitem><para>ex. jetty:run, dependency:tree, or dependency:help</para></listitem>
                 </itemizedlist>            
             </listitem>
             <listitem><para>-D(system-property)</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Manually define a system property key or key and value to be used as a property in the build</para></listitem>
                     <listitem><para>Must configure surefire/failsafe to promote these as properties Junit -- 
                         these are system properties of the maven build and not of the JVM tasks kicked off
@@ -644,7 +644,7 @@ $ mvn (phase) (plugin:goal) -D(system-property) -P(profile)
                 </itemizedlist>            
             </listitem>
             <listitem><para>-P(profile)</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Manually trigger build configurations latched by a profile</para></listitem>
                     <listitem><para>e.g., which DB driver to use</para></listitem>
                 </itemizedlist>            

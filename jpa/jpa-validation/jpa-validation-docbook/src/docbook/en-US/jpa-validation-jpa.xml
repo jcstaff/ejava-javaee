@@ -61,9 +61,9 @@ public class Person {
         </properties>
     </persistence-unit>            
 </persistence>]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>validation-mode</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>AUTO - enable if validator present in classpath</para></listitem>
                     <listitem><para>CALLBACK - turn on and report error if no validator found in classpath</para></listitem>
                     <listitem><para>NONE - turn off</para></listitem>
@@ -71,12 +71,12 @@ public class Person {
                 </itemizedlist>
             </listitem>
             <listitem><para>validation groups</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>javax.persistence.validation.group.pre-persist - defines groups to call during @PrePersist phase</para></listitem>
                     <listitem><para>javax.persistence.validation.group.pre-update - defines groups to call during @PreUpdate phase</para></listitem>
                     <listitem><para>javax.persistence.validation.group.pre-remove - defines groups to call during @PreRemove phase</para></listitem>
                     <listitem><para>default behavior</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Default group for @PrePersist and @PreUpdate</para></listitem>
                             <listitem><para>Nothing for @PreRemove</para></listitem>
                         </itemizedlist>
@@ -122,7 +122,7 @@ List of constraint violations:[
     <section id="jpa-validation-jpa-rules">
         <title>Validation with JPA</title>
         
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Validation is not automatically cascaded (@Valid) across relationships</para></listitem>
             <listitem><para>Validation will occur for related entity during its appropriate lifecycle phases</para></listitem>
             <listitem><para>Groups could be divided into client, service, DAO-insert, DAO-update, DAO-delete</para></listitem>

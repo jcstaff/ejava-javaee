@@ -3,7 +3,7 @@
 
 <chapter id="devenv-mavenprofiles">
     <title>Maven Profiles</title>
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Provide groups of conditional configuration</para></listitem>
         <listitem><para>Adds flexibility to build</para></listitem>
         <listitem><para>Flexibility can sometimes add confusion for both developers and build tools -- be careful</para></listitem>
@@ -11,9 +11,9 @@
     
     <section id="devenv-mavenprofiles-spec">
         <title>Profile Definition</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Can consist of</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>properties</para></listitem>
                     <listitem><para>dependencies</para></listitem>
                     <listitem><para>build elements</para></listitem>
@@ -53,7 +53,7 @@
 
         <section id="devenv-mavenprofiles-activation-explicit">
             <title>Explicit Activation/Deactivation</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem>            
                     <para>Use <code>-P(profile)</code> to manually trigger a profile to be included</para>
                     <programlisting language=""><![CDATA[$ mvn test -Ph2db]]></programlisting>
@@ -76,7 +76,7 @@
 
         <section id="devenv-mavenprofiles-activation-rule">
             <title>Activation/Deactivation By Rule</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
             
                 <listitem><para>Property having a value</para>
             <programlisting language="xml"><![CDATA[<profile>

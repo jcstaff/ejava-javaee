@@ -4,15 +4,15 @@
 <chapter id="webejb-wardeploy">
     <title>EJB WAR Deployment</title>
     <subtitle>Flexible EJB Deployment</subtitle>
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Prior to JavaEE 6</para>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>EJB beans could only be deployed in EJB modules</para></listitem>
                 <listitem><para>EJB modules integrated with WARs using common EAR</para></listitem>
             </itemizedlist>                   
         </listitem>
         <listitem><para>Starting with JavaEE 6</para>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>EJB beans can be embedded within WAR</para></listitem>
                 <listitem><para>EJB modules can be deployed within WAR</para></listitem>
             </itemizedlist>                   
@@ -29,7 +29,7 @@
     |-- lib
     `-- web.xml
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>index.html - example static web resource</para></listitem>
             <listitem><para>WEB-INF/jboss-web.xml - container-specific configuration. Used here to control name of WAR</para></listitem>
             <listitem><para>WEB-INF/lib - directory to place jars for classpath</para></listitem>
@@ -38,7 +38,7 @@
                            
         <section id="webejb-warstructure-external">
             <title>Deploying External EJB JARs</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>EJB beans developed external to WAR</para></listitem>
                 <listitem><para>Integrated using WEB-INF/lib</para></listitem>
             </itemizedlist>                   
@@ -47,7 +47,7 @@
 	`-- webejbCustomerEJB-3.0.2012.2-SNAPSHOT.jar
 ]]></programlisting>
 
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>example EJB module contents</para>
 <programlisting language=""><![CDATA[
 $ jar tf WEB-INF/lib/webejbCustomerEJB-3.0.2012.2-SNAPSHOT.jar | sort
@@ -109,7 +109,7 @@ META-INF/persistence.xml
 
         <section id="webejb-warstructure-embedded">
             <title>Deploying Embedded EJBs</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>EJB beans developed as part of WAR</para></listitem>
                 <listitem><para>No need to declare new EJB module just to get EJB bean functionality</para></listitem>
             </itemizedlist>                   
@@ -150,7 +150,7 @@ WEB-INF
 |       `-- persistence.xml
 ...
         ]]></programlisting>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>CDI descriptor hosted in WEB-INF/beans.xml</para></listitem>
                 <listitem><para>persistence unit hosted in WEB-INF/classes/META-INF/persistence.xml</para></listitem>
                 <listitem><para>JNDI name uses WAR name (minus.war)</para>
@@ -172,14 +172,14 @@ java:module/InventoryMgmtRMIEJB
 
     <section id="webejb-warclients">
         <title>WAR Clients</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Alternative: Use traditional RMI interface (specific to Java)</para></listitem>
             <listitem><para>Alternative: Use Web-oriented HTTP interface (open to all platforms)</para></listitem>
         </itemizedlist>
 
         <section id="webejb-warclients-httpclient">
             <title>Accessing HTTP Resources</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>JAX-RS 1.x only addresses server side</para></listitem>
                 <listitem><para>Many vendor-specific client libraries (e.g., RESTEasy, Jersey, HttpClient)</para></listitem>
                 <listitem><para>HTTP/REST Client API will be part of JAX-RS 2.0</para></listitem>

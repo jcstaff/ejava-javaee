@@ -20,7 +20,7 @@ where c.firstName='cat']]></programlisting>
         qdef.select(c)
             .where(cb.equal(c.get("firstName"), "cat"));
 ]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Return entities where there is an equality match</para></listitem>
         </itemizedlist>
 
@@ -50,7 +50,7 @@ where c.firstName='cat']]></programlisting>
         qdef.select(s)
             .where(cb.equal(s.get("name"), "Big Al's"));
 ]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Literal values automatically escaped</para></listitem>
         </itemizedlist>
 
@@ -393,12 +393,12 @@ Hibernate:
     <section id="jpa-query-criteria-where-equality">
         <title>Equality Tests</title>
         
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Must compare values</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Of same type</para></listitem>
                     <listitem><para>Of legal promotion type</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>Can compare 123:int to 123:long</para></listitem>
                             <listitem><para>Cannot compare 123:int to "123":string</para></listitem>
                         </itemizedlist>
@@ -426,7 +426,7 @@ Root<Sale> s = qdef2.from(Sale.class);
 Join<Sale, Clerk> c2 = s.join("clerks");
 qdef2.select(s)
      .where(cb.equal(c2, clerk));]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Compare entities and not primary/foreign key values</para></listitem>
         </itemizedlist>
 
@@ -658,7 +658,7 @@ Hibernate:
             and sales1_.SALE_ID=sale2_.SALE_ID))
 ...
  -found result:firstName=Jack, lastName=Pep, hireDate=1973-03-01, termDate=null, sales(0)={}]]></programlisting>                            
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Sub-select returns values from collection under test</para></listitem>
         <listitem><para>Outer query tests for no existing (EMPTY)values</para></listitem>
     </itemizedlist>
@@ -701,7 +701,7 @@ Hibernate:
  -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
 ...
  -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Sub-select returns values from collection under test</para></listitem>
             <listitem><para>Outer query tests for existing (NOT EMPTY)values</para></listitem>
         </itemizedlist>
@@ -732,7 +732,7 @@ Root<Sale> s = qdef2.from(Sale.class);
 qdef2.select(s)
      .where(cb.isMember(clerk, s.<List<Clerk>>get("clerks")));
 ]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Defines a shorthand for a subquery</para></listitem>
         </itemizedlist>
 
@@ -843,7 +843,7 @@ Hibernate:
 
     <section id="jpa-query-criteria-where-all">
         <title>All</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>All existing values must meet criteria (i.e., no value may fail criteria)</para></listitem>
             <listitem><para>Zero values is the lack of failure (i.e., meets criteria)</para></listitem>
         </itemizedlist>
@@ -870,7 +870,7 @@ Predicate p1 = cb.lessThan(
         cb.literal(new BigDecimal(125)), 
         cb.all(sqdef));
 qdef.where(p1);]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>List all clerks that have all sales above $125.00 or none at all</para></listitem>
             <listitem><para>-or- List all clerks with no sale &lt;= $125.00</para></listitem>
         </itemizedlist>
@@ -906,7 +906,7 @@ Hibernate:
 ...
  -found result:firstName=Jack, lastName=Pep, hireDate=1973-03-01, termDate=null, sales(0)={}
 ]]></programlisting>                            
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Manny excluded because has 1 sale below $125.00</para></listitem>
                 <listitem><para>Moe included because has only $150.00 sale</para></listitem>
                 <listitem><para>Jack included because has no sales that fail criteria</para></listitem>
@@ -925,7 +925,7 @@ Predicate p2 = cb.greaterThan(
         cb.all(sqdef));
 
 qdef.where(p2);]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>List all clerks that have all sales below $125.00 or none at all</para></listitem>
             <listitem><para>-or- List all clerks with no sale >= $125.00</para></listitem>
         </itemizedlist>
@@ -958,7 +958,7 @@ Hibernate:
         )
 
  -found result:firstName=Jack, lastName=Pep, hireDate=1973-03-01, termDate=null, sales(0)={}]]></programlisting>                            
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Manny excluded because has 1 sale above $125.00</para></listitem>
                 <listitem><para>Moe excluded because has only $150.00 sale</para></listitem>
                 <listitem><para>Jack included because has no sales that fail criteria</para></listitem>
@@ -968,7 +968,7 @@ Hibernate:
 
     <section id="jpa-query-criteria-where-any">
         <title>Any</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Any matching value meets criteria (i.e., one match and you are in)</para></listitem>
             <listitem><para>Zero values fails to meet the criteria (i.e., must have at least one matching value)</para></listitem>
         </itemizedlist>
@@ -998,7 +998,7 @@ Predicate p1 = cb.lessThan(
         cb.any(sqdef));
 
 qdef.where(p1);]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>List all clerks that have at least one sale above $125.00</para></listitem>
         </itemizedlist>
 
@@ -1032,7 +1032,7 @@ Hibernate:
  -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }
 ...
  -found result:firstName=Moe, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(1)={2, }]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Manny included because has 1 sale above $125.00</para></listitem>
             <listitem><para>Moe included because $150.00 sale qualifies him as well</para></listitem>
             <listitem><para>Jack excluded because has no sales that meet criteria</para></listitem>
@@ -1050,7 +1050,7 @@ Predicate p2 = cb.greaterThan(
         cb.any(sqdef));
 
 qdef.where(p2);]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>List all clerks that have at least one sale below $125.00</para></listitem>
         </itemizedlist>
 
@@ -1082,7 +1082,7 @@ Hibernate:
         )
 
  -found result:firstName=Manny, lastName=Pep, hireDate=1970-01-01, termDate=null, sales(2)={1, 2, }]]></programlisting>                            
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Manny included because has 1 sale below $125.00</para></listitem>
             <listitem><para>Moe excluded because his only $150.00 sale above criteria</para></listitem>
             <listitem><para>Jack excluded because has no sales that meet criteria</para></listitem>
@@ -1092,7 +1092,7 @@ Hibernate:
 
     <section id="jpa-query-criteria-where-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>

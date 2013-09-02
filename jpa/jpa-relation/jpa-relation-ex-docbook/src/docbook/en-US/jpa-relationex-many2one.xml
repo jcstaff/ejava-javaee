@@ -204,7 +204,7 @@ $ mvn clean process-test-classes; more target/classes/ddl/relationEx-createJPA.d
 
                 <listitem><para>Regenerate the database schema and note the changes made to the schema
                     using the more explicit declaration of the foreign key column. It now</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>uses a specified column name</para></listitem>
                             <listitem><para>is defined to be non-nullable</para></listitem>
                         </itemizedlist>
@@ -638,7 +638,7 @@ public class HousePK implements Serializable {
 }
 ]]></programlisting>
                     <para>Note, as a primary key class, it ...</para>                        
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>implements Serializable</para></listitem>
                         <listitem><para>implements a default constructor</para></listitem>
                         <listitem><para>overrides the default hashCode() based on the properties</para></listitem>
@@ -1130,7 +1130,7 @@ public class ItemType {
                 <listitem><para>Since the child entities will have a two properties -- one of them derived from
                     the parent entity -- we need to model a compound primary key class for the child entity.
                     Place the following primary key class in your src/main tree. It models two properties</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>typeId - represents the primary key value of the ItemType entity</para></listitem>
                     <listitem><para>number - represents a unique value per ItemType.id given to an Item</para></listitem>
                 </itemizedlist>                    

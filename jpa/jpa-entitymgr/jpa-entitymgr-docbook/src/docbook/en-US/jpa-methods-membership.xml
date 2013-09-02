@@ -10,7 +10,7 @@
         <programlisting language="java"><![CDATA[
 boolean contains(Object entity);
 ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Returns true if object is managed in the persistence context</para></listitem>
         </itemizedlist>                   
     </section>
@@ -20,7 +20,7 @@ boolean contains(Object entity);
         <programlisting language="java"><![CDATA[
 void clear();
 ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Clears all entities and queued changes from the persistence context</para></listitem>
             <listitem><para>All entities become detached</para></listitem>
         </itemizedlist>                   
@@ -57,7 +57,7 @@ assertFalse("unexpected name change",
 -author.firstName=foo
 -author2.firstName=dr
 ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Detaches existing entity from persistence context</para></listitem>
             <listitem><para>Detach cascaded to CascadeType.DETACH and ALL relationships</para></listitem>
             <listitem><para>Subsequent changes to entity will not change database</para></listitem>

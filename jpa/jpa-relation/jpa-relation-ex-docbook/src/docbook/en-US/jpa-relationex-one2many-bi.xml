@@ -1682,7 +1682,7 @@ Hibernate:
                 one/parent/inverse side of a one-to-many, bi-directional relationship. We are going to skip
                 making any errors with the entity and move straight to a reasonable solution. The key aspects
                 to remember about one-to-many, bi-directional relationships are</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>The many/child side is required to be the owning side and the one/parent side is the inverse</para></listitem>
                     <listitem><para>The one/parent side declares it is the inverse side by adding the @OneToMany.mappedBy attribute</para></listitem>
                     <listitem><para>Without the parent declaring the mappedBy attribute, you end up with a dual uni-directional relationship and chaos</para></listitem>
@@ -1831,7 +1831,7 @@ public class Tire {
 
             <listitem><para>Put the following class in place. This class represents an primary key 
                 class that will be used as an @IdClass. That means</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>The properties must be modeled with the same property names as the entity class</para></listitem>
                     <listitem><para>The properties must be modeled with the same property access (FIELD or PROPERTY) as the entity class</para></listitem>
                     <listitem><para>The class must implement Serializable</para></listitem>

@@ -9,7 +9,7 @@
         <title>Annotated Injection</title>
         <para>Simplest, most-common approach</para>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
 
             <listitem><para>Define injection using annotation</para>
 <programlisting language="java"><![CDATA[
@@ -50,7 +50,7 @@ public class TellerEJB implements TellerLocal, TellerRemote {
         <title>JNDI Approach</title>
         <para>Older manual technique</para>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
 
             <listitem><para></para>
 <programlisting language="java"><![CDATA[
@@ -77,7 +77,7 @@ public class BakeSchedulerEJB implements BakeSchedulerRemote {
         <title>ejb-jar.xml injection</title>
         <para>Older injection technique</para>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
 
             <listitem><para></para>
 <programlisting language="java"><![CDATA[
@@ -126,7 +126,7 @@ public class AidSchedulerEJB extends SchedulerBase
         <title>Context and Dependency Injection (CDI)</title>
         <para>Newer technique -- JavaEE's answer to Spring Configuration</para>
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
 
             <listitem><para>Define qualifier annotation</para>
 <programlisting language="java"><![CDATA[
@@ -175,7 +175,7 @@ public class TrainSchedulerEJB
 
     <section id="jpa-serverside-injection-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Annotation</para></listitem>
             <listitem><para>JNDI lookup</para></listitem>
             <listitem><para>XML injection</para></listitem>

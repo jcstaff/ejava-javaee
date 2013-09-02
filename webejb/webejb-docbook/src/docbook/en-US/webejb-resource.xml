@@ -7,12 +7,12 @@
 
     <section id="webejb-resource-resources">
         <title>Resources</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>An asset to be exposed to the web</para></listitem>
             <listitem><para>Document, set of properties, method, nearly anything</para></listitem>
             <listitem><para>Web has limited methods but an unlimited number of resources</para></listitem>
             <listitem><para>Example</para>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Products</para></listitem>
                 <listitem><para>Categories</para></listitem>
                 <listitem><para>Customers</para></listitem>
@@ -23,7 +23,7 @@
 
     <section id="webejb-resource-uris">
         <title>URIs</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>An address to access a particular resource</para></listitem>
             <listitem><para>Can be expressed relative</para>
 <programlisting language=""><![CDATA[
@@ -79,10 +79,10 @@ return UriBuilder.fromUri(appURI)
 
     <section id="webejb-resource-methods">
         <title>Methods</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Bounded ("uniform interface")</para></listitem>
             <listitem><para>Primary Set</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>GET - non-destructive read</para></listitem>
                     <listitem><para>POST - create and other methods</para></listitem>
                     <listitem><para>PUT - create or update</para></listitem>
@@ -90,7 +90,7 @@ return UriBuilder.fromUri(appURI)
                 </itemizedlist>
             </listitem>
             <listitem><para>Secondary Set</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>HEAD - a GET without the data - metadata only</para></listitem>
                     <listitem><para>OPTIONS - lists which methods supported</para></listitem>
                 </itemizedlist>
@@ -106,9 +106,9 @@ GET http://127.0.0.1:8080/jaxrsInventoryWAR/rest/products/1
     
     <section id="webejb-resource-response-codes">
         <title>Response Codes</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Standardized</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>2xx - success</para></listitem>
                     <listitem><para>3xx - success/redirect</para></listitem>
                     <listitem><para>4xx - client error</para></listitem>
@@ -116,7 +116,7 @@ GET http://127.0.0.1:8080/jaxrsInventoryWAR/rest/products/1
                 </itemizedlist>                   
             </listitem>
             <listitem><para>Common Set</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>200 - OK</para></listitem>
                     <listitem><para>201 - CREATED</para></listitem>
                     <listitem><para>400 - BAD_REQUEST</para></listitem>
@@ -129,7 +129,7 @@ GET http://127.0.0.1:8080/jaxrsInventoryWAR/rest/products/1
 
     <section id="webejb-resource-jaxrsclass">
         <title>JAX-RS Resource Class</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Annotated with @Path</para></listitem>
             <listitem><para>Injected with implementation details and call context</para></listitem>
         </itemizedlist>                   
@@ -148,7 +148,7 @@ public class ProductsResource {
         
         <section id="webejb-resource-jaxrsclass-post">
             <title>JAX-RS Resource POST Method</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Create new resource or tunnel service</para></listitem>
                 <listitem><para>Returns CREATED and URO of created resource</para></listitem>
             </itemizedlist>                   
@@ -177,7 +177,7 @@ public Response addCustomer(Customer customer) {
 
         <section id="webejb-resource-jaxrsclass-get">
             <title>JAX-RS GET Resource Method</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Non-destructive read</para></listitem>
                 <listitem><para>Returns OK with payload</para></listitem>
             </itemizedlist>                   
@@ -208,7 +208,7 @@ public Response getProduct(@PathParam("id")int id) {
 
         <section id="webejb-resource-jaxrsclass-put">
             <title>JAX-RS PUT Resource Method</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Create new or update existing</para></listitem>
                 <listitem><para>Optional results</para></listitem>
             </itemizedlist>                   
@@ -233,7 +233,7 @@ public Response getProduct(@PathParam("id")int id) {
 
         <section id="webejb-resource-jaxrsclass-delete">
             <title>JAX-RS DELETE Resource Method</title>
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Deletes specified resource</para></listitem>
                 <listitem><para>Optional results</para></listitem>
             </itemizedlist>                   
@@ -256,7 +256,7 @@ public Response deleteCustomer(@PathParam("id") int id) {
 
         <section id="webejb-resource-http">
         <title>HTTP Request/Response</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Request supplies method, URI, optional payload, and other properties</para></listitem>
         </itemizedlist>                   
 <programlisting language=""><![CDATA[
@@ -267,7 +267,7 @@ Connection: Keep-Alive
 User-Agent: Apache-HttpClient/4.1.3 (java 1.5)
 ]]></programlisting>
 
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Response provides status code, optional entity, and other properties]</para></listitem>
         </itemizedlist>                   
 <programlisting language=""><![CDATA[

@@ -9,7 +9,7 @@
     
     <section id="devenv-maveneclipse-import">
         <title>Project Import</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Import an existing maven project into Eclipse as a maven project</para></listitem>
             <listitem><para>M2E will inpsect the pom.xml and configure Eclipse accordingly</para></listitem>
         </itemizedlist>     
@@ -17,14 +17,14 @@
             <title>Import Existing Maven Project into Eclipse</title>
             <graphic scalefit="1" fileref="images/devenv-import-maven-project.png"/>
         </figure>        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>M2E provides mechanisms to create new maven projects (we will not discuss)</para></listitem>
         </itemizedlist>                   
     </section>
         
     <section id="devenv-maveneclipse-update">
         <title>Project Update</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Notice the Eclipse project dependencies are in sync with the versions specified in the pom.xml</para></listitem>
             <listitem><para>If you make a valid change to the pom.xml the Eclipse dependencies will update</para></listitem>
         </itemizedlist>                   
@@ -32,9 +32,9 @@
             <title>Keeping Eclipse Dependencies in Sync</title>
             <graphic scalefit="1" fileref="images/devenv-maven-dependencies.png"/>
         </figure>        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Dependency hierachy shows</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Which modules bring in other modules</para></listitem>
                     <listitem><para>Specific versions and where there are conflicts</para></listitem>
                 </itemizedlist>                   
@@ -49,7 +49,7 @@
     <section id="devenv-maveneclipse-refresh">
         <title>Project Refresh</title>
         <para>When things are not automatically updated, try...</para>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Refresh/F5</para></listitem>
             <listitem><para>Project-&gt;Clean</para></listitem>
             <listitem><para>Maven-&gt;Update Projects</para></listitem>

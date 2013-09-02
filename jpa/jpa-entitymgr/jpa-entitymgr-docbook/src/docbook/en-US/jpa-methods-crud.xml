@@ -21,10 +21,10 @@ log.debug("created author:" + author);]]></programlisting>
 -creating author:ejava.examples.daoex.bo.Author@17e7691, id=0, fn=dr, ln=seuss, subject=children, pdate=Sun Sep 16 10:14:32 EDT 2012, version=0
 -created author:ejava.examples.daoex.bo.Author@17e7691, id=50, fn=dr, ln=seuss, subject=children, pdate=Sun Sep 16 10:14:32 EDT 2012, version=0
 ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Inserts entity into database</para></listitem>
             <listitem><para>Actual insert time depends on transaction active and FlushMode</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Extended Persistence Context - queues insert until transaction active</para></listitem>
                     <listitem><para>Transaction-Scoped Persistence Context - always has transaction active</para></listitem>
                     <listitem><para>Flush occurs automatically prior to or during commit()</para></listitem>
@@ -33,7 +33,7 @@ log.debug("created author:" + author);]]></programlisting>
             </listitem>
             
             <listitem><para>New or removed entity enters managed state</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>All further changes are watched and will update database</para></listitem>
                 </itemizedlist>                   
         <programlisting language="java"><![CDATA[
@@ -50,7 +50,7 @@ log.debug("em.contains(author)=" + em.contains(author));
             </listitem>
             
             <listitem><para>Existing entity is ignored</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Cascades will still occur for CascadeType.PERSIST and ALL relationships</para></listitem>
                 </itemizedlist>                   
         <programlisting language="java"><![CDATA[
@@ -61,7 +61,7 @@ log.debug("em.contains(author)=" + em.contains(author));
             </listitem>
             
             <listitem><para>Detached entities will be rejected</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Entities with an identity but not associated with a persistence context</para></listitem>
                 </itemizedlist>                   
                 <programlisting language="java"><![CDATA[
@@ -97,7 +97,7 @@ log.debug("em.contains(author)=" + em.contains(author));
 <T> T find(Class<T> entityClass, Object primaryKey);
 <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties);
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Searches for the entity by primary key value</para></listitem>
             <listitem><para>Returns managed entity if found, else null</para></listitem>
             <listitem><para>Properties permitted for vendor-specific values and ignored if not understood</para></listitem>
@@ -109,7 +109,7 @@ log.debug("em.contains(author)=" + em.contains(author));
         <programlisting language="java"><![CDATA[
 <T> T getReference(Class<T> entityClass, Object primaryKey);
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Searches for the entity by primary key</para></listitem>
             <listitem><para>Returns a LAZY load reference if found</para></listitem>
             <listitem><para>Throws EntityNotFoundException if not exist</para></listitem>
@@ -142,7 +142,7 @@ assertSame("merged result not existing managed", author, tmp);
 Author author3 = em.find(Author.class, author.getId());
 assertEquals("updated " + firstName, author3.getFirstName());            
 ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Update database with state of detached object</para></listitem>
             <listitem><para>State of detached object copied into managed entity or new instance created</para></listitem>
             <listitem><para>Merging a managed entity is ignored. CascadeType.MERGE and ALL relationships are propagated</para></listitem>
@@ -176,10 +176,10 @@ public Author update(Author author) {
         <programlisting language="java"><![CDATA[
 void remove(Object entity);
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Managed entity is removed from database</para></listitem>
             <listitem><para>Actual delete time depends on transaction active and FlushMode</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Extended Persistence Context - queues delete until transaction active</para></listitem>
                 </itemizedlist>
             </listitem>

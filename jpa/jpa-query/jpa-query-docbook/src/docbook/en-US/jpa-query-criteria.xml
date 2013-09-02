@@ -40,9 +40,9 @@ Root<Customer> c = qdef.from(Customer.class);
 qdef.select(c);]]></programlisting>                        
                         
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>"from"</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>defines source of root query terms</para></listitem>
                     <listitem><para>returns object leveraged in query body</para></listitem>
                 </itemizedlist>
@@ -89,7 +89,7 @@ Root<Customer> c = qdef.from(Customer.class);
 qdef.select(c.<String>get("lastName"));
 ]]></programlisting>                        
   
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Allows return of simple property</para></listitem>
             <listitem><para>c.get("lastName") is called a "path"</para></listitem>
             <listitem><para>All paths based from root query terms (thus requirement for Root&lt;Customer&gt; c object)</para></listitem>
@@ -105,7 +105,7 @@ qdef.select(c.<String>get("lastName"));
 
 TypedQuery<String> query = em.createQuery(qdef);
 List<String> results = query.getResultList();]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Query result is a List&lt;String&gt; because "c.lastName" is a String</para></listitem>
         </itemizedlist>
 
@@ -136,7 +136,7 @@ CriteriaQuery<Object[]> qdef = cb.createQuery(Object[].class);
 Root<Clerk> c = qdef.from(Clerk.class);
 qdef.select(cb.array(c.get("firstName"), c.get("hireDate")));
 ]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Select specifies multiple terms within array()</para></listitem>
                 <listitem><para>Terms are expressed thru a path expression</para></listitem>
                 <listitem><para>Terms must be based off paths from root terms in the FROM (or JOIN) clause -- thus why Root&lt;Clerk&gt; c was retained from cb.from() call</para></listitem>
@@ -158,7 +158,7 @@ for(Object[] result : results) {
     Date hireDate = (Date) result[1];
     log.info("firstName=" + firstName + " hireDate=" + hireDate);
 }]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Query defined to return elements of select in Object[]</para></listitem>
             </itemizedlist>
 
@@ -190,7 +190,7 @@ qdef.select(cb.tuple(
         c.get("firstName").alias("firstName"), 
         c.get("hireDate").alias("hireDate")));
 ]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Aliases may be assigned to select terms for named-access to results</para></listitem>
         </itemizedlist>
 
@@ -213,10 +213,10 @@ for(Tuple result : results) {
     log.info("firstName=" + firstName + " hireDate=" + hireDate);
 }
 ]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Query defined to return instances of Tuple class</para></listitem>
             <listitem><para>Tuples provide access using</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>get(index) - simular to Object[]</para></listitem>
                     <listitem><para>get(index, Class&lt;T&gt; resultType) - typed access by index</para></listitem>
                     <listitem><para>get(alias) - access by alias</para></listitem>
@@ -259,7 +259,7 @@ qdef.select(cb.construct(
                 s.get("date"),
                 s.get("amount")));
 ]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Individual elements of select() are matched up against class constructor</para></listitem>
         </itemizedlist>
 
@@ -283,7 +283,7 @@ for(Receipt receipt : results) {
     log.info("receipt=" + receipt);
 }        
 ]]></programlisting>                        
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Constructed class may be simple POJO -- no need to be an entity</para></listitem>
         <listitem><para>Instances are not managed</para></listitem>
         <listitem><para>Suitable for use as Data Transfer Objects (DTOs)</para></listitem>
@@ -324,7 +324,7 @@ Root<Sale> s = qdef.from(Sale.class);
 qdef.select(cb.array(s.get("id"),
                      s.get("store").get("name")));
 ]]></programlisting>                          
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>All paths based off root-level FROM (or JOIN) terms</para></listitem>
                 <listitem><para>Paths use call chaining to change contexts</para></listitem>
                 <listitem><para>Paths -- used this way -- must always express a single element. Must use JOINs for paths involving collections</para></listitem>
@@ -364,7 +364,7 @@ Hibernate:
         sale0_.SALE_STORE=store1_.STORE_ID
  -sale.id=1, sale.store.name=Big Al's
  -sale.id=2, sale.store.name=Big Al's]]></programlisting>                            
-             <itemizedlist>
+             <itemizedlist spacing="compact">
                 <listitem><para>Automatic INNER JOIN formed between Sale and Store because of the cross-entity path</para></listitem>
             </itemizedlist>
         </section>
@@ -385,7 +385,7 @@ CriteriaQuery<Date> qdef = cb.createQuery(Date.class);
 Root<Clerk> c = qdef.from(Clerk.class);
 Join<Clerk, Sale> sale = c.join("sales", JoinType.INNER);
 qdef.select(sale.<Date>get("date"));]]></programlisting>                        
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Collection is brought in as a root term of the query through a JOIN expression</para></listitem>
                     <listitem><para>JOINs will match entities by their defined primary/foreign keys</para></listitem>
                     <listitem><para>INNER JOIN will return only those entities where there is a match</para></listitem>
@@ -409,7 +409,7 @@ Hibernate:
  -found result:1998-04-10 10:13:35.0
  -found result:1999-06-11 14:15:10.0
  -found result:1999-06-11 14:15:10.0]]></programlisting>                            
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>(Many-to-Many) Link table used during JOIN</para></listitem>
                     <listitem><para>Tables automatically joined on primary keys</para></listitem>
                     <listitem><para>Only Sales sold by our Clerks are returned</para></listitem>
@@ -435,7 +435,7 @@ Join<Clerk, Sale> sale = c.join("sales", JoinType.LEFT);
 qdef.select(cb.array(c.get("id"),
                      c.get("firstName"),
                      sale.get("amount")));]]></programlisting>                        
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>LEFT OUTER JOIN will return root with or without related entities</para></listitem>
                 </itemizedlist>
 
@@ -458,7 +458,7 @@ Hibernate:
  -clerk.id=1, clerk.firstName=Manny, amount=150.00
  -clerk.id=2, clerk.firstName=Moe, amount=150.00
  -clerk.id=3, clerk.firstName=Jack, amount=null]]></programlisting>                            
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>(Many-to-Many) Link table used during JOIN</para></listitem>
                     <listitem><para>Tables automatically joined on primary keys</para></listitem>
                     <listitem><para>All clerks, with or without a Sale, are returned</para></listitem>
@@ -480,7 +480,7 @@ Root<Sale> s = qdef.from(Sale.class);
 Root<Customer> c = qdef.from(Customer.class);
 qdef.select(c)
     .where(cb.equal(c.get("id"), s.get("buyerId")));]]></programlisting>                        
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Permits JOINs without relationship in entity model</para></listitem>
                 </itemizedlist>
 
@@ -500,7 +500,7 @@ Hibernate:
         
  -found result:firstName=cat, lastName=inhat
  -found result:firstName=thing, lastName=one]]></programlisting>                            
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Returns all Customers that are identified by a Sale</para></listitem>
                 </itemizedlist>
             </section>  
@@ -529,7 +529,7 @@ Root<Store> s = qdef.from(Store.class);
 s.join("sales");
 qdef.select(s)
     .where(cb.equal(s.get("name"), "Big Al's"));]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>A normal JOIN (implicit or explicit) may honor the fetch=LAZY property setting of the relation</para></listitem>
                 <listitem><para>Can be exactly what is desired</para></listitem>
                 <listitem><para>Can also cause problems or extra work if not desired</para></listitem>
@@ -545,7 +545,7 @@ public class Store {
             fetch=FetchType.LAZY)
     private List<Sale> sales = new ArrayList<Sale>();
 ]]></programlisting>                        
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Sales are lazily fetched when obtaining Store</para></listitem>
     </itemizedlist>
 
@@ -566,7 +566,7 @@ try {
 } catch (LazyInitializationException expected) {
     log.info("caught expected exception:" + expected);
 }]]></programlisting>                        
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Accessing the Sale properties causes a LazyInitializationException when persistence context no longer active or accessible</para></listitem>
     </itemizedlist>
 
@@ -612,7 +612,7 @@ s.fetch("sales");
 qdef.select(s)
     .where(cb.equal(s.get("name"), "Big Al's"));
 ]]></programlisting>                        
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>A JOIN FETCH used to eager load related entities as side-effect of query</para></listitem>
                 <listitem><para>Can be used as substitute for fetch=EAGER specification on relation</para></listitem>
             </itemizedlist>
@@ -637,7 +637,7 @@ Hibernate:
             on store0_.STORE_ID=sales1_.SALE_STORE 
     where
         store0_.name=?]]></programlisting>                            
-            <itemizedlist>
+            <itemizedlist spacing="compact">
                 <listitem><para>Sales are eagerly fetched when obtaining Store</para></listitem>
             </itemizedlist>
             <note>
@@ -664,7 +664,7 @@ CriteriaQuery<String> qdef = cb.createQuery(String.class);
 Root<Customer> c = qdef.from(Customer.class);
 qdef.select(c.<String>get("lastName"))
     .distinct(true);]]></programlisting>                        
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Limits output to unique value combinations</para></listitem>
         </itemizedlist>
 
@@ -703,7 +703,7 @@ Hibernate:
 
     <section id="jpa-query-criteria-summary">
        <title>Summary</title>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>
             <listitem><para></para></listitem>

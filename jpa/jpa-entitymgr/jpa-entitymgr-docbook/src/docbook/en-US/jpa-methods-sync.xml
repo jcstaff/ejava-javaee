@@ -9,7 +9,7 @@
         <programlisting language="java"><![CDATA[
 void flush();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Synchronizes cached changes with underlying database</para></listitem>
             <listitem><para>Requires active transaction</para></listitem>
         </itemizedlist>                   
@@ -22,7 +22,7 @@ void flush();
 void setFlushMode(javax.persistence.FlushModeType);
 javax.persistence.FlushModeType getFlushMode();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>AUTO (default) - unspecified</para></listitem>
             <listitem><para>COMMIT - flush only happens during commit</para></listitem>
         </itemizedlist>                   
@@ -62,7 +62,7 @@ assertEquals("unexpected name", newName, author.getFirstName());
 -calling refresh
 -author.firstName=foo
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Updates/overwrites cached entity state with database state</para></listitem>
 
             <listitem><para>Refresh of new entity results in java.lang.IllegalArgumentException</para>

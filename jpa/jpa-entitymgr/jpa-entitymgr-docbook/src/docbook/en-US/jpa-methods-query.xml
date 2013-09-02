@@ -13,7 +13,7 @@ javax.persistence.Query createQuery(String jpaql);
 javax.persistence.Query createNamedQuery(String name);
 <T> javax.persistence.TypedQuery<T> createNamedQuery(String name, Class<T> resultClass);
 ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Create query based on JPA Query Language (JPAQL)</para></listitem>
         </itemizedlist>                   
     </section>
@@ -26,7 +26,7 @@ javax.persistence.Query createNativeQuery(String sql);
 javax.persistence.Query createNativeQuery(String sql, Class resultClass);
 javax.persistence.Query createNativeQuery(String sql, String resultMapping);
 ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Create query based on SQL</para></listitem>
         </itemizedlist>                   
     </section>
@@ -37,7 +37,7 @@ javax.persistence.Query createNativeQuery(String sql, String resultMapping);
 <T> javax.persistence.TypedQuery<T> createQuery(javax.persistence.criteria.CriteriaQuery<T> criteria);
 javax.persistence.criteria.CriteriaBuilder getCriteriaBuilder();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Create query based on typed criteria API</para></listitem>
         </itemizedlist>                   
     </section>

@@ -8,7 +8,7 @@
        with natural/compound keys. We are combining multiple fields to 
        represent the object's identity.</para>
     <para>A compound primary key is required to...</para>
-    <itemizedlist>
+    <itemizedlist spacing="compact">
         <listitem><para>Be Serializable</para></listitem>
         <listitem><para>Have a default constructor (either built-in or declared)</para></listitem>
         <listitem><para>Supply a hash() and equals() method</para></listitem>
@@ -65,7 +65,7 @@ public class CowPK implements Serializable { //required to be Serializable
 }
 ]]></programlisting>
                 <para>Note the class is...</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Annotated as @Embeddable</para></listitem>
                     <listitem><para>Implement Serializable</para></listitem>
                     <listitem><para>Provide a default constructor</para></listitem>
@@ -73,7 +73,7 @@ public class CowPK implements Serializable { //required to be Serializable
                     <listitem><para>Provides attributes that will be used for the primary key fields</para></listitem>
                 </itemizedlist>                        
                 <para>Note the class also...</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Optionally implemented a convenience constructor</para></listitem>
                     <listitem><para>Optionally removed the setter methods so the primary 
                         key fields could not be accidentally changed</para></listitem>
@@ -279,13 +279,13 @@ public class Cow2 {
 }
 ]]></programlisting>
                 <para>Note this class...</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Declares the primary key class as an @IdClass</para></listitem>
                     <listitem><para>Identifies two properties as @Id properties and these must match
                         the properties of the primary key class.</para></listitem>
                 </itemizedlist>                        
                 <para>This class also happens to...</para>
-                <itemizedlist>                        
+                <itemizedlist spacing="compact">                        
                     <listitem><para>Provide a custom override of the "name" primary key property using @AttributeOverride
                         at the class level.</para></listitem>
                     <listitem><para>Provides read-only access to the primary key values by only supplying getters</para></listitem>

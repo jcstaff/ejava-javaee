@@ -8,7 +8,7 @@
         <title>Setup Maven Project</title>
         <para></para>
         
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Add the following to your .m2/settings.xml file. This will allow you to 
                 resolve the exercise archetype and set a default database for the exercise.</para>
 <programlisting language=""><![CDATA[
@@ -117,7 +117,7 @@ queryEx/
 ]]></programlisting>                        
             </listitem>        
             <listitem><para>Verify the instantiated template builds in your environment</para>
-                <itemizedlist>
+                <itemizedlist spacing="compact">
                     <listitem><para>Activate the h2db profile (and deactivate the h2srv profile) to use an embedded file as your database.
                         This option does not require a server but is harder to inspect database state in between tests.</para>
 <programlisting language=""><![CDATA[

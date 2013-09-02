@@ -67,7 +67,7 @@ public void testMulti() {
     assertEquals("unexpected number of movies", 7, movies.size());
 }]]></programlisting>
                     <para>Notice...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>createQuery() accepts JPAQL syntax</para></listitem>
                         <listitem><para>supplying a type (Movie.class) for the second argument produces a type-safe assignment and
                             eliminates the need to perform a cast</para></listitem>
@@ -119,7 +119,7 @@ public void testSingle() {
     assertNotNull("no movie", movie);
 }]]></programlisting>
                     <para>Notice...</para>
-                    <itemizedlist>
+                    <itemizedlist spacing="compact">
                         <listitem><para>getSingleResult() - returns exactly one result</para></listitem>
                     </itemizedlist>
                 </listitem>
@@ -636,7 +636,7 @@ public void testValueQuery() {
     assertEquals("unexpected number of titles", 7, titles.size());
 }]]></programlisting>
                         <para>Notice...</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>The data type returned in the list is declared in the query</para></listitem>
                             <listitem><para>The result is returned as a simple list of values</para></listitem>
                         </itemizedlist>
@@ -691,7 +691,7 @@ public void testResultValueQuery() {
     assertEquals("unexpected number of titles", 7, titleCount);
 }]]></programlisting>          
                         <para>Notice...</para>
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>The query returns the result of a JPAQL function</para></listitem>
                             <listitem><para>Adding the return type to the query function allows for type-safe usage of the result</para></listitem>
                             <listitem><para>The value can be retrieved using the getSingleResult()</para></listitem>
@@ -744,7 +744,7 @@ public void testMultiValueQuery() {
     assertEquals("unexpected number of results", 7, results.size());
 }]]></programlisting>
                         <para>Notice...</para>                        
-                        <itemizedlist>
+                        <itemizedlist spacing="compact">
                             <listitem><para>The query requests multiple values to be returned</para></listitem>
                             <listitem><para>The query is declared to return an Object[]</para></listitem>
                             <listitem><para>The query returns a List with each element in the List containing an Object[]</para></listitem>

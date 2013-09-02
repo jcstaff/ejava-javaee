@@ -9,7 +9,7 @@
         <programlisting language="java"><![CDATA[
 boolean isOpen();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Returns true if persistence context is open</para></listitem>
         </itemizedlist>                   
     </section>
@@ -19,7 +19,7 @@ boolean isOpen();
         <programlisting language="java"><![CDATA[
 void close();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Closes persistence context</para></listitem>
             <listitem><para>All contained entities become detached</para></listitem>
         </itemizedlist>                   
@@ -30,7 +30,7 @@ void close();
         <programlisting language="java"><![CDATA[
 javax.persistence.EntityTransaction getTransaction();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Returns transaction object for inspection and control</para></listitem>
             <listitem><para>Invalid call for transaction-scoped persistence contexts</para></listitem>
         </itemizedlist>                   
@@ -41,7 +41,7 @@ javax.persistence.EntityTransaction getTransaction();
         <programlisting language="java"><![CDATA[
 void joinTransaction();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Associate a persistence context with a JTA transaction</para></listitem>
         </itemizedlist>                   
     </section>
@@ -51,7 +51,7 @@ void joinTransaction();
         <programlisting language="java"><![CDATA[
 <T> T unwrap(Class<T> clazz);
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Return object of specified type</para></listitem>
             <listitem><para>Provides access to underlying implementation classes</para></listitem>
         </itemizedlist>                   
@@ -62,7 +62,7 @@ void joinTransaction();
         <programlisting language="java"><![CDATA[
 Object getDelegate();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Returns vendor-specific object backing EntityManager</para></listitem>
         </itemizedlist>                   
     </section>
@@ -73,7 +73,7 @@ Object getDelegate();
         <programlisting language="java"><![CDATA[
 javax.persistence.metamodel.Metamodel getMetamodel();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Returns metamodel object for persistence context</para></listitem>
         </itemizedlist>                   
     </section>
@@ -83,7 +83,7 @@ javax.persistence.metamodel.Metamodel getMetamodel();
         <programlisting language="java"><![CDATA[
 javax.persistence.EntityManagerFactory getEntityManagerFactory();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Returns EntityManagerFactory associated with EntityManager</para></listitem>
         </itemizedlist>                   
     </section>
@@ -94,7 +94,7 @@ javax.persistence.EntityManagerFactory getEntityManagerFactory();
 void setProperty(String key, Object value);
 java.util.Map getProperties();
         ]]></programlisting>
-        <itemizedlist>
+        <itemizedlist spacing="compact">
             <listitem><para>Access EntityManager properties</para></listitem>
         </itemizedlist>                   
     </section>
