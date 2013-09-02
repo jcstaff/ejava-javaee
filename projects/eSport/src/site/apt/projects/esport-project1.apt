@@ -789,7 +789,7 @@ Project1: eSport Data Access Tier and Initial Business Logic
 ===
     [[1]] Design and implement a mechanism to ingest a starting state for
     eLeague based on a provided data file and parser.  You will implement
-    two primary classes to support this requirement; JDBC Ingest DAO
+    two primary classes to support this requirement; the DAO(s)
     and an Ingestor. 
 
         [Note:] The ClubDAO interface, in this case, is a DAO in the
@@ -803,13 +803,9 @@ Project1: eSport Data Access Tier and Initial Business Logic
 
         [[a]] Design and implement a set of DAOs that can be used
         to ingest eLeague business data into the database using the
-        JDBC API and the database schema you designed as a part of a
-        separate requirement. These DAOs can optionally implement a
-        common interface with the JPA DAOs you implement as a part of a
-        separate requirement -or- can be unique in how they achieve what
-        can be thought of as a performance goal (rather than working
-        within business rules).  The JDBC Ingest DAO need only support
-        create/insert operations.
+        the database schema you designed as a part of a
+        separate requirement. These DAOs can optionally be tuned for 
+        ingest or simply reused from your CRUD-style requirements.
 
         [[b]] Design and implement an Ingestor that will use an externally
         provided parser to obtain business data for eLeague and use the JDBC
@@ -827,11 +823,8 @@ Project1: eSport Data Access Tier and Initial Business Logic
     of JPA @Annotations, descriptor files, or a combination of both. Your
     interface should encapsulate the fact that an EntityManager is being
     used and the same EntityManager should be shared among other DAOs in
-    the same Thread. Using either (a crude form of) dependency injection
-    or ThreadLocal can be quite useful here. However, you will find
-    that dependency injection works easiest in most cases.  Your DAOs
-    should not attempt to control the transaction or they will <NOT>
-    be portable to the EJB tier.
+    the same Thread.  Your DAOs should not attempt to control the 
+    transaction or they will <NOT> be portable to the EJB tier.
 
         [[A]] eLeague DAOs
 
