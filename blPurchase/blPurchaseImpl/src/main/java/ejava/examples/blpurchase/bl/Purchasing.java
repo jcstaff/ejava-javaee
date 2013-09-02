@@ -11,7 +11,6 @@ public interface Purchasing {
 	 * @param email
 	 * @param firstName
 	 * @param lastName
-	 * @return
 	 */
 	Account createAccount(String email, String firstName, String lastName);
 
@@ -22,7 +21,6 @@ public interface Purchasing {
 	 * Note that this capability is not yet fully defined.
 	 * @param email
 	 * @param password
-	 * @return
 	 */
 	double checkout(String email, String password);
 }

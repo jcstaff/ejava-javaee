@@ -13,7 +13,6 @@ public interface Catalog {
 	 * Returns a list of products in the catalog chunked into page sizes.
 	 * @param offset
 	 * @param limit
-	 * @return
 	 */
 	List<Product> getProducts(int offset, int limit);
 
