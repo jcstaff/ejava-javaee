@@ -343,17 +343,18 @@
                 <artifactId>jsr250-api</artifactId>
                 <version>${jsr250-api.version}</version>
             </dependency>
+            <!-- DELETE ME?
             <dependency>
                 <groupId>org.jboss.jbossas</groupId>
                 <artifactId>jboss-as-server</artifactId>
                 <version>${jboss-as-server.version}</version>
                 <classifier>jmx-invoker-adaptor-client</classifier>
                 <exclusions>
-                    <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                    <exclusion>
                         <groupId>org.jboss.security</groupId>
                         <artifactId>jbosssx-client</artifactId>
                     </exclusion>
-                    <exclusion> <!-- gets in the way with newer versions -->
+                    <exclusion> 
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
                     </exclusion>
@@ -365,28 +366,29 @@
                 <version>${jboss-as-client.version}</version>            
                 <type>pom</type>
                 <exclusions>
-                    <exclusion> <!-- gets in the way with JBoss6 and M2 -->
+                    <exclusion> <!- - gets in the way with JBoss6 and M2 - ->
                         <groupId>org.jboss.security</groupId>
                         <artifactId>jbosssx-client</artifactId>
                     </exclusion>
-                    <exclusion> <!-- gets in the way with newer versions -->
+                    <exclusion> <!- - gets in the way with newer versions - ->
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
                     </exclusion>
-                    <exclusion> <!-- causes reference to defunct repo -->
+                    <exclusion> <!- - causes reference to defunct repo - ->
                         <groupId>trove</groupId>
                         <artifactId>trove</artifactId>
                     </exclusion>
-                    <exclusion> <!-- troubles finding this artifact -->
+                    <exclusion> <!- - troubles finding this artifact - ->
                         <groupId>com.sun.istack</groupId>
                         <artifactId>istack-commons-runtime</artifactId>
                     </exclusion>
-                    <exclusion> <!-- troubles finding this artifact -->
+                    <exclusion> <!- - troubles finding this artifact - ->
                         <groupId>woodstox</groupId>
                         <artifactId>wstx-asl</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
+            -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
