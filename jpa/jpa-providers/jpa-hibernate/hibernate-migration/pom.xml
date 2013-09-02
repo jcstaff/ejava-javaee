@@ -39,6 +39,7 @@
         <jpa2-hibernate.version>3.5.0-Final</jpa2-hibernate.version>
         <hibernate-slf4j.version>1.5.8</hibernate-slf4j.version>
         <wagon-ssh-external.version>2.2</wagon-ssh-external.version>
+        <maven-site-plugin.version>3.3</maven-site-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -84,6 +85,7 @@
             <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
+                <version>${maven-site-plugin.version}</version>
                 <configuration>
                     <skip>true</skip>
                     <skipDeploy>true</skipDeploy>
