@@ -80,13 +80,6 @@
             <type>war</type>
             <scope>runtime</scope>
        </dependency>
-        <dependency>
-            <groupId>ejava.webejb</groupId>
-            <artifactId>webejb-docbook</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-            <scope>runtime</scope>
-        </dependency>
 
         <dependency>
             <groupId>ejava.jpa</groupId>
@@ -109,10 +102,17 @@
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
-
         <dependency>
             <groupId>ejava.jpa.hibernate.migration</groupId>
             <artifactId>hibernate-migration-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ejava.webejb</groupId>
+            <artifactId>webejb-docbook</artifactId>
             <version>${project.version}</version>
             <type>war</type>
             <scope>runtime</scope>
