@@ -25,7 +25,6 @@ public interface ClubDAO {
 	 * and count values. Provide 0s to turn off paging.
 	 * @param start
 	 * @param count
-	 * @return
 	 * @throws ClubDAOException
 	 */
 	List<Venue> getVenues(int start, int count)
