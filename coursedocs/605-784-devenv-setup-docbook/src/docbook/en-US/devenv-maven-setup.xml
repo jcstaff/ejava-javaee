@@ -118,7 +118,7 @@ $ mvn clean
                             of the <code>.m2/settings.xml</code> file in your
                             HOME directory. 
                         </para>
-                        <programlisting><![CDATA[
+                        <programlisting language="xml"><![CDATA[
     <activeProfiles>
         <activeProfile>h2db</activeProfile>
     </activeProfiles>
@@ -135,7 +135,7 @@ $ mvn clean
                             the path. The path does not have to exist. It will 
                             be created during the next build. 
                         </para>
-                        <programlisting><![CDATA[
+                        <programlisting language="xml"><![CDATA[
     <offline>false</offline>
     <!-- this overrides the default $HOME/.m2/repository location. --> 
     <localRepository>c:/jhu/repository</localRepository>
