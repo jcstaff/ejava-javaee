@@ -1,24 +1,22 @@
 package ejava.examples.javase5;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
-
 import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-
-public class ForEachTest extends TestCase {
+public class ForEachTest {
     private static final Log log = LogFactory.getLog(ForEachTest.class); 
     
     /**
      * legacy way
      */
+    @Test
     public void testIteratorCollection() {
         log.info("testForEachCollection");
         
@@ -39,6 +37,7 @@ public class ForEachTest extends TestCase {
      * java SE 5 way
      *
      */
+    @Test
     public void testForLoopCollection() {
         log.info("testForEachCollection");
         
@@ -59,6 +58,7 @@ public class ForEachTest extends TestCase {
      * legacy way
      *
      */
+    @Test
     public void testIteratorArray() {
         log.info("testIteratorArray");
         
@@ -78,6 +78,7 @@ public class ForEachTest extends TestCase {
      * java SE 5 way
      *
      */
+    @Test
     public void testForLoopArray() {
         log.info("testForEachArray");
         
@@ -93,10 +94,4 @@ public class ForEachTest extends TestCase {
         }
         assertTrue("unexpected count:" + i, i==array.length);        
     }
-
-    
-    public static Test suite() {
-        return new TestSuite(ForEachTest.class);
-    }
-
 }

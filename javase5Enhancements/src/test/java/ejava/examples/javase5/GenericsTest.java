@@ -1,18 +1,17 @@
 package ejava.examples.javase5;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-public class GenericsTest extends TestCase {
+public class GenericsTest {
     private static final Log log = LogFactory.getLog(GenericsTest.class);
     
     private static class TestType {
@@ -24,6 +23,7 @@ public class GenericsTest extends TestCase {
      *
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Test
     public void testRawCollection() {
         log.info("testRawCollection");
         
@@ -42,6 +42,7 @@ public class GenericsTest extends TestCase {
      * Typed collections check at compile time
      *
      */
+    @Test
     public void testTypedCollection() {
         log.info("testTypedCollection");
         
@@ -62,6 +63,7 @@ public class GenericsTest extends TestCase {
      *
      */
     @SuppressWarnings("unchecked")
+    @Test
 	public void testCheckedCollection() {
         log.info("testCheckedCollection");
         
@@ -111,8 +113,4 @@ public class GenericsTest extends TestCase {
         assertTrue("unexpected number of exceptions:" + exceptions, 
                 exceptions == 1);
     }    
-    
-    public static Test suite() {
-        return new TestSuite(GenericsTest.class);
-    }
 }

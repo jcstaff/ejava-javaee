@@ -1,13 +1,12 @@
 package ejava.examples.javase5;
 
+import static org.junit.Assert.*;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-public class AutoboxingTest extends TestCase {
+public class AutoboxingTest {
     private static final Log log = LogFactory.getLog(AutoboxingTest.class);
     
     
@@ -19,7 +18,8 @@ public class AutoboxingTest extends TestCase {
         log.info("received Long=" + i);
         return i;
     }
-    
+
+    @Test
     public void testAutobox() {
         log.info("testAutoBox");
         
@@ -36,9 +36,4 @@ public class AutoboxingTest extends TestCase {
         assertEquals(intWrap, intBox);
         assertEquals(longWrap, longBox);
     }
-    
-    public static Test suite() {
-        return new TestSuite(AutoboxingTest.class);
-    }
-
 }
