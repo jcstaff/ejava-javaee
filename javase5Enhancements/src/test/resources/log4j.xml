@@ -18,10 +18,12 @@
    
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
         <param name="Target" value="System.out"/>
-
+        <!-- 
+                   value="%-5p %d{dd-MM HH:mm:ss,SSS} (%F:%M:%L)-%m%n"/>
+         -->
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" 
-                   value="%-5p %d{dd-MM HH:mm:ss,SSS} (%F:%M:%L)  -%m%n"/>
+                   value="%-5p %d{HH:mm:ss,SSS}-%m%n"/>
         </layout>
     </appender>
 
