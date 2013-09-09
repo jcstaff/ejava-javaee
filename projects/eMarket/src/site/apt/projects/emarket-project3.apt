@@ -15,7 +15,7 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     * Define users and roles for both applications.
 
     * Define access controls and implement authentication mechanisms for 
-    applications.
+    both applications.
 
     * Implement a publish/subscribe capability between the eSales, eBidbot
     and stand-alone client applications.
@@ -32,11 +32,13 @@ Project3: eMarket Secure and Asynchronous N-Tier Application
     of the overall API and capability. JBoss and other application
     servers provide simple, default mechanisms that are easy to
     demonstrate and more sophisticated mechanisms that are realistic for
-    deployments that require no change to the JavaEE-compliant application code.
+    deployments. Switching between the two requires no change to 
+    JavaEE-compliant application code.
     We will use the simple, default/"other" security-domain defined
     within the standard JBoss installation. This uses the RealmUsersRoles
-    login-module -- which is powered by two property files supplied and
-    pre-populated by the class server files from ejava-jboss711.
+    login-module -- which is configured by two property files and
+    pre-populated by the class server files installed at the start 
+    of the semester during development environment setup:
 
 *----------+-----------------+
 | <<File>> | <<Description>> |
@@ -111,7 +113,7 @@ user3 | esales-user,ebidbot-user
 
         []
 
-    For some asynchronous activity, we will implement ain Auction
+    For some asynchronous activity, we will implement an Auction
     Topic with eSales that will be used to provide updates to auction
     information.  eBidbot will listen to this topic using a Message Driven
     Bean to keep orders up to date and to specifically know when they
@@ -147,7 +149,7 @@ user3 | esales-user,ebidbot-user
     [[1]] Extend your existing RMI Test project and RMI client(s) to
     address new authentication requirements.
 
-        * Add a valid login to your existsing tests to re-enable them under
+        * Add a valid login to your existing tests to re-enable them under
         the newly secured environment.
 
         * Add a new unit test that verifies the access controls of the
@@ -206,7 +208,8 @@ user3 | esales-user,ebidbot-user
     [[1]] Extend your eSales EJB implementations to publish changes to 
     Auctions.
 
-        * Use the emarket-esales-auction topic (JNDI name: topic/ejava/projects/emarket/esales-auction)
+        * Use the emarket-esales-auction topic 
+        (JNDI name: topic/ejava/projects/emarket/esales-auction)
 
         * Design your JMS Message. You can use any JMS Type and JMS/custom
         properties you wish.  However, you need to account for the fact
@@ -262,8 +265,8 @@ user3 | esales-user,ebidbot-user
     eBidbot using its new access control restrictions and ability to
     authenticate with eSales.
 
-    [[1]] iImplement the scripted use case below as an automated JUnit
-    test and manually driven script through the Web UI. All command
+    [[1]] Implement the scripted use case below as an automated JUnit
+    test and manually driven actions through the Web UI. All command
     line implementations must be wrapped in an Ant runtime script to
     encapulsate the classpath details in a portable manner (see the
     class jmsNotifier project for an example of using an Ant runtime script).

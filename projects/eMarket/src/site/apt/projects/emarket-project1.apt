@@ -710,7 +710,7 @@ Project1: eMarket Data Access Tier and Initial Business Logic
 
 * Testing
 
-    [[1]] Provide a JUnit test for your business objects that test the 
+    [[1]] Provide a JUnit test for your business objects (BOs) that test the 
     manipulation of the data. An example test might be the addition
     of a bid for a closed auction. There should be a separate project 
     and test for both eSales and eBidbot. This test should be packaged with
@@ -806,74 +806,76 @@ Project1: eMarket Data Access Tier and Initial Business Logic
         will have any artifacts at the root layer. It should be
         used only as a convenience wrapper to perform goals across both
         projects. The root project can also be used for common property, 
-        dependencyManagement, and pluginManagement defintions. All 
-        concrete dependency and plugins should be defined in the leaf-level
-        poms to avoid unwanted dependencies from the root or mid-level
-        parents.
+        dependencyManagement, and pluginManagement definitions. All 
+        concrete dependency and plugin instantiations should be defined 
+        in the leaf-level poms to avoid unwanted dependencies from the 
+        root or mid-level parents.
 
         []
 
 ---
 eMarket/
+|-- pom.xml
 |-- eBidbot
-|   |-- eBidbotImpl
-|   |   |-- pom.xml
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- ebidbot
-|   |       |   |       |-- bo
-|   |       |   |       |-- dao
-|   |       |   |       |-- jpa
-|   |       |   |       |-- bl
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `-- ddl
-|   |       |           |-- eBidbot-create.ddl
-|   |       |           `-- eBidbot-drop.ddl
-|   |       `-- test
-|   |           |-- java
-|   |           |   `-- ebidbot
-|   |           |       |-- bo
-|   |           |       |-- dao
-|   |           |       `-- bl
-|   |           `-- resources
-|   |               |-- log4j.xml
-|   |               `-- META-INF
-|   |                  `-- persistence.xml
-|   `-- pom.xml
-|-- eSales
-|   |-- eSalesImpl
-|   |   |-- pom.xml
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- esales
-|   |       |   |       |-- bo
-|   |       |   |       |-- dao
-|   |       |   |       |-- jpa
-|   |       |   |       |-- bl
-|   |       |   |       `-- blimpl
-|   |       |   `-- resources
-|   |       |       `-- ddl
-|   |       |           |-- eSales-create.ddl
-|   |       |           `-- eSales-drop.ddl
-|   |       `-- test
-|   |           |-- java
-|   |           |   `-- esales
-|   |           |       |-- bo
-|   |           |       |-- dao
-|   |           |       `-- bl
-|   |           `-- resources
-|   |               |-- log4j.xml
-|   |               `-- META-INF
-|   |                  `-- persistence.xml
-|   `-- pom.xml
-`-- pom.xml
+|   |-- pom.xml
+|   `-- eBidbotImpl
+|       |-- pom.xml
+|       `-- src
+|           |-- main
+|           |   |-- java
+|           |   |   `-- ebidbot
+|           |   |       |-- bo
+|           |   |       |-- dao
+|           |   |       |-- jpa
+|           |   |       |-- bl
+|           |   |       |-- blimpl
+|           |   `-- resources
+|           |       `-- ddl
+|           |           |-- eBidbot-create.ddl
+|           |           `-- eBidbot-drop.ddl
+|           `-- test
+|               |-- java
+|               |   `-- ebidbot
+|               |       |-- bo
+|               |       |-- dao
+|               |       `-- bl
+|               `-- resources
+|                   |-- log4j.xml
+|                   `-- META-INF
+|                      `-- persistence.xml
+`-- eSales
+    |-- pom.xml
+    `-- eSalesImpl
+        |-- pom.xml
+        `-- src
+            |-- main
+            |   |-- java
+            |   |   `-- esales
+            |   |       |-- bo
+            |   |       |-- dao
+            |   |       |-- jpa
+            |   |       |-- bl
+            |   |       `-- blimpl
+            |   `-- resources
+            |       `-- ddl
+            |           |-- eSales-create.ddl
+            |           `-- eSales-drop.ddl
+            `-- test
+                |-- java
+                |   `-- esales
+                |       |-- bo
+                |       |-- dao
+                |       `-- bl
+                `-- resources
+                    |-- log4j.xml
+                    `-- META-INF
+                       `-- persistence.xml
 ---
 ---
 eMarket/
+|-- pom.xml
 |-- eBidbot
+|   |-- pom.xml
 |   |-- eBidbotBO
 |   |   |-- pom.xml
 |   |   `-- src
@@ -908,71 +910,69 @@ eMarket/
 |   |               |-- log4j.xml
 |   |               `-- META-INF
 |   |                   `-- persistence.xml
-|   |-- eBidbotBLImpl
-|   |   |-- pom.xml
-|   |   `-- src
-|   |       |-- main
-|   |       |   `-- java
-|   |       |       `-- ebidbot
-|   |       |           `-- blimpl
-|   |       `-- test
-|   |           |-- java
-|   |           |   `-- ebidbot
-|   |           |       `-- bl
-|   |           `-- resources
-|   |               `-- log4j.xml
-|   `-- pom.xml
-|-- eSales
-|   |-- eSalesBO
-|   |   |-- pom.xml
-|   |   `-- src
-|   |       |-- main
-|   |       |   `-- java
-|   |       |       `-- esales
-|   |       |           |-- bl
-|   |       |           `-- bo
-|   |       `-- test
-|   |           |-- java
-|   |           |   `-- esales
-|   |           |       `-- bo
-|   |           `-- resources
-|   |               `-- log4j.xml
-|   |-- eSalesDAO
-|   |   |-- pom.xml
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- esales
-|   |       |   |       |-- dao
-|   |       |   |       `-- jpa
-|   |       |   `-- resources
-|   |       |       `-- ddl
-|   |       |           |-- eBidbot-create.ddl
-|   |       |           `-- eBidbot-drop.ddl
-|   |       `-- test
-|   |           |-- java
-|   |           |   `-- esales
-|   |           |       `-- dao
-|   |           `-- resources
-|   |               |-- log4j.xml
-|   |               `-- META-INF
-|   |                   `-- persistence.xml
-|   |-- eSalesBLImpl
-|   |   |-- pom.xml
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- esales
-|   |       |   |       `-- blimpl
-|   |       |   `-- resources
-|   |       `-- test
-|   |           |-- java
-|   |           |   `-- esales
-|   |           |       `-- bl
-|   |           `-- resources
-|   |               `-- log4j.xml
-|   `-- pom.xml
-`-- pom.xml
+|   `-- eBidbotBLImpl
+|       |-- pom.xml
+|       `-- src
+|           |-- main
+|           |   `-- java
+|           |       `-- ebidbot
+|           |           `-- blimpl
+|           `-- test
+|               |-- java
+|               |   `-- ebidbot
+|               |       `-- bl
+|               `-- resources
+|                   `-- log4j.xml
+`-- eSales
+    |-- pom.xml
+    |-- eSalesBO
+    |   |-- pom.xml
+    |   `-- src
+    |       |-- main
+    |       |   `-- java
+    |       |       `-- esales
+    |       |           |-- bl
+    |       |           `-- bo
+    |       `-- test
+    |           |-- java
+    |           |   `-- esales
+    |           |       `-- bo
+    |           `-- resources
+    |               `-- log4j.xml
+    |-- eSalesDAO
+    |   |-- pom.xml
+    |   `-- src
+    |       |-- main
+    |       |   |-- java
+    |       |   |   `-- esales
+    |       |   |       |-- dao
+    |       |   |       `-- jpa
+    |       |   `-- resources
+    |       |       `-- ddl
+    |       |           |-- eBidbot-create.ddl
+    |       |           `-- eBidbot-drop.ddl
+    |       `-- test
+    |           |-- java
+    |           |   `-- esales
+    |           |       `-- dao
+    |           `-- resources
+    |               |-- log4j.xml
+    |               `-- META-INF
+    |                   `-- persistence.xml
+    `-- eSalesBLImpl
+        |-- pom.xml
+        `-- src
+            |-- main
+            |   |-- java
+            |   |   `-- esales
+            |   |       `-- blimpl
+            |   `-- resources
+            `-- test
+                |-- java
+                |   `-- esales
+                |       `-- bl
+                `-- resources
+                    `-- log4j.xml
 ---
 
 * Grading

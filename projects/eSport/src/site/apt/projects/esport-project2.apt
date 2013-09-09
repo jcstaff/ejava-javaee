@@ -1,6 +1,6 @@
 Project2: eSport N-Tier Application
 
-    2010-08-29
+    2013-09-08 DRAFT
 
 * Goals
 
@@ -9,19 +9,23 @@ Project2: eSport N-Tier Application
 
     * Deploy data access tier and business logic as an EJB component
 
-    * Provide a remote interface and client to business logic
+    * Deploy EJBs using EAR and WAR approaches
 
-    * Provide a local interface and Web client to business logic
+    * Provide a remote interface and client to business logic
 
     * Provide a Web tier 
 
 * Objectives
 
-    * Expand the current project development architecture to include EJB,
-    WAR, EAR, and remote Test sub-projects for eLeague.
+    * Expand the current project development architecture to include 
+    EJB, WAR, EAR, and remote Test sub-projects for eLeague. For eLeague
+    you will have separate EJB, WAR, EAR, and rmi Test modules. This 
+    is being done to simulate a complex project option.
 
-    * Expand the current project development architecture to include EJB,
-    WAR, EAR, and remote Test sub-projects for eClub.
+    * Expand the current project development architecture to include 
+    EJB, WAR, and remote Test sub-projects for eClub. For eClub you 
+    will have a single WAR for deployment.  This being done to simulate
+    a simple project option.
 
     * Re-host the data access tiers and initial business logic from 
     Project 1 within the new EJB and WEB tiers.
@@ -34,10 +38,9 @@ Project2: eSport N-Tier Application
     * Create the remote Test sub-project to deploy and run tests using the
     remote EJB interface.
 
-    * Create and test the WAR sub-project to host the user interface.
-    This component will ultimately be deployed within the EAR to 
-    the application server and use local interfaces of the EJB to
-    access business logic. 
+    * Create and test the WAR sub-projects to host the user interface.
+    This component will ultimately be deployed to the application server and 
+    may use local interfaces of the EJB to access business logic.
 
 * Technical Overview
 
@@ -52,9 +55,14 @@ Project2: eSport N-Tier Application
 
     The project will continue along two parallel paths; eLeague and eClub.
     However, this time we will add several new project types; EJB, EAR,
-    WAR, and Test. These new sub-projects will become siblings to your
-    existing Impl -or- BO, DAO, and BLImpl sub-projects. The new projects
-    will depend on your legacy work. The remote interface of the EJB
+    WAR, and Test. We will add all new project types to eLeague. We will
+    use a WAR deployment for eClub.
+    These new sub-projects will become siblings to your
+    existing Impl -or- BO, DAO, and BLImpl sub-projects. 
+    For eClub, you have the option of making the WAR a sibling 
+    project or migrating the existing Impl project to be a WAR project
+    (and remain with a single module for eClub).
+    The new projects will depend on your legacy work. The remote interface of the EJB
     will also require specific design of what gets externalized to the
     client. The remote clients do not share the same address space we had
     in Project 1 and we cannot afford to serialize the entire contents
@@ -68,11 +76,10 @@ Project2: eSport N-Tier Application
     control transaction boundaries, provide local interaction for the
     Web Tier, and a RMI interface for remote clients. Security will be
     addressed in the next project. To limit the scope of the project, the
-    Web UI requirements will be constrained to a limited number of
-    use cases. The EJB and WAR will be deployed as a part of an
-    EAR by a Test project. The Test project will host RMI testing of the
-    EJB methods that are to be used by eLeague remote clients, including
-    eClub business logic. 
+    Web UI requirements will be constrained to a few of the league
+    use cases. You are to deploy eLeague using an EAR and eClub 
+    uding only a WAR.
+    
 
     eClub will require additional work as well. With a remote interface
     for eLeague in hand and the ability to either simulate or operate with a
@@ -90,32 +97,10 @@ Project2: eSport N-Tier Application
     components, Java packages, JNDI names, etc. to help logically separate
     the parallel project implementations.
 
-    [Note:] There should be no use of System.out.println() in the code
-    and all implementations must use the jakarta commons logging API
-    with the log4j logging provider.  You may leave debug in your code,
-    but this should be able to be turned on/off with the proper logging
-    priority changes in the log4j.xml configuration.
-
-* Assembly Overview
-
-    You will be adding several sibling projects to both eLeague and eClub.
-    See suggestions for the layout towards the bottom of this specification.
-    Once you add a new project, make sure to add a reference to it in the 
-    parent pom.xml. Spelling and case count. Ignoring case of characters 
-    (e.g. eLeague versus eleague) will make your project non-portable to
-    Unix file systems. 
-
-    [Note:] As with the previous project, the use of the name eSport,
-    eLeague, and eClub within the project specification are to be taken as
-    placeholders. Please make an effort to uniquely name your directories,
-    components, Java packages, JNDI names, etc. to help logically separate
-    the parallel project implementations.
-
-    [Note:] There should be no use of System.out.println() in the code
-    and all implementations must use the jakarta commons logging API
-    with the log4j logging provider.  You may leave debug in your code,
-    but this should be able to be turned on/off with the proper logging
-    priority changes in the log4j.xml configuration.
+    [Note:] There should be no use of System.out.println() in the code and
+    all implementations must use a logging API with a logging provider.
+    You may leave debug in your code, but this should be able to be turned
+    on/off with the proper logging priority changes in the configuration.
 
 
 * Technical Details
@@ -161,10 +146,10 @@ Project2: eSport N-Tier Application
             remote testing requirements. A remote interface and bean
             implementation will need to be designed for this EJB.
 
-        [[A]] DTOs - The DTOs will be used to serialize the state of the
-        business objects between the EJB and client when using the remote
-        interface. Remember that there can be more than 1 DTO to represent
-        the same information related to a business object. For example,
+        [[A]] DTOs - The DTOs will be used to serialize the state of 
+        the business objects between the EJB and client when using the 
+        remote interface. Remember that there can be more than 1 DTO to 
+        represent the same information related to a business object. For example,
         collections might contain summary information only
         and a single result might contain full details. The following is
         only provided as a reasonable starting point.
@@ -228,7 +213,8 @@ Project2: eSport N-Tier Application
 ===
 
     [[1]] Create an EJB tier to host your eClub business logic and
-    data access tiers. The EJB(s) provided will provide the
+    data access tiers. However, host this EJB tier within your eClub WAR.
+    The EJB(s) will provide the
     necessary dependency injection and initialization for the business
     objects. Transaction scope will be added as a part of a separate
     requirement. Security will be added in the next project. The main
@@ -237,8 +223,12 @@ Project2: eSport N-Tier Application
     that gets serialized to the client in a set of Data Transfer Objects
     (DTOs).
 
+        [[A]] WAR - Create a WAR module to host the eClub server-side
+        components and the remote tests for the WAR/EJB components.
+
         [[A]] EJBs - The EJBs will be used to inject and initialize
-        implementation objects and provide a remote interface. Refer to
+        implementation objects and provide a remote interface. These
+        EJB classes should be hosted in the WAR module.  Refer to
         the previous diagram for a view of the EJBs within the context
         of the business logic, DAOs, and eLeague remote interface.
 
@@ -265,18 +255,10 @@ Project2: eSport N-Tier Application
         them of any persistence provider classes before serializing them
         to the client. 
 
-        [[A]] EAR - Create an EAR to host the eClub server-side
-        components; including the EJB component just developed.
-
-        [[A]] Test - Create a Test project that will deploy the EAR to the
-        application server and run through a set of JUnit test using the
-        remote interface of the EJB. 
-
 ===
 
-    [[1]] Add a Web UI to the eLeague application. This should use the EJB
-    local interfaces, which can be identical to the interface implemented for
-    the business logic. The WAR for the Web UI must be deployed as part of 
+    [[1]] Add a Web UI to the eLeague application. This may use the EJB local 
+    or remote interfaces. The WAR for the Web UI must be deployed as part of 
     the eLeague EAR. The Web UI must have the following functionality. Note
     that the test data will already have a current season, divisions,
     other clubs, teams, etc. We will just be adding eClub information 
@@ -314,10 +296,11 @@ Project2: eSport N-Tier Application
 
 ===
 
-    [[1]] Add a Web UI to the eClub application. This should use the EJB
-    local interfaces, which can be identical to the interface implemented for
-    the business logic. The WAR for the Web UI must be deployed as part of 
-    the eClub EAR. The Web UI must have the following functionality.
+    [[1]] Add a Web UI to the eClub application (i.e., to the WAR you 
+    have already created for the EJBs). This may use the EJB local or 
+    remote interfaces. The WAR for the Web UI must be deployed solo --
+    containing the EJBs and Impls. The Web UI must have the following 
+    functionality.
 
         * Test Admin
 
@@ -355,24 +338,30 @@ Project2: eSport N-Tier Application
         applications should require a transaction.
 
         [[A]] Transaction Integrity - add transaction rollback logic to
-        EJBs that demonstrates this capability. You may add new methods
+        EJBs that demonstrate this capability. You may add new methods
         to demonstrate this if existing logic is not complex enough.
-        You may also choose to add this demonstration to the TestUtil
-        EJB if it does not correctly fit within existing business
-        logic.  For example, reportScore() might require scores to be
-        non-negative and rollback the transaction if violated. However,
-        if you report only a single score, there's really nothing to
-        rollback (error checking stopped it from being stored). By adding
-        a reportsScores() demonstration method that reports several scores
-        in one call, breaks them into several lower-level reportScore()
-        calls in a single transaction, and provides a bad score towards
-        the end -- all should be rolled back and fully demonstrate the
-        capability of a transaction.
 
-        [[A]] Test - update the test project(s) to verify the transaction
-        logic.
+        [[A]] Create a demonstration of
+        transactions and the capability of rollback by implementing a
+        scenario that adds something to the database and then a *follow-on*
+        rollback causes the changes to be undone.
+
+        [Note] To satisfy the transaction demonstration requirement, you
+        must actually store something in the database and then later in
+        the transaction roll it back based on some decision. If you make
+        the decision before you store the information -- you are not
+        satisfying the requirement. It is common for students to
+        implement a wrapper around an existing method that takes a
+        collection and populate the collection with good data up front
+        and bad data at the end. The good data that got successfully
+        processed should get rolled back once the bad data is
+        processed. Create remote methods that can tell your RMI client
+        that this actually occured.
+
+        []
 
 ===
+
 * Testing
 
     [[1]] Provide JUnit tests that verify the EJB functionality of
@@ -381,25 +370,18 @@ Project2: eSport N-Tier Application
 
     [[1]] Provide JUnit tests that verify the extra business logic
     functionality of eClub interfacing with eLeague. These tests may
-    be placed in either with the business logic project or the RMI Test
-    project for eClub.
+    be placed either with the business logic or where you test the
+    remote interfaces.
 
-    [[1]] Provide JUnit tests that verify the EJB functionality of eClub
-    accessed through its remote interface. This will also test its use of
-    DTOs. Theses tests should be packaged in the eClub RMI Test project.
+    [[1]] Provide JUnit tests that verify the EJB functionality of 
+    eClub accessed through its remote interface. This will also test 
+    its use of DTOs. These tests should be packaged in the eClub 
+    WAR (or optional RMI Test) project.
 
     [[1]] Perform an end-to-end use case to do the following. This must be 
     demonstrated in an automated JUnit test and then be manually
-    implementable using the Web UI and any implemented command line
-    interfaces.
+    implementable using the Web UI.
     
-    [Note:]Any actions, including the ingest, that must be executed
-    from the command line (versus the Web UI) must be wrapped inside an
-    <<RUN>> script similar to ones demonstrated in class (see the class
-    jdbcDAO project for an example of using an Ant script to encapsulate
-    command-line details. The provided eLeagueBLImpl sample also contains
-    an example of wrapping classpaths and command lines within Ant).
-
     []
 
         [[a]] reset all eLeague tables (using the LeagueTestUtilEJB)
@@ -456,15 +438,18 @@ Project2: eSport N-Tier Application
     point for your overall application. It assumes you already have either
     a consolidated Impl -or- a BO, DAO, and BLImpl set of projects in
     place from Project 1. You will not have the option of consolidating
-    the EJB, WAR, EAR, and RMI Test into a single project. They must be
-    implemented as separate projects with proper dependencies between
-    them declared.  Note that all "e"Sport, "e"League, and "e"Club names
-    should be changed to your specific name mangler. The same type of
-    modification needs to occur for the java package names.
+    the EJB, WAR, EAR, and RMI Test into a single project for eLeague. 
+    They must be implemented as separate projects (with the Impl 
+    optionally merged with the EJB). Note that all "e"Sport, 
+    "e"League, and "e"Club names should be changed to your specific 
+    name mangler. The same type of modification needs to occur for the 
+    java package names.
 
 ---
 `-- eSport
+    |-- pom.xml
     |-- eLeague
+    |   |-- pom.xml
     |   |-- eLeagueBO
     |   |-- eLeagueDAO
     |   |-- eLeagueBLImpl
@@ -476,10 +461,11 @@ Project2: eSport N-Tier Application
     |   |           |   `-- eleague
     |   |           |       `-- ejb
     |   |           `-- resources
-    |   |               |-- META-INF
-    |   |               |   `-- persistence.xml
-    |   |               |-- ejb-jar.xml
-    |   |               `-- jboss.xml
+    |   |               `-- META-INF
+    |   |                   |-- beans.xml
+    |   |                   |-- persistence.xml
+    |   |                   |-- (ejb-jar.xml)
+    |   |                   `-- (jboss-ejb3.xml)
     |   |-- eLeagueWAR
     |   |   |-- pom.xml
     |   |   `-- src
@@ -490,8 +476,10 @@ Project2: eSport N-Tier Application
     |   |           |-- resources
     |   |           `-- webapp
     |   |               |-- WEB-INF
-    |   |               |   |-- content
-    |   |               |   `-- web.xml
+    |   |               |   |-- beans.xml
+    |   |               |   |-- web.xml
+    |   |               |   |-- (jboss-web.xml)
+    |   |               |   `-- content
     |   |               `-- index.jsp
     |   |-- eLeagueEAR
     |   |   `-- pom.xml
@@ -501,56 +489,37 @@ Project2: eSport N-Tier Application
     |   |       `-- test
     |   |           |-- java
     |   |           |   `-- eleague
-    |   |           |       `-- ejbclient
+    |   |           |       `-- ejbclient (*IT.java)
     |   |           `-- resources
-    |   |               |-- eLeague-ant.xml
-    |   |               |-- eLeague.properties
     |   |               `-- jndi.properties
-    |   `-- pom.xml
-    |-- eClub
-    |   |-- eClubBO
-    |   |-- eClubDAO
-    |   |-- eClubBLImpl
-    |   |-- eClubEJB
-    |   |   |-- pom.xml
-    |   |   `-- src
-    |   |       `-- main
-    |   |           |-- java
-    |   |           |   `-- eclub
-    |   |           |       `-- ejb
-    |   |           `-- resources
-    |   |               |-- META-INF
-    |   |               |   `-- persistence.xml
-    |   |               |-- ejb-jar.xml
-    |   |               `-- jboss.xml
-    |   |-- eClubWAR
-    |   |   |-- pom.xml
-    |   |   `-- src
-    |   |       `-- main
-    |   |           |-- java
-    |   |           |   `-- eclub
-    |   |           |       `-- web
-    |   |           |-- resources
-    |   |           `-- webapp
-    |   |               |-- WEB-INF
-    |   |               |   |-- content
-    |   |               |   `-- web.xml
-    |   |               `-- index.jsp
-    |   |-- eClubEAR
-    |   |   `-- pom.xml
-    |   |-- eClubTest
-    |   |   |-- pom.xml
-    |   |   `-- src
-    |   |       `-- test
-    |   |           |-- java
-    |   |           |   `-- eclub
-    |   |           |       `-- ejbclient
-    |   |           `-- resources
-    |   |               |-- eClub-ant.xml
-    |   |               |-- eClub.properties
-    |   |               `-- jndi.properties
-    |   `-- pom.xml
-    `-- pom.xml
+    `-- eClub
+        |-- pom.xml
+        |-- (eClubBLImpl -- could be merged with WAR)
+        `-- eClubWAR
+            |-- pom.xml
+            `-- src
+                |-- main
+                |   |-- java
+                |   |   `-- eclub
+                |   |       |-- ejb
+                |   |       `-- web
+                |   |-- resources
+                |   |   `-- META-INF
+                |   |       |-- persistence.xml
+                |   |       `-- (ejb-jar.xml)
+                |   `-- webapp
+                |       |-- WEB-INF
+                |       |   |-- beans.xml
+                |       |   |-- web.xml
+                |       |   |-- (jboss-web.xml)
+                |       |   `-- (jboss-ejb3.xml)
+                |       `-- index.jsp
+                `-- test
+                    |-- java
+                    |   `-- eleague
+                    |       `-- ejbclient (*IT.java)
+                    `-- resources
+                        `-- jndi.properties
 ---
 
 
@@ -567,9 +536,11 @@ Project2: eSport N-Tier Application
 
         * Project 1 functionality: 10pts
 
-        * EJB Tier, remote interface, and EAR deployment: 30pts
+        * EJB Tier, remote interface, and EAR deployment: 25pts
 
-        * Web UI integration: 25pts
+        * Web/EJB deployment: 15pts
+
+        * Web UI integration: 15pts
 
         * Transactions: 10pts
 

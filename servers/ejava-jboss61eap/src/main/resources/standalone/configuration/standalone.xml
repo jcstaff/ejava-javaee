@@ -306,6 +306,12 @@
                         <permission type="createDurableQueue" roles="esales-user"/>
                         <permission type="createNonDurableQueue" roles="esales-user"/>
                     </security-setting>
+                    <security-setting match="jms.topic.esport-eleague-contests">
+                        <permission type="send" roles="eleague-sys"/>
+                        <permission type="consume" roles="eleague-user"/>
+                        <permission type="createDurableQueue" roles="eleague-user"/>
+                        <permission type="createNonDurableQueue" roles="eleague-user"/>
+                    </security-setting>
                 </security-settings>
                 <address-settings>
                     <!--default for catch all-->
@@ -377,8 +383,12 @@
                         <entry name="java:jboss/exported/topic/ejava/projects/datashare/mayberry-poi"/>
                     </jms-topic>
                     <jms-topic name="emarket-esales-auction">
-                        <entry name="java:/topic/ejava/projects/emarket/esales-action"/>
+                        <entry name="java:/topic/ejava/projects/emarket/esales-auction"/>
                         <entry name="java:jboss/exported/topic/ejava/projects/emarket/esales-auction"/>
+                    </jms-topic>
+                    <jms-topic name="esport-eleague-contests">
+                        <entry name="java:/topic/ejava/projects/esport/eleague-contests"/>
+                        <entry name="java:jboss/exported/topic/ejava/projects/esport/eleague-contests"/>
                     </jms-topic>
                 </jms-destinations>
             </hornetq-server>

@@ -20,12 +20,12 @@ Project2: eMarket N-Tier Application
     * Expand the current project development architecture to include
     EJB, WAR, EAR, and remote Test sub-projects for eSales. For eSales
     you will have separate EJB, WAR, EAR, and rmi Test modules. This is
-    being done to simulate a complext project option.
+    being done to simulate a complex project option.
 
     * Expand the current project development architecture to include
-    EJB, WAR, and remote Tests for eBidbot. For eBidbot you will have a
-    single WAR for deployment.  This is being done to simulate a simple
-    project option.
+    EJB, WAR, and remote Test rub-projects for eBidbot. For eBidbot you 
+    will have a single WAR for deployment.  This is being done to simulate 
+    a simple project option.
 
     * Re-host the data access tiers and initial business logic from 
     Project 1 within the new EJB and WEB tiers at component/runtime.
@@ -55,13 +55,13 @@ Project2: eMarket N-Tier Application
 
     The project will continue along two parallel paths; eSales and eBidbot.
     However, this time we will add several new project types; EJB, EAR,
-    WAR, and Test. We will add all new project types to eSales. We will add
-    (or migrate to) the WAR type to eBidbot.
+    WAR, and Test. We will add all new project types to eSales. We will use
+    a WAR deployment for eBidbot.
     These new sub-projects will become siblings to your
     existing eSales Impl -or- BO, DAO, and BLImpl sub-projects. 
     For eBidbot, you have the option of making the WAR a sibling
     project or migrating the existing Impl project to be a WAR project
-    (and remain with a single module for eMayberry).
+    (and remain with a single module for eBidbot).
     The new projects will depend on your legacy work. The remote interface of the EJB 
     will also require specific design of what gets externalized to the 
     client. The remote clients do not share the same address space we had 
@@ -76,8 +76,8 @@ Project2: eMarket N-Tier Application
     control transaction boundaries, provide local interaction for the
     Web Tier, and a RMI interface for remote clients. Security will be
     addressed in the next project. To limit the scope of the project, the
-    Web UI requirements will be limited to only a few of the Buyer
-    interaction use cases. You are to deploy eSales using an EAR and eBidbot 
+    Web UI requirements will be constrained to only a few of the Buyer
+    use cases. You are to deploy eSales using an EAR and eBidbot 
     using only a WAR.
 
     eBidbot will require additional work as well. With a remote interface
@@ -96,12 +96,10 @@ Project2: eMarket N-Tier Application
     components, Java packages, JNDI names, etc. to help logically separate
     the parallel project implementations.
 
-    [Note:] There should be no use of System.out.println() in the code
-    and all implementations must use the jakarta commons logging API
-    with the log4j logging provider.  You may leave debug in your code,
-    but this should be able to be turned on/off with the proper logging
-    priority changes in the log4j.xml configuration.
-
+    [Note:] There should be no use of System.out.println() in the code and
+    all implementations must use a logging API with a logging provider.
+    You may leave debug in your code, but this should be able to be turned
+    on/off with the proper logging priority changes in the configuration.
 
 * Technical Details
 
@@ -195,7 +193,7 @@ Project2: eMarket N-Tier Application
 
     [[1]] Create an EJB tier to host your eBidbot business logic and
     data access tiers. However, host this EJB tier within your eBidbot WAR.
-    The EJB(s) provided will provide the
+    The EJB(s) will provide the
     necessary dependency injection and initialization for the business
     objects. Transaction scope will be added as a part of a separate
     requirement. Security will be added in the next project. The main
@@ -264,7 +262,7 @@ Project2: eMarket N-Tier Application
 
     [[1]] Add a WebUI to the eBidbot application (i.e., to the WAR you
     have already created for the EJBs). This may use the EJB local or
-    remote interfaces. The WAR for the Web UI must be deployed soloi --
+    remote interfaces. The WAR for the Web UI must be deployed solo --
     containing the EJBs and Impls. The Web UI must have the following
     functionality.
 
@@ -284,8 +282,8 @@ Project2: eMarket N-Tier Application
         applications should require a transaction.
 
         [[A]] Transaction Integrity - add transaction rollback logic to
-        EJBs that detect a bid could not be executed because it was either
-        too low or was for a closed auction.
+        EJBs that demonstrate this capability. You may add new methods
+        to demonstrate this if existing logic is not complex enough.
 
         [[A]] Create a demonstration of 
         transactions and the capability of rollback by implementing a 
@@ -320,35 +318,35 @@ Project2: eMarket N-Tier Application
     [[1]] Provide JUnit tests that verify the EJB functionality of 
     eBidbot accessed through its remote interface. This will also test
     its use of DTOs. These tests should be packaged in the eBitbot
-    WAR (optional RMI Test) project.
+    WAR (or optional RMI Test) project.
 
     [[1]] Perform an end-to-end use case to do the following. This must be
     demonstrated in an automated JUnit test and then be manually
     implementable using the Web UI.
     
-        * reset databases
+        [[a]] reset databases
 
-        * ingest data
+        [[a]] ingest data
 
-        * createAccount for seller, buyer1, and buyer2 in eSales 
+        [[a]] createAccount for seller, buyer1, and buyer2 in eSales 
 
-        * createAccount for buyer2 in eBidbot
+        [[a]] createAccount for buyer2 in eBidbot
 
-        * createAuction for seller
+        [[a]] createAuction for seller
 
-        * getUserAuctions for seller
+        [[a]] getUserAuctions for seller
 
-        * getAuction for the one created in earlier step
+        [[a]] getAuction for the one created in earlier step
 
-        * getOpenAuctions 
+        [[a]] getOpenAuctions 
 
-        * placeBid for buyer1 
+        [[a]] placeBid for buyer1 
 
-        * getAuctions for buyer1
+        [[a]] getAuctions for buyer1
 
-        * placeOrder for buyer2 in eBidbot (stimulate a bid)
+        [[a]] placeOrder for buyer2 in eBidbot (stimulate a bid)
 
-        * getAuction to verify bids were placed for buyer1 and buyer2
+        [[a]] getAuction to verify bids were placed for buyer1 and buyer2
 
     [Note:] To be clear. The above scenario should be both automated with a
     single JUnit test and then repeated with interactive Web UI actions.
@@ -370,7 +368,9 @@ Project2: eMarket N-Tier Application
 
 ---
 `-- eMarket
+    |-- pom.xml
     |-- eSales
+    |   |-- pom.xml
     |   |-- eSalesBO
     |   |-- eSalesDAO
     |   |-- eSalesBLImpl
@@ -410,37 +410,36 @@ Project2: eMarket N-Tier Application
     |           `-- test
     |               |-- java
     |               |   `-- esales
-    |               |       `-- ejbclient
-    |               `-- resources
-    |                   `-- jndi.properties
-    |-- eBidbot
-    |   |-- (eBidbotImpl -- could be merged with WAR)
-    |   |-- eBidbotWAR
-    |       |-- pom.xml
-    |       `-- src
-    |           |-- main
-    |           |   |-- java
-    |           |   |   `-- ebidbot
-    |           |   |       |-- ejb
-    |           |   |       `-- web
-    |           |   |-- resources
-    |           |   |   `-- META-INF
-    |           |   |       |-- persistence.xml
-    |           |   |       `-- (ejb-jar.xml)
-    |           |   `-- webapp
-    |           |       |-- WEB-INF
-    |           |       |   |-- beans.xml
-    |           |       |   |-- web.xml
-    |           |       |   |-- (jboss-web.xml)
-    |           |       |   `-- (jboss-ejb3.xml)
-    |           |       `-- index.jsp
-    |           `-- test
-    |               |-- java
-    |               |   `-- ebidbot
     |               |       `-- ejbclient (*IT.java)
     |               `-- resources
     |                   `-- jndi.properties
-    `-- pom.xml
+    `-- eBidbot
+        |-- (eBidbotImpl -- could be merged with WAR)
+        |-- eBidbotWAR
+            |-- pom.xml
+            `-- src
+                |-- main
+                |   |-- java
+                |   |   `-- ebidbot
+                |   |       |-- ejb
+                |   |       `-- web
+                |   |-- resources
+                |   |   `-- META-INF
+                |   |       |-- persistence.xml
+                |   |       `-- (ejb-jar.xml)
+                |   `-- webapp
+                |       |-- WEB-INF
+                |       |   |-- beans.xml
+                |       |   |-- web.xml
+                |       |   |-- (jboss-web.xml)
+                |       |   `-- (jboss-ejb3.xml)
+                |       `-- index.jsp
+                `-- test
+                    |-- java
+                    |   `-- ebidbot
+                    |       `-- ejbclient (*IT.java)
+                    `-- resources
+                        `-- jndi.properties
 ---
 
 

@@ -1,6 +1,6 @@
 Project3: eSport Secure and Asynchronous N-Tier Application
 
-    2010-08-29
+    2013-09-08 DRAFT
 
 * Goals
 
@@ -15,15 +15,12 @@ Project3: eSport Secure and Asynchronous N-Tier Application
     * Define users and roles for both applications.
 
     * Define access controls and implement authentication mechanisms for 
-    eLeague.
-
-    * Define access controls and implement authentication mechanisms for
-    eClub.
-
-    * Configure JMS destinations used for applications.
+    both applications.
 
     * Implement a publish/subscribe capability between the eLeague, eClub
     and stand-alone client applications.
+
+    * Trigger certain behaviors based on timers.
 
 * Technical Overview
 
@@ -31,83 +28,138 @@ Project3: eSport Secure and Asynchronous N-Tier Application
     2. We will mostly extend existing projects with security and
     asynchronous logic. 
 
-    Although logically independent, the eLeague and eClub EARs are
-    expected to be deployed to the same application server for the project
-    implementation and testing. This may require us to define and deploy a
-    resource within the eLeague application rather than have a
-    duplicate/independent copy in eClub. This would not be an issue if
-    they were deployed to physically separate application servers.
+    Java EE defines authentication and authorization to be independent 
+    of the overall API and capability. JBoss and other application 
+    servers provide simple, default, mechanisms that are easy to 
+    demonstrate and more sophisticated mechanisms that are realistic for 
+    deployments. Switching between the two requires no change to 
+    JavaEE-compliant application code.
+    We will use the simple, default/"other" security-domain defined 
+    within the standard JBoss installation. iThis uses the RealmUsersRoles
+    login-module -- which is configured by two property files and 
+    pre-populated by the class server files installed at the start
+    of the semester during development environment setup: 
 
-    Java EE defines authentication and authorization to be independent of
-    the overall API and capability. JBoss and other application servers
-    provide simple, "hello world", mechanisms that are easy to demonstrate
-    and more sophisticated mechanisms that are realistic for deployments.
-    We will use the simple "other" authentication application policy 
-    defined within the standard JBoss installation. This method takes two
-    files: 
-
-        * users.properties - defines username=password lines that list the
-        login username and plain-text password
-
-        * roles.properties - defines username=role1,role2 lines that list
-        the login username and assigned roles.
-
-    These two files must be available in the root package within the
-    classloader classpath. This means that they would be at the root
-    directory of an EJB or WEB-INF/classes. Knowing our environment, we'll
-    create a single set to be shared between eLeague and eClub and place
-    this in the eLeague.
+*----------+-----------------+
+| <<File>> | <<Description>> |
+*----------+-----------------+
+${jboss.server.config.dir}/application-users.properties | defines username=password lines that list the login username and hashed password
+*-------+--------+
+${jboss.server.config.dir}/application-roles.properties | defines username=role1,role2 lines that list the login username and assigned roles
+*-------+--------+
 
     We are going to have a couple types of users. Some of the users will
     have zero, one, or more of these roles. Because of the static nature of
     our authentication, all users will have a login configured long before
-    they register for an account.
+    the application is even deployed to the server.
 
-        * eleague-admin - this role is authorized to run LeagueTestUtil
-        operations.
+*----------+-----------------+
+| <<Role>> | <<Description>> |
+*----------+-----------------+
+(anonymous) | these users can view standings and schedules in league
+*-------+--------+
+eleague-sys | authorized to publish to eLeague topic
+*-------+--------+
+eleague-user | authorized to subscribe to eLeague topic
+*-------+--------+
+eleague-admin | authorized to reset and populate the database
+*-------+--------+
+eleague-coord | authorized to create season, 
+divisions, clubs, and schedule contests.
+*-------+--------+
+eleague-clubcoord | authorized to create teams,
+provide contacts for the teams, and assign them to divisions.
+*-------+--------+
+eleague-divcoord | authorized to report scores.
+*-------+--------+
+eclub-admin | authorized to run ClubTestUtil operations.
+*-------+--------+
+eclub-member | authorized to obtain team rosters and
+update contact and role information.
+*-------+--------+
+eclub-coord | authorized to create teams and assign players, coaches, and managers.
+*-------+--------+
 
-        * eleague-coord - this role is authorized to create season, 
-        divisions, clubs, and schedule contests.
-
-        * eleague-clubcoord - this role is authorized to create teams,
-        provide contacts for the teams, and assign them to divisions.
-
-        * eleague-divcoord - this role is authorized to report scores.
-
-        * eclub-admin - this role is authorized to run ClubTestUtil
-        operations.
-
-        * eclub-member - this role is authorized to obtain team rosters and
-        update contact and role information.
-
-        * eclub-coord - this role is authorized to create teams and assign
-        players, coaches, and managers.
-
-
-    [Note:] To clarify, your application will have a static set of
-    logins and will ingest a set of contacts (with the loginId within
-    the contact).  A user with a login and no contact info can login,
-    but won't be able to do anything meaningful. A user with a contact
-    and no login won't be able to access the system. Normally the login
-    would be created at the same time as the contact.  Except for your
-    JBoss configuration and your add contact logic, no other part of
-    your project should be aware of this tradeoff made for class project
-    simplicity.
-
-    [Note:] If a user has a login for one application, they will use the same
+    If a user has a login for one application, they will use the same
     account to access the other application (e.g., user1 might have
     both eclub-coord and eleague-clubcoord roles).
 
-    []
+*-----------+------------+
+| <<Login>> | <<Roles>>  |
+*-----------+------------+
+known | (no roles)
+*-------+--------+
+eleaguesys1 | eleague-sys
+*-------+--------+
+eclubsys1 | eleague-user
+*-------+--------+
+admin1 | eleague-admin,eclub-admin
+*-------+--------+
+lmtucker | eleague-coord
+*-------+--------+
+user2 | eleague-clubcoord,eclub-coord,eclub-member
+*-------+--------+
+user3 | eclub-member
+*-------+--------+
+jtflynn | eleague-divcoord
+*-------+--------+
+
+    Based on the test data, the following are some other logins that may 
+    be useful...
+
+*-----------+------------+
+| <<Login>> | <<Roles>>  |
+*-----------+------------+
+tbswanson | eleague-clubcoord
+*-------+--------+
+kdromero | eleague-clubcoord
+*-------+--------+
+sthart | eleague-clubcoord
+*-------+--------+
+lmfuller | eleague-clubcoord
+*-------+--------+
+rgrobbins | eleague-clubcoord
+*-------+--------+
+gchamilton | eleague-clubcoord
+*-------+--------+
+avschultz | eleague-clubcoord
+*-------+--------+
+jcbell | eleague-clubcoord
+*-------+--------+
+user4 | eleague-clubcoord
+*-------+--------+
+jddavidson | eleague-divcoord
+*-------+--------+
+whlee | eleague-divcoord
+*-------+--------+
+pjjimenez | eleague-divcoord
+*-------+--------+
+ksharrison | eleague-divcoord
+*-------+--------+
+acrussell | eleague-divcoord
+*-------+--------+
+ckriley5687 | eleague-divcoord
+*-------+--------+
 
     Some actions are open to any users; authenticated or not.
-    Authenticate will be performed using a JAAS configuration and
-    login logic.  RMI Tests will be updated with JAAS configuration and
-    login logic.
+    Authenticate will be performed using a JNDI login.  All users
+    will have a password of "password1!".
 
-    We will implement a ScheduleTopic where eLeague will publish messages
-    related to team schedules. eClub will subscribe to the topic using a
-    Message Driven Bean to keep members up to date on schedule changes.
+        [Note:] To clarify, your application will have a static set of logins
+        and will ingest a set of accounts. A user with a login and no account
+        can login, but won't be able to do anything meaningful. A user with an
+        account and no login won't be able to access the system. Normally the
+        login would be created at the same time as the account.  Except for
+        your JBoss configuration and your "Create Account" logic, no other
+        part of your project should be aware of this tradeoff made for class
+        project simplicity.
+
+        []
+
+    For asynchronous activity, we will implement a Schedule Topic where 
+    eLeague will publish messages related to team schedules. 
+    eClub will subscribe to the topic using a Message Driven 
+    Bean to keep members up to date on schedule changes.
     A stand-alone client will also be used to subscribe to schedule
     events. A topic will have to be added to your JMS Server within
     JBoss. You will have to design the type, structure, and payload of
@@ -118,38 +170,6 @@ Project3: eSport Secure and Asynchronous N-Tier Application
 * Technical Details
 
     [[1]] Provide all functionality from Projects 1 and 2.
-
-===
-
-    [[1]] Add a users/roles.properties set of files to eLeagueEJB that 
-    defines the combined set of users and roles between the two
-    applications. The files should define the following usernames and
-    roles (all users should have a password of "password".
-
-        * admin1=eleague-admin,eclub-admin
-
-        * lmtucker=eleague-coord
-
-        * user2=eleague-clubcoord,eclub-coord,eclub-member
-
-        * user3=eclub-member
-
-        * jtflynn=eleague-divcoord
-
-        * ...
-
-        [Note:] In looking at the test data, the other identities can be created,
-        but are not necessarily needed.
-
-        * eleague-coord: lmtucker
-
-        * eleague-clubcoord: tbswanson, kdromero, sthart, lmfuller, 
-            rgrobbins, gchamilton, avschultz, jcbell, user4 
-
-        * eleague-divcoord: jddavidson, jtflynn,
-            whlee, pjjimenez, ksharrison, acrussell, ckriley5687
-
-        []
 
 ===
 
@@ -191,14 +211,15 @@ Project3: eSport Secure and Asynchronous N-Tier Application
     [[1]] Extend your existing RMI Test project and any RMI client(s) to
     address new authentication requirements.
 
-        * Add JAAS Configuration for JBoss the ClientLoginModule.
+        * Add a valid set of logins to your existing tests to re-enable them under 
+        the newly secured environment.
 
         * Add a new unit test that verifies the access controls of the
-        protected and open methods.
+        protected and open methods. This means that -- after fixing access
+        issues in the previous bullet -- you purposely attempt to violate 
+        access restrictions from a new JUnit test to show a test of access
+        control.
     
-        * Add a valid login to your existing tests to re-enable them under
-        the new secure environment.
-
 ===
 
     [[1]] Enhance eClub with access restrictions.
@@ -227,22 +248,29 @@ Project3: eSport Secure and Asynchronous N-Tier Application
     [[1]] Extend your existing RMI Test project and any RMI client(s) to
     address new authentication requirements.
 
-        * Add JAAS Configuration for JBoss the ClientLoginModule.
-
-        * Add a new unit test that verifies the access controls of the
-        protected and open methods.
-
         * Add a valid login to your existing tests to re-enable them under 
         the new secure environment.
+
+        * Add a new unit test that verifies the access controls of the
+        protected and open methods. Same comment as above -- after
+        fixing proper access to Mayberry you should have at least
+        one test that demonstrates how the application is preventing
+        unauthorized access.
 
 ===
 
     [[1]] Enhance eLeagueWAR with access restrictions.
 
-        * Assign the WAR to the "java:jass/other" security domain.
+        * Assign the WAR to the "other" security domain.
 
         * Restrict access beyond the main page to users with
         the appropriate roles. You may use FORM or BASIC authentication.
+
+            [Note:] It is recommeneded that you use FORM-based authentication
+            due to the need to logout/login as different users during
+            the sequence of the end-to-end scenario.
+
+            []
 
         * Permit only users to only ask the EJB tier for
         information that is associated with their login. For example,
@@ -254,7 +282,7 @@ Project3: eSport Secure and Asynchronous N-Tier Application
 
     [[1]] Enhance eClubWAR with access restrictions.
 
-        * Assign the WAR to the "java:jass/other" security domain.
+        * Assign the WAR to the "other" security domain.
 
         * Restrict access beyond the main page to users with
         the appropriate roles. You may use FORM or BASIC authentication.
@@ -272,7 +300,8 @@ Project3: eSport Secure and Asynchronous N-Tier Application
     [[1]] Extend your eLeague EJB implementations to publish changes to 
     Contests.
 
-        * Add the JMS topic to your JBoss server.
+        * Use the esport-eleague-contests topic 
+        (JNDI name: topic/projects/esport/eleague-contests)
 
         * Design your JMS Message. You can use any JMS Type and JMS/custom
         properties you wish.  However, you need to account for the fact
@@ -292,13 +321,16 @@ Project3: eSport Secure and Asynchronous N-Tier Application
         This must be a JMS selector, not client-side Java logic. All
         this client has to do is log the information from the message.
 
+        * Simply print the fact that the process was called and the 
+        contents of the message.
+
         * You must launch this subscriber using an Ant wrapper script.
 
 ===
 
     [[1]] Implement a Message Driven Bean within eClub to subscribe to 
-    contests that are new or rescheduled; but not completed (i.e. it 
-    should have a selector that causes the MDB to not be told about
+    contests that are new, rescheduled, or reminders; but not completed 
+    (i.e. it should have a selector that causes the MDB to not be told about
     scores being reported).
 
         * Use a JMS Selector for the MDB to limit the type of messages
@@ -309,13 +341,19 @@ Project3: eSport Secure and Asynchronous N-Tier Application
         address list to the log. You do not have to physically send an
         e-mail as a part of this project.
 
+        [Note:] The ability to reschedule a contest was not part of 
+        the functional requirements and need not be implemented at this time
+
+        []
+
 ===
 
     [[1]] Implement an EJB Timer that will allow eLeague to automatically
     wake-up and send out schedule reminders for contests that have not yet
     finished. Depending on the provided test data, you might want to limit
     the number of reminders sent. The main goal of this requirement is
-    that you make use of an EJBTimer.
+    that you make use of an EJBTimer and that you trigger the MDB logic
+    in eClub.
 
 * Testing
 
@@ -324,26 +362,16 @@ Project3: eSport Secure and Asynchronous N-Tier Application
     access control restrictions.
 
     [[1]] Provide JUnit tests that verify the EJB functionality of 
-    eClub using its new access control restrictions.
+    eClub using its new access control restrictions and ability to
+    access the anonymous methods of eLeague.
 
-    [[1]] Perform the following scripted use case.  All command
+    [[1]] Implement the following scripted use case below as an automated JUnit
+    test and manually driven actions through the Web UI.  All command
     line implementations must be wrapped in an Ant runtime script to
     encapsulate the classpath details in a portable manner (see the
-    class jdbcDAO project for an example of using an Ant runtime script).
-    Although an automated JUnit test is not required here, developing one
-    can be quite helpful.
-
-        * admin1=eleague-admin,eclub-admin
-
-        * user1(lmtucker)=eleague-coord
-
-        * user2=eleague-clubcoord,eclub-coord,eclub-member
-
-        * user3=eleague-eclub-member
-
-        * user4(jtflynn)=eleague-divcoord
-
-        []
+    class jmsNotifier project for an example of using an Ant runtime script).
+    The <<full>> JSE subscriber need not be part of the automated end-to-end 
+    JUnit test.
 
         [[1]] the applications deploy and/or started
 
@@ -394,7 +422,7 @@ Project3: eSport Secure and Asynchronous N-Tier Application
 
         [[1]] user1(lmtucker) schedules a Season eLeague (using ContestMgmtEJB)
 
-        [[1]] ContestMgmtEJB plublishes schedule events to Schedule Topic
+        [[1]] ContestMgmtEJB publishes schedule events to Schedule Topic
 
         [[1]] LeagueSubscriber receives messages related to its team. It
         prints the contents of the message.

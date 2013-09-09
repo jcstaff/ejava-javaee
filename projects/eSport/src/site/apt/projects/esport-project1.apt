@@ -1,6 +1,6 @@
 Project1: eSport Data Access Tier and Initial Business Logic
 
-    2013-08-27 DRAFT
+    2013-09-08 DRAFT
 
 * Goals
 
@@ -97,12 +97,16 @@ Project1: eSport Data Access Tier and Initial Business Logic
     Delete), capability with JPA.  You are required to encapsulate
     all object to relational (O/R) mapping within the DAOs, descriptor
     files, and business object annotations.  You will be given a set of
-    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eSport/eSportData/eLeagueTestUtil/src/main/resources/xml/}
+    {{{https://raw.github.com/jcstaff/ejava-javaee/master/projects/eSport/eSportData/eLeagueTestUtil/src/main/resources/xml/eLeague-all.xml}
     test data}} to initially populate your applications and be the source
     of data for the ingest requirement.  To use the data, you will ingest
     using a parser supplied by the instructor. There is a sample thread 
     in the projects/eSport/eLeague directory that shows how to use the 
     parser as well as other technology within the project.
+
+    The database will have a functional schema and indexes to provide 
+    query performance. Business objects will be validated in the database
+    using schema constraints and within the JVM using the Validation API.
 
     The business logic will provide a set of classes with concise methods
     that map easily to use cases. The business logic will ensure proper
@@ -135,7 +139,7 @@ Project1: eSport Data Access Tier and Initial Business Logic
     coordinate integration testing, and then group the lower-level
     work under two child projects; eLeague and eClub.  See some
     suggested project layouts at the bottom of this specification.  A
-    {{{https://ejava.info:8443/repos/class/trunk/ejava-javaee/projects/eSport/}
+    {{{https://github.com/jcstaff/ejava-javaee/tree/master/projects/eSport/}
     sample set of projects}} that implement a thin eLeague thread has
     been made available. Please <<ignore>> the <<eSportData>> sub-project when
     using the example to craft your source tree. You will depend on
@@ -487,9 +491,12 @@ Project1: eSport Data Access Tier and Initial Business Logic
             to a team within the club. Note that historical information
             for teams is not kept from season to season. For simplicity,
             we will only assign a single head coach (no assistant coaches).
+            Note also the information below is internal to EClub. You may 
+            want to include an indentifer the league tracks this team
+            by and store it here for querying the league about the team.
 
                 * ID - this is an artificial value used to refer to a
-                specific team.
+                specific team. 
 
                 * TEAM_NAME - this is a required field used to hold a textual 
                 name for the team. It can be updated.
@@ -787,6 +794,24 @@ Project1: eSport Data Access Tier and Initial Business Logic
         []
 
 ===
+
+    [[1]] Add validation API declarations to your business objects as appropriate. 
+    This need not be extensive or exhaustive. Just do enough to show use of
+    declarative validation as a part of your application. 
+
+        [[a]] Determine the validation groups you wish to use in 
+        your application (suggest business logic interface and persistence tier).
+
+        [[a]] Add validation annotations to your business objects and assign them
+        to your designed groups as appropriate.
+
+        [[a]] Manually invoke validation from the business tier and integrate
+        the validation into your persistence unit.
+
+        []
+
+===
+
     [[1]] Design and implement a mechanism to ingest a starting state for
     eLeague based on a provided data file and parser.  You will implement
     two primary classes to support this requirement; the DAO(s)
@@ -854,12 +879,19 @@ Project1: eSport Data Access Tier and Initial Business Logic
         []
 ===
 
+    [[1]] Add tuning to your database schema by augmenting the DDL files with 
+    indexes for foreign keys, joins, and where clauses. This need not be extensive 
+    or exhaustive. Just do enough to show that proper data model and database tuniung 
+    is part of the overall enterprise development process.
+
+===
+
     [[1]] Design an initial business interface and business logic for
     the applications. The core O/R mapping work will be done
     by the DAOs.  However, it is the ultimate responsibility of these
     business logic implementations that either it or the business objects
     enforce the business rules of the application. The DAOs only perform
-    O/R mapping and do not enforce such things as a minimum bid. The
+    O/R mapping and do not enforce such things as a schedule conflicts. The
     business logic is assumed to work within the context of a single,
     externally controlled transaction. Do not attempt to control the
     transaction of the EntityManager within these objects or you will
@@ -953,13 +985,9 @@ Project1: eSport Data Access Tier and Initial Business Logic
                 the fact that you have placed the scheduling within the
                 correct architectural area is the key point. How simple
                 you make the algorithm is totally up to you and will not
-                impact your grade. You may decide home much scheduling
+                impact your grade. You may decide how much scheduling
                 gets done by the business object(s) and how much gets
                 done by the business logic.
-
-                * rescheduleContest - division coordinators will need to 
-                be able to reschedule a contest for external reasons, such
-                as rain-out.
 
                 * reportScore - division coordinators will need to be able
                 to report the results of a contest.
@@ -992,6 +1020,15 @@ Project1: eSport Data Access Tier and Initial Business Logic
         [[A]] eClub Candidate Business Logic
 
 [../images/eClub_business_logic.jpg] eClub Business Logic
+
+            [Note:] Keep in mind that this project has two notions of a club. From 
+            the league's perpective it manages schedules, scores, and high
+            level contact information for teams within a club. From the club's
+            perspective, there is the need to manage coaches, players, and 
+            parents associated with the team. For that reason -- I am calling
+            the club an organization here to avoid some confusion.
+
+            []
 
             [[a]] MemberMgmt/MemberMgmtImpl - encapsulates the actions
             required to manage individuals registering with the club.
@@ -1060,16 +1097,11 @@ Project1: eSport Data Access Tier and Initial Business Logic
     a contest that conflicts with a team and/or venue schedule. These
     tests should be packaged with the BOs.
     
-    [[1]] Provide a Junit test for the eLeague JDBC DAOs. Verify they can 
-    functionally create new objects within the eLeague system. This test
-    should be packaged with the DAOs.
-
-    [[1]] Provide a JUnit test for your eLeague and eClub JPA DAOs. This
-    should test the implementation for the fundamental CRUD operations
-    for each type of object. It is understood that some of the objects
-    will be handled by cascades, so you might not have a set of methods
-    handling each type of business object.  This test should be packaged
-    with the DAOs.
+    [[1]] Provide a JUnit test for your JPA DAOs. This should test the 
+    implementation for the fundamental CRUD operations for each type of 
+    object. It is understood that some of the objects will be handled by 
+    cascades, so you might not have a set of methods handling each type of 
+    business object.  This test should be packaged with the DAOs.
 
     [[1]] Provide a JUnit test for your business logic to test the
     basic functionality of your business logic design, including ingest.
@@ -1081,7 +1113,11 @@ Project1: eSport Data Access Tier and Initial Business Logic
     end-to-end scenario in eLeague.  This test should be implemented as
     a JUnit test and packaged with the business logic implementation.
 
-        * ingest data (using LeagueIngestor)
+        * reset (using LeagueTestUtil) -- reset the league 
+            database to an initial starting state.
+
+        * ingest data (using LeagueIngestor) -- ingest the full XML test
+            data file.
 
         * createClub (using LeagueMgmtImpl)
 
@@ -1095,8 +1131,6 @@ Project1: eSport Data Access Tier and Initial Business Logic
         exist for current/next season within the test data.
 
         * scheduleSeason (using ContestMgmtImpl)
-
-        * rescheduleContest (using ContestMgmtImpl)
 
         * getDivisions (using LeagueMgmtImpl)
 
@@ -1115,6 +1149,9 @@ Project1: eSport Data Access Tier and Initial Business Logic
     a JUnit test and packaged with the business logic implementation.
     Note that it is anticipated that you may only have time to create
     one team, with one player, manager, parent, and coach for the club.
+
+        * reset (using OrganizationTestUtil) -- reset the organization
+            database to an initial starting state.
 
         * createParent (MemberMgmtImpl)
 
@@ -1151,12 +1188,14 @@ Project1: eSport Data Access Tier and Initial Business Logic
         should be changed to your specific name mangler. The same type of
         modification needs to occur for the java package names.
 
-        [Note:] Other than a README, it is not anticipated that you will
-        have any artifacts at the eSport layer. It should be used only as a
-        convenience wrapper to perform goals across both projects. All
-        details will be specified at the eLeague and eClub levels and
-        below; with the leaf-level projects being your default choice for 
-        detailed information (e.g., DB drivers, etc.)
+        [Note:] Other than a README, it is not anticipated that you 
+        will have any artifacts at the eSport layer. It should be 
+        used only as a convenience wrapper to perform goals across both 
+        projects. The root project can also be used for common property,
+        dependencyManagement, and pluginManagement definitions. All
+        concrete dependency and plugin instantiations should be defined 
+        in the leaf-level poms to avoid unwanted dependencies form the 
+        root or mid-level parents.
 
         []
 
@@ -1164,161 +1203,175 @@ Project1: eSport Data Access Tier and Initial Business Logic
 
 ---
 eSport
+|-- pom.xml
 |-- eLeague
-|   +--eLeagueImpl
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- eleague
-|   |       |   |       |-- bo
-|   |       |   |       |-- dao
-|   |       |   |       |-- jdbc
-|   |       |   |       |-- jpa
-|   |       |   |       |-- bl
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
-|   |       |-- test
-|   |       |   |-- java
-|   |       |   |   `-- eleague
-|   |       |   |       |-- bo
-|   |       |   |       |-- jdbc
-|   |       |   |       |-- jpa
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `log4j.xml
-|   |       `-- pom.xml
-|   `-- pom.xml
-|-- eClub
-|   +--eClubImpl
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- eclub
-|   |       |   |       |-- bo
-|   |       |   |       |-- dao
-|   |       |   |       |-- jpa
-|   |       |   |       |-- bl
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
-|   |       |-- test
-|   |       |   |-- java
-|   |       |   |   `-- eclub
-|   |       |   |       |-- bo
-|   |       |   |       |-- jpa
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `log4j.xml
-|   |       `-- pom.xml
-|   `-- pom.xml
-`-- pom.xml
+|   |-- pom.xml
+|   `--eLeagueImpl
+|       |-- pom.xml
+|       `-- src
+|           |-- main
+|           |   |-- java
+|           |   |   `-- eleague
+|           |   |       |-- bo
+|           |   |       |-- dao
+|           |   |       |-- jpa
+|           |   |       |-- bl
+|           |   |       |-- blimpl
+|           |   `-- resources
+|           |       `-- ddl
+|           |           |-- eLeague-create.ddl
+|           |           |-- eLeague-drop.ddl
+|           |           `-- eLeague-tuning.ddl
+|           |-- test
+|               |-- java
+|               |   `-- eleague
+|               |       |-- bo
+|               |       |-- dao
+|               |       |-- bl
+|               `-- resources
+|                   |-- log4j.xml
+|                   |-- META-INF
+|                      `-- persistence.xml
+|           
+`-- eClub
+    |-- pom.xml
+    `--eClubImpl
+        |-- pom.xml
+        `-- src
+            |-- main
+            |   |-- java
+            |   |   `-- eclub
+            |   |       |-- bo
+            |   |       |-- dao
+            |   |       |-- jpa
+            |   |       |-- bl
+            |   |       |-- blimpl
+            |   `-- resources
+            |       `-- ddl
+            |           |-- eClub-create.ddl
+            |           |-- eClub-drop.ddl
+            |           `-- eClub-tuning.ddl
+            `-- test
+                |-- java
+                |   `-- eclub
+                |       |-- bo
+                |       |-- dao
+                |       |-- bl
+                `-- resources
+                    |-- log4j.xml
+                    `-- META-INF
+                        `-- persistence.xml
 ---
 ---
 eSport
+|-- pom.xml
 |-- eLeague
+|   |-- pom.xml
 |   +--eLeagueBO
+|   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
 |   |       |   |   `-- eleague
 |   |       |   |       |-- bo
 |   |       |   |       `-- bl
-|   |       |-- test
-|   |       |   |-- java
-|   |       |   |   `-- eleague
-|   |       |   |       |-- bo
-|   |       |   `-- resources
-|   |       |       `log4j.xml
-|   |       `-- pom.xml
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- eleague
+|   |           |       `-- bo
+|   |           `-- resources
+|   |               `-- log4j.xml
 |   +--eLeagueDAO
+|   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
 |   |       |   |   `-- eleague
 |   |       |   |       |-- dao
 |   |       |   |       |-- jdbc
-|   |       |   |       |-- jpa
+|   |       |   |       `-- jpa
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
+|   |       |       `-- ddl
+|   |       |           |-- eLeague-create.ddl
+|   |       |           |-- eLeague-drop.ddl
+|   |       |           `-- eLeague-tuning.ddl
 |   |       |-- test
 |   |       |   |-- java
 |   |       |   |   `-- eleague
-|   |       |   |       |-- jdbc
-|   |       |   |       |-- jpa
+|   |       |   |       `-- dao
 |   |       |   `-- resources
-|   |       |       `log4j.xml
-|   |       `-- pom.xml
+|   |       |       |-- log4j.xml
+|   |       |       `-- META-INF
+|   |       |           `-- persistence.xml
 |   +--eLeagueBLImpl
+|   |   |-- pom.xml
 |   |   `-- src
 |   |       |-- main
 |   |       |   |-- java
 |   |       |   |   `-- eleague
-|   |       |   |       |-- blimpl
+|   |       |   |       `-- blimpl
 |   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
-|   |       |-- test
-|   |       |   |-- java
-|   |       |   |   `-- eleague
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `log4j.xml
-|   |       `-- pom.xml
-|   `-- pom.xml
-|-- eClub
-|   +--eClubBO
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- eclub
-|   |       |   |       |-- bo
-|   |       |   |       `-- bl
-|   |       |-- test
-|   |       |   |-- java
-|   |       |   |   `-- eclub
-|   |       |   |       |-- bo
-|   |       |   `-- resources
-|   |       |       `log4j.xml
-|   |       `-- pom.xml
-|   +--eClubDAO
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- eclub
-|   |       |   |       |-- dao
-|   |       |   |       |-- jpa
-|   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
-|   |       |-- test
-|   |       |   |-- java
-|   |       |   |   `-- eclub
-|   |       |   |       |-- jpa
-|   |       |   `-- resources
-|   |       |       `log4j.xml
-|   |       `-- pom.xml
-|   +--eClubBLImpl
-|   |   `-- src
-|   |       |-- main
-|   |       |   |-- java
-|   |       |   |   `-- eclub
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `-- META-INF
-|   |       |           `-- persistence.xml
-|   |       |-- test
-|   |       |   |-- java
-|   |       |   |   `-- eclub
-|   |       |   |       |-- blimpl
-|   |       |   `-- resources
-|   |       |       `log4j.xml
-|   |       `-- pom.xml
-|   `-- pom.xml
-`-- pom.xml
+|   |       `-- test
+|   |           |-- java
+|   |           |   `-- eleague
+|   |           |       `-- bl
+|   |           `-- resources
+|   |               |-- log4j.xml
+|   |               `-- META-INF
+|   |                   `-- persistence.xml
+`-- eClub
+    |-- pom.xml
+    +--eClubBO
+    |   |-- pom.xml
+    |   `-- src
+    |       |-- main
+    |       |   |-- java
+    |       |   |   `-- eclub
+    |       |   |       |-- bo
+    |       |   |       `-- bl
+    |       |-- test
+    |       |   |-- java
+    |       |   |   `-- eclub
+    |       |   |       `-- bo
+    |       |   `-- resources
+    |       |       `-- log4j.xml
+    +--eClubDAO
+    |   |-- pom.xml
+    |   `-- src
+    |       |-- main
+    |       |   |-- java
+    |       |   |   `-- eclub
+    |       |   |       |-- dao
+    |       |   |       `-- jpa
+    |       |   `-- resources
+    |       |       `-- ddl
+    |       |           |-- eClub-create.ddl
+    |       |           |-- eClub-drop.ddl
+    |       |           `-- eClub-tuning.ddl
+    |       `-- test
+    |           |-- java
+    |           |   `-- eclub
+    |           |       `-- dao
+    |           `-- resources
+    |               |-- log4j.xml
+    |               `-- META-INF
+    |                   `-- persistence.xml
+    `--eClubBLImpl
+        |-- pom.xml
+        `-- src
+            |-- main
+            |   |-- java
+            |   |   `-- eclub
+            |   |       `-- blimpl
+            |   `-- resources
+            `-- test
+                |-- java
+                |   `-- eclub
+                |       `-- bl
+                `-- resources
+                    |-- log4j.xml
+                    `-- META-INF
+                        `-- persistence.xml
 ---
 
 * Grading
@@ -1332,9 +1385,13 @@ eSport
 
         * projects cleanly builds with Maven: 15pts
 
-        * business objects: 15pts
+        * managed schema to include declaration of key indexes (i.e., defined 
+        in a set of files and explicitly used to coldstart and initialize the 
+        database at defined times): 5pts
 
-        * JDBC DAO: 15pts
+        * business objects: 10pts
+
+        * use of validation API: 5pts
 
         * JPA DAO and JPA O/R Mapping: 25pts
 
