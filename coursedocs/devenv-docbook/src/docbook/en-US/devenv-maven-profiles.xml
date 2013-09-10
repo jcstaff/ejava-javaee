@@ -26,7 +26,7 @@
         <id>h2db</id>
         <properties>
               <jdbc.driver>org.h2.Driver</jdbc.driver>
-              <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
+              <jdbc.url>jdbc:h2:\${basedir}/target/h2db/ejava</jdbc.url>
               <jdbc.user>sa</jdbc.user>
               <jdbc.password/>
               <hibernate.dialect>
@@ -60,7 +60,7 @@
                 </listitem>
 
                 <listitem>            
-                    <para>Use <code>-P\!(profile)</code> to manually trigger a profile to be excluded</para>
+                    <para>Use <code>-P!(profile)</code> to manually trigger a profile to be excluded. Use -P\!(profile) with bash shell</para>
                     <programlisting language=""><![CDATA[$ mvn test -P\!h2db]]></programlisting>
                 </listitem>
 

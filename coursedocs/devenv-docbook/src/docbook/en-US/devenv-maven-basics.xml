@@ -11,8 +11,7 @@
             <listitem><para>Can be customized</para></listitem>
             <listitem><para>Root directory stays fairly clean</para></listitem>
         </itemizedlist>                   
-        <programlisting language=""><![CDATA[
-|-- pom.xml
+        <programlisting language=""><![CDATA[|-- pom.xml
 |-- src
 |   |-- main
 |   `-- test
@@ -22,7 +21,7 @@
     |-- surefire-reports
     `-- test-classes
         ]]></programlisting>
-        <variablelist>
+        <variablelist spacing="compact">
             <varlistentry>
                 <term><filename>src</filename></term>
                 <listitem><para>Source tree for all developed code</para></listitem>
@@ -68,22 +67,21 @@
     |               `-- AppTest.java
     `-- resources
         `-- log4j.xml]]></programlisting>
-            <variablelist>
+                    
+            <variablelist spacing="compact">
                 <varlistentry>
                     <term><filename>main</filename></term>
                     <listitem><para>Contains production artifacts for module</para>
                         <itemizedlist spacing="compact">
                             <listitem><para>Built artifacts from this tree are generally placed in the produced archive</para>
-                            <programlisting language=""><![CDATA[
-jar tf target/ex1-1.0-SNAPSHOT.jar 
+                            <programlisting language=""><![CDATA[jar tf target/ex1-1.0-SNAPSHOT.jar 
 META-INF/
 META-INF/MANIFEST.MF
 myorg/
 myorg/mypackage/
 myorg/mypackage/ex1/
 myorg/mypackage/ex1/App.class
-...
-                            ]]></programlisting>
+...]]></programlisting>
                             </listitem>
                         </itemizedlist>
                     </listitem>
@@ -112,8 +110,15 @@ myorg/mypackage/ex1/App.class
                     <term><filename>[main or test]/resources</filename></term>
                     <listitem><para>Contains property or other data files</para>
                         <itemizedlist spacing="compact">
-                            <listitem><para>Generally copied target tree as-is or optionally filtered by the build</para></listitem>
+                            <listitem><para>Generally copied to target tree as-is or optionally filtered by the build</para></listitem>
                         </itemizedlist>
+                        <note>
+                            <para>Resource filtering is when substitution ${placeholder}s in source files are replaced by their declared 
+                                property values in the target tree. This is quite useful in customizing URLs, credentials, and other properties that 
+                                might be unique to the current build environment. Properties can be defined in the pom.xml, settings.xml or
+                                injected into the build through various plugins (e.g., inject current date).
+                            </para>
+                        </note>
                     </listitem>
                 </varlistentry>
             </variablelist>
@@ -126,8 +131,7 @@ myorg/mypackage/ex1/App.class
                 <listitem><para>Contains auto-generated artifacts</para></listitem>
                 <listitem><para>Can be deleted at any time</para></listitem>
             </itemizedlist>                   
-            <programlisting language=""><![CDATA[
-target
+            <programlisting language=""><![CDATA[target
 |-- classes
 |   `-- myorg
 |       `-- mypackage
@@ -143,14 +147,13 @@ target
     `-- myorg
         `-- mypackage
             `-- ex1
-                `-- AppTest.class
-            ]]></programlisting>
-            <variablelist>
+                `-- AppTest.class]]></programlisting>
+            <variablelist spacing="compact">
                 <varlistentry>
                     <term><filename>classes</filename></term>
                     <listitem><para>An exploded directory tree for built artifacts to be placed into the module archive</para>
                         <itemizedlist spacing="compact">
-                            <listitem><para>Mixture of java and resource artifacts</para></listitem>
+                            <listitem><para>Mixture of Java and resource artifacts</para></listitem>
                         </itemizedlist>
                     </listitem>
                 </varlistentry>
@@ -159,7 +162,7 @@ target
                     <term><filename>test-classes</filename></term>
                     <listitem><para>An exploded directory tree for built artifacts used for test</para>
                         <itemizedlist spacing="compact">
-                            <listitem><para>Mixture of java and resource artifacts</para></listitem>
+                            <listitem><para>Mixture of Java and resource artifacts</para></listitem>
                             <listitem><para>Part of the test classpath</para></listitem>
                         </itemizedlist>
                     </listitem>
@@ -172,8 +175,7 @@ target
                             <listitem><para><filename>surefire-reports</filename> unit test results</para></listitem>
                             <listitem><para><filename>failsafe-reports</filename> integration test results</para></listitem>
                             <listitem><para>Locate details of test pass/failures within this directory</para>
-                            <programlisting language=""><![CDATA[
-$ mvn clean test
+                            <programlisting language=""><![CDATA[$ mvn clean test
 ...
 Failed tests:   testFail(myorg.mypackage.ex1.AppTest): app didn't return 0
 
@@ -193,8 +195,7 @@ java.lang.AssertionError: app didn't return 0
         at org.junit.Assert.fail(Assert.java:93)
         at org.junit.Assert.assertTrue(Assert.java:43)
         at myorg.mypackage.ex1.AppTest.testFail(AppTest.java:28)
-...
-                            ]]></programlisting>
+...]]></programlisting>
                             </listitem>
                         </itemizedlist>
                     </listitem>
@@ -214,7 +215,7 @@ java.lang.AssertionError: app didn't return 0
                     <term><filename>log4j-out.txt</filename></term>
                     <listitem><para>An example output file of the build/tests written to the target directory</para>
                         <itemizedlist spacing="compact">
-                            <listitem><para>Produced by log4j following configuration in src/test/resources/log4j.xml</para></listitem>
+                            <listitem><para>Produced by log4j based on configuration in src/test/resources/log4j.xml or log4j.properties</para></listitem>
                         </itemizedlist>
                     </listitem>
                 </varlistentry>
@@ -269,6 +270,14 @@ java.lang.AssertionError: app didn't return 0
                 <listitem><para>packaging=... - custom extensions</para></listitem>
             </itemizedlist>
             <para>Value assigned relates to dependency <code>type</code> element</para>
+            <programlisting language=""><![CDATA[<dependency>
+    <groupId>${project.groupId}</groupId>
+    <artifactId>ejbsessionBankEAR</artifactId>
+    <version>${project.version}</version>
+    <type>ear</type>
+    <scope>compile</scope>
+</dependency>]]></programlisting>                        
+
         </section>
         
         <section id="devenv-mavenbasics-gav">
@@ -278,7 +287,7 @@ java.lang.AssertionError: app didn't return 0
             <programlisting language="xml"><![CDATA[<groupId>myorg.myproject</groupId>
 <artifactId>ex1</artifactId>
 <version>1.0-SNAPSHOT</version>]]></programlisting>
-            <variablelist>
+            <variablelist spacing="compact">
                 <varlistentry>
                     <term><filename>groupId</filename></term>
                     <listitem><para>Hierarchical name used to group a set of one or more artifacts</para>
@@ -324,7 +333,7 @@ java.lang.AssertionError: app didn't return 0
                     <listitem><para>Timestamped release that does not change name</para></listitem>
                     <listitem><para>Useful for active development not yet ready for release</para></listitem>
                     <listitem><para>Dependents poll for new snapshots and get the latest version</para></listitem>
-                    <listitem><para>Easy to develop but nearly impossible to manage changes</para></listitem>
+                    <listitem><para>Easy to use during development but nearly impossible to manage changes</para></listitem>
                     <listitem><para>-SNAPSHOT suffix added to version</para>
                         <programlisting language="xml"><![CDATA[<version>1.0-SNAPSHOT</version>]]></programlisting>
             <programlisting language=""><![CDATA[1.0-SNAPSHOT/
@@ -337,8 +346,8 @@ java.lang.AssertionError: app didn't return 0
                 <title>Releases</title>
                 <itemizedlist spacing="compact">
                     <listitem><para>Fixed-named version of the artifact</para></listitem>
-                    <listitem><para>Contents should not change -- allows caches bypass updates</para></listitem>
-                    <listitem><para>No formal numbering schme except for lack of SNAPSHOT in name</para>
+                    <listitem><para>Contents should not change -- allows caching, bypass updates</para></listitem>
+                    <listitem><para>No formal numbering scheme except for lack of SNAPSHOT in name</para>
                         <itemizedlist spacing="compact">
                             <listitem><para>Plugins and community work best with major.minor.x.y dotted numbering scheme</para></listitem>
                         </itemizedlist>                   
@@ -361,7 +370,7 @@ java.lang.AssertionError: app didn't return 0
     <localRepository>c:/jhu/repository</localRepository>
     ...]]></programlisting>
                 </listitem>
-                <listitem><para>MAVEN_HOME/con/settings.xml defines a core set of remote repositories</para></listitem>
+                <listitem><para>MAVEN_HOME/conf/settings.xml defines a core set of remote repositories</para></listitem>
                 <listitem><para>Maven poms can define extensions to the remote repository list</para>
                 <programlisting language="xml"><![CDATA[<repositories>
     <repository>
@@ -432,7 +441,7 @@ java.lang.AssertionError: app didn't return 0
             <title>Properties</title>
             <itemizedlist spacing="compact">
                 <listitem><para>Provide a means to define behavior of the build</para></listitem>
-                <listitem><para>Provide a means to define values onces and re-use acoss the build</para></listitem>
+                <listitem><para>Provide a means to define values once and re-use across the build</para></listitem>
                 <listitem><para>Promotes consistency</para></listitem>
             </itemizedlist>                   
             <programlisting language="xml"><![CDATA[<properties>
@@ -456,6 +465,7 @@ java.lang.AssertionError: app didn't return 0
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
         <version>1.1.1</version>
+        <type>jar</type>
         <scope>compile</scope>
     </dependency>
     <dependency>
@@ -466,7 +476,7 @@ java.lang.AssertionError: app didn't return 0
     </dependency>
 ....
 </dependencies>]]></programlisting>
-            <variablelist>
+            <variablelist spacing="compact">
                 <varlistentry>
                     <term><filename>GAV</filename></term>
                     <listitem><para>Must provide its groupId, artifactId, and version for each dependency</para></listitem>
@@ -480,6 +490,11 @@ java.lang.AssertionError: app didn't return 0
                             <listitem><para>scope=provided - classpath of src/main, src/test but not dependents</para></listitem>
                             <listitem><para>scope=test - classpath of src/test but not src/main and dependents</para></listitem>
                             <listitem><para>scope=runtime - classpath of src/test and dependents but not of src/main</para></listitem>
+                        </itemizedlist>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>scope=import - used to replace locally declared dependencyManagement dependencies with the contents from another pom. 
+                                Useful when declaring complex dependencies and want to make easy wholesale changes in dependency versions.</para></listitem>
+                            <listitem><para>scope=system - used to declare a direct reference to a local archive. Not portable.</para></listitem>
                         </itemizedlist>
                     </listitem>
                 </varlistentry>
@@ -495,6 +510,14 @@ java.lang.AssertionError: app didn't return 0
                             <listitem><para>type=... - custom type</para></listitem>
                         </itemizedlist>
                         <para>Value directly relates to the project packaging element of the dependency</para>
+                        <programlisting language=""><![CDATA[|-- ejbsessionBankImpl
+|       |-- ejbsessionBankImpl-3.0.2013.2-SNAPSHOT.jar
+|-- ejbsessionBankEJB
+|       |-- ejbsessionBankEJB-3.0.2013.2-SNAPSHOT.jar
+|-- ejbsessionBankWAR
+|       |-- ejbsessionBankWAR-3.0.2013.2-SNAPSHOT.war
+|-- ejbsessionBankEAR
+|       |-- ejbsessionBankEAR-3.0.2013.2-SNAPSHOT.ear]]></programlisting>                        
                     </listitem>
                 </varlistentry>
 
@@ -502,12 +525,19 @@ java.lang.AssertionError: app didn't return 0
                     <term><filename>classifier</filename></term>
                     <listitem><para>Defines a special type of artifact/custom from a module</para>
                         <itemizedlist spacing="compact">
-                            <listitem><para>classifier=tests - tests java archive</para></listitem>
+                            <listitem><para>classifier=tests - java archive containing test artifacts</para></listitem>
+                            <listitem><para>classifier=sources - java archive containing module source code</para></listitem>
                             <listitem><para>type=... - custom classifiers</para></listitem>
                         </itemizedlist>
-                    </listitem>
-                </varlistentry>
+                        <programlisting language=""><![CDATA[`-- target
+...
+    |-- txHotelDAO-3.0.2013.2-SNAPSHOT.jar
+    |-- txHotelDAO-3.0.2013.2-SNAPSHOT-sources.jar
+    `-- txHotelDAO-3.0.2013.2-SNAPSHOT-tests.jar]]></programlisting>                        
+                    </listitem>                    
+                </varlistentry>                
             </variablelist>
+           
         </section>
 
         <section id="devenv-mavenbasics-build">
@@ -598,7 +628,7 @@ $ mvn (phase) (plugin:goal) -D(system-property) -P(profile)
         ]]></programlisting>
         <itemizedlist spacing="compact">
             <listitem><para>phase</para>
-                <variablelist>
+                <variablelist spacing="compact">
                     <varlistentry>
                         <term><filename>clean</filename></term>
                         <listitem><para>Remove contents of target tree</para></listitem>
@@ -648,6 +678,17 @@ $ mvn (phase) (plugin:goal) -D(system-property) -P(profile)
                     <listitem><para>Manually trigger build configurations latched by a profile</para></listitem>
                     <listitem><para>e.g., which DB driver to use</para></listitem>
                 </itemizedlist>            
+            </listitem>
+            <listitem><para>-P!(profile)</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Manually turn off a profile</para></listitem>
+                    <listitem><para>e.g., turn off a profile activated by a rule or settings.xml</para></listitem>
+                </itemizedlist>
+                <note>
+                    <title>Use -P\!(profile) with bash shell</title>
+                    <para>The bash shell requires the bang ("!") character to be escaped. Use -P\!(profile)
+                        when using the bash shell.</para>
+                </note>            
             </listitem>
         </itemizedlist>                   
     </section>
