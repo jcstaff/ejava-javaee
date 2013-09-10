@@ -4,85 +4,6 @@
 <chapter id="bl_requirements">
     <title>Using Business Logic for Requirements</title>
 
-    <section id="bl_requirements-testcase">
-        <title>Test Cases as Executable Requirements</title>
-        <itemizedlist spacing="compact">
-            <listitem><para>Test-first approach</para></listitem>
-        </itemizedlist>                   
-        <programlisting language="java"><![CDATA[/**
- * A user shall be able to establish an account with just a first 
- * and last name and a unique email address.
- */
-@Test
-public void establishAccount() {
-    log.info("*** establishAccount ***");
-    
-    //the user will supply their email address, first and last name
-    String email="jharb@ravens.com";
-    String firstName="john";
-    String lastName="harbaugh";
-    Account account = purchasing.createAccount(email, firstName, lastName);
-    
-    //they will get back a generated password to use as a login for the account
-    assertNotNull("no account returned", account);
-    assertNotNull("no password assigned", account.getPassword());
-}]]></programlisting>
-
-        <programlisting language="java"><![CDATA[/**
- * A user shall be able browse products in the catalog.
- */
-@Test
-public void browseCatalog() {
-    log.info("*** browseCatalog ***");
-    
-        //the user will ask for product summaries in pages
-    int pageSize=10;
-    int offset=0;
-    List<Product> products = catalog.getProducts(offset, pageSize);
-    
-        //they will receive <= a page size of product information
-    assertNotNull("no products returned", products);
-    assertTrue("no products provided", products.size() > 0);
-    
-        //they can page thru the entire set
-    for (int i=0; products.size() != 0; i++) {
-        offset += products.size();
-        products = catalog.getProducts(offset, pageSize);
-        assertTrue("this catalog never ends!!!", i<100);
-    }
-}]]></programlisting>
-
-        <programlisting language="java"><![CDATA[/**
- * A user shall be able to purchase a product in the catalog.
- */
-@Test
-public void purchaseProduct() {
-    log.info("*** purchaseProduct ***");
-    
-        //the user selects a product
-    Product product=null;
-    Random random=new Random();
-    for (int i=0; product == null; i++) {
-        List<Product> products=catalog.getProducts(random.nextInt(100), 1);
-        product=products.iterator().next();
-        assertTrue("I can't find anything to buy!!!", i<1000);
-    }
-    
-        //the user adds the product to their shopping cart by providing the 
-        //product id and their credentials
-    int count=catalog.addToCart(product.getId(), validEmail);
-        //the user receives a count of the items in the cart
-    assertEquals("somebody tweeked my cart!!!!", 1, count);
-    
-        //the user checks out with the cashier -- payment not yet implemented
-    double total=purchasing.checkout(validEmail, validPassword);
-    
-        //the user gets a total amount back as their receipt
-    assertEquals("price doesn't add up", product.getPrice(), total, .01);
-}]]></programlisting>
-    </section>
-
-
     <section id="bl-requirements-interfaces">
         <title>Business Interfaces Capture Functional Requirements</title>
         <programlisting language="java"><![CDATA[
@@ -189,6 +110,86 @@ public class Cart {
     </section>
 
 
+    <section id="bl_requirements-testcase">
+        <title>Test Cases as Executable Requirements</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Test-first approach</para></listitem>
+        </itemizedlist>                   
+        <programlisting language="java"><![CDATA[/**
+ * A user shall be able to establish an account with just a first 
+ * and last name and a unique email address.
+ */
+@Test
+public void establishAccount() {
+    log.info("*** establishAccount ***");
+    
+    //the user will supply their email address, first and last name
+    String email="jharb@ravens.com";
+    String firstName="john";
+    String lastName="harbaugh";
+    Account account = purchasing.createAccount(email, firstName, lastName);
+    
+    //they will get back a generated password to use as a login for the account
+    assertNotNull("no account returned", account);
+    assertNotNull("no password assigned", account.getPassword());
+}]]></programlisting>
+
+        <programlisting language="java"><![CDATA[/**
+ * A user shall be able browse products in the catalog.
+ */
+@Test
+public void browseCatalog() {
+    log.info("*** browseCatalog ***");
+    
+        //the user will ask for product summaries in pages
+    int pageSize=10;
+    int offset=0;
+    List<Product> products = catalog.getProducts(offset, pageSize);
+    
+        //they will receive <= a page size of product information
+    assertNotNull("no products returned", products);
+    assertTrue("no products provided", products.size() > 0);
+    
+        //they can page thru the entire set
+    for (int i=0; products.size() != 0; i++) {
+        offset += products.size();
+        products = catalog.getProducts(offset, pageSize);
+        assertTrue("this catalog never ends!!!", i<100);
+    }
+}]]></programlisting>
+
+        <programlisting language="java"><![CDATA[/**
+ * A user shall be able to purchase a product in the catalog.
+ */
+@Test
+public void purchaseProduct() {
+    log.info("*** purchaseProduct ***");
+    
+        //the user selects a product
+    Product product=null;
+    Random random=new Random();
+    for (int i=0; product == null; i++) {
+        List<Product> products=catalog.getProducts(random.nextInt(100), 1);
+        product=products.iterator().next();
+        assertTrue("I can't find anything to buy!!!", i<1000);
+    }
+    
+        //the user adds the product to their shopping cart by providing the 
+        //product id and their credentials
+    int count=catalog.addToCart(product.getId(), validEmail);
+        //the user receives a count of the items in the cart
+    assertEquals("somebody tweeked my cart!!!!", 1, count);
+    
+        //the user checks out with the cashier -- payment not yet implemented
+    double total=purchasing.checkout(validEmail, validPassword);
+    
+        //the user gets a total amount back as their receipt
+    assertEquals("price doesn't add up", product.getPrice(), total, .01);
+}]]></programlisting>
+    </section>
+
+
+
     <section id="bl-requirements-layout">
         <title>Sample Project Layout</title>
         <programlisting language=""><![CDATA[|-- pom.xml
@@ -198,16 +199,16 @@ public class Cart {
     |   |   `-- ejava
     |   |       `-- examples
     |   |           `-- blpurchase
-    |   |               `-- bl
-    |   |                   |-- blimpl
-    |   |                   |   |-- CatalogImpl.java
-    |   |                   |   `-- PurchasingImpl.java
-    |   |                   |-- bo
-    |   |                   |   |-- Account.java
-    |   |                   |   |-- Cart.java
-    |   |                   |   `-- Product.java
-    |   |                   |-- Catalog.java
-    |   |                   `-- Purchasing.java
+    |   |               |-- bo
+    |   |               |   |-- Account.java
+    |   |               |   |-- Cart.java
+    |   |               |   `-- Product.java
+    |   |               |-- bl
+    |   |               |   |-- Catalog.java
+    |   |               |   `-- Purchasing.java
+    |   |               `-- blimpl
+    |   |                   |-- CatalogImpl.java
+    |   |                   `-- PurchasingImpl.java
     |   `-- resources
     `-- test
         |-- java
@@ -222,11 +223,6 @@ public class Cart {
             |-- log4j.xml
             `-- META-INF
                 `-- persistence.xml]]></programlisting>
-        <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>                   
     </section>
 
 </chapter>
