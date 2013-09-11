@@ -114,7 +114,7 @@ myorg/mypackage/ex1/App.class
    target/test-classes. 
    
 ---
-> export JUNIT_JAR=`cygpath --windows c:/jhu/repository/junit/junit/4.10/junit-4.7.jar
+> export JUNIT_JAR=`cygpath --windows c:/jhu/repository/junit/junit/4.10/junit-4.10.jar
 > javac -classpath "target/ex1.jar;$JUNIT_JAR" \
 src/test/java/myorg/mypackage/ex1/AppTest.java -d target/test-classes
 
@@ -129,7 +129,7 @@ target/
 
 ---
 > java -classpath "target/ex1.jar;$JUNIT_JAR;target/test-classes" \
-junit.textui.TestRunner myorg.mypackage.ex1.AppTest
+org.junit.runner.JUnitCore myorg.mypackage.ex1.AppTest
 .testApp
 Here's One!
 
