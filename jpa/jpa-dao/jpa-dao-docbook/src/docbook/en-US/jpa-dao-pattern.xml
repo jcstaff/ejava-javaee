@@ -1,0 +1,59 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-dao-pattern">
+    <title>Data Access Object (DAO) Pattern</title>
+
+    <section id="jpa-dao-pattern-contect">
+        <title>Context</title>
+            <itemizedlist spacing="compact">
+            <listitem><para>Access to data varies depending on source of data</para></listitem>
+        </itemizedlist>
+    </section>
+    
+    
+    <section id="jpa-dao-pattern-problem">
+        <title>Problem</title>
+            <itemizedlist spacing="compact">
+            <listitem><para>Interfaces to data sources vary</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Relational Database Management Systems (RDBMS)</para></listitem>
+                    <listitem><para>NoSQL Solutions</para></listitem>
+                    <listitem><para>Flat Files</para></listitem>
+                    <listitem><para>Backend Systems</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Even standard RDBMS/SQL interfaces can vary</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jpa-dao-pattern-forces">
+        <title>Forces</title>
+            <itemizedlist spacing="compact">
+            <listitem><para>Many components within application need access to data</para></listitem>
+            <listitem><para>Interfaces to data vary by technology and vendor</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Least common denominator option for portability may not be feasible in all cases</para></listitem>
+                    <listitem><para>May make use of vendor extensions</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Impact of unique interfaces significant when exposed to many components and component types</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Components need more abstraction and shielding from the details of the persistent store</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jpa-dao-pattern-solution">
+       <title>Solution</title>
+    <figure>
+        <title>DAO Pattern Player Relationship</title>
+        <graphic scalefit="1" fileref="images/xxx.png"/>
+    </figure>
+    </section>    
+
+</chapter>
+  
+
+  
