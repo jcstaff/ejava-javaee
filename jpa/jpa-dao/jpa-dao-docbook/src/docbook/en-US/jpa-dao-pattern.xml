@@ -47,10 +47,104 @@
 
     <section id="jpa-dao-pattern-solution">
        <title>Solution</title>
-    <figure>
-        <title>DAO Pattern Player Relationship</title>
-        <graphic scalefit="1" fileref="images/xxx.png"/>
-    </figure>
+       <para>Use a Data Access Object (DAO) to abstract and encapsulate access to business objects in the data source</para>
+       
+        <figure>
+            <title>DAO Pattern Players</title>
+            <graphic scale="90" fileref="images/jpa-dao-pattern-players.png"/>
+        </figure>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>Business Logic</filename></term>
+                <listitem>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Object within the business domain that needs access to data (e.g., session bean)</para></listitem>
+                        <listitem><para>Knows when/why data is needed, but not how</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>Data Access Object</filename></term>
+                <listitem>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Abstracts the access details from the business object</para></listitem>
+                        <listitem><para>Knows where/how data is accessed, but not when/why</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>Business Object (Entity)</filename></term>
+                <listitem>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>An entity within the business logic</para></listitem>
+                        <listitem><para>Encapsulates information and data business rules within application</para></listitem>
+                        <listitem><para>A data carrier of information to/from the DAO</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>Data Source</filename></term>
+                <listitem>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Physically stores the data (e.g., database)</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+                
+        <figure>
+            <title>Interactions: DAO Create</title>
+            <graphic scale="90" fileref="images/jpa-dao-pattern-scenario-create.png"/>
+        </figure>
+        <figure>
+            <title>Interactions: DAO Read/Get</title>
+            <graphic scale="90" fileref="images/jpa-dao-pattern-scenario-read.png"/>
+        </figure>
+        <figure>
+            <title>Interactions: DAO Update</title>
+            <graphic scale="90" fileref="images/jpa-dao-pattern-scenario-update.png"/>
+        </figure>
+        <figure>
+            <title>Interactions: DAO Delete</title>
+            <graphic scale="90" fileref="images/jpa-dao-pattern-scenario-delete.png"/>
+        </figure>
+    </section>    
+
+    <section id="jpa-dao-pattern-dao-structure">
+        <title>DAO Implementation Structure</title>
+        <para>Key point: hide details from business logic and other interfacing components</para>
+        <figure>
+            <title>DAO Abstraction/Impl Strategy</title>
+            <graphic scale="90" fileref="images/jpa-dao-pattern-dao-structure.png"/>
+        </figure>
+    </section>    
+
+    <section id="jpa-dao-pattern-consequences">
+       <title>Consequences</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Centralizes All Data Access into a Separate Layer</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Easier to maintain</para></listitem>
+                    <listitem><para>Enables Transparency</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Access to implementation details hidden within DAO</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Enables Easier Migration</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Client layers encapsulated from changes</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Reduces Code Complexity in Business Logic</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>No details, such as SQL, in business logic</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Harder to abstract with EJB2.x Container Managed Persistence (CMP) frameworks</para></listitem>
+            <listitem><para>EJB3 Java Persistence API provides a significant amount of abstraction</para></listitem>
+        </itemizedlist>
     </section>    
 
 </chapter>

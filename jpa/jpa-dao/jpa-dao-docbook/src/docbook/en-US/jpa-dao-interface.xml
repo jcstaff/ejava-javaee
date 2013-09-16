@@ -1,0 +1,125 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-dao-interface">
+    <title>DAO Interface</title>
+
+    <section id="jpa-dao-interface-interface">
+        <title>DAO Interface</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Technology agnostic and business object-focused</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>No mention of Connection or EntityManager in methods</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Ability to at least CRUD (with possible options)</para></listitem>
+            <listitem><para>Aggregate data functions added when behavior better performed at data source</para></listitem>
+            <listitem><para>Extensions added to address data access details for specific use cases (e.g., LAZY/EAGER load)</para></listitem>
+        </itemizedlist>
+        
+<programlisting language="java"><![CDATA[...
+public interface BookDAO {
+    Book create(Book book) throws PersistenceException;
+    Book update(Book book) throws PersistenceException;
+    Book get(long id) throws PersistenceException;
+    void remove(Book book) throws PersistenceException;
+    List<Book> findAll(int start, int count) throws PersistenceException;
+}]]></programlisting>      
+    <note>
+        <para>The declaration of the unchecked/runtime exception PersistenceException is not required
+            and is only being done here for extra clarity</para>
+    </note>                          
+    </section>
+    
+    <section id="jpa-dao-interface-exceptions">
+        <title>DAO Exceptions</title>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>Runtime Exceptions</filename></term>
+                <listitem><para></para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Used to report unexpected issues (e.g., no connection)</para></listitem>
+                        <listitem><para>Extends java.lang.RuntimeException</para></listitem>
+                        <listitem><para>ex. javax.persistence.PersistenceException</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><filename>Checked Exceptions</filename></term>
+                <listitem><para></para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Used to report anticipated errors mostly have to do with input</para></listitem>
+                        <listitem><para>Extends java.lang.Exception</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        
+    </section>
+    
+    <section id="jpa-dao-interface-implementation">
+        <title>DAO Implementation</title>
+        <para>Adds implementation out-of-band from DAO interface</para>
+        
+<programlisting language="java"><![CDATA[...
+public class JPABookDAOImpl implements BookDAO {
+    private EntityManager em;    
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+    }
+
+    @Override
+    public Book create(Book book) { ... }
+    
+    @Override
+    public Book update(Book book) { ... }
+    @Override
+    public Book get(long id) { ... }
+    @Override
+    public void remove(Book book) { ... }
+    @Override
+    public List<Book> findAll(int offset, int limit) { ... }
+}]]></programlisting>                                
+    </section>
+
+    <section id="jpa-dao-interface-test">
+        <title>DAO Test</title>
+        <para>Demonstrates how technology-neutral DAO clients can be when
+            dao implementation is injected into client.</para>
+        
+<programlisting language="java"><![CDATA[...
+public class BookDAOTestBase {
+    protected BookDAO dao; //sub-classes will provide an implementation.
+
+    protected Book makeBook() {
+        Random random = new Random();
+        Book book = new Book();
+        book.setTitle("GWW-" + random.nextInt());
+        ...
+        return book;
+    }
+
+    @Test
+    public void testCreate() {
+        Book book = makeBook();
+        assertEquals("id not assigned", 0, book.getId());
+        book = dao.create(book);
+        assertTrue("id not assigned", book.getId()>0);
+    }
+    
+    @Test
+    public void testGet() {... }    
+    @Test
+    public void testUpdate() { ... }    
+    @Test
+    public void testDelete() { ... }
+    @Test
+    public void testFindAll() { ... }
+}]]></programlisting>                                
+    </section>
+
+</chapter>
+  
+
+  
