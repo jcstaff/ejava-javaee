@@ -23,7 +23,6 @@ public class BookDAOTestBase {
 		Random random = new Random();
 		Book book = new Book();
 		book.setTitle("GWW-" + random.nextInt());
-		book.setAuthor("MM-" + random.nextInt());
 		book.setDescription("this and that-" + random.nextInt());
 		book.setPages(1037 + random.nextInt());
 		return book;

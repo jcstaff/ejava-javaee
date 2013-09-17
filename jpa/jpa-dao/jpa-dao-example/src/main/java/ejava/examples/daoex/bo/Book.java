@@ -8,7 +8,6 @@ package ejava.examples.daoex.bo;
 public class Book  {
     private long id;
     private String title;
-    private String author;
     private int pages;
     private String description;
     
@@ -16,11 +15,6 @@ public class Book  {
     public Book(long id) { this.id = id; }
     
     public long getId() { return id; }
-    
-    public String getAuthor() { return author; }
-    public void setAuthor(String author) {
-        this.author = author;
-    }
     
     public String getDescription() { return description; }
     public void setDescription(String description) {
@@ -41,7 +35,6 @@ public class Book  {
         StringBuilder text = new StringBuilder();
         text.append("id=" + id);
         text.append(", title=").append(title);
-        text.append(", author=").append(author);
         text.append(", pages=").append(pages);
         return text.toString();
     }

@@ -1,0 +1,227 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-dao-schema">
+    <title>RDBMS Schema</title>
+
+    <section id="jpa-dao-schema-rdbms">
+        <title>RDBMS</title>
+        <para/>
+
+        <section id="jpa-dao-schema-rdbms-background">
+            <title>Background<footnote id="jpa-dao-schema-rdbms-wikipedia"><para><ulink url="http://en.wikipedia.org/wiki/Relational_database_management_system">RDBMS Wikipedia Page</ulink></para></footnote></title>            
+            <itemizedlist spacing="compact">
+                <listitem><para>DBMS based on a relational model</para></listitem>
+                <listitem><para>Introduced by E. F. Codd in 1970s</para></listitem>
+                <listitem><para>Some challenges by other forms but still remains a standard for corporate data stores</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-dao-schema-rdbms-tables">
+            <title>Tables/Columns</title>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>Table</filename></term>
+                    <listitem>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Group of columns</para></listitem>
+                            <listitem><para>Represents a type</para></listitem>
+                            <listitem><para>Commonly mapped to a Java class</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>Column</filename></term>
+                    <listitem>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Single piece of data</para></listitem>
+                            <listitem><para>Represents a property</para></listitem>
+                            <listitem><para>Commonly mapped to a Java class attribute</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+
+            <figure>
+                <title>Tables and Columns</title>
+                <graphic scale="100" fileref="images/jpa-dao-schema-book-author.png"/>
+            </figure>
+            <para>Sample (H2) Column Types<footnote id="jpa-dao-schema-rdbms-tables-h2"><para><ulink url="http://www.h2database.com/html/datatypes.html">H2 Data Types</ulink></para></footnote></para>
+            <itemizedlist spacing="compact">
+                <listitem><para>INTEGER</para></listitem>
+                <listitem><para>DECIMAL</para></listitem>
+                <listitem><para>TIME</para></listitem>
+                <listitem><para>DATE</para></listitem>
+                <listitem><para>TIMESTAMP</para></listitem>
+                <listitem><para>VARCHAR</para></listitem>
+                <listitem><para>BLOB</para></listitem>
+                <listitem><para>CLOB</para></listitem>
+            </itemizedlist>
+           
+        </section>
+
+        <section id="jpa-dao-schema-rdbms-constraints">
+            <title>Constraints</title>
+            <variablelist spacing="compact">
+                <varlistentry>
+                    <term><filename>NOT NULL</filename></term>
+                    <listitem><para>Row cannot exist without this column value supplied</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>UNIQUE</filename></term>
+                    <listitem><para>No other row may have a column with this value</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><filename>FOREIGN KEY</filename></term>
+                    <listitem><para>If supplied, must reference matching column(s) of existing row</para></listitem>
+                </varlistentry>
+            </variablelist>
+            
+        </section>
+
+        <section id="jpa-dao-schema-rdbms-relationships">
+            <title>Relationships</title>
+
+            <section id="jpa-dao-schema-rdbms-relationships-expression">
+               <title>Relationship Expression</title>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>Foreign Key Join</filename></term>
+                        <listitem><para>Column within child table references parent</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>Primary Key Join</filename></term>
+                        <listitem><para>Foreign key column within child table is child's primary key column. Parent and child table primary keys must match.</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>Link Table Join</filename></term>
+                        <listitem><para>Foreign keys to parent/child expressed in separate table</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>    
+            
+            <section id="jpa-dao-schema-rdbms-relationships-rules">
+                <title>Relationship Rules</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Foreign keys may be defined in child table or link table</para></listitem>
+                    <listitem><para>Link tables can always be used (at an extra cost) no matter the cardinality</para></listitem>
+                    <listitem><para>Foreign keys cannot be defined on "one side" of a one-to-many relationship</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Link table must be used if foreign key cannot be placed on many side</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Link tables must be used in many-to-many relationships</para></listitem>
+                </itemizedlist>
+            </section>    
+            
+        </section>
+
+        <section id="jpa-dao-schema-rdbms-indexes">
+            <title>Indexes</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Optionally defined</para></listitem>
+                <listitem><para>Used to more quickly locate values within table rows</para></listitem>
+                <listitem><para>Types</para>
+                    <variablelist spacing="compact">
+                        <varlistentry>
+                            <term><filename>Non-unique</filename></term>
+                            <listitem><para>Index with possible repeated values</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>Unique</filename></term>
+                            <listitem><para>Index over a unique (set of) column(s)</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>Simple</filename></term>
+                            <listitem><para>Single column index</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>Composite</filename></term>
+                            <listitem><para>Multiple columns stored in index</para></listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><filename>Cluster</filename></term>
+                            <listitem><para>Parent/child share common location</para></listitem>
+                        </varlistentry>
+                    </variablelist>
+                </listitem>
+            </itemizedlist>            
+        </section>
+    </section>
+
+    <section id="jpa-dao-schema-ddl">
+        <title>Data Definition Language (DDL)</title>
+        <para>Used to manipulate schema in RDBMS</para>
+        
+        <section id="jpa-dao-schema-ddl-createtable">
+           <title>Create Table</title>
+<programlisting language=""><![CDATA[create table JPADAO_AUTHOR (
+    ID integer generated by default as identity,
+    FIRST_NAME varchar(16) not null,
+    LAST_NAME varchar(32) not null,
+    primary key (ID)
+);
+create table JPADAO_BOOK (
+    ID bigint generated by default as identity,
+    DESCRIPTION varchar(1000),
+    PAGES integer,
+    TITLE varchar(32) not null,
+    AUTHOR_ID integer,
+    primary key (ID)
+);]]></programlisting>                        
+        </section>    
+
+        <section id="jpa-dao-schema-ddl-droptable">
+           <title>Drop Table</title>
+<programlisting language=""><![CDATA[drop table JPADAO_AUTHOR if exists;
+drop table JPADAO_BOOK if exists;]]></programlisting>                        
+        </section>    
+        
+        <section id="jpa-dao-schema-ddl-createfk">
+           <title>Create Foreign Key Constraint</title>
+<programlisting language=""><![CDATA[alter table JPADAO_BOOK 
+    add constraint JPADAO_BOOK_AUTHOR_FK 
+    foreign key (AUTHOR_ID) 
+    references JPADAO_AUTHOR]]></programlisting>                        
+        </section>    
+
+        <section id="jpa-dao-schema-ddl-dropfk">
+           <title>Drop Foreign Key Constraint</title>
+<programlisting language=""><![CDATA[alter table JPADAO_BOOK drop constraint JPADAO_BOOK_AUTHOR_FK;]]></programlisting>                        
+        </section>    
+        
+        <section id="jpa-dao-schema-ddl-createindex">
+           <title>Create Index</title>
+<programlisting language=""><![CDATA[create index JPADAO_BOOK_AUTHOR_FKX on JPADAO_BOOK(AUTHOR_ID);
+create unique index JPADAO_BOOK_TITLE_IDX on JPADAO_BOOK(TITLE);]]></programlisting>                        
+        </section>    
+        
+        <section id="jpa-dao-schema-ddl-dropindex">
+           <title>Drop Index</title>
+<programlisting language=""><![CDATA[drop index JPADAO_BOOK_AUTHOR_FKX if exists;
+drop index JPADAO_BOOK_TITLE_IDX if exists;]]></programlisting>                        
+        </section>    
+    </section>
+
+    <section id="jpa-dao-schema-ddl-maven">
+       <title>DDL Files in Maven Module</title>
+<programlisting language=""><![CDATA[
+src/main/resources/
+`-- ddl
+    |-- book-create.ddl
+    |-- book-drop.ddl
+    |-- book-tuning.ddl
+    `-- book-tuningdrop.ddl
+target/classes/
+`-- ddl
+    |-- book-create.ddl
+    |-- book-drop.ddl
+    |-- book-tuning.ddl
+    `-- book-tuningdrop.ddl
+]]></programlisting>                        
+    </section>    
+
+</chapter>
+  
+
+  
