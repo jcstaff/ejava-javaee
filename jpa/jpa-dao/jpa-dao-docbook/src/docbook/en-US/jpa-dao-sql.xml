@@ -1,16 +1,57 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-dao-chapter">
-    <title>DAO ...</title>
+<chapter id="jpa-dao-sql">
+    <title>SQL Basics</title>
 
-    <section id="jpa-dao-section">
-        <title>DAO...</title>
-        <para/>
+    <section id="jpa-dao-sql-create">
+        <title>Create/INSERT</title>
+<programlisting language=""><![CDATA[insert 
+into
+    JPADAO_BOOK
+    (ID, DESCRIPTION, PAGES, TITLE) 
+values
+    (null, 'this and that', 1037, 'gww')]]></programlisting>
+        <para>Get the generated primary key value</para>                            
+<programlisting language=""><![CDATA[call IDENTITY()]]></programlisting>                        
     </section>
 
+    <section id="jpa-dao-sql-select">
+        <title>Read/SELECT</title>
+<programlisting language=""><![CDATA[
+select
+    book.ID,
+    book.DESCRIPTION,
+    book.PAGES,
+    book.TITLE 
+from
+    JPADAO_BOOK book  
+]]></programlisting>                        
+    </section>
+
+    <section id="jpa-dao-sql-update">
+        <title>Update/UPDATE</title>
+<programlisting language=""><![CDATA[
+update
+    JPADAO_BOOK 
+set
+    DESCRIPTION='this, that, and the other thing'
+where
+    ID=3
+]]></programlisting>                        
+    </section>
+
+    <section id="jpa-dao-sql-delete">
+        <title>Delete/DELETE</title>
+<programlisting language=""><![CDATA[
+delete 
+from
+    JPADAO_BOOK 
+where
+    ID=?
+]]></programlisting>                        
+    </section>
 
 </chapter>
   
 
-  

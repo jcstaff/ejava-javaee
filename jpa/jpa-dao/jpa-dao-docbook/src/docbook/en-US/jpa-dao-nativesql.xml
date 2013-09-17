@@ -1,0 +1,97 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-dao-nativesql">
+    <title>Working with Native SQL</title>
+
+    <section id="jpa-dao-nativesql-jdbc">
+        <title>Java Database Connectivity (JDBC)</title>
+<programlisting language="java"><![CDATA[public class JDBCBookDAOImpl implements BookDAO {
+    private Connection connection;
+    
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    @Override
+    public Book create(Book book) throws PersistenceException {
+        PreparedStatement statement=null;
+        ResultSet rs = null;
+        try {
+            statement=connection.prepareStatement(
+                "insert into JPADAO_BOOK (ID, DESCRIPTION, PAGES, TITLE) " +
+                "values (null, ?, ?, ?)");
+            statement.setString(1, book.getDescription());
+            statement.setInt(2, book.getPages());
+            statement.setString(3, book.getTitle());
+            statement.execute();
+            statement.close();
+            
+            Field id = Book.class.getDeclaredField("id");
+            id.setAccessible(true);
+            statement = connection.prepareStatement("call identity()");
+            rs = statement.executeQuery();
+            if (rs.next()) {
+                id.set(book, rs.getLong(1));
+            }
+            
+            return book;
+        } catch (SQLException ex) { 
+            throw new PersistenceException("SQL error creating book", ex);
+        } catch (NoSuchFieldException ex) {
+            throw new RuntimeException("Error locating id field", ex);
+        } catch (SecurityException ex) {
+            throw new RuntimeException("Security error setting id", ex);
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException("Error setting id", ex);
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException("Access error setting id", ex);
+        } finally {
+            try { rs.close(); } catch (Exception ex){}
+            try { statement.close(); } catch (Exception ex){}
+        }
+    }
+    ...
+}]]></programlisting>                        
+    </section>
+
+    <section id="jpa-dao-nativesql-jpa">
+        <title>Java Persistence API (JPA) Native SQL</title>
+<programlisting language="java"><![CDATA[
+public class JPANativeSQLBookDAO implements BookDAO {
+    private EntityManager em;
+    
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+    }
+    
+    @Override
+    public Book create(Book book) throws PersistenceException {
+        em.createNativeQuery(
+            "insert into JPADAO_BOOK (ID, DESCRIPTION, PAGES, TITLE) " +
+            "values (null, ?1, ?2, ?3)")
+                .setParameter(1, book.getDescription())
+                .setParameter(2, book.getPages())
+                .setParameter(3, book.getTitle())
+                .executeUpdate();
+        
+        int idVal = ((Number)em.createNativeQuery("call identity()")
+            .getSingleResult()).intValue();
+        try {
+            Field id = Book.class.getDeclaredField("id");
+            id.setAccessible(true);
+            id.set(book, idVal);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error setting id", ex);
+        } 
+        
+        return book;
+    }
+    ...
+}]]></programlisting>                        
+    </section>
+
+</chapter>
+  
+
+  
