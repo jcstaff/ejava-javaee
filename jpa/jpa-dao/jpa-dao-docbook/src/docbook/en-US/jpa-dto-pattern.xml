@@ -3,37 +3,41 @@
 
 <chapter id="jpa-dto-pattern">
     <title>Data Transfer Object (DTO) Pattern</title>
+    <subtitle>Relating Business Objects to DTOs</subtitle>
 
     <section id="jpa-dto-pattern-contect">
         <title>Context</title>
             <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
+            <listitem><para>Business Objects represent too much information or behavior to transfer to remote client</para></listitem>
         </itemizedlist>
     </section>
-    
-    
+
     <section id="jpa-dto-pattern-problem">
         <title>Problem</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Client may get information they don't need</para></listitem>
+            <listitem><para>Client may get information they can't handle</para></listitem>
+            <listitem><para>Client may get information they are not authorized to use</para></listitem>
+            <listitem><para>Client may get too much information/behavior to be useful (e.g., entire database serialized to client)</para></listitem>
         </itemizedlist>
     </section>
 
     <section id="jpa-dto-pattern-forces">
         <title>Forces</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Some clients are local and can share object references with business logic</para></listitem>
+            <listitem><para>Handling specifics of remote clients outside of core scope of business logic</para></listitem>
         </itemizedlist>
     </section>
 
     <section id="jpa-dto-pattern-solution">
        <title>Solution</title>
-       <para></para>
-       
+        <itemizedlist spacing="compact">
+            <listitem><para>Layer a Remote Facade over Business Logic</para></listitem>
+            <listitem><para>Remote Facade constructs Data Transfer Objects (DTOs) from Business Objects that are appropriate for remote client view</para></listitem>
+            <listitem><para>Remote Facade uses DTOs to construct or locate Business Objects to communicate with Business Logic</para></listitem>
+        </itemizedlist>
+
         <figure>
             <title>DAO Pattern Players</title>
             <graphic scale="90" fileref="images/dto-pattern-players.png"/>
@@ -43,9 +47,13 @@
                 <term><filename>Data Transfer Object</filename></term>
                 <listitem>
                     <itemizedlist spacing="compact">
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Represents a subset of the state of the application at a point in time</para></listitem>
+                        <listitem><para>Not dependent on Business Objects or server-side technologies</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Doing so would require sending Business Objects to client</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem><para>XML and JSON provide the “ultimate isolation” in DTO implementation/isolation</para></listitem>
                     </itemizedlist>
                 </listitem>
             </varlistentry>
@@ -53,19 +61,8 @@
                 <term><filename>Remote Facade</filename></term>
                 <listitem>
                     <itemizedlist spacing="compact">
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
-                    </itemizedlist>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term><filename>Business Object (Entity)</filename></term>
-                <listitem>
-                    <itemizedlist spacing="compact">
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Uses Business Logic to perform core business logic</para></listitem>
+                        <listitem><para>Layered on top of Business Logic to translate between Business Objects and DTOs</para></listitem>
                     </itemizedlist>
                 </listitem>
             </varlistentry>
@@ -73,22 +70,39 @@
                 <term><filename>Business Logic</filename></term>
                 <listitem>
                     <itemizedlist spacing="compact">
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
-                        <listitem><para></para></listitem>
+                        <listitem><para>Continues to perform core duties as described in DAO Pattern</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>Business Object (Entity)</filename></term>
+                <listitem>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Continues to perform core duties as described in DAO Pattern</para></listitem>
+                        <listitem><para>May have more server-side-specific logic when DTOs are present in the design</para></listitem>
                     </itemizedlist>
                 </listitem>
             </varlistentry>
         </variablelist>
-                
     </section>    
 
     <section id="jpa-dto-pattern-consequences">
        <title>Consequences</title>
         <itemizedlist spacing="compact">
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
+            <listitem><para>Clients only get what they need</para></listitem>
+            <listitem><para>Clients only get what they understand</para></listitem>
+            <listitem><para>Clients only get what they are authorized to use</para></listitem>
+            <listitem><para>Remote and Local interfaces to services are different</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Makes it harder to provide location transparency</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Lightweight Business Objects can be used as DTOs</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Remote Facade must make sure they are “pruned” of excess related items before transferring to client</para></listitem>
+                    <listitem><para>Remote Facade must make sure they are “cleaned” of DAO persistence classes before transferring to client</para></listitem>
+                </itemizedlist>
+            </listitem>
         </itemizedlist>
     </section>    
 
