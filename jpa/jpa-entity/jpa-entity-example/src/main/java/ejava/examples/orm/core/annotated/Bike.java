@@ -10,6 +10,7 @@ import javax.persistence.*; //brings in JPA Annotations
  * can be done through a deployment descriptor instead of annotations. 
  */
 @Entity  //tells ORM that this class can be mapped 
+@Table(uniqueConstraints=@UniqueConstraint(columnNames={"make","model"}))
 public class Bike {
     @Id   //tells ORM that this property provides pk simple value
     private long id;
