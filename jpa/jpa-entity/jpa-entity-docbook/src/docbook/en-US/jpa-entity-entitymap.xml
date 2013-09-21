@@ -1,0 +1,48 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entity-entitymap">
+    <title>Mapping Entity Classes</title>
+
+    <section id="jpa-entity-entitymap-mappings">
+        <title>Elementary Schema Mappings</title>
+        
+        <section id="jpa-entity-entitymap-mappings-core">
+            <title>Core Mappings</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>@Entity.name - assigns entity name to entity class</para></listitem>
+                <listitem><para>@Table.name - assigns table name to entity class</para></listitem>
+                <listitem><para>@Column.name - assigns column name to entity property</para></listitem>
+            </itemizedlist>
+        </section>
+        
+        <section id="jpa-entity-entitymap-mappings-property">
+            <title>More Detailed Property Mappings</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Mostly used when generating schema</para></listitem>
+                <listitem><para>@Table</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>* uniqueConstraints - column groupings that will have a unique value</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>@Column</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>* unique - column will have unique value</para></listitem>
+                        <listitem><para>* nullable - column may contain a null value/is optional</para></listitem>
+                        <listitem><para>insertable - column will be included in SQL during initial insert</para></listitem>
+                        <listitem><para>updatable - column will be included in SQL during follow-on updates</para></listitem>
+                        <listitem><para>table - table for column in a multi-table mapping</para></listitem>
+                        <listitem><para>* length - length of column for Strings</para></listitem>
+                        <listitem><para>* precision - defines number of digits used for Numeric types (e.g., 100.02 is precision=5)</para></listitem>
+                        <listitem><para>* scale - defines number of digits to use to the righ of decimal place out of the total number of precision defined (e.g., 100.01 is scale=2)</para></listitem>
+                        <listitem><para>* columnDefinition - custom DDL for column creation</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+            <para>* - Used only in schema generation</para>
+        </section>    
+            
+    </section>    
+
+</chapter>
+  
