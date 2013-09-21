@@ -1,5 +1,7 @@
 Exercise: Entity Manager
 
+2013-09-21
+
 * Goals
 
     * Gain hands on experience building and testing a component
@@ -15,17 +17,19 @@ Exercise: Entity Manager
 
     * {{{Part_C} Setup Database Schema}}
 
-    * {{{Part_D} Setup JPA Persistence Unit}}
+    * {{{Part_D} Add SQL Tuning}}
 
-    * {{{Part_E} Setup JPA Test Project}}
+    * {{{Part_E} Setup JPA Persistence Unit}}
 
-    * {{{Part_F} Ready Project for Import Into Eclipse}}
+    * {{{Part_F} Setup JPA Test Project}}
+
+    * {{{Part_G} Ready Project for Import Into Eclipse}}
     
-    * {{{Part_G} Test Entity Manager Functions}}
+    * {{{Part_H} Test Entity Manager Functions}}
     
-    * {{{Part_H} Automatically Generate Schema}}
+    * {{{Part_I} Automatically Generate Schema}}
 
-    * {{{Part_I} Create JPA Parent POM}}
+    * {{{Part_J} Create JPA Parent POM}}
 
 * Steps
 
@@ -83,12 +87,13 @@ Password:
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>myorg.jpa</groupId>
     <artifactId>entityMgrEx</artifactId>
-    <name>Entity Manager Exercise</name>
     <version>1.0-SNAPSHOT</version>
+
+    <name>Entity Manager Exercise</name>
 
 </project> 
 ---
@@ -119,15 +124,15 @@ Password:
         <jboss.host>localhost</jboss.host>
         <db.host>${jboss.host}</db.host>
 
-        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
-        <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>2.16</maven-surefire-plugin.version>
         <sql-maven-plugin.version>1.4</sql-maven-plugin.version>        
 
-        <commons-logging.version>1.0.4</commons-logging.version>
+        <commons-logging.version>1.1.1</commons-logging.version>
         <h2db.version>1.3.168</h2db.version>
         <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
-        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
+        <hibernate-entitymanager.version>4.2.0.Final</hibernate-entitymanager.version>
         <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
         <hibernate3.version>3.6.0.Final</hibernate3.version>
         <junit.version>4.10</junit.version>
@@ -392,13 +397,14 @@ Password:
 
     * Add a set of profiles that define H2 and Hibernate as our database and 
     persistence provider. In the example below we are adding two database
-    definitions (that happpen to both be the same vendor). Once requires the
+    definitions (that happpen to both be the same vendor). One requires the
     server to be running and the other uses an embedded server and a local
     filesystem. The embedded version can be easier to test with. The server
     version can be easier to debug. Activate which one you want with either
     your settings.xml#activeProfile settings or using a -Pprofile-name argument
     on the command line. If you already have a settings.xml#activeProfile
-    setting, you can turn it off using -P\!deactivated-profile-name and
+    setting, you can turn it off using -P\!deactivated-profile-name ((bash) or 
+    -P!deactivated-profile-name (dos)) and
     follow it up with -Pactivated-profile-name.
 
     [Note:] Profiles can be used to control which options are enabled at
@@ -709,7 +715,74 @@ DROP TABLE EM_AUTO if EXISTS;
 
     []
     
-** {Part D}: Setup JPA Persistence Unit
+** {Part D}: Adding SQL Tuning 
+
+    In this section we are going to add tuning aspects to the schema put in place above.
+    Examples of this include any indexes we believe would enhance the query performance.
+    This example is still quite simple and lacks enough context to determine what would and would
+    not be a helpful index. Simply treat this exercise as a tutorial in putting an index
+    in place when properly identified.
+
+    Adding the physical files mentioned here could be considered optional if all
+    schema is hand-crafted. You control the contents of each file in a 100% hand-crafted
+    DDL solution. However, for those cases where auto-generated schema files are created,
+    you may want a separate set of files designated for "tuning" the schema that was 
+    auto-generated. We will demonstrate using two extra files to create/drop database
+    indexes. 
+
+    * Add a file to add database indexes for your schema
+
+---
+# src/main/resources/ddl/emauto_tuningadd.ddl
+
+CREATE INDEX EM_AUTO_MAKEMODEL ON EM_AUTO(MAKE, MODEL);
+---
+
+    * Wire this new file into your SQL plugin definition for creating schema. Have it run
+    after your table creates.
+
+---
+    <includes>
+        <include>main/resources/ddl/**/*create*.ddl</include>
+        <include>main/resources/ddl/**/*tuningadd*.ddl</include>
+    </includes>
+---
+
+    * Add a file to augment the drop script and remove indexes from your schema
+
+---
+# src/main/resources/ddl/emauto_tuningremove.ddl
+
+DROP INDEX EM_AUTO_MAKEMODEL if exists;
+---
+
+    * Wite this new file into your SQL plugin definition for dropping schema. Have it run
+    before your table drops.
+
+---
+    <includes>
+        <include>main/resources/ddl/**/*tuningremove*.ddl</include>
+        <include>main/resources/ddl/**/*drop*.ddl</include>
+    </includes>
+---
+
+    * Build the schema for your module
+
+---
+$ mvn clean process-test-classes
+...
+[INFO] --- sql-maven-plugin:1.4:execute (drop-db-before-test) @ entityMgrEx ---
+[INFO] Executing file: .../src/main/resources/ddl/emauto_drop.ddl
+[INFO] Executing file: .../src/main/resources/ddl/emauto_tuningremove.ddl
+[INFO] 2 of 2 SQL statements executed successfully
+[INFO] 
+[INFO] --- sql-maven-plugin:1.4:execute (create-db-before-test) @ entityMgrEx ---
+[INFO] Executing file: .../src/main/resources/ddl/emauto_create.ddl
+[INFO] Executing file: .../entityMgrEx/src/main/resources/ddl/emauto_tuningadd.ddl
+[INFO] 2 of 2 SQL statements executed successfully
+---
+
+** {Part E}: Setup JPA Persistence Unit
 
     Create the entity class(es), the persistence.xml, and associated 
     property file to define the persistence unit.
@@ -756,7 +829,12 @@ DROP TABLE EM_AUTO if EXISTS;
         * @GeneratedValue to tell the provider to generate primary keys
         for rows inserted for this entity.
 
-        * make the class implement java.io.Serializable. 
+        * make the class implement java.io.Serializable. We will make 
+        use of this feature during the merge() example.
+
+        * Add a default contructor and a means to initialize and get
+        the primary key. Make the primary key not modifiable by the 
+        public interface since primary keys cannot be modified.
 
 ---
 package myorg.entitymgrex;
@@ -779,13 +857,9 @@ public class Auto implements Serializable {
     private String color;
     private int mileage;
 
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
+    public Auto(){}
+    public Auto(int id) { this.id=id; }
+    public long getId() { return id; }
 
     //more getter/setters go here
 }
@@ -800,31 +874,24 @@ public class Auto implements Serializable {
     when you manually add the first constructor.
     
 ---
-    public String getMake() {
-        return make;
-    }
     public void setMake(String make) {
         this.make = make;
     }
-    public int getMileage() {
-        return mileage;
-    }
+    
+    public int getMileage() { return mileage; }
     public void setMileage(int mileage) {
         this.mileage = mileage;
     }
-    public String getModel() {
-        return model;
-    }
+    
+    public String getModel() { return model; }
     public void setModel(String model) {
         this.model = model;
     }
-    public String getColor() {
-        return color;
-    }
+    
+    public String getColor() { return color; }
     public void setColor(String color) {
         this.color = color;
     }    
-}
 ---
 
     * You may also want to add a public toString():String method to 
@@ -905,6 +972,7 @@ hibernate.connection.driver_class=${jdbc.driver}
 hibernate.connection.password=${jdbc.password}
 hibernate.connection.username=${jdbc.user}
 #hibernate.hbm2ddl.auto=create
+#hibernate.hbm2ddl.import_files=/ddl/emauto-tuningdrop.ddl,/ddl/emauto-tuning.ddl 
 hibernate.show_sql=true
 hibernate.format_sql=true
 #hibernate.jdbc.batch_size=0
@@ -916,41 +984,41 @@ hibernate.format_sql=true
 ---
 $ mvn clean install -P\!h2db -Ph2srv
 
-├── pom.xml
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   └── myorg
-│   │   │       └── entitymgrex
-│   │   │           └── Auto.java
-│   │   └── resources
-│   │       ├── ddl
-│   │       │   ├── emauto_create.ddl
-│   │       │   ├── emauto_delete.ddl
-│   │       │   └── emauto_drop.ddl
-│   │       └── META-INF
-│   │           └── persistence.xml
-│   └── test
-│       └── resources
-│           └── hibernate.properties
-└── target
-    ├── classes
-    │   ├── ddl
-    │   │   ├── emauto_create.ddl
-    │   │   ├── emauto_delete.ddl
-    │   │   └── emauto_drop.ddl
-    │   ├── META-INF
-    │   │   └── persistence.xml
-    │   └── myorg
-    │       └── entitymgrex
-    │           └── Auto.class
-    ├── entityMgrEx-1.0-SNAPSHOT.jar
-    ├── generated-sources
-    │   └── annotations
-    ├── maven-archiver
-    │   └── pom.properties
-    └── test-classes
-        └── hibernate.properties
+|-- pom.xml
+|-- src
+|   |-- main
+|   |   |-- java
+|   |   |   `-- myorg
+|   |   |       `-- entitymgrex
+|   |   |           `-- Auto.java
+|   |   `-- resources
+|   |       |-- ddl
+|   |       |   |-- emauto_create.ddl
+|   |       |   |-- emauto_delete.ddl
+|   |       |   |-- emauto_drop.ddl
+|   |       |   |-- emauto_tuningadd.ddl
+|   |       |   `-- emauto_tuningremove.ddl
+|   |       `-- META-INF
+|   |           `-- persistence.xml
+|   `-- test
+|       `-- resources
+|           `-- hibernate.properties
+`-- target
+    |-- classes
+    |   |-- ddl
+    |   |   |-- emauto_create.ddl
+    |   |   |-- emauto_delete.ddl
+    |   |   |-- emauto_drop.ddl
+    |   |   |-- emauto_tuningadd.ddl
+    |   |   `-- emauto_tuningremove.ddl
+    |   |-- META-INF
+    |   |   `-- persistence.xml
+    |   `-- myorg
+    |       `-- entitymgrex
+    |           `-- Auto.class
+   ...
+    `-- test-classes
+        `-- hibernate.properties
 ---
     
     * You should also check that your hibernate.properties file was filtered
@@ -982,12 +1050,13 @@ hibernate.connection.driver_class=org.h2.Driver
 hibernate.connection.password=
 hibernate.connection.username=sa
 #hibernate.hbm2ddl.auto=create
+#hibernate.hbm2ddl.import_files=/ddl/emauto-tuningdrop.ddl,/ddl/emauto-tuning.ddl 
 hibernate.show_sql=true
 hibernate.format_sql=true
 #hibernate.jdbc.batch_size=0
 ---
 
-** {Part E}: Setup JPA Test Project
+** {Part F}: Setup JPA Test Project
 
     Create the unit test and supporting file(s) to be able to work with
     the perstence unit and database schema in the database.
@@ -1239,64 +1308,79 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
     * Check that you have the following artifacts in your project tree.
 
 ---
-├── pom.xml
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   └── myorg
-│   │   │       └── entitymgrex
-│   │   │           └── Auto.java
-│   │   └── resources
-│   │       ├── ddl
-│   │       │   ├── emauto_create.ddl
-│   │       │   ├── emauto_delete.ddl
-│   │       │   └── emauto_drop.ddl
-│   │       └── META-INF
-│   │           └── persistence.xml
-│   └── test
-│       ├── java
-│       │   └── myorg
-│       │       └── entitymgrex
-│       │           └── EntityMgrTest.java
-│       └── resources
-│           ├── hibernate.properties
-│           └── log4j.xml
-└── target
-    ├── classes
-    │   ├── ddl
-    │   │   ├── emauto_create.ddl
-    │   │   ├── emauto_delete.ddl
-    │   │   └── emauto_drop.ddl
-    │   ├── META-INF
-    │   │   └── persistence.xml
-    │   └── myorg
-    │       └── entitymgrex
-    │           └── Auto.class
-    ├── entityMgrEx-1.0-SNAPSHOT.jar
-    ├── generated-sources
-    │   └── annotations
-    ├── generated-test-sources
-    │   └── test-annotations
-    ├── h2db
-    │   └── ejava.h2.db
-    ├── log4j-out.txt
-    ├── maven-archiver
-    │   └── pom.properties
-    ├── surefire-reports
-    │   ├── myorg.entitymgrex.EntityMgrTest.txt
-    │   └── TEST-myorg.entitymgrex.EntityMgrTest.xml
-    └── test-classes
-        ├── hibernate.properties
-        ├── log4j.xml
-        └── myorg
-            └── entitymgrex
-                └── EntityMgrTest.class
+|-- pom.xml
+|-- src
+|   |-- main
+|   |   |-- java
+|   |   |   `-- myorg
+|   |   |       `-- entitymgrex
+|   |   |           `-- Auto.java
+|   |   `-- resources
+|   |       |-- ddl
+|   |       |   |-- emauto_create.ddl
+|   |       |   |-- emauto_delete.ddl
+|   |       |   |-- emauto_drop.ddl
+|   |       |   |-- emauto_tuningadd.ddl
+|   |       |   `-- emauto_tuningremove.ddl
+|   |       `-- META-INF
+|   |           `-- persistence.xml
+|   `-- test
+|       |-- java
+|       |   `-- myorg
+|       |       `-- entitymgrex
+|       |           `-- EntityMgrTest.java
+|       `-- resources
+|           |-- hibernate.properties
+|           `-- log4j.xml
+`-- target
+    |-- antrun
+    |   `-- build-main.xml
+    |-- classes
+    |   |-- ddl
+    |   |   |-- emauto_create.ddl
+    |   |   |-- emauto_delete.ddl
+    |   |   |-- emauto_drop.ddl
+    |   |   |-- emauto_tuningadd.ddl
+    |   |   `-- emauto_tuningremove.ddl
+    |   |-- META-INF
+    |   |   `-- persistence.xml
+    |   `-- myorg
+    |       `-- entitymgrex
+    |           `-- Auto.class
+    |-- generated-sources
+    |   `-- annotations
+    |-- generated-test-sources
+    |   `-- test-annotations
+    |-- h2db
+    |   `-- ejava.h2.db
+    |-- log4j-out.txt
+    |-- maven-status
+    |   `-- maven-compiler-plugin
+    |       |-- compile
+    |       |   `-- default-compile
+    |       |       |-- createdFiles.lst
+    |       |       `-- inputFiles.lst
+    |       `-- testCompile
+    |           `-- default-testCompile
+    |               |-- createdFiles.lst
+    |               `-- inputFiles.lst
+    |-- surefire-reports
+    |   |-- myorg.entitymgrex.EntityMgrTest.txt
+    |   `-- TEST-myorg.entitymgrex.EntityMgrTest.xml
+    `-- test-classes
+        |-- hibernate.properties
+        |-- log4j.xml
+        `-- myorg
+            `-- entitymgrex
+                `-- EntityMgrTest.class
 ---
 
-** {Part F}: Ready Project for Import Into Eclipse
+** {Part G}: Ready Project for Import Into Eclipse
 
     Eclipse Indigo and Juno users will get a warning/error for the 
-    sql-maven-plugin. The error is related 
+    sql-maven-plugin. Eclipse Kepler may or may not produce the same error.
+    It has been a while since I have tested this against a clean Eclipse install.
+    The error, if reported, is related 
     to Eclipse trying to have a tighter integration with Maven by trying to 
     perform comparable tasks inside of Eclipse for what would happen in 
     a normal Maven command line build. For some of the plugins -- Maven does
@@ -1358,7 +1442,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
 
 
-** {Part G}: Test Entity Manager Functions
+** {Part H}: Test Entity Manager Functions
 
     [Note:] The following changes are all made to the EntityMgrTest.java
     JUnit test class. Everything is being done within this file to 
@@ -1674,7 +1758,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
  -removing car:myorg.entitymgrex.Auto@28305d, id=11, make=Jeep, model=Cherokee, color=Green, mileage=30000
 ---
 
-** {Part H}: Automatically Generate Schema
+** {Part I}: Automatically Generate Schema
 
     In part C, you manually created a set of DDL files to create schema, 
     delete rows from the schema in the database, and drop the schema
@@ -1810,20 +1894,27 @@ main:
 ...
 ---
 ---
-└── target
-    ...
-    ├── classes
-    │   ├── ddl
-    │   │   ├── emauto_create.ddl
-    │   │   ├── emauto_delete.ddl
-    │   │   ├── emauto_drop.ddl
-    │   │   ├── entityMgrEx-createJPA.ddl
-    │   │   └── entityMgrEx-dropJPA.ddl
+`-- target
+   ...
+    |-- classes
+    |   |-- ddl
+    |   |   |-- emauto_create.ddl
+    |   |   |-- emauto_delete.ddl
+    |   |   |-- emauto_drop.ddl
+    |   |   |-- emauto_tuningadd.ddl
+    |   |   |-- emauto_tuningremove.ddl
+    |   |   |-- entityMgrEx-createJPA.ddl
+    |   |   `-- entityMgrEx-dropJPA.ddl
 ---
 
-    * Add a lifecycle mapping for the hibernate3-maven-plugin to tell Eclipse
-    to ignore the functionality of the plugin and eliminate any errors Eclipse
-    might display. This goes with the definition you created for the sql-maven-plugin. 
+    * (Optionally) update your SQL plugin defintion added in Part C to reference
+    the dynamically generated schema in the target tree.
+
+    * If Eclipse reports an error for the plugin, add a lifecycle
+    mapping for the hibernate3-maven-plugin to tell Eclipse to ignore
+    the functionality of the plugin and eliminate any errors Eclipse
+    might display. This goes with the definition you created for the
+    sql-maven-plugin.
     
 ---
                             <pluginExecution>
@@ -1841,7 +1932,7 @@ main:
                             </pluginExecution>
 ---    
 
-** {Part I}: Create JPA Parent POM
+** {Part J}: Create JPA Parent POM
 
     Since you will likely have many JPA modules in your enterprise application,
     lets take a moment to break the current module into a parent and child before
@@ -1888,6 +1979,7 @@ $ mkdir ../jpa-parent
 
     <groupId>myorg.jpa</groupId>
     <artifactId>entityMgrEx-child</artifactId>
+
     <name>Entity Manager Exercise</name>
 ---
 
@@ -2197,3 +2289,11 @@ $ mkdir ../jpa-parent
     </profiles>
 </project>
 ---
+
+* Summary 
+
+    This exercise was another hands-on introduction to setting up a project module for use with Maven. In this
+    specific case, the module is intended to host the data persistence tier so much of what we did had to do with
+    the database, JPA, and the POJO classes that map to the database through the JPA ORM provider. This exercise
+    also provided you with a quick overview of EntityManager CRUD methods that will be used by the DAO in your
+    data persistence tier.
