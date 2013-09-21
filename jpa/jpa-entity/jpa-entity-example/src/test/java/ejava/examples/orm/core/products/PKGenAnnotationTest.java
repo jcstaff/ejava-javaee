@@ -1,49 +1,27 @@
 package ejava.examples.orm.core.products;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assume;
+import org.junit.Test;
 
 import ejava.examples.orm.core.annotated.Drill;
 import ejava.examples.orm.core.annotated.EggBeater;
+import ejava.examples.orm.core.annotated.Fan;
 import ejava.examples.orm.core.annotated.Gadget;
-
-import junit.framework.TestCase;
 
 /**
  * This test case provides a demo of using automatically generated primary
  * keys setup using class annotations.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class PKGenAnnotationDemo extends TestCase {
-    private static Log log = LogFactory.getLog(BasicAnnotationDemo.class);
-    private static final String PERSISTENCE_UNIT = "ormCore";
-    private EntityManagerFactory emf;
-    private EntityManager em = null;
-
-    protected void setUp() throws Exception {        
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-    }
-
-    protected void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
-    }
+public class PKGenAnnotationTest extends TestBase {
+    private static Log log = LogFactory.getLog(BasicAnnotationTest.class);
     
     static String getText(Throwable ex) {
         StringBuilder text = new StringBuilder(ex.getMessage());
@@ -59,6 +37,7 @@ public class PKGenAnnotationDemo extends TestCase {
      * This test provides a demo of using the AUTO GeneratedType. This value
      * is provided by the Java Persistance provider.
      */
+    @Test
     public void testAUTOGood() {
         log.info("testAUTOGood");
         //note that since PKs are generated, we must pass in an object that
@@ -79,6 +58,7 @@ public class PKGenAnnotationDemo extends TestCase {
      * This test provides a demo of the error that can occure when passing an
      * object with the PK already assigned when using GeneratedValues.
      */
+    @Test
     public void testAUTOBad() {
         log.info("testAUTOBad");
         //he's not going to like they non-zero PK value here
@@ -99,6 +79,7 @@ public class PKGenAnnotationDemo extends TestCase {
         assertTrue(exceptionThrown);
     }        
 
+    @Test
     public void testTABLE() {
         log.info("testTABLE");
         log.debug("table id before=" + getTableId());
@@ -130,10 +111,39 @@ public class PKGenAnnotationDemo extends TestCase {
         return results.size() == 0 ? null : (Integer)results.get(0);
     }
 
+
+    @Test
     public void testSEQUENCE() {
-        log.info("testSEQUENCE - see PKSequenceGenAnnotationDemo");
+        log.info("testSEQUENCE");
+        Assume.assumeTrue(Boolean.parseBoolean(System.getProperty("sql.sequences", "true")));
+        try {
+            //note that since PKs are generated, we must pass in an object that
+            //has not yet been assigned a PK value.
+            ejava.examples.orm.core.annotated.Fan fan = new Fan(0);
+            fan.setMake("cool runner 1");
+            
+            //insert a row in the database
+            em.persist(fan);
+            log.info("created fan (before flush):" + fan);
+            em.flush(); 
+            log.info("created fan (after flush):" + fan);
+            
+            assertFalse(fan.getId() == 0L);
+            
+            for (int i=2; i<20; i++) {
+            	Fan f = new Fan();
+            	f.setMake("cool runner " + i);
+            	em.persist(f);
+            	em.flush();
+            }
+        } catch (PersistenceException ex) {
+            String text = getText(ex);
+            log.error("error in testSEQUENCE:" + text, ex);
+            fail("error in testSEQUENCE:" + text);
+        }
     }
 
+    @Test
     public void testIDENTITY() {
         log.info("testIDENTITY");
         try {

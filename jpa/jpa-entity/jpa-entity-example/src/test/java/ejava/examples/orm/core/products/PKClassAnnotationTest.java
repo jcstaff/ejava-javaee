@@ -1,12 +1,10 @@
 package ejava.examples.orm.core.products;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import static org.junit.Assert.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.orm.core.annotated.MakeModelPK;
 import ejava.examples.orm.core.annotated.Mower;
@@ -15,40 +13,18 @@ import ejava.examples.orm.core.annotated.NapsackPK;
 import ejava.examples.orm.core.annotated.Pen;
 import ejava.examples.orm.core.MowerPK;
 
-import junit.framework.TestCase;
-
 /**
  * This test case provides a demo of using customer primary key classes
  * specified by annotations.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class PKClassAnnotationDemo extends TestCase {
-    private static Log log = LogFactory.getLog(BasicAnnotationDemo.class);
-    private static final String PERSISTENCE_UNIT = "ormCore";
-    private EntityManagerFactory emf;
-    private EntityManager em = null;
-
-    protected void setUp() throws Exception {        
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-    }
-
-    protected void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
-    }
+public class PKClassAnnotationTest extends TestBase {
+    private static Log log = LogFactory.getLog(BasicAnnotationTest.class);
     
     /**
      * This test provides a demo of using the AUTO GeneratedType. This value
-     * is provided by the Java Persistance provider.
+     * is provided by the Java Persistence provider.
      */
+    @Test
     public void testIdClass() {
         log.info("testIdClass");
         ejava.examples.orm.core.annotated.Mower mower = 
@@ -86,6 +62,7 @@ public class PKClassAnnotationDemo extends TestCase {
      * are provided within the NapsackPK class.
      *
      */
+    @Test
     public void testEmbeddedId() {
         log.info("testEmbedded");
         ejava.examples.orm.core.annotated.Napsack napsack = 
@@ -123,6 +100,7 @@ public class PKClassAnnotationDemo extends TestCase {
      * with the generic PK class.
      *
      */
+    @Test
     public void testEmbeddedIdOverrides() {
         log.info("testEmbeddedOverrides");
         ejava.examples.orm.core.annotated.Pen pen = 

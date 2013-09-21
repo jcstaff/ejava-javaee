@@ -1,44 +1,30 @@
 package ejava.examples.orm.core.products;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import static org.junit.Assert.*;
+
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 import ejava.examples.orm.core.mapped.Car;
-
-import junit.framework.TestCase;
 
 /**
  * This test case provides a demo of using a class that has been mapped
  * to the database with with specific table and column elements in orm.xml. 
- * 
- * @author jcstaff
- * $Id:$
  */
-public class TableColumnMappingDemo extends TestCase {
-    private static Log log = LogFactory.getLog(TableColumnMappingDemo.class);
-    private static final String PERSISTENCE_UNIT = "ormCore";
-    private EntityManagerFactory emf;
-    private EntityManager em = null;
-
-    protected void setUp() throws Exception {        
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-    }
-
-    protected void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
+public class TableColumnMappingTest extends TestBase {
+    private static Log log = LogFactory.getLog(TableColumnMappingTest.class);
+    
+    @Before
+    public void cleanup() {
+    	for (Car car: em.createQuery("select c from MappedCar c", Car.class).getResultList()) {
+    		em.remove(car);
+    	}
+    	em.getTransaction().commit();
+    	em.getTransaction().begin();
     }
     
     /**
@@ -48,6 +34,7 @@ public class TableColumnMappingDemo extends TestCase {
      * By looking at the Car class, we would expect to see a ORBCORE_CAR table
      * with columns CAR_ID, CAR_MAKE, CAR_MODEL, CAR_YEAR, and CAR_COST. 
      */
+    @Test
     public void testTableColumnMapping() {
         log.info("testTableColumnMapping");
         

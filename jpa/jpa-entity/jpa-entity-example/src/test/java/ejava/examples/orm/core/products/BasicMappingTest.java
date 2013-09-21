@@ -1,46 +1,21 @@
 package ejava.examples.orm.core.products;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import static org.junit.Assert.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.orm.core.mapped.Bike;
 
-import junit.framework.TestCase;
-
 /** 
  * This test case provides a demo of using a class that has been mapped to
- * the database using a separate orm.xml descripor referenced by
+ * the database using a separate orm.xml descriptor referenced by
  * META-INF/persistence.xml. Only the basic properties were specific. All
  * remaining properties are the default of the Java Persistence provider.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class BasicMappingDemo extends TestCase {
-    private static Log log = LogFactory.getLog(BasicMappingDemo.class);
-    private static final String PERSISTENCE_UNIT = "ormCore";
-    private EntityManagerFactory emf;
-    private EntityManager em = null;
-
-    protected void setUp() throws Exception {        
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-    }
-
-    protected void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
-    }
+public class BasicMappingTest extends TestBase {
+    private static Log log = LogFactory.getLog(BasicMappingTest.class);
     
     /**
      * This test demonstrates the ability to map a simple object to the 
@@ -57,6 +32,7 @@ public class BasicMappingDemo extends TestCase {
      * these columns are the defaults of the Java Persistence provider. If we
      * left the name off, the table would have been called MappedBike. 
      */
+    @Test
     public void testDefaultMapping() {
         log.info("testDefaultMapping");
         ejava.examples.orm.core.mapped.Bike bike = new Bike(2);

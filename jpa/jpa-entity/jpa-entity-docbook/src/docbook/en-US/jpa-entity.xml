@@ -19,17 +19,44 @@
     </bookinfo>
     <preface id="jpa-entity-purpose">
         <title>Purpose</title>
-        <itemizedlist spacing="compact">
-            <listitem><para></para>
-                <itemizedlist spacing="compact">
-                    <listitem><para></para></listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem><para></para></listitem>
-        </itemizedlist>
+        <section id="jpa-entity-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Introduce mapping a single class (void of relationships) to the database</para></listitem>
+                <listitem><para>Introduce primary key generation for synthetic key usage</para></listitem>
+                <listitem><para>Introduce composite keys for natural key usage</para></listitem>
+                <listitem><para>Introduce multi-table mappings for individual Java classes</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-entity-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have an understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Object/Relational Mapping (ORM) based on the Java Persistence API (JPA)</para></listitem>
+                        <listitem><para>Class mapping strategies</para></listitem>
+                        <listitem><para>Field mapping strategies</para></listitem>
+                        <listitem><para>Primary key strategies</para></listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Be able to map a single Java class and attributes to the database using class annotations and ORM descriptors</para></listitem>
+                        <listitem><para>Be able to define a specific primary key strategy for their mapped class</para></listitem>
+                        <listitem><para>Be able to create, get, set, and delete information from the database using class mappings</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
     </preface>
 
     <toc/>
-
-    <xi:include href="jpa-entity-chapter.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    
+    <xi:include href="jpa-entity-entitymap.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <!-- 
+    <xi:include href="jpa-entity-pkmap.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-entity-multitablemap.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+     -->
 </book>

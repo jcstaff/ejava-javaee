@@ -1,50 +1,26 @@
 package ejava.examples.orm.core.products;
 
-import java.util.Date;
+import static org.junit.Assert.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.orm.core.ColorType;
 import ejava.examples.orm.core.mapped.Vase;
 
-import junit.framework.TestCase;
-
 /**
  * This test case provides an example of providing special mappings for
  * certain types, like dates and enums.
- *  
- * @author jcstaff
- * $Id:$
  */
-public class TypesMappingDemo extends TestCase {
-    private static Log log = LogFactory.getLog(TypesMappingDemo.class);
-    private static final String PERSISTENCE_UNIT = "ormCore";
-    private EntityManagerFactory emf;
-    private EntityManager em = null;
-
-    protected void setUp() throws Exception {        
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-    }
-
-    protected void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
-    }
+public class TypesMappingTest extends TestBase {
+    private static Log log = LogFactory.getLog(TypesMappingTest.class);
     
     /**
      */
+    @Test
     public void testValues() {
         log.info("testValues");
         ejava.examples.orm.core.mapped.Vase vase = new Vase(2);
