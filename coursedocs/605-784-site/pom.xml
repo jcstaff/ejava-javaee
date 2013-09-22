@@ -68,6 +68,13 @@
         </dependency>
         <dependency>
             <groupId>ejava.jpa</groupId>
+            <artifactId>jpa-entity-docbook</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ejava.jpa</groupId>
             <artifactId>jpa-validation-docbook</artifactId>
             <version>${project.version}</version>
             <type>war</type>
@@ -180,6 +187,12 @@
                 <overlay>
                     <groupId>ejava.jpa</groupId>
                     <artifactId>jpa-entitymgr-docbook</artifactId>
+                    <type>war</type>
+                    <targetPath>../site/docs/content</targetPath>
+               </overlay>
+                <overlay>
+                    <groupId>ejava.jpa</groupId>
+                    <artifactId>jpa-entity-docbook</artifactId>
                     <type>war</type>
                     <targetPath>../site/docs/content</targetPath>
                </overlay>
