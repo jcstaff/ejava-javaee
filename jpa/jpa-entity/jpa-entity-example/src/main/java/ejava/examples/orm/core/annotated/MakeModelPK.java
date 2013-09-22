@@ -10,9 +10,6 @@ import javax.persistence.*;
  * use an instance of this class rather than having separate fields that
  * match the fields of this class. All fields will be mapped by the 
  * containing class.
- * 
- * @author jcstaff
- * $Id:$
  */
 @Embeddable
 public class MakeModelPK implements Serializable {
@@ -29,24 +26,10 @@ public class MakeModelPK implements Serializable {
         return serialVersionUID;
     }
     
-    public String getMake() {
-        return make;
-    }
-    @SuppressWarnings("unused")
-    private void setMake(String make) {
-        this.make = make;
-    }
+    public String getMake() { return make; }
+    public String getModel() { return model; }
 
-    public String getModel() {
-        return model;
-    }
-    @SuppressWarnings("unused")
-    private void setModel(String model) {
-        this.model = model;
-    }
-    public int hashCode() {
-        return make.hashCode() + model.hashCode();
-    }
+    public int hashCode() { return make.hashCode() + model.hashCode(); }
     public boolean equals(Object obj) {
         try {
             if (this == obj) return true;
@@ -58,13 +41,13 @@ public class MakeModelPK implements Serializable {
         }
     }
     
-	@Override
-	public String toString() {
-		return new StringBuilder()
-		          .append(super.toString())	       
-		          .append(", make=").append(make)
-		          .append(", model=").append(model)
-		          .toString();
-	}    
+    @Override
+    public String toString() {
+        return new StringBuilder()
+              .append(super.toString())	       
+              .append(", make=").append(make)
+              .append(", model=").append(model)
+              .toString();
+    }    
 
 }

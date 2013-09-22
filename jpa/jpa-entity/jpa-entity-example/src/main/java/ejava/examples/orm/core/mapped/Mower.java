@@ -1,7 +1,5 @@
 package ejava.examples.orm.core.mapped;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 import ejava.examples.orm.core.MowerPK;
@@ -17,9 +15,10 @@ import ejava.examples.orm.core.MowerPK;
 @Entity
 @Table(name="ORMCORE_MOWER")
 @IdClass(MowerPK.class)
-public class Mower implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Mower {
+    @Id
     private String make;
+    @Id
     private String model;    
     private int size;
     
@@ -30,28 +29,10 @@ public class Mower implements Serializable {
         this.model = model;
     }
     
-    @Id
-    @Column(nullable=false, updatable=false)
-    public String getMake() {
-        return make;
-    }
-    @SuppressWarnings("unused")
-    private void setMake(String make) {
-        this.make = make;
-    }
-    
-    @Id
-    @Column(nullable=false, updatable=false)
-    public String getModel() {
-        return model;
-    }
-    @SuppressWarnings("unused")
-    private void setModel(String model) {
-        this.model = model;
-    }
-    public int getSize() {
-        return size;
-    }
+    public String getMake() { return make; }
+    public String getModel() { return model; }
+
+    public int getSize() { return size; }
     public void setSize(int size) {
         this.size = size;
     }

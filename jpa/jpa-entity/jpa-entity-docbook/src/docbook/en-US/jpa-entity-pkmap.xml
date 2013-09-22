@@ -1,11 +1,86 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-entity-chapter">
-    <title>JPA Chapter</title>
+<chapter id="jpa-entity-pkmap">
+    <title>Primary Keys</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Every entity must have a primary key</para></listitem>
+        <listitem><para>Primary keys must be unique</para></listitem>
+        <listitem><para>Map to one ("simple") or more ("composite") properties</para></listitem>
+        <listitem><para>Properties must be of type</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Java primitive types -- including object wrappers</para></listitem>
+                <listitem><para>java.lang.String</para></listitem>
+                <listitem><para>Custom classes made up of legal property types</para></listitem>
+            </itemizedlist>
+        </listitem>
+    </itemizedlist>
         
-    <section id="jpa-entity-section">
-        <title>JPA Entity Section</title>
+    <section id="jpa-entity-pkmap-generated">
+        <title>Generated Simple Primary Keys</title>
+        <orderedlist spacing="compact">
+            <listitem><para>Persistence providers required to provide primary key generation</para></listitem>
+            <listitem><para>Specific type of generator specified through a strategy</para>
+                <figure>
+                    <title>Specifying Primary Key Generation thru Annotations</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_DRILL")
+public class Drill  {
+    @Id
+    @GeneratedValue( //AUTO is the default and could be left off here
+            strategy=GenerationType.AUTO) 
+    private long id; //unassigned PK value must be zero
+    private String make;
+...]]></programlisting>                        
+                </figure>
+                
+                <figure>
+                    <title>Specifying Primary Key Generation thru orm.xml</title>
+<programlisting language="xml"><![CDATA[
+]]></programlisting>                        
+                </figure>
+            
+            </listitem>
+            <listitem><para>Three (+1) Types</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>SEQUENCE</filename></term>
+                        <listitem><para>Database generates unique value from a global sequence</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>IDENTITY</filename></term>
+                        <listitem><para>Database generates unique value on a per-table basis</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>TABLE</filename></term>
+                        <listitem><para></para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>AUTO</filename></term>
+                        <listitem><para>Provider may choose any technique, including one not specified above</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+       </orderedlist>
+       
+        <section id="jpa-entity-pkmap-generated-auto">
+           <title>GenerationType.AUTO</title>
+            <itemizedlist spacing="compact">
+                <listitem><para></para></listitem>
+            </itemizedlist>
+        </section>    
+       
+
+    </section>
+
+
+    <section id="jpa-entity-pkmap-composite">
+        <title></title>
+        <para/>
+    </section>
+
+    <section id="jpa-entity-pkmap-">
+        <title></title>
         <para/>
     </section>
 </chapter>

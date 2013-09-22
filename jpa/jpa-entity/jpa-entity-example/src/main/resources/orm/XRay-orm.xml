@@ -11,7 +11,7 @@
         embeddable.
         -->
     <entity class="ejava.examples.orm.core.mapped.XRay" 
-        access="PROPERTY"
+        access="FIELD"
         metadata-complete="true"
         name="MappedXRay">
         <table name="ORMCORE_XRAY"/>
@@ -29,7 +29,7 @@
     </entity>        
     
     <embeddable class="ejava.examples.orm.core.mapped.Manufacturer"
-                access="PROPERTY">
+                access="FIELD">
                 
         <attributes>
             <!-- I had to create mapping here -->

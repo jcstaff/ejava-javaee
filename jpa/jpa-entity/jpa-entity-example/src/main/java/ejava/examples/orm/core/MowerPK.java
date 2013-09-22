@@ -8,9 +8,6 @@ import java.io.Serializable;
  * correctly override hashCode() and equals(). Not annotations or orm.xml
  * mappings are required for this specific class. All annotations and orm.xml 
  * entries are supplied by the classes this PK class identifies.
- * 
- * @author jcstaff
- * $Id:$
  */
 public class MowerPK implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -22,26 +19,11 @@ public class MowerPK implements Serializable {
         this.make = make;
         this.model = model;
     }
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-    public String getMake() {
-        return make;
-    }
-    @SuppressWarnings("unused")
-    private void setMake(String make) {
-        this.make = make;
-    }
-    public String getModel() {
-        return model;
-    }
-    @SuppressWarnings("unused")
-    private void setModel(String model) {
-        this.model = model;
-    }
-    public int hashCode() {
-        return make.hashCode() + model.hashCode();
-    }
+
+    public String getMake() { return make; }
+    public String getModel() { return model; }
+
+    public int hashCode() { return make.hashCode() + model.hashCode(); }
     public boolean equals(Object obj) {
         try {
             if (this == obj) return true;

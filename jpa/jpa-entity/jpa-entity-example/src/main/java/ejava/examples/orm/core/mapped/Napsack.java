@@ -1,22 +1,16 @@
 package ejava.examples.orm.core.mapped;
 
-import java.io.Serializable;
 import javax.persistence.*;
 
 /**
  * This class provides an example of embedding a primary key class within
  * the conatining class.
- * 
- * @author jcstaff
- * $Id:$
  */
 @Entity
 @Table(name="ORMCORE_NAPSACK")
-public class Napsack implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Napsack {
     private NapsackPK pk;
     private int size;
-    
     
     public Napsack() {}
     public Napsack(String make, String model) {
@@ -24,16 +18,12 @@ public class Napsack implements Serializable {
     }
     
     @EmbeddedId
-    public NapsackPK getPk() {
-        return pk;
-    }
+    public NapsackPK getPk() { return pk; }
     public void setPk(NapsackPK pk) {
         this.pk = pk;
     }
     
-    public int getSize() {
-        return size;
-    }
+    public int getSize() { return size; }
     public void setSize(int size) {
         this.size = size;
     }
