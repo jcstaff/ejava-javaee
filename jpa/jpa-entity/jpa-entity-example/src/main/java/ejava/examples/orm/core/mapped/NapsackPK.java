@@ -25,14 +25,7 @@ public class NapsackPK implements Serializable {
     }
     
     public String getMake() { return make; }
-    public void setMake(String make) {
-        this.make = make;
-    }
-
     public String getModel() { return model; }
-    public void setModel(String model) {
-        this.model = model;
-    }
 
     public int hashCode() { return make.hashCode() + model.hashCode(); }
     public boolean equals(Object obj) {

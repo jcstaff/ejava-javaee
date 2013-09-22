@@ -1,13 +1,9 @@
 package ejava.examples.orm.core.mapped;
 
-import javax.persistence.*;
-
 /**
  * This class provides an example of embedding a primary key class within
- * the conatining class.
+ * the containing class.
  */
-@Entity
-@Table(name="ORMCORE_NAPSACK")
 public class Napsack {
     private NapsackPK pk;
     private int size;
@@ -17,11 +13,7 @@ public class Napsack {
         this.pk = new NapsackPK(make, model);
     }
     
-    @EmbeddedId
     public NapsackPK getPk() { return pk; }
-    public void setPk(NapsackPK pk) {
-        this.pk = pk;
-    }
     
     public int getSize() { return size; }
     public void setSize(int size) {

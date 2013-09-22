@@ -25,9 +25,6 @@ public class Pen {
     }
     
     public MakeModelPK getPk() { return pk; }
-    public void setPk(MakeModelPK pk) {
-        this.pk = pk;
-    }
     
     public int getSize() { return size; }
     public void setSize(int size) {

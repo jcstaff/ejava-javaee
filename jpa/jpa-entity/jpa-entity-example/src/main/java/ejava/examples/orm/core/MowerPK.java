@@ -22,8 +22,10 @@ public class MowerPK implements Serializable {
 
     public String getMake() { return make; }
     public String getModel() { return model; }
-
+    
+    @Override
     public int hashCode() { return make.hashCode() + model.hashCode(); }
+    @Override
     public boolean equals(Object obj) {
         try {
             if (this == obj) return true;
@@ -35,6 +37,7 @@ public class MowerPK implements Serializable {
         }
     }
     
+    @Override
     public String toString() {
         return super.toString() +
             ", make=" + make +

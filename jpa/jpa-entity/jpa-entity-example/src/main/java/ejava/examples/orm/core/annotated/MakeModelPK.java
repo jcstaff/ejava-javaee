@@ -22,9 +22,6 @@ public class MakeModelPK implements Serializable {
         this.make = make;
         this.model = model;
     }
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
     
     public String getMake() { return make; }
     public String getModel() { return model; }

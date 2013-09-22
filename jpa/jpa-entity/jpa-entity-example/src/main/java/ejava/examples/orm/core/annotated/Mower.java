@@ -14,10 +14,8 @@ import ejava.examples.orm.core.MowerPK;
 @IdClass(MowerPK.class)
 public class Mower {
     @Id
-    @Column(nullable=false, updatable=false)
     private String make;
     @Id
-    @Column(nullable=false, updatable=false)
     private String model;    
     private int size;
     
@@ -27,8 +25,7 @@ public class Mower {
         this.model = model;
     }
     
-    public String getMake() { return make; }
-    
+    public String getMake() { return make; }    
     public String getModel() { return model; }
 
     public int getSize() { return size; }

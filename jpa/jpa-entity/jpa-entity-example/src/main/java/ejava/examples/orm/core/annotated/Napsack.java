@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 /**
  * This class provides an example of embedding a primary key class within
- * the conatining class.
+ * the containing class.
  */
 @Entity
 @Table(name="ORMCORE_NAPSACK")
