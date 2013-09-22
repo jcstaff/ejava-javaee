@@ -97,8 +97,9 @@ public class PKGenAnnotationTest extends TestBase {
         assertFalse(eggbeater.getId() == 0L);   
         log.debug("table id after=" + getTableId());
         for (int i=2; i<20; i++) {
-        	em.persist(new EggBeater());
-        	em.flush();
+        	EggBeater eb = new EggBeater();
+        	em.persist(eb);
+            log.info("created ehhbeater:" + eb);
             log.debug("table id after[" + i + "]=" + getTableId());        	
         }
     }
@@ -134,7 +135,7 @@ public class PKGenAnnotationTest extends TestBase {
             	Fan f = new Fan();
             	f.setMake("cool runner " + i);
             	em.persist(f);
-            	em.flush();
+                log.info("created fan:" + f);
             }
         } catch (PersistenceException ex) {
             String text = getText(ex);
@@ -162,7 +163,7 @@ public class PKGenAnnotationTest extends TestBase {
             	Gadget g = new Gadget();
             	g.setMake("gizmo " + i);
             	em.persist(g);
-            	em.flush();
+                log.info("created gadget:" + g);
             }
         } catch (PersistenceException ex) {
             String text = getText(ex);

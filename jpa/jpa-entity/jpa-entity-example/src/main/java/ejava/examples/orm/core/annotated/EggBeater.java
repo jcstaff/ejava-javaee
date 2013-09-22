@@ -15,7 +15,7 @@ import javax.persistence.*;
         pkColumnName="UID_ID",         //pk column for seq table
         pkColumnValue="ORMCORE_EGGBEATER",  //pk value in pk column
         valueColumnName="UID_VAL",     //column for seq value
-        allocationSize=17              //increment UID_ID after using this many
+        allocationSize=5              //increment UID_ID after using this many
     )        
 public class EggBeater {
     @Id

@@ -5,16 +5,14 @@ import javax.persistence.*;
 /**
  * This class demonstrates the use of SEQUENCE generator strategy using
  * annotations.
- * 
- * $Id:$
  */
 @Entity
 @Table(name="ORMCORE_FAN")
 @SequenceGenerator(
     name="fanSequence",     //required logical name
     sequenceName="FAN_SEQ", //name in database
-    initialValue=44,        //start with something odd to be noticeable
-    allocationSize=13)      //I noticed with JBoss that this was used for initVal
+    initialValue=4,         //start with something odd to be noticeable
+    allocationSize=3)       //number of IDs to internally assign per-sequence value
 public class Fan {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, //use DB sequence 
