@@ -115,11 +115,11 @@ public class Bike {
                     <area id="jpa-entity-entityid-entities-mapped-area-entityxml" coords="8"/>
                     <area id="jpa-entity-entityid-entities-mapped-area-idxml" coords="14"/>
                 </areaspec>
-<programlisting language=""><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<programlisting language="java"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
-        version="2.0">
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+ version="2.0">
             
     <entity class="ejava.examples.orm.core.mapped.Bike" 
             access="FIELD"
@@ -146,10 +146,12 @@ public class Bike {
                     <area id="jpa-entity-entityid-entities-mapped-area-orm" coords="8"/>
                     <area id="jpa-entity-entityid-entities-mapped-area-class" coords="9"/>
                 </areaspec>
-<programlisting language=""><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<programlisting language="java"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://java.sun.com/xml/ns/persistence 
+  http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+ version="2.0">
 
     <persistence-unit name="ormCore">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
