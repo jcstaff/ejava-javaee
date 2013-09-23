@@ -19,10 +19,8 @@ public class Tank {
     public Tank() {}
     public Tank(long id) { this.id = id; }
     
-    @Id
-    public long getId() {
-        return id;
-    }
+    @Id 
+    public long getId() { return id; }
     protected void setId(long id) {
         this.id = id;
     }

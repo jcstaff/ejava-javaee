@@ -181,6 +181,257 @@ try {
 org.hibernate.exception.DataException: could not execute statement]]></programlisting>                        
         </figure>
     </section>    
+    
+    
+    <section id="jpa-entity-entitymap-transient">
+        <title>Transient Properties</title>
+        <orderedlist spacing="compact">
+            <listitem><para>Entity using PROPERTY access</para></listitem>
+            <listitem><para>Entity class contains property that complies with default rules that should *not* be mapped to database</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>setters</para></listitem>
+                    <listitem><para>getters</para></listitem>
+                    <listitem><para>relations to other classes, including collections</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </orderedlist>
+        
+        <figure>
+            <title>Transient Example Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_TANK")
+public class Tank {
+    private long id;
+    private String make;
+    private String model;
+    
+    public Tank() {}
+    public Tank(long id) { this.id = id; }
+    
+    @Id 
+    public long getId() { return id; }
+    protected void setId(long id) {
+        this.id = id;
+    }
+        
+    @Transient    //if you remove this, it will fail trying to locate setter
+    public String getMakeModel() {
+        return make + " " + model;
+    }
+    
+    public String getMake() { return make; }
+    public void setMake(String make) {
+        this.make = make;
+    }
+
+    public String getModel() { return model; }
+    public void setModel(String model) {
+        this.model = model;
+    }]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Transient Example orm.xml</title>
+<programlisting language="xml"><![CDATA[
+<entity class="ejava.examples.orm.core.mapped.Tank" access="PROPERTY">
+    <table name="ORMCORE_TANK"/>
+    <attributes>
+        <id name="id"/>
+        <transient name="makeModel"/>            
+    </attributes>
+</entity>]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Transient Example Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_TANK (
+    id bigint not null,
+    make varchar(255),
+    model varchar(255),
+    primary key (id)
+)]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Transient Example Test</title>
+<programlisting language="java"><![CDATA[ejava.examples.orm.core.annotated.Tank tank = new Tank(1);
+tank.setMake("acme");
+tank.setModel("great guns");
+
+//insert a row in the database
+em.persist(tank);
+log.info("created tank:" + tank);]]></programlisting>                        
+
+<programlisting language=""><![CDATA[-created tank:ejava.examples.orm.core.annotated.Tank@4eef4eb7make=acme, model=great guns]]></programlisting>                        
+        </figure>
+
+    </section>    
+
+    <section id="jpa-entity-entitymap-lob">
+        <title>Lob Properties</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Storing large text document as CLOB</para></listitem>
+            <listitem><para>Storing large binary data as BLOB</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>CLOB Example Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_UMBRELLA (
+    id bigint not null,
+    make clob,
+    model varchar(255),
+    primary key (id)
+)]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>CLOB Example Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_UMBRELLA")
+public class Umbrella {
+    @Lob
+    @Basic(fetch=FetchType.LAZY) //ignored
+    public char[] getMake() {
+        return make.toCharArray();
+    }
+    public void setMake(char[] make) {
+        this.make = new String(make);
+    }]]></programlisting>                        
+        </figure>
+
+    </section>    
+    
+    
+    <section id="jpa-entity-entitymap-temporalenum">
+       <title>Temporal and Enumerated Properties</title>
+       
+        <section id="jpa-entity-entitymap-temporal">
+           <title>Temporals</title>
+           <orderedlist spacing="compact">
+                <listitem><para>DATE</para></listitem>
+                <listitem><para>TIME</para></listitem>
+                <listitem><para>TIMESTAMP</para></listitem>
+           </orderedlist>
+        </section>    
+       
+        <section id="jpa-entity-entitymap-num">
+            <title>Enums</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>ORDINAL</para></listitem>
+                <listitem><para>NAME</para></listitem>
+            </itemizedlist>
+        </section>    
+
+        <section id="jpa-entity-entitymap-schema">
+            <title>Temporal/Enum Example</title>
+            <figure>
+                <title>Temporal/Enum Example Schema</title>
+<programlisting language="java"><![CDATA[create table ORMCORE_VASE (
+    id bigint not null,
+    aDate date,
+    aTime time,
+    aTimestamp timestamp,
+    colorId integer,
+    colorName varchar(255),
+    primary key (id)
+)]]></programlisting>                        
+            </figure>            
+    
+            <figure>
+                <title>Temporal/Enum Example Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_VASE")
+public class Vase {
+    @Id
+    private long id;
+    @Temporal(TemporalType.DATE)
+    private Date aDate;
+    @Temporal(TemporalType.TIME)
+    private Date aTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date aTimestamp;
+    @Enumerated(EnumType.ORDINAL)
+    private ColorType colorId;
+    @Enumerated(EnumType.STRING)
+    private ColorType colorName;]]></programlisting>                        
+            </figure>
+            
+            <figure>
+                <title>Temporal/Enum Example orm.xml</title>
+<programlisting language="xml"><![CDATA[
+<entity class="ejava.examples.orm.core.mapped.Vase" access="FIELD">
+    <table name="ORMCORE_VASE"/>
+    <attributes>
+        <id name="id"/>
+        <basic name="aDate">
+            <temporal>DATE</temporal>
+        </basic>            
+        <basic name="aTime">
+            <temporal>TIME</temporal>
+        </basic>            
+        <basic name="aTimestamp">
+            <temporal>TIMESTAMP</temporal>
+        </basic>            
+        <basic name="colorId">
+            <enumerated>ORDINAL</enumerated>
+        </basic>            
+        <basic name="colorName">
+            <enumerated>STRING</enumerated>
+        </basic>            
+    </attributes>
+</entity>]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Temporal/Enum Example Test</title>
+<programlisting language="java"><![CDATA[@Test
+public void testValues() {
+    log.info("testValues");
+    ejava.examples.orm.core.annotated.Vase vase = new Vase(1);
+    Date date = new Date();
+    vase.setADate(date);
+    vase.setATime(date);
+    vase.setATimestamp(date);
+    vase.setColorId(ColorType.RED);
+    vase.setColorName(ColorType.RED);
+    
+    //insert a row in the database
+    em.persist(vase);
+    log.info("created case:" + vase);
+    
+    //find the inserted object
+    em.flush();
+    em.clear();
+    Vase vase2 = em.find(Vase.class, 1L); 
+
+    log.info("found vase:" + vase2);]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+-created case:ejava.examples.orm.core.annotated.Vase@7f68f33c, 
+    id=1, 
+    aDate=Mon Sep 23 00:11:10 EDT 2013, 
+    aTime=Mon Sep 23 00:11:10 EDT 2013, 
+    aTimestamp=Mon Sep 23 00:11:10 EDT 2013, 
+    colorId=RED, 
+    colorName=RED
+    
+-found vase:ejava.examples.orm.core.annotated.Vase@5f0d8b74, 
+    id=1, 
+    aDate=2013-09-23, 
+    aTime=00:11:10, 
+    aTimestamp=2013-09-23 00:11:10.296, 
+    colorId=RED, 
+    colorName=RED    
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+select * from ORMCORE_VASE
+ID ADATE      ATIME    ATIMESTAMP                    COLORID COLORNAME
+-- ---------- -------- ----------------------------- ------- ---------
+1  2006-09-23 14:08:22 2006-09-23 14:08:22.221000000 0       RED]]></programlisting>                        
+        </figure>
+            <para>Notice impact of temporal DB-mapping does effect until data saved and retrieved from database</para>
+        </section>    
+    </section>    
 
 </chapter>
   

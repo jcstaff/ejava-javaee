@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 @Table(name="ORMCORE_UMBRELLA")
 public class Umbrella {
     private static Log log = LogFactory.getLog(Umbrella.class);
-    private static final long serialVersionUID = 1L;
     private long id;
     private String make;
     private String model;
