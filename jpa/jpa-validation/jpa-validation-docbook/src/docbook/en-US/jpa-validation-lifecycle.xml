@@ -8,8 +8,7 @@
     <section id="jpa-validation-callbacks">
         <title>Callbacks</title>
         <para>Persistence lifecycle events provided to class methods</para>
-<programlisting language="java"><![CDATA[
-@Entity 
+<programlisting language="java"><![CDATA[@Entity 
 @Table(name="ORMLISTEN_PERSON")
 public class Person {
     @Id @GeneratedValue 
@@ -31,7 +30,8 @@ public class Person {
     @PreRemove public void preRemove() {
     }
     @PostRemove public void postRemove() {
-    }]]></programlisting>                        
+    }
+}]]></programlisting>                        
         <itemizedlist spacing="compact">
             <listitem><para>Could be used to log or validate instance at certain stages of lifecycle</para></listitem>
             <listitem><para>JPA prohibits calling EntityManager within callback methods</para></listitem>
@@ -42,8 +42,7 @@ public class Person {
         <title>Listeners</title>
         <para>Persistence lifecycle events provided to external class</para>
   
-<programlisting language="java"><![CDATA[
-@Entity 
+<programlisting language="java"><![CDATA[@Entity 
 @Table(name="ORMLISTEN_PERSON")
 @EntityListeners(Listener.class)
 public class Person {]]></programlisting>                        
@@ -64,8 +63,7 @@ public class Listener {
     }
     @PostRemove public void postRemove(Object entity) {
     }
-}
-]]></programlisting>                        
+}]]></programlisting>                        
         <itemizedlist spacing="compact">
             <listitem><para>Same Listener class may listen to multiple entity types</para></listitem>
             <listitem><para>Good for when Listener has specific purpose that is type-agnostic</para></listitem>
