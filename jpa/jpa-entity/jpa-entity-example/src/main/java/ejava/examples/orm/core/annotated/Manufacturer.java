@@ -1,6 +1,5 @@
 package ejava.examples.orm.core.annotated;
 
-import java.io.Serializable;
 import javax.persistence.*;
 
 /**
@@ -9,7 +8,7 @@ import javax.persistence.*;
  * an example of a containing object.
  */
 @Embeddable
-public class Manufacturer implements Serializable {
+public class Manufacturer {
     private String name;
     private String address;
     private String phone;

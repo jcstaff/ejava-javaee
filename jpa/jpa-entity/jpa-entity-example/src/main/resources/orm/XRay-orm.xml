@@ -18,7 +18,6 @@
         <attributes>
             <id name="id"/>
             <embedded name="maker">
-                <!-- this was being ignored -->
                 <attribute-override name="name">
                     <column name="XRAY_MAKER"/>
                 </attribute-override>
@@ -28,16 +27,7 @@
         </attributes>
     </entity>        
     
-    <embeddable class="ejava.examples.orm.core.mapped.Manufacturer"
-                access="FIELD">
-                
-        <attributes>
-            <!-- I had to create mapping here -->
-            <basic name="name">
-                <column name="XRAY_MAKER"/>
-            </basic>
-        </attributes>
-    </embeddable>
+    <embeddable class="ejava.examples.orm.core.mapped.Manufacturer" access="FIELD"/>
     
     
 </entity-mappings>
