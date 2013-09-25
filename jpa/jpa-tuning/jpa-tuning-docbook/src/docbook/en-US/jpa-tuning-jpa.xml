@@ -107,6 +107,7 @@ where
                 <figure>    
                     <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
+- 20 movies
 Fetch Lazy Thin Parent.Get Parent:warmups=2, rounds=10, ave=0.32 [+- 0.03]
 Fetch Lazy Thick Parent.Get Parent:warmups=2, rounds=10, ave=0.58 [+- 0.03]
 ]]></programlisting>                        
@@ -264,6 +265,7 @@ where
                 <figure>    
                     <title>Relative Test Result</title>
 <programlisting language=""><![CDATA[
+- 20 movies
 Fetch Eager Thin Parent.Get Parent:warmups=2, rounds=10, ave=2.43 [+- 0.47]
 Fetch Eager Thick Parent.Get Parent:warmups=2, rounds=10, ave=2.59 [+- 0.06]
 ]]></programlisting>                        
@@ -826,8 +828,6 @@ where
             <figure>    
                 <title>Generated SQL - Fetch=EAGER</title>
                 <link linkend="jpa-tuning-jpa-fetch-parent-eager-figure-sql">Same as fetch=EAGER SQL shown above</link>
-<programlisting language=""><![CDATA[
-]]></programlisting>                        
             </figure>
             <itemizedlist spacing="compact">
                 <listitem><para>Provider will issue one query for entire object graph, to include entities in relation</para></listitem>
@@ -1445,7 +1445,7 @@ Loop Eager.DAO Page 50:warmups=1, rounds=10, ave=2.53 [+- 0.06]
             <tip>
                 <title>Performance Degrades in DAO as Row Sizes Increase</title>
                 <para>Paging within the Java code starts off near equivalent to the database
-                    solution for small row sizes but gradually get worse when row sizes 
+                    solution for small row sizes but gradually gets worse when row sizes 
                     increase and later pages are requested.</para>
             </tip>
         </section>
