@@ -1,0 +1,72 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-relation">
+    <bookinfo>
+        <title>Java Persistence API: Relations</title>
+        <subtitle>Mapping Entity Relations to the Database</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides information for mapping Java entity class relationships
+                to the database using JPA. 
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="jpa-relation-purpose">
+        <title>Purpose</title>
+        <section id="jpa-relation-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Introduce mapping entity class relationships to the database</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-relation-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have an understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Object/Relational Mapping (ORM) based on the Java Persistence API (JPA)</para></listitem>
+                        <listitem><para>Relationship mapping strategies</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Cardinality (one-to-one, one-to-many, many-to-one, and many-to-many)</para></listitem>
+                                <listitem><para>Direction (uni-directional, bi-directional)</para></listitem>
+                                <listitem><para>Realization (foreign key and link table)</para></listitem>
+                                <listitem><para>Simple types/element collections</para></listitem>
+                                <listitem><para>Orphan removal</para></listitem>
+                                <listitem><para>Cascades</para></listitem>
+                                <listitem><para>Foreign key reuse (primary key as foreign key (insert/update=false) and foreign key as primary key(@MapsId))</para></listitem>
+                                <listitem><para></para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Be able to map a Java entity class relationships to the database using class annotations and ORM descriptors</para></listitem>
+                        <listitem><para>Be able to map one-to-one, one-to-many, many-to-one, and many-to-many relationships</para></listitem>
+                        <listitem><para>Be able form relationships using foreign keys and link tables</para></listitem>
+                        <listitem><para>Be able define cascades for relationships</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="jpa-relation-o2o.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relation-o2m.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relation-relations.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relation-collections.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relation-fkey.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relation-m2o.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-relation-m2m.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+     -->    
+</book>
