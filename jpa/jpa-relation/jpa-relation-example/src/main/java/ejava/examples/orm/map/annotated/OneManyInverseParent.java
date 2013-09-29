@@ -9,51 +9,40 @@ import javax.persistence.*;
  * This class represents a parent in One-to-Many, bi-directional relationship.
  * The parent is the inverse side of the relationship and keeps the children 
  * in a Map. The OneManyOwningChild defines the relationship.
- * @author jcstaff
- *
  */
 @Entity @Table(name="ORMMAP_ONEMANY_INVPARENT")
 public class OneManyInverseParent {
-	private String name;
-	private Map<String, OneManyOwningChild> ownedByChildren =
-		new HashMap<String, OneManyOwningChild>();
+    @Id
+    private String name;
 
-	protected OneManyInverseParent() {}
-	public OneManyInverseParent(String name) {
-		this.name = name;
-	}
+    @OneToMany(mappedBy="oneInverseParent")
+    @MapKey(name="name")
+    private Map<String, OneManyOwningChild> ownedByChildren =
+            new HashMap<String, OneManyOwningChild>();
 
-	@Id
-	public String getName() {
-		return name;
-	}
+    protected OneManyInverseParent() {}
+    public OneManyInverseParent(String name) { this.name = name; }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	@OneToMany(mappedBy="oneInverseParent")
-	@MapKey(name="name")
-	public Map<String, OneManyOwningChild> getOwnedByChildren() {
-		return ownedByChildren;
-	}
-	public void setOwnedByChildren(
-			Map<String, OneManyOwningChild> ownedByChildren) {
-		this.ownedByChildren = ownedByChildren;
-	}
+    public String getName() { return name; }
+    
+    public Map<String, OneManyOwningChild> getOwnedByChildren() { return ownedByChildren; }
+    public void setOwnedByChildren(
+                    Map<String, OneManyOwningChild> ownedByChildren) {
+        this.ownedByChildren = ownedByChildren;
+    }
 
-	public String toString() {
-		StringBuilder text = new StringBuilder();
-		
-		text.append(getClass().getName());
-		text.append(", name=" + name);
-		if (ownedByChildren != null) {
-			text.append(", ownedByChildren=(" + ownedByChildren.size() + ")={");
-			for (String key : ownedByChildren.keySet()) {
-				text.append(ownedByChildren.get(key).getName() + ", ");
-			}
-			text.append("}");
-		}
-		return text.toString();
-	}
+    public String toString() {
+        StringBuilder text = new StringBuilder();
+        
+        text.append(getClass().getName());
+        text.append(", name=" + name);
+        if (ownedByChildren != null) {
+            text.append(", ownedByChildren=(" + ownedByChildren.size() + ")={");
+            for (String key : ownedByChildren.keySet()) {
+                    text.append(ownedByChildren.get(key).getName() + ", ");
+            }
+            text.append("}");
+        }
+        return text.toString();
+    }
 }

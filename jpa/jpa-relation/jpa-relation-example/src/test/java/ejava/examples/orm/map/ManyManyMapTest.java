@@ -26,9 +26,6 @@ import ejava.examples.orm.rel.DemoBase;
  * side has no knowledge of the relationship. All this means is that the 
  * application code has no responsibility to update the inverse side.</li>
  * </nl><p/>
- * 
- * @author jcstaff
- *
  */
 public class ManyManyMapTest extends DemoBase {
     
@@ -94,8 +91,8 @@ public class ManyManyMapTest extends DemoBase {
     }
 
 	
-	/**
-	 * This method tests the case where one entity owns the many-to-many,
+    /**
+     * This method tests the case where one entity owns the many-to-many,
      * bi-directional relationship and the other side forms the inverse side. 
      * If we model the Java form of the relationship without defining a 
      * @MapKey, then the following schema gets created,<p/>
@@ -177,12 +174,12 @@ public class ManyManyMapTest extends DemoBase {
     </pre><p/>
 
 	 */
-	@Test
-	public void testManyToManyInverseMap() {
-		log.info("*** testManyToManyInverseMap ***");
-		
-		ManyManyInverseEntity manyManyInverseEntity1 = 
-			new ManyManyInverseEntity("chandler");
+    @Test
+    public void testManyToManyInverseMap() {
+        log.info("*** testManyToManyInverseMap ***");
+        
+        ManyManyInverseEntity manyManyInverseEntity1 = 
+                new ManyManyInverseEntity("chandler");
         ManyManyInverseEntity manyManyInverseEntity2 = 
             new ManyManyInverseEntity("ross");
 		
@@ -212,22 +209,22 @@ public class ManyManyMapTest extends DemoBase {
                 manyManyOwningEntity2.getName(),
                 manyManyOwningEntity2);
 		
-		em.persist(manyManyInverseEntity1);
+        em.persist(manyManyInverseEntity1);
         em.persist(manyManyInverseEntity2);
         em.persist(manyManyOwningEntity1);
         em.persist(manyManyOwningEntity2);		
 		em.flush();
         
-		em.getTransaction().commit();
-		log.info("persisted manyManyInverseEntity1=" + manyManyInverseEntity1);
+        em.getTransaction().commit();
+        log.info("persisted manyManyInverseEntity1=" + manyManyInverseEntity1);
         log.info("persisted manyManyInverseEntity2=" + manyManyInverseEntity2);
         log.info("persisted manyManyOwningEntity1=" + manyManyOwningEntity1);
         log.info("persisted manyManyOwningEntity2=" + manyManyOwningEntity2);
 
-		em.clear();
+        em.clear();
 
-		ManyManyInverseEntity manyManyInverseEntity1a =
-			em.find(ManyManyInverseEntity.class,
+        ManyManyInverseEntity manyManyInverseEntity1a =
+                em.find(ManyManyInverseEntity.class,
                     manyManyInverseEntity1.getName());
         ManyManyInverseEntity manyManyInverseEntity2a =
             em.find(ManyManyInverseEntity.class,
@@ -243,8 +240,8 @@ public class ManyManyMapTest extends DemoBase {
         log.info("found manyManyInverseEntity2=" + manyManyInverseEntity2a);
         log.info("found manyManyOwningEntity1=" + manyManyOwningEntity1a);
         log.info("found manyManyOwningEntity2=" + manyManyOwningEntity2a);
-	}
-	
+    }
+    
     /**
      * This method tests the a simpler version of the owning/inverse
      * case. This case only has an owning side. The final schema ends up

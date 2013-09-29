@@ -28,9 +28,6 @@ import javax.persistence.*;
  * Author "owns" the relationship (thus defines the join/link table). Media
  * only defines the mapping back to Author. The relationship can be navigated
  * by either side.
- * 
- * @author jcstaff
- * $Id:$
  */
 @Entity @Table(name="ORMREL_MEDIA")
 public class Media implements Serializable {
@@ -47,23 +44,14 @@ public class Media implements Serializable {
         //log.debug(super.toString() + ": ctor()"); 
     }
 
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
+    public long getId() { return id; }
     
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
     public void setTitle(String title) {
         this.title = title;
     }        
-    public Collection<Author> getAuthors() {
-        return authors;
-    }
+
+    public Collection<Author> getAuthors() { return authors; }
     public void setAuthors(Collection<Author> authors) {
         this.authors = authors;
     }

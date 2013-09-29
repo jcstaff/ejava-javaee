@@ -11,8 +11,6 @@ import ejava.examples.orm.rel.DemoBase;
 
 /**
  * 
- * @author jcstaff
- *
  */
 public class OneManyUnidirectionalTest extends DemoBase {
     
@@ -69,40 +67,40 @@ public class OneManyUnidirectionalTest extends DemoBase {
      * know nothing of the parent. In this case, there is only an owning 
      * side. 
      */
-	@Test
-	public void testOneToManyOwningParent() {
-		log.info("*** testOneToManyOwningParent ***");
-		
-		OneManyOwningParent oneManyOwningParent = 
-			new OneManyOwningParent("tom");
-		
-		OneManyChild oneManyChild1 = new OneManyChild("david");
-		oneManyOwningParent.getChildren().add(oneManyChild1);
-		
-		OneManyChild oneManyChild2 = new OneManyChild("tommy");
-		oneManyOwningParent.getChildren().add(oneManyChild2);		
-		
-		em.persist(oneManyOwningParent);
+    @Test
+    public void testOneToManyOwningParent() {
+        log.info("*** testOneToManyOwningParent ***");
+        
+        OneManyOwningParent oneManyOwningParent = 
+                new OneManyOwningParent("tom");
+        
+        OneManyChild oneManyChild1 = new OneManyChild("david");
+        oneManyOwningParent.getChildren().add(oneManyChild1);
+        
+        OneManyChild oneManyChild2 = new OneManyChild("tommy");
+        oneManyOwningParent.getChildren().add(oneManyChild2);		
+        
+        em.persist(oneManyOwningParent);
         em.persist(oneManyChild1);
         em.persist(oneManyChild2);
-		
-		em.flush();
-		em.getTransaction().commit();
-		log.info("persisted oneManyOwningParent=" + oneManyOwningParent);
-		log.info("persisted oneManyChild1=" + oneManyChild1);
-		log.info("persisted oneManyChild2=" + oneManyChild2);
-		
-		em.clear();
+            
+        em.flush();
+        em.getTransaction().commit();
+        log.info("persisted oneManyOwningParent=" + oneManyOwningParent);
+        log.info("persisted oneManyChild1=" + oneManyChild1);
+        log.info("persisted oneManyChild2=" + oneManyChild2);
+        
+        em.clear();
 
-		OneManyOwningParent oneManyOwningParentA =
-			em.find(OneManyOwningParent.class,oneManyOwningParent.getId());
-		OneManyChild oneManyChild1a = 
-			em.find(OneManyChild.class, oneManyChild1.getId());
-		OneManyChild oneManyChild2a = 
-			em.find(OneManyChild.class, oneManyChild2.getId());
-		
-		log.info("found oneManyOwningParentA=" + oneManyOwningParentA);
-		log.info("found oneManyChild1a=" + oneManyChild1a);
-		log.info("found oneManyChild2a=" + oneManyChild2a);
-	}
+        OneManyOwningParent oneManyOwningParentA =
+                em.find(OneManyOwningParent.class,oneManyOwningParent.getId());
+        OneManyChild oneManyChild1a = 
+                em.find(OneManyChild.class, oneManyChild1.getId());
+        OneManyChild oneManyChild2a = 
+                em.find(OneManyChild.class, oneManyChild2.getId());
+        
+        log.info("found oneManyOwningParentA=" + oneManyOwningParentA);
+        log.info("found oneManyChild1a=" + oneManyChild1a);
+        log.info("found oneManyChild2a=" + oneManyChild2a);
+    }
 }

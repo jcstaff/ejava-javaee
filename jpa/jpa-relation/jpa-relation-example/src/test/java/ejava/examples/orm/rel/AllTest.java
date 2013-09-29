@@ -11,19 +11,16 @@ import org.junit.runners.Suite.SuiteClasses;
  * architecture (i.e., BO, DAO, and BLImpl) or types of technology (e.g.,
  * JDBC and JPA). Coincidentally, each of the classes under test also inherit 
  * from a common base test class that provides the ability to share resources.
- *  
- * @author jcstaff
- * $Id:$
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    OneToOneDemo.class,
-    OneToManyDemo.class,
-    ManyToOneUnidirectionalDemo.class,
-    OneToManyJoinTableDemo.class,
-    ManyToManyDemo.class,
-    OneToManyMapDemo.class,
-    RelationshipOwnershipDemo.class
+    OneToOneTest.class,
+    OneToManyTest.class,
+    ManyToOneUnidirectionalTest.class,
+    OneToManyJoinTableTest.class,
+    ManyToManyTest.class,
+    OneToManyMapTest.class,
+    RelationshipOwnershipTest.class
 })
 public class AllTest {
 }

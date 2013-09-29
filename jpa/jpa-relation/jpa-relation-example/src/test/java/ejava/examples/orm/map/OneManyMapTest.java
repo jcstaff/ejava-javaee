@@ -34,9 +34,6 @@ import ejava.examples.orm.rel.DemoBase;
  * parent or child knowing about one another (totally senseless for this
  * example). 
  * <nl>
- * 
- * @author jcstaff
- *
  */
 public class OneManyMapTest extends DemoBase {
     
@@ -281,42 +278,42 @@ fred                        ernie
     );
      </pre><p/>
      */
-	@Test
-	public void testOneToManyOwningParentMap() {
-		log.info("*** testOneToManyOwningParentMap ***");
+    @Test
+    public void testOneToManyOwningParentMap() {
+            log.info("*** testOneToManyOwningParentMap ***");
+            
+            OneManyOwningParent oneManyOwningParent = 
+                    new OneManyOwningParent("fred");
+            
+            OneManyChild oneManyChild1 = new OneManyChild("chip");
+            oneManyOwningParent.getOwnedChildren().put(
+                            oneManyChild1.getName(), oneManyChild1);
+            
+            OneManyChild oneManyChild2 = new OneManyChild("ernie");
+            oneManyOwningParent.getOwnedChildren().put(
+                            oneManyChild2.getName(), oneManyChild2);		
+            
+            em.persist(oneManyOwningParent);
+            em.persist(oneManyChild1);
+            em.persist(oneManyChild2);
 		
-		OneManyOwningParent oneManyOwningParent = 
-			new OneManyOwningParent("fred");
-		
-		OneManyChild oneManyChild1 = new OneManyChild("chip");
-		oneManyOwningParent.getOwnedChildren().put(
-				oneManyChild1.getName(), oneManyChild1);
-		
-		OneManyChild oneManyChild2 = new OneManyChild("ernie");
-		oneManyOwningParent.getOwnedChildren().put(
-				oneManyChild2.getName(), oneManyChild2);		
-		
-		em.persist(oneManyOwningParent);
-        em.persist(oneManyChild1);
-        em.persist(oneManyChild2);
-		
-		em.flush();
-		em.getTransaction().commit();
-		log.info("persisted neManyOwningParent=" + oneManyOwningParent);
-		log.info("persisted oneManyChild1=" + oneManyChild1);
-		log.info("persisted oneManyChild2=" + oneManyChild2);
-		
-		em.clear();
+            em.flush();
+            em.getTransaction().commit();
+            log.info("persisted neManyOwningParent=" + oneManyOwningParent);
+            log.info("persisted oneManyChild1=" + oneManyChild1);
+            log.info("persisted oneManyChild2=" + oneManyChild2);
+            
+            em.clear();
 
-		OneManyOwningParent oneManyOwningParentA =
-			em.find(OneManyOwningParent.class,oneManyOwningParent.getName());
-		OneManyChild oneManyChild1a = 
-			em.find(OneManyChild.class, oneManyChild1.getName());
-		OneManyChild oneManyChild2a = 
-			em.find(OneManyChild.class, oneManyChild2.getName());
-		
-		log.info("found oneManyOwningParentA=" + oneManyOwningParentA);
-		log.info("found oneManyChild1a=" + oneManyChild1a);
-		log.info("found oneManyChild2a=" + oneManyChild2a);
+            OneManyOwningParent oneManyOwningParentA =
+                    em.find(OneManyOwningParent.class,oneManyOwningParent.getName());
+            OneManyChild oneManyChild1a = 
+                    em.find(OneManyChild.class, oneManyChild1.getName());
+            OneManyChild oneManyChild2a = 
+                    em.find(OneManyChild.class, oneManyChild2.getName());
+            
+            log.info("found oneManyOwningParentA=" + oneManyOwningParentA);
+            log.info("found oneManyChild1a=" + oneManyChild1a);
+            log.info("found oneManyChild2a=" + oneManyChild2a);
 	}
 }

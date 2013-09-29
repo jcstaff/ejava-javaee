@@ -11,11 +11,8 @@ import ejava.examples.orm.rel.annotated.Person;
 /**
  * This test case provides a demo of a ManyToMany relationship. This,
  * of course, also uses a Join (or link) table.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class RelationshipOwnershipDemo extends DemoBase {
+public class RelationshipOwnershipTest extends DemoBase {
     private long borrowerId;
     private long applicantId;
     
@@ -73,7 +70,7 @@ public class RelationshipOwnershipDemo extends DemoBase {
      * reflected in the DB when the transaction commits.
      *
      */
-	@Test
+    @Test
     public void testOnetoOneInverse() {
         log.info("testOneToOneInverse");
         
@@ -184,7 +181,7 @@ public class RelationshipOwnershipDemo extends DemoBase {
      * the Borrower. A change to Applicant gets written to DB, but not 
      * automatically reflected in Borrower until manually set of refreshed.
      */
-	@Test
+    @Test
     public void testOnetoOneOwnership() {
         log.info("testOneToOneOwnership");
         

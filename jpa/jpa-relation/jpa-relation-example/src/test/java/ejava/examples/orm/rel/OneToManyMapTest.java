@@ -10,13 +10,10 @@ import ejava.examples.orm.rel.annotated.Person;
  * This test case provides a demo of a OneToMany relationship using a Map
  * In this relationship, a field from the related object is used to populate 
  * the key of a Map entry.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class OneToManyMapDemo extends DemoBase {
+public class OneToManyMapTest extends DemoBase {
     
-	@Test
+    @Test
     public void testMapCreate() {
         log.info("testMapCreate");
         ejava.examples.orm.rel.annotated.Library library

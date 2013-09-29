@@ -16,32 +16,25 @@ import javax.persistence.*;
  */
 @Entity @Table(name="ORMREL_INVENTORY")
 public class Inventory {
+    @Id @GeneratedValue
     private long id;
     private String name;
+
+    @OneToMany(cascade={CascadeType.ALL})
+    @JoinTable(name="ORMREL_INVENTORY_MEDIA")
     private Collection<Media> media = new ArrayList<Media>();
     
     public Inventory()        {}
     public Inventory(long id) { this.id = id; }
     
-    @Id @GeneratedValue
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
-    @OneToMany(cascade={CascadeType.ALL})
-    @JoinTable(name="ORMREL_INVENTORY_MEDIA")
-    public Collection<Media> getMedia() {
-        return media;
-    }
+    public long getId() { return id; }
+
+    public Collection<Media> getMedia() { return media; }
     public void setMedia(Collection<Media> media) {
         this.media = media;
     }
-    public String getName() {
-        return name;
-    }
+
+    public String getName() { return name; }
     public void setName(String name) {
         this.name = name;
     }
@@ -57,6 +50,4 @@ public class Inventory {
         text.append("}");
         return text.toString();
     }
-    
-
 }

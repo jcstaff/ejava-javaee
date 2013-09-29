@@ -38,31 +38,23 @@ public class Person implements Serializable {
     public long getId() {
         return id;
     }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
-    public String getFirstName() {
-        return firstName;
-    }
+
+    public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-    public String getLastName() {
-        return lastName;
-    }
+
+    public String getLastName() { return lastName; }
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-    public String getPhone() {
-        return phone;
-    }
+
+    public String getPhone() { return phone; }
     public void setPhone(String phone) {
         this.phone = phone;
     }    
-    public Photo getPhoto() {
-        return photo;
-    }
+
+    public Photo getPhoto() { return photo; }
     public void setPhoto(Photo photo) {
         this.photo = photo;
     }

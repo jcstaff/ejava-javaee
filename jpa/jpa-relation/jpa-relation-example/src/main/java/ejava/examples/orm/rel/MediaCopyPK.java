@@ -26,6 +26,9 @@ public class MediaCopyPK implements Serializable {
         this.mediaId = mediaId;
     }
     
+    public int hashCode() {
+        return (int)mediaId + copyNo;
+    }    
     public boolean equals(Object obj) {
         try {
             if (obj == this) return true;
@@ -36,7 +39,4 @@ public class MediaCopyPK implements Serializable {
             return false;
         }
     }
-    public int hashCode() {
-        return (int)mediaId + copyNo;
-    }    
 }

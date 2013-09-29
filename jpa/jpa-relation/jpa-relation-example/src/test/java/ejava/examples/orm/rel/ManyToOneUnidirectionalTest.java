@@ -10,11 +10,10 @@ import ejava.examples.orm.rel.annotated.MediaCopy;
 import ejava.examples.orm.rel.annotated.MediaCopy2;
 
 /**
- * 
- * @author jcstaff
- * $Id:$
+ * This test case provides a demonstration of a amny-to-one, uni-directional
+ * mapping.
  */
-public class ManyToOneUnidirectionalDemo extends DemoBase {
+public class ManyToOneUnidirectionalTest extends DemoBase {
     
     /**
      */
@@ -26,7 +25,7 @@ public class ManyToOneUnidirectionalDemo extends DemoBase {
      * This version of MediaCopy uses a READ-ONLY foreign key mapping
      * based on JPA 1.0
      */
-	@Test
+    @Test
     public void testCreateManyToOne() {
         log.info("testCreateManyToOne");
         ejava.examples.orm.rel.annotated.Media media = new Media();
@@ -65,11 +64,11 @@ public class ManyToOneUnidirectionalDemo extends DemoBase {
         }
    }    
 
-	/**
-	 * This version of the MediaCopy uses a JPA 2.0 @MapsId annotation to link
-	 * the foreign and primary key properties.
-	 */
-	@Test
+    /**
+     * This version of the MediaCopy uses a JPA 2.0 @MapsId annotation to link
+     * the foreign and primary key properties.
+     */
+    @Test
     public void testCreateManyToOneMapsId() {
         log.info("testCreateManyToOneMapsId");
         ejava.examples.orm.rel.annotated.Media media = new Media();

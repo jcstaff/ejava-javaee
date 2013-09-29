@@ -13,22 +13,10 @@ import javax.persistence.*;
  */
 @Entity @Table(name="ORMREL_AUTHOR")
 public class Author {
+    @Id @GeneratedValue
     private long id;
     private String name;
-    private List<Media> media = new ArrayList<Media>();
-    
-    public Author()        {}
-    public Author(long id) { this.id = id; }
-    
-    @Id @GeneratedValue
-    public long getId() {
-        return id;
-    }    
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
-    
+
     @ManyToMany
     @JoinTable(name="ORMREL_AUTHOR_MEDIA", //defines the link table
                 //defines the column in the link table for author FK
@@ -36,15 +24,19 @@ public class Author {
                 //defines the column in the link table for the media FK
             inverseJoinColumns={@JoinColumn(name="LINK_MEDIA_ID")})
     @OrderBy("title DESC") //order the list returned from database
-    public List<Media> getMedia() {
-        return media;
-    }
+    private List<Media> media = new ArrayList<Media>();
+    
+    public Author()        {}
+    public Author(long id) { this.id = id; }
+    
+    public long getId() { return id; }    
+    
+    public List<Media> getMedia() { return media; }
     public void setMedia(List<Media> media) {
         this.media = media;
     }
-    public String getName() {
-        return name;
-    }
+
+    public String getName() { return name; }
     public void setName(String name) {
         this.name = name;
     }

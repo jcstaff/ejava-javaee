@@ -17,11 +17,8 @@ import ejava.examples.orm.rel.annotated.Photo;
  * This test case provides a demo of using a class that has been mapped
  * to the database with only basic class annotations. All defaults will
  * be determined by the Java Persistence provider.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class OneToOneDemo extends DemoBase {
+public class OneToOneTest extends DemoBase {
     private static final String PHOTO_FILE = 
         System.getProperty("photo.file", "images/photo.jpg");
     private byte[] image;
@@ -49,7 +46,7 @@ public class OneToOneDemo extends DemoBase {
      * initially created with a FK=null and then its setter is later called
      * to setup the relationship between Person and Photo.
      */
-	@Test
+    @Test
     public void testRelateOrphans() {
         log.info("testRelateOrphans");
         
@@ -91,7 +88,7 @@ public class OneToOneDemo extends DemoBase {
      * owning side. The tree is very small, consisting of only the Person
      * and Photo, but demonstrates the Cascade.PERSIST capability.
      */
-	@Test
+    @Test
     public void testCacadePersist() {
         log.info("testCascadePersist");
         
@@ -134,7 +131,7 @@ public class OneToOneDemo extends DemoBase {
      * set of objects are created using the find. 
      *
      */
-	@Test
+    @Test
     public void testPersistOnSetter() {
         log.info("testSetPersistedWithNew");
         
@@ -179,7 +176,7 @@ public class OneToOneDemo extends DemoBase {
      * instead of a separate column in the borrower table. 
      *
      */
-	@Test
+    @Test
     public void testPrimaryKeyJoin() {
         log.info("testPrimaryKeyJoin");
         
@@ -221,7 +218,7 @@ public class OneToOneDemo extends DemoBase {
      * that they can both independently exist and that the Applicant physically
      * owns the relationship by hosting the foreign key field.
      */
-	@Test
+    @Test
     public void testOneToOneBiDirectional() {
         log.info("testOneToOneBiDirectional");
         

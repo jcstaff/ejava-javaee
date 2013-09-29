@@ -37,18 +37,12 @@ public class Photo implements Serializable {
         log.debug(super.toString() + ": getId()=" + id);
         return id;
     }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        log.debug(super.toString() + ": setId()=" + id);
-        this.id = id;
-    }
     
-    public byte[] getImage() {
-        return image;
-    }
+    public byte[] getImage() { return image; }
     public void setImage(byte[] image) {
         this.image = image;
     }          
+
     public String toString() {
         long size = (image == null) ? 0 : image.length;
         String sizeText = 

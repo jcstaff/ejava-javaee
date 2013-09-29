@@ -15,13 +15,10 @@ import ejava.examples.orm.rel.annotated.WantList;
 /**
  * This test case provides a demo of a ManyToMany relationship. This,
  * of course, also uses a Join (or link) table.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class ManyToManyDemo extends DemoBase {
+public class ManyToManyTest extends DemoBase {
     
-	@Test
+    @Test
     public void testManyToManyUniCreate() {
         log.info("testManyToManyUniCreate");
         Collection<WantList> wantLists = new ArrayList<WantList>(); 
@@ -75,7 +72,7 @@ public class ManyToManyDemo extends DemoBase {
     }
 
     
-	@Test
+    @Test
     public void testManyToManyBiCreate() {
         log.info("testManyToManyBiCreate");
         Collection<Author> authors = new ArrayList<Author>(); 

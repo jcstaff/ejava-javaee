@@ -29,24 +29,14 @@ public class Applicant implements Serializable {
     @JoinColumn(name="APP_BORROWER")//we own relationship to Borrower
     private Borrower borrower;
     
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
+    public long getId() { return id; }
 
-    public Borrower getBorrower() {
-        return borrower;
-    }
+    public Borrower getBorrower() { return borrower; }
     public void setBorrower(Borrower borrower) {
         this.borrower = borrower;
     }
 
-    public Person getIdentity() {
-        return identity;
-    }
+    public Person getIdentity() { return identity; }
     public void setIdentity(Person identity) {
         this.identity = identity;
     }

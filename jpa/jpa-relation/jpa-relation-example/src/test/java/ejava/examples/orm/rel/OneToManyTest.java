@@ -15,11 +15,8 @@ import ejava.examples.orm.rel.annotated.Person;
  * This test case provides a demo of OneToMany and ManyToOne relationships.
  * In this type of relationship, the foreign key is either in the many side's
  * table or a link table.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class OneToManyDemo extends DemoBase {
+public class OneToManyTest extends DemoBase {
     private long borrowerId;
     
     /**
@@ -53,7 +50,7 @@ public class OneToManyDemo extends DemoBase {
      * foreign key relationships.
      *
      */
-	@Test
+    @Test
     public void testManyOneBiDirectional() {
         log.info("testManyOneBiDirectional");
         //get a borrower
@@ -96,7 +93,7 @@ public class OneToManyDemo extends DemoBase {
      * relationship. Note that we have to update the java fields on both sides
      * of the bi-directional relationship.
      */
-	@Test
+    @Test
     public void testRemove() {
         log.info("testRemove");
         //get a borrower

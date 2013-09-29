@@ -19,9 +19,6 @@ import org.apache.commons.logging.LogFactory;
  * Note too that this object fully encapsulates the relationship by never
  * handing over the Person; only using it to derive values. All concenience
  * getters are declared Transient.
- *  
- * @author jcstaff
- * $Id:$
  */
 @Entity @Table(name="ORMREL_BORROWER")
 public class Borrower implements Serializable {
@@ -57,22 +54,15 @@ public class Borrower implements Serializable {
         this.id = identity.getId();
         this.identity = identity;
     }
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
-    public Date getEndDate() {
-        return endDate;
-    }
+
+    public long getId() { return id; }
+
+    public Date getEndDate() { return endDate; }
     public void setEndDate(Date end) {
         this.endDate = end;
     }
-    public Date getStartDate() {
-        return startDate;
-    }
+
+    public Date getStartDate() { return startDate; }
     public void setStartDate(Date start) {
         this.startDate = start;
     }
@@ -86,12 +76,12 @@ public class Borrower implements Serializable {
     public String getName() {
         return identity.getFirstName() + " " + identity.getLastName();
     }
-    public Applicant getApplication() {
-        return application;
-    }
+
+    public Applicant getApplication() { return application; }
     public void setApplication(Applicant application) {
         this.application = application;
     }
+
     public Collection<Checkout> getCheckouts() {
         //don't let them directly touch our collection
         return new ArrayList<Checkout>(checkouts);

@@ -40,22 +40,14 @@ public class Checkout implements Serializable {
             returnDate.getTime() - outDate.getTime()  > CHECKOUT_DAYS;
     }
     
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
-    public Borrower getBorrower() {
-        return borrower;
-    }
+    public long getId() { return id; }
+
+    public Borrower getBorrower() { return borrower; }
     public void setBorrower(Borrower borrower) {
         this.borrower = borrower;
     }
-    public Date getReturnDate() {
-        return returnDate;
-    }
+
+    public Date getReturnDate() { return returnDate; }
     public void setReturnDate(Date returnDate) {
         this.returnDate = returnDate;
     }

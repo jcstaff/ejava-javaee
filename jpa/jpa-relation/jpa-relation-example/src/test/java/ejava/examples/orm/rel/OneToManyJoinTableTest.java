@@ -13,13 +13,10 @@ import ejava.examples.orm.rel.annotated.Media;
  * This test case provides a demo of a OneToMany relationship using a Join
  * (or Link) table. In this relationship, the foreign keys are in a table
  * separate from the two related items.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class OneToManyJoinTableDemo extends DemoBase {
+public class OneToManyJoinTableTest extends DemoBase {
     
-	@Test
+    @Test
     public void testOneToManyJoinCreate() {
         log.info("testLinkCreate");
         ejava.examples.orm.rel.annotated.Inventory inventory
@@ -37,7 +34,7 @@ public class OneToManyJoinTableDemo extends DemoBase {
         log.info("creating inventory:" + inventory);
     }
     
-	@Test
+    @Test
     public void testOneToManyJoinFind() {
         log.info("testOneToManyJoinFind()");
         
@@ -75,7 +72,7 @@ public class OneToManyJoinTableDemo extends DemoBase {
         findMedia(inventory2.getMedia(), true);
     }
 
-	@Test
+    @Test
     public void testOneToManyJoinRemove() {
         log.info("testOneToManyJoinRemove");
         ejava.examples.orm.rel.annotated.Inventory inventory1

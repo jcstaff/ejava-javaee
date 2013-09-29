@@ -119,38 +119,29 @@ import javax.persistence.*;
  */
 @Entity(name="O2MOwningParent") @Table(name="ORMO2M_PARENT")
 public class OneManyOwningParent {
-    private long id;
-    private String name;
-    private Collection<OneManyChild> children = new ArrayList<OneManyChild>();
-    
-    public OneManyOwningParent() {}
-    public OneManyOwningParent(long id) {
-        this.id = id;
-    }
-    public OneManyOwningParent(String name) {
-        this.name = name;
-    }
-    
     @Id @GeneratedValue @Column(name="PARENTID")
-    public long getId() {
-        return id;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
+    private long id;
+
+    private String name;
+
     @OneToMany
     @JoinColumn(name="PARENT_ID")
     //@JoinTable(
     //        joinColumns=@JoinColumn(name="PARENT_ID"))
-    public Collection<OneManyChild> getChildren() {
-        return children;
+    private Collection<OneManyChild> children = new ArrayList<OneManyChild>();
+    
+    public OneManyOwningParent() {}
+    public OneManyOwningParent(long id) { this.id = id; }
+    public OneManyOwningParent(String name) { this.name = name; }
+    
+    public long getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
     }
+
+    public Collection<OneManyChild> getChildren() { return children; }
     public void setChildren(Collection<OneManyChild> children) {
         this.children = children;
     }
