@@ -1,0 +1,349 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entity-compositepk">
+    <title>Composite Primary Keys</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Primary key consisting of multiple properties</para></listitem>
+        <listitem><para>Represented using a primary key class</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Must implement Serializable</para>
+<programlisting language="java"><![CDATA[public class MowerPK implements Serializable {]]></programlisting>                        
+                </listitem>
+                <listitem><para>Must have a public no-arg constructor</para>
+<programlisting language="java"><![CDATA[public MowerPK() {}]]></programlisting>                        
+                </listitem>
+                <listitem><para>Must implement hashCode() and equals() methods</para>
+<programlisting language="java"><![CDATA[@Override
+public int hashCode() { ... }
+@Override
+public boolean equals(Object obj) { ... }]]></programlisting>                        
+                </listitem>
+                <listitem><para>Must define properties that match with the definition of the entity, including access</para>
+<programlisting language=""><![CDATA[private String make;
+private String model;]]></programlisting>                        
+                </listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>Accessed using same strategy as entity using it</para></listitem>
+    </itemizedlist>
+    
+    <section id="jpa-entity-compositepk-example">
+        <title>Example Composite Primary Key Class</title>
+<programlisting language="java"><![CDATA[package ejava.examples.orm.core;
+
+import java.io.Serializable;
+
+public class MowerPK implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String make;
+    private String model;
+    
+    public MowerPK() {}
+    public MowerPK(String make, String model) {
+        this.make = make;
+        this.model = model;
+    }
+
+    public String getMake() { return make; }
+    public String getModel() { return model; }
+    
+    @Override
+    public int hashCode() { return make.hashCode() + model.hashCode(); }
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) return true;
+            return make.equals(((MowerPK)obj).getMake()) &&
+                   model.equals(((MowerPK)obj).getModel());
+            
+        } catch (Throwable ignored) { //catch NP & Cast Exceptions 
+            return false;
+        }
+    }
+...    
+}]]></programlisting>                        
+    </section>
+
+    <section id="jpa-entity-compositepk-idclass">
+        <title>Composite @IdClass</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>A class separate from the entity that independently models PK properties</para></listitem>
+            <listitem><para>No reference to the @IdClass within the entity</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Composite @IdClass Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_MOWER (
+    make varchar(255) not null,
+    model varchar(255) not null,
+    size integer not null,
+    primary key (make, model)
+)]]></programlisting>                        
+        </figure>
+    
+        <figure>
+            <title>Composite @IdClass Example Usage</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_MOWER")
+@IdClass(MowerPK.class)
+public class Mower {
+    @Id
+    private String make;
+    @Id
+    private String model;    
+    private int size;
+    
+    public Mower() {}
+    public Mower(String make, String model) {
+        this.make = make;
+        this.model = model;
+    }
+    
+    public String getMake() { return make; }    
+    public String getModel() { return model; }
+]]></programlisting>                        
+        </figure>
+    
+        <figure>
+            <title>Composite @IdClass Example orm.xml</title>
+<programlisting language="xml"><![CDATA[<entity class="ejava.examples.orm.core.mapped.Mower" access="FIELD">
+    <table name="ORMCORE_MOWER"/>
+    <id-class class="ejava.examples.orm.core.MowerPK"/>
+    <attributes>
+        <id name="make"/>
+        <id name="model"/>
+    </attributes>
+</entity>]]></programlisting>                        
+        </figure>
+        
+        <figure>
+            <title>Composite @IdClass Example Client</title>
+<programlisting language="java"><![CDATA[@Test
+public void testIdClass() {
+    ejava.examples.orm.core.annotated.Mower mower = 
+        new Mower("acme", "power devil2");
+    mower.setSize(21);
+    
+    //insert a row in the database
+    em.persist(mower);
+    log.info("created mower:" + mower);
+]]></programlisting>                        
+<programlisting language=""><![CDATA[-created mower:ejava.examples.orm.core.annotated.Mower@2c137a23, make=acme, model=power devil2, size=21]]></programlisting>                        
+    
+<programlisting language="java"><![CDATA[    Mower mower2 = 
+        em.find(Mower.class, new MowerPK("acme", "power devil2"));
+    assertNotNull(mower2);
+    log.info("found mower:" + mower2);
+    assertEquals(mower.getSize(), mower2.getSize());
+]]></programlisting>                        
+<programlisting language=""><![CDATA[-found mower:ejava.examples.orm.core.annotated.Mower@2c137a23, make=acme, model=power devil2, size=21]]></programlisting>                        
+        </figure>
+        
+    </section>
+
+
+    <section id="jpa-entity-compositepk-embedded">
+        <title>Composite @EmbeddedId</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>A class that hosts the primary key properties</para></listitem>
+            <listitem><para>Contained/"embedded" within the entity class</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>@EmbeddedId Example Database Schema</title>
+<programlisting language="java"><![CDATA[create table ORMCORE_NAPSACK (
+    NAPSACK_MAKE varchar(255) not null,
+    NAPSACK_MODEL varchar(255) not null,
+    size integer not null,
+    primary key (NAPSACK_MAKE, NAPSACK_MODEL)
+)]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>@Embeddable Primary Key Class</title>
+<programlisting language="java"><![CDATA[package ejava.examples.orm.core.mapped;
+
+import java.io.Serializable;
+import javax.persistence.*;
+
+@Embeddable
+public class NapsackPK implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Column(name="NAPSACK_MAKE") //maps field to column of containing class
+    private String make;
+    @Column(name="NAPSACK_MODEL")//maps field to column of containing class
+    private String model;
+    
+    public NapsackPK() {}
+    public NapsackPK(String make, String model) {
+        this.make = make;
+        this.model = model;
+    }
+    
+    public String getMake() { return make; }
+    public String getModel() { return model; }
+
+    public int hashCode() { return make.hashCode() + model.hashCode(); }
+    public boolean equals(Object obj) {
+        try {
+            if (this == obj) return true;
+            return make.equals(((NapsackPK)obj).getMake()) &&
+                   model.equals(((NapsackPK)obj).getModel());
+            
+        } catch (Throwable ignored) { //catch NP & Cast Exceptions 
+            return false;
+        }
+    }
+]]></programlisting>                        
+        </figure>
+        
+        <figure>
+            <title>Composite @EmbeddedId Example Usage</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_NAPSACK")
+public class Napsack {
+    @EmbeddedId
+    private NapsackPK pk;
+    private int size;
+    
+    public Napsack() {}
+    public Napsack(String make, String model) {
+        this.pk = new NapsackPK(make, model);
+    }
+    
+    public NapsackPK getPk() { return pk; }
+...]]></programlisting>                        
+        </figure>
+        
+        <figure>
+            <title>Composite @EmbeddedId Example orm.xml</title>
+<programlisting language="xml"><![CDATA[
+<entity class="ejava.examples.orm.core.mapped.Napsack" access="FIELD">
+    <table name="ORMCORE_NAPSACK"/>
+    <attributes>
+        <embedded-id name="pk"/>
+    </attributes>
+</entity>    
+<embeddable class="ejava.examples.orm.core.mapped.NapsackPK">
+    <attributes>
+        <basic name="make">
+            <column name="NAPSACK_MAKE"/>
+        </basic>
+        <basic name="model">
+            <column name="NAPSACK_MODEL"/>
+        </basic>            
+    </attributes>
+</embeddable>]]></programlisting>                        
+        </figure>
+    </section>
+
+    <section id="jpa-entity-compositepk-embedded-overrides">
+        <title>Composite Overrides</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Supply or override mapping of primary key class by entity class</para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title>Example Overridden @Embeddable PK Class</title>
+<programlisting language="java"><![CDATA[@Embeddable
+public class MakeModelPK implements Serializable {
+    private String make;
+    private String model;]]></programlisting>                        
+        </figure>
+        
+        <figure>
+            <title>Example Overridden @Embeddable Entity Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_PEN (
+    PEN_MAKE varchar(255) not null,
+    PEN_MODEL varchar(255) not null,
+    size integer not null,
+    primary key (PEN_MAKE, PEN_MODEL)
+)]]></programlisting>                        
+        </figure>
+        
+        <figure>
+            <title>Example Overridden @Embeddable Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_PEN")
+public class Pen {
+    @EmbeddedId
+    @AttributeOverrides({
+        @AttributeOverride(name="make", column=@Column(name="PEN_MAKE")),
+        @AttributeOverride(name="model", column=@Column(name="PEN_MODEL"))             
+        })
+    private MakeModelPK pk;
+    private int size;
+    
+    public Pen() {}
+    public Pen(String make, String model) {
+        this.pk = new MakeModelPK(make, model);
+    }
+    
+    public MakeModelPK getPk() { return pk; }
+]]></programlisting>                        
+        </figure>
+        
+        <figure>
+            <title>Example Overridden @Embeddableorm.xml</title>
+<programlisting language="xml"><![CDATA[
+<entity class="ejava.examples.orm.core.mapped.Pen" access="FIELD">
+    <table name="ORMCORE_PEN"/>
+    <attributes>
+        <embedded-id name="pk">
+            <attribute-override name="make">
+                <column name="PEN_MAKE"/>
+            </attribute-override>
+            <attribute-override name="model">
+                <column name="PEN_MODEL"/>
+            </attribute-override>
+        </embedded-id>
+    </attributes>
+</entity>    
+
+<embeddable class="ejava.examples.orm.core.mapped.MakeModelPK">
+    <attributes>
+        <basic name="make"/>
+        <basic name="model"/>
+    </attributes>
+</embeddable>
+]]></programlisting>                        
+        </figure>
+    </section>
+
+    <section id="jpa-entity-compositepk-summary">
+        <title>Composite Primary Key Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>PKClass Requirements</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Serializable</para></listitem>
+                <listitem><para>No-arg constructor</para></listitem>
+                <listitem><para>hashCode() and equals()</para></listitem>
+                <listitem><para>PK properties</para></listitem>
+            </itemizedlist>
+            </listitem>
+            <listitem><para>@IdClass</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Independent class containing copy of entity PK properties</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>@Embeddable</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Class instance containing entity PK properties -- embedded within entity</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>DB Mapping</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Primary in PKClass</para></listitem>
+                    <listitem><para>Overrides in Entity class</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>@AttributeOverrides</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+</chapter>
+  

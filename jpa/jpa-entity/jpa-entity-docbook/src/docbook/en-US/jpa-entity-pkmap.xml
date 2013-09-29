@@ -1,0 +1,496 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entity-pkmap">
+    <title>Primary Keys</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Every entity must have a primary key</para></listitem>
+        <listitem><para>Primary keys must be unique</para></listitem>
+        <listitem><para>Map to one ("simple") or more ("composite") properties</para></listitem>
+        <listitem><para>Properties must be of type</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>Java primitive types -- including object wrappers</para></listitem>
+                <listitem><para>java.lang.String</para></listitem>
+                <listitem><para>Custom classes made up of legal property types</para></listitem>
+            </itemizedlist>
+        </listitem>
+    </itemizedlist>
+        
+    <section id="jpa-entity-pkmap-generated">
+        <title>Generated Simple Primary Keys</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Persistence providers required to provide primary key generation</para></listitem>
+            <listitem><para>Specific type of generator specified through a strategy</para>
+                <figure>
+                    <title>Specifying Primary Key Generation thru Annotations</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_DRILL")
+public class Drill  {
+    @Id
+    @GeneratedValue( //AUTO is the default and could be left off here
+            strategy=GenerationType.AUTO) 
+    private long id; //unassigned PK value must be zero
+    private String make;
+...]]></programlisting>                        
+                </figure>
+                
+                <figure>
+                    <title>Specifying Primary Key Generation thru orm.xml</title>
+<programlisting language="xml"><![CDATA[<entity class="ejava.examples.orm.core.mapped.Drill" access="FIELD">
+    <table name="ORMCORE_DRILL"/>
+    <attributes>
+        <id name="id">
+            <generated-value strategy="AUTO"/>
+        </id>
+    </attributes>
+</entity>]]></programlisting>                        
+                </figure>
+            
+            </listitem>
+            <listitem><para>Three (+1) Types</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>SEQUENCE</filename></term>
+                        <listitem><para>Database generates unique value from a global sequence</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>IDENTITY</filename></term>
+                        <listitem><para>Database generates unique value on a per-table basis</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>TABLE</filename></term>
+                        <listitem><para></para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>AUTO</filename></term>
+                        <listitem><para>Provider may choose any technique, including one not specified above</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+       </itemizedlist>
+       
+        <section id="jpa-entity-pkmap-generated-auto">
+            <title>GenerationType.AUTO</title>
+           
+            <figure>
+                <title>Entity with GenerationType.AUTO</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_DRILL")
+public class Drill  {
+    @Id
+    @GeneratedValue 
+    private long id;
+    private String make;
+...]]></programlisting>                        
+            </figure>
+           
+            <figure>
+                <title>AUTO (Success) Test</title>
+<programlisting language="java"><![CDATA[
+@Test
+public void testAUTOGood() {
+    log.info("testAUTOGood");
+    //note that since PKs are generated, we must pass in an object that
+    //has not yet been assigned a PK value.
+    ejava.examples.orm.core.annotated.Drill drill = new Drill(0);
+    drill.setMake("acme");
+    
+    //insert a row in the database
+    em.persist(drill);
+    log.info("created drill:" + drill);
+    
+    assertFalse(drill.getId() == 0L);        
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA[-testAUTOGood
+Hibernate:
+    insert 
+    into
+        ORMCORE_DRILL
+        (id, make) 
+    values
+        (null, ?)
+-created drill:ejava.examples.orm.core.annotated.Drill@35853853, id=1, make=acme]]></programlisting>                        
+            </figure>
+            
+
+            <figure>
+                <title>AUTO (Failure) Test</title>
+<programlisting language="java"><![CDATA[
+@Test
+public void testAUTOBad() {
+    log.info("testAUTOBad");
+    //he's not going to like they non-zero PK value here
+    ejava.examples.orm.core.annotated.Drill drill = new Drill(25L);
+    drill.setMake("BD");
+    
+    //insert a row in the database
+    boolean exceptionThrown = false;
+    try { 
+        assertFalse(drill.getId() == 0L);        
+        log.info("trying to create drill with pre-exist pk:" + drill);
+        em.persist(drill);
+    }
+    catch (PersistenceException ex) {
+        log.info("got expected exception: " + ex);
+        exceptionThrown = true;
+    }        
+    assertTrue(exceptionThrown);
+}]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+-testAUTOBad
+-trying to create drill with pre-exist pk:ejava.examples.orm.core.annotated.Drill@76160af2, id=25, make=BD
+-got expected exception: javax.persistence.PersistenceException: 
+    org.hibernate.PersistentObjectException: 
+        detached entity passed to persist: ejava.examples.orm.core.annotated.Drill
+]]></programlisting>                        
+            </figure>
+        </section>    
+
+        <section id="jpa-entity-pkmap-generated-identity">
+           <title>GenerationType.IDENTITY</title>
+            <figure>
+               <title>Entity with GenerationType.IDENTITY</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_GADGET")
+public class Gadget {
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private long id;
+    private String make;]]></programlisting>                        
+            </figure>
+            
+            <figure>
+                <title>IDENTITY Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_GADGET (
+    id bigint generated by default as identity,
+    make varchar(255),
+    primary key (id)
+)]]></programlisting>                        
+            </figure>
+            
+
+            <figure>
+                <title>IDENTITY Test</title>
+<programlisting language="java"><![CDATA[@Test
+public void testIDENTITY() {
+    ejava.examples.orm.core.annotated.Gadget gadget = new Gadget(0);
+    gadget.setMake("gizmo 1");
+    
+    //insert a row in the database
+    em.persist(gadget);
+    log.info("created gadget (before flush):" + gadget);
+    em.flush(); 
+    log.info("created gadget (after flush):" + gadget);
+    
+    assertFalse(gadget.getId() == 0L);                
+}]]></programlisting>                        
+<programlisting language=""><![CDATA[-testIDENTITY
+Hibernate:
+    insert 
+    into
+        ORMCORE_GADGET
+        (id, make) 
+    values
+        (null, ?)
+-created gadget (before flush):ejava.examples.orm.core.annotated.Gadget@7b61257e, id=1, make=gizmo 1
+-created gadget (after flush):ejava.examples.orm.core.annotated.Gadget@7b61257e, id=1, make=gizmo 1
+]]></programlisting>                        
+            </figure>
+            
+            <figure>
+                <title>Follow-on IDENTITY Allocations</title>
+<programlisting language=""><![CDATA[Hibernate:
+    insert 
+    into
+        ORMCORE_GADGET
+        (id, make) 
+    values
+        (null, ?)
+-created gadget:ejava.examples.orm.core.annotated.Gadget@581e495d, id=2, make=gizmo 2
+Hibernate:
+    insert 
+    into
+        ORMCORE_GADGET
+        (id, make) 
+    values
+        (null, ?)
+-created gadget:ejava.examples.orm.core.annotated.Gadget@1f06d526, id=3, make=gizmo 3
+Hibernate:
+    insert 
+    into
+        ORMCORE_GADGET
+        (id, make) 
+    values
+        (null, ?)
+-created gadget:ejava.examples.orm.core.annotated.Gadget@199bdabd, id=4, make=gizmo 4
+...]]></programlisting>                        
+            </figure>
+
+            <note>
+                <title>IDENTITY Requires Provider to Get All PK Values from Database</title>
+                <para>The provider must obtain the next primary key value from the database 
+                   each time. Notice in the first case above -- the provider has already flushed the
+                   INSERT to the database during the persist and before out manual call to flush()</para>
+            </note>
+        </section>
+       
+
+        <section id="jpa-entity-pkmap-generated-sequence">
+            <title>GenerationType.SEQUENCE</title>
+            <figure>
+                <title>Entity with GenerationType.SEQUENCE</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_FAN")
+@SequenceGenerator(
+    name="fanSequence",     //required logical name
+    sequenceName="FAN_SEQ", //name in database
+    initialValue=4,         //start with something odd to be noticeable
+    allocationSize=3)       //number of IDs to internally assign per-sequence value
+public class Fan {
+    @Id
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, //use DB sequence 
+            generator="fanSequence")                  //point to logical def
+    private long id;
+    private String make;
+...]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>SEQUENCE Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_FAN (
+    id bigint not null,
+    make varchar(255),
+    primary key (id)
+)
+
+create sequence FAN_SEQ]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>SEQUENCE Test</title>
+<programlisting language="java"><![CDATA[@Test
+public void testSEQUENCE() {
+    log.info("testSEQUENCE");
+    //note that since PKs are generated, we must pass in an object that
+    //has not yet been assigned a PK value.
+    ejava.examples.orm.core.annotated.Fan fan = new Fan(0);
+    fan.setMake("cool runner 1");
+    
+    //insert a row in the database
+    em.persist(fan);
+    log.info("created fan (before flush):" + fan);
+    em.flush(); 
+    log.info("created fan (after flush):" + fan);
+    
+    assertFalse(fan.getId() == 0L);
+}]]></programlisting>                 
+
+<programlisting language=""><![CDATA[-testSEQUENCE
+Hibernate:
+    call next value for FAN_SEQ
+-created fan (before flush):ejava.examples.orm.core.annotated.Fan@e18a174, id=3, make=cool runner 1
+Hibernate:
+    insert 
+    into
+        ORMCORE_FAN
+        (make, id) 
+    values
+        (?, ?)
+-created fan (after flush):ejava.examples.orm.core.annotated.Fan@e18a174, id=3, make=cool runner 1]]></programlisting>                               
+            </figure>
+            
+            <figure>
+                <title>Follow-on SEQUENCE Allocations</title>
+<programlisting language=""><![CDATA[
+-created fan:ejava.examples.orm.core.annotated.Fan@6806da29, id=4, make=cool runner 2
+-created fan:ejava.examples.orm.core.annotated.Fan@77d5a139, id=5, make=cool runner 3
+-
+    call next value for FAN_SEQ
+-created fan:ejava.examples.orm.core.annotated.Fan@1c0cf528, id=6, make=cool runner 4
+-created fan:ejava.examples.orm.core.annotated.Fan@27c3a4a3, id=7, make=cool runner 5
+-created fan:ejava.examples.orm.core.annotated.Fan@17f7ed6e, id=8, make=cool runner 6
+-
+    call next value for FAN_SEQ
+...]]></programlisting>                        
+            </figure>
+            
+            <note>
+                <title>SEQUENCE Strategy Allows Clients to Self-Generate Groups of PK Values</title>
+                <para>The provider generates allocationSize primary key values before performing a flush or 
+                    follow-on poll of the sequence. An allocationSize greater than one (1) is much less communication
+                    with the database than the IDENTITY strategy -- which would be somewhat 
+                    analogous to a SEQUENCE allocationSize=1.</para>
+            </note>
+            
+        </section>
+
+
+
+        <section id="jpa-entity-pkmap-generated-table">
+           <title>GenerationType.TABLE</title>
+            <figure>
+           <title>Entity with GenerationType.TABLE</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_EGGBEATER")
+@TableGenerator(  //note that all but name are optional if generating schema
+        name="eggbeaterGenerator",     //logical name of generator
+        table="ORMCORE_EB_UID",        //name of table storing seq
+        pkColumnName="UID_ID",         //pk column for seq table
+        pkColumnValue="ORMCORE_EGGBEATER",  //pk value in pk column
+        valueColumnName="UID_VAL",     //column for seq value
+        allocationSize=5              //increment UID_ID after using this many
+    )        
+public class EggBeater {
+    @Id
+    @GeneratedValue(strategy=GenerationType.TABLE, //use DB table 
+            generator="eggbeaterGenerator")        //point to logical def
+    private long id;
+    private String make;
+...]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>TABLE Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_EGGBEATER (
+    id bigint not null,
+    make varchar(255),
+    primary key (id)
+)
+
+create table ORMCORE_EB_UID (
+     UID_ID varchar(255),
+     UID_VAL integer 
+)]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>TABLE Test</title>
+<programlisting language="java"><![CDATA[@Test
+public void testTABLE() {
+    log.info("testTABLE");
+    log.debug("table id before=" + getTableId());
+    //note that since PKs are generated, we must pass in an object that
+    //has not yet been assigned a PK value.
+    ejava.examples.orm.core.annotated.EggBeater eggbeater = new EggBeater(0);
+    eggbeater.setMake("done right");
+    
+    //insert a row in the database
+    em.persist(eggbeater);
+    log.info("created eggbeater (before flush):" + eggbeater);
+    em.flush(); 
+    log.info("created eggbeater (after flush):" + eggbeater);
+    
+    assertFalse(eggbeater.getId() == 0L);   
+}
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+-testTABLE
+Hibernate:
+    select
+        UID_VAL 
+    from
+        ORMCORE_EB_UID 
+    where
+        UID_ID='ORMCORE_EGGBEATER'
+-table id before=null
+Hibernate:
+    select
+        UID_VAL 
+    from
+        ORMCORE_EB_UID 
+    where
+        UID_ID = 'ORMCORE_EGGBEATER' for update
+Hibernate:
+    insert 
+    into
+        ORMCORE_EB_UID
+        (UID_ID, UID_VAL) 
+    values
+        ('ORMCORE_EGGBEATER', ?)
+Hibernate:
+    update
+        ORMCORE_EB_UID 
+    set
+        UID_VAL = ? 
+    where
+        UID_VAL = ? 
+        and UID_ID = 'ORMCORE_EGGBEATER'
+-created eggbeater (before flush):ejava.examples.orm.core.annotated.EggBeater@4eb8b5a9, id=1, make=done right
+Hibernate:
+    insert 
+    into
+        ORMCORE_EGGBEATER
+        (make, id) 
+    values
+        (?, ?)
+-created eggbeater (after flush):ejava.examples.orm.core.annotated.EggBeater@4eb8b5a9, id=1, make=done right
+]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Follow-on TABLE Allocations</title>
+<programlisting language=""><![CDATA[
+-table id after=1
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@3576465f, id=2, make=null
+-table id after[2]=1
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@306435cd, id=3, make=null
+-table id after[3]=1
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@35194a50, id=4, make=null
+-table id after[4]=1
+Hibernate:
+    select
+        UID_VAL 
+    from
+        ORMCORE_EB_UID 
+    where
+        UID_ID = 'ORMCORE_EGGBEATER' for update
+Hibernate:
+    update
+        ORMCORE_EB_UID 
+    set
+        UID_VAL = ? 
+    where
+        UID_VAL = ? 
+        and UID_ID = 'ORMCORE_EGGBEATER'
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@288c819b, id=5, make=null
+-table id after[5]=2
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@10508cb2, id=6, make=null
+-table id after[6]=2
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@49250068, id=7, make=null
+-table id after[7]=2
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@372b2a85, id=8, make=null
+-table id after[8]=2
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@5e69cd5e, id=9, make=null
+-table id after[9]=2
+Hibernate:
+    select
+        UID_VAL 
+    from
+        ORMCORE_EB_UID 
+    where
+        UID_ID = 'ORMCORE_EGGBEATER' for update
+Hibernate:
+    update
+        ORMCORE_EB_UID 
+    set
+        UID_VAL = ? 
+    where
+        UID_VAL = ? 
+        and UID_ID = 'ORMCORE_EGGBEATER'
+-created ehhbeater:ejava.examples.orm.core.annotated.EggBeater@1dbf9510, id=10, make=null
+-table id after[10]=3
+...]]></programlisting>                        
+            </figure>
+
+            <note>
+                <title>TABLE Strategy Allows Clients to Self-Generate Groups of PK Values</title>
+                <para>As will SEQUENCE, the TABLE strategy allows each client to generate an allocationSize
+                    amount of primary key values before requiring a flush of the current batch or
+                    polling for a new table value.</para>
+            </note>
+        </section>
+    </section>
+</chapter>
+  

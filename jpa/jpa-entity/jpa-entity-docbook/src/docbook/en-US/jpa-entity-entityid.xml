@@ -1,0 +1,371 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entity-entityidid">
+    <title>Identifying Entity Classes</title>
+        
+    <section id="jpa-entity-entityid-entities">
+        <title>Entities</title>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>Plain Old Java Objects</para></listitem>
+            <listitem><para>Instantiated just like any other Java object</para>
+<programlisting language=""><![CDATA[Bike bike = new Bike(1);
+bike.setMake("trek");
+bike.setModel("2200");
+bike.setSize(26);]]></programlisting>                        
+            </listitem>
+            
+            <listitem><para>Mapped to database schema</para></listitem>
+            <listitem><para>Interact with EntityManager to perform persistence operations</para>
+<programlisting language=""><![CDATA[em.persist(bike);
+Bike bike2 = em.find(Bike.class, 1L); 
+em.remove(bike);]]></programlisting>                        
+            </listitem>
+            
+            <listitem><para>Must</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Have a no-arg constructor (spec says non-private; but hibernate can work with private)</para></listitem>
+                    <listitem><para>Be identified as an Entity (either using class annotations or ORM descriptors)</para></listitem>
+                    <listitem><para>Have at least one (1) @Id property to be used as a primary key</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+        <figure id="jpa-entity-entityid-entities-annotated-class">
+            <title>Annotated Class Example</title>
+            <programlistingco>
+                <areaspec units="linecolumn">
+                    <area id="jpa-entity-entityid-entities-annotated-area-entity" coords="5"/>
+                    <area id="jpa-entity-entityid-entities-annotated-area-id" coords="7"/>
+                    <area id="jpa-entity-entityid-entities-annotated-area-defctor" coords="13"/>
+                </areaspec>
+<programlisting language="java"><![CDATA[package ejava.examples.orm.core.annotated;
+
+import javax.persistence.*; //brings in JPA Annotations
+
+@Entity 
+public class Bike {
+    @Id   //tells ORM that this property provides pk simple value
+    private long id;
+    private String make;
+    private String model;
+    private int size;
+    
+    public Bike() {} //required non-private default ctor
+    public Bike(long id) { this.id = id; }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getMake() { return make; }
+    public void setMake(String make) {
+        this.make = make;
+    }
+...
+}]]></programlisting>
+                <calloutlist>
+                    <callout arearefs="jpa-entity-entityid-entities-annotated-area-entity"><para>Tells provider to include in persistence unit</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-annotated-area-id"><para>Tells provider to use this property as the primary key</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-annotated-area-defctor"><para>Default ctor required for provider to instantiate from DB</para></callout>
+                </calloutlist>                        
+            </programlistingco>            
+        </figure>
+
+        <figure id="jpa-entity-entityid-entities-mapped-class">
+            <title>Mapped Class Example</title>
+            <programlistingco>
+                <areaspec units="linecolumn">
+                    <area id="jpa-entity-entityid-entities-mapped-area-id" coords="4"/>
+                    <area id="jpa-entity-entityid-entities-mapped-area-defctor" coords="9"/>
+                </areaspec>
+<programlisting language="java"><![CDATA[package ejava.examples.orm.core.mapped;
+
+public class Bike {
+    private long id; //orm.xml file will map this field to Identity
+    private String make;
+    private String model;
+    private int size;
+    
+    public Bike() {}
+    public Bike(long id) { this.id = id; }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getMake() { return make; }
+    public void setMake(String make) {
+        this.make = make;
+    }
+...
+}]]></programlisting>
+                <calloutlist>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-id"><para>Must have a property to later define as a primary key</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-defctor"><para>Must have a default ctor</para></callout>
+                </calloutlist>                        
+            </programlistingco>            
+        </figure>
+
+        <figure id="jpa-entity-entityid-entities-mapped-ormxml">
+            <title>Mapped Class ORM.xml Example</title>
+            <programlistingco>
+                <areaspec units="linecolumn">
+                    <area id="jpa-entity-entityid-entities-mapped-area-entityxml" coords="8"/>
+                    <area id="jpa-entity-entityid-entities-mapped-area-idxml" coords="14"/>
+                </areaspec>
+<programlisting language="java"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+ version="2.0">
+            
+    <entity class="ejava.examples.orm.core.mapped.Bike" 
+            access="FIELD"
+            metadata-complete="true"
+            name="MappedBike">
+        <table name="Bike"/>
+        <attributes>
+            <id name="id"/>
+        </attributes>
+    </entity>    
+</entity-mappings>
+]]></programlisting>
+                <calloutlist>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-entityxml"><para>Identifies class as an entity</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-idxml"><para>Identifies @Id property for a primary key</para></callout>
+                </calloutlist>                        
+            </programlistingco>            
+        </figure>
+
+        <figure id="jpa-entity-entityid-entities-mapped-persistencexml">
+            <title>Mapped Class META-INF/persistence.xml Reference</title>
+            <programlistingco>
+                <areaspec units="linecolumn">
+                    <area id="jpa-entity-entityid-entities-mapped-area-orm" coords="8"/>
+                    <area id="jpa-entity-entityid-entities-mapped-area-class" coords="9"/>
+                </areaspec>
+<programlisting language="java"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://java.sun.com/xml/ns/persistence 
+  http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+ version="2.0">
+
+    <persistence-unit name="ormCore">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>orm/Bike-orm.xml</mapping-file>
+        <class>ejava.examples.orm.core.annotated.Bike</class>
+...
+    </persistence-unit>        
+    
+</persistence>
+]]></programlisting>
+                <calloutlist>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-orm"><para>Reference to orm.xml to map Java class(es) to database and make part of persistence unit</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-class"><para>Reference to class that may/may not be within local archive but should be part of persistence unit</para></callout>
+                </calloutlist>                        
+            </programlistingco>            
+        </figure>
+
+        <figure id="jpa-entity-entityid-entities-directory">
+            <title>Example Directory Structure</title>
+            <programlistingco>
+                <areaspec units="linecolumn">
+                    <area id="jpa-entity-entityid-entities-mapped-area-aclass" coords="7"/>
+                    <area id="jpa-entity-entityid-entities-mapped-area-mclass" coords="9"/>
+                    <area id="jpa-entity-entityid-entities-mapped-area-persistencexml" coords="12"/>
+                    <area id="jpa-entity-entityid-entities-mapped-area-ormxml" coords="13"/>
+                    <area id="jpa-entity-entityid-entities-mapped-area-properties" coords="16"/>
+                </areaspec>
+<programlisting language=""><![CDATA[src/
+|-- main
+|   |-- java
+|   |   `-- ejava
+...
+|   |                   |-- annotated
+|   |                   |   `-- Bike.java
+|   |                   `-- mapped
+|   |                       `-- Bike.java
+|   `-- resources
+|       |-- META-INF
+|       |   `-- persistence.xml
+|       `-- orm
+|           `-- Bike-orm.xml
+`-- test
+    `-- resources
+        `-- hibernate.properties]]></programlisting>                        
+                <calloutlist>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-aclass"><para>Annotated class</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-mclass"><para>Pure-POJO class mapped by orm.xml</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-persistencexml"><para>persistence.xml defines reference to orm.xml</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-ormxml"><para>orm.xml defines Java class mapping to database</para></callout>
+                    <callout arearefs="jpa-entity-entityid-entities-mapped-area-properties"><para>Properties file with database runtime properties</para></callout>
+                </calloutlist>                        
+            </programlistingco>            
+        </figure>
+    </section>
+        
+    <section id="jpa-entity-entityid-entityname">
+        <title>Entity Name</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Defaults to unqualified name of entity class (e.g., Bike)</para></listitem>
+            <listitem><para>Used to determine database table name</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Bike entity -&gt; BIKE table</para>
+<programlisting language=""><![CDATA[create table Bike (
+    id bigint not null,
+    make varchar(255),
+    model varchar(255),
+    size integer not null,
+    primary key (id)
+)]]></programlisting>                        
+                    </listitem>
+                    <listitem><para>Used to refer to entity in JPA-QL</para>
+<programlisting language=""><![CDATA[select b from Bike b]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Can be assigned optional name property</para>
+<programlisting language="java"><![CDATA[@Entity(name="AnnotatedBike")
+class Bike {]]></programlisting>                        
+<programlisting language="xml"><![CDATA[<entity class="ejava.examples.orm.core.mapped.Bike" 
+    name="MappedBike">]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Table name can be specified separate from entity name</para>
+<programlisting language="java"><![CDATA[@Entity(name="AnnotatedBike")
+@Table(name="COREORM_BIKE")
+class Bike {]]></programlisting>                                    
+<programlisting language="xml"><![CDATA[<entity class="ejava.examples.orm.core.mapped.Bike" 
+    name="MappedBike">
+    <table name="COREORM_BIKE"/>]]></programlisting>                        
+                    </listitem>
+                </itemizedlist>            
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+    <section id="jpa-entity-entityid-access">
+        <title>Field/Property Access</title>
+        
+            <section id="jpa-entity-entityid-access-types">
+                <title>Access Types</title>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>FIELD</filename> Access</term>
+                        <listitem><para>Direct access to Java variable</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>PROPERTY</filename> Access</term>
+                        <listitem><para>Accessed through Java set/get methods</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </section>
+            
+            <section id="jpa-entity-entityid-access-annotations">
+                <title>Defining Access using @Annotations</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Placement of @Id class annotation determines default choice when using annotations</para>
+
+                        <figure>
+                            <title>Defining FIELD Access using Annotations</title>
+<programlisting language="java"><![CDATA[@Entity 
+public class Bike {
+    @Id
+    private long id;
+    private String make;]]></programlisting>                        
+                        </figure>
+
+                        <figure>
+                            <title>Defining PROPERTY Access using Annotations</title>
+<programlisting language="java"><![CDATA[@Entity 
+public class Bike {
+    @Id
+    public long getId() { return id; }
+    protected void setId(int id) {
+        this.id=id;
+    }
+
+    public String getMake() { return make; }
+    public void setMake(String make) {
+        this.make = make;
+    }]]></programlisting>                        
+                        </figure>
+                    </listitem>
+                    
+                    <listitem><para>Per-property access override thru @Access</para>
+<programlisting language="java"><![CDATA[@Entity 
+public class Bike {
+    @Id
+    private long id;
+    private String make;
+...
+    @Access(AccessType.PROPERTY)
+    public String getMake() { return make; }
+    public void setMake(String make) {
+        this.make = make;
+    }]]></programlisting>                        
+                    </listitem>
+                </itemizedlist>
+            </section>
+                
+            <section id="jpa-entity-entityid-access-orm">
+                <title>Defining Access using orm.xml</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Can be defined globally</para>
+<programlisting language="xml"><![CDATA[<access>FIELD</access>]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Can be defined per-class</para>
+<programlisting language="xml"><![CDATA[<entity class="ejava.examples.orm.core.mapped.Bike" 
+        access="FIELD">]]></programlisting>                        
+                    </listitem>
+                    
+                    <listitem><para>Can be defined per-property</para>
+<programlisting language="xml"><![CDATA[<entity class="ejava.examples.orm.core.mapped.Bike" 
+        access="FIELD">
+    <attributes>
+        <id name="id"/>
+        <basic name="make" access="PROPERY">
+        </basic>
+    </attributes>
+</entity>]]></programlisting>                        
+                    </listitem>
+                </itemizedlist>
+            </section>
+                
+    </section>
+
+    <section id="jpa-entity-entityid-approaches">
+        <title>Approaches</title>
+            <section id="jpa-entity-entityid-approaches-javafist">
+                <title>Java First</title>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Appropriate for quick prototypes</para></listitem>
+                    <listitem><para>Most vendors provide tools to create database schema from entity classes</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Generated schema will be consistent with Java class model and not optimized for any particular use</para></listitem>
+                        </itemizedlist>                        
+                    </listitem>
+                    <listitem><para>Less use of javax.persistence.* annotations because Java defaults mostly sufficient</para></listitem>
+                    <listitem><para>Add more use of javax.persistence.* annotations to reach desired schema model</para></listitem>
+                </itemizedlist>
+            </section>    
+
+            <section id="jpa-entity-entityid-approaches-dbfist">
+               <title>Schema First</title>
+               <itemizedlist spacing="compact">
+                    <listitem><para>Common in most legacy and non-trivial environments</para></listitem>
+                    <listitem><para>Most vendors provide tools to create entity classes from database schema (in addition to DAOs)</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Generated entity classes will be consistent with database table design and not have any bearing on the business needs of the data tier</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>More use of javax.persistence.* annotations to get desired business objects mapped to desired database schema</para></listitem>
+                </itemizedlist>
+             </section>    
+    </section>
+</chapter>
+  

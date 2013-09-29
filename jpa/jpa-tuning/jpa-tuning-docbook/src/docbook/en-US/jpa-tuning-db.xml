@@ -1,4 +1,4 @@
-<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="jpa-tuning-db">
@@ -8,7 +8,7 @@
         <title>Reasons for Inefficient SQL Performance</title>
         <itemizedlist spacing="compact">
             <listitem><para>Poorly constructed data model</para></listitem>
-            <listitem><para>Poorly constructed SQL</para></listitem>
+            <listitem><para>Poorly constructed access for the data model</para></listitem>
             <listitem><para>Missing access structures</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Indexes</para></listitem>
@@ -163,14 +163,14 @@ grant SELECT ANY DICTIONARY to (user);]]></programlisting>
     <figure>
         <title>Example: Connection Generates SQL Commands</title>
 <programlisting language=""><![CDATA[select poo.first_name, poo.last_name
-from queryex_person poo;]]></programlisting>                        
+from jpatune_person poo;]]></programlisting>                        
     </figure>
 
     <figure>
         <title>Example: SQL Commands of Interest Located in V$PLAN</title>
-<programlisting language=""><![CDATA[select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from queryex_person poo%';]]></programlisting>                        
-<programlisting language=""><![CDATA[87d246wux9qag   "select poo.first_name, poo.last_name from queryex_person poo"
-9bzam4xu5q7p5   select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from queryex_person poo%']]></programlisting>                        
+<programlisting language=""><![CDATA[select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from jpatune_person poo%';]]></programlisting>                        
+<programlisting language=""><![CDATA[87d246wux9qag   "select poo.first_name, poo.last_name from jpatune_person poo"
+9bzam4xu5q7p5   select sql_id, sql_fulltext from V$SQL where sql_fulltext like '%from jpatune_person poo%']]></programlisting>                        
             </figure>
         
             <figure>
@@ -180,7 +180,7 @@ TABLE(DBMS_XPLAN.DISPLAY_CURSOR('87d246wux9qag',null, 'TYPICAL'));]]></programli
 <programlisting language=""><![CDATA[
 SQL_ID  87d246wux9qag, child number 0
 -------------------------------------
-select poo.first_name, poo.last_name from queryex_person poo
+select poo.first_name, poo.last_name from jpatune_person poo
  
 Plan hash value: 1628338048
  
@@ -210,7 +210,7 @@ FROM v$sql s, table(DBMS_XPLAN.DISPLAY_CURSOR(s.sql_id, s.child_number)) t WHERE
         <itemizedlist spacing="compact">
             <listitem><para>SQL implementations can be inefficient for many reasons</para></listitem>
             <listitem><para>Administrative and Developer tools available to access execution plans</para></listitem>
-            <listitem><para>Looking at executions plans can aid discovery of issues and solutions</para></listitem>
+            <listitem><para>Looking at execution plans can aid discovery of issues and solutions</para></listitem>
         </itemizedlist>
     </section>    
 </chapter>

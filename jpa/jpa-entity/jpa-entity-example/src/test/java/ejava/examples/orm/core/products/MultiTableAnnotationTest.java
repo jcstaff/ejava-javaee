@@ -1,51 +1,27 @@
 package ejava.examples.orm.core.products;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import static org.junit.Assert.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-import ejava.examples.orm.core.mapped.Watch;
-
-import junit.framework.TestCase;
+import ejava.examples.orm.core.annotated.Watch;
 
 /**
  * This test case provides an example of mapping multiple tables into a 
  * single object. See the javadoc for the Watch class to describe the 
  * mapping details, but essentially 3 tables make-up a single Watch object.
- *  
- * @author jcstaff
- * $Id:$
  */
-public class MultiTableMappingDemo extends TestCase {
-    private static Log log = LogFactory.getLog(MultiTableMappingDemo.class);
-    private static final String PERSISTENCE_UNIT = "ormCore";
-    private EntityManagerFactory emf;
-    private EntityManager em = null;
-
-    protected void setUp() throws Exception {        
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-    }
-
-    protected void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
-    }
+public class MultiTableAnnotationTest extends TestBase {
+    private static Log log = LogFactory.getLog(MultiTableAnnotationTest.class);
     
     /**
      */
+    @Test
     public void testMultiTable() {
         log.info("testMultiTable");
-        ejava.examples.orm.core.mapped.Watch watch = new Watch(2);
+        ejava.examples.orm.core.annotated.Watch watch = new Watch(1);
         watch.setMake("ontime");
         watch.setModel("round-and-round");
         watch.setOwner("john doe");
@@ -60,7 +36,7 @@ public class MultiTableMappingDemo extends TestCase {
         
         em.flush();
         em.clear();
-        Watch watch2 = em.find(Watch.class, 2L);
+        Watch watch2 = em.find(Watch.class, 1L);
         assertNotNull(watch2);
         log.info("found watch:" + watch2);
         assertEquals(watch.getMake(), watch2.getMake());
@@ -75,7 +51,7 @@ public class MultiTableMappingDemo extends TestCase {
         log.info("removed watch:" + watch);
         
         //leave a watch in DB to inspect
-        Watch watch3 = new Watch(4);
+        Watch watch3 = new Watch(3);
         watch3.setMake("ontime3");
         watch3.setModel("round-and-round3");
         watch3.setOwner("john doe3");

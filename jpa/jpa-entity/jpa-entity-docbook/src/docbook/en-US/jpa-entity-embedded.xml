@@ -1,0 +1,106 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entity-embedded">
+    <title>Embedded Object</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Similar to @EmbeddedId except embedded object is not a primary key</para></listitem>
+        <listitem><para>Embedded object has no primary key -- housed in parent entity table</para></listitem>
+        <listitem><para>Embedded object represents some abstraction</para></listitem>
+        <listitem><para>Parent entity represents an abstraction with a primary key and the embedded object</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>The primary key could be the only thing the parent entity is providing</para></listitem>
+            </itemizedlist>
+        </listitem>
+    </itemizedlist>
+    
+    <section id="jpa-entity-embedded-example">
+        <title>Embedded Object Example</title>
+        <figure>
+            <title>Embedded Object Example Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_XRAY (
+    id bigint not null,
+    address varchar(255),
+    XRAY_MAKER varchar(255),
+    phone varchar(255),
+    model varchar(255),
+    primary key (id)
+)]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Embedded Object Example Embedded Class</title>
+<programlisting language="java"><![CDATA[
+@Embeddable
+public class Manufacturer {
+    private String name;
+    private String address;
+    private String phone;
+]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Embedded Object Example Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_XRAY")
+public class XRay {
+    @Id
+    private long id;
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name="name", column=@Column(name="XRAY_MAKER"))
+        //note that we are letting address and phone default 
+    })
+    private Manufacturer maker;
+    private String model;]]></programlisting>                        
+        </figure>
+
+
+        <figure>
+            <title>Embedded Object Example orm.xml</title>
+<programlisting language="xml"><![CDATA[<entity class="ejava.examples.orm.core.mapped.XRay" access="FIELD">
+    <table name="ORMCORE_XRAY"/>
+    <attributes>
+        <id name="id"/>
+        <embedded name="maker">
+            <attribute-override name="name">
+                <column name="XRAY_MAKER"/>
+            </attribute-override>
+            <!-- address and phone will default to a column name -->
+        </embedded>
+        <!-- model will default to a column name -->
+    </attributes>
+</entity>        
+
+<embeddable class="ejava.examples.orm.core.mapped.Manufacturer" access="FIELD"/>]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Embedded Object Example Test</title>
+<programlisting language="java"><![CDATA[XRay xray3 = new XRay(3);
+xray3.setModel("inside-counts");
+xray3.setMaker(
+        new Manufacturer("hi-tech", "low valley", "410-555-1212"));
+em.persist(xray3);]]></programlisting>                        
+
+<programlisting language=""><![CDATA[ID PHONE        ADDRESS    XRAY_MAKER MODEL
+-- ------------ ---------- ---------- -------------
+3  410-555-1212 low valley hi-tech    inside-counts]]></programlisting>                        
+        </figure>
+    </section>
+
+        
+    <section id="jpa-entity-embedded-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Useful when</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Embedded object has no primary key</para></listitem>
+                    <listitem><para>Embedded object represents an abstraction within the entity (e.g., Address for Venue)</para></listitem>
+                    <listitem><para>Avoid database table joins</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+</chapter>
+  

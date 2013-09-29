@@ -1,0 +1,437 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entity-entitymap">
+    <title>Mapping Entity Classes</title>
+
+    <section id="jpa-entity-entitymap-core">
+        <title>Core Mappings</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>@Entity.name - assigns entity name to entity class</para></listitem>
+            <listitem><para>@Table.name - assigns table name to entity class</para></listitem>
+            <listitem><para>@Column.name - assigns column name to entity property</para></listitem>
+        </itemizedlist>
+    </section>
+    
+    <section id="jpa-entity-entitymap-property">
+        <title>More Detailed Property Mappings</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Mostly used when generating schema</para></listitem>
+            <listitem><para>@Table</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>uniqueConstraints * - column groupings that will have a unique value</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>@Column</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>unique * - column will have unique value</para></listitem>
+                    <listitem><para>nullable * - column may contain a null value/is optional</para></listitem>
+                    <listitem><para>insertable - column will be included in SQL during initial insert</para></listitem>
+                    <listitem><para>updatable - column will be included in SQL during follow-on updates</para></listitem>
+                    <listitem><para>table - table for column in a multi-table mapping</para></listitem>
+                    <listitem><para>length * - length of column for Strings</para></listitem>
+                    <listitem><para>precision * - defines number of digits used for Numeric types (e.g., 100.02 is precision=5)</para></listitem>
+                    <listitem><para>scale * - defines number of digits to use to the right of decimal place (e.g., 100.01 is scale=2)</para></listitem>
+                    <listitem><para>columnDefinition * - custom DDL for column creation</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+        <para>* - Used only in schema generation</para>
+    </section>    
+
+    <section id="jpa-entity-entitymap-example">
+        <title>Entity Mapping Example</title>
+
+        <section id="jpa-entity-entitymap-example-schema">
+           <title>Example Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_CAR (
+    CAR_ID bigint not null,
+    CAR_COST decimal(7,2),
+    CAR_MAKE varchar(20) not null,
+    CAR_MODEL varchar(20) not null,
+    CAR_YEAR integer not null,
+    primary key (CAR_ID)
+)]]></programlisting>                        
+        </section>    
+
+        <section id="jpa-entity-entitymap-example-annotations">
+            <title>Mapping Entity Class with Annotations</title>
+            <programlistingco>
+                <areaspec units="linecolumn">
+                    <area id="jpa-entity-entitymap-example-annotations-area-table" coords="2"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-id" coords="5"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-make" coords="7"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-model" coords="14"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-year" coords="16"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-cost" coords="18"/>
+                </areaspec>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_CAR")
+public class Car {    
+    @Id
+    @Column(name="CAR_ID", nullable=false)
+    private long id;
+    @Column(name="CAR_MAKE", 
+            unique=false, 
+            nullable=false, 
+            insertable=true,
+            updatable=true,
+            length=20)
+    private String make;
+    @Column(name="CAR_MODEL", nullable=false, length=20)
+    private String model;    
+    @Column(name="CAR_YEAR", nullable=false)
+    private int year;
+    @Column(name="CAR_COST", precision=7, scale=2)
+    private BigDecimal cost;
+...
+]]></programlisting>
+            </programlistingco>            
+        </section>    
+
+        <section id="jpa-entity-entitymap-example-orm">
+            <title>Mapping Entity Class with orm.xml</title>
+
+            <programlistingco>
+                <areaspec units="linecolumn">
+                    <area id="jpa-entity-entitymap-example-annotations-area-mtable" coords="3"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-mid" coords="6"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-mmake" coords="9"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-mmodel" coords="16"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-myear" coords="19"/>
+                    <area id="jpa-entity-entitymap-example-annotations-area-mcost" coords="22"/>
+                </areaspec>
+<programlisting language="java"><![CDATA[<entity class="ejava.examples.orm.core.mapped.Car" 
+    access="FIELD">
+    <table name="ORMCORE_CAR"/>
+    <attributes>
+        <id name="id">
+            <column name="CAR_ID" nullable="false"/>
+        </id>
+        <basic name="make">
+            <column name="CAR_MAKE"
+                    nullable="false"
+                    insertable="true"
+                    updatable="true"
+                    length="20"/>
+        </basic>
+        <basic name="model">
+            <column name="CAR_MODEL" nullable="false" length="20"/>
+        </basic>
+        <basic name="year">
+            <column name="CAR_YEAR" nullable="false"/>
+        </basic>
+        <basic name="cost">
+            <column name="CAR_COST" precision="7" scale="2"/>
+        </basic>
+    </attributes>
+</entity>    
+]]></programlisting>
+            </programlistingco>            
+            
+        </section>
+
+    </section>    
+
+
+    <section id="jpa-entity-entitymap-scale">
+       <title>More on Precision/Scale</title>
+        <figure>
+            <title>More on Scale</title>
+<programlisting language="java"><![CDATA[//precision defined in ORM as precision=7, scale=2 
+car.setCost(new BigDecimal("12345.66"));
+em.persist(car);
+em.flush(); em.clear();
+
+//get a fresh copy from the DB
+Car car2 = em.find(Car.class, car.getId());
+log.info("car.cost=" + car.getCost());
+log.info("car2.cost=" + car2.getCost());
+assertTrue("unexpectected value", car.getCost().equals(car2.getCost()));
+
+//update beyond the scale values -- too many digits to right of decimal
+car2.setCost(new BigDecimal("1234.666"));
+em.flush(); em.clear();
+Car car3 = em.find(Car.class, car.getId());
+log.info("car2.cost=" + car2.getCost());
+log.info("car3.cost=" + car3.getCost());
+assertFalse("unexpected scale", car2.getCost().equals(car3.getCost()));]]></programlisting>            
+
+<programlisting language=""><![CDATA[-car.cost=12345.66     //Value created within scale=2
+-car2.cost=12345.66    //Value correctly retrieved from DB     
+-car2.cost=1234.666    //Value goes beyond scale=2
+-car3.cost=1234.67     //Value rounded down to scale from DB]]></programlisting>                        
+        </figure>
+            
+
+        <figure>
+            <title>More on Precision</title>
+<programlisting language="java"><![CDATA[
+//update beyond the precision values -- too many digits overall
+car2 = car3;
+car2.setCost(new BigDecimal("123456.66"));
+try {
+    em.flush();
+    fail("database accepted too many digits");
+} catch (PersistenceException ex) {
+    log.info("caught expected exception:" + ex);
+}
+]]></programlisting>                        
+<programlisting language=""><![CDATA[-caught expected exception:javax.persistence.PersistenceException: 
+org.hibernate.exception.DataException: could not execute statement]]></programlisting>                        
+        </figure>
+    </section>    
+    
+    
+    <section id="jpa-entity-entitymap-transient">
+        <title>Transient Properties</title>
+        <orderedlist spacing="compact">
+            <listitem><para>Entity using PROPERTY access</para></listitem>
+            <listitem><para>Entity class contains property that complies with default rules that should *not* be mapped to database</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>setters</para></listitem>
+                    <listitem><para>getters</para></listitem>
+                    <listitem><para>relations to other classes, including collections</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </orderedlist>
+        
+        <figure>
+            <title>Transient Example Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_TANK")
+public class Tank {
+    private long id;
+    private String make;
+    private String model;
+    
+    public Tank() {}
+    public Tank(long id) { this.id = id; }
+    
+    @Id 
+    public long getId() { return id; }
+    protected void setId(long id) {
+        this.id = id;
+    }
+        
+    @Transient    //if you remove this, it will fail trying to locate setter
+    public String getMakeModel() {
+        return make + " " + model;
+    }
+    
+    public String getMake() { return make; }
+    public void setMake(String make) {
+        this.make = make;
+    }
+
+    public String getModel() { return model; }
+    public void setModel(String model) {
+        this.model = model;
+    }]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Transient Example orm.xml</title>
+<programlisting language="xml"><![CDATA[
+<entity class="ejava.examples.orm.core.mapped.Tank" access="PROPERTY">
+    <table name="ORMCORE_TANK"/>
+    <attributes>
+        <id name="id"/>
+        <transient name="makeModel"/>            
+    </attributes>
+</entity>]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Transient Example Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_TANK (
+    id bigint not null,
+    make varchar(255),
+    model varchar(255),
+    primary key (id)
+)]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Transient Example Test</title>
+<programlisting language="java"><![CDATA[ejava.examples.orm.core.annotated.Tank tank = new Tank(1);
+tank.setMake("acme");
+tank.setModel("great guns");
+
+//insert a row in the database
+em.persist(tank);
+log.info("created tank:" + tank);]]></programlisting>                        
+
+<programlisting language=""><![CDATA[-created tank:ejava.examples.orm.core.annotated.Tank@4eef4eb7make=acme, model=great guns]]></programlisting>                        
+        </figure>
+
+    </section>    
+
+    <section id="jpa-entity-entitymap-lob">
+        <title>Lob Properties</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Storing large text document as CLOB</para></listitem>
+            <listitem><para>Storing large binary data as BLOB</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>CLOB Example Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_UMBRELLA (
+    id bigint not null,
+    make clob,
+    model varchar(255),
+    primary key (id)
+)]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>CLOB Example Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_UMBRELLA")
+public class Umbrella {
+    @Lob
+    @Basic(fetch=FetchType.LAZY) //ignored
+    public char[] getMake() {
+        return make.toCharArray();
+    }
+    public void setMake(char[] make) {
+        this.make = new String(make);
+    }]]></programlisting>                        
+        </figure>
+
+    </section>    
+    
+    
+    <section id="jpa-entity-entitymap-temporalenum">
+       <title>Temporal and Enumerated Properties</title>
+       
+        <section id="jpa-entity-entitymap-temporal">
+           <title>Temporals</title>
+           <orderedlist spacing="compact">
+                <listitem><para>DATE</para></listitem>
+                <listitem><para>TIME</para></listitem>
+                <listitem><para>TIMESTAMP</para></listitem>
+           </orderedlist>
+        </section>    
+       
+        <section id="jpa-entity-entitymap-num">
+            <title>Enums</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>ORDINAL</para></listitem>
+                <listitem><para>NAME</para></listitem>
+            </itemizedlist>
+        </section>    
+
+        <section id="jpa-entity-entitymap-schema">
+            <title>Temporal/Enum Example</title>
+            <figure>
+                <title>Temporal/Enum Example Schema</title>
+<programlisting language="java"><![CDATA[create table ORMCORE_VASE (
+    id bigint not null,
+    aDate date,
+    aTime time,
+    aTimestamp timestamp,
+    colorId integer,
+    colorName varchar(255),
+    primary key (id)
+)]]></programlisting>                        
+            </figure>            
+    
+            <figure>
+                <title>Temporal/Enum Example Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_VASE")
+public class Vase {
+    @Id
+    private long id;
+    @Temporal(TemporalType.DATE)
+    private Date aDate;
+    @Temporal(TemporalType.TIME)
+    private Date aTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date aTimestamp;
+    @Enumerated(EnumType.ORDINAL)
+    private ColorType colorId;
+    @Enumerated(EnumType.STRING)
+    private ColorType colorName;]]></programlisting>                        
+            </figure>
+            
+            <figure>
+                <title>Temporal/Enum Example orm.xml</title>
+<programlisting language="xml"><![CDATA[
+<entity class="ejava.examples.orm.core.mapped.Vase" access="FIELD">
+    <table name="ORMCORE_VASE"/>
+    <attributes>
+        <id name="id"/>
+        <basic name="aDate">
+            <temporal>DATE</temporal>
+        </basic>            
+        <basic name="aTime">
+            <temporal>TIME</temporal>
+        </basic>            
+        <basic name="aTimestamp">
+            <temporal>TIMESTAMP</temporal>
+        </basic>            
+        <basic name="colorId">
+            <enumerated>ORDINAL</enumerated>
+        </basic>            
+        <basic name="colorName">
+            <enumerated>STRING</enumerated>
+        </basic>            
+    </attributes>
+</entity>]]></programlisting>                        
+            </figure>
+
+            <figure>
+                <title>Temporal/Enum Example Test</title>
+<programlisting language="java"><![CDATA[@Test
+public void testValues() {
+    log.info("testValues");
+    ejava.examples.orm.core.annotated.Vase vase = new Vase(1);
+    Date date = new Date();
+    vase.setADate(date);
+    vase.setATime(date);
+    vase.setATimestamp(date);
+    vase.setColorId(ColorType.RED);
+    vase.setColorName(ColorType.RED);
+    
+    //insert a row in the database
+    em.persist(vase);
+    log.info("created case:" + vase);
+    
+    //find the inserted object
+    em.flush();
+    em.clear();
+    Vase vase2 = em.find(Vase.class, 1L); 
+
+    log.info("found vase:" + vase2);]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+-created case:ejava.examples.orm.core.annotated.Vase@7f68f33c, 
+    id=1, 
+    aDate=Mon Sep 23 00:11:10 EDT 2013, 
+    aTime=Mon Sep 23 00:11:10 EDT 2013, 
+    aTimestamp=Mon Sep 23 00:11:10 EDT 2013, 
+    colorId=RED, 
+    colorName=RED
+    
+-found vase:ejava.examples.orm.core.annotated.Vase@5f0d8b74, 
+    id=1, 
+    aDate=2013-09-23, 
+    aTime=00:11:10, 
+    aTimestamp=2013-09-23 00:11:10.296, 
+    colorId=RED, 
+    colorName=RED    
+]]></programlisting>                        
+<programlisting language=""><![CDATA[
+select * from ORMCORE_VASE
+ID ADATE      ATIME    ATIMESTAMP                    COLORID COLORNAME
+-- ---------- -------- ----------------------------- ------- ---------
+1  2006-09-23 14:08:22 2006-09-23 14:08:22.221000000 0       RED]]></programlisting>                        
+        </figure>
+            <para>Notice impact of temporal DB-mapping does effect until data saved and retrieved from database</para>
+        </section>    
+    </section>    
+
+</chapter>
+  

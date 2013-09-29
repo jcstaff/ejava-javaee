@@ -1,7 +1,5 @@
 package ejava.examples.orm.core.mapped;
 
-import java.io.Serializable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -9,13 +7,9 @@ import org.apache.commons.logging.LogFactory;
  * This class provides an example of using LAZY fetch hints. We use 
  * log statements in the setters and getters to track activity within
  * the objects.
- *   
- * @author jcstaff
- * $Id:$
  */
-public class Umbrella implements Serializable {
+public class Umbrella {
     private static Log log = LogFactory.getLog(Umbrella.class);
-    private static final long serialVersionUID = 1L;
     private long id;
     private String make;
     private String model;
@@ -32,8 +26,7 @@ public class Umbrella implements Serializable {
         trace("getId()=" + id);
         return id;
     }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
+    protected void setId(long id) {
         trace("setId(" + id + ")");
         this.id = id;
     }

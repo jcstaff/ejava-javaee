@@ -1,7 +1,6 @@
 package ejava.examples.orm.core.mapped;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
 
 /**
@@ -9,14 +8,14 @@ import javax.persistence.*;
  * embedded into the referenced class. The containing class will simply
  * use an instance of this class rather than having separate fields that
  * match the fields of this class.
- * 
- * @author jcstaff
- * $Id:$
  */
 @Embeddable
 public class NapsackPK implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    @Column(name="NAPSACK_MAKE") //maps field to column of containing class
     private String make;
+    @Column(name="NAPSACK_MODEL")//maps field to column of containing class
     private String model;
     
     public NapsackPK() {}
@@ -24,28 +23,11 @@ public class NapsackPK implements Serializable {
         this.make = make;
         this.model = model;
     }
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
     
-    @Column(name="NAPSACK_MAKE") //maps field to column of containing class
-    public String getMake() {
-        return make;
-    }
-    public void setMake(String make) {
-        this.make = make;
-    }
+    public String getMake() { return make; }
+    public String getModel() { return model; }
 
-    @Column(name="NAPSACK_MODEL")//maps field to column of containing class
-    public String getModel() {
-        return model;
-    }
-    public void setModel(String model) {
-        this.model = model;
-    }
-    public int hashCode() {
-        return make.hashCode() + model.hashCode();
-    }
+    public int hashCode() { return make.hashCode() + model.hashCode(); }
     public boolean equals(Object obj) {
         try {
             if (this == obj) return true;

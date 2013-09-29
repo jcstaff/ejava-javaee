@@ -1,45 +1,21 @@
 package ejava.examples.orm.core.products;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import static org.junit.Assert.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import ejava.examples.orm.core.annotated.Bike;
-
-import junit.framework.TestCase;
 
 /**
  * This test case provides a demo of using a class that has been mapped
  * to the database with only basic class annotations. All defaults will
  * be determined by the Java Persistence provider.
  * 
- * @author jcstaff
- * $Id:$
  */
-public class BasicAnnotationDemo extends TestCase {
-    private static Log log = LogFactory.getLog(BasicAnnotationDemo.class);
-    private static final String PERSISTENCE_UNIT = "ormCore";
-    private EntityManagerFactory emf;
-    private EntityManager em = null;
-
-    protected void setUp() throws Exception {        
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-    }
-
-    protected void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
-    }
+public class BasicAnnotationTest extends TestBase {
+    private static Log log = LogFactory.getLog(BasicAnnotationTest.class);
     
     /**
      * This test demonstrates the ability to map a simple object to the 
@@ -51,6 +27,7 @@ public class BasicAnnotationDemo extends TestCase {
      * with columns id, make, model, and size. The data types for these 
      * columns are the defaults of the Java Persistence provider. 
      */
+    @Test
     public void testDefaultMapping() {
         log.info("testDefaultMapping");
         ejava.examples.orm.core.annotated.Bike bike = new Bike(1);

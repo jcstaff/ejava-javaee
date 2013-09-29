@@ -1,4 +1,4 @@
-<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="jpa-validation-maven">
@@ -6,30 +6,30 @@
         
     <section id="jpa-validation-maven-dependencies">
         <title>Adding POM Dependencies</title>
-
-        <itemizedlist spacing="compact">
-            <listitem><para>API Dependency</para>
-<programlisting language="xml"><![CDATA[
-<dependency>
+        
+        <figure>
+            <title>API Dependency</title>
+<programlisting language="xml"><![CDATA[<dependency>
     <groupId>javax.validation</groupId>
     <artifactId>validation-api</artifactId>
     <version>1.1.0.Final</version>
     <scope>compile</scope>
 </dependency>]]></programlisting>                        
-            </listitem>
-            <listitem><para>Implementation Dependency (includes API dependency)</para>
-<programlisting language="xml"><![CDATA[
-<dependency>
+        </figure>
+
+        <figure>
+            <title>Implementation Dependency (includes API dependency)</title>
+<programlisting language="xml"><![CDATA[<dependency>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator</artifactId>
     <version>5.0.1.Final</version>
     <scope>test</scope>
 </dependency>]]></programlisting>                        
-            </listitem>
+        </figure>
 
-            <listitem><para>Hibernate Implementation Dependency for @Pattern constraints</para>
-<programlisting language="xml"><![CDATA[
-<dependency>
+        <figure>
+            <title>Hibernate Implementation Dependency for @Pattern constraints</title>
+<programlisting language="xml"><![CDATA[<dependency>
     <groupId>javax.el</groupId>
     <artifactId>javax.el-api</artifactId>
     <version>2.2.4</version>
@@ -41,19 +41,15 @@
     <version>2.2.4</version>
     <scope>test</scope>
 </dependency>]]></programlisting>                        
-            </listitem>
-        </itemizedlist>
-        
-        <para></para>
+        </figure>
     </section>
 
     <section id="jpa-validation-maven-plugins">
         <title>Adding Plugin Dependencies</title>
   
-        <itemizedlist spacing="compact">
-            <listitem><para>Add validator to schema generation pluginManagement</para>
-<programlisting language="xml"><![CDATA[
-<plugin>
+          <figure>
+            <title>Add validator to schema generation pluginManagement</title>
+<programlisting language="xml"><![CDATA[<plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>hibernate3-maven-plugin</artifactId>
     <version>${hibernate3-maven-plugin.version}</version>
@@ -69,9 +65,10 @@
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator.version}</version>
         </dependency>
-    </dependencies>]]></programlisting>                        
-            </listitem>
-        </itemizedlist>
+    </dependencies>
+</plugin>]]></programlisting>                        
+        </figure>
+
     </section>
 </chapter>
   

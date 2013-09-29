@@ -1,0 +1,155 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
+
+<chapter id="jpa-entity-multitable">
+    <title>Multi-table Mapping</title>
+    <itemizedlist spacing="compact">
+        <listitem><para>Map a single Java class to multiple tables in database</para></listitem>
+        <listitem><para>Uses a join of two or more tables and a single Java class</para>
+           <orderedlist spacing="compact">
+                <listitem><para>One table is designated as primary</para></listitem>
+                <listitem><para>Secondary and primary must have a column to join</para></listitem>
+           </orderedlist>
+        </listitem>
+    </itemizedlist>
+    
+    <section id="jpa-entity-multitable-example">
+        <title>Multi-table Example</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Three tables (one primary and two secondary) joined</para></listitem>
+        </itemizedlist>
+
+
+        <figure>
+            <title>Multi-table Mapping Example Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMCORE_WATCH (
+    id bigint not null,
+    make varchar(255),
+    model varchar(255),
+    primary key (id)
+)]]></programlisting>
+
+<programlisting language=""><![CDATA[create table ORMCORE_OWNER (
+    cardnum varchar(255),
+    NAME varchar(255),
+    OWNER_ID bigint not null,
+    primary key (OWNER_ID)
+)]]></programlisting>                        
+
+<programlisting language=""><![CDATA[create table ORMCORE_MAKER (
+    address varchar(255),
+    NAME varchar(255),
+    phone varchar(255),
+    MAKER_ID bigint not null,
+    primary key (MAKER_ID)
+)]]></programlisting>                        
+                        
+<programlisting language=""><![CDATA[alter table ORMCORE_MAKER 
+    add constraint FKB91D15CEC0CE58E2 
+    foreign key (MAKER_ID) 
+    references ORMCORE_WATCH
+alter table ORMCORE_OWNER 
+    add constraint FKB943503D985CE28 
+    foreign key (OWNER_ID) 
+    references ORMCORE_WATCH]]></programlisting>                        
+        </figure>
+
+
+        <figure>
+            <title>Multi-table Mapping Example Entity Class</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMCORE_WATCH")
+@SecondaryTables({
+    @SecondaryTable(name="ORMCORE_OWNER",
+        pkJoinColumns={
+            @PrimaryKeyJoinColumn(name="OWNER_ID")}),
+    @SecondaryTable(name="ORMCORE_MAKER",
+        pkJoinColumns={
+            @PrimaryKeyJoinColumn(name="MAKER_ID")})
+})
+public class Watch {
+    @Id
+    private long id;
+    private String make;
+    private String model;
+    @Column(name="NAME", table="ORMCORE_OWNER")
+    private String owner;
+    @Column(table="ORMCORE_OWNER")
+    private String cardnum;
+    @Column(name="NAME", table="ORMCORE_MAKER")
+    private String manufacturer;
+    @Column(table="ORMCORE_MAKER")
+    private String address;
+    @Column(table="ORMCORE_MAKER")
+    private String phone;]]></programlisting>                        
+        </figure>
+
+
+        <figure>
+            <title>Multi-table Mapping Example orm.xml</title>
+<programlisting language="xml"><![CDATA[<entity class="ejava.examples.orm.core.mapped.Watch" access="FIELD">
+    <table name="ORMCORE_WATCH"/>
+    <secondary-table name="ORMCORE_OWNER">
+        <primary-key-join-column name="OWNER_ID"/>
+    </secondary-table>
+    <secondary-table name="ORMCORE_MAKER">
+        <primary-key-join-column name="MAKER_ID"/>
+    </secondary-table>
+    <attributes>
+        <id name="id"/>
+        <basic name="owner">
+            <column name="NAME" table="ORMCORE_OWNER"/>
+        </basic>
+        <basic name="cardnum">
+            <column table="ORMCORE_OWNER"/>
+        </basic>
+        <basic name="manufacturer">
+            <column name="NAME" table="ORMCORE_MAKER"/>
+        </basic>
+        <basic name="address">
+            <column table="ORMCORE_MAKER"/>
+        </basic>
+        <basic name="phone">
+            <column table="ORMCORE_MAKER"/>
+        </basic>
+    </attributes>
+</entity>        
+]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Multi-table Mapping Example Test</title>
+<programlisting language=""><![CDATA[//leave a watch in DB to inspect
+Watch watch3 = new Watch(3);
+watch3.setMake("ontime3");
+watch3.setModel("round-and-round3");
+watch3.setOwner("john doe3");
+watch3.setCardnum("123-45-67893");
+watch3.setManufacturer("getter done3");
+watch3.setAddress("12noon lane3");
+watch3.setPhone("410-555-12123");       
+em.persist(watch3);]]></programlisting>                        
+
+<programlisting language=""><![CDATA[select * from ORMCORE_WATCH
+ID MAKE    MODEL
+3  ontime3 round-and-round3]]></programlisting>
+                        
+<programlisting language=""><![CDATA[select * from ORMCORE_MAKER
+NAME         PHONE         ADDRESS      MAKER_ID
+getter done3 410-555-12123 12noon lane3 3]]></programlisting>
+                        
+<programlisting language=""><![CDATA[select * from ORMCORE_OWNER
+CARDNUM      NAME      OWNER_ID
+123-45-67893 john doe3 3]]></programlisting>                        
+        </figure>
+
+    </section>
+
+    <section id="jpa-entity-multitable-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Useful when single domain class spread across multiple legacy tables</para></listitem>
+        </itemizedlist>
+    </section>
+</chapter>
+  

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" version="1.0">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+        version="2.0">
 
     <!-- this descriptor provides an example of mapping an embedded object.
     
@@ -10,14 +11,13 @@
         embeddable.
         -->
     <entity class="ejava.examples.orm.core.mapped.XRay" 
-        access="PROPERTY"
+        access="FIELD"
         metadata-complete="true"
         name="MappedXRay">
         <table name="ORMCORE_XRAY"/>
         <attributes>
             <id name="id"/>
             <embedded name="maker">
-                <!-- this was being ignored -->
                 <attribute-override name="name">
                     <column name="XRAY_MAKER"/>
                 </attribute-override>
@@ -27,16 +27,7 @@
         </attributes>
     </entity>        
     
-    <embeddable class="ejava.examples.orm.core.mapped.Manufacturer"
-                access="PROPERTY">
-                
-        <attributes>
-            <!-- I had to create mapping here -->
-            <basic name="name">
-                <column name="XRAY_MAKER"/>
-            </basic>
-        </attributes>
-    </embeddable>
+    <embeddable class="ejava.examples.orm.core.mapped.Manufacturer" access="FIELD"/>
     
     
 </entity-mappings>

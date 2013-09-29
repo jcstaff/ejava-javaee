@@ -1,4 +1,4 @@
-<!DOCTYPE partintro PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
 <chapter id="jpa-validation-jpa">
@@ -9,8 +9,7 @@
         <title>Entity Class</title>
         <para>JPA and Validation API annotations can be mixed together</para>
   
-<programlisting language="java"><![CDATA[
-@Entity
+<programlisting language="java"><![CDATA[@Entity
 @Table(name="VALIDATION_PERSON")
 public class Person {
     @Id @GeneratedValue
@@ -45,8 +44,7 @@ public class Person {
         
     <section id="jpa-validation-jpa-persistencexml">
         <title>Persistence Unit</title>
-<programlisting language="xml"><![CDATA[
-<?xml version="1.0" encoding="UTF-8"?>
+<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <persistence ...
 
     <persistence-unit name="jpa-validation-example-test">
@@ -89,8 +87,7 @@ public class Person {
         
     <section id="jpa-validation-jpa-validation">
         <title>Validation</title>
-<programlisting language="java"><![CDATA[
-Person p = new Person()
+<programlisting language="java"><![CDATA[Person p = new Person()
     .setFirstName("Bob")
     .setLastName("Smith")
     .setBirthDate(new Date());
@@ -100,8 +97,7 @@ try {
     log.info("caught expected exception:" + ex);
 }]]></programlisting>                        
 
-<programlisting language=""><![CDATA[
- -caught expected exception:javax.validation.ConstraintViolationException: 
+<programlisting language=""><![CDATA[ -caught expected exception:javax.validation.ConstraintViolationException: 
      Validation failed for classes [ejava.jpa.example.validation.Person] 
      during persist time for groups [ejava.jpa.example.validation.Drivers, ]
 List of constraint violations:[
@@ -133,10 +129,10 @@ List of constraint violations:[
 
     <section id="jpa-validation-jpa-summary">
        <title>Summary</title>
-       <orderedlist>
+       <itemizedlist>
             <listitem><para>Validation API is independent of JPA specification</para></listitem>
             <listitem><para>JPA provides specific hooks to integrate Validation API</para></listitem>
-       </orderedlist>
+       </itemizedlist>
     </section>    
 </chapter>
   

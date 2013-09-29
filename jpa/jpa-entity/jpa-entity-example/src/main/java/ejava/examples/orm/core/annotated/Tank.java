@@ -1,7 +1,5 @@
 package ejava.examples.orm.core.annotated;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 /**
@@ -10,14 +8,10 @@ import javax.persistence.*;
  * The getMakeModel() convenience method will cause processing to fail 
  * because there is no matching setter(). Marking it with @Transient fixes
  * this.
- *  
- * @author jcstaff
- * $Id:$
  */
 @Entity
 @Table(name="ORMCORE_TANK")
-public class Tank implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Tank {
     private long id;
     private String make;
     private String model;
@@ -25,12 +19,9 @@ public class Tank implements Serializable {
     public Tank() {}
     public Tank(long id) { this.id = id; }
     
-    @Id
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
+    @Id 
+    public long getId() { return id; }
+    protected void setId(long id) {
         this.id = id;
     }
         
@@ -39,15 +30,12 @@ public class Tank implements Serializable {
         return make + " " + model;
     }
     
-    public String getMake() {
-        return make;
-    }
+    public String getMake() { return make; }
     public void setMake(String make) {
         this.make = make;
     }
-    public String getModel() {
-        return model;
-    }
+
+    public String getModel() { return model; }
     public void setModel(String model) {
         this.model = model;
     }
@@ -59,5 +47,4 @@ public class Tank implements Serializable {
            .append(", model=").append(model)
            .toString();
     }
-
 }

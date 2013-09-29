@@ -1,52 +1,31 @@
 package ejava.examples.orm.core.products;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import static org.junit.Assert.*;
+
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assume;
+import org.junit.Test;
 
 import ejava.examples.orm.core.mapped.Drill;
 import ejava.examples.orm.core.mapped.EggBeater;
+import ejava.examples.orm.core.mapped.Fan;
 import ejava.examples.orm.core.mapped.Gadget;
-
-import junit.framework.TestCase;
 
 /**
  * This test case provides a demo of using automatically generated primary
  * keys setup using class annotations.
- * 
- * @author jcstaff
- * $Id:$
  */
-public class PKGenMappingDemo extends TestCase {
-    private static Log log = LogFactory.getLog(BasicAnnotationDemo.class);
-    private static final String PERSISTENCE_UNIT = "ormCore";
-    private EntityManagerFactory emf;
-    private EntityManager em = null;
-
-    protected void setUp() throws Exception {        
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);   
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-    }
-
-    protected void tearDown() throws Exception {
-        EntityTransaction tx = em.getTransaction();
-        if (tx.isActive()) {
-            if (tx.getRollbackOnly() == true) { tx.rollback(); }
-            else                              { tx.commit(); }
-        }
-        em.close();
-    }
+public class PKGenMappingTest extends TestBase {
+    private static Log log = LogFactory.getLog(BasicAnnotationTest.class);
     
     /**
      * This test provides a demo of using the AUTO GeneratedType. This value
      * is provided by the Java Persistance provider.
      */
+    @Test
     public void testAUTOGood() {
         log.info("testAUTOGood");
         //note that since PKs are generated, we must pass in an object that
@@ -67,6 +46,7 @@ public class PKGenMappingDemo extends TestCase {
      * This test provides a demo of the error that can occure when passing an
      * object with the PK already assigned when using GeneratedValues.
      */
+    @Test
     public void testAUTOBad() {
         log.info("testAUTOBad");
         //he's not going to like they non-zero PK value here
@@ -87,6 +67,7 @@ public class PKGenMappingDemo extends TestCase {
         assertTrue(exceptionThrown);
     }        
 
+    @Test
     public void testTABLE() {
         log.info("testTABLE");
         //note that since PKs are generated, we must pass in an object that
@@ -104,9 +85,23 @@ public class PKGenMappingDemo extends TestCase {
     }
 
     public void testSEQUENCE() {
-        log.info("testSEQUENCE - see PKSequenceGenMappingDemo");
+        Assume.assumeTrue(Boolean.parseBoolean(System.getProperty("sql.sequences", "true")));
+        log.info("testSEQUENCE");
+        //note that since PKs are generated, we must pass in an object that
+        //has not yet been assigned a PK value.
+        ejava.examples.orm.core.mapped.Fan fan = new Fan(0);
+        fan.setMake("cool runner 2");
+        
+        //insert a row in the database
+        em.persist(fan);
+        log.info("created fan (before flush):" + fan);
+        em.flush(); 
+        log.info("created fan (after flush):" + fan);
+        
+        assertFalse(fan.getId() == 0L);                
     }
 
+    @Test
     public void testIDENTITY() {
         log.info("testIDENTITY");
         ejava.examples.orm.core.mapped.Gadget gadget = new Gadget(0);

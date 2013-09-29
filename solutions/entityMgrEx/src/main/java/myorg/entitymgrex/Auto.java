@@ -18,36 +18,27 @@ public class Auto implements Serializable {
     private String color;
     private int mileage;
 
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
+    public Auto(){}
+    public Auto(int id) { this.id=id; }
+    public long getId() { return id; }
 
     //more getter/setters go here
-    public String getMake() {
-        return make;
-    }
+    public String getMake() { return make; }
     public void setMake(String make) {
         this.make = make;
     }
-    public int getMileage() {
-        return mileage;
-    }
+    
+    public int getMileage() { return mileage; }
     public void setMileage(int mileage) {
         this.mileage = mileage;
     }
-    public String getModel() {
-        return model;
-    }
+    
+    public String getModel() { return model; }
     public void setModel(String model) {
         this.model = model;
     }
-    public String getColor() {
-        return color;
-    }
+    
+    public String getColor() { return color; }
     public void setColor(String color) {
         this.color = color;
     }    

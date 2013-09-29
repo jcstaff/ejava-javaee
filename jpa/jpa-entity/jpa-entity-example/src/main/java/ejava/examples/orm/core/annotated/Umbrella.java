@@ -1,7 +1,5 @@
 package ejava.examples.orm.core.annotated;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 import org.apache.commons.logging.Log;
@@ -11,15 +9,11 @@ import org.apache.commons.logging.LogFactory;
  * This class provides an example of using LAZY fetch hints. We use 
  * log statements in the setters and getters to track activity within
  * the objects.
- *   
- * @author jcstaff
- * $Id:$
  */
 @Entity
 @Table(name="ORMCORE_UMBRELLA")
-public class Umbrella implements Serializable {
+public class Umbrella {
     private static Log log = LogFactory.getLog(Umbrella.class);
-    private static final long serialVersionUID = 1L;
     private long id;
     private String make;
     private String model;

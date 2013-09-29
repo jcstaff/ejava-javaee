@@ -1,20 +1,14 @@
 package ejava.examples.orm.core.annotated;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 /**
  * This class provides an example of an object with no identity of its own
  * and must be stored within a containing object. See the XRay class for
  * an example of a containing object.
- * 
- * @author jcstaff
- * $Id:$
  */
 @Embeddable
-public class Manufacturer implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Manufacturer {
     private String name;
     private String address;
     private String phone;
@@ -26,21 +20,17 @@ public class Manufacturer implements Serializable {
         this.phone=phone;
     }
     
-    public String getAddress() {
-        return address;
-    }
+    public String getAddress() { return address; }
     public void setAddress(String address) {
         this.address = address;
     }
-    public String getName() {
-        return name;
-    }
+
+    public String getName() { return name; }
     public void setName(String name) {
         this.name = name;
     }
-    public String getPhone() {
-        return phone;
-    }
+
+    public String getPhone() { return phone; }
     public void setPhone(String phone) {
         this.phone = phone;
     }
