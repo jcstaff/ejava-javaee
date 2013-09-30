@@ -23,8 +23,8 @@ public class OneToManyTest extends DemoBase {
      * This setUp method creates a Borrower to be used during the test
      * methods.
      */
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUpBase() throws Exception {
+        super.setUpBase();
         log.info("creating base Borrower for tests");
         ejava.examples.orm.rel.annotated.Person person = new Person();
         person.setFirstName("john");

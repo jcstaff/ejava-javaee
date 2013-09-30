@@ -1,6 +1,5 @@
 package ejava.examples.orm.rel.annotated;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Collection;
 import java.util.ArrayList;
@@ -21,8 +20,7 @@ import org.apache.commons.logging.LogFactory;
  * getters are declared Transient.
  */
 @Entity @Table(name="ORMREL_BORROWER")
-public class Borrower implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Borrower  {
     private static Log log = LogFactory.getLog(Borrower.class);
     @Id @Column(name="BORROWER_ID")
     private long id;
@@ -36,6 +34,7 @@ public class Borrower implements Serializable {
                      CascadeType.REFRESH,
                      CascadeType.MERGE})
     @PrimaryKeyJoinColumn  //the two tables will be joined by PKs
+    //@MapsId
     private Person identity;
     
     @OneToOne(fetch=FetchType.LAZY, 

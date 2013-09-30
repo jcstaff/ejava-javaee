@@ -38,14 +38,14 @@ public abstract class DemoBase {
     }
 
     @Before
-    public void setUp() throws Exception {        
+    public void setUpBase() throws Exception {        
         em = emf.createEntityManager();
         precleanup();
         em.getTransaction().begin();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDownBase() throws Exception {
         EntityTransaction tx = em.getTransaction();
         if (tx.isActive()) {
             if (tx.getRollbackOnly() == true) { tx.rollback(); }
@@ -56,8 +56,8 @@ public abstract class DemoBase {
     }
 
     @AfterClass
-    public static void tearDownShared() throws Exception {
-    	logBase.debug("*** tearDownShared() ***");
+    public static void tearDownBaseClass() throws Exception {
+    	logBase.debug("*** tearDownBaseClass() ***");
         if (emf != null) {
         	emf.close();
         	emf = null;

@@ -1,7 +1,5 @@
 package ejava.examples.orm.rel.annotated;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 import org.apache.commons.logging.Log;
@@ -12,14 +10,10 @@ import org.apache.commons.logging.LogFactory;
  * Uni-directional relationship. The person has been physically separated
  * into two tables and objects. This class maintains the core properties.
  * The photo object maintains the larger and optional photo. 
- * 
- * @author jcstaff
- * $Id:$
  */
 @Entity
 @Table(name="ORMREL_PERSON")
-public class Person implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Person  {
     private static Log log = LogFactory.getLog(Person.class);
     @Id @GeneratedValue @Column(name="PERSON_ID")
     private long id;
@@ -29,7 +23,7 @@ public class Person implements Serializable {
 
     @OneToOne(cascade={ 
             CascadeType.ALL},  //have creates, deletes, etc. cascade to photo
-            fetch=FetchType.LAZY)       //a hint that we don't need this blob
+            fetch=FetchType.LAZY)       //a hint that we don't need this
     @JoinColumn(name="PERSON_PHOTO")    //define local foreign key column
     private Photo photo;
 

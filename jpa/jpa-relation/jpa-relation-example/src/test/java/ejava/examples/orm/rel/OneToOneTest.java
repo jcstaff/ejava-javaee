@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Date;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ejava.examples.orm.rel.annotated.Applicant;
@@ -23,8 +24,8 @@ public class OneToOneTest extends DemoBase {
         System.getProperty("photo.file", "images/photo.jpg");
     private byte[] image;
     
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
         InputStream is = Thread.currentThread()
             .getContextClassLoader()
             .getResourceAsStream(PHOTO_FILE);
@@ -42,13 +43,13 @@ public class OneToOneTest extends DemoBase {
     
     /**
      * This test provides an example of setting a OneToOne relationship 
-     * between two independent obejcts in the database. The Person is 
+     * between two independent objects in the database. The Person is 
      * initially created with a FK=null and then its setter is later called
      * to setup the relationship between Person and Photo.
      */
     @Test
-    public void testRelateOrphans() {
-        log.info("testRelateOrphans");
+    public void testUni() {
+        log.info("testUni");
         
         //create the owning side 
         ejava.examples.orm.rel.annotated.Person person = new Person();
@@ -63,20 +64,18 @@ public class OneToOneTest extends DemoBase {
         //create the person and photo detached
         assertTrue(person.getId() == 0);
         assertTrue(photo.getId() == 0);
-        em.persist(person);        
-        em.persist(photo);
-        assertTrue(person.getId() != 0);
-        assertTrue(photo.getId() != 0);
-        log.info("created person:" + person);
-        log.info("     and photo:" + photo);
 
-        //add photo to person
+        //add photo to person and persist object tree
         person.setPhoto(photo); //this sets the FK in person
         log.info("added photo to person:" + person);
+        em.persist(person);        
+        assertTrue("personId not set", person.getId() != 0);
+        assertTrue("photoId not set", photo.getId() != 0);
+        log.info("created person:" + person);
+        log.info("     and photo:" + photo);
         
         //verify what we can get from DB
-        em.flush();
-        em.clear();
+        em.flush(); em.clear();
         Person person2 = em.find(Person.class, person.getId());
         assertNotNull(person2);
         assertNotNull(person2.getPhoto());
@@ -192,11 +191,11 @@ public class OneToOneTest extends DemoBase {
         ejava.examples.orm.rel.annotated.Borrower borrower = 
             new Borrower(person);
         borrower.setStartDate(new Date());
-        assertEquals(person.getId(), borrower.getId()); //ctor copies PK         
         
         //persist the borrower, creating the relationship to person
         em.persist(borrower);
         log.info("created borrower:" + borrower);
+        assertEquals(person.getId(), borrower.getId()); //ctor copies PK         
         
         //lets add a photo to make the finder more interesting
         person.setPhoto(new Photo(image));
@@ -245,8 +244,7 @@ public class OneToOneTest extends DemoBase {
         em.persist(borrower);
         log.info("created applicant in DB:" + applicant);
         log.info("    and borrower:" + borrower);
-        em.flush();
-        em.clear();
+        em.flush(); em.clear();
         
         //locate them from DB
         Applicant applicant2 = em.find(Applicant.class, applicant.getId());
@@ -261,8 +259,7 @@ public class OneToOneTest extends DemoBase {
         applicant2.setBorrower(borrower2);    //set owning side
         log.info("related applicant in DB:" + applicant2);
         log.info("    and borrower:" + borrower2);
-        em.flush();
-        em.clear();
+        em.flush(); em.clear();
         
         //locate them from DB
         Applicant applicant3 = em.find(Applicant.class, applicant.getId());
@@ -280,8 +277,7 @@ public class OneToOneTest extends DemoBase {
         log.info("removed borrower from applicant and DB");        
 
         //verify borrower not associated with applicant
-        em.flush();
-        em.clear();
+        em.flush(); em.clear();
         Applicant applicant4 = em.find(Applicant.class, applicant.getId());
         Borrower borrower4 = em.find(Borrower.class, borrower.getId());
         assertNotNull(applicant4);

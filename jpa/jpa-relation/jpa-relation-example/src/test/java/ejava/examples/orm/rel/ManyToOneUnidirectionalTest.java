@@ -17,8 +17,8 @@ public class ManyToOneUnidirectionalTest extends DemoBase {
     
     /**
      */
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUpBase() throws Exception {
+        super.setUpBase();
     }
 
     /**

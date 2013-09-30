@@ -2,6 +2,8 @@ package ejava.examples.orm.rel;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import ejava.examples.orm.rel.annotated.Applicant;
@@ -20,9 +22,8 @@ public class RelationshipOwnershipTest extends DemoBase {
      * This setUp method creates a few objects that we'll use to test a few
      * relations.
      */
-    public void setUp() throws Exception {
-        super.setUp();
-        
+    @Before
+    public void setUp() throws Exception {        
         ejava.examples.orm.rel.annotated.Person person = new Person();
         person.setFirstName("test");
         person.setLastName("one2oneOwnership");
@@ -36,7 +37,6 @@ public class RelationshipOwnershipTest extends DemoBase {
             new Borrower(person);
         em.persist(borrower);
         
-        em.flush();
         em.getTransaction().commit();
         borrowerId = borrower.getId();
         applicantId = applicant.getId();
@@ -47,6 +47,7 @@ public class RelationshipOwnershipTest extends DemoBase {
     /**
      * This method makes sure there are no relationships left over after test
      */
+    @After
     public void tearDown() throws Exception {        
         
         Borrower borrower = em.find(Borrower.class, borrowerId);
@@ -58,8 +59,6 @@ public class RelationshipOwnershipTest extends DemoBase {
             em.getTransaction().begin();
             em.getTransaction().commit();
         }
-        
-        super.tearDown();
     }
 
     /**
@@ -97,7 +96,6 @@ public class RelationshipOwnershipTest extends DemoBase {
 
         //commit changes to the DB, but since only inserse side of relationship
         //was set, no FK data gets written
-        em.flush();
         em.getTransaction().commit();
         em.clear();
 
@@ -120,10 +118,9 @@ public class RelationshipOwnershipTest extends DemoBase {
         //wire both sides of the relationship and write to DB
         borrower.setApplication(applicant);
         applicant.setBorrower(borrower);
-        em.getTransaction().begin();
-        em.flush();
-        em.clear();
+        em.getTransaction().begin(); 
         em.getTransaction().commit();        
+        em.clear();
 
         assertFalse("borrower was managed", em.contains(borrower));
         assertFalse("application was managed", em.contains(applicant));
@@ -153,9 +150,8 @@ public class RelationshipOwnershipTest extends DemoBase {
         //commit changes to the DB, but since only inserse side of relationship
         //was null, the FK won't get reset
         em.getTransaction().begin();
-        em.flush();
-        em.clear();
         em.getTransaction().commit();        
+        em.clear();
 
         
         assertFalse("borrower was managed", em.contains(borrower));
@@ -205,28 +201,26 @@ public class RelationshipOwnershipTest extends DemoBase {
 
         //commit changes to the DB, since the owning side was set, we do
         //get changes made to DB
-        em.flush();
         em.getTransaction().commit();
-
-        //synchronize DB changes to borrower with object in cache
-        assertNull("borrower has unexpected applicant:" + 
-                borrower.getApplication(), 
-                borrower.getApplication());
-        log.info("refreshing stale borrower:" + borrower);
-        em.refresh(borrower);
-        log.info("stale borrower refreshed:" + borrower);
-        assertNotNull("borrower does not have applicant", 
-                borrower.getApplication());
+        em.clear();
         
         borrower = em.find(Borrower.class, borrowerId);
         applicant = em.find(Applicant.class, applicantId);
 
+        //verify that relationship from cache written to DB
+        assertNotNull("borrower was not updated with applicant:" + 
+                borrower.getApplication(), 
+                borrower.getApplication());
+        assertNotNull("applicant was not updated with borrower", 
+                applicant.getBorrower());
+        
+
+        //remove relationship from borrower
         applicant.setBorrower(null);
         log.info("writing rel owner (application) to DB:" + applicant);
         log.info("writing rel inverse (borrower) to DB:" + borrower);
         
         em.getTransaction().begin();
-        em.flush();
         em.getTransaction().commit();
 
         log.info("refreshing stale borrower:" + borrower);

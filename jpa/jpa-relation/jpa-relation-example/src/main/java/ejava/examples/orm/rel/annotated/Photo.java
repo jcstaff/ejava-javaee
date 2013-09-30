@@ -1,7 +1,5 @@
 package ejava.examples.orm.rel.annotated;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 import org.apache.commons.logging.Log;
@@ -11,15 +9,11 @@ import org.apache.commons.logging.LogFactory;
  * This class provides an example of the "inverse side" of a OneToOne 
  * Uni-directional relationship. This object will be "owned" by the Person
  * object.
- * 
- * @author jcstaff
- * $Id:$
  */
 @Entity
 @Table(name="ORMREL_PHOTO")
-public class Photo implements Serializable {
+public class Photo {
     private static Log log = LogFactory.getLog(Photo.class);
-    private static final long serialVersionUID = 1L;
 
     @Id @GeneratedValue @Column(name="PHOTO_ID")
     private long id;

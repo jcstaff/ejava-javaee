@@ -1,7 +1,5 @@
 package ejava.examples.orm.rel.annotated;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 /**
@@ -10,14 +8,9 @@ import javax.persistence.*;
  * bi-directional, non-primary key relationship with Borrower. In both cases
  * the Applicant owns the relationship. This means that the foreign key forming
  * the relationships will exist in the Applicant's table.
- *   
- * @author jcstaff
- * $Id:$
  */
 @Entity @Table(name="ORMREL_APPLICANT")
-public class Applicant implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
+public class Applicant  {
     @Id @GeneratedValue
     private long id;
     
