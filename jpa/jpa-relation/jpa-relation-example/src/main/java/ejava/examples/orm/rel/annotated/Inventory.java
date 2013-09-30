@@ -11,8 +11,6 @@ import javax.persistence.*;
  * navigation is uni-directional from Inventory to Media and the MEDIA table
  * has no foreign key to reference the INVENTORY table. An INVENTORY_MEDIA
  * join (or link) table is used to make the linkage.
- *
- * @author jcstaff
  */
 @Entity @Table(name="ORMREL_INVENTORY")
 public class Inventory {
@@ -22,6 +20,7 @@ public class Inventory {
 
     @OneToMany(cascade={CascadeType.ALL})
     @JoinTable(name="ORMREL_INVENTORY_MEDIA")
+    //@JoinColumn(name="INVENTORY_ID")
     private Collection<Media> media = new ArrayList<Media>();
     
     public Inventory()        {}

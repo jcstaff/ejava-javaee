@@ -101,90 +101,9 @@
 ]]></programlisting>                        
         </figure>
         
-        <section id="jpa-relation-o2o-uni-annotation">
-           <title>@OneToOne Annotation</title>
-            <variablelist spacing="compact">
-                <varlistentry>
-                    <term><filename>optional:boolean (default=false)</filename></term>
-                    <listitem><para>Designates whether relation is required. Default is true.</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>fetch:FetchType (default=EAGER)</filename></term>
-                    <listitem><para>Use EAGER or LAZY fetching of relationship when loading this entity. 
-                        More of coverage of fetch in <link linkend="jpa-relation-fetch">Fetching</link> section</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>orphanRemoval:boolean (default=false)</filename></term>
-                    <listitem><para>Remote entity only exists for use by this relation. Automatically delete when relation terminated.</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>cascade:CascadeType[] (default=none)</filename></term>
-                    <listitem><para>Perform actions taken on this entity on related entity</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>targetEntity:Class</filename></term>
-                    <listitem><para>Define type for related class (if related Java type over-generalized)</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>mappedBy:String</filename></term>
-                    <listitem><para>Used by inverse side to specify owning entity property that maps relation to DB</para></listitem>
-                </varlistentry>
-            </variablelist>
-        </section>
-        
-        <section id="jpa-relation-o2o-uni-column-annotation">
-           <title>@JoinColumn Annotation</title>
-           <para>Defines a foreign key mapping</para>
-            <variablelist spacing="compact">
-                <varlistentry>
-                    <term><filename>name</filename></term>
-                    <listitem><para>Database column name</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>referencedColumnName (default=primary key)</filename></term>
-                    <listitem><para>Primarily used during composite key mappings to signify which property goes with which primary key member</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>unique (default=false)</filename></term>
-                    <listitem><para>Foreign key is unique within entity table</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>nullable (default=true)</filename></term>
-                    <listitem><para>Foreign key is optional within entity table. Used for 0..1 relationships</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>insertable (default=true)</filename></term>
-                    <listitem><para>Foreign key is part of SQL INSERT for entity</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>updatable (default=true)</filename></term>
-                    <listitem><para>Foreign key is part of SQL UPDATEs for the entity</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>table</filename></term>
-                    <listitem><para>Used in multi-table mappings to identify source table for column</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                    <term><filename>columnDefinition</filename></term>
-                    <listitem><para>Customized DDL for column definition when generating schema</para></listitem>
-                </varlistentry>
-            </variablelist>
-        </section>
-        
-        <section id="jpa-relation-o2o-uni-columns-annotation">
-           <title>@JoinColumns Annotation</title>
-           <para>Used to define multiple @JoinColumns when using composite foreign keys</para>
-<programlisting language="java"><![CDATA[@OneToOne
-@JoinColumns({ //defines an array of @JoinColumns
-    @JoinColumn(...),
-    @JoinColumn(...)    
-})]]></programlisting>                                   
-        </section>    
 
-        <section id="jpa-relation-o2o-uni-usage">
-           <title>One-to-One Uni-directional Example Usage</title>
-            <figure>
-               <title>One-to-One Uni-directional Usage</title>
+        <figure>
+           <title>One-to-One Uni-directional Usage</title>
 <programlisting language="java"><![CDATA[//create the owning side 
 ejava.examples.orm.rel.annotated.Person person = new Person();
 person.setFirstName("john");
@@ -240,10 +159,92 @@ Hibernate:
     where photo0_.PHOTO_ID=?
 -found person:Person@29564bb9, id=1, name=john doe, phone=410-555-1212, 
     photo=Photo@785e7845, id=1. image=46080 bytes]]></programlisting>                        
-            </figure>
-        </section>    
+        </figure>
 
     </section>
+
+    <section id="jpa-relation-o2o-annotation">
+       <title>@OneToOne Annotation</title>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>optional:boolean (default=false)</filename></term>
+                <listitem><para>Designates whether relation is required. Default is true.</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>fetch:FetchType (default=EAGER)</filename></term>
+                <listitem><para>Use EAGER or LAZY fetching of relationship when loading this entity. 
+                    More of coverage of fetch in <link linkend="jpa-relation-fetch">Fetching</link> section</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>orphanRemoval:boolean (default=false)</filename></term>
+                <listitem><para>Remote entity only exists for use by this relation. Automatically delete when relation terminated.</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>cascade:CascadeType[] (default=none)</filename></term>
+                <listitem><para>Perform actions taken on this entity on related entity</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>targetEntity:Class</filename></term>
+                <listitem><para>Define type for related class (if related Java type over-generalized)</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>mappedBy:String</filename></term>
+                <listitem><para>Used by inverse side to specify owning entity property that maps relation to DB</para></listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+    
+    <section id="jpa-relation-o2o-column-annotation">
+       <title>@JoinColumn Annotation</title>
+       <para>Defines a foreign key mapping</para>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>name</filename></term>
+                <listitem><para>Database column name</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>referencedColumnName (default=primary key)</filename></term>
+                <listitem><para>Primarily used during composite key mappings to signify which property goes with which primary key member</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>unique (default=false)</filename></term>
+                <listitem><para>Foreign key is unique within entity table</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>nullable (default=true)</filename></term>
+                <listitem><para>Foreign key is optional within entity table. Used for 0..1 relationships</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>insertable (default=true)</filename></term>
+                <listitem><para>Foreign key is part of SQL INSERT for entity</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>updatable (default=true)</filename></term>
+                <listitem><para>Foreign key is part of SQL UPDATEs for the entity</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>table</filename></term>
+                <listitem><para>Used in multi-table mappings to identify source table for column</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>columnDefinition</filename></term>
+                <listitem><para>Customized DDL for column definition when generating schema</para></listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+    
+    <section id="jpa-relation-o2o-columns-annotation">
+       <title>@JoinColumns Annotation</title>
+       <para>Used to define multiple @JoinColumns when using composite foreign keys</para>
+<programlisting language="java"><![CDATA[@OneToOne
+@JoinColumns({ //defines an array of @JoinColumns
+    @JoinColumn(...),
+    @JoinColumn(...)    
+})]]></programlisting>                                   
+    </section>    
+
+
+
     
     <section id="jpa-relation-o2o-bi">
         <title>One-to-One: Bi-directional</title>
@@ -303,11 +304,8 @@ Hibernate:
         </figure>
 
 
-        <section id="jpa-relation-o2o-bi-usage">
-            <title>One-to-One Bi-directional Example Usage</title>
-
-            <figure>
-                <title>One-to-One Uni-directional Example Usage</title>
+        <figure>
+            <title>One-to-One Uni-directional Example Usage</title>
 <programlisting language="java"><![CDATA[
         //locate them from DB
         Applicant applicant2 = em.find(Applicant.class, applicant.getId());
@@ -383,8 +381,6 @@ Hibernate:
                 <listitem><para>inner joins used for optional=false relationships</para></listitem>
                 <listitem><para>left outer joins used for optional=true relationships</para></listitem>
             </itemizedlist>
-        </section>    
-    
     </section>
     
     <section id="jpa-relation-o2o-bi-ownership">

@@ -1,6 +1,5 @@
 package ejava.examples.orm.rel.annotated;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.*;
@@ -9,9 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 @Entity @Table(name="ORMREL_CHECKOUT")
-public class Checkout implements Serializable {
+public class Checkout {
     private static Log log = LogFactory.getLog(Checkout.class); 
-    private static final long serialVersionUID = 1L;
     private static long CHECKOUT_DAYS = 1000 * 60 * 60 * 24 * 14;
 
     @Id @GeneratedValue @Column(name="CHECKOUT_ID")

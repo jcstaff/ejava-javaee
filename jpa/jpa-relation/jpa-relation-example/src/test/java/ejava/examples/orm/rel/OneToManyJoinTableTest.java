@@ -31,7 +31,7 @@ public class OneToManyJoinTableTest extends DemoBase {
             log.info("created media:" + media);
             inventory.getMedia().add(media);
         }
-        log.info("creating inventory:" + inventory);
+        log.info("created inventory:" + inventory);
     }
     
     @Test

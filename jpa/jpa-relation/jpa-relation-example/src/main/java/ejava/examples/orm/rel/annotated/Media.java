@@ -30,9 +30,8 @@ import javax.persistence.*;
  * by either side.
  */
 @Entity @Table(name="ORMREL_MEDIA")
-public class Media implements Serializable {
+public class Media  {
     //private static Log log = LogFactory.getLog(Media.class);
-    private static final long serialVersionUID = 1L;
 
     @Id @GeneratedValue @Column(name="MEDIA_ID")
     private long id;

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ejava.examples.orm.rel.annotated.Borrower;
@@ -23,8 +24,8 @@ public class OneToManyTest extends DemoBase {
      * This setUp method creates a Borrower to be used during the test
      * methods.
      */
-    public void setUpBase() throws Exception {
-        super.setUpBase();
+    @Before
+    public void setUp() throws Exception {
         log.info("creating base Borrower for tests");
         ejava.examples.orm.rel.annotated.Person person = new Person();
         person.setFirstName("john");
