@@ -8,8 +8,6 @@ import javax.persistence.*;
 /**
  * This class provides an example of one end of a ManyToMany relationship. 
  * This class will "own" the relationship, thus define the join table.
- *
- * @author jcstaff
  */
 @Entity @Table(name="ORMREL_AUTHOR")
 public class Author {

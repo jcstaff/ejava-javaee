@@ -16,8 +16,7 @@ public class WantList {
     @Id @GeneratedValue
     private long id;
     @ManyToMany
-    @JoinTable(name="ORMREL_WANTED_MEDIA") //define table, 
-                                           //but let columns use default names
+    @JoinTable(name="ORMREL_WANTED_MEDIA") //define table, but let columns use default names
     private Collection<Media> media = new ArrayList<Media>();
     
     public long getId() { return id; }
