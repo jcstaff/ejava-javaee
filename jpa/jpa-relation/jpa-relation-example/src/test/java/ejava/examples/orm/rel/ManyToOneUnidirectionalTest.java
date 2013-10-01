@@ -94,8 +94,8 @@ public class ManyToOneUnidirectionalTest extends DemoBase {
         em.clear();
         
         for(int i=0; i<5; i++) {
-            ejava.examples.orm.rel.MediaCopyPK pk =
-                new MediaCopyPK(media.getId(), i);
+            ejava.examples.orm.rel.MediaCopyPK2 pk =
+                new MediaCopyPK2(media.getId(), i);
             MediaCopy2 mc = em.find(MediaCopy2.class, pk);
             log.info("found media copy:" + mc);
             assertNotNull("media copy not found:" + pk, mc);

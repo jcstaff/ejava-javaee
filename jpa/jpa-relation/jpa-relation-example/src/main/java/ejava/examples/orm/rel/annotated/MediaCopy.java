@@ -1,7 +1,5 @@
 package ejava.examples.orm.rel.annotated;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 import org.apache.commons.logging.Log;
@@ -43,9 +41,8 @@ import ejava.examples.orm.rel.MediaCopyPK;
 
 @Entity @Table(name="ORMREL_MEDIACOPY")
 @IdClass(MediaCopyPK.class)
-public class MediaCopy implements Serializable {
+public class MediaCopy {
     private static final Log log = LogFactory.getLog(MediaCopy.class);
-    private static final long serialVersionUID = 1L;    
     @Id //mapped to COPY_NO by IdClass
     private int copyNo;    
     @Id //mapped to MEDIACOPY_MID by IdClass
