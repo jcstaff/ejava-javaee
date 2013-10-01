@@ -6,62 +6,192 @@
         
     <section id="jpa-relation-collections-identity">
         <title>Object Identity</title>
-        <para/>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>hashCode()</filename></term>
+                <listitem><para>Returns an int value to be used by hashtables to help store and locate</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Must remain constant *unless* state that is used to derive value changes</para></listitem>
+                        <listitem><para>Two objects resulting in equals(obj)=true must return same hashCode</para></listitem>
+                        <listitem><para>Two objects resulting in same hashCode may result in equals(obj)=false - but may lead to inneficient access</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>equals()</filename></term>
+                <listitem><para>Returns the boolean result of whether two objects are "equal"</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Reflexive - this should always equal this</para></listitem>
+                        <listitem><para>Symmetric - if x==y, then y==x</para></listitem>
+                        <listitem><para>Transitive - if x==y and y==z, then x==z</para></listitem>
+                        <listitem><para>Consistent - if x==y, then x will always equal y (unless state used changes)</para></listitem>
+                        <listitem><para></para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </varlistentry>
+        </variablelist>
 
         <section id="jpa-relation-collections-identity-instanceid">
             <title>Instance Id</title>
-            <para/>
+            <itemizedlist spacing="compact">
+                <listitem><para>Uses object instance to determine identity</para></listitem>
+                <listitem><para>Two instances with identical state will not be equal</para></listitem>
+                <listitem><para>Default implementation</para></listitem>
+                <listitem><para>Works for cases where you will only have a single instance representing a single object</para></listitem>
+            </itemizedlist>
+            <figure>
+                <title>Using Default Identity Methods</title>
+<programlisting language="java"><![CDATA[public class java.lang.Object {
+...
+  public native int hashCode();
+  public boolean equals(java.lang.Object);
+...
+}]]></programlisting>                        
+            </figure>
+            
         </section>
 
         <section id="jpa-relation-collections-identity-pkid">
             <title>Primary Key Id</title>
-            <para/>
+            <itemizedlist spacing="compact">
+                <listitem><para>Use assigned database primary key as identity</para></listitem>
+                <listitem><para>Positives: unique value within table or possibly database</para></listitem>
+                <listitem><para>Negatives: automatically generated values not available until object persisted</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Only an issue for auto-generated primary keys</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+            <figure>
+                <title>Using Database Primary Key For Identity</title>
+<programlisting language="java"><![CDATA[@Entity
+public abstract class Ship {
+    @Id
+    @GeneratedValue
+    protected int id;
+]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[@Override
+public int hashCode() {
+    return id;
+}]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[@Override
+public boolean equals(Object obj) {
+    try {
+        if (obj == null) { return false; }
+        if (this == obj) { return true; }
+        return id==((Ship)obj).id;
+    } catch (Exception ex) { return false; }
+}]]></programlisting>                        
+            </figure>
         </section>
 
         <section id="jpa-relation-collections-identity-switch">
             <title>Switching Ids</title>
-            <para/>
+            <itemizedlist spacing="compact">
+                <listitem><para>Using instanceId until database primary key assigned</para></listitem>
+                <listitem><para>Positives: able to compare objects in same persistent stage</para></listitem>
+                <listitem><para>Negatives:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Persisting object will break consistency rule (except that state really did change)</para></listitem>
+                        <listitem><para>Cannot compare transient instances to persisted instances</para></listitem>
+                        <listitem><para>Identity-based collections can get confused by inconsistent behavior</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Switching Identity Schemes</title>
+<programlisting language="java"><![CDATA[@Override
+public int hashCode() {
+    return id==0 ? super.hashCode() : id;
+}]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[@Override
+public boolean equals(Object obj) {
+    try {
+        if (obj == null) return false;
+        if (this == obj) { return true; }
+        return (id==0) ? super.equals(obj) : id==((Ship)obj).id;
+    } catch (Exception ex) { return false; }
+}]]></programlisting>                        
+            </figure>
         </section>
 
         <section id="jpa-relation-collections-identity-businessId">
             <title>Business Id</title>
-            <para/>
+            <itemizedlist spacing="compact">
+                <listitem><para>Use unique business values to determine identity -- independent of database primary key</para></listitem>
+                <listitem><para>Positives: consistent state through persistence lifecycle of object</para></listitem>
+                <listitem><para>Negatives: may have trouble identifying unique properties within each object type</para></listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Switching Identity Schemes</title>
+<programlisting language="java"><![CDATA[@Override
+public int hashCode() {
+    return (name==null ? 0 : name.hashCode()) + 
+           (created==null ? 0 : (int)created.getTime());
+}]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[@Override
+public boolean equals(Object obj) {
+    try {
+        if (obj == null) { return false; }
+        if (this == obj) { return true; }
+        return name.equals(((ShipByBusinessId)obj).name) &&
+                created.getTime() == (((ShipByBusinessId)obj).created.getTime());
+    } catch (Exception ex) { return false; }
+}]]></programlisting>                        
+            </figure>
+
         </section>
     </section>
         
     <section id="jpa-relation-collections-types">
         <title>Collection Types</title>
-        <para/>
-
-        <section id="jpa-relation-collections-collection">
-            <title>Collection</title>
-            <para/>
-        </section>
-
-        <section id="jpa-relation-collections-list">
-            <title>List</title>
-            <para/>
-        </section>
-
-        <section id="jpa-relation-collections-types-set">
-            <title>Set</title>
-            <para/>
-        </section>
-
-        <section id="jpa-relation-collections-map">
-            <title>Map</title>
-            <para/>
-        </section>
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>Collection</filename></term>
+                <listitem><para>Bag, no specific collection ordering. Duplicates allowed.</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>List</filename></term>
+                <listitem><para>Duplicates allowed. Order maintained by database using @SortKey("property ASC/DESC")</para>
+<programlisting language=""><![CDATA[@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+@JoinColumn
+@OrderBy("number ASC")
+private List<Segment> segments;]]></programlisting>                        
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>Set</filename></term>
+                <listitem><para>Unique value (object identity comes into play here). No specific order.</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>Map</filename></term>
+                <listitem><para>Each object registered in collection with a property key using @MapKey("property")</para>
+<programlisting language=""><![CDATA[@OneToMany
+@MapKey(name="position")
+@JoinColumn(name="LINEUP_ID")
+private Map<String, Position> positions;]]></programlisting>                        
+                </listitem>
+            </varlistentry>
+        </variablelist>
     </section>
         
-    <section id="jpa-relation-collections-ordering">
-        <title>Collection Ordering</title>
-        <para/>
-    </section>
-        
-    <section id="jpa-relation-collections-">
-        <title></title>
-        <para/>
+    <section id="jpa-relation-collections-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Object identity strategy needs to be considered based on context each object used</para>
+               <orderedlist spacing="compact">
+                    <listitem><para>Not every object has business properties to determine uniqueness</para></listitem>
+                    <listitem><para>May need to insert artificial properties -- like creation date -- when using businessIds</para></listitem>
+               </orderedlist>
+            </listitem>
+            <listitem><para>Different collection types supported</para></listitem>
+        </itemizedlist>
     </section>
 </chapter>
   
