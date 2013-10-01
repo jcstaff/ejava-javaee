@@ -85,7 +85,7 @@ public class OneToManyTest extends DemoBase {
         em.flush();
         em.clear();
         Borrower borrower2 = em.find(Borrower.class, borrower.getId());
-        log.info("found borrower: " + borrower);
+        log.info("found borrower: " + borrower.getName());
         assertEquals(6, borrower2.getCheckouts().size());               
     }
 
@@ -138,7 +138,7 @@ public class OneToManyTest extends DemoBase {
         em.clear();
         Borrower borrower3 = em.find(Borrower.class, borrowerId);
         assertNotNull(borrower3);
-        log.info("found borrower:" + borrower3);
+        log.info("found borrower:" + borrower3.getName());
         assertEquals(0,borrower3.getCheckouts().size());        
     }    
 }

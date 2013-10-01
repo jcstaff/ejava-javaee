@@ -6,58 +6,281 @@
         
     <section id="jpa-relation-fetch">
         <title>Fetching</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Determines how when related objects are retrieved</para>
+                <variablelist spacing="compact">
+                    <varlistentry>
+                        <term><filename>LAZY</filename></term>
+                        <listitem><para>Only parent object immediately retrieved -- child objects retrieved on demand</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Can result in better performance when child data is not needed - unused objects not retrieved</para></listitem>
+                                <listitem><para>Can result in poor performance when all child data is needed - retrieves objects one at a time rather than in bulk</para></listitem>
+                                <listitem><para>Can result in lazy load exception if unloaded data accessed after it can no longer be retrieved from database</para></listitem>
+                                <listitem><para>Can be simulated, on demand, using value or result class queries with JPA-QL</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><filename>EAGER (the default)</filename></term>
+                        <listitem><para>Provider required to have loaded prior to transaction committing</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Can result in better performance when all child data is needed</para></listitem>
+                                <listitem><para>Can result in poor performance when no child data or limited child data is needed</para></listitem>
+                                <listitem><para>Should never result in a lazy load exception</para></listitem>
+                                <listitem><para>Can be simulated, on-demand, using "join fetch" queries with JPA-QL</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+        </itemizedlist>
+        
 
         <section id="jpa-relation-fetch-lazy">
             <title>fetch=LAZY</title>
-            <para/>
+            
+            <figure>
+                <title>fetch=LAZY Example Declaration</title>
+<programlisting language="java"><![CDATA[@OneToMany(mappedBy="borrower", //this relationship is owned by Checkout
+        fetch=FetchType.LAZY)
+private Collection<Checkout> checkouts = new ArrayList<Checkout>();]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>@XxxToXxx Relationship annotated with fetch=LAZY property</para></listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>fetch=LAZY Example Use</title>
+<programlisting language="java"><![CDATA[Borrower borrower2 = em.find(Borrower.class, borrower.getId());
+log.info("found borrower: " + borrower.getName());
+assertEquals(6, borrower2.getCheckouts().size());]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Parent accessed, debug printed, and then child collection accessed</para></listitem>
+            </itemizedlist>
+            
+            <figure>
+                <title>fetch=LAZY SQL Output</title>
+<programlisting language=""><![CDATA[Hibernate: 
+    select
+        applicant0_.id as id1_12_2_,
+        applicant0_.APP_BORROWER as APP2_12_2_,
+        applicant0_.APP_PERSON as APP3_12_2_,
+        borrower1_.BORROWER_ID as BORROWER1_15_0_,
+        borrower1_.endDate as endDate2_15_0_,
+        borrower1_.startDate as startDat3_15_0_,
+        person2_.PERSON_ID as PERSON1_24_1_,
+...
+        person2_.PERSON_PHOTO as PERSON5_24_1_ 
+    from ORMREL_APPLICANT applicant0_ 
+    left outer join ORMREL_BORROWER borrower1_ 
+            on applicant0_.APP_BORROWER=borrower1_.BORROWER_ID 
+    inner join ORMREL_PERSON person2_ 
+            on applicant0_.APP_PERSON=person2_.PERSON_ID 
+    where applicant0_.APP_BORROWER=?
+
+-found borrower: john smith
+
+Hibernate: 
+    select
+        checkouts0_.CHECKOUT_BID as CHECKOUT4_15_1_,
+        checkouts0_.CHECKOUT_ID as CHECKOUT1_16_1_,
+        checkouts0_.CHECKOUT_ID as CHECKOUT1_16_0_,
+        checkouts0_.CHECKOUT_BID as CHECKOUT4_16_0_,
+        checkouts0_.outDate as outDate2_16_0_,
+        checkouts0_.returnDate as returnDa3_16_0_ 
+    from ORMREL_CHECKOUT checkouts0_ 
+    where checkouts0_.CHECKOUT_BID=?
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Debug for parent printed before child rows retrieved</para></listitem>
+                <listitem><para>Child rows retrieved when parent collection accessed</para></listitem>
+            </itemizedlist>
+            
+            
         </section>
         
         <section id="jpa-relation-fetch-eager">
             <title>fetch=EAGER</title>
-            <para/>
+
+            <figure>
+                <title>fetch=EAGER Example Declaration</title>
+<programlisting language="java"><![CDATA[@OneToMany(mappedBy="borrower", //this relationship is owned by Checkout
+        fetch=FetchType.EAGER)
+private Collection<Checkout> checkouts = new ArrayList<Checkout>();]]></programlisting>                        
+            </figure>
+
+
+            <figure>
+                <title>fetch=EAGER Example Use</title>
+<programlisting language="java"><![CDATA[
+Borrower borrower3 = em.find(Borrower.class, borrowerId);
+log.info("found borrower: " + borrower.getName());
+assertEquals(0,borrower3.getCheckouts().size());        
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Same as fetch=LAZY case</para></listitem>
+            </itemizedlist>
+                
+
+            
+            <figure>
+                <title>fetch=EAGER SQL Output</title>
+<programlisting language=""><![CDATA[Hibernate: 
+    select
+        applicant0_.id as id1_12_3_,
+        applicant0_.APP_BORROWER as APP2_12_3_,
+        applicant0_.APP_PERSON as APP3_12_3_,
+        borrower1_.BORROWER_ID as BORROWER1_15_0_,
+        borrower1_.endDate as endDate2_15_0_,
+        borrower1_.startDate as startDat3_15_0_,
+        checkouts2_.CHECKOUT_BID as CHECKOUT4_15_5_,
+        checkouts2_.CHECKOUT_ID as CHECKOUT1_16_5_,
+        checkouts2_.CHECKOUT_ID as CHECKOUT1_16_1_,
+        checkouts2_.CHECKOUT_BID as CHECKOUT4_16_1_,
+        checkouts2_.outDate as outDate2_16_1_,
+        checkouts2_.returnDate as returnDa3_16_1_,
+        person3_.PERSON_ID as PERSON1_24_2_,
+...
+        person3_.PERSON_PHOTO as PERSON5_24_2_ 
+    from ORMREL_APPLICANT applicant0_ 
+    left outer join ORMREL_BORROWER borrower1_ 
+            on applicant0_.APP_BORROWER=borrower1_.BORROWER_ID 
+    left outer join ORMREL_CHECKOUT checkouts2_ 
+            on borrower1_.BORROWER_ID=checkouts2_.CHECKOUT_BID 
+    inner join ORMREL_PERSON person3_ 
+            on applicant0_.APP_PERSON=person3_.PERSON_ID 
+    where applicant0_.APP_BORROWER=?
+
+-found borrower: john smith
+]]></programlisting>                        
+            </figure>
+            <itemizedlist spacing="compact">
+                <listitem><para>Child objects fetched with parent</para></listitem>
+                <listitem><para>Access to child collection occurs after all children fetched</para></listitem>
+            </itemizedlist>
+            
         </section>
     </section>
     
     
     <section id="jpa-relation-cascade">
         <title>Cascades</title>
-        <para/>
-
-        <section id="jpa-relation-cascade-persist">
-            <title>cascade=PERSIST</title>
-            <para/>
-        </section>
-
-        <section id="jpa-relation-cascade-merge">
-            <title>cascade=MERGE</title>
-            <para/>
-        </section>
-
-        <section id="jpa-relation-cascade-refresh">
-            <title>cascade=REFRESH</title>
-            <para/>
-        </section>
-
-        <section id="jpa-relation-cascade-detach">
-            <title>cascade=DETACH</title>
-            <para/>
-        </section>
-
-        <section id="jpa-relation-cascade-remove">
-            <title>cascade=REMOVE</title>
-            <para/>
-        </section>
+        <itemizedlist spacing="compact">
+            <listitem><para>Automatically cause persistence commands to be repeated on related objects</para></listitem>
+            <listitem><para></para></listitem>
+            <listitem><para></para></listitem>
+        </itemizedlist>
+        
+        <figure>
+            <title></title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="RELATIONEX_LICAPP")
+public class LicenseApplication {
+    @Id @GeneratedValue
+    private int id;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated;
+    
+    @OneToOne(optional=false, fetch=FetchType.EAGER, 
+            cascade={
+                CascadeType.PERSIST,
+                CascadeType.DETACH,
+                CascadeType.REMOVE,
+                CascadeType.REFRESH,
+                CascadeType.MERGE
+            })
+    private License license;
+]]></programlisting>                        
+        </figure>
+        
+        <variablelist spacing="compact">
+            <varlistentry>
+                <term><filename>PERSIST</filename></term>
+                <listitem><para>Related entities persisted when this entity is passed to em.persist()</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>DETACH</filename></term>
+                <listitem><para>Related entities detached from persistence unit when this entity passed to em.detach()</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>REMOVE</filename></term>
+                <listitem><para>Related entities deleted from database when this entity passed to em.remove()</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>REFRESH</filename></term>
+                <listitem><para>Related entities refreshed with state of database when this entity passed to em.refresh()</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>MERGE</filename></term>
+                <listitem><para>Related entities update state of database when this entity is passed to em.merge()</para></listitem>
+            </varlistentry>
+        </variablelist>
     </section>
     
     <section id="jpa-relation-orphan">
         <title>Orphan Removal</title>
-        <para/>
+        <itemizedlist spacing="compact">
+            <listitem><para>Automatic removal of an object who's sole purpose is to support a related object that may dereference it</para></listitem>
+            <listitem><para>Related to cascade=REMOVE but the triggering object is not being deleted</para></listitem>
+            <listitem><para>Supported in the following relationships</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>@OneToOne</para></listitem>
+                    <listitem><para>@OneToMany</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+        
+        
+        <figure>
+            <title>OrphanRemoval Example Declaration</title>
+<programlisting language="java"><![CDATA[
+@Entity
+@Table(name="RELATIONEX_ATTENDEE")
+public class Attendee {
+    @Id @GeneratedValue
+    private int id;
+    
+    //orphanRemoval will take care of dereference and DELETE from dependent Attendee 
+    @OneToOne(cascade=CascadeType.PERSIST, orphanRemoval=true)
+    private Residence residence;
+]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>Triggering OrphanRemoval</title>
+<programlisting language="java"><![CDATA[attendee.setResidence(null);
+em.flush();]]></programlisting>                        
+        </figure>
+
+        <figure>
+            <title>OrphanRemoval Database Interaction</title>
+<programlisting language=""><![CDATA[Hibernate: 
+    update RELATIONEX_ATTENDEE 
+    set name=?, residence_id=? 
+    where id=?
+Hibernate: 
+    delete from RELATIONEX_RESIDENCE 
+    where id=?]]></programlisting>                        
+        </figure>
+       <orderedlist spacing="compact">
+            <listitem><para>Attendee.residence_id set to null</para></listitem>
+            <listitem><para>Orphaned residence deleted</para></listitem>
+       </orderedlist>
     </section>
     
     
-    <section id="jpa-relation-">
-        <title></title>
-        <para/>
+    <section id="jpa-relation-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Use fetch=EAGER when always accessing related objects together</para></listitem>
+            <listitem><para>Use fetch=LAZY when commonly access one object without accessing related objects</para></listitem>
+            <listitem><para>Use JPA-QL when encountering corner cases that violate default mapping</para></listitem>
+            <listitem><para>Cascades can be used to automate persistence actions on an entire object graph</para></listitem>
+            <listitem><para>OrphanRemoval can used to automatically delete dereferenced objects that have no use outside the scope of its owning relation</para></listitem>
+        </itemizedlist>
     </section>
 </chapter>
   

@@ -20,7 +20,7 @@ public class Checkout {
 
     @Temporal(value=TemporalType.DATE)
     private Date returnDate;
-    @ManyToOne(optional=false)
+    @ManyToOne(optional=false, fetch=FetchType.LAZY)
     @JoinColumn(name="CHECKOUT_BID")
     private Borrower borrower;
     
