@@ -1,0 +1,63 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="jpa-inheritance">
+    <bookinfo>
+        <title>Java Persistence API: Inheritance</title>
+        <subtitle>Mapping Entity Inheritance to the Database</subtitle>
+        <issuenum>${content.version}</issuenum>
+        <pubdate>${docbook.pubdate}</pubdate>
+        <copyright>
+            <year>${copyright.year}</year>
+            <holder>${copyright.holder}</holder>
+        </copyright>
+        <abstract>
+            <para>This presentation provides information for mapping Java entity class inheritance
+                to the database using JPA. 
+            </para>
+        </abstract>
+    </bookinfo>
+    <preface id="jpa-inheritance-purpose">
+        <title>Purpose</title>
+        <section id="jpa-inheritance-goals">
+            <title>Goals</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Introduce mapping entity class inheritance to the database</para></listitem>
+            </itemizedlist>
+        </section>
+
+        <section id="jpa-inheritance-objectives">
+            <title>Objectives</title>
+            <para>At the completion of this topic, the student shall</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>have an understanding of:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Inheritance strategies</para>
+                            <itemizedlist spacing="compact">
+                                <listitem><para>Single Table</para></listitem>
+                                <listitem><para>Table per Concrete Class</para></listitem>
+                                <listitem><para>Joined</para></listitem>
+                                <listitem><para>Mapped Superclass for non-entity parent classes</para></listitem>
+                            </itemizedlist>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem><para>be able to:</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>Be able to map a Java inheritance relationship using a Single Table strategy</para></listitem>
+                        <listitem><para>Be able to map a Java inheritance relationship using a Table per Concrete Class strategy</para></listitem>
+                        <listitem><para>Be able to map a Java inheritance relationship using a Table per Subclass (Join) strategy</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </preface>
+
+    <toc/>
+
+    <xi:include href="jpa-inheritance-singletable.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-inheritance-concreteclass.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-inheritance-joined.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-inheritance-nonentity.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="jpa-inheritance-mixed.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>
