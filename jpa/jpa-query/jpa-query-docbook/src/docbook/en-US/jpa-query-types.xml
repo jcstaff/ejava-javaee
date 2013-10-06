@@ -4,63 +4,19 @@
 <chapter id="jpa-query-types">
     <title>JPA Query Types</title>
     <para>Three fundamental query types within JPA</para>
+    <orderedlist spacing="compact">
+        <listitem><para>JPA Query Language (JPA) - entity/property/relationship-based</para></listitem>
+        <listitem><para>Native SQL - table/column-based</para></listitem>
+        <listitem><para>Criteria API - entity/property/relationship-based using Java classes</para></listitem>
+    </orderedlist>
+    
         
     <section id="jpa-query-types-jpaql">
-        <title>JPA Query Language (JPAQL) Queries</title>
-        <para>JPA provides access to the entity model using a SQL-like 
-           text query language which expresses queries at entity abstraction 
-           level</para>
-
-<programlisting language="java"><![CDATA[
-String jpaqlString =
-    "select c from Customer c " +
-    "where c.firstName = :firstName " +
-    "order by c.lastName ASC"; 
-//use query string to build query
-TypedQuery<Customer> query = em
-        .createQuery(jpaqlString,Customer.class);
-
-//at this point we are query-type agnostic
-List<Customer> customers = query
-        .setParameter("firstName", "thing")
-        .getResultList();
-log.info("result=" + customers);
-assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
-       <orderedlist>
-            <listitem><para>"c" is part of root query</para></listitem>
-            <listitem><para>"c" represents rows from Customer entity table(s)</para></listitem>
-            <listitem><para>"c.lastName" is path off root term</para></listitem>
-            <listitem><para>":firstName" is parameter placeholder</para></listitem>
-            <listitem><para>"c.firstName" is path off root term</para></listitem>
-       </orderedlist>
-        <para>Runtime output</para>
-<programlisting language=""><![CDATA[
-select
-    customer0_.CUSTOMER_ID as CUSTOMER1_3_,
-    customer0_.FIRST_NAME as FIRST2_3_,
-    customer0_.LAST_NAME as LAST3_3_ 
-from
-    JPAQL_CUSTOMER customer0_ 
-where
-    customer0_.FIRST_NAME=? 
-order by
-    customer0_.LAST_NAME ASC
-    
--result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]></programlisting>                        
-
-        <para>Consolidated form</para>
-<programlisting language="java"><![CDATA[
-List<Customer> customers = em.createQuery(
-    "select c from Customer c " +
-    "where c.firstName = :firstName " +
-    "order by c.lastName ASC",
-    Customer.class)
-        .setParameter("firstName", "thing")
-        .getResultList();
-log.info("result=" + customers);
-assertEquals("unexpected number of results", 2, customers.size());
-]]></programlisting>                        
-
+        <title>JPA Query Language (JPA-QL) Queries</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Access to the *entity* model using a SQL-like text query language</para></listitem>
+            <listitem><para>Queries expressed using entities, properties, and relationships</para></listitem>
+        </itemizedlist>
         <itemizedlist spacing="compact">
             <listitem><para>Pros</para>
                 <itemizedlist spacing="compact">
@@ -73,72 +29,79 @@ assertEquals("unexpected number of results", 2, customers.size());
             </listitem>
             <listitem><para>Cons</para>
                 <itemizedlist spacing="compact">
-                    <listitem><para>Not type-safe</para></listitem>
+                    <listitem><para>Not (overly) type-safe</para></listitem>
                     <listitem><para>No help from Java compiler in constructing query expression</para></listitem>
                     <listitem><para>Don't find out most errors until runtime</para></listitem>
                 </itemizedlist>
             </listitem>
         </itemizedlist>
+
+        <figure>
+            <title>Building a JPA Query using JPA-QL</title>
+<programlisting language="java"><![CDATA[String jpaqlString =
+    "select c from Customer c " +
+    "where c.firstName = :firstName " +
+    "order by c.lastName ASC"; 
+//use query string to build typed JPA-QL query
+TypedQuery<Customer> query = em
+        .createQuery(jpaqlString,Customer.class);]]></programlisting>                        
+        </figure>
+       <itemizedlist>
+            <listitem><para>"c" is part of root query</para></listitem>
+            <listitem><para>"c" represents rows from Customer entity table(s)</para></listitem>
+            <listitem><para>"c.lastName" is path off root term</para></listitem>
+            <listitem><para>":firstName" is parameter placeholder</para></listitem>
+            <listitem><para>"c.firstName" is path off root term</para></listitem>
+            <listitem><para>"Customer.class" type parameter allows for a type-safe return result</para></listitem>
+       </itemizedlist>
+
+        <figure>
+            <title>Executing a JPA Query (built from JPA-QL)</title>
+<programlisting language="java"><![CDATA[//at this point we are query-type agnostic
+List<Customer> customers = query
+        .setParameter("firstName", "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+select
+    customer0_.CUSTOMER_ID as CUSTOMER1_3_,
+    customer0_.FIRST_NAME as FIRST2_3_,
+    customer0_.LAST_NAME as LAST3_3_ 
+from JPAQL_CUSTOMER customer0_ 
+where customer0_.FIRST_NAME=? 
+order by customer0_.LAST_NAME ASC
+    
+-result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]></programlisting>                        
+        </figure>
+        <itemizedlist>
+            <listitem><para>Placeholder is replaced by runtime parameter</para></listitem>
+            <listitem><para>Zero-or-more results are requested</para></listitem>
+            <listitem><para>Entities returned are managed</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Condensing the JPA-QL Query</title>
+<programlisting language="java"><![CDATA[List<Customer> customers = em.createQuery(
+    "select c from Customer c " +
+    "where c.firstName = :firstName " +
+    "order by c.lastName ASC",
+    Customer.class)
+        .setParameter("firstName", "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+        </figure>
     </section>
+
+
 
     <section id="jpa-query-types-sql">
         <title>Native SQL Queries</title>
-        <para>JPA provides access to all the power of working with native SQL
-            and database vendor extensions</para>
-  
-<programlisting language="java"><![CDATA[
-Table table = Customer.class.getAnnotation(Table.class);
-String sqlString =
-    "select c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME " +                        
-    String.format("from %s c ", table.name()) +
-    "where c.FIRST_NAME = ? " +
-    "order by c.LAST_NAME ASC";    
-//use query string to build query
-Query query = em.createNativeQuery(sqlString,Customer.class);
-
-//at this point we are query-type agnostic (mostly)
-@SuppressWarnings("unchecked")
-List<Customer> customers = query
-        .setParameter(1, "thing")
-        .getResultList();
-log.info("result=" + customers);
-assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
         <itemizedlist spacing="compact">
-            <listitem><para>"c" represents rows in table</para></listitem>
-            <listitem><para>specific columns (or *) are return for each row</para></listitem>
-            <listitem><para>"?" marks a positional parameter -- non-portable to use named parameters in native SQL queries</para></listitem>
-            <listitem><para>TypedQuery&lt;T&gt;s not supported in native SQL queries because of a conflict with legacy JPA 1.0 API</para></listitem>
+            <listitem><para>Access to power of working with native SQL</para></listitem>
         </itemizedlist>
-
-        <para>Runtime output</para>
-<programlisting language=""><![CDATA[
-select
-    c.CUSTOMER_ID,
-    c.FIRST_NAME,
-    c.LAST_NAME 
-from
-    JPAQL_CUSTOMER c 
-where
-    c.FIRST_NAME = ? 
-order by
-    c.LAST_NAME ASC
-
--result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]></programlisting>                        
-
-        <para>Consolidated form</para>
-<programlisting language="java"><![CDATA[
-@SuppressWarnings("unchecked")
-List<Customer> customers = em.createNativeQuery(
-    "select c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME " +                        
-    "from JPAQL_CUSTOMER c " +
-    "where c.FIRST_NAME = ? " +
-    "order by c.LAST_NAME ASC",
-    Customer.class)
-        .setParameter(1, "thing")
-        .getResultList();
-log.info("result=" + customers);
-assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
-
         <itemizedlist spacing="compact">
             <listitem><para>Pros</para>
                 <itemizedlist spacing="compact">
@@ -157,10 +120,66 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
                 </itemizedlist>
             </listitem>
         </itemizedlist>
+  
+        <figure>
+            <title>Building a JPA Query using Native SQL</title>
+<programlisting language="java"><![CDATA[Table table = Customer.class.getAnnotation(Table.class);
+String sqlString =
+    "select c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME " +                        
+    String.format("from %s c ", table.name()) +
+    "where c.FIRST_NAME = ? " +
+    "order by c.LAST_NAME ASC";    
+//use query string to build query
+Query query = em.createNativeQuery(sqlString,Customer.class);]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>"c" represents rows in table</para></listitem>
+            <listitem><para>specific columns (or *) are return for each row</para></listitem>
+            <listitem><para>"?" marks a positional parameter -- non-portable to use named parameters in native SQL queries</para></listitem>
+            <listitem><para>TypedQuery&lt;T&gt;s not supported in native SQL queries because of a conflict with legacy JPA 1.0 API</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Executing a JPA Query (built from Native SQL)</title>
+<programlisting language="java"><![CDATA[//at this point we are query-type agnostic (mostly)
+@SuppressWarnings("unchecked")
+List<Customer> customers = query
+        .setParameter(1, "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>
+
+<programlisting language=""><![CDATA[
+select
+    c.CUSTOMER_ID,
+    c.FIRST_NAME,
+    c.LAST_NAME 
+from JPAQL_CUSTOMER c 
+where c.FIRST_NAME = ? 
+order by c.LAST_NAME ASC
+
+-result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]></programlisting>                        
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Query execution similar to other query types</para></listitem>
+            <listitem><para>User-provided SQL executed</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Condensing the SQL Query</title>
+<programlisting language="java"><![CDATA[@SuppressWarnings("unchecked")
+List<Customer> customers = em.createNativeQuery(
+    "select c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME " +                        
+    "from JPAQL_CUSTOMER c " +
+    "where c.FIRST_NAME = ? " +
+    "order by c.LAST_NAME ASC",
+    Customer.class)
+        .setParameter(1, "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+        </figure>
     </section>
-
-
-
 
 
 
@@ -168,11 +187,34 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
 
     <section id="jpa-query-types-criteria">
         <title>Criteria API Queries</title>
-        <para>JPA provides a somewhat parallel capability to JPAQL -- to 
-            build the overall query using Java types (demonstrated here with "string accessors").</para>
-  
-<programlisting language="java"><![CDATA[
-CriteriaBuilder cb = em.getCriteriaBuilder();
+        <itemizedlist spacing="compact">
+            <listitem><para>Somewhat parallel capability to JPAQL</para></listitem>
+            <listitem><para>Build overall query using Java types (demonstrated here with "string accessors")</para></listitem>
+        </itemizedlist>
+        <itemizedlist spacing="compact">
+            <listitem><para>Pros</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Structure of query is type-safe</para></listitem>
+                    <listitem><para>Allows object-level manipulation of the query versus manipulation of a query string</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Useful when building total query based on runtime properties</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Cons</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Complex -- looses familiarity with SQL</para></listitem>
+                    <listitem><para>Cannot be expressed in XML deployment descriptor</para></listitem>
+                    <listitem><para>Access to properties not type-safe (addressed by 
+                        <link linkend="jpa-query-criteria-overview-choices-criteria-canonicalmm">Canonical Metamodel)</link></para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Building a JPA Query using Criteria API</title>
+<programlisting language="java"><![CDATA[CriteriaBuilder cb = em.getCriteriaBuilder();
 CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
 Root<Customer> c = qdef.from(Customer.class);
 qdef.select(c)
@@ -181,14 +223,8 @@ qdef.select(c)
     .orderBy(cb.asc(c.get("lastName")));
 //build query from criteria definition
 TypedQuery<Customer> query = em.createQuery(qdef);
-
-//at this point we are query-type agnostic
-List<Customer> customers = query
-        .setParameter("firstName", "thing")
-        .getResultList();
-log.info("result=" + customers);
-assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>
-                        
+]]></programlisting>
+        </figure>
         <itemizedlist spacing="compact">
             <listitem><para>"CriteriaBuilder" used as starting point to build objects within the query tree</para></listitem>
             <listitem><para>"CriteriaQuery&lt;T&gt;" used to hold the definition of query</para></listitem>
@@ -201,22 +237,33 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
             <listitem><para>"CriteriaBuilder.parameter()" builds a parameter placeholder within query. Useful with @Temporal date comparisons</para></listitem>
         </itemizedlist>
 
-        <para>Runtime output</para>
+        <figure>
+            <title>Executing a JPA Query using Criteria API</title>
+<programlisting language="java"><![CDATA[//at this point we are query-type agnostic
+List<Customer> customers = query
+        .setParameter("firstName", "thing")
+        .getResultList();
+log.info("result=" + customers);
+assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>
+
 <programlisting language=""><![CDATA[
     select
         customer0_.CUSTOMER_ID as CUSTOMER1_3_,
         customer0_.FIRST_NAME as FIRST2_3_,
         customer0_.LAST_NAME as LAST3_3_ 
-    from
-        JPAQL_CUSTOMER customer0_ 
-    where
-        customer0_.FIRST_NAME=? 
-    order by
-        customer0_.LAST_NAME asc
+    from JPAQL_CUSTOMER customer0_ 
+    where customer0_.FIRST_NAME=? 
+    order by customer0_.LAST_NAME asc
         
  -result=[firstName=thing, lastName=one, firstName=thing, lastName=two]]]]></programlisting>                        
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Query execution identical to JPA-QL case</para></listitem>
+        </itemizedlist>
 
-        <para>Consolidated form</para>
+        
+        <figure>
+            <title>Condensing the Criteria API Query</title>
 <programlisting language="java"><![CDATA[
 CriteriaBuilder cb = em.getCriteriaBuilder();
 CriteriaQuery<Customer> qdef = cb.createQuery(Customer.class);
@@ -229,22 +276,8 @@ List<Customer> customers = em.createQuery(qdef.select(c)
 
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
+        </figure>
 
-        <itemizedlist spacing="compact">
-            <listitem><para>Pros</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>Structure of query is type-safe</para></listitem>
-                    <listitem><para>Allows object-level manipulation of the query versus manipulation of a query string -- useful when building total query based on runtime properties</para></listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem><para>Cons</para>
-                <itemizedlist spacing="compact">
-                    <listitem><para>Complex -- looses familiarity with SQL</para></listitem>
-                    <listitem><para>Cannot be expressed in XML deployment descriptor</para></listitem>
-                    <listitem><para>Access to properties not type-safe (addressed by Canonical Metamodel)</para></listitem>
-                </itemizedlist>
-            </listitem>
-        </itemizedlist>
     </section>
 
 
