@@ -53,9 +53,9 @@ public class SingleTablePerHierarchyTest extends DemoBase {
         assertFalse("bread still managed", em.contains(bread));
         assertFalse("soup still managed", em.contains(soup));
         
-        @SuppressWarnings("unchecked")
-        List<Product> products = 
-            em.createQuery("select p from Product p").getResultList();
+        List<Product> products = em.createQuery(
+        	"select p from Product p", Product.class)
+        	.getResultList();
         assertTrue("unexpected number of products:" + products.size(),
                 products.size() == 2);
         for(Product p: products) {
@@ -64,7 +64,7 @@ public class SingleTablePerHierarchyTest extends DemoBase {
         
         //query specific tables for columns
         int rows = em.createNativeQuery(
-                "select ID, TYPE, COST, SOUPTYPE, EXPIRATION, BAKEDON, SLICES " +
+                "select ID, PTYPE, COST, SOUPTYPE, EXPIRATION, BAKEDON, SLICES " +
                 " from ORMINH_PRODUCT")
                 .getResultList().size();
         assertEquals("unexpected number of product rows:" + rows, 2, rows);

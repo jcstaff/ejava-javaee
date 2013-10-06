@@ -16,7 +16,7 @@ import ejava.examples.orm.inheritance.annotated.Person;
  * This class provides a demonstration of a class hierachy that uses a 
  * class for each class in the inheritance hierarchy.
  */
-public class TablePerClassTest extends DemoBase {
+public class JoinedTest extends DemoBase {
     
 	@Before
     public void setUp() throws Exception {
@@ -35,16 +35,14 @@ public class TablePerClassTest extends DemoBase {
     public void testTablePerClassCreate() {
         log.info("testTablePerClassCreate");
         
-        ejava.examples.orm.inheritance.annotated.Employee employee = 
-            new Employee();
+        ejava.examples.orm.inheritance.annotated.Employee employee = new Employee();
         employee.setFirstName("john");
         employee.setLastName("doe");
         employee.setHireDate(new Date());
         employee.setPayrate(10.00);
         em.persist(employee);
         
-        ejava.examples.orm.inheritance.annotated.Customer customer = 
-            new Customer();
+        ejava.examples.orm.inheritance.annotated.Customer customer = new Customer();
         customer.setFirstName("jane");
         customer.setLastName("johnson");
         customer.setRating(Customer.Rating.SILVER);
@@ -55,9 +53,7 @@ public class TablePerClassTest extends DemoBase {
         assertFalse("employee still managed", em.contains(employee));
         assertFalse("customer still managed", em.contains(customer));
         
-        @SuppressWarnings("unchecked")
-        List<Person> people = 
-            em.createQuery("select p from Person p").getResultList();
+        List<Person> people = em.createQuery("select p from Person p", Person.class).getResultList();
         assertTrue("unexpected number of people:" + people.size(),
                 people.size() == 2);
         for(Person p: people) {

@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity @Table(name="ORMINH_PRODUCT")
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="TYPE", //column in root table indicating type
+@DiscriminatorColumn(name="PTYPE", //column in root table indicating type
     discriminatorType=DiscriminatorType.STRING,//data type of column
     length=32) //length of discriminator string
 public abstract class Product {

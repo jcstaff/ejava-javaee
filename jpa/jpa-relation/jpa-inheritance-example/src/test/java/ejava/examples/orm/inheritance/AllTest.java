@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 @SuiteClasses({
     SingleTablePerHierarchyTest.class,
     TablePerConcreteClassTest.class,
-    TablePerClassTest.class,
+    JoinedTest.class,
     NonEntityBaseTest.class,
     MixedTest.class
 })

@@ -46,11 +46,7 @@ public class TablePerConcreteClassTest extends DemoBase {
         assertFalse("checking still managed", em.contains(checking));
         assertFalse("savings still managed", em.contains(savings));
         
-        List<Account> accounts = 
-            em.createQuery("select a from CheckingAccount a").getResultList();
-        accounts.addAll( 
-            em.createQuery("select a from InterestAccount a").getResultList());
-        
+        List<Account> accounts =em.createQuery("select a from Account a").getResultList(); 
         assertTrue("unexpected number of accounts:" + accounts.size(),
                 accounts.size() == 2);
         for(Account a: accounts) {

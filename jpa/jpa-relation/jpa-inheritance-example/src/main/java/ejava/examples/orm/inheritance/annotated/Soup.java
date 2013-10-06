@@ -23,6 +23,7 @@ public class Soup extends Product {
     };
 
     @Enumerated(EnumType.STRING)
+    @Column(name="SOUPTYPE", length=16)
     private SoupType type = SoupType.UNKNOWN;
     @Temporal(TemporalType.DATE)
     private Date expiration;

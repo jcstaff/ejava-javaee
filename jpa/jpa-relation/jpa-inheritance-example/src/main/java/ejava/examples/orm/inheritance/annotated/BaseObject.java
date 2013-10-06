@@ -5,27 +5,24 @@ import javax.persistence.*;
 /**
  * This class provides an example of a non-entity base class that can be 
  * mapped into tables defined by entities that derive from this class.
- *
- * @author jcstaff
  */
 @MappedSuperclass
 public abstract class BaseObject {
     private long id;
+    @Access(AccessType.FIELD)
     private long version;
     
     @Transient
-    public long getId() {
-        return id;
-    }
+    public long getId() { return id; }
     protected void setId(long id) {
         this.id = id;
     }
-    public long getVersion() {
-        return version;
-    }
+    
+    public long getVersion() { return version; }
     public void setVersion(long version) {
         this.version = version;
     }
+    
     @Transient
     public abstract String getName();
     

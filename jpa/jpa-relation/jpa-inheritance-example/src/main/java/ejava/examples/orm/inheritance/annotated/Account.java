@@ -11,8 +11,6 @@ import javax.persistence.*;
  * must be used to create id values or allow the ids of each sub-type to 
  * be allowed to be locally generated (thus getting overlaps in id values).
  * The approach taken here was to define a sequence generator.
- *
- * @author jcstaff
  */
 @Entity
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
@@ -21,21 +19,15 @@ import javax.persistence.*;
         sequenceName="ORMINH_SEQ" //name in database
 )
 public abstract class Account {
+    @Id @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="orminhSeq")
     private long id;
     private double balance;
-
-    @Id @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="orminhSeq")
-    public long getId() {
-        return id;
-    }
-    @SuppressWarnings("unused")
-    private void setId(long id) {
-        this.id = id;
-    }
     
-    public double getBalance() {
-        return balance;
-    }
+    public Account() {}
+    public Account(long id) { this.id=id; }
+    public long getId() { return id; }
+    
+    public double getBalance() { return balance; }
     public void setBalance(double balance) {
         this.balance = balance;
     }

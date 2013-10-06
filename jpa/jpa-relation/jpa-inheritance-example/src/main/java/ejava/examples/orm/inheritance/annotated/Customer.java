@@ -7,19 +7,18 @@ import javax.persistence.*;
  * strategy. The parent class will define a table and primary key value.
  * This class and all derived classes will form separate tables that are joined
  * by primary key.
- *
- * @author jcstaff
  */
 @Entity 
 @Table(name="ORMINH_CUSTOMER") //joined with Person table to form Customer
 public class Customer extends Person {
     public enum Rating { GOLD, SILVER, BRONZE }
-    private Rating rating;
-
     @Enumerated(EnumType.STRING)
-    public Rating getRating() {
-        return rating;
-    }
+    private Rating rating;
+    
+    public Customer() {}
+    public Customer(long id) { super(id); }
+
+    public Rating getRating() { return rating; }
     public void setRating(Rating rating) {
         this.rating = rating;
     }

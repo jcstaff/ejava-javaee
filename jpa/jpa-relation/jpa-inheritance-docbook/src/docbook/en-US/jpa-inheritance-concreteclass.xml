@@ -4,15 +4,219 @@
 <chapter id="jpa-inheritance-concreteclass">
     <title>Inheritance Strategy:Table per Concrete Class</title>
 
-    <figure>
-        <title>Table per Concrete Class Inheritance Strategy</title>
-        <graphic scale="100" fileref="images/jpa-inheritance-concreteclass.png"/>
-    </figure>
+    <section id="jpa-inheritance-concreteclass-overview">
+        <title>Table per Concrete Class Strategy Overview</title>
+        <figure>
+            <title>Table per Concrete Class Inheritance Strategy</title>
+            <graphic scale="100" fileref="images/jpa-inheritance-concreteclass.png"/>
+        </figure>
+
+        <itemizedlist spacing="compact">
+            <listitem><para>Advantages</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>May have constrained columns</para></listitem>
+                    <listitem><para>No joins when accessing a single concrete type</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>Disadvantages</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Not normalized</para></listitem>
+                    <listitem><para>Redundant columns in each concrete child table</para></listitem>
+                    <listitem><para>More work required to query across tables</para>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>Requires use of SQL "UNION"</para></listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem><para>Least desirable from a performance/portability standpoint</para></listitem>
+                </itemizedlist>
+            </listitem>
+            <listitem><para>More suitable for ...</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Sub-types not needed to be manipulated with sibling other sub-types</para></listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </section>
+
+
+
+    <section id="jpa-inheritance-concreteclass-schema">
+        <title>Table per Concrete Class Example Database Schema</title>
+
+        <figure>
+            <title>Table per Concrete Class Example Database Schema</title>
+<programlisting language=""><![CDATA[create table ORMINH_CHECKING (
+    id bigint not null,
+    balance double not null,
+    fee double not null,
+    primary key (id)
+)
+create table ORMINH_INTERESTACCT (
+    id bigint not null,
+    balance double not null,
+    rate double not null,
+    primary key (id)
+)
+create sequence ORMINH_SEQ]]></programlisting>                        
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Table for each concrete class</para></listitem>
+            <listitem><para>No separate table for parent class</para></listitem>
+            <listitem><para>Parent columns repeated in concrete sub-class tables</para></listitem>
+            <listitem><para>*   his particular example uses SEQUENCE for primary key generation</para></listitem>
+        </itemizedlist>
+    </section>
+
+
+
+    <section id="jpa-inheritance-concreteclass-mapping">
+        <title>Table per Concrete Class Example Java Mapping</title>
+
+        <figure>
+            <title>Table per Concrete Class Example Java Mapping (Parent Class)</title>
+<programlisting language="java"><![CDATA[@Entity
+@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+@SequenceGenerator(
+        name="orminhSeq", //required logical name
+        sequenceName="ORMINH_SEQ" //name in database
+)
+public abstract class Account {
+    @Id @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="orminhSeq")
+    private long id;
+    private double balance;
+...
+    public void deposit(double amount) throws AccountException {
+        setBalance(getBalance() + amount);
+    }
+    public abstract void withdraw(double amount) throws AccountException;
+...]]></programlisting>
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Parent defines default mapping for all derived types, including PK generation</para></listitem>
+            <listitem><para>Using a common SEQUENCE allows sub-classes to have unique PKs across all tables</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Table per Concrete Class Example Java Mapping (Subclasses)</title>
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMINH_CHECKING")
+public class CheckingAccount extends Account {
+    private double fee;
+
+    public void withdraw(double amount) throws AccountException {
+        super.setBalance(super.getBalance() - fee);
+    }]]></programlisting>                        
+
+<programlisting language="java"><![CDATA[@Entity
+@Table(name="ORMINH_INTERESTACCT")
+public class InterestAccount extends Account {
+    private double rate;
+    
+    public void withdraw(double amount) throws AccountException {
+        super.setBalance(super.getBalance() - amount);
+    }]]></programlisting>                        
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Subclasses name their specific entity class table</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section id="jpa-inheritance-concreteclass-usage">
+        <title>Table per Concrete Class Example Usage</title>
+        <figure>
+            <title>Table per Concrete Class Example Usage (Persist)</title>
+<programlisting language="java"><![CDATA[ejava.examples.orm.inheritance.annotated.CheckingAccount checking = new CheckingAccount();
+checking.setFee(0.50);
+em.persist(checking);
+
+ejava.examples.orm.inheritance.annotated.InterestAccount savings = new InterestAccount();
+savings.setRate(0.25);
+em.persist(savings);
+]]></programlisting>                        
+
+<programlisting language=""><![CDATA[
+Hibernate:
+    call next value for ORMINH_SEQ
+Hibernate:
+    insert into ORMINH_CHECKING (balance, fee, id) 
+    values (?, ?, ?)
+Hibernate:
+    insert into ORMINH_INTERESTACCT (balance, rate, id) 
+    values (?, ?, ?)]]></programlisting>                        
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Rows for entities placed into separate tables</para></listitem>
+        </itemizedlist>
+
+
+        <figure>
+            <title>Table per Concrete Class Example Usage (Get Entities)</title>
+<programlisting language="java"><![CDATA[List<Account> accounts =em.createQuery("select a from Account a").getResultList(); 
+assertTrue("unexpected number of accounts:" + accounts.size(), accounts.size() == 2);
+for(Account a: accounts) {
+    log.info("account found:" + a);
+}]]></programlisting>
+
+<programlisting language=""><![CDATA[select
+    account0_.id as id1_0_,
+    account0_.balance as balance2_0_,
+    account0_.rate as rate1_7_,
+    account0_.fee as fee1_2_,
+    account0_.clazz_ as clazz_ 
+from ( 
+    select id, balance, rate, null as fee, 1 as clazz_ 
+    from ORMINH_INTERESTACCT
+     
+    union all
+     
+    select id, balance, null as rate, fee, 2 as clazz_ 
+    from ORMINH_CHECKING 
+) account0_
+-account found:InterestAccount, id=51, balance=0.0, rate=0.25
+-account found:CheckingAccount, id=50, balance=0.0, fee=0.5
+]]></programlisting>                        
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Query through parent type causes SQL "UNION ALL" of each concrete sub-class table</para></listitem>
+        </itemizedlist>
+
+        <figure>
+            <title>Table per Concrete Class Example Usage (Verify DB Schema)</title>
+<programlisting language="java"><![CDATA[//query specific tables for columns
+int rows = em.createNativeQuery(
+        "select ID, BALANCE, FEE from ORMINH_CHECKING")
+        .getResultList().size();
+assertEquals("unexpected number of checking rows:" + rows, 1, rows);
+rows = em.createNativeQuery(
+        "select ID, BALANCE, RATE from ORMINH_INTERESTACCT")
+        .getResultList().size();
+assertEquals("unexpected number of interestacct rows:" + rows, 1, rows);]]></programlisting>                        
+
+<programlisting language=""><![CDATA[select * from ORMINH_CHECKING
+ID BALANCE FEE
+-- ------- ---
+50 0.0     0.5
+
+select * from ORMINH_INTERESTACCT
+ID BALANCE RATE
+-- ------- ----
+51 0.0     0.25]]></programlisting>                        
+        </figure>
+        <itemizedlist spacing="compact">
+            <listitem><para>Table per concrete class</para></listitem>
+            <listitem><para>No unused columns</para></listitem>
+            <listitem><para>Parent columns repeated in each sub-class table</para></listitem>
+        </itemizedlist>
+    </section>
 
         
-    <section id="jpa-inheritance-concreteclass-">
-        <title></title>
-        <para/>
+    <section id="jpa-inheritance-concreteclass-summary">
+        <title>Summary</title>
+        <itemizedlist spacing="compact">
+            <listitem><para>Properties pushed down to each concrete class' table</para></listitem>
+            <listitem><para>Requires no joins</para></listitem>
+            <listitem><para>Requires SQL "UNION ALL" of all concrete class table to access common properties across hierarchy</para></listitem>
+        </itemizedlist>
     </section>
 </chapter>
   

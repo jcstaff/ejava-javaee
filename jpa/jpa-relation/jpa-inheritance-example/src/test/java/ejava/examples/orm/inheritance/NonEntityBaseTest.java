@@ -21,14 +21,12 @@ public class NonEntityBaseTest extends DemoBase {
 	public void testNonEntityBaseCreate() {
         log.info("testNonEntityBaseCreate");
         
-        ejava.examples.orm.inheritance.annotated.Album album = 
-            new Album();
+        ejava.examples.orm.inheritance.annotated.Album album = new Album();
         album.setArtist("Lynyrd Skynyrd");
         album.setTitle("One More for the Road");
         em.persist(album);
         
-        ejava.examples.orm.inheritance.annotated.ToothPaste toothpaste = 
-            new ToothPaste();
+        ejava.examples.orm.inheritance.annotated.ToothPaste toothpaste = new ToothPaste();
         toothpaste.setSize(10);
         em.persist(toothpaste);
         
@@ -47,7 +45,7 @@ public class NonEntityBaseTest extends DemoBase {
         for(BaseObject o: objects) {
             log.info("object found:" + o);
         }        
-        
+
         //query specific tables for columns
         int rows = em.createNativeQuery(
                 "select ALBUM_ID, ALBUM_VERSION, ARTIST, TITLE " +

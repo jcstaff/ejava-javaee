@@ -7,13 +7,14 @@ import javax.persistence.*;
  * classes per-concrete derived class. This means that the base class
  * properties will get merged into this table (similar to non-entity 
  * inheritance).
- *
- * @author jcstaff
  */
 @Entity
 @Table(name="ORMINH_INTERESTACCT")
 public class InterestAccount extends Account {
     private double rate;
+    
+    public InterestAccount() {}
+    public InterestAccount(long id) { super(id); }
 
     public void withdraw(double amount) throws AccountException {
         super.setBalance(super.getBalance() - amount);
