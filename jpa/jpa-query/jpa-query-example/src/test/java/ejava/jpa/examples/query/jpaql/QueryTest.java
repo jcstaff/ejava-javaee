@@ -1,8 +1,12 @@
 package ejava.jpa.examples.query.jpaql;
 
 import static org.junit.Assert.*;
+
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.TemporalType;
@@ -128,8 +132,25 @@ public class QueryTest extends QueryBase {
                     sales.size() >= 1);
             for(Sale s: sales) {
                 log.info("found sale in page(" + i + "):" + s);
+                em.detach(s); //we are done with this
             }
-            em.clear();
+        }
+    }
+    
+    @Test
+    public void testLock() {
+        log.info("*** testLock() ***");
+        //get a list of clerks to update -- locked so others cannot change
+        List<Clerk> clerks = em.createQuery(
+        		"select c from Clerk c " +
+        		"where c.hireDate > :date", Clerk.class)
+        		.setParameter("date", new GregorianCalendar(1972,Calendar.JANUARY,1).getTime())
+        		.setLockMode(LockModeType.PESSIMISTIC_WRITE)
+        		.setHint("javax.persistence.lock.timeout", 0)
+        		.getResultList(); 
+        //make changes
+        for (Clerk c: clerks) {
+        	c.setHireDate(new GregorianCalendar(1972, Calendar.FEBRUARY, 1).getTime());
         }
     }
 }

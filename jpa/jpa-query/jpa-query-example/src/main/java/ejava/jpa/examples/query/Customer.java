@@ -12,6 +12,11 @@ import javax.persistence.*;
             query="select s from Sale s " +
                     "where s.buyerId=:custId")
 })
+@NamedNativeQueries({
+	@NamedNativeQuery(name="Customer.getCustomerRows", 
+			query="select * from JPAQL_CUSTOMER c " +
+                  "where c.FIRST_NAME = ?1")
+})
 public class Customer {
     @Id @GeneratedValue 
     @Column(name="CUSTOMER_ID")    

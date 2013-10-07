@@ -1,6 +1,8 @@
 package ejava.jpa.examples.query.jpaql;
 
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -35,5 +37,17 @@ public class NamedQueryTest extends QueryBase {
         for (Sale s: sales) {
             log.info("found sale:" + s);
         }
+    }
+    
+    @Test
+    public void testNamedNativeQuery() {
+        log.info("*** testNamedQuery() ***");
+
+        @SuppressWarnings("unchecked")
+		List<Object[]> rows = em.createNamedQuery("Customer.getCustomerRows")
+        		.setParameter(1, "cat")
+        		.getResultList();
+        assertEquals("unexpected customers found", 1, rows.size());
+        log.info("found customer:" + Arrays.toString(rows.get(0)));
     }
 }
