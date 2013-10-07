@@ -177,8 +177,7 @@ for(Customer c : customers) {
        
         <figure>
             <title>Date-based Parameters</title>
-<programlisting language="java"><![CDATA[
-Calendar hireDate = Calendar.getInstance();
+<programlisting language="java"><![CDATA[Calendar hireDate = Calendar.getInstance();
 hireDate.set(Calendar.YEAR, 1972);
 TypedQuery<Clerk> query = em.createQuery(
         "select c from Clerk c " +
@@ -304,7 +303,7 @@ for update
         
         <figure>
             <title>Bulk Update Example</title>
-<programlisting language=""><![CDATA[Query update = em.createQuery(
+<programlisting language="java"><![CDATA[Query update = em.createQuery(
         "update Clerk c set c.lastName=:newlast where c.lastName=:last");
 update.setParameter("last", "Pep");
 update.setParameter("newlast", "Peppy");
@@ -411,8 +410,7 @@ List<Object[]> rows = em.createNamedQuery("Customer.getCustomerRows")
 assertEquals("unexpected customers found", 1, rows.size());
 log.info("found customer:" + Arrays.toString(rows.get(0)));]]></programlisting>
 
-<programlisting language=""><![CDATA[
-    select * from JPAQL_CUSTOMER c 
+<programlisting language=""><![CDATA[    select * from JPAQL_CUSTOMER c 
     where c.FIRST_NAME = ?
 -found customer:[1, cat, inhat]]]></programlisting>                        
         </figure>
