@@ -109,25 +109,6 @@
                 </executions>
             </plugin>
 
-            <!-- add generated JPA metamodel classes to classpath -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                   <execution>
-                       <id>add-metamodel-classes</id>
-                       <phase>process-sources</phase>
-                       <goals>
-                           <goal>add-source</goal>
-                       </goals>
-                       <configuration>
-                           <sources>
-                               <source>target/generated-sources/annotations</source>
-                           </sources>
-                       </configuration>
-                   </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -159,6 +140,39 @@
     </repositories>
 
     <profiles>
+        <!-- don't add this to classpath if we are building on Jenkins -->
+        <profile>
+            <id>metamodel</id>
+            <activation>
+                <property>
+                    <name>!env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- add generated JPA metamodel classes to classpath -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                           <execution>
+                               <id>add-metamodel-classes</id>
+                               <phase>process-sources</phase>
+                               <goals>
+                                   <goal>add-source</goal>
+                               </goals>
+                               <configuration>
+                                   <sources>
+                                       <source>target/generated-sources/annotations</source>
+                                   </sources>
+                               </configuration>
+                           </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>testing</id>
             <activation>
