@@ -556,7 +556,6 @@ where c.id IN
 
         <figure>
             <title>Example ALL Query</title>
-            <graphic scalefit="1" fileref="images/xxx.png"/>
 <programlisting language=""><![CDATA[select c from Clerk c
 where 125 < ALL
 (select s.amount from c.sales s)]]></programlisting>
