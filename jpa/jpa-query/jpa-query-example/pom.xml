@@ -143,11 +143,11 @@
         <!-- don't add this to classpath if we are building on Jenkins -->
         <profile>
             <id>metamodel</id>
-            <activation>
-                <property>
-                    <name>!env.BUILD_NUMBER</name>
-                </property>
-            </activation>
+	    <activation>
+	        <property>
+	            <name>m2e.version</name>
+	        </property>
+	    </activation>
             <build>
                 <plugins>
                     <!-- add generated JPA metamodel classes to classpath -->
