@@ -6,9 +6,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import junit.framework.TestCase;
-
-
 public class AnnotationTest {
     private static final Log log = LogFactory.getLog(AnnotationTest.class);
     

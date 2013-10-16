@@ -10,7 +10,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
-import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 
 import ejava.jpa.examples.tuning.TestBase;
 

@@ -220,7 +220,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		Ship ship = new ShipByDefault().setName(""+i).setCreated(new Date());
     		ships.add(ship);
     		originalHashCode.add(ship.peekHashCode());
-    		boolean added;
+    		boolean added=false;
     		assertTrue(added=fleet.getShipsListByDefault().add((ShipByDefault)ship));
     		log.debug("entity " + ship + " added to list=" + added);
     		assertTrue(added=fleet.getShipsSetByDefault().add((ShipByDefault)ship));
@@ -237,7 +237,7 @@ public class BasisForCollectionTest extends JPATestBase {
     	log.debug("check if parent collections still have original child objects"); 
     	for (int i=0; i<count; i++) {
     		Ship ship = ships.get(i);
-    		boolean contains;
+    		boolean contains=false;
     		//basis for hashCode did not change
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship.peekHashCode());
     		assertTrue(ship.peekHashCode() == originalHashCode.get(i).intValue());
@@ -263,7 +263,7 @@ public class BasisForCollectionTest extends JPATestBase {
     	log.debug("check if second parent has original child objects"); 
     	for (int i=0; i<count; i++) {
     		Ship ship = ships.get(i);
-    		boolean contains;
+    		boolean contains=false;
     		assertTrue(contains=fleet.getShipsListByDefault().contains(ship));
     		log.debug("original list contains " + ship + "=" + contains);
     		//basis of hashCode has changed
@@ -298,7 +298,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		Ship ship = new ShipByPK().setName(""+i).setCreated(new Date());
     		ships.add(ship);
     		originalHashCode.add(ship.peekHashCode());
-    		boolean added;
+    		boolean added=false;
     		assertTrue(added=fleet.getShipsListByPK().add((ShipByPK)ship));
     		log.debug("entity " + ship + " added to list=" + added);
     		//since the entity is identified by an unassigned PK 
@@ -320,7 +320,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		//basis of hashCode has changed
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship.peekHashCode());
     		assertFalse(ship.peekHashCode() == originalHashCode.get(i));
-    		boolean contains;
+    		boolean contains=false;
     		//since the entity is identified by a PK value that is shared across multiple instances
     		//representing the same row -- we will get matches between previous instances referencing
     		//the row and some collections in what we have pulled back.
@@ -352,7 +352,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship2.peekHashCode());
     		assertFalse(originalHashCode.get(i) == ship2.peekHashCode());
 
-    		boolean contains;
+    		boolean contains=false;
     		assertTrue(contains=fleet.getShipsListByPK().contains(ship));
     		log.debug("original list contains " + ship + "=" + contains);
     		assertTrue(contains=fleet2.getShipsListByPK().contains(ship));
@@ -381,7 +381,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		Ship ship = new ShipBySwitch().setName(""+i).setCreated(new Date());
     		ships.add(ship);
     		originalHashCode.add(ship.peekHashCode());
-    		boolean added;
+    		boolean added=false;
     		assertTrue(added=fleet.getShipsListBySwitch().add((ShipBySwitch)ship));
     		log.debug("entity " + ship + " added to list=" + added);
     		//since entities are starting out instance-based -- all elements are accepted by sets
@@ -400,7 +400,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		//basis of hashCode has changed
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship.peekHashCode());
     		assertFalse(ship.peekHashCode() == originalHashCode.get(i).intValue());
-    		boolean contains;
+    		boolean contains=false;
     		assertTrue(contains=fleet.getShipsListBySwitch().contains(ship));
     		log.debug("list contains " + ship + "=" + contains);
     		//new hashCode/equals results in mis-match of values even with same PK
@@ -426,7 +426,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		Ship ship2 = em.find(ShipByPK.class, ship.getId());
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship2.peekHashCode());
     		assertFalse(originalHashCode.get(i) == ship2.peekHashCode());
-    		boolean contains;
+    		boolean contains=false;
     		//since the entities are now being identified by PK value -- the previous
     		//values will match the entities in the retrieved collections
     		assertTrue(contains=fleet.getShipsListBySwitch().contains(ship));
@@ -456,7 +456,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		Ship ship = new ShipByBusinessId().setName(""+i).setCreated(new Date());
     		ships.add(ship);
     		originalHashCode.add(ship.peekHashCode());
-    		boolean added;
+    		boolean added=false;
     		assertTrue(added=fleet.getShipsListByBusinessId().add((ShipByBusinessId)ship));
     		log.debug("entity " + ship + " added to list=" + added);
     		added=fleet.getShipsSetByBusinessId().add((ShipByBusinessId)ship);
@@ -474,7 +474,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		//basis of hashCode has not changed
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship.peekHashCode());
     		assertTrue(ship.peekHashCode() == originalHashCode.get(i).intValue());
-    		boolean contains;
+    		boolean contains=false;
     		assertTrue(contains=fleet.getShipsListByBusinessId().contains(ship));
     		log.debug("list contains " + ship + "=" + contains);
     		assertTrue(contains=fleet.getShipsSetByBusinessId().contains(ship));
@@ -498,7 +498,7 @@ public class BasisForCollectionTest extends JPATestBase {
     		Ship ship2 = em.find(ShipByBusinessId.class, ship.getId());
     		log.debug("hashCode old=" + originalHashCode.get(i) + ", new=" + ship2.peekHashCode());
     		assertTrue(originalHashCode.get(i) == ship2.peekHashCode());
-    		boolean contains;
+    		boolean contains=false;
     		assertTrue(contains=fleet.getShipsListByBusinessId().contains(ship));
     		log.debug("original list contains " + ship + "=" + contains);
     		assertTrue(contains=fleet2.getShipsListByBusinessId().contains(ship));

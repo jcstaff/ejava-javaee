@@ -1,6 +1,5 @@
 package ejava.examples.orm.rel.annotated;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 

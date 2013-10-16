@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 

@@ -1,9 +1,5 @@
 package ejava.jpa.examples.tuning.stuff;
 
-import static org.junit.Assert.*;
-
-
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
