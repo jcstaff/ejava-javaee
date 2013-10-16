@@ -16,8 +16,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import ejava.examples.secureping.ejb.SecurePing;
-import ejava.examples.secureping.ejb.SecurePingRemote;
-import ejava.util.ejb.EJBClient;
 
 /**
  * This class demonstrates accessing the application server and EJB using
