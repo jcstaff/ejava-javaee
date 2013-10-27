@@ -33,7 +33,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     @Resource
     protected SessionContext ctx;
 
-    //@Inject @Named("javaeeEx")
+    //@Inject @JavaeeEx
     //private EntityManager em;
 
     @PostConstruct

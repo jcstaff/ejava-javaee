@@ -24,6 +24,10 @@ Part E: Implementing CDI Dependency Injection
          Creating Type-safe Qualifiers
         }} 
 
+    * {{{Method_Producers}
+        Method Producers
+       }}
+
     * {{{Inject_DAO_with_Resources}
          Inject DAO with Resources
         }}
@@ -163,10 +167,12 @@ Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
 ---
     //this is a second option for an EntityManager to create an ambiguity
     //when selecting on type alone
-    @Produces
-    public EntityManager getEntityManager() {
-    	return em;
+    @Produces 
+    public EntityManager getEntityManager(@JavaeeEx EntityManager em2) {
+        em2.setProperty("foo", "bar");
+        return em2;
     }
+
 ---
 
     [[1]] Attempt to redeploy the application and note the error produced. @Default is a built-in qualifier that applies
@@ -180,86 +186,11 @@ Producer Field [EntityManager] with qualifiers [@Any @Default] declared as [[fie
 Producer Method [EntityManager] with qualifiers [@Any @Default] declared as [[method] @Produces public myorg.javaeeex.cdi.ResourceConfig.getEntityManager()]]]
 ---
 
-    [[1]] Add a @Named qualifier to the @Produces field. The @Named qualifier is a built-in
-    string-based qualifier. It's primary function is to support JSPs where Java types are
-    not as easily applied.
-
----
-$cat javaeeExEJB/src/main/java/myorg/javaeeex/cdi/ResourceConfig.java
-...
-import javax.inject.Named;
-...
-    @Produces @Named("javaeeEx")
-    @PersistenceContext(unitName="javaeeEx")
-    public EntityManager em;
----
-
-    [[1]] If you re-deploy again you will see that the error has not yet been fixed but 
-    the field choice has been annotated with our string-based name qualifier.
-
----
-...WeldService: org.jboss.weld.exceptions.DeploymentException: WELD-001409 Ambiguous dependencies for type [EntityManager] with qualifiers [@Default]
-at injection point [[field] @Inject private myorg.javaeeex.ejb.RegistrarEJB.em]. Possible dependencies 
-[[Resource Producer Field [EntityManager] with qualifiers [@Any @Default @Named] declared as [[field] @Produces @PersistenceContext @Named public myorg.javaeeex.cdi.ResourceConfig.em],
-Producer Method [EntityManager] with qualifiers [@Any @Default] declared as [[method] @Produces public myorg.javaeeex.cdi.ResourceConfig.getEntityManager()]]]
----
-
-    [[1]] Add the string-based @Named qualifier to the injection point in the RegistrarEJB.
-
----
-$ cat javaeeExEJB/src/main/java/myorg/javaeeex/ejb/RegistrarEJB.java
-...
-import javax.inject.Named;
-...
-    @Inject @Named("javaeeEx")
-    private EntityManager em;
----
-
-    [[1]] Redeploy your application and re-run all tests. They should now pass again.
-
----
-$ mvn clean install -rf :javaeeExEJB
-...
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
-
-...
-[INFO] Java EE Exercise EJB .............................. SUCCESS [5.959s]
-[INFO] Java EE Exercise EAR .............................. SUCCESS [0.797s]
-[INFO] Java EE Exercise Remote Test ...................... SUCCESS [11.967s]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
----
-
 * {Creating Type-safe Qualifiers}
 
-    In the previous section we leveraged a string-based injection qualifier to 
-    distinguish between multiple injection options. In this section we will 
-    demonstrate a key deficiency with using an untyped string-qualifier and 
-    replace it with a type-safe alternateive approach.
-
-    [[1]] Update the persistence context injection in the TestUtilEJB but make 
-    a small typo with the string-based qualifier.
-
----
-$ cat javaeeEx/javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilEJB.java
-...
-import javax.inject.Inject;
-import javax.inject.Named;
-...
-
-@Stateless
-public class TestUtilEJB implements TestUtilRemote {
-    ....
-    @Inject @Named("javaeeExx")
-    private EntityManager em;
----
-
-    [[1]] Redeploy the application and note the error.
-
----
-WELD-001408 Unsatisfied dependencies for type [EntityManager] with qualifiers [@Named] at injection point 
-[[field] @Inject @Named private myorg.javaeeex.ejb.TestUtilEJB.em]
----
+    In the previous section we finished with an ambiguous injection error.
+    In this section we will create a type-safe @Qualifier to complete the 
+    injections.
 
     [[1]] Create a type-safe qualifier using a Java annotation construct.
 
@@ -292,8 +223,7 @@ public @interface JavaeeEx {
 }
 ---
 
-    [[1]] Replace the @Named qualifier annotation in TestUtilEJB with
-    this new type-safe qualifier annotation.
+    [[1]] Add the type-safe qualifier annotation to the TestUtilEJB.
 
 ---
 $cat javaeeEx/javaeeExEJB/src/main/java/myorg/javaeeex/ejb/TestUtilEJB.java
@@ -325,7 +255,8 @@ WELD-001408 Unsatisfied dependencies for type [EntityManager] with qualifiers [@
 $ cat javaeeEx/javaeeExEJB/src/main/java/myorg/javaeeex/cdi/ResourceConfig.java
     ...
     @Produces @JavaeeEx
-    public EntityManager getEntityManager() {
+    @PersistenceContext(unitName="javaeeEx")
+    public EntityManager em;
     ...
 ---
 
@@ -349,6 +280,60 @@ Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ---
 
+* {Method Producers}
+
+    In the previous section we used a field producer to define the injected 
+    bean. This works fine for beans that require no modification. However, if you
+    need to do some bean assembly, you can alternatively use a factory producer.
+
+
+    [[1]] Add an additional qualifier for the new bean source.
+
+---
+package myorg.javaeeex.cdi;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.inject.Qualifier;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Qualifier
+@Target({ TYPE, METHOD, PARAMETER, FIELD })
+@Retention(RUNTIME)
+@Documented
+public @interface JavaeeEx2 {
+}
+---
+
+    [[1]] Add a factory method to the ResourceConfig class. Add the @JavaeeEx2
+    qualifier so we can specify a different source. Have it inject the previous
+    bean type. Note that this particular function is manipulating the injected
+    bean. Since this is a function -- we can pretty much do what we want.
+
+---
+    //this is a second option for an EntityManager to produce a bean that 
+    //requires inputs and manipulation
+    @Produces @JavaeeEx2
+    public EntityManager getEntityManager(@JavaeeEx EntityManager em2) {
+        em2.setProperty("foo", "bar");
+        return em2;
+    }
+---
+
+    [[1]] Change our EJB from the initial @JavaeeEx bean to the @JavaeeEx2 bean.
+
+---
+    @Inject @JavaeeEx2
+    private EntityManager em;
+---
+
+    [[1]] Rebuild and re-deploy the application and the new produces method should be called.
+    You can add a line of debug or a breakpoint to prove it is being used.
 
 * {Inject DAO with Resources}
 
@@ -469,7 +454,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     @Inject
     private Registrar registrar;
 
-    //@Inject @Named("javaeeEx")
+    //@Inject @JavaeeEx
     //private EntityManager em;
 
     @PostConstruct

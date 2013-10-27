@@ -11,14 +11,7 @@ import javax.persistence.PersistenceContext;
  */
 public class ResourceConfig {
 
-    @Produces @Named("javaeeEx")
+    @Produces @JavaeeEx
     @PersistenceContext(unitName="javaeeEx")
     public EntityManager em;
-
-    //this is a second option for an EntityManager to create an ambiguity
-    //when selecting on type alone
-    @Produces @JavaeeEx
-    public EntityManager getEntityManager() {
-    	return em;
-    }
 }

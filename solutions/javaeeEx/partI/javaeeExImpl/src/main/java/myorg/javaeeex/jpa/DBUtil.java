@@ -7,10 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
-
-import myorg.javaeeex.cdi.JavaeeEx;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

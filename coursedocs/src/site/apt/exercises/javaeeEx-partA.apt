@@ -163,11 +163,15 @@ $ mvn clean install
 ---
 
     [[1]] Add in the maven-compiler-plugin specification to the parent 
-    pom to make sure JDK 1.6 is used and we use an up to date version.
+    pom to make sure JDK 1.6 or above is used and we use an up to date version
+    of the plugin. In this case we are using a JDK7 runtime and using source 
+    compatible with JDK6.
 
 ---
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.source.version>1.6</java.source.version>
+        <java.target.version>1.7</java.target.version>
 
         <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
     </properties>
@@ -180,8 +184,8 @@ $ mvn clean install
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
-                            <source>1.6</source>
-                            <target>1.6</target>
+                            <source>${java.source.version}</source>
+                            <target>${java.target.version}</target>
                     </configuration>	                
                 </plugin>
 ...
@@ -1389,7 +1393,7 @@ Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
 
     <properties>
         ...
-        <maven-failsafe-plugin.version>2.12.2</maven-failsafe-plugin.version>
+        <maven-failsafe-plugin.version>2.16</maven-failsafe-plugin.version>
 ...
     	<pluginManagement>
             <plugins>
@@ -1571,6 +1575,13 @@ $ cat $JBOSS_HOME/standalone/configuration/standalone.xml
         configurations but not required if you use the default standalone.xml
         configuration file.
 
+        [Note:] The exercise instructions are written to work against a (open source) 
+        JBoss AS 7.2.x, which is compatible with JBoss EAP 6.1.x for our purposes. 
+        The runtime output shown is from JBoss 7.1.1 -- which should not differ much
+        from the JBoss EAP 6.1.x server you should be using.
+
+        []
+
 ---
 $ ./bin/standalone.sh -Djboss.server.base.dir=standalone -c standalone.xml
 ---
@@ -1701,10 +1712,10 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
     <properties>
         ...
-        <cargo-maven2-plugin.version>1.2.3</cargo-maven2-plugin.version>
+        <cargo-maven2-plugin.version>1.4.3</cargo-maven2-plugin.version>
         <cargo.containerId>jboss71x</cargo.containerId>
         ...
-        <jboss.version>7.1.1.Final</jboss.version>
+        <jboss.version>7.2.0.Final</jboss.version>
         ...
         <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
         <jboss.mgmt.port>9999</jboss.mgmt.port>

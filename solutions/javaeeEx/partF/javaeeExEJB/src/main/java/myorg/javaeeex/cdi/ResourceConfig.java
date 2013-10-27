@@ -10,15 +10,7 @@ import javax.persistence.PersistenceContext;
  * injection solutions and their source within the container.
  */
 public class ResourceConfig {
-
-    @Produces @Named("javaeeEx")
+    @Produces @JavaeeEx
     @PersistenceContext(unitName="javaeeEx")
     public EntityManager em;
-
-    //this is a second option for an EntityManager to create an ambiguity
-    //when selecting on type alone
-    @Produces @JavaeeEx
-    public EntityManager getEntityManager() {
-    	return em;
-    }
 }

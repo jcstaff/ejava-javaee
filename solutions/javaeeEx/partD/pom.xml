@@ -22,13 +22,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.source.version>1.6</java.source.version>
+        <java.target.version>1.7</java.target.version>
 
         <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
-        <maven-ear-plugin.version>2.7</maven-ear-plugin.version>
+        <maven-ear-plugin.version>2.8</maven-ear-plugin.version>
         <maven-ejb-plugin.version>2.3</maven-ejb-plugin.version>
-        <maven-failsafe-plugin.version>2.12.2</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
-        <cargo-maven2-plugin.version>1.2.3</cargo-maven2-plugin.version>
+        <maven-failsafe-plugin.version>2.16</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>2.16</maven-surefire-plugin.version>
+        <cargo-maven2-plugin.version>1.4.3</cargo-maven2-plugin.version>
         <cargo.containerId>jboss71x</cargo.containerId>
         <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
         <hibernate3.version>3.6.0.Final</hibernate3.version>
@@ -37,14 +39,14 @@
         <commons-logging.version>1.1.1</commons-logging.version>
         <ejava.version>3.0.2013.2-SNAPSHOT</ejava.version>
         <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
-        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
+        <hibernate-entitymanager.version>4.2.0.Final</hibernate-entitymanager.version>
         <h2db.version>1.3.168</h2db.version>
         <javaee-api.version>6.0</javaee-api.version>
         <junit.version>4.10</junit.version>
         <log4j.version>1.2.13</log4j.version>
         <slf4j.version>1.6.1</slf4j.version>
 
-        <jboss.version>7.1.1.Final</jboss.version>
+        <jboss.version>7.2.0.Final</jboss.version>
         <jboss.host>localhost</jboss.host>
         <jboss.naming.port>4447</jboss.naming.port>
         <jboss.user>admin</jboss.user>
@@ -148,8 +150,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
-                            <source>1.6</source>
-                            <target>1.6</target>
+                            <source>${java.source.version}</source>
+                            <target>${java.target.version}</target>
                     </configuration>	                
                 </plugin>
 

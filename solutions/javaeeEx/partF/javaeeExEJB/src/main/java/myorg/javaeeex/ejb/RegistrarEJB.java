@@ -25,7 +25,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     @Inject
     private Registrar registrar;
 
-    //@Inject @Named("javaeeEx")
+    //@Inject @JavaeeEx
     //private EntityManager em;
 
     @PostConstruct

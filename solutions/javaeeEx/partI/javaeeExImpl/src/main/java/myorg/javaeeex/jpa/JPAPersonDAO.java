@@ -21,8 +21,8 @@ public class JPAPersonDAO implements PersonDAO {
     
     private EntityManager em;
     
-    @Inject @JavaeeEx
-    public void setEntityManager(EntityManager em) {
+    @Inject
+    public void setEntityManager(@JavaeeEx EntityManager em) {
         this.em = em;
     }
 

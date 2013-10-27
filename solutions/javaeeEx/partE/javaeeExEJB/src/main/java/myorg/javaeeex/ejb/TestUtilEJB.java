@@ -14,7 +14,7 @@ import myorg.javaeeex.bl.TestUtil;
 public class TestUtilEJB implements TestUtilRemote {
     private static Log log = LogFactory.getLog(TestUtilEJB.class);
 
-    //@Inject @JavaeeEx
+    //@Inject @JavaeeEx2
     //private EntityManager em;
 
     @Inject

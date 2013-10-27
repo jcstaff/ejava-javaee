@@ -8,8 +8,6 @@ import javax.annotation.PreDestroy;
 import javax.ejb.EJBException;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +25,7 @@ public class RegistrarEJB implements RegistrarLocal, RegistrarRemote {
     @Inject
     private Registrar registrar;
 
-    //@Inject @Named("javaeeEx")
+    //@Inject @JavaeeEx
     //private EntityManager em;
 
     @PostConstruct

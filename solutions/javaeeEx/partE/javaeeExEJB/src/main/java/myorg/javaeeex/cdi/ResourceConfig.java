@@ -1,7 +1,6 @@
 package myorg.javaeeex.cdi;
 
 import javax.enterprise.inject.Produces;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -11,14 +10,15 @@ import javax.persistence.PersistenceContext;
  */
 public class ResourceConfig {
 
-    @Produces @Named("javaeeEx")
+    @Produces @JavaeeEx
     @PersistenceContext(unitName="javaeeEx")
     public EntityManager em;
 
-    //this is a second option for an EntityManager to create an ambiguity
-    //when selecting on type alone
-    @Produces @JavaeeEx
-    public EntityManager getEntityManager() {
-    	return em;
+    //this is a second option for an EntityManager to produce a bean that 
+    //requires inputs and manipulation
+    @Produces //@JavaeeEx2
+    public EntityManager getEntityManager(@JavaeeEx EntityManager em2) {
+    	em2.setProperty("foo", "bar");
+    	return em2;
     }
 }

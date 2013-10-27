@@ -40,7 +40,6 @@ public class RegistrarIT {
     private static final String userPassword = System.getProperty("user.password", "password");
     private static final String adminUser = System.getProperty("admin.user", "admin1");
     private static final String adminPassword = System.getProperty("admin.password", "password");
-    private TestUtilRemote testUtil;
     private Context jndi;
 
     @Before
@@ -57,13 +56,15 @@ public class RegistrarIT {
         log.debug("registrar=" + registrar);
 
         log.debug("jndi name:" + testUtilJNDI);
-        testUtil = (TestUtilRemote)jndi.lookup(testUtilJNDI);
+        TestUtilRemote testUtil = (TestUtilRemote)jndi.lookup(testUtilJNDI);
         log.debug("testUtil=" + testUtil);
 
         log.debug(String.format("admin= %s/%s", adminUser, adminPassword));
         
         cleanup();
-        runAs(userUser, userPassword);
+        //run the tests as user
+        Context context=runAs(userUser, userPassword);
+        registrar=(RegistrarRemote)context.lookup(registrarJNDI);
     }
     
     /**
@@ -80,8 +81,7 @@ public class RegistrarIT {
 
     protected void cleanup() throws Exception {
         log.info("calling testUtil.resetAll()");
-        runAs(adminUser, adminPassword);
-        testUtil.resetAll();
+        ((TestUtilRemote)runAs(adminUser, adminPassword).lookup(testUtilJNDI)).resetAll();
         log.info("testUtil.resetAll() complete");
     }
 

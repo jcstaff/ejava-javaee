@@ -7,10 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
-
-import myorg.javaeeex.cdi.JavaeeEx;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,8 +15,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This class will execute a set of drop and create DDL scripts against
  * a supplied entity manager.
- * @author jcstaff
- *
  */
 public class DBUtil {
     static Log log = LogFactory.getLog(DBUtil.class);

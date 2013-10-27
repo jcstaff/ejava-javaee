@@ -650,9 +650,7 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 ...
     protected void cleanup() throws Exception {
         log.info("calling testUtil.resetAll()");
-        runAs(adminUser, adminPassword);
-        testUtil.resetAll();
-        runAs(null, null);
+        ((TestUtilRemote)runAs(adminUser, adminPassword).lookup(testUtilJNDI)).resetAll();
         log.info("testUtil.resetAll() complete");
     }
 ...
@@ -760,9 +758,7 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 ...
     protected void cleanup() throws Exception {
         log.info("calling testUtil.resetAll()");
-        runAs(adminUser, adminPassword);
-        testUtil.resetAll();
-        runAs();
+        ((TestUtilRemote)runAs(adminUser, adminPassword).lookup(testUtilJNDI)).resetAll();
         log.info("testUtil.resetAll() complete");
     }
 ---
@@ -1056,7 +1052,9 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
     public void setUp() throws Exception {
         ...
         cleanup();
-        runAs(userUser, userPassword);
+        //run the tests as user
+        Context context=runAs(userUser, userPassword);
+        registrar=(RegistrarRemote)context.lookup(registrarJNDI);
     }
 ...
 ---

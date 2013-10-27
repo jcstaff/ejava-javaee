@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import myorg.javaeeex.bl.TestUtil;
+import myorg.javaeeex.cdi.JavaeeEx2;
 import myorg.javaeeex.cdi.JavaeeEx;
 import myorg.javaeeex.jpa.DBUtil;
 
@@ -13,7 +14,7 @@ public class TestUtilImpl implements TestUtil {
     protected static final String CREATE_SCRIPT = 
         "ddl/javaeeExImpl-createJPA.ddl";
     
-    @Inject @JavaeeEx
+    @Inject //@JavaeeEx2    
     protected EntityManager em;
 
     public void setEntityManager(EntityManager em) {
