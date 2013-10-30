@@ -8,11 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
 
 /**
  * The shopping cart contans all the items a user has cached for purchase.
  */
 @Entity
+@Table(name="BLPURCHASE_CART")
 public class Cart {
 	@Id
 	private String email;

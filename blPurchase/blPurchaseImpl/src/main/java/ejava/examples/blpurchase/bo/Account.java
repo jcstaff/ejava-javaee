@@ -6,11 +6,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 /**
  * An account is tracked 
  */
 @Entity
+@Table(name="BLPURCHASE_ACCOUNT")
 @NamedQueries({
 	@NamedQuery(name="blPurchasing.findAccountByEmail", 
 			    query="select a from Account a where a.email=:email")
