@@ -23,9 +23,9 @@
     <p/>
     Test accounts:
      <ul>
-        <li>admin1/password</li>
-        <li>user1/password</li>
-        <li>known/password - someone who has a login, but no permissions</li>
+        <li>admin1/password1.</li>
+        <li>user1/password1.</li>
+        <li>known/password1. - someone who has a login, but no permissions</li>
      </ul>
   </body>
 </html>
