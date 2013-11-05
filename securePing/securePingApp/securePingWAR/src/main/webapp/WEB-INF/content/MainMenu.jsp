@@ -25,15 +25,15 @@
             <input type="submit" name="command" value="logout"/>
         </form>
         <form method="GET" action="<%=action%>">
-            <input type="text" name="role" readonly="true" value="admin"/>
+            <input type="text" name="role" readonly="readonly" value="admin"/>
             <input type="submit" name="command" value="isCallerInRole"/>
         </form>
         <form method="GET" action="<%=action%>">
-            <input type="text" name="role" readonly="true" value="user"/>
+            <input type="text" name="role" readonly="readonly" value="user"/>
             <input type="submit" name="command" value="isCallerInRole"/>
         </form>
         <form method="GET" action="<%=action%>">
-            <input type="text" name="role" readonly="true" value="internalRole"/>
+            <input type="text" name="role" readonly="readonly" value="internalRole"/>
             <input type="submit" name="command" value="isCallerInRole"/>
         </form>
         <form method="GET" action="<%=action%>">
