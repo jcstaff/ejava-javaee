@@ -12,7 +12,6 @@ import javax.naming.NamingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ejava.examples.secureping.ejb.SecurePing;
@@ -70,13 +69,19 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
      * InitialContext.
      * @throws NamingException
      */
-    @Test @Ignore
+    @Test 
     public void testAnonymousInitialContext() throws NamingException {
     	log.info("*** testAnonymousInitialContext ***");
     	Context jndi=null;
     	try {
     		jndi=runAs(null, null);
-    		fail("did not detect anonymous InitialContext");
+        	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
+        	String response = ejb.pingAll();
+        	if (!response.contains("principal=$local")) {
+        		fail("did not detect anonymous InitialContext");
+    		} else {
+    			log.debug("JBoss used $local user:" + response);
+    		}
     	}
         catch (NamingException ex) {
             log.info("expected error for anonymous InitialContext:" + ex);
