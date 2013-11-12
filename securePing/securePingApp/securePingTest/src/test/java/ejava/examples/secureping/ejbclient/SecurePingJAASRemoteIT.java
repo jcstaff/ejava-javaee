@@ -3,14 +3,16 @@ package ejava.examples.secureping.ejbclient;
 
 import static org.junit.Assert.*;
 
+
+import java.io.File;
+import java.net.URL;
 import java.security.Principal;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 
@@ -20,12 +22,18 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ejava.examples.secureping.ejb.SecurePing;
+import ejava.examples.secureping.ejb.SecurePingRemote;
 
-public class SecurePingRemoteIT extends SecurePingTestBase {
-    private static final Log log = LogFactory.getLog(SecurePingRemoteIT.class);
+/**
+ * This class demonstrates accessing the application server and EJB using
+ * a JAAS LoginContext mechanism and legacy JBoss remoting API. 
+</pre>
+ */
+@Ignore //this test/feature is not yet working for me in JBoss AS 7.x/EAP6.x
+public class SecurePingJAASRemoteIT extends SecurePingTestBase {
+    private static final Log log = LogFactory.getLog(SecurePingJAASRemoteIT.class);
     String jmxUser = System.getProperty("jmx.username","admin");
-    String jmxPassword = System.getProperty("jmx.password","password");
+    String jmxPassword = System.getProperty("jmx.password","password1.");
     
     Map<String,CallbackHandler> logins = new HashMap<String, CallbackHandler>();
     CallbackHandler knownLogin;
@@ -37,6 +45,12 @@ public class SecurePingRemoteIT extends SecurePingTestBase {
     @Before
     public void setUp() throws Exception {
         log.debug("jndi name:" + jndiName);
+        String loginConfig = System.getProperty("java.security.auth.login.config");        
+        assertNotNull("-Djava.security.auth.login.config not defined - are you running in IDE without defining it?", loginConfig);
+		System.out.println(loginConfig);
+		URL url = new URL(loginConfig);
+		File loginConfigFile = new File(url.getFile());
+		assertTrue("cannot locate:" + loginConfigFile.getCanonicalPath(), loginConfigFile.exists());
         
         //create different types of logins
         knownLogin = new BasicCallbackHandler();
@@ -71,6 +85,7 @@ public class SecurePingRemoteIT extends SecurePingTestBase {
             */
     }
     
+    /*
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	private Context runAs(String username, String password) throws NamingException {
         Hashtable env = new Hashtable();
@@ -81,17 +96,22 @@ public class SecurePingRemoteIT extends SecurePingTestBase {
         log.debug(String.format("%s env=%s", username, env));
         return new InitialContext(env);
     }
+    */
     
-    @Test @Ignore
+    @Test 
     public void testLoginContext() throws Exception {
         log.info("*** testLoginContext ***");
         
+        InitialContext jndi = new InitialContext();
         LoginContext lc = new LoginContext("securePingTest", adminLogin);
         lc.login();
         log.info("subject=" + lc.getSubject());
+        Set<String> principals = new HashSet<String>();
         for (Principal p: lc.getSubject().getPrincipals()) {
             log.info("principal=" + p + ", " + p.getClass().getName());
+            principals.add(p.getName());
         }
+        assertTrue("adminUser not in principals", principals.contains(adminUser));
         log.info(lc.getSubject().getPrivateCredentials().size() + 
                 " private credentials");
         for (Object c: lc.getSubject().getPrivateCredentials()) {
@@ -102,6 +122,8 @@ public class SecurePingRemoteIT extends SecurePingTestBase {
         for (Object c: lc.getSubject().getPublicCredentials()) {
             log.info("public credential=" + c + ", " + c.getClass().getName());
         }
+        SecurePingRemote securePing=(SecurePingRemote)jndi.lookup(jndiName);
+        assertEquals("unexpected user", adminUser, securePing.getPrincipal());
         lc.logout();
     }
 
@@ -152,11 +174,11 @@ public class SecurePingRemoteIT extends SecurePingTestBase {
         //assertTrue("admin not in internalRole role",
            securePing.isCallerInRole("internalRole");
         //);
-        lc.logout();        
+        lc.logout();
     }
-	*/
     
-    @Test @Ignore
+    /*
+    @Test
     public void testPingAll() throws Exception {
     	SecurePing ejb=null;
     	
@@ -243,8 +265,6 @@ public class SecurePingRemoteIT extends SecurePingTestBase {
 
     }
     
-    /*
-    
     @Test
     public void testPingUser() throws Exception {
         log.info("*** testPingUser ***");
@@ -290,6 +310,8 @@ public class SecurePingRemoteIT extends SecurePingTestBase {
         }        
     }
 
+    /*
+    
     @Test
     public void testPingAdmin() throws Exception {
         log.info("*** testPingAdmin ***");

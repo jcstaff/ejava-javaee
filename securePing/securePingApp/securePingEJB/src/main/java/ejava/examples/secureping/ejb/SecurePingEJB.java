@@ -98,4 +98,9 @@ public class SecurePingEJB
                 ", isCallerInRole(" + role + ")=" + result);  
         return result;
     }
+    
+    @PermitAll
+    public String getPrincipal() {
+    	return ctx.getCallerPrincipal().getName();
+    }
 }
