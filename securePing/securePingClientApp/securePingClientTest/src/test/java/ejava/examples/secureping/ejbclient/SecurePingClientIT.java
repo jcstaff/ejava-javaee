@@ -77,17 +77,17 @@ public class SecurePingClientIT {
         //create different types of logins
         knownLogin = new BasicCallbackHandler();
         ((BasicCallbackHandler)knownLogin).setName("known");
-        ((BasicCallbackHandler)knownLogin).setPassword("password");
+        ((BasicCallbackHandler)knownLogin).setPassword("password1!");
         
         userLogin = new BasicCallbackHandler();
         log.debug("using user username=" + userUser);
         ((BasicCallbackHandler)userLogin).setName(userUser);
-        ((BasicCallbackHandler)userLogin).setPassword("password");
+        ((BasicCallbackHandler)userLogin).setPassword("password1!");
 
         adminLogin = new BasicCallbackHandler();
         log.debug("using admin username=" + adminUser);
         ((BasicCallbackHandler)adminLogin).setName(adminUser);
-        ((BasicCallbackHandler)adminLogin).setPassword("password");        
+        ((BasicCallbackHandler)adminLogin).setPassword("password1!");        
     }
 
     /**

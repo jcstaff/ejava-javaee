@@ -31,8 +31,6 @@ public class ParserServerIT {
 
     @Before
     public void setUp() throws Exception {
-        jndi = new InitialContext();
-        parser = (ParserTestRemote)jndi.lookup(jndiName);
     }
     
     @After
@@ -45,6 +43,8 @@ public class ParserServerIT {
 	@Test
 	public void testIngest() throws Exception {
 		log.info("*** testIngest ***");
+        jndi = new InitialContext();
+        parser = (ParserTestRemote)jndi.lookup(jndiName);
 		parser.ingest();
 	}
 }

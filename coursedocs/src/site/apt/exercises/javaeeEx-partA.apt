@@ -1148,9 +1148,9 @@ jboss.naming.client.ejb.context=true
         <jboss.host>localhost</jboss.host>
         <jboss.naming.port>4447</jboss.naming.port>
         <jboss.user>admin</jboss.user>
-        <jboss.password>password</jboss.password>
+        <jboss.password>password1!</jboss.password>
         <jndi.user>known</jndi.user>
-        <jndi.password>password</jndi.password>
+        <jndi.password>password1!</jndi.password>
 
         <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
         <jboss.remoting.java.naming.provider.url>remote://${jboss.host}:${jboss.naming.port}</jboss.remoting.java.naming.provider.url>
@@ -1200,7 +1200,7 @@ java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
 java.naming.factory.url.pkgs=
 java.naming.provider.url=remote://localhost:4447
 java.naming.security.principal=known
-java.naming.security.credentials=password
+java.naming.security.credentials=password1!
 jboss.naming.client.ejb.context=true
 ---
 
@@ -1636,7 +1636,8 @@ $ (cd javaeeExTest/; mvn clean install)
 ...
 Running myorg.javaeeex.ejbclient.RegistrarIT
  -getting jndi initial context
- -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password}
+ -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=,
+ java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password1!}
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.031 sec
 
 Results :
@@ -1793,7 +1794,8 @@ INFO: JBoss Remoting version 3.2.3.GA
  -------------------------------------------------------
 Running myorg.javaeeex.ejbclient.RegistrarIT
  -getting jndi initial context
- -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password}
+ -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=,
+ java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password1!}
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.078 sec
 
 Results :
@@ -1980,7 +1982,8 @@ $ (cd javaeeExTest/; mvn clean install)
 ...
 Running myorg.javaeeex.ejbclient.RegistrarIT
  -getting jndi initial context
- -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=, java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password}
+ -jndi={java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory, java.naming.provider.url=remote://localhost:4447, java.naming.factory.url.pkgs=,
+ java.naming.security.principal=known, jboss.naming.client.ejb.context=true, java.naming.security.credentials=password1!}
  -jndi name:javaeeExEAR-1.0-SNAPSHOT/javaeeExEJB-1.0-SNAPSHOT/RegistrarEJB!myorg.javaeeex.ejb.RegistrarRemote
  -registrar=Proxy for remote EJB StatelessEJBLocator{appName='javaeeExEAR-1.0-SNAPSHOT', moduleName='javaeeExEJB-1.0-SNAPSHOT', distinctName='', beanName='RegistrarEJB', view='interface myorg.javaeeex.ejb.RegistrarRemote'}
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.237 sec

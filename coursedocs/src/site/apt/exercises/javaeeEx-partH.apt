@@ -230,7 +230,7 @@ java.naming.security.credentials=${jboss.remoting.java.naming.security.credentia
 $ cat javaeeextest/target/test-classes/jndi.properties
 ...
 java.naming.security.principal=known
-java.naming.security.credentials=password
+java.naming.security.credentials=password1!
 ...
 ---
 
@@ -547,7 +547,7 @@ $ cat javaeeExTest/pom.xml
                     <argLine>${surefire.argLine}</argLine>
                     <systemPropertyVariables>
                         <admin.user>admin1</admin.user>
-                        <admin.password>password</admin.password>
+                        <admin.password>password1!</admin.password>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -566,7 +566,7 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 public class RegistrarIT {
 ...
     private static final String adminUser = System.getProperty("admin.user", "admin1");
-    private static final String adminPassword = System.getProperty("admin.password", "password");
+    private static final String adminPassword = System.getProperty("admin.password", "password1!");
 ...
 
     @Before
@@ -712,9 +712,9 @@ $ cat javaeeExTest/pom.xml
 ...
                     <systemPropertyVariables>
                         <known.user>known</known.user>
-                        <known.password>password</known.password>
+                        <known.password>password1!</known.password>
                         <admin.user>admin1</admin.user>
-                        <admin.password>password</admin.password>
+                        <admin.password>password1!</admin.password>
                     </systemPropertyVariables>
 ...
 ---
@@ -728,7 +728,7 @@ $ cat javaeeExTest/pom.xml
 $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 ...
     private static final String knownUser = System.getProperty("known.user", "known");
-    private static final String knownPassword = System.getProperty("known.password", "password");
+    private static final String knownPassword = System.getProperty("known.password", "password1!");
 ...
 ---
 
@@ -1027,7 +1027,7 @@ $ cat javaeeExTest/pom.xml
                 <artifactId>maven-failsafe-plugin</artifactId>
 ...
                         <user.user>user1</user.user>
-                        <user.password>password</user.password>
+                        <user.password>password1!</user.password>
 ...  
 ---
 ---
@@ -1035,7 +1035,7 @@ $ cat javaeeExTest/src/test/java/myorg/javaeeex/ejbclient/RegistrarIT.java
 
 ...
     private static final String userUser = System.getProperty("user.user","user1");
-    private static final String userPassword = System.getProperty("user.password", "password");
+    private static final String userPassword = System.getProperty("user.password", "password1!");
 ...
 ---
 

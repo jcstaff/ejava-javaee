@@ -33,7 +33,7 @@ import ejava.examples.secureping.ejb.SecurePingRemote;
 public class SecurePingJAASRemoteIT extends SecurePingTestBase {
     private static final Log log = LogFactory.getLog(SecurePingJAASRemoteIT.class);
     String jmxUser = System.getProperty("jmx.username","admin");
-    String jmxPassword = System.getProperty("jmx.password","password1.");
+    String jmxPassword = System.getProperty("jmx.password","password1!");
     
     Map<String,CallbackHandler> logins = new HashMap<String, CallbackHandler>();
     CallbackHandler knownLogin;
@@ -54,8 +54,8 @@ public class SecurePingJAASRemoteIT extends SecurePingTestBase {
         
         //create different types of logins
         knownLogin = new BasicCallbackHandler();
-        ((BasicCallbackHandler)knownLogin).setName("known");
-        ((BasicCallbackHandler)knownLogin).setPassword("password");
+        ((BasicCallbackHandler)knownLogin).setName(knownUser);
+        ((BasicCallbackHandler)knownLogin).setPassword(knownPassword);
         
         userLogin = new BasicCallbackHandler();
         log.debug("using user username=" + userUser);
