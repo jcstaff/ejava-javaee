@@ -1,0 +1,37 @@
+Example         LAZY                     EAGER  
+----------------------------------------------light, parent access
+Default         thin=0.32                2.43
+Mapping         thick=0.58              0.58         
+
+Result          thin=0.34               0.32
+Class           thick=0.32              0.32
+
+----------------------------------------------deep, child access
+Default         thin=7.25               2.26
+Mapping         thick=7.25              2.52
+
+join-fetch      thin=2.56               2.24
+                thick=2.54              2.58
+
+---------------------------------------------- count
+API             1.83 (2 queries)        5.40
+
+join-query      1.37 (1 query)          18.82
+
+count(join)     0.50                    0.45
+
+count(no-join)  0.47                    0.44
+
+---------------------------------------------- outer/inner-query
+for-loop        4.91
+
+subquery        2.52
+
+---------------------------------------------- paging
+for-loop         0=0.39                 0.38
+                10=1.01                 1.10
+                50=2.80                 2.52
+
+subquery         0=0.32                 0.32
+                10=0.31                 0.32
+                50=0.32                 0.32

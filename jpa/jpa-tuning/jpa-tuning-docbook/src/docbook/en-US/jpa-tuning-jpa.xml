@@ -314,9 +314,8 @@ Fetch Eager Thick Parent.Get Parent:warmups=2, rounds=10, ave=2.59 [+- 0.06]
 }]]></programlisting>                        
                 </figure>
                 <itemizedlist spacing="compact">
-                    <listitem><para>We define an alternate native SQL query for provider to use that does not include relationships</para></listitem>
-                    <listitem><para>Single entity in the result set -- so mappings can be expressed as a single Movie.class</para></listitem>
-                    <listitem><para>Movie entity already defines table/column mappings -- we are just limiting the supplied set</para></listitem>
+                    <listitem><para>We define an alternate JPA-QL query for provider to use that does not include relationships</para></listitem>
+                    <listitem><para>Result class not mapped beyond this query -- does not have to be an entity class</para></listitem>
                 </itemizedlist>
 
                 <figure>    
