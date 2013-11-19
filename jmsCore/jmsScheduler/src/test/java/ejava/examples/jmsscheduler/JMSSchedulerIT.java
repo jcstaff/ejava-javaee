@@ -35,7 +35,7 @@ import ejava.util.jndi.JNDIUtil;
 public class JMSSchedulerIT {
 	static final Log log = LogFactory.getLog(JMSSchedulerIT.class);
     private static String adminUser = System.getProperty("admin.user", "admin1");
-    private static String adminPassword = System.getProperty("admin.password", "password");
+    private static String adminPassword = System.getProperty("admin.password", "password1!");
 	private static String requestorUsername;
 	private static String requestorPassword;
 	private static String workerUsername;

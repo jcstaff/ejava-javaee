@@ -31,9 +31,9 @@ public class JMSTestBase {
             "topic/ejava/examples/jmsMechanics/topic1");
 
     protected static String adminUser = System.getProperty("admin.user", "admin1");
-    protected static String adminPassword = System.getProperty("admin.password", "password");
+    protected static String adminPassword = System.getProperty("admin.password", "password1!");
     protected static String user = System.getProperty("user", "user1");
-    protected static String password = System.getProperty("password", "password");
+    protected static String password = System.getProperty("password", "password1!");
 
     private static EmbeddedJMS server; //used when JMS server embedded in JVM
     private static Context jndi;     //used when JMS server remote in JBoss
