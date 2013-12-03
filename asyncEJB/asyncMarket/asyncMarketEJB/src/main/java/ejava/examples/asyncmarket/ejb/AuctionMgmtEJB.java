@@ -164,7 +164,7 @@ public class AuctionMgmtEJB implements AuctionMgmtRemote, AuctionMgmtLocal {
 
     
     @Timeout
-    @Schedule(second="*/10", minute ="*", hour="*", dayOfMonth="*", month="*", year="*")
+    @Schedule(second="*/10", minute ="*", hour="*", dayOfMonth="*", month="*", year="*", persistent=false)
     public void execute(Timer timer) {
         log.info("timer fired:" + timer);
         try {
