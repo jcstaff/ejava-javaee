@@ -233,7 +233,7 @@ $ mvn clean install -rf :javaeeExWAR -DskipTests; mvn pre-integration-test -rf :
 
         * Click on {{{http://localhost:8080/javaeeEx/model/admin/handler?command=Get+All+People&index=0&count=10}Get All People}}. You should get a browser pop-up requesting User Name and Password for the javaeeEx Realm.
 
-        * Log in with credentials admin1/password. This user was assigned both 
+        * Log in with credentials admin1/password1!. This user was assigned both 
         the user role (required by the EJB) and the admin role (required
         by the web tier). You should see the People Display
 
@@ -257,7 +257,7 @@ admin2=admin
 
         * Access {{{http://localhost:8080/javaeeEx/model/admin/handler?command=Get+All+People&index=0&count=10}Get All People}} again. You should get a browser pop-up requesting User Name and Password for the javaeeEx Realm.
 
-        * Log in with credentials admin1/password. This user was assigned
+        * Log in with credentials admin1/password1!. This user was assigned
         only the admin role (required by the web tier) but does not have
         the user role. You should see an error about the user being unauthorized.
 
@@ -382,10 +382,10 @@ $ cat javaeeExWAR/src/main/webapp/WEB-INF/content/LoginFailure.jsp
     <p/>
     Test accounts:
      <ul>
-        <li>admin1/password - an admin that is only an admin</li>
-        <li>admin2/password - an admin that is also a user</li>
-        <li>user1/password</li>
-        <li>known/password - someone who has a login, but no permissions</li>
+        <li>admin1/password1! - an admin that is only an admin</li>
+        <li>admin2/password1! - an admin that is also a user</li>
+        <li>user1/password1!</li>
+        <li>known/password1! - someone who has a login, but no permissions</li>
      </ul>
   </body>
 </html>

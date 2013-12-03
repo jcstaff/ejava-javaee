@@ -32,7 +32,7 @@ import ejava.util.jndi.JNDIUtil;
 public class JMSNotifierIT {
 	static final Log log = LogFactory.getLog(JMSNotifierIT.class);
     protected static String adminUser = System.getProperty("admin.user", "admin1");
-    protected static String adminPassword = System.getProperty("admin.password", "password");
+    protected static String adminPassword = System.getProperty("admin.password", "password1!");
     protected static boolean jmsEmbedded = Boolean.parseBoolean(System.getProperty("jms.embedded", "true"));
     private static Context jndi; 
 

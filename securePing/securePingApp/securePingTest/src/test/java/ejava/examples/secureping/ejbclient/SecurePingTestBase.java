@@ -17,11 +17,11 @@ public class SecurePingTestBase {
     	EJBClient.getRemoteLookupName("securePingEAR", "securePingEJB", 
    			"SecurePingEJB", SecurePingRemote.class.getName()));
     String knownUser = System.getProperty("known.username", "known");
-    String knownPassword = System.getProperty("known.password", "password1.");
+    String knownPassword = System.getProperty("known.password", "password1!");
     String userUser = System.getProperty("user.username","user1");
-    String userPassword = System.getProperty("user.password","password1.");
+    String userPassword = System.getProperty("user.password","password1!");
     String adminUser = System.getProperty("admin.username","admin1");
-    String adminPassword = System.getProperty("admin.password","password1.");
+    String adminPassword = System.getProperty("admin.password","password1!");
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {

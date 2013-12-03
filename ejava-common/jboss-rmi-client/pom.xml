@@ -59,6 +59,16 @@
        <dependency>
            <groupId>org.jboss.as</groupId>
            <artifactId>jboss-as-naming</artifactId>
+           <exclusions>
+               <exclusion>
+                   <artifactId>log4j-jboss-logmanager</artifactId>
+                   <groupId>org.jboss.logmanager</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jboss-logmanager</artifactId>
+                   <groupId>org.jboss.logmanager</groupId>
+               </exclusion>
+           </exclusions>
        </dependency>
 
        <!-- Import the transaction spec API, we use runtime scope because we aren't using any direct

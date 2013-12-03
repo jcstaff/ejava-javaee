@@ -136,7 +136,6 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
         finally {
         	if (jndi != null) { jndi.close(); jndi=null; }
         }
-
         try {
         	jndi=runAs(userUser, userPassword);
         	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
@@ -197,8 +196,9 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
         	if (jndi != null) { jndi.close(); jndi=null; }
         }
 
+/************
         try {
-        	jndi = runAs("known", "password");
+        	jndi = runAs(knownUser, knownPassword);
         	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
             String result = ejb.pingAll();
             log.info(result);
@@ -213,7 +213,7 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
         finally {
         	if (jndi != null) { jndi.close(); jndi=null; }
         }
-        
+***********/        
         try {
         	jndi = runAs(userUser, userPassword);
         	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
@@ -353,6 +353,7 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
         	if (jndi != null) { jndi.close(); jndi=null; }
         }
 
+/************
         try {
             jndi=runAs(knownUser, knownPassword);
         	SecurePing ejb=(SecurePing)jndi.lookup(jndiName);
@@ -368,6 +369,7 @@ public class SecurePingInitialContextRemoteIT extends SecurePingTestBase {
         finally {
         	if (jndi != null) { jndi.close(); jndi=null; }
         }
+************/
         
         try {
             jndi = runAs(userUser, userPassword);

@@ -40,7 +40,7 @@ public class SecurePingInitialContextClientIT extends SecurePingClientTestBase {
     	Properties env = new Properties();
     	if (username != null) {
     		env.put(Context.SECURITY_PRINCIPAL, username);
-    		env.put(Context.SECURITY_CREDENTIALS, "password");
+    		env.put(Context.SECURITY_CREDENTIALS, "password1!");
     	}
     	Context context = new InitialContext(env);
     	return context;
