@@ -340,17 +340,22 @@
                 <site>
                     <id>ejava-jpa.website</id>
                     <name>ejava-jpa website</name>
-                    <url>scpexe://ejava.info/var/www/ejava.info/html/sites/ejava-jpa/jpa/jpa-providers/jpa-parent</url>
+                    <url>scpexe://srau.ejava.info/var/www/ejava.info/html/sites/ejava-jpa/jpa/jpa-parent</url>
+                </site>
+                <site>
+                    <id>ejava-jpa.website</id>
+                    <name>SRA-U ejava website</name>
+                    <url>scpexe://srau.ejava.info/var/www/ejava.info/html/sites/ejava-jpa</url>
                 </site>
                 <repository>
-                    <id>ejava-jpa.release</id>
-                    <name>ejava-jpa release</name>
-                    <url>https://ejava.info/nexus/content/repositories/ejava-release</url>
+                    <id>srau-releases</id>
+                    <name>SRA-U Releases</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/srau-releases/</url>
                 </repository>
                 <snapshotRepository>
-                    <id>ejava-jpa.snapshot</id>
-                    <name>ejava-jpa snapshot</name>
-                    <url>https://ejava.info/nexus/content/repositories/ejava-snapshot</url>
+                    <id>srau-snaphots</id>
+                    <name>SRA-U Snapshots</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/srau-snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
@@ -359,19 +364,20 @@
             <id>jpatest-deploy</id>
             <distributionManagement>
                 <site>
-                    <id>test-website</id>
-                    <name>ejava-jpa test-deploy website</name>
-                    <url>scpexe://ejava.info/var/www/ejava.info/html/sites/test-deploy/ejava-jpa/jpa/jpa-providers/jpa-hibernate/hibernate-migration</url>
+                    <id>ejava-jpa.website</id>
+                    <name>SRA-U ejava website</name>
+                    <url>scpexe://srau.ejava.info/var/www/ejava.info/html/test-sites/ejava-jpa/jpa/jpa-parent</url>
                 </site>
                 <repository>
                     <id>test-releases</id>
-                    <name>ejava-jpa test-deploy release</name>
-                    <url>https://ejava.info/nexus/content/repositories/test-release</url>
+                    <name>SRA-U Releases</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/test-releases/</url>
                 </repository>
                 <snapshotRepository>
                     <id>test-snapshots</id>
-                    <name>ejava-jpa test-deploy snapshot</name>
-                    <url>https://ejava.info/nexus/content/repositories/test-snapshot</url>
+                    <name>SRA-U Snapshots</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/test-snapshots/</url>
+                    <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
         </profile>
