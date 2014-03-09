@@ -110,8 +110,8 @@ public class Requestor implements Runnable, MessageListener {
                 message.setIntProperty("count", ++count);
                 message.setInt("difficulty", count % 10);
                 message.setJMSReplyTo(replyTo);
-                producer.send(message);
                 synchronized (requests) {
+                	producer.send(message);
                     requests.put(message.getJMSMessageID(), message);
                 }
                 if (sleepTime>=1000 || (count % 100==0)) {
@@ -125,7 +125,7 @@ public class Requestor implements Runnable, MessageListener {
             while (requests.size() > 0) {
                 log.debug("waiting for " + requests.size() +  
                           " outstanding responses");
-                log.debug("requests=" + requests);
+                log.trace("requests=" + requests);
                 Thread.sleep(3000);
             }
             connection.stop();
