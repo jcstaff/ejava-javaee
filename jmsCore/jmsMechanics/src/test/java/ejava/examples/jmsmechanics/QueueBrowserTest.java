@@ -75,7 +75,9 @@ public class QueueBrowserTest extends JMSTestBase {
 	            if (msgs==msgCount) { break; }
 	            else { 
 	                log.debug("retrying queueBrowser, got " + msgs + " out of " + msgCount);
-	            	msgs=0; 
+	            	msgs=0;
+	            	qbrowser.close();
+	            	qbrowser = session.createBrowser((Queue)destination); 
 	            }
             }
             assertEquals("unexpected number nf queue browser messages", 
