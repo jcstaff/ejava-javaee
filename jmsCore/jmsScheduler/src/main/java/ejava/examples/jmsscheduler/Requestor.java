@@ -125,6 +125,7 @@ public class Requestor implements Runnable, MessageListener {
             while (requests.size() > 0) {
                 log.debug("waiting for " + requests.size() +  
                           " outstanding responses");
+                log.debug("requests=" + requests);
                 Thread.sleep(3000);
             }
             connection.stop();
