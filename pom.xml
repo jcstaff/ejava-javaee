@@ -21,12 +21,16 @@
     <modules>
         <module>ejava-build</module>
         <module>ejava-common</module>
+        <!--
         <module>solutions</module>
         <module>servers</module>
         <module>projects</module>
         <module>javase5Enhancements</module>
         <module>blPurchase</module>
+
         <module>jpa</module>
+        -->
+        <!--
         <module>ejbsessionBank</module>
         <module>jndiDemo</module>
         <module>txReservation</module>
@@ -35,41 +39,36 @@
         <module>securePing</module>
         <module>jmsCore</module>
         <module>asyncEJB</module>
+        -->
         <!-- These will be posted over the course of the semester
         -->
         <module>coursedocs</module>
     </modules>
 
-    <url>http://webdev.apl.jhu.edu/~jcs/ejava-javaee</url>
-    <organization>
-        <name>
-            John's Hopkins University, Engineering Programs for Professionals 
-        </name>
-        <url>http://ep.jhu.edu</url>
-    </organization>
+    <url>http://srau.ejava.info/sites/ejava-jpa</url>
     <mailingLists>
         <mailingList>
             <name>class newsgroup (for class use)</name>
-            <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
+            <subscribe>https://corpteams.sranet.sra.com/support/sra-u/Spring2014/api/Lists/Team%20Discussion</subscribe>
         </mailingList>
     </mailingLists>
     <scm>
-        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/master</url>
+        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/jpa-class</url>
         <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
         <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
     </scm>
 
     <ciManagement>
-        <system>hudson</system>
-        <url>https://ejava.info/jenkins/view/Spring-2013/</url>
+        <system>jenkins</system>
+        <url>https://srau.ejava.info/jenkins/</url>
     </ciManagement>
 
     <developers>
         <developer>
             <id>jcstaff</id>
             <name>Jim Stafford</name>
-            <email>jcstaff@apl.jhu.edu</email>
-            <url>http://www.apl.jhu.edu/~jcstaff</url>
+            <email>jstaffo4@jhu.edu</email>
+            <url>http://srau.ejava.info</url>
             <organization>SRA International</organization>
             <organizationUrl>http://www.sra.com</organizationUrl>
             <timezone>-4</timezone>
@@ -80,34 +79,14 @@
         </developer>
     </developers>
     <contributors>
-        <contributor>
-            <name>Mark Sholund</name>
-            <email>mdsholund@gmail.com</email>
-            <timezone>-4</timezone>
-            <roles>
-                <role>Grader</role>
-            </roles>
-        </contributor>
-        <!--
-        <contributor>
-            <name>Bruce Cohen</name>
-            <email>ejava@cohenmail.net</email>
-            <organization>SRA International</organization>
-            <organizationUrl>http://www.sra.com</organizationUrl>
-            <timezone>-4</timezone>
-            <roles>
-                <role>Grader</role>
-            </roles>
-        </contributor>
-        -->
     </contributors>
 
     <repositories>
         <!-- needed to resolve released parents -->
         <repository>
-            <id>webdev</id>
-            <name>ejava webdev repository</name>
-            <url>http://webdev.apl.jhu.edu/~jcs/maven2</url>
+            <id>srau-ejava</id>
+            <name>sra-u ejava repository</name>
+            <url>http://srau.ejava.info/nexus/content/groups/public/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -239,6 +218,48 @@
                     <id>webdev.snapshot.repo</id>
                     <name>ejava JHU snapshot repository</name>
                     <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2-snapshot</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>jpa-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>ejava-jpa.website</id>
+                    <name>SRA-U ejava website</name>
+                    <url>scpexe://srau.ejava.info/var/www/ejava.info/html/sites/ejava-jpa</url>
+                </site>
+                <repository>
+                    <id>srau-releases</id>
+                    <name>SRA-U Releases</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/srau-releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>srau-snaphots</id>
+                    <name>SRA-U Snapshots</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/srau-snapshots/</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>jpatest-deploy</id>
+            <distributionManagement>
+                <site>
+                    <id>ejava-jpa.website</id>
+                    <name>SRA-U ejava website</name>
+                    <url>scpexe://srau.ejava.info/var/www/ejava.info/html/test-sites/ejava-jpa</url>
+                </site>
+                <repository>
+                    <id>test-releases</id>
+                    <name>SRA-U Releases</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/test-releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>test-snapshots</id>
+                    <name>SRA-U Snapshots</name>
+                    <url>https://srau.ejava.info/nexus/content/repositories/test-snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
@@ -379,13 +400,11 @@
                                         <aggregate>false</aggregate>
                                     </configuration>
                                 </plugin>
-                                <!--
                                 <plugin>
                                     <groupId>org.codehaus.mojo</groupId>
                                     <artifactId>cobertura-maven-plugin</artifactId>
                                     <version>${cobertura-maven-plugin.version}</version>
                                 </plugin>
-                                -->
                             </reportPlugins>
                         </configuration>
                     </plugin>
@@ -406,13 +425,13 @@
             </activation>
             
             <properties>
-                <docProfile>605-784-style</docProfile>
+                <docProfile>jpa-style</docProfile>
                 <docProfile.version>${project.version}</docProfile.version>
                 <doc.base>${project.artifactId}</doc.base>
                 <sourceDocumentName>${doc.base}.xml</sourceDocumentName>
                 <htmlName>${doc.base}.html</htmlName>
                 <pdfName>${doc.base}.pdf</pdfName>
-                <copyright.holder>jim stafford (jcstaff@apl.jhu.edu)</copyright.holder>
+                <copyright.holder>jim stafford (jstaffo4@jhu.edu)</copyright.holder>
                 <datePattern>yyyy-MM-dd HH:mm z</datePattern>
                 <timeZone>EST</timeZone>
             </properties>

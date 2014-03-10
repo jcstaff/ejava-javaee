@@ -24,8 +24,8 @@
               doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
               standalone="no"/>
 
-  <xsl:param name="siteHref" select="'http://ejava.info/sites/ejava-jpa'"/>
-  <xsl:param name="docHref" select="'http://ejava.info/sites/ejava-jpa'"/>
+  <xsl:param name="siteHref" select="'http://srau.ejava.info/sites/ejava-jpa'"/>
+  <xsl:param name="docHref" select="'http://srau.ejava.info/sites/ejava-jpa'"/>
   <xsl:param name="siteLinkText" select="'JPA'"/>
   <xsl:param name="docLinkText" select="'@TOPIC@'"/>
 
@@ -33,7 +33,7 @@
    
    <!-- Placement of titles -->
    <xsl:param name="formal.title.placement">
-      figure after example before equation before table before procedure before
+      figure before example before equation before table before procedure before
    </xsl:param>
    
    <!-- Callouts -->
@@ -60,7 +60,7 @@
       code highlighting routine. This causes the callouts to appear on different lines from the code they relate to. -->
   <xsl:param name="chunker.output.indent" select="'no'"/>
 
-  <xsl:param name="html.stylesheet" select="'css/jbossorg.css'"/>
+  <xsl:param name="html.stylesheet" select="'css/ejava.css'"/>
   <xsl:param name="html.stylesheet.type" select="'text/css'"/>
   <xsl:param name="html.cleanup" select="1"/>
   <xsl:param name="html.ext" select="'.html'"/>
