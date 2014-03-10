@@ -13,7 +13,7 @@
 
   <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.72.0/xhtml/docbook.xsl"/>
 
-  <xsl:include href="605-784-common.xsl"/>
+  <xsl:include href="jpa-common.xsl"/>
 
 
 <xsl:template match="pubdate" mode="titlepage.mode">

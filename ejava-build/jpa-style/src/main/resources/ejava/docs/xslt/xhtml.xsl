@@ -13,7 +13,7 @@
   
   <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.72.0/xhtml/chunk.xsl"/>
 
-  <xsl:include href="605-784-common.xsl"/>
+  <xsl:include href="jpa-common.xsl"/>
 
 <!--
 From: xhtml/titlepage-templates.xsl
