@@ -4,13 +4,13 @@
     <parent>
         <groupId>ejava.jpa</groupId>
         <artifactId>jpa-parent</artifactId>
-        <version>3.0.2013.2-SNAPSHOT</version>
-        <relativePath></relativePath>
+        <version>3.0.2014.1-SNAPSHOT</version>
+        <relativePath />
     </parent>
 
     <groupId>myorg.entityex</groupId>
     <artifactId>entityEx</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.0.2014.1-SNAPSHOT</version>
 
     <name>JPA Entity::Exercise Solution</name>
     <description>
@@ -78,8 +78,7 @@
                             <path location="${project.build.directory}/classes" />
                             <path location="${project.build.directory}/test-classes" />
                         </classpath>
-                        <jpaconfiguration persistenceunit="entityEx-test" 
-                            propertyfile="${basedir}/target/test-classes/hibernate.properties" />
+                        <jpaconfiguration persistenceunit="entityEx-test" propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                     </hibernatetool>
                 </configuration>
             </plugin>

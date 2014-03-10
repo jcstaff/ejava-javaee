@@ -4,7 +4,7 @@
 
     <groupId>ejava.jpa.hibernate.migration</groupId>
     <artifactId>migration-root</artifactId>
-    <version>3.0.2013.2-SNAPSHOT</version>
+    <version>3.0.2014.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Migration::Root</name>
@@ -118,7 +118,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore/>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -159,7 +159,7 @@
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
                   <hibernate.dialect>
                       org.hibernate.dialect.H2Dialect
                   </hibernate.dialect>
@@ -180,7 +180,7 @@
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
                   <hibernate.dialect>
                       org.hibernate.dialect.H2Dialect
                   </hibernate.dialect>
@@ -205,7 +205,7 @@
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:${basedir}/target/hsqldb/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
                   <hibernate.dialect>
                       org.hibernate.dialect.HSQLDialect
                   </hibernate.dialect>
@@ -225,7 +225,7 @@
                   <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                   <jdbc.url>jdbc:hsqldb:hsql://${db.host}:9001</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
                   <hibernate.dialect>
                       org.hibernate.dialect.HSQLDialect
                   </hibernate.dialect>

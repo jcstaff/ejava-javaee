@@ -1,10 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>ejava.jpa.hibernate.migration</groupId>
         <artifactId>migration-root</artifactId>
-        <version>3.0.2013.2-SNAPSHOT</version>
+        <version>3.0.2014.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -121,10 +119,8 @@
                         </goals>
                         <configuration>
                             <hibernatetool>
-                                <annotationconfiguration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml"
-                                    namingstrategy="ejava.jpa.hibernatemigration.ProjectNamingStrategy"/>
-                                <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                    outputfilename="${project.artifactId}-dropNAM.ddl"/>
+                                <annotationconfiguration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml" namingstrategy="ejava.jpa.hibernatemigration.ProjectNamingStrategy" />
+                                <hbm2ddl export="false" create="false" drop="true" format="true" outputfilename="${project.artifactId}-dropNAM.ddl" />
                             </hibernatetool>
                         </configuration>
                     </execution>
@@ -137,10 +133,8 @@
                         </goals>
                         <configuration>
                             <hibernatetool>
-                                <annotationconfiguration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml"
-                                    namingstrategy="ejava.jpa.hibernatemigration.ProjectNamingStrategy"/>
-                                <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                    outputfilename="${project.artifactId}-createNAM.ddl"/>
+                                <annotationconfiguration configurationfile="${project.build.directory}/classes/hibernate.cfg.xml" namingstrategy="ejava.jpa.hibernatemigration.ProjectNamingStrategy" />
+                                <hbm2ddl export="false" create="true" drop="false" format="true" outputfilename="${project.artifactId}-createNAM.ddl" />
                             </hibernatetool>
                         </configuration>
                     </execution>
