@@ -98,12 +98,11 @@
                     <arg>-Xvalue-constructor</arg>
                 </args>
                 <plugins>
-                    <!-- this is hosted on webdev -->
-                    <plugin>
-                        <groupId>jaxb2-commons</groupId>
-                        <artifactId>value-constructor</artifactId>
-                        <version>1.5</version>
-                    </plugin>
+                    <dependency>
+                        <groupId>org.jvnet.jaxb2_commons</groupId>
+                        <artifactId>jaxb2-value-constructor</artifactId>
+                        <version>3.0</version>
+                    </dependency>
                 </plugins> 
             </configuration>
             <dependencies>
