@@ -20,7 +20,7 @@
                     Unzip the contents into a directory with no spaces in its path.
                 </para>
                 <programlisting><![CDATA[
-$ ls apache-maven-3.1.0/
+$ ls apache-maven-3.2.1/
 bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
 ]]></programlisting>
             </listitem>
@@ -31,17 +31,17 @@ bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
                 </para>
                 <programlisting><![CDATA[
 //my linux system -- should be done in .bashrc
-export MAVEN_HOME=/opt/apache-maven-3.1.0
+export MAVEN_HOME=/opt/apache-maven-3.2.1
 export PATH=$MAVEN_HOME/bin:$PATH
 
 //my windows system -- should be done in Advanced System Settings->Environment Variables
-set MAVEN_HOME=/apps/apache-maven-3.1.0
+set MAVEN_HOME=/apps/apache-maven-3.2.1
 set PATH=%MAVEN_HOME%\bin;%PATH%
 ]]></programlisting>
             </listitem>
             <listitem>
                 <para>Verify maven is installed and in the path (TODO:Update Windows Example)</para>
-                <!-- TODO: update windows to Maven 3.1.0 -->
+                <!-- TODO: update windows to Maven 3.2.1 -->
                 <programlisting><![CDATA[
 //my fedora system
 $ mvn --version

@@ -5,22 +5,12 @@
 <chapter id="devenv-eclipse-setup">
     <title>Eclipse Setup</title>
     <para>
-        The most current version of Eclipse is Juno, Service Release 1.
-        The Juno SR1 release has some significant performance issues that
-        makes it undesirable over the Eclipse Indigo SR2 release. However,
-        Eclipse recently released a performance patch for Juno SR1 and 
-        has plans to release SR2 with those patches in the Feb 2013 timeframe.
-        The instructions below will ask you to download the Juno SR1 release 
-        and apply the performance patches. If Juno SR2 is released within the 
-        first few weeks of class -- please feel free to use that version. If 
-        either Juno SR1+patch or SR2 have issues -- please feel free to drop 
-        back to Indigo SR2 
-        <ulink url="http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigosr2">http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigosr2</ulink>
-        - look to the right side of the page).   
+        The most current version of Eclipse is Kepler. I have only been using
+        it for class, but so far it is fantastic.
     </para>
 
     <section id="devenv-eclipse-install">
-        <title>Download and Install Eclipse Juno Service Release 1 (SR2 if available)</title>
+        <title>Download and Install Eclipse Kepler</title>
         <orderedlist spacing="compact">
             <listitem>
                 <para>
@@ -30,23 +20,15 @@
             </listitem>
             <listitem><para>Unzip the downloaded archive.</para>
 <programlisting><![CDATA[
-$ tar xzf ~/Downloads/eclipse-jee-juno-SR1-linux-gtk.tar.gz
+$ tar xzf ~/Downloads/eclipse-jee-kepler-R-linux-gtk-x86_64.tar.gz
 
 $ ls eclipse
-about_files  artifacts.xml  dropins  eclipse.ini   features  libcairo-swt.so  p2       readme
-about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      plugins
+about_files  about.html  artifacts.xml  configuration  dropins  eclipse  eclipse.ini  
+epl-v10.html  features  icon.xpm  notice.html  p2  plugins  readme
 ]]></programlisting>                        
             </listitem>
             <listitem><para>Create a shortcut for starting Eclipse</para></listitem>
             <listitem><para>Start Eclipse</para></listitem>
-            
-            <listitem>
-                <para>
-                    Follow the resolution instructions documented at the following site
-                    <ulink url="http://wiki.eclipse.org/Platform_UI/Juno_Performance_Investigation">http://wiki.eclipse.org/Platform_UI/Juno_Performance_Investigation</ulink>.
-                </para>
-            </listitem>
-            
         </orderedlist>
     </section>
     
@@ -69,18 +51,15 @@ about.html   configuration  eclipse  epl-v10.html  icon.xpm  notice.html      pl
         you should always define changes within the Maven pom.xml and rely on
         m2e to translate that into Eclipse. Any changes added directly to 
         Eclipse will not be seen by the command-line build.</para>
+        
+        <note>
+            <title>M2E is now part of Eclipse JavaEE</title>
+            <para>m2e was pre-installed in my download of kepler. Nothing more 
+                needs to be done to install it. The rest of these instructions
+                are concerned with using it and demonstrating it.</para>
+        </note>
+        
         <orderedlist spacing="compact">
-            <listitem><para><code>Help-&gt;Eclipse Marketplace...</code></para></listitem>
-            <listitem><para>Enter "m2e"</para></listitem>
-            <listitem><para>Installer "Maven Integration for Eclipse" by Eclipse.org</para></listitem>
-            <listitem><para>Complete the installation steps for Maven Integration for Eclipse</para></listitem>
-            <listitem><para>Register your Maven installation with m2e</para>
-                <orderedlist spacing="compact">
-                    <listitem><para><code>Window-&gt;Preferences-&gt;Maven-&gt;Installations-&gt;Add...</code></para></listitem>
-                    <listitem><para>Navigate and select the MAVEN_HOME directory installed earlier</para></listitem>
-                    <listitem><para>Re-select the internal Maven instance as the default</para></listitem>
-                </orderedlist>
-            </listitem>
             <listitem><para>Add the Java Package Explorer to the JavaEE Perspective.
                     I find this easier to work with than the Project 
                     Explorer used by default in the JavaEE perspective.</para>
@@ -159,16 +138,16 @@ openFile
             transition easier between one checked out branch to another or 
             correctly react to an updated branch. To do this -- install the 
             EGit plugin.</para>
+            
+        
+        <note>
+            <title>Git and EGit is now part of Eclipse JavaEE</title>
+            <para>Git and EGit was pre-installed in my download of kepler. Nothing more 
+                needs to be done to install it. The rest of these instructions
+                are concerned with using it and demonstrating it.</para>
+        </note>
+            
             <orderedlist spacing="compact">
-                <listitem><para>Open the Eclipse Marketplace panel using 
-                    <code>Help-&gt;Eclipse Marketplace</code></para>
-                </listitem>
-                <listitem><para>Type EGit into the seach field and press Go</para></listitem>
-                <listitem><para>Click Install for the <code>EGit - Git Team Provider</code>.
-                    This will end up selecting both EGit and JGit. JGit is the 
-                    underlying pure Java interface for Git. EGit is the portion
-                    that integrates the capability into Eclipse.</para></listitem>
-                <listitem><para>Complete the installation process</para></listitem>
                 <listitem><para>Right click on the <code>ejavase5Enhancements</code>
                    project imported earlier and select 
                    <code>Team-&gt;Share Project...-&gt;Git-&gt;Use of create repository in parent folder of project-&gt;Finish</code></para></listitem>
@@ -186,15 +165,14 @@ openFile
                 <code>Help-&gt;Eclipse Marketplace</code></para>
             </listitem>
             <listitem><para>Type JBoss into the seach field and press Go</para></listitem>
-            <listitem><para>Click Install for the <code>JBoss Tools (Juno)</code></para></listitem>
+            <listitem><para>Click Install for the <code>JBoss Tools (Kepler)</code></para></listitem>
             <listitem><para>Complete the installation steps for JBoss Tools. There
-                are a lot of tools in the repository. Not all of them are
+                are many tools in the repository. Not all of them are
                 needed for class or obvious how to use them without more investigation. 
-                Choose the following minimal set.</para>
+                Choose the following suggested minimal set.</para>
                 <itemizedlist spacing="compact">
-                <!-- 
                     <listitem><para>Context and Dependency Injection Tools</para></listitem>
-                 -->
+                    <listitem><para>Hibernate Tools</para></listitem>
                     <listitem><para>JBoss JAX-RS Tools</para></listitem>
                     <listitem><para>JBoss AS Tools</para></listitem>
                     <listitem><para>JBoss WebServices Tools</para></listitem>
@@ -203,13 +181,20 @@ openFile
                     <para>You will receive a warning about the content within the 
                     plugin being unsigned.</para>
                 </note>
+                <note>
+                    <para>You will receive a warning after restarting Eclipse 
+                    about the reporting anonymous use to JBoss. They use those callbacks
+                    to determine where and when their tools are being used 
+                    (for bragging rights?). I disable that.</para>
+                </note>
             </listitem>
-            <listitem><para>Define a Server Instance for JBoss AS 7</para>
+            <listitem><para>Define a Server Instance for JBoss</para>
                 <orderedlist spacing="compact">
                     <listitem><para>Open the JavaEE Perspective</para></listitem>
                     <listitem><para>Select "new server wizard..." in the Servers panel</para></listitem>
-                    <listitem><para>Select JBossAS 7.1</para></listitem>
-                    <listitem><para>Set HOME to your jboss-as-7.1.1.Final directory
+                    <listitem><para>Select Enterprise Application Platform 6.x under the 
+                        JBoss Enterprise Middleware folder</para></listitem>
+                    <listitem><para>Set HOME to your jboss-eap-6.2.0.Final directory
                        using the Browse button on the next panel</para></listitem>
                     <listitem><para>Name the server "standalone" and leave the 
                        to match the default "standalone.xml" configuration file.</para></listitem>

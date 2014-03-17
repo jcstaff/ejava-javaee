@@ -37,7 +37,7 @@
         <para>Obtain a copy of the H2 database jar from one of the following sources</para>
         <itemizedlist spacing="compact">
             <listitem><para>Within the JBoss installation</para>
-                <programlisting><![CDATA[jboss-as-7.x.x.Final/modules/com/h2database/h2/main/]]></programlisting>
+                <programlisting><![CDATA[jboss-xxx-x.x.x.Final/modules/.../com/h2database/h2/main/]]></programlisting>
             </listitem>
 
             <listitem><para>Internet Maven Repository (<ulink url="http://repo2.maven.org/maven2/com/h2database/h2/">
@@ -88,8 +88,6 @@
                 <listitem><para>0 - Read Uncommitted - transaction isolation disabled</para></listitem>
                 <listitem><para>1 - Serializable - database is (read and write) locked until transaction commits</para></listitem>
                 <listitem><para>3 - Read Committed (default) - read locks released after statement completes</para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
             </itemizedlist>
         </note>                   
     </section>
@@ -99,7 +97,13 @@
         <title>Activate H2 Server Profile for Builds</title>
         <para>Do one of the following</para>
         <itemizedlist spacing="compact">
-            <listitem><para>add -Ph2srv to the command line of each build</para></listitem>
+            <listitem><para>add -P\!Ph2db -Ph2srv to the command line of each build</para>
+                <note>
+                    <para>The bang ("!") character turns off a profile. Unix shells
+                        require the bang ("!") character to be escaped. Windows DOS does not.
+                    </para>
+                </note>
+            </listitem>
             
             <listitem><para>change the settings.xml activeProfile specification 
                 from embedded mode (h2db)</para>
