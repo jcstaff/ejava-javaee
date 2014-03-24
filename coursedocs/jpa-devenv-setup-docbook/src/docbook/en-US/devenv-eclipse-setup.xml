@@ -154,10 +154,24 @@ openFile
                 <listitem><para><code>[(branch-name)]</code> should now be displayed 
                     to the right of the project name</para></listitem>
             </orderedlist>
+            
+        <note>
+            <para>
+                Newer versions of Eclipse may have automatically setup the project as a shared
+                Git project during the import. If the project is already "Shared", try using the
+                Team-&gt;Show in History option to invoke a sample read-only action. 
+            </para>
+        </note>            
     </section>
     
     <section id="devenv-eclipse-setup-jbosstools">
         <title>Setup JBoss Eclipse Integration</title>
+        
+        <note>
+            <para>This is only necessary when JBoss has been installed and you will be deploying
+                 to the server side</para>
+        </note>
+        
         <para>Add the following repository to your Eclipse instance and
            install the plugin</para>
         <orderedlist spacing="compact">
@@ -188,6 +202,7 @@ openFile
                     (for bragging rights?). I disable that.</para>
                 </note>
             </listitem>
+            
             <listitem><para>Define a Server Instance for JBoss</para>
                 <orderedlist spacing="compact">
                     <listitem><para>Open the JavaEE Perspective</para></listitem>

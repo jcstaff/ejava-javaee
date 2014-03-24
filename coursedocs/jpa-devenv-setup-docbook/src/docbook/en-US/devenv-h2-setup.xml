@@ -62,7 +62,21 @@
             <listitem><para>Start database and server only</para>
                 <programlisting language=""><![CDATA[java -jar h2.jar -tcp -web]]></programlisting>
             </listitem>
-        </itemizedlist>                   
+        </itemizedlist>
+        <note>
+            <para>Linux users might want to edit/save the following shell script to their PATH.
+<programlisting language=""><![CDATA[#!/bin/sh
+cd /tmp
+java -jar $HOME/.m2/repository2/com/h2database/h2/1.3.168/h2-1.3.168.jar $@]]></programlisting>                        
+            </para>
+        </note>                   
+        <note>
+            <para>Windows users might want to edit/save the following .bat script to their Desktop
+                after creating the c:/tmp directory.
+<programlisting language=""><![CDATA[cd c:\tmp
+java -jar %HOME%\m2\repository\com\h2database\h2\1.3.168\h2-1.3.168.jar]]></programlisting>                        
+            </para>
+        </note>                   
     </section>
 
     
@@ -123,7 +137,7 @@
     <id>h2srv</id>
     <properties>
           <jdbc.driver>org.h2.Driver</jdbc.driver>
-          <jdbc.url>jdbc:h2:tcp://${db.host}:9092/ejava</jdbc.url>
+          <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
           <jdbc.user>sa</jdbc.user>
           <jdbc.password/>
           <hibernate.dialect>
@@ -141,6 +155,7 @@
                                
     </section>
 
+<!-- 
     <section id="devenv-h2-jboss">
         <title>Update JBoss to use Server Mode</title>
         <itemizedlist spacing="compact">
@@ -168,5 +183,6 @@
                 where you started the database server.</para>
         </note>                   
     </section>
+ -->
 
 </chapter>

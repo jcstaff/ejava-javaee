@@ -230,4 +230,48 @@ $ mvn install:install-file -Dfile=/home/jcstaff/Downloads/ojdbc6.jar -DgroupId=c
                  manually import the artifact.</para>
         </note>
     </section>
+    
+
+    <section id="devenv-maven-mavenrc">
+       <title>Customizing Maven Environment</title>
+       <para>Whether it is a memory issue, an SSL trustStore requirement, etc. you may
+           run into circumstances where you need to adjust the JVM properties to complete
+           a build.</para>
+    <figure>
+        <title>Example Maven JVM Error</title>
+       <programlisting language=""><![CDATA[[ERROR] The system is out of resources.
+[ERROR] Consult the following stack trace for details.
+[ERROR] java.lang.OutOfMemoryError: PermGen space]]></programlisting>                        
+    </figure>
+    
+    <para> JVM properties can be done by setting the MAVEN_OPTS environment variable
+         in one of the following ways:</para>
+    <itemizedlist spacing="compact">
+        <listitem><para>Linux</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>set MAVEN_OPTS in your .bashrc</para></listitem>
+                <listitem><para>set MAVEN_OPTS in $HOME/.mavenrc</para>
+                    <figure>
+                        <title>Example $HOME/.mavenrc setting maximum memory and MaxPermSize</title>
+<programlisting language=""><![CDATA[MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"]]></programlisting>                        
+                    </figure>
+                </listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>Windows</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>set MAVEN_OPTS in your Computer Properties</para></listitem>
+                <listitem><para>set MAVEN_OPTS in %HOME%/.maven_pre.bat</para>
+                    <figure>
+                        <title>Example %HOME#/mavenrc_pre.bat setting maximum memory and MaxPermSize</title>
+<programlisting language=""><![CDATA[set MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m]]></programlisting>                        
+                    </figure>
+                </listitem>
+            </itemizedlist>
+        </listitem>
+    </itemizedlist>
+       
+
+    </section>    
+    
 </chapter>
