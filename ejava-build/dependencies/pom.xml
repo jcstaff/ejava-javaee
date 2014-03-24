@@ -836,17 +836,17 @@
                 <site>
                     <id>ejava-jpa.website</id>
                     <name>SRA-U ejava website</name>
-                    <url>scpexe://${sra.site.server}/var/www/ejava.info/html/sites/ejava-jpa</url>
+                    <url>scpexe://${jpa.site.server}/var/www/ejava.info/html/sites/ejava-jpa</url>
                 </site>
                 <repository>
                     <id>srau-releases</id>
                     <name>SRA-U Releases</name>
-                    <url>https://${sra.site.server}/nexus/content/repositories/srau-releases/</url>
+                    <url>https://${jpa.site.server}/nexus/content/repositories/srau-releases/</url>
                 </repository>
                 <snapshotRepository>
                     <id>srau-snaphots</id>
                     <name>SRA-U Snapshots</name>
-                    <url>https://${sra.site.server}/nexus/content/repositories/srau-snapshots/</url>
+                    <url>https://${jpa.site.server}/nexus/content/repositories/srau-snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
