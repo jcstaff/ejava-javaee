@@ -813,7 +813,7 @@ public class JPAQLTest extends QueryBase {
                 "select c, COUNT(s) from Clerk c " +
                 "LEFT JOIN c.sales s " +
                 "GROUP BY c " +
-                "HAVING COUNT(S) <= 1", Object[].class)
+                "HAVING COUNT(s) <= 1", Object[].class)
                 .getResultList();
         for (Object[] result : results) {
         	log.info("found=" + Arrays.toString(result));
