@@ -78,7 +78,7 @@
         <javax.el.version>2.2.4</javax.el.version>        
         <jaxb-api.version>2.1</jaxb-api.version>
         <jaxb-impl.version>2.1.9-brew</jaxb-impl.version>
-        <jboss.version>7.2.0.Final</jboss.version>
+        <jboss.version>7.3.1.Final-redhat-3</jboss.version>
         <jboss-as-client.version>${jboss.version}</jboss-as-client.version>
         <jboss-kernel.version>2.0.6.GA</jboss-kernel.version>
         <jms.version>1.1</jms.version>
@@ -163,6 +163,34 @@
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>redhat-techpreview</id>
+            <name>Redhat Tech Preview Repository</name>
+            <url>http://maven.repository.redhat.com/techpreview/all/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+        <!--
+        <repository>
+            <id>redhat-earlyaccess</id>
+            <name>Redhat Early Access Repository</name>
+            <url>http://maven.repository.redhat.com/earlyaccess/all/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+        -->
         <!--
         <repository>
             <id>java.net-repo-subst</id>
