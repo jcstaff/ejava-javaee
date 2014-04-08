@@ -89,8 +89,7 @@ em.persist(author);
         </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 @javax.persistence.Entity
-public class Author implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Author {
     @Id
     @GeneratedValue
     private long id;
