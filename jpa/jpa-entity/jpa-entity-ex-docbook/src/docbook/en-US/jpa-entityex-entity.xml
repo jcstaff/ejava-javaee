@@ -19,8 +19,7 @@
 
         <orderedlist>
             <listitem><para>Create a POJO Java class in the ...mapped Java package</para>
-<programlisting language="java"><![CDATA[
-package myorg.entityex.mapped;
+<programlisting language="java"><![CDATA[package myorg.entityex.mapped;
 
 import java.util.Date;
 
@@ -55,16 +54,14 @@ public class Animal {
     public void setWeight(double weight) {
         this.weight = weight;
     }
-}
-]]></programlisting>
+}]]></programlisting>
             </listitem>
             
             <listitem><para>Copy the existing AutoTest.java to AnimalTest.java and
                 remove (or ignore) references to the Auto class from AnimalTest.java</para></listitem>
             <listitem><para>Attempt to persist the Animal by adding the following 
                 @Test method to the AnimalTest.java JUnit class.</para>
- <programlisting language="java"><![CDATA[
- # src/test/java/myorg/entityex/AnimalTest.java
+ <programlisting language="java"><![CDATA[# src/test/java/myorg/entityex/AnimalTest.java
  
     @Test
     public void testCreateAnimal() {
@@ -95,8 +92,7 @@ java.lang.IllegalArgumentException: Unknown entity: myorg.entityex.mapped.Animal
                 by adding an orm.xml JPA mapping file to your project. 
                 Place the file in the src/main/resources/orm directory. 
                 </para>
- <programlisting language="xml"><![CDATA[
-# src/main/resources/orm/Animal-orm.xml
+ <programlisting language="xml"><![CDATA[# src/main/resources/orm/Animal-orm.xml
 
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
@@ -105,15 +101,13 @@ java.lang.IllegalArgumentException: Unknown entity: myorg.entityex.mapped.Animal
 
     <entity class="myorg.entityex.mapped.Animal"/>
 
-</entity-mappings>
-]]></programlisting>
+</entity-mappings>]]></programlisting>
             </listitem>
 
             <listitem><para>Register the orm.xml file with the persistence unit
                 by adding a mapping-file element reference. 
                 </para>
- <programlisting language="xml"><![CDATA[
-# src/test/resources/META-INF/persistence.xml
+ <programlisting language="xml"><![CDATA[# src/test/resources/META-INF/persistence.xml
 
     <persistence-unit name="entityEx-test">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
@@ -121,8 +115,7 @@ java.lang.IllegalArgumentException: Unknown entity: myorg.entityex.mapped.Animal
         <mapping-file>orm/Animal-orm.xml</mapping-file>
         <class>myorg.entityex.Auto</class>
         <properties>
-        ...
-]]></programlisting>
+        ...]]></programlisting>
             </listitem>
 
 
@@ -132,11 +125,10 @@ java.lang.IllegalArgumentException: Unknown entity: myorg.entityex.mapped.Animal
                 test or building within Maven since the pom is configured to build
                 database schema from the JPA mappings prior to running the JUnit test. 
                 </para>
- <programlisting language="xml"><![CDATA[
-PersistenceUnit: entityEx-test] Unable to configure EntityManagerFactory: No identifier specified for entity: myorg.entityex.mapped.Animal
+ <programlisting language="xml"><![CDATA[PersistenceUnit: entityEx-test] Unable to configure EntityManagerFactory: No identifier specified for entity: myorg.entityex.mapped.Animal
 
-Caused by: org.hibernate.AnnotationException: No identifier specified for entity: myorg.entityex.mapped.Animal
-]]></programlisting>
+Caused by: org.hibernate.AnnotationException: No identifier specified for entity: myorg.entityex.mapped.Animal]]></programlisting>
+
                 <para>Although the class is a valid POJO and we followed the deployment 
                     descriptor mechanism for registering it with the persistence unit,
                     it is not a legal entity. The error message indicates it is lacking
@@ -146,21 +138,19 @@ Caused by: org.hibernate.AnnotationException: No identifier specified for entity
             <listitem><para>Update the orm.xml file and define the "id" column
                 as the primary key property for the entity.  
                 </para>
- <programlisting language="xml"><![CDATA[
-    <entity class="myorg.entityex.mapped.Animal">
+ <programlisting language="xml"><![CDATA[    <entity class="myorg.entityex.mapped.Animal">
         <attributes>
             <id name="id"/>
         </attributes>
-    </entity>
-]]></programlisting>
+    </entity>]]></programlisting>
+    
             </listitem>
 
             <listitem><para>Rebuild your module and it should now persist the 
                 POJO as a JPA entity. The SQL should be printed in the debug
                 output.  
                 </para>
- <programlisting language=""><![CDATA[
-$ mvn clean test
+ <programlisting language=""><![CDATA[$ mvn clean test
 ...
 Hibernate: 
     insert 
@@ -180,16 +170,14 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-]]></programlisting>
+[INFO] ------------------------------------------------------------------------]]></programlisting>
             </listitem>
 
             <listitem><para>Update your JUnit test method to look like the following.
                 The unit test now clears the cache of entities and forces the entity
                 manager to instantiate a new instance for the value returned from the 
                 find().</para>
- <programlisting language="java"><![CDATA[
-    @Test
+ <programlisting language="java"><![CDATA[    @Test
     public void testCreateAnimal() {
         log.info("testCreateAnimal");
         Animal animal = new Animal("bessie", 
@@ -216,14 +204,13 @@ javax.persistence.PersistenceException: org.hibernate.InstantiationException: No
             </listitem>
 
             <listitem><para>Update the POJO with a default constructor.</para>
- <programlisting language="java"><![CDATA[
-    public Animal() {} //must have default ctor
+ <programlisting language="java"><![CDATA[    public Animal() {} //must have default ctor
     public Animal(String name, Date dob, double weight) {
         this.name = name;
         this.dob = dob;
         this.weight = weight;
-    }
-]]></programlisting>
+    }]]></programlisting>
+    
             </listitem>
 
             <listitem><para>Rebuild the module. It should now pass because you have 
@@ -253,8 +240,7 @@ javax.persistence.PersistenceException: org.hibernate.InstantiationException: No
         
         <orderedlist>
             <listitem><para>Copy the POJO class to a new java package and class name (Animal2).</para>
-<programlisting language="java"><![CDATA[
-package myorg.entityex.annotated;
+<programlisting language="java"><![CDATA[package myorg.entityex.annotated;
 
 import java.util.Date;
 
@@ -266,30 +252,25 @@ public class Animal2 {
     
     public Animal2() {} //must have default ctor
 ...
-}
-]]></programlisting>                        
+}]]></programlisting>                        
             </listitem>
 
             <listitem><para>Add a javax.persistence.Entity annotation to the class</para>
-<programlisting language="java"><![CDATA[
-import javax.persistence.Entity;
+<programlisting language="java"><![CDATA[import javax.persistence.Entity;
 
 @javax.persistence.Entity
-public class Animal2 {
-]]></programlisting>                        
+public class Animal2 {]]></programlisting>                        
             </listitem>
 
             <listitem><para>Register the new entity with the persistence.xml using a 
                 class element reference</para>
-<programlisting language="xml"><![CDATA[
-    <persistence-unit name="entityEx-test">
+<programlisting language="xml"><![CDATA[    <persistence-unit name="entityEx-test">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
         <mapping-file>orm/Animal-orm.xml</mapping-file>
         <class>myorg.entityex.Auto</class>
         <class>myorg.entityex.annotated.Animal2</class>
-        <properties>
-]]></programlisting>
+        <properties>]]></programlisting>
                 <note>
                     <title>@Entities are only automatically scanned for in archive local to persistence.xml</title>  
                     <para>Classes annotated with @Entity are automatically located when
@@ -300,8 +281,7 @@ public class Animal2 {
                         how the current structure looks -- the persistence.xml and Animal2 class
                         are in what is considered separate archives.
                     </para>
-<programlisting language=""><![CDATA[
-$ tree target/*classes
+<programlisting language=""><![CDATA[$ tree target/*classes
 target/classes
 ├── ddl
 ├── myorg
@@ -320,14 +300,12 @@ target/test-classes
 │   └── persistence.xml
 └── myorg
     └── entityex
-        └── AutoTest.class
-]]></programlisting>                        
+        └── AutoTest.class]]></programlisting>                        
                 </note>                        
             </listitem>
 
             <listitem><para>Add a new test method to work with the new class added to the module.</para>
-<programlisting language="java"><![CDATA[
-    @Test
+<programlisting language="java"><![CDATA[    @Test
     public void testCreateAnimalAnnotated() {
         log.info("testCreateAnimalAnnotated");
         myorg.entityex.annotated.Animal2 animal = new myorg.entityex.annotated.Animal2("bessie", 
@@ -338,8 +316,7 @@ target/test-classes
         
         em.flush(); //make sure all writes were issued to DB
         em.clear(); //purge the local entity manager entity cache to cause new instance
-        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));
-]]></programlisting>                        
+        assertNotNull("animal not found", em.find(myorg.entityex.annotated.Animal2.class,animal.getId()));]]></programlisting>                        
             </listitem>
 
             <listitem><para>Attempt to build/run your module at this point. You should get a familiar 
@@ -352,20 +329,16 @@ Unable to configure EntityManagerFactory: No identifier specified for entity: my
             <listitem><para>Since we want to use annotations for the new class, fix the issue by adding
                 a @javax.persistence.Id annotation to the id attribute. This is called FIELD access in JPA.
                 You can alternately use PROPERTY access by moving the annotation to the getId() method.</para>
-<programlisting language="java"><![CDATA[
-    @javax.persistence.Id
-    private int id;
-]]></programlisting>                        
+<programlisting language="java"><![CDATA[    @javax.persistence.Id
+    private int id;]]></programlisting>
+                            
             </listitem>
 
             <listitem><para>Re-run you test. It should succeed this time.</para>
-<programlisting language=""><![CDATA[
-$ mvn clean test
+<programlisting language=""><![CDATA[$ mvn clean test
 ...
 [INFO] BUILD SUCCESS
-
-$ cat 
-]]></programlisting>                        
+...]]></programlisting>                        
             </listitem>
 
             <listitem><para>If you would like to observe the data in the database, do two things</para>
@@ -373,8 +346,7 @@ $ cat
                 <itemizedlist spacing="compact">
                     <listitem><para>Turn off the hibernate.hbm2ddl.auto=create option by commenting it out
                         in hibernate.properties</para>
-<programlisting language=""><![CDATA[
-$ more src/test/resources/hibernate.properties
+<programlisting language=""><![CDATA[$ more src/test/resources/hibernate.properties
  
 hibernate.dialect=${hibernate.dialect}
 hibernate.connection.url=${jdbc.url}
@@ -384,15 +356,13 @@ hibernate.connection.username=${jdbc.user}
 #hibernate.hbm2ddl.auto=create
 hibernate.show_sql=true
 hibernate.format_sql=true
-#hibernate.jdbc.batch_size=0
-]]></programlisting>                        
+#hibernate.jdbc.batch_size=0]]></programlisting>                        
                     </listitem>
                     <listitem><para>Make sure you are running with the h2srv (server) profile and have the 
                         server running. The easier way to run with the server profile within Eclipse is
-                        to choose it as one of your active profiles in .m2/settings/settings.xml and have
+                        to choose it as one of your active profiles in .m2/settings.xml and have
                         Eclipse re-read your settings.xml</para>
-<programlisting language=""><![CDATA[
-# start server
+<programlisting language=""><![CDATA[# start server
 $ java -jar (localRepository)/com/h2database/h2/1.3.168/h2-1.3.168.jar
 
 
@@ -404,19 +374,16 @@ $ java -jar (localRepository)/com/h2database/h2/1.3.168/h2-1.3.168.jar
         <activeProfile>h2srv</activeProfile>
 
 # or manually from command line
-$ mvn clean test -P\!h2db -Ph2srv
-]]></programlisting>                        
+$ mvn clean test -P\!h2db -Ph2srv]]></programlisting>                        
                     </listitem>
                 </itemizedlist>
 
             </listitem>
 
             <listitem><para>Type the following command in the H2 browser UI</para>
-<programlisting language=""><![CDATA[
-SELECT * FROM ANIMAL2;
+<programlisting language=""><![CDATA[SELECT * FROM ANIMAL2;
 ID      DOB     NAME    WEIGHT  
-0   1960-02-01 00:00:00.0   bessie  1400.2
-]]></programlisting>                        
+0   1960-02-01 00:00:00.0   bessie  1400.2]]></programlisting>                        
             </listitem>
             
         </orderedlist>
