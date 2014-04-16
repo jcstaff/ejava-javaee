@@ -566,7 +566,7 @@ $ mvn clean test -P\!h2db -Ph2srv -Dtest=myorg.relex.CollectionTest#testByPK
                         <title>Is changing result of hashCode/equals legal?</title>
                         <para>The Internet is not short on discussion of hashCode/equals and whether its 
                             value and result can be changed during the lifetime of an object. The 
-                            <ulink url="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html#hashCode()">java.lang.Object.hashCode javadoc</ulink>
+                            <ulink url="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html#hashCode()">java.lang.Object.hashCode javadoc</ulink>
                             states that "...the hashCode method must consistently return the same integer, 
                             provided no information used in equals comparisons on the object is modified".
                             The first part of that phrase makes the following solution suspect. The last
