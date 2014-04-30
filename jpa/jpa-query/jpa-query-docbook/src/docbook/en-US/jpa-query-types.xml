@@ -106,7 +106,7 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
             <listitem><para>Pros</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>Provides full access to native SQL power</para></listitem>
-                    <listitem><para>Provides fill access to database-vendor SQL extensions</para></listitem>
+                    <listitem><para>Provides full access to database-vendor SQL extensions</para></listitem>
                     <listitem><para>Easy to see when native SQL is being used within application -- target for portability review</para></listitem>
                     <listitem><para>Ability to produce managed entity as result of query</para></listitem>
                 </itemizedlist>
@@ -193,7 +193,7 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
             <itemizedlist spacing="compact">
                 <listitem><para>Allow query to return mixture of managed entities and values</para></listitem>
                 <listitem><para>DAOs can use value results to plugin transient aggregate properties in parent
-                    without pulling child entities back from database</para>
+                    entity without pulling entire child entities back from database</para>
                     <itemizedlist spacing="compact">
                         <listitem><para>e.g., total sales for clerk</para></listitem>
                     </itemizedlist>

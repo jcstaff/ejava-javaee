@@ -372,10 +372,12 @@ assertTrue("no rows updated", rows > 0);]]></programlisting>
         </figure>
         
         <figure>
-            <title>Clear/Detach Stale Entit(ies)</title>
-<programlisting language="java"><![CDATA[//evict all managed entities in persistence context
+            <title>Refresh/Clear/Detach Stale Entit(ies)</title>
+<programlisting language="java"><![CDATA[//re-sync entity with DB changes
+em.refresh(clerk);
+//evict all managed entities in persistence context
 em.clear();
-//evict a specific managed entity
+//remove entity from persistence context
 em.detach(clerk);]]></programlisting>                        
         </figure>
         <itemizedlist spacing="compact">
@@ -460,7 +462,7 @@ log.info("found customer:" + Arrays.toString(rows.get(0)));]]></programlisting>
             <listitem><para>DATE, TIME, and TIMSTAMP parameters</para></listitem>
             <listitem><para>Offset(firstResult) and limit(maxResults) paging</para></listitem>
             <listitem><para>Locking</para></listitem>
-            <listitem><para>Bulk updates</para></listitem>
+            <listitem><para>JPA-QL and (JPA 2.1) Criteria Bulk Updates </para></listitem>
             <listitem><para>Named Queries</para></listitem>
         </itemizedlist>
     </section>    
