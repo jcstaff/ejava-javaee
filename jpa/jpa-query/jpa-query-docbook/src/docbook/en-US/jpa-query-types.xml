@@ -187,6 +187,101 @@ List<Customer> customers = em.createNativeQuery(
 log.info("result=" + customers);
 assertEquals("unexpected number of results", 2, customers.size());]]></programlisting>                        
         </figure>
+        
+        <section id="jpa-query-types-sql-sqlresultset">
+            <title>SqlResultSetMappings</title>
+            <itemizedlist spacing="compact">
+                <listitem><para>Allow query to return mixture of managed entities and values</para></listitem>
+                <listitem><para>DAOs can use value results to plugin transient aggregate properties in parent
+                    without pulling child entities back from database</para>
+                    <itemizedlist spacing="compact">
+                        <listitem><para>e.g., total sales for clerk</para></listitem>
+                    </itemizedlist>
+                </listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>NativeQuery with SqlResultSetMapping</title>
+<programlisting language="java"><![CDATA[@SuppressWarnings("unchecked")
+List<Object[]> results = em.createNativeQuery(
+        "select clerk.CLERK_ID, "
+        + "clerk.FIRST_NAME, "
+        + "clerk.LAST_NAME, "
+        + "clerk.HIRE_DATE, "
+        + "clerk.TERM_DATE, "
+        + "sum(sales.amount) total_sales " 
+        + "from JPAQL_CLERK clerk "
+        + "left outer join JPAQL_SALE_CLERK_LINK slink on clerk.CLERK_ID=slink.CLERK_ID "
+        + "left outer join JPAQL_SALE sales on sales.SALE_ID=slink.SALE_ID "
+        + "group by clerk.CLERK_ID, "
+        + "clerk.FIRST_NAME, "
+        + "clerk.LAST_NAME, "
+        + "clerk.HIRE_DATE, "
+        + "clerk.TERM_DATE "
+        + "order by total_sales DESC",
+        "Clerk.clerkSalesResult")
+        .getResultList();
+]]></programlisting>
+<programlisting language="java"><![CDATA[@Entity @Table(name="JPAQL_CLERK")
+@SqlResultSetMappings({
+    @SqlResultSetMapping(name = "Clerk.clerkSalesResult", 
+            entities={ @EntityResult(entityClass = Clerk.class )},
+            columns={@ColumnResult(name = "total_sales")}
+    )
+})
+public class Clerk {]]></programlisting>                        
+            </figure>                        
+    
+            <figure>
+                <title>Example NativeQuery with SqlResultSetMapping Output</title>
+<programlisting language="java"><![CDATA[for (Object[] result: results) {
+    Clerk clerk = (Clerk) result[0];
+    BigDecimal totalSales = (BigDecimal) result[1];
+    log.info(String.format("%s, $ %s", clerk.getFirstName(), totalSales));
+}]]></programlisting>                        
+<programlisting language=""><![CDATA[-Manny, $ 250.00
+-Moe, $ 150.00
+-Jack, $ null]]></programlisting>                        
+            </figure>
+    
+            <figure>
+                <title>NamedNativeQuery with SqlResultSetMapping</title>
+<programlisting language="java"><![CDATA[@Entity @Table(name="JPAQL_CLERK")
+@NamedNativeQueries({
+    @NamedNativeQuery(name = "Clerk.clerkSales", query = 
+            "select clerk.CLERK_ID, "
+            + "clerk.FIRST_NAME, "
+            + "clerk.LAST_NAME, "
+            + "clerk.HIRE_DATE, "
+            + "clerk.TERM_DATE, "
+            + "sum(sales.amount) total_sales " 
+            + "from JPAQL_CLERK clerk "
+            + "left outer join JPAQL_SALE_CLERK_LINK slink on clerk.CLERK_ID=slink.CLERK_ID "
+            + "left outer join JPAQL_SALE sales on sales.SALE_ID=slink.SALE_ID "
+            + "group by clerk.CLERK_ID, "
+            + "clerk.FIRST_NAME, "
+            + "clerk.LAST_NAME, "
+            + "clerk.HIRE_DATE, "
+            + "clerk.TERM_DATE "
+            + "order by total_sales DESC",
+            resultSetMapping="Clerk.clerkSalesResult")
+})
+@SqlResultSetMappings({
+    @SqlResultSetMapping(name = "Clerk.clerkSalesResult", 
+            entities={ @EntityResult(entityClass = Clerk.class )},
+            columns={@ColumnResult(name = "total_sales")}
+    )
+})
+public class Clerk {]]></programlisting>                        
+            </figure>
+        
+    
+            <figure>
+                <title>Example NamedNativeQuery with SqlResultSetMapping Usage</title>
+<programlisting language="java"><![CDATA[List<Object[]> results = em.createNamedQuery("Clerk.clerkSales").getResultList();]]></programlisting>                        
+            </figure>
+            
+        </section>
     </section>
 
 
@@ -596,6 +691,9 @@ assertEquals("unexpected number of results", 2, customers.size());]]></programli
                 <itemizedlist spacing="compact">
                     <listitem><para>JPAQL</para></listitem>
                     <listitem><para>Native SQL</para></listitem>
+                        <itemizedlist spacing="compact">
+                            <listitem><para>SqlResultSetMapping</para></listitem>
+                        </itemizedlist>
                     <listitem><para>Criteria API</para>
                         <itemizedlist spacing="compact">
                             <listitem><para>String-based Accessors</para></listitem>

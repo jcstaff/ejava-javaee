@@ -298,11 +298,11 @@ for update
         <itemizedlist spacing="compact">
             <listitem><para>Change database -- not query it</para></listitem>
             <listitem><para>Bypasses cache -- cached entities out of sync with database changes</para></listitem>
-            <listitem><para>Only available using JPA-QL and Native SQL -- not available in Criteria API</para></listitem>
+            <listitem><para>Criteria API updates/deletes added in JPA 2.1</para></listitem>
         </itemizedlist>
         
         <figure>
-            <title>Bulk Update Example</title>
+            <title>JPA-QL Bulk Update Example</title>
 <programlisting language="java"><![CDATA[Query update = em.createQuery(
         "update Clerk c set c.lastName=:newlast where c.lastName=:last");
 update.setParameter("last", "Pep");
@@ -319,9 +319,24 @@ where LAST_NAME=?]]></programlisting>
             <listitem><para>Number of entities changed returned</para></listitem>
         </itemizedlist>
         
+        <figure>
+            <title>Criteria API Bulk Update Example</title>
+<programlisting language="java"><![CDATA[CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaUpdate<Clerk> qdef2=cb.createCriteriaUpdate(Clerk.class);
+
+//"update Clerk c set c.lastName=:newlast where c.lastName=:last"
+Root<Clerk> c2 = qdef2.from(Clerk.class);
+qdef2.set("lastName", "Peppy")
+     .where(cb.equal(c2.get("lastName"), "Pep"));
+
+Query update = em.createQuery(qdef2);
+int rows = update.executeUpdate();
+assertEquals("unexpected rows updated:" + rows, clerks.size(), rows);]]></programlisting>                        
+        </figure>
+        
         
         <figure>
-            <title>Bulk Delete Example</title>
+            <title>JPA-QL Bulk Delete Example</title>
 <programlisting language="java"><![CDATA[Query update = em.createQuery(
         "delete from Customer c " +
         "where c.firstName like :first AND c.lastName like :last");
@@ -337,6 +352,24 @@ where ( FIRST_NAME like ? ) and ( LAST_NAME like ? )]]></programlisting>
             <listitem><para>Bulk deletes do not trigger cascades</para></listitem>
             <listitem><para>Entity instance exists in memory even after deleted from database</para></listitem>
         </itemizedlist>
+
+        <figure>
+            <title>Criteria API Bulk Update Example</title>
+<programlisting language="java"><![CDATA[CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaDelete<Customer> delete = cb.createCriteriaDelete(Customer.class);
+
+//"delete from Customer c " +
+//"where c.firstName like :first AND c.lastName like :last");
+Root<Customer> c2 = delete.from(Customer.class);
+delete.where(cb.and(
+        cb.like(c.<String>get("firstName"), "thing"),
+        cb.like(c.<String>get("lastName"), "%")
+        ));
+
+Query update = em.createQuery(delete);
+int rows = update.executeUpdate();
+assertTrue("no rows updated", rows > 0);]]></programlisting>                        
+        </figure>
         
         <figure>
             <title>Clear/Detach Stale Entit(ies)</title>
