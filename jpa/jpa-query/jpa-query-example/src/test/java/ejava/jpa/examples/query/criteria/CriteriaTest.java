@@ -1001,7 +1001,7 @@ where customer0_.FIRST_NAME=?
     	//set s.date = CURRENT_DATE
         CriteriaUpdate<Sale> qupdate = cb.createCriteriaUpdate(Sale.class);
         Root<Sale> s2 = qupdate.from(Sale.class);
-        qupdate.set(s2.get("date"), cb.currentDate());
+        qupdate.set(s2.<Date>get("date"), cb.currentDate());
         rows = em.createQuery(qupdate).executeUpdate();
         assertEquals("unexpected number of rows", 2, rows);
         
