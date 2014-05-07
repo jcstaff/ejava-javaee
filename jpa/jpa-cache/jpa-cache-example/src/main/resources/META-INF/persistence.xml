@@ -8,23 +8,14 @@
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 
         <properties>
+        <!-- Hibernate 4 2nd-level cache properties 
+         -->
             <property name="hibernate.cache.region.factory_class"
                 value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />      
             <property name="hibernate.cache.provider_class"
                 value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory" />
             <property name="hibernate.cache.use_second_level_cache" value="true" />
             <property name="hibernate.cache.use_query_cache" value="true" />
-                
-                
-                          
-            <!-- 2nd level cache 
-            -->
-        <!-- 
-                value="net.sf.ehcache.hibernate.SingletonEhCacheProvider"/>
-            <property name="net.sf.ehcache.configurationResourceName"
-                value="/ehcache.xml" />
-            <property name="hibernate.generate_statistics" value="false" />
-         -->
         </properties>
     </persistence-unit>        
     

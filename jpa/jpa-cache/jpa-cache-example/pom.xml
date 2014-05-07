@@ -85,7 +85,7 @@
         </plugin>
 
         <!-- generates a DDL file for persistence unit
-            see effective-pom for full configuration -->
+             Must comment out hibernate4 2nd-level cache in peristence.xml to enable this
         <plugin>
             <artifactId>hibernate3-maven-plugin</artifactId>
             <groupId>org.codehaus.mojo</groupId>
@@ -98,6 +98,7 @@
                 </hibernatetool>
             </configuration>
         </plugin>
+        -->
     </plugins>      
   </build>
 </project>
