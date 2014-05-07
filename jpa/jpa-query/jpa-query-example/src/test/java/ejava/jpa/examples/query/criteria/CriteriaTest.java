@@ -1,7 +1,6 @@
 package ejava.jpa.examples.query.criteria;
 
 import static org.junit.Assert.assertEquals;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -19,6 +18,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
@@ -995,10 +995,14 @@ where customer0_.FIRST_NAME=?
         rows = executeQuery(qdef).size();
         assertEquals("unexpected number of rows", 0, rows);
 
-        //no bulk query capability in Criteria API
-        rows = em.createQuery(
-                "update Sale s " +
-                "set s.date = CURRENT_DATE").executeUpdate();
+        //bulk query capability added to Criteria API in JPA 2.1
+        
+        //update Sale s
+    	//set s.date = CURRENT_DATE
+        CriteriaUpdate<Sale> qupdate = cb.createCriteriaUpdate(Sale.class);
+        Root<Sale> s2 = qupdate.from(Sale.class);
+        qupdate.set(s2.get("date"), cb.currentDate());
+        rows = em.createQuery(qupdate).executeUpdate();
         assertEquals("unexpected number of rows", 2, rows);
         
         em.getTransaction().commit();
