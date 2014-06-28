@@ -3,6 +3,8 @@ package ejava.jpa.examples.cache;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,8 +28,7 @@ public class ZipTest {
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		Map<String, String> props = new HashMap<String, String>();
-		emf=Persistence.createEntityManagerFactory(PU_NAME, props);
-		
+		emf=Persistence.createEntityManagerFactory(PU_NAME, props);		
 		
 		EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
@@ -42,6 +43,9 @@ public class ZipTest {
 		em=emf.createEntityManager();
 		em.setProperty("javax.persistence.retrieveMode ", CacheRetrieveMode.USE);
 		em.setProperty("javax.persistence.cache.storeMode", CacheStoreMode.USE);
+		log.info(String.format("setUp: shared cache contains(%s)=%s", 
+				testZip, 
+				emf.getCache().contains(ZipAddress.class, testZip)));
 	}
 	
 	private static void ingest(EntityManager em) throws IOException {
@@ -65,7 +69,7 @@ public class ZipTest {
 	
 	@After
 	public void tearDown() {
-		log.info(String.format("shared cache contains(%s)=%s", 
+		log.info(String.format("tearDown: shared cache contains(%s)=%s", 
 				testZip, 
 				emf.getCache().contains(ZipAddress.class, testZip)));
 		if (em!=null) {
