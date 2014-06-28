@@ -4,7 +4,7 @@
     <parent>
         <groupId>ejava.jpa</groupId>
         <artifactId>jpa-validation</artifactId>
-        <version>3.0.2013.2-SNAPSHOT</version>
+        <version>3.0.2013.2</version>
     </parent>
 
     <artifactId>jpa-validation-example</artifactId>
@@ -93,8 +93,7 @@
                             <path location="${project.build.directory}/classes" />
                             <path location="${project.build.directory}/test-classes" />
                         </classpath>
-                        <jpaconfiguration persistenceunit="jpa-validation-example-test" 
-                            propertyfile="${basedir}/target/test-classes/hibernate.properties" />
+                        <jpaconfiguration persistenceunit="jpa-validation-example-test" propertyfile="${basedir}/target/test-classes/hibernate.properties" />
                     </hibernatetool>
                 </configuration>
             </plugin>

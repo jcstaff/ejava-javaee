@@ -3,7 +3,7 @@
 
     <groupId>ejava.jpa</groupId>
     <artifactId>jpa-parent</artifactId>
-    <version>3.0.2013.2-SNAPSHOT</version>
+    <version>3.0.2013.2</version>
     <packaging>pom</packaging>
 
     <name>JPA Parent POM</name>
@@ -140,8 +140,7 @@
                             </goals>
                             <configuration>
                                 <hibernatetool>
-                                    <hbm2ddl export="false" create="false" drop="true" format="true" 
-                                        outputfilename="${project.artifactId}-dropJPA.ddl"/>
+                                    <hbm2ddl export="false" create="false" drop="true" format="true" outputfilename="${project.artifactId}-dropJPA.ddl" />
                                 </hibernatetool>
                             </configuration>
                         </execution>
@@ -153,8 +152,7 @@
                             </goals>
                             <configuration>
                                 <hibernatetool>
-                                    <hbm2ddl export="false" create="true" drop="false" format="true" 
-                                        outputfilename="${project.artifactId}-createJPA.ddl"/>
+                                    <hbm2ddl export="false" create="true" drop="false" format="true" outputfilename="${project.artifactId}-createJPA.ddl" />
                                 </hibernatetool>
                             </configuration>
                         </execution>
@@ -203,7 +201,7 @@
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
                   <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
             </properties>
             <dependencies>
@@ -222,7 +220,7 @@
                   <jdbc.driver>org.h2.Driver</jdbc.driver>
                   <jdbc.url>jdbc:h2:${basedir}/target/h2db/ejava</jdbc.url>
                   <jdbc.user>sa</jdbc.user>
-                  <jdbc.password/>
+                  <jdbc.password />
                   <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
             </properties>
             <dependencies>
