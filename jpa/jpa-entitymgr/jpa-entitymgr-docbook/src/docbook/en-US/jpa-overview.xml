@@ -33,6 +33,17 @@
                     <listitem><para>Criteria API</para></listitem>
                 </itemizedlist>
             </listitem>
+
+            <listitem><para>JavaEE 7 enhanced specification</para>
+                <itemizedlist spacing="compact">
+                    <listitem><para>Java Persistence API (JPA) version 2.1</para></listitem>
+                    <listitem><para>Converters - to convert attributes to/from DB types</para></listitem>
+                    <listitem><para>Criteria API Bulk Updates</para></listitem>
+                    <listitem><para>Stored Procedure Query support</para></listitem>
+                    <listitem><para>Partial fetching of objects</para></listitem>
+                    <listitem><para>...</para></listitem>
+                </itemizedlist>
+            </listitem>
         </itemizedlist>                   
     </section>
 
@@ -78,8 +89,7 @@ em.persist(author);
         </itemizedlist>                   
         <programlisting language="java"><![CDATA[
 @javax.persistence.Entity
-public class Author implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Author {
     @Id
     @GeneratedValue
     private long id;
@@ -367,7 +377,7 @@ version="2.0">
 
         
         <section id="jpa-overview-persistencexml-elements">
-            <title>persistrence.xml Elements</title>
+            <title>persistence.xml Elements</title>
 
             <variablelist>
                 <varlistentry>

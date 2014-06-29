@@ -367,12 +367,25 @@ where s.date = CURRENT_DATE]]></programlisting>
             </figure>
         <itemizedlist spacing="compact">
             <listitem><para>Located no sales on today's date</para></listitem>
+            <listitem><para>Update with a bulk query</para></listitem>
         </itemizedlist>
 
+            <note>
+                <para>Criteria API added Bulk Updates in JPA 2.1</para>
+            </note>
+
            <figure>
-                <title>Use JPA-QL to update Rows</title>
+            <title>Equivalent JPAQL</title>
 <programlisting language=""><![CDATA[update Sale s set s.date = CURRENT_DATE]]></programlisting>
             </figure>
+            <figure>
+                <title>Criteria API Definition</title>
+<programlisting language="java"><![CDATA[CriteriaUpdate<Sale> qupdate = cb.createCriteriaUpdate(Sale.class);
+Root<Sale> s2 = qupdate.from(Sale.class);
+qupdate.set(s2.<Date>get("date"), cb.currentDate());
+int rows = em.createQuery(qupdate).executeUpdate();]]></programlisting>                        
+            </figure>
+
            <figure>
                 <title>Runtime Output</title>
 <programlisting language=""><![CDATA[update JPAQL_SALE set date=CURRENT_DATE]]></programlisting>                            
@@ -380,13 +393,10 @@ where s.date = CURRENT_DATE]]></programlisting>
             <itemizedlist spacing="compact">
                 <listitem><para>Update all sales to today</para></listitem>
             </itemizedlist>
-            <note>
-                <title>JPA Criteria API does not Provide Bulk Updates</title>
-                <para>JPA provides no mechanism to perform bulk updates with Criteria API.
-                    You must use JPAQL or SQL to perform bulk updates.</para>
-            </note>
-        
 
+        
+        
+        
         <figure>
             <title>Equivalent JPAQL</title>
 <programlisting language=""><![CDATA[select s from Sale s

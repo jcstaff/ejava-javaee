@@ -37,7 +37,7 @@
         <para>Obtain a copy of the H2 database jar from one of the following sources</para>
         <itemizedlist spacing="compact">
             <listitem><para>Within the JBoss installation</para>
-                <programlisting><![CDATA[jboss-as-7.x.x.Final/modules/com/h2database/h2/main/]]></programlisting>
+                <programlisting><![CDATA[jboss-xxx-x.x.x.Final/modules/.../com/h2database/h2/main/]]></programlisting>
             </listitem>
 
             <listitem><para>Internet Maven Repository (<ulink url="http://repo2.maven.org/maven2/com/h2database/h2/">
@@ -62,7 +62,21 @@
             <listitem><para>Start database and server only</para>
                 <programlisting language=""><![CDATA[java -jar h2.jar -tcp -web]]></programlisting>
             </listitem>
-        </itemizedlist>                   
+        </itemizedlist>
+        <note>
+            <para>Linux users might want to edit/save the following shell script to their PATH.
+<programlisting language=""><![CDATA[#!/bin/sh
+cd /tmp
+java -jar $HOME/.m2/repository2/com/h2database/h2/1.3.168/h2-1.3.168.jar $@]]></programlisting>                        
+            </para>
+        </note>                   
+        <note>
+            <para>Windows users might want to edit/save the following .bat script to their Desktop
+                after creating the c:/tmp directory.
+<programlisting language=""><![CDATA[cd c:\tmp
+java -jar %HOME%\m2\repository\com\h2database\h2\1.3.168\h2-1.3.168.jar]]></programlisting>                        
+            </para>
+        </note>                   
     </section>
 
     
@@ -88,8 +102,6 @@
                 <listitem><para>0 - Read Uncommitted - transaction isolation disabled</para></listitem>
                 <listitem><para>1 - Serializable - database is (read and write) locked until transaction commits</para></listitem>
                 <listitem><para>3 - Read Committed (default) - read locks released after statement completes</para></listitem>
-                <listitem><para></para></listitem>
-                <listitem><para></para></listitem>
             </itemizedlist>
         </note>                   
     </section>
@@ -99,7 +111,13 @@
         <title>Activate H2 Server Profile for Builds</title>
         <para>Do one of the following</para>
         <itemizedlist spacing="compact">
-            <listitem><para>add -Ph2srv to the command line of each build</para></listitem>
+            <listitem><para>add -P\!Ph2db -Ph2srv to the command line of each build</para>
+                <note>
+                    <para>The bang ("!") character turns off a profile. Unix shells
+                        require the bang ("!") character to be escaped. Windows DOS does not.
+                    </para>
+                </note>
+            </listitem>
             
             <listitem><para>change the settings.xml activeProfile specification 
                 from embedded mode (h2db)</para>
@@ -119,7 +137,7 @@
     <id>h2srv</id>
     <properties>
           <jdbc.driver>org.h2.Driver</jdbc.driver>
-          <jdbc.url>jdbc:h2:tcp://${db.host}:9092/ejava</jdbc.url>
+          <jdbc.url>jdbc:h2:tcp://${db.host}:9092/h2db/ejava</jdbc.url>
           <jdbc.user>sa</jdbc.user>
           <jdbc.password/>
           <hibernate.dialect>
@@ -137,6 +155,7 @@
                                
     </section>
 
+<!-- 
     <section id="devenv-h2-jboss">
         <title>Update JBoss to use Server Mode</title>
         <itemizedlist spacing="compact">
@@ -164,5 +183,6 @@
                 where you started the database server.</para>
         </note>                   
     </section>
+ -->
 
 </chapter>

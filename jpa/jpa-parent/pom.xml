@@ -3,7 +3,7 @@
 
     <groupId>ejava.jpa</groupId>
     <artifactId>jpa-parent</artifactId>
-    <version>3.0.2014.1-SNAPSHOT</version>
+    <version>3.0.2014.1</version>
     <packaging>pom</packaging>
 
     <name>JPA Parent POM</name>
@@ -38,8 +38,8 @@
 
         <commons-logging.version>1.0.4</commons-logging.version>
         <h2db.version>1.3.168</h2db.version>
-        <hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
-        <hibernate-entitymanager.version>4.0.1.Final</hibernate-entitymanager.version>
+        <hibernate-jpa-2.1-api.version>1.0.0.Final</hibernate-jpa-2.1-api.version>
+        <hibernate-entitymanager.version>4.3.4.Final</hibernate-entitymanager.version>
         <hibernate3-maven-plugin.version>3.0</hibernate3-maven-plugin.version>
         <hibernate3.version>3.6.0.Final</hibernate3.version>
         <junit.version>4.10</junit.version>
@@ -57,8 +57,8 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
-                <artifactId>hibernate-jpa-2.0-api</artifactId>
-                <version>${hibernate-jpa-2.0-api.version}</version>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>${hibernate-jpa-2.1-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -334,42 +334,49 @@
         </profile>
         <profile>
             <id>jpa-deploy</id>
+            <properties>
+                <jpa.site.server>srau.ejava.info</jpa.site.server>
+            </properties>
             <distributionManagement>
                 <site>
                     <id>ejava-jpa.website</id>
-                    <name>ejava-jpa website</name>
-                    <url>scpexe://ejava.info/var/www/ejava.info/html/sites/ejava-jpa/jpa/jpa-providers/jpa-parent</url>
+                    <name>SRA-U ejava website</name>
+                    <url>scpexe://${jpa.site.server}/var/www/ejava.info/html/sites/ejava-jpa/jpa/jpa-parent</url>
                 </site>
                 <repository>
-                    <id>ejava-jpa.release</id>
-                    <name>ejava-jpa release</name>
-                    <url>https://ejava.info/nexus/content/repositories/ejava-release</url>
+                    <id>srau-releases</id>
+                    <name>SRA-U Releases</name>
+                    <url>https://${jpa.site.server}/nexus/content/repositories/srau-releases/</url>
                 </repository>
                 <snapshotRepository>
-                    <id>ejava-jpa.snapshot</id>
-                    <name>ejava-jpa snapshot</name>
-                    <url>https://ejava.info/nexus/content/repositories/ejava-snapshot</url>
+                    <id>srau-snapshots</id>
+                    <name>SRA-U Snapshots</name>
+                    <url>https://${jpa.site.server}/nexus/content/repositories/srau-snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
         </profile>
         <profile>
             <id>jpatest-deploy</id>
+            <properties>
+                <jpa.site.server>srau.ejava.info</jpa.site.server>
+            </properties>
             <distributionManagement>
                 <site>
-                    <id>test-website</id>
-                    <name>ejava-jpa test-deploy website</name>
-                    <url>scpexe://ejava.info/var/www/ejava.info/html/sites/test-deploy/ejava-jpa/jpa/jpa-providers/jpa-hibernate/hibernate-migration</url>
+                    <id>ejava-jpa.website</id>
+                    <name>SRA-U ejava website</name>
+                    <url>scpexe://${jpa.site.server}/var/www/ejava.info/html/test-sites/ejava-jpa/jpa/jpa-parent</url>
                 </site>
                 <repository>
-                    <id>test-release</id>
-                    <name>ejava-jpa test-deploy release</name>
-                    <url>https://ejava.info/nexus/content/repositories/test-release</url>
+                    <id>test-releases</id>
+                    <name>SRA-U Releases</name>
+                    <url>https://${jpa.site.server}/nexus/content/repositories/test-releases/</url>
                 </repository>
                 <snapshotRepository>
-                    <id>test-snapshot</id>
-                    <name>ejava-jpa test-deploy snapshot</name>
-                    <url>https://ejava.info/nexus/content/repositories/test-snapshot</url>
+                    <id>test-snapshots</id>
+                    <name>SRA-U Snapshots</name>
+                    <url>https://${jpa.site.server}/nexus/content/repositories/test-snapshots/</url>
+                    <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
         </profile>

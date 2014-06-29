@@ -133,7 +133,7 @@ public class Worker implements Runnable {
                                 dlqProducer.send(request);
                             }
                             finally {
-                                log.debug("committing session");
+                                log.debug("committing session for: " + request.getJMSMessageID());
                                 session.commit();
                             }
                         }

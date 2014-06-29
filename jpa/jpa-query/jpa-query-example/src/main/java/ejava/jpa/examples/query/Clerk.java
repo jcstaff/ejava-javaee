@@ -3,9 +3,35 @@ package ejava.jpa.examples.query;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+
 import javax.persistence.*;
 
 @Entity @Table(name="JPAQL_CLERK")
+@NamedNativeQueries({
+	@NamedNativeQuery(name = "Clerk.clerkSales", query = 
+			"select clerk.CLERK_ID, "
+			+ "clerk.FIRST_NAME, "
+			+ "clerk.LAST_NAME, "
+			+ "clerk.HIRE_DATE, "
+			+ "clerk.TERM_DATE, "
+			+ "sum(sales.amount) total_sales " 
+			+ "from JPAQL_CLERK clerk "
+			+ "left outer join JPAQL_SALE_CLERK_LINK slink on clerk.CLERK_ID=slink.CLERK_ID "
+			+ "left outer join JPAQL_SALE sales on sales.SALE_ID=slink.SALE_ID "
+			+ "group by clerk.CLERK_ID, "
+			+ "clerk.FIRST_NAME, "
+			+ "clerk.LAST_NAME, "
+			+ "clerk.HIRE_DATE, "
+			+ "clerk.TERM_DATE "
+			+ "order by total_sales DESC",
+			resultSetMapping="Clerk.clerkSalesResult")
+})
+@SqlResultSetMappings({
+	@SqlResultSetMapping(name = "Clerk.clerkSalesResult", 
+			entities={ @EntityResult(entityClass = Clerk.class )},
+			columns={@ColumnResult(name = "total_sales")}
+	)
+})
 public class Clerk {
     @Id @GeneratedValue @Column(name="CLERK_ID")
     private long id;

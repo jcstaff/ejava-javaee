@@ -2,6 +2,8 @@ package ejava.jpa.examples.query;
 
 import static org.junit.Assert.*;
 
+
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -17,6 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
+/**
+ * This test case provides an example of each of the different query types.
+ */
 public class QueryTypesTest extends QueryBase {
 	private static final Log log = LogFactory.getLog(QueryTypesTest.class);
 
@@ -93,11 +98,12 @@ public class QueryTypesTest extends QueryBase {
 	@Test
 	public void exampleSQLOptimized() {
 		log.info("*** exampleSQLOptimized ***");
+		Table table = Customer.class.getAnnotation(Table.class);
 		
 		@SuppressWarnings("unchecked")
 		List<Customer> customers = em.createNativeQuery(
 			"select c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME " +						
-			"from JPAQL_CUSTOMER c " +
+			String.format("from %s c ", table.name()) +
 			"where c.FIRST_NAME = ? " +
 			"order by c.LAST_NAME ASC",
 			Customer.class)
@@ -105,6 +111,46 @@ public class QueryTypesTest extends QueryBase {
 				.getResultList();
 		log.info("result=" + customers);
 		assertEquals("unexpected number of results", 2, customers.size());
+	}
+	
+	/**
+	 * This test shows more features of the SqlResultSet -- where we mix entity
+	 * and value return values.
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void exampleSQLResultSet() {
+		List<Object[]> results = em.createNativeQuery(
+				"select clerk.CLERK_ID, "
+				+ "clerk.FIRST_NAME, "
+				+ "clerk.LAST_NAME, "
+				+ "clerk.HIRE_DATE, "
+				+ "clerk.TERM_DATE, "
+				+ "sum(sales.amount) total_sales " 
+				+ "from JPAQL_CLERK clerk "
+				+ "left outer join JPAQL_SALE_CLERK_LINK slink on clerk.CLERK_ID=slink.CLERK_ID "
+				+ "left outer join JPAQL_SALE sales on sales.SALE_ID=slink.SALE_ID "
+				+ "group by clerk.CLERK_ID, "
+				+ "clerk.FIRST_NAME, "
+				+ "clerk.LAST_NAME, "
+				+ "clerk.HIRE_DATE, "
+				+ "clerk.TERM_DATE "
+				+ "order by total_sales DESC",
+				"Clerk.clerkSalesResult")
+				.getResultList();
+		for (Object[] result: results) {
+			Clerk clerk = (Clerk) result[0];
+			BigDecimal totalSales = (BigDecimal) result[1];
+			log.info(String.format("%s, $ %s", clerk.getFirstName(), totalSales));
+		}
+		
+		results = em.createNamedQuery("Clerk.clerkSales").getResultList();
+		for (Object[] result: results) {
+			Clerk clerk = (Clerk) result[0];
+			BigDecimal totalSales = (BigDecimal) result[1];
+			log.info(String.format("%s, $ %s", clerk.getFirstName(), totalSales));
+		}
+		log.info("");
 	}
 	
 	@Test 

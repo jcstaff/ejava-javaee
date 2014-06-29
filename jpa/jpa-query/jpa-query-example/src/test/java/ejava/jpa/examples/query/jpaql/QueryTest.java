@@ -107,8 +107,9 @@ public class QueryTest extends QueryBase {
     public void testDateParameter() {
         log.info("*** testDateParameter() ***");
         
-        Calendar hireDate = Calendar.getInstance();
-        hireDate.set(Calendar.YEAR, 1972);
+        log.info(em.createQuery("select c from Clerk c", Clerk.class).getResultList());
+        
+        Calendar hireDate = new GregorianCalendar(1972, Calendar.JANUARY, 1);
         TypedQuery<Clerk> query = em.createQuery(
                 "select c from Clerk c " +
                 "where c.hireDate > :date", Clerk.class);

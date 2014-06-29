@@ -49,6 +49,7 @@ public class BulkQueryTest extends QueryBase {
         }
     }
     
+    
     @Test
     public void testBulkDelete() {
         log.info("*** testBulkDelete() ***");

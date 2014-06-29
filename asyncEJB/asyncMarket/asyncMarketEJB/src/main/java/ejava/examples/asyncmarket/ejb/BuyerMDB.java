@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
@@ -87,6 +88,7 @@ public class BuyerMDB implements MessageListener {
         ((JPAAuctionItemDAO)auctionItemDAO).setEntityManager(em);        
     }
 
+    @PermitAll
     public void onMessage(Message message) {
         try {
             log.debug("onMessage:" + message.getJMSMessageID());

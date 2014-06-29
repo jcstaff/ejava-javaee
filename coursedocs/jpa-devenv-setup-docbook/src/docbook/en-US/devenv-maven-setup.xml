@@ -8,7 +8,7 @@
     <section id="devenv-maven-install">
         <title>Maven Installation</title>
         <para></para>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem>
                 <para>
                     Download Maven 3
@@ -20,7 +20,7 @@
                     Unzip the contents into a directory with no spaces in its path.
                 </para>
                 <programlisting><![CDATA[
-$ ls apache-maven-3.0.4/
+$ ls apache-maven-3.2.1/
 bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
 ]]></programlisting>
             </listitem>
@@ -31,42 +31,40 @@ bin  boot  conf  lib  LICENSE.txt  NOTICE.txt  README.txt
                 </para>
                 <programlisting><![CDATA[
 //my linux system -- should be done in .bashrc
-export MAVEN_HOME=/opt/apache-maven-3.0.4
+export MAVEN_HOME=/opt/apache-maven-3.2.1
 export PATH=$MAVEN_HOME/bin:$PATH
 
 //my windows system -- should be done in Advanced System Settings->Environment Variables
-set MAVEN_HOME=/apps/apache-maven-3.0.4
+set MAVEN_HOME=/apps/apache-maven-3.2.1
 set PATH=%MAVEN_HOME%\bin;%PATH%
 ]]></programlisting>
             </listitem>
             <listitem>
-                <para>Verify maven is installed and in the path</para>
-                <programlisting><![CDATA[
-//my fedora system
+                <para>Verify maven is installed and in the path (TODO:Update Windows Example)</para>
+                <!-- TODO: update windows to Maven 3.2.1 -->
+                <programlisting><![CDATA[//my fedora system
 $ mvn --version
-Apache Maven 3.0.4 (r1232337; 2012-01-17 03:44:56-0500)
-Maven home: /opt/apache-maven-3.0.4
-Java version: 1.7.0_09-icedtea, vendor: Oracle Corporation
-Java home: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.9.x86_64/jre
+Apache Maven 3.2.1 (ea8b2b07643dbb1b84b6d16e1f08391b666bc1e9; 2014-02-14T12:37:52-05:00)
+Maven home: /opt/apache-maven-3.2.1
+Java version: 1.7.0_25, vendor: Oracle Corporation
+Java home: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.25.x86_64/jre
 Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "3.7.3-101.fc17.x86_64", arch: "amd64", family: "unix"                       
+OS name: "linux", version: "3.9.10-100.fc17.x86_64", arch: "amd64", family: "unix"
 
 //my windows xp system
-> mvn --version
-Apache Maven 3.0.4 (r1232337; 2012-01-17 03:44:56-0500)
-Maven home: C:\apps\apache-maven-3.0.4\bin\..
-Java version: 1.7.0_11, vendor: Oracle Corporation
-Java home: C:\apps\Java\jdk1.7.0_11\jre
+>mvn --version
+Apache Maven 3.2.1 (ea8b2b07643dbb1b84b6d16e1f08391b666bc1e9; 2014-02-14T12:37:52-05:00)
+Maven home: C:\apps\apache-maven-3.2.1\bin\..
+Java version: 1.7.0_51, vendor: Oracle Corporation
+Java home: c:\apps\java\jdk1.7.0_51\jre
 Default locale: en_US, platform encoding: Cp1252
-OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
-]]></programlisting>
+OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"]]></programlisting>
             </listitem>
         </orderedlist>
     </section>
-
     <section id="devenv-maven-config">
         <title>Maven Configuration</title>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem>
                 <para>Add a skeletal settings.xml file that will be used
                     to provide local overrides for the build. This is
@@ -74,14 +72,13 @@ OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
                     environment specifics like directory locations, server
                     address, server ports, etc.
                 </para>
-                <orderedlist>
+                <orderedlist spacing="compact">
                     <listitem>
                         <para>
                             Add the following to the<code>.m2/settings.xml</code>
                             file in your HOME directory.
                         </para>
-                        <programlisting language="xml"><![CDATA[
-<?xml version="1.0"?>
+                        <programlisting language="xml"><![CDATA[<?xml version="1.0"?>
 <settings xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
@@ -93,9 +90,26 @@ OS name: "windows xp", version: "5.1", arch: "x86", family: "windows"
     
     <activeProfiles>
     </activeProfiles>
-</settings>    
+</settings>]]></programlisting>
+                    </listitem>
+
+                    <listitem>
+                        <para>
+                            If your operating system HOME directory has spaces
+                            in the path (e.g., Windows XP's Documents and Settings)
+                            then add a <code>localRepository</code> path specification
+                            to the <code>.m2/settings.xml</code> file and have
+                            it point to a location that does not have spaces in 
+                            the path. The path does not have to exist. It will 
+                            be created during the next build. 
+                        </para>
+                        <programlisting language="xml"><![CDATA[
+    <offline>false</offline>
+    <!-- this overrides the default $HOME/.m2/repository location. --> 
+    <localRepository>c:/m2/repository</localRepository>
 ]]></programlisting>
                     </listitem>
+
                     <listitem>
                         <para>You can test whether your settings.xml
                             file is seen by Maven by temporarily making
@@ -118,30 +132,13 @@ $ mvn clean
                             of the <code>.m2/settings.xml</code> file in your
                             HOME directory. 
                         </para>
-                        <programlisting><![CDATA[
+                        <programlisting language="xml"><![CDATA[
     <activeProfiles>
         <activeProfile>h2db</activeProfile>
     </activeProfiles>
 ]]></programlisting>
                     </listitem>
                     
-                    <listitem>
-                        <para>
-                            If your operating system HOME directory has spaces
-                            in the path (e.g., Windows XP's Documents and Settings)
-                            then add a <code>localRepository</code> path specification
-                            to the <code>.m2/settings.xml</code> file and have
-                            it point to a location that does not have spaces in 
-                            the path. The path does not have to exist. It will 
-                            be created during the next build. 
-                        </para>
-                        <programlisting><![CDATA[
-    <offline>false</offline>
-    <!-- this overrides the default $HOME/.m2/repository location. --> 
-    <localRepository>c:/jhu/repository</localRepository>
-]]></programlisting>
-                    </listitem>
-
                 </orderedlist>
             </listitem>
         </orderedlist>
@@ -157,7 +154,7 @@ $ mvn clean
             Therefore, do the following to test your initial installation and
             repeat each week.
         </para>
-        <orderedlist>
+        <orderedlist spacing="compact">
             <listitem>
                 <para>
                     Change your current directory to the root of the cloned 
@@ -179,4 +176,102 @@ $ mvn clean install
              </listitem>
          </orderedlist>
     </section>
+    
+    <section id="devenv-maven-missing-dependencies">
+        <title>Missing Dependencies</title>
+        <para>There are a few cases where dependencies cannot be hosted in public repositories
+             and must be downloaded and installed manually. Oracle DB Client is one example.
+        </para>
+        <figure>
+            <title>Missing Maven Dependency Error/Warning Message</title>
+<programlisting language=""><![CDATA[
+Failure to find com.oracle:ojdbc6:pom:11.2.0.3 in ... 
+was cached in the local repository, resolution will not be reattempted until the update interval of 
+... has elapsed or updates are forced.
+]]></programlisting>                        
+        </figure>
+        
+        <para>If the message is a warning (i.e., for site/javadoc documentation -- it can be ignored).
+            If you want to eliminate the warning or it is coming up as an error, you can download
+            the artifact directly from the vendor and manually install it in your local repository.
+        </para>
+       <orderedlist spacing="compact">
+            <listitem><para>Download the driver jar from 
+                <ulink url="http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html">Oracle</ulink> 
+                accept the license agreement.</para>
+            </listitem>
+            <listitem><para>Install it manually into your localRepository</para>
+<programlisting language=""><![CDATA[
+$ mvn install:install-file -Dfile=/home/jcstaff/Downloads/ojdbc6.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.3 -Dpackaging=jar
+[INFO] Scanning for projects...
+...
+[INFO] --- maven-install-plugin:2.4:install-file (default-cli) @ standalone-pom ---
+[INFO] Installing /home/jcstaff/Downloads/ojdbc6.jar to /home/jcstaff/.m2/repository/com/oracle/ojdbc6/11.2.0.3/ojdbc6-11.2.0.3.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+...
+]]></programlisting>                        
+            </listitem>
+       </orderedlist>
+
+        <note>
+            <title>Artifacts are Best Placed in Network Repositories</title>
+            <para>This artifact would ideally be placed within a network cache/repository (i.e., Nexus)
+                and not into individual localRepositories. In the next chapter you will be shown
+                how could could setup a Maven Nexus for team use. If you go that route -- it would
+                be better to upload the file to that archive.</para>
+        </note>
+        <note>
+            <title>Rogue Internet Repositories</title>
+            <para>Probably violating license restrictions, but the following 
+                <ulink url="https://code.lds.org/nexus/content/groups/main-repo/">network repository</ulink>
+                 does contain the missing Oracle driver. One could add that as an upstream repository
+                 in their Nexus or define it as an artifact repository in the pom to avoid having to
+                 manually import the artifact.</para>
+        </note>
+    </section>
+    
+
+    <section id="devenv-maven-mavenrc">
+       <title>Customizing Maven Environment</title>
+       <para>Whether it is a memory issue, an SSL trustStore requirement, etc. you may
+           run into circumstances where you need to adjust the JVM properties to complete
+           a build.</para>
+    <figure>
+        <title>Example Maven JVM Error</title>
+       <programlisting language=""><![CDATA[[ERROR] The system is out of resources.
+[ERROR] Consult the following stack trace for details.
+[ERROR] java.lang.OutOfMemoryError: PermGen space]]></programlisting>                        
+    </figure>
+    
+    <para> JVM properties can be done by setting the MAVEN_OPTS environment variable
+         in one of the following ways:</para>
+    <itemizedlist spacing="compact">
+        <listitem><para>Linux</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>set MAVEN_OPTS in your .bashrc</para></listitem>
+                <listitem><para>set MAVEN_OPTS in $HOME/.mavenrc</para>
+                    <figure>
+                        <title>Example $HOME/.mavenrc setting maximum memory and MaxPermSize</title>
+<programlisting language=""><![CDATA[MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"]]></programlisting>                        
+                    </figure>
+                </listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem><para>Windows</para>
+            <itemizedlist spacing="compact">
+                <listitem><para>set MAVEN_OPTS in your Computer Properties</para></listitem>
+                <listitem><para>set MAVEN_OPTS in %HOME%/.maven_pre.bat</para>
+                    <figure>
+                        <title>Example %HOME#/mavenrc_pre.bat setting maximum memory and MaxPermSize</title>
+<programlisting language=""><![CDATA[set MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m]]></programlisting>                        
+                    </figure>
+                </listitem>
+            </itemizedlist>
+        </listitem>
+    </itemizedlist>
+       
+
+    </section>    
+    
 </chapter>

@@ -1154,13 +1154,17 @@ Version:1.72
 </xsl:template>
 
 <xsl:template match="subtitle" mode="book.titlepage.recto.auto.mode">
-<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="book.titlepage.recto.style" text-align="center" font-size="34pt" space-before="30pt" font-family="{$title.fontset}">
+<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="book.titlepage.recto.style" text-align="center" font-size="18pt" space-before="30pt" font-family="{$title.fontset}">
 <xsl:apply-templates select="." mode="book.titlepage.recto.mode"/>
 </fo:block>
 </xsl:template>
 
 <xsl:template match="issuenum" mode="book.titlepage.recto.auto.mode">
-<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="book.titlepage.recto.style" text-align="center" font-size="16pt" space-before="15.552pt" font-family="{$title.fontset}">
+<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="book.titlepage.recto.style" text-align="center" font-size="12pt" space-before="15.552pt" font-family="{$title.fontset}">
+    <xsl:call-template name="gentext">
+      <xsl:with-param name="key" select="'revision'"/>
+	</xsl:call-template>
+	<xsl:text>: </xsl:text>
 <xsl:apply-templates select="." mode="book.titlepage.recto.mode"/>
 </fo:block>
 </xsl:template>
@@ -1173,7 +1177,7 @@ Version:1.72
   </fo:block>
 </xsl:template>
 
-<!-- <xsl:template name="book.titlepage.recto">
+<xsl:template name="book.titlepage.recto">
   <xsl:choose>
     <xsl:when test="bookinfo/title">
       <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/title"/>
@@ -1185,10 +1189,6 @@ Version:1.72
       <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="title"/>
     </xsl:when>
   </xsl:choose>
-
-  <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/issuenum"/>
-  <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/issuenum"/>
-  <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="issuenum"/>
 
   <xsl:choose>
     <xsl:when test="bookinfo/subtitle">
@@ -1202,6 +1202,21 @@ Version:1.72
     </xsl:when>
   </xsl:choose>
 
+  <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/issuenum"/>
+  <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/issuenum"/>
+  <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="issuenum"/>
+
+  <fo:block xsl:use-attribute-sets="book.titlepage.recto.style" text-align="center" font-size="10"> 
+    <xsl:text>Built on: </xsl:text>
+    <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/pubdate"/>
+    <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/pubdate"/>
+  </fo:block>
+  <fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" text-align="center">
+      <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/copyright"/>
+      <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/copyright"/>
+  </fo:block>
+
+
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/corpauthor"/>
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/corpauthor"/>
 
@@ -1210,10 +1225,13 @@ Version:1.72
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/author"/>
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/author"/>
 
+  <!-- INVPART
   <fo:block xsl:use-attribute-sets="book.titlepage.recto.style" color="black">
     <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/invpartnumber"/>
     <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/invpartnumber"/>
   </fo:block>
+  -->
+  <!-- ISBN
   <fo:block xsl:use-attribute-sets="book.titlepage.recto.style" color="black">
     <xsl:call-template name="gentext">
       <xsl:with-param name="key" select="'isbn'"/>
@@ -1222,17 +1240,23 @@ Version:1.72
     <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/isbn"/>
     <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/isbn"/>
   </fo:block>
-  <fo:block xsl:use-attribute-sets="book.titlepage.recto.style" color="black"> 
-    <xsl:call-template name="gentext">
-      <xsl:with-param name="key" select="'pubdate'"/>
-	</xsl:call-template>
-	<xsl:text>: </xsl:text>
-    <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/pubdate"/>
-    <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/pubdate"/>
-  </fo:block>
-</xsl:template> -->
+  -->
 
-   <!-- Use our own slightly simpler title page (just show title, version, authors) -->
+<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" space-before="25.552pt">
+  <xsl:choose>
+    <xsl:when test="bookinfo/abstract">
+      <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/abstract"/>
+    </xsl:when>
+    <xsl:when test="info/abstract">
+      <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/abstract"/>
+    </xsl:when>
+  </xsl:choose>
+</fo:block>
+
+
+</xsl:template> 
+
+   <!-- Use our own slightly simpler title page (just show title, version, authors) 
    <xsl:template name="book.titlepage.recto">
       <xsl:choose>
          <xsl:when test="bookinfo/title">
@@ -1299,8 +1323,10 @@ Version:1.72
       </fo:block>
 
    </xsl:template>
+        -->
 
-<!-- <xsl:template name="book.titlepage.verso">
+<!--
+<xsl:template name="book.titlepage.verso">
   <xsl:choose>
     <xsl:when test="bookinfo/abstract">
       <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/abstract"/>
@@ -1310,12 +1336,14 @@ Version:1.72
     </xsl:when>
   </xsl:choose>
 
-</xsl:template> -->
+</xsl:template>
+   -->
 
    <xsl:template name="book.titlepage.verso"></xsl:template>
 
 
-<!-- <xsl:template name="book.titlepage3.recto">
+<!--
+<xsl:template name="book.titlepage3.recto">
   <xsl:choose>
     <xsl:when test="bookinfo/title">
       <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/title"/>
@@ -1340,12 +1368,12 @@ Version:1.72
   <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/legalnotice"/>
   <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/publisher"/>
   <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/publisher"/>
-</xsl:template> -->
+</xsl:template>
+-->
 
    <xsl:template name="book.titlepage3.recto">
-
    </xsl:template>
-   
+
    <!-- Make examples, tables etc. break across pages -->
    <xsl:attribute-set name="formal.object.properties">
       <xsl:attribute name="keep-together.within-column">auto</xsl:attribute>

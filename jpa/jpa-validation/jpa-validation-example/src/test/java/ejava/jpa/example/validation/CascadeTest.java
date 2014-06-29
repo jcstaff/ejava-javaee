@@ -3,7 +3,9 @@ package ejava.jpa.example.validation;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -27,7 +29,7 @@ public class CascadeTest extends JPATestBase {
 	Validator val = vf.getValidator();
 
 	/**
-	 * This test validation of two related POJOs. The parent is valid and
+	 * This tests validation of two related POJOs. The parent is valid and
 	 * two of the children have 1 violation each. We expect the validation
 	 * to be able to cascade across the relationship and validate both the 
 	 * parent and child beans.
@@ -37,7 +39,7 @@ public class CascadeTest extends JPATestBase {
 		log.info("*** testPOJOCascade ***");
 		
 		Purchase p = new Purchase()
-			.setDate(new Date())
+			.setDate(new GregorianCalendar(2013, Calendar.JANUARY, 1).getTime()) //making sure in past
 			.addItem(new PurchaseItem()
 						.setAmount(new BigDecimal(60))
 						.setCount(2))
