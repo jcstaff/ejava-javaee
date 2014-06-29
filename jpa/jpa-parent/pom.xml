@@ -291,6 +291,32 @@
         </profile>
 
         <profile>
+            <id>localdev-deploy</id>
+            <properties>
+                <site.server>localdev.ejava.info</site.server>
+                <devsite.server>localdev.ejava.info</devsite.server>
+                <site.name>ejava-javaee</site.name>
+            </properties>
+            <distributionManagement>
+                <site>
+                    <id>localdev.website</id>
+                    <name>localdev website</name>
+                    <url>scpexe://${site.server}/var/www/ejava.info/html/sites/${site.name}</url>
+                </site>
+                <repository>
+                    <id>test-releases</id>
+                    <name>Test Releases</name>
+                    <url>https://${site.server}/nexus/content/repositories/test-releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>test-snapshots</id>
+                    <name>Test Snapshots</name>
+                    <url>https://${site.server}/nexus/content/repositories/test-snapshots/</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
             <id>webdev-deploy</id>
             <properties>
                 <site.server>webdev.apl.jhu.edu</site.server>
