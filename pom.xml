@@ -4,7 +4,7 @@
     <parent>
         <groupId>ejava.build</groupId>
         <artifactId>dependencies</artifactId>
-        <version>3.0.2014.1</version>
+        <version>3.0.2014.2-SNAPSHOT</version>
         <relativePath>ejava-build/dependencies</relativePath>
     </parent>
 
@@ -41,23 +41,30 @@
         <module>coursedocs</module>
     </modules>
 
-    <url>http://srau.ejava.info/sites/ejava-jpa</url>
+    <url>http://${site.server}/ejava-javaee</url>
+
+    <organization>
+        <name>
+            John's Hopkins University, Engineering Programs for Professionals 
+        </name>
+        <url>http://ep.jhu.edu</url>
+    </organization>
     <mailingLists>
         <mailingList>
             <name>class newsgroup (for class use)</name>
-            <subscribe>https://corpteams.sranet.sra.com/support/sra-u/Spring2014/api/Lists/Team%20Discussion</subscribe>
+            <subscribe>http://groups.yahoo.com/group/ejava_class/</subscribe>
         </mailingList>
     </mailingLists>
     <scm>
-        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/jpa-class</url>
+        <url>https://jcstaff@github.com/jcstaff/ejava-javaee/tree/master</url>
         <connection>scm:git:git@github.com:jcstaff/ejava-javaee.git</connection>
         <developerConnection>scm:git:git@github.com:jcstaff/ejava-javaee.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <ciManagement>
         <system>jenkins</system>
-        <url>https://srau.ejava.info/jenkins/</url>
+        <url>https://${devsite.server}/jenkins/</url>
     </ciManagement>
 
     <developers>
@@ -79,7 +86,7 @@
     </contributors>
 
     <repositories>
-        <!-- needed to resolve released parents -->
+        <!-- needed to resolve released parents 
         <repository>
             <id>srau-ejava</id>
             <name>sra-u ejava repository</name>
@@ -88,6 +95,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+             -->
     </repositories>
 
     <build>
@@ -179,42 +187,50 @@
 
         <profile>
             <id>webdev-deploy</id>
+            <properties>
+                <site.server>webdev.apl.jhu.edu</site.server>
+                <devsite.server>dev5.ejava.info</devsite.server>
+            </properties>
             <distributionManagement>
                 <site>
                     <id>webdev.website</id>
                     <name>ejava JHU webdev website</name>
-                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/ejava-javaee</url>
+                    <url>scpexe://${site.server}/home/jcs/public_html/ejava-javaee</url>
                 </site>
                 <repository>
                     <id>webdev.repository</id>
                     <name>ejava JHU repository</name>
-                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/maven2</url>
+                    <url>scpexe://${site.server}/home/jcs/public_html/maven2</url>
                 </repository>
                 <snapshotRepository>
                     <id>webdev.snapshot.repo</id>
                     <name>ejava JHU snapshot repository</name>
-                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/maven2-snapshot</url>
+                    <url>scpexe://${site.server}/home/jcs/public_html/maven2-snapshot</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
         </profile>
         <profile>
             <id>test-deploy</id>
+            <properties>
+                <site.server>webdev.apl.jhu.edu</site.server>
+                <devsite.server>dev5.ejava.info</devsite.server>
+            </properties>
             <distributionManagement>
                 <site>
                     <id>webdev.website</id>
                     <name>ejava JHU webdev website</name>
-                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/ejava-javaee</url>
+                    <url>scpexe://${site.server}/home/jcs/public_html/test-deploy/ejava-javaee</url>
                 </site>
                 <repository>
                     <id>webdev.repository</id>
                     <name>ejava JHU repository</name>
-                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2</url>
+                    <url>scpexe://${site.server}/home/jcs/public_html/test-deploy/maven2</url>
                 </repository>
                 <snapshotRepository>
                     <id>webdev.snapshot.repo</id>
                     <name>ejava JHU snapshot repository</name>
-                    <url>scpexe://webdev.apl.jhu.edu/home/jcs/public_html/test-deploy/maven2-snapshot</url>
+                    <url>scpexe://${site.server}/home/jcs/public_html/test-deploy/maven2-snapshot</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
@@ -222,23 +238,24 @@
         <profile>
             <id>jpa-deploy</id>
             <properties>
-                <jpa.site.server>srau.ejava.info</jpa.site.server>
+                <site.server>srau.ejava.info</site.server>
+                <devsite.server>srau.ejava.info</devsite.server>
             </properties>
             <distributionManagement>
                 <site>
                     <id>ejava-jpa.website</id>
-                    <name>SRA-U ejava website</name>
-                    <url>scpexe://${jpa.site.server}/var/www/ejava.info/html/sites/ejava-jpa</url>
+                    <name>JPA ejava website</name>
+                    <url>scpexe://${site.server}/var/www/ejava.info/html/sites/ejava-jpa</url>
                 </site>
                 <repository>
                     <id>srau-releases</id>
-                    <name>SRA-U Releases</name>
-                    <url>https://${jpa.site.server}/nexus/content/repositories/srau-releases/</url>
+                    <name>JPA Releases</name>
+                    <url>https://${site.server}/nexus/content/repositories/srau-releases/</url>
                 </repository>
                 <snapshotRepository>
                     <id>srau-snapshots</id>
-                    <name>SRA-U Snapshots</name>
-                    <url>https://${jpa.site.server}/nexus/content/repositories/srau-snapshots/</url>
+                    <name>JPA Snapshots</name>
+                    <url>https://${site.server}/nexus/content/repositories/srau-snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
@@ -246,23 +263,24 @@
         <profile>
             <id>jpatest-deploy</id>
             <properties>
-                <jpa.site.server>srau.ejava.info</jpa.site.server>
+                <site.server>srau.ejava.info</site.server>
+                <devsite.server>srau.ejava.info</devsite.server>
             </properties>
             <distributionManagement>
                 <site>
                     <id>ejava-jpa.website</id>
-                    <name>SRA-U ejava website</name>
-                    <url>scpexe://${jpa.site.server}/var/www/ejava.info/html/test-sites/ejava-jpa</url>
+                    <name>JPA ejava website</name>
+                    <url>scpexe://${site.server}/var/www/ejava.info/html/test-sites/ejava-jpa</url>
                 </site>
                 <repository>
                     <id>test-releases</id>
-                    <name>SRA-U Releases</name>
-                    <url>https://${jpa.site.server}/nexus/content/repositories/test-releases/</url>
+                    <name>JPA Releases</name>
+                    <url>https://${site.server}/nexus/content/repositories/test-releases/</url>
                 </repository>
                 <snapshotRepository>
                     <id>test-snapshots</id>
-                    <name>SRA-U Snapshots</name>
-                    <url>https://${jpa.site.server}/nexus/content/repositories/test-snapshots/</url>
+                    <name>JPA Snapshots</name>
+                    <url>https://${site.server}/nexus/content/repositories/test-snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>
