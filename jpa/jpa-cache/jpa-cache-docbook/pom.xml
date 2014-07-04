@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ejava.jpa</groupId>
+        <artifactId>jpa-cache</artifactId>
+        <version>3.0.2014.2-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jpa-cache-docbook</artifactId>
+    <packaging>pom</packaging>
+
+    <name>JPA Cache::Notes</name>
+    <description>
+        This project provides discussion notes for JPA Caching.
+    </description>
+    
+    <properties>
+       <doc.base>jpa-cache</doc.base>
+       <content.version>v2014-05-06</content.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

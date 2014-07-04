@@ -4,7 +4,7 @@
     <parent>
         <groupId>ejava</groupId>
         <artifactId>ejava-root</artifactId>
-        <version>3.0.2014.1-SNAPSHOT</version>
+        <version>3.0.2014.2-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -25,25 +25,25 @@
         <profile>
             <id>docs</id>
             <modules>
-            <!--
                 <module>605-784-docbook</module>
                 <module>javaee-intro-docbook</module>
                 <module>605-784-devenv-setup-docbook</module>
-                <module>605-784-site</module>
-                -->
                 <module>devenv-docbook</module>
+                <module>605-784-site</module>
+            <!--
                 <module>jpa-docbook</module>
                 <module>jpa-devenv-setup-docbook</module>
                 <module>jpa-site</module>
+                -->
             </modules>
         </profile>
 
         <profile>
             <id>site</id>
             <modules>
-                <module>jpa-site</module>
-            <!--
                 <module>605-784-site</module>
+            <!--
+                <module>jpa-site</module>
                  -->
             </modules>
         </profile>

@@ -1,20 +1,26 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
 
-<chapter id="jpa-entityex-setup">
+<chapter id="jpa-relationex-setup">
     <title>JPA Entity Exercise Setup</title>
         
-    <section id="jpa-entityex-maven">
+    <section id="jpa-relationex-setup-maven">
         <title>Setup Maven Project</title>
         <para>The setup for this exercise will use a maven archetype process to build you the 
            shell of a JPA module to perform these exercises. The module can be created
            anywhere, but if you create it within a directory that already has a pom.xml,
            the archetype will attempt to integrate the new module as a sub-module of the 
            existing parent.</para>
-        
+
+            <para>
+                <ulink type="video" url="https://www.youtube.com/watch?v=Yv2xctJxE-w&amp;list=PL4AFF701184976B25">TEST YOUTUBE LINK</ulink>
+            </para>
+          
+
         <itemizedlist spacing="compact">
             <listitem><para>Add the following to your .m2/settings.xml file. This will allow you to 
                 resolve the exercise archetype and set a default database for the exercise.</para>
+                
 <programlisting language=""><![CDATA[
     <profiles>
        <profile>

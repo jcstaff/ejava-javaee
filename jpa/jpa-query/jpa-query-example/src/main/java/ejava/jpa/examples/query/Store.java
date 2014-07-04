@@ -1,11 +1,12 @@
 package ejava.jpa.examples.query;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import javax.persistence.*;
 
-@Entity @Table(name="ORMQL_STORE")
+@Entity @Table(name="JPAQL_STORE")
 public class Store {
     @Id @GeneratedValue 
     @Column(name="STORE_ID")

@@ -41,8 +41,8 @@ Exercise: Entity Manager
 ** {Part A}: Setup and Start Database
 
     * Prepare your environment to run the database in server mode for this
-    exercise by following the instructions defined in 
-    {{{../../coursedocs/605-784-site/docs/content/html/devenv-h2-setup.html}Exercise 0}}. 
+    exercise by following the instructions defined in the development environment
+    setup exercise. 
 
     * Start the database and web server server in a directory where you wish 
     to create database files. Your h2.jar file source be located in 
@@ -118,7 +118,7 @@ Password:
 ---
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.source.version>1.6</java.source.version>
+        <java.source.version>1.7</java.source.version>
         <java.target.version>1.7</java.target.version>
 
         <jboss.host>localhost</jboss.host>
@@ -342,11 +342,7 @@ Password:
 ---
 
     * Add a definition for the maven-surefire-plugin so we can set 
-    properties needed for testing. At this point, we are just allowing
-    the argLine defined in the settings.xml to be optionally specified.
-    We do not yet have a need for system properties, but the example
-    below shows how -Dname=value would be specified within the 
-    plugin configuration.
+    properties needed for testing. 
 
 ---
     <build>
@@ -370,11 +366,11 @@ Password:
 
         [Note:] At this point, we are just allowing the argLine defined 
         elsewhere to be optionally specified (for debugging).  We do not 
-        yet have a need for system properties, but if we did we would
-        add a plugin (not pluginManagement) definition in the child 
-        pom to include any necessary system properties to be passed to
-        the unit test. This won't hurt anything if you add this to 
-        your current pom except cause it to pass the extra system properties.
+        yet have a need for system properties, but if we did 
+        the example shows how -Dname=value would be specified within the 
+        plugin configuration. The plugin (not pluginManagement) definition 
+        in the child pom will include any necessary system properties
+        to be passed to the unit test. 
 
 ---
     <build>
@@ -397,7 +393,7 @@ Password:
 
     * Add a set of profiles that define H2 and Hibernate as our database and 
     persistence provider. In the example below we are adding two database
-    definitions (that happpen to both be the same vendor). One requires the
+    definitions (that happen to both be the same vendor). One requires the
     server to be running and the other uses an embedded server and a local
     filesystem. The embedded version can be easier to test with. The server
     version can be easier to debug. Activate which one you want with either
@@ -566,7 +562,7 @@ DROP TABLE EM_AUTO if EXISTS;
 ---
 
     * Next add the potentially project-specific portion to a build-plugins-plugin
-    section that would normally be in the child module. However, we you add
+    section that would normally be in the child module. However, when you add
     this to the module -- do so within a profile that is wired to always run
     except when the system property -DskipTests is defined. This is a standard
     maven system property that builders use to build the module and bypass both
@@ -804,7 +800,7 @@ $ mvn clean process-test-classes
 ---
 
     * Create a (Plain Old Java Object (POJO)) Class to represent an
-    automobile. Use class annotations to prvide the following:
+    automobile. Use class annotations to provide the following:
 
         * @Entity annotation on the class to tell persistence provider 
         this is part of persistence unit
@@ -816,11 +812,6 @@ $ mvn clean process-test-classes
         mileage:int.
 
         * a public getId():long to return the id field.
-
-        * a private setId(long) to set the primary key. This will be called
-        by the persistence provider. You may want to add a 
-        @SuppressWarnings("unused") if your compiler is warning you that
-        the private setId() is not being used within the class.
 
         * @Id annotation on the id attribute to tell the persistence 
         provider the id property is the primary key and to use 
@@ -950,7 +941,7 @@ public class Auto implements Serializable {
 ---
 
     * Create a hibernate.properties file in src/test/resources to hold 
-    information we want to suport testing, but may not want to be 
+    information we want to support testing, but may not want to be 
     part of the deployed artifact. Leave the volatile values as variables
     so they can be expanded into the target tree during compile time.
 
@@ -2033,7 +2024,7 @@ $ mkdir ../jpa-parent
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.source.version>1.6</java.source.version>
+        <java.source.version>1.7</java.source.version>
         <java.target.version>1.7</java.target.version>
 
         <jboss.host>localhost</jboss.host>

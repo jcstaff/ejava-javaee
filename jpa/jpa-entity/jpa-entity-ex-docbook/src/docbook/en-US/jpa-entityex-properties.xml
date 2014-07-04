@@ -17,8 +17,7 @@
 
         <orderedlist>
             <listitem><para>Copy your Animal.java class to Cat.java</para>
-<programlisting language="java"><![CDATA[
-package myorg.entityex.mapped;
+<programlisting language="java"><![CDATA[package myorg.entityex.mapped;
 
 import java.util.Date;
 
@@ -36,13 +35,11 @@ public class Cat {
     }
     
     public int getId() { return id; }
-...
-]]></programlisting>
+...]]></programlisting>
             </listitem>
 
             <listitem><para>Copy your Animal2.java class to Cat2.java</para>
-<programlisting language="java"><![CDATA[
-package myorg.entityex.annotated;
+<programlisting language="java"><![CDATA[package myorg.entityex.annotated;
 
 import java.util.Date;
 
@@ -62,13 +59,11 @@ public class Cat2 {
     
     @javax.persistence.Id
     public int getId() { return id; }
-...
-]]></programlisting>
+...]]></programlisting>
             </listitem>
 
             <listitem><para>Name the new Cat entity class in the Animal-orm.xml</para>
-<programlisting language="xml"><![CDATA[
-# src/main/resources/orm/Animal-orm.xml
+<programlisting language="xml"><![CDATA[# src/main/resources/orm/Animal-orm.xml
 
     <entity class="myorg.entityex.mapped.Animal">
 ...
@@ -76,27 +71,26 @@ public class Cat2 {
         <attributes>
             <id name="id"/>
         </attributes>
-    </entity>
-]]></programlisting>
+    </entity>]]></programlisting>
+    
             </listitem>
 
             <listitem><para>Name the new Cat2 entity class in the persistence.xml</para>
-<programlisting language="xml"><![CDATA[
-# src/test/resources/META-INF/persistence.xml
+<programlisting language="xml"><![CDATA[# src/test/resources/META-INF/persistence.xml
 
         <mapping-file>orm/Animal-orm.xml</mapping-file>
         <class>myorg.entityex.Auto</class>
         <class>myorg.entityex.annotated.Animal2</class>
-        <class>myorg.entityex.annotated.Cat2</class>
-]]></programlisting>
+        <class>myorg.entityex.annotated.Cat2</class>]]></programlisting>
+        
+        
             </listitem>
 
             <listitem><para>Rebuild your module form the command line and observe the 
                 create schema generated for Cat and Cat2. Notice that the JPA provider
                 used the class name as the default entity name and will be attempting to
                 map the entity to a database table by the same name as the entity.</para>
-<programlisting language=""><![CDATA[
-$ more target/classes/ddl/*
+<programlisting language=""><![CDATA[$ more target/classes/ddl/*
 ...
    create table Cat (
         id integer not null,
@@ -112,8 +106,9 @@ $ more target/classes/ddl/*
         name varchar(255),
         weight double not null,
         primary key (id)
-    );
-]]></programlisting>
+    );]]></programlisting>
+    
+    
             </listitem>
 
             <listitem><para>Add a table element to the orm.xml definition to 
@@ -127,20 +122,17 @@ $ more target/classes/ddl/*
 
             <listitem><para>Add a @javax.persistence.Table annotation to the Cat2
                 class to map instances to the ENTITYEX_CAT table.</para>
-<programlisting language="java"><![CDATA[
-@javax.persistence.Entity
+<programlisting language="java"><![CDATA[@javax.persistence.Entity
 @javax.persistence.Table(name="ENTITYEX_CAT")
 public class Cat2 {
-    private int id;
-]]></programlisting>
+    private int id;]]></programlisting>
             </listitem>
 
 
             <listitem><para>Rebuild your module form the command line and observe the 
                 create schema generated for Cat and Cat2. Notice now that we have mapped
                 two entity classes to the same table using a custom table name.</para>
-<programlisting language=""><![CDATA[
-$ more target/classes/ddl/*
+<programlisting language=""><![CDATA[$ more target/classes/ddl/*
 ...
    create table ENTITYEX_CAT (
         id integer not null,
@@ -148,22 +140,19 @@ $ more target/classes/ddl/*
         name varchar(255),
         weight double not null,
         primary key (id)
-    );
-]]></programlisting>
+    );]]></programlisting>
             </listitem>
 
             <listitem><para>Map the id property for both the Cat and Cat2 to the CAT_ID
                 column. Also have the persistence provider automatically generate a
                 value for the primary key during the persist(). The exercise will go
                 into generated primary key types in more detaiu</para>
-<programlisting language="java"><![CDATA[
-    @javax.persistence.Id
+<programlisting language="java"><![CDATA[    @javax.persistence.Id
     @javax.persistence.Column(name="CAT_ID")
     @javax.persistence.GeneratedValue
-    private int id;
-]]></programlisting>
-<programlisting language="xml"><![CDATA[
-    <entity class="myorg.entityex.mapped.Cat">
+    private int id;]]></programlisting>
+    
+<programlisting language="xml"><![CDATA[    <entity class="myorg.entityex.mapped.Cat">
         <table name="ENTITYEX_CAT"/>
         <attributes>
             <id name="id">
@@ -171,8 +160,7 @@ $ more target/classes/ddl/*
                 <generated-value/>
             </id>
         </attributes>
-    </entity>
-]]></programlisting>
+    </entity>]]></programlisting>
             </listitem>
 
             <listitem><para>Make the name column mandatory (nullable=false) and 
@@ -180,23 +168,20 @@ $ more target/classes/ddl/*
                 property assignments are only useful as documentation and generating
                 schema. Many of the column properties are not used at runtime by the 
                 provider.</para>
-<programlisting language="java"><![CDATA[
-    @javax.persistence.Column(nullable=false, length=20)
-    private String name;
-]]></programlisting>
-<programlisting language="xml"><![CDATA[
-            <basic name="name">
+<programlisting language="java"><![CDATA[    @javax.persistence.Column(nullable=false, length=20)
+    private String name;]]></programlisting>
+    
+    
+<programlisting language="xml"><![CDATA[            <basic name="name">
                 <column nullable="false" length="20"/>
-            </basic>
-]]></programlisting>
+            </basic>]]></programlisting>
             </listitem>
 
             <listitem><para>Have the weight column stored with a precision of 
                 3 digits, with 1 digit (scale) to the right of the decimal place.
                 You will need to change the datatype of the mapped property to
                 BigDecimal to fully leverage this capability.</para>
-<programlisting language="java"><![CDATA[
-# src/main/java/myorg/entityex/annotated/Cat2.java
+<programlisting language="java"><![CDATA[# src/main/java/myorg/entityex/annotated/Cat2.java
 
     @javax.persistence.Column(precision=3, scale=1)  //10.2lbs
     private BigDecimal weight;
@@ -204,31 +189,27 @@ $ more target/classes/ddl/*
     public Cat2(String name, Date dob, BigDecimal weight) {
 ...
     public BigDecimal getWeight() { return weight; }
-    public void setWeight(BigDecimal weight) {
-]]></programlisting>
-<programlisting language="java"><![CDATA[
-# src/main/java/myorg/entityex/mapped/Cat.java
+    public void setWeight(BigDecimal weight) {]]></programlisting>
+
+<programlisting language="java"><![CDATA[# src/main/java/myorg/entityex/mapped/Cat.java
 
     private BigDecimal weight;
 ...
     public Cat(String name, Date dob, BigDecimal weight) {
 ...
     public BigDecimal getWeight() { return weight; }
-    public void setWeight(BigDecimal weight) {
-]]></programlisting>
-<programlisting language="xml"><![CDATA[
-# src/main/resources/orm/Animal-orm.xml
+    public void setWeight(BigDecimal weight) {]]></programlisting>
+    
+<programlisting language="xml"><![CDATA[# src/main/resources/orm/Animal-orm.xml
             <basic name="weight">
                 <column precision="3" scale="1"/>
-            </basic>
-]]></programlisting>
+            </basic>]]></programlisting>
             </listitem>
 
             <listitem><para>Rebuild the module from the command line and 
                observe the database schema generated generated for the 
                ENTITEX_CAT table.</para>
-<programlisting language=""><![CDATA[
-# target/classes/ddl/entityEx-createJPA.ddl
+<programlisting language=""><![CDATA[# target/classes/ddl/entityEx-createJPA.ddl
 
     create table ENTITYEX_CAT (
         CAT_ID integer generated by default as identity,
@@ -236,8 +217,8 @@ $ more target/classes/ddl/*
         name varchar(20) not null,
         weight decimal(3,1),
         primary key (CAT_ID)
-    );
-]]></programlisting>
+    );]]></programlisting>
+    
                 <para>Notice how</para>
                 <itemizedlist spacing="compact">
                     <listitem><para>All defaults not overwritten are preserved (e.g., column names)</para></listitem>
@@ -263,44 +244,36 @@ $ more target/classes/ddl/*
             FIELD access was chosen by the provider by the fact that our annotated 
             class placed the @Id annotation on a Java attribute and not a Java getter().
         </para>
-<programlisting language="java"><![CDATA[
-# implies FIELD access
+<programlisting language="java"><![CDATA[# implies FIELD access
 
     @javax.persistence.Id
     @javax.persistence.Column(name="CAT_ID")
     @javax.persistence.GeneratedValue
     private int id;
 ...    
-    public int getId() { return id; }
-]]></programlisting>
+    public int getId() { return id; }]]></programlisting>
 
         <para>If moved the @Id property definitions to the getter(), then the 
             access would have been switched to PROPERTY. That was how JPA 1.0
             annotated classed worked and it was always one way or another.</para>
-<programlisting language="java"><![CDATA[
-# implies PROPERTY access
+<programlisting language="java"><![CDATA[# implies PROPERTY access
 
     private int id;
 ...    
     @javax.persistence.Id
     @javax.persistence.Column(name="CAT_ID")
     @javax.persistence.GeneratedValue
-    public int getId() { return id; }
-]]></programlisting>
+    public int getId() { return id; }]]></programlisting>
 
         <para>Since it was always one way or the other with JPA 1.0, the specification
             in the orm.xml file was placed on the root element of the entity</para>
-<programlisting language="xml"><![CDATA[
-    <entity class="myorg.entityex.mapped.Cat"
-        access="FIELD">
-]]></programlisting>
+<programlisting language="xml"><![CDATA[    <entity class="myorg.entityex.mapped.Cat"
+        access="FIELD">]]></programlisting>
 
         <para>Starting with JPA 2.0, we can also make the specification more explicit
             (like the XML technique) with the addition of the @Access annotation</para>
-<programlisting language="java"><![CDATA[
-@javax.persistence.Access(javax.persistence.AccessType.FIELD)
-public class Cat2 {
-]]></programlisting>
+<programlisting language="java"><![CDATA[@javax.persistence.Access(javax.persistence.AccessType.FIELD)
+public class Cat2 {]]></programlisting>
 
 
         <para>Although switching between FIELD and PROPERTY access was always a 
@@ -314,22 +287,20 @@ public class Cat2 {
         <orderedlist>
             <listitem><para>Update the annotated Cat2 entity to store weight as a double
                 and expose it to the provider as a BigDecimal.</para>
-<programlisting language="java"><![CDATA[
-    private double weight;
+<programlisting language="java"><![CDATA[    private double weight;
 ...
     public BigDecimal getWeight() {
         return new BigDecimal(weight); 
     }
     public void setWeight(BigDecimal weight) {
         this.weight = weight==null ? 0 : weight.doubleValue();
-    }
-]]></programlisting>
+    }]]></programlisting>
+    
             </listitem>
 
             <listitem><para>Add a logger and some log statements to help identify the calls
                 to the getter and setter methods</para>
-<programlisting language="java"><![CDATA[
-# src/main/java/myorg/entityex/annotated/Cat2.java
+<programlisting language="java"><![CDATA[# src/main/java/myorg/entityex/annotated/Cat2.java
 
     private static final Log log = LogFactory.getLog(Cat2.class);
 ...
@@ -340,8 +311,7 @@ public class Cat2 {
     public void setWeight(BigDecimal weight) {
         log.debug("annotated.setWeight()");
         this.weight = weight==null ? 0 : weight.doubleValue();
-    }
-]]></programlisting>
+    }]]></programlisting>
             </listitem>
 
             <listitem><para>Add the following test method to your AnimalTest. By persisting
@@ -349,8 +319,7 @@ public class Cat2 {
                 By clearing the persistence unit of the entity prior to executing the find,
                 we will force the provider to instantiate a new entity instance and set the 
                 properties within the entity.</para>
-<programlisting language="java"><![CDATA[
-# src/test/java/myorg/entityex/AnimalTest.java
+<programlisting language="java"><![CDATA[# src/test/java/myorg/entityex/AnimalTest.java
 
     @Test
     public void testCreateCatAnnotated() {
@@ -359,13 +328,11 @@ public class Cat2 {
         em.persist(cat);                                                 //get provider to call getters
         em.flush(); em.detach(cat);
         cat = em.find(myorg.entityex.annotated.Cat2.class, cat.getId()); //get provider to call setters
-    }
-]]></programlisting>
+    }]]></programlisting>
             </listitem>
 
             <listitem><para>Run your new test method and observe the calls to getWeight and setWeight printed.</para>
-<programlisting language="java"><![CDATA[
-$ mvn clean test -Dtest=myorg.entityex.AnimalTest#testCreateCatAnnotated
+<programlisting language="java"><![CDATA[$ mvn clean test -Dtest=myorg.entityex.AnimalTest#testCreateCatAnnotated
 ...
 -testCreateCatAnnotated
  -annotated.getWeight() //<----------------
@@ -388,15 +355,13 @@ Hibernate:
         ENTITYEX_CAT cat2x0_ 
     where
         cat2x0_.CAT_ID=?
- -annotated.setWeight() //<----------------
-]]></programlisting>
+ -annotated.setWeight() //<----------------]]></programlisting>
             </listitem>
 
             <listitem><para>Make the same code changes for weight and debugging in the mapped entity class.
                These changes expose weight to the provider as a different type than it is stored locally.
                The debug will help use track the calls to the getter and setter.</para>
-<programlisting language="java"><![CDATA[
-# src/main/java/myorg/entityex/mapped/Cat.java
+<programlisting language="java"><![CDATA[# src/main/java/myorg/entityex/mapped/Cat.java
 
 public class Cat {
     private static final Log log = LogFactory.getLog(Cat.class);
@@ -412,29 +377,24 @@ public class Cat {
     public void setWeight(BigDecimal weight) {
         log.debug("mapped.setWeight()");
         this.weight = weight==null ? 0 : weight.doubleValue();
-    }
-]]></programlisting>
+    }]]></programlisting>
             </listitem>
 
             <listitem><para>Add the following test method to your JUnit class.</para>
-<programlisting language="java"><![CDATA[
-    @Test
+<programlisting language="java"><![CDATA[    @Test
     public void testCreateCatMapped() {
         log.info("testCreateCatMapped");
         myorg.entityex.mapped.Cat cat = new myorg.entityex.mapped.Cat("fluffy", null, 99.9);
         em.persist(cat);                                                 //get provider to call getters
         em.flush(); em.detach(cat);
         cat = em.find(myorg.entityex.mapped.Cat.class, cat.getId()); //get provider to call setters
-    }
-]]></programlisting>
+    }]]></programlisting>
             </listitem>
 
             <listitem><para>Add the access="PROPERTY" to the weight definition within the orm.xml</para>
-<programlisting language="xml"><![CDATA[
-            <basic name="weight" access="PROPERTY">
+<programlisting language="xml"><![CDATA[            <basic name="weight" access="PROPERTY">
                 <column precision="3" scale="1"/>
-            </basic>
-]]></programlisting>
+            </basic>]]></programlisting>
             <note>
                 <para>I had to remove the access="FIELD" attribute from the entity element for 
                     the provider to honor the per-property specification at the weight level.</para>
@@ -443,8 +403,7 @@ public class Cat {
 
             <listitem><para>Build and run the test for the mapped version of the class. Look for the 
                 debug statements coming from the getter and setter</para>
-<programlisting language=""><![CDATA[
- -testCreateCatMapped
+<programlisting language=""><![CDATA[ -testCreateCatMapped
  -mapped.getWeight() //<----------------
 Hibernate: 
     insert 
@@ -465,8 +424,7 @@ Hibernate:
         ENTITYEX_CAT cat0_ 
     where
         cat0_.CAT_ID=?
- -mapped.setWeight() //<----------------
-]]></programlisting>
+ -mapped.setWeight() //<----------------]]></programlisting>
             </listitem>
 
         </orderedlist>
