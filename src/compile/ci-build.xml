@@ -7,7 +7,7 @@
     <property name="JBOSS7_HOME" value="/opt/jboss-as-7.1.1.Final"/>
 
     <property name="jboss.server" value="standard"/>
-    <property name="jboss.servlet.port" value="8080"/>
+    <property name="jboss.http.port" value="8080"/>
     <property name="start.timeout" value="100"/>
 
     <target name="jboss5.configure" if="jboss5">
@@ -25,7 +25,7 @@
         <property name="jboss.console" 
                   value="${jboss.server.home}/log/console.log"/>
         <property name="jboss.url" 
-                  value="http://${jboss.host}:${jboss.servlet.port}/index.html"/>
+                  value="http://${jboss.host}:${jboss.http.port}/index.html"/>
         <property name="jboss.shutdown.address.option" value="-s"/>
         <echo message="using JBoss 5"/>
     </target>
@@ -44,7 +44,7 @@
         <property name="jboss.console" 
                   value="${jboss.server.home}/log/console.log"/>
         <property name="jboss.url" 
-                  value="http://${jboss.host}:${jboss.servlet.port}/index.html"/>
+                  value="http://${jboss.host}:${jboss.http.port}/index.html"/>
         <property name="jboss.shutdown.address.option" value="-o"/>
         <echo message="using JBoss 6"/>
     </target>
@@ -60,7 +60,7 @@
         <property name="jboss.console" 
                   value="${jboss.server.home}/log/console.log"/>
         <property name="jboss.url" 
-                  value="http://${jboss.host}:${jboss.servlet.port}/index.html"/>
+                  value="http://${jboss.host}:${jboss.http.port}/index.html"/>
         <property name="jboss.shutdown.address.option" value="-o"/>
         -->
         <echo message="using JBoss 7"/>

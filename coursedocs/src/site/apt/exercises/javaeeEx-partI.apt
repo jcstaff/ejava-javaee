@@ -671,7 +671,7 @@ public class RegistrarHandlerServlet extends HttpServlet {
     <env-entry>
         <env-entry-name>httpPort</env-entry-name>
         <env-entry-type>java.lang.Integer</env-entry-type>
-        <env-entry-value>${jboss.servlet.port}</env-entry-value>
+        <env-entry-value>${jboss.http.port}</env-entry-value>
     </env-entry>    
 ---
 
@@ -698,7 +698,7 @@ $ cat javaeeExWAR/pom.xml
             </plugin>
 ---
 
-    [[1]] Add a definition of the jboss.servlet.port to the parent
+    [[1]] Add a definition of the jboss.http.port to the parent
     pom.
 
 ---
@@ -707,7 +707,7 @@ $ cat pom.xml
     <properties>
     ...
 
-        <jboss.servlet.port>8080</jboss.servlet.port>
+        <jboss.http.port>8080</jboss.http.port>
 ---
 
     [[1]] Specify the version of the war plugin since we need to 

@@ -26,9 +26,9 @@
             <properties>
                 <jboss.protocol>http</jboss.protocol>
                 <jboss.host>localhost</jboss.host>
-                <jboss.servlet.port>8080</jboss.servlet.port>
+                <jboss.http.port>8080</jboss.http.port>
                 <jboss.user>admin</jboss.user>
-                <jboss.password>password</jboss.password>
+                <jboss.password>password1!</jboss.password>
                 <db.host>${jboss.host}</db.host>
             </properties>                                  
         </profile>        
@@ -44,6 +44,20 @@
             <properties>
                 <jboss.home>c:/apps/jboss-6.1.0.Final</jboss.home>
                 <jboss.server>ejava-jboss6</jboss.server>
+            </properties>                                  
+        </profile>        
+        <profile>
+            <id>jboss7</id>
+            <properties>
+                <jboss.home>c:/apps/jboss-eap-6.1</jboss.home>
+                <jboss.server>ejava-jboss6</jboss.server>
+            </properties>                                  
+        </profile>        
+        <profile>
+            <id>jboss6</id>
+            <properties>
+                <jboss.home>c:/apps/wildfly-8.1.0.Final</jboss.home>
+                <jboss.server>ejava-jboss8</jboss.server>
             </properties>                                  
         </profile>        
 
@@ -92,7 +106,7 @@
 
     <activeProfiles>
         <activeProfile>ejavaPC</activeProfile>
-        <activeProfile>jboss6</activeProfile>
+        <activeProfile>jboss8</activeProfile>
         <activeProfile>hsql</activeProfile>
         <activeProfile>webdev-repositories</activeProfile>
     </activeProfiles>

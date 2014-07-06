@@ -2,7 +2,7 @@ package ejava.examples.ejbwar.inventory.rs;
 
 import java.io.IOException;
 
-
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -29,8 +29,12 @@ import org.apache.commons.logging.LogFactory;
 public class TxFilter implements Filter {
     private static final Log log = LogFactory.getLog(TxFilter.class);
     @Inject
-    private static UserTransaction tx;
-
+    private UserTransaction tx;
+    
+    @PostConstruct
+    public void init() {
+    	log.debug("tx="+tx);
+    }
     
     public void doFilter(ServletRequest request, 
             ServletResponse response, 

@@ -14,78 +14,56 @@
   <description>
       This project aggregates several dependencies required for JBoss RMI
       clients. This was taken from 
-      https://github.com/jboss-developer/jboss-eap-quickstarts/blob/6.2.x/ejb-remote/client/pom.xml
-      however, the use of jboss.version=7.2.1.Final-redhat-10 had to be used instead 
-      of any of the 7.3.x versions.
+      https://github.com/wildfly/quickstart/blob/master/ejb-remote/client/pom.xml
    </description>
 
    <properties>
-        <jboss.javaee6.spec.version>3.0.2.Final</jboss.javaee6.spec.version>
+        <jboss.javaee7.spec.version>1.0.0.Final</jboss.javaee7.spec.version>
    </properties>
 
    <dependencyManagement>
       <dependencies>
-         <!-- Define the version of JBoss' Java EE 6 APIs we want to use -->
-         <!-- JBoss distributes a complete set of Java EE 6 APIs including
+         <!-- Define the version of JBoss' Java EE 7 APIs we want to use -->
+         <!-- JBoss distributes a complete set of Java EE 7 APIs including
             a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or
             a collection) of artifacts. We use this here so that we always get the correct
-            versions of artifacts. Here we use the jboss-javaee-6.0 stack (you can
-            read this as the JBoss stack of the Java EE 6 APIs). You can actually
-            use this stack with any version of JBoss AS that implements Java EE 6, not
-            just JBoss AS 7! -->
+            versions of artifacts. Here we use the jboss-javaee-7.0 stack (you can
+            read this as the JBoss stack of the Java EE 7 APIs). You can actually
+            use this stack with any version of WildFly that implements Java EE 7, not
+            just WildFly 8! -->
          <dependency>
             <groupId>org.jboss.spec</groupId>
-            <artifactId>jboss-javaee-6.0</artifactId>
-            <version>${jboss.javaee6.spec.version}</version>
+            <artifactId>jboss-javaee-7.0</artifactId>
+            <version>${jboss.javaee7.spec.version}</version>
             <type>pom</type>
             <scope>import</scope>
          </dependency>
 
          <dependency>
-             <groupId>org.jboss.as</groupId>
-             <artifactId>jboss-as-ejb-client-bom</artifactId>
-             <version>${jboss.version}</version>
+             <groupId>org.wildfly</groupId>
+             <artifactId>wildfly-ejb-client-bom</artifactId>
+             <version>${wildfly.version}</version>
              <type>pom</type>
              <scope>import</scope>
-         </dependency>
-
-         <dependency>
-             <groupId>org.jboss.as</groupId>
-             <artifactId>jboss-as-naming</artifactId>
-             <version>${jboss.version}</version>
          </dependency>
       </dependencies>
    </dependencyManagement>
 
     <dependencies>
-       <dependency>
-           <groupId>org.jboss.as</groupId>
-           <artifactId>jboss-as-naming</artifactId>
-           <exclusions>
-               <exclusion>
-                   <artifactId>log4j-jboss-logmanager</artifactId>
-                   <groupId>org.jboss.logmanager</groupId>
-               </exclusion>
-               <exclusion>
-                   <artifactId>jboss-logmanager</artifactId>
-                   <groupId>org.jboss.logmanager</groupId>
-               </exclusion>
-           </exclusions>
-       </dependency>
 
        <!-- Import the transaction spec API, we use runtime scope because we aren't using any direct
         reference to the spec API in our client code -->
       <dependency>
          <groupId>org.jboss.spec.javax.transaction</groupId>
-         <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+         <artifactId>jboss-transaction-api_1.2_spec</artifactId>
          <scope>runtime</scope>
       </dependency>
 
-      <!-- Import the EJB 3.1 API, we use runtime scope because we aren't using any direct
+      <!-- Import the EJB 3.x API, we use runtime scope because we aren't using any direct
        reference to EJB spec API in our client code -->
       <dependency>
          <groupId>org.jboss.spec.javax.ejb</groupId>
-         <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+         <artifactId>jboss-ejb-api_3.2_spec</artifactId>
          <scope>runtime</scope>
       </dependency>
 
@@ -103,7 +81,6 @@
            <artifactId>xnio-api</artifactId>
            <scope>runtime</scope>
        </dependency>
-
        <dependency>
            <groupId>org.jboss.xnio</groupId>
            <artifactId>xnio-nio</artifactId>
@@ -112,10 +89,10 @@
 
       <!-- The client needs JBoss remoting to access the server -->
        <dependency>
-            <groupId>org.jboss.remoting3</groupId>
+            <groupId>org.jboss.remoting</groupId>
             <artifactId>jboss-remoting</artifactId>
             <scope>runtime</scope>
-        </dependency>
+       </dependency>
 
       <!-- Remote EJB accesses can be secured -->
        <dependency>
@@ -131,11 +108,13 @@
            <scope>runtime</scope>
        </dependency>
 
-        <dependency>
-           <groupId>org.picketbox</groupId>
-           <artifactId>picketbox</artifactId>
-           <scope>runtime</scope>
-        </dependency>
+       <!-- used for non-EJB-specific, generic JNDI lookups -->
+       <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jboss-remote-naming</artifactId>
+            <scope>runtime</scope>
+       </dependency>
+
     </dependencies>
 
     <build>

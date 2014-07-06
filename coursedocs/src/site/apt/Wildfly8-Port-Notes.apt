@@ -1,0 +1,67 @@
+Porting from JBoss 6.x EAP (7.x) to Wildfly 8.1.0.Final
+
+These are the issues encountered and steps taken to port the ejava example
+source tree from JBoss 6.1 EAP to Wildfly 8.1.0.Final version prior to upgrading
+to any of the JavaEE 7 APIs (except an upgrade to JPA 2.1 had already been performed).
+
+    []
+
+
+* Key Issues
+
+    [[1]] The separate remoting interface (4447) used for JNDI and other 
+    RMI uses has been eliminated and replaced with their standard HTTP (8080)
+    interface. 
+    
+    * The jndi.properties#java.naming.provider.url was changed from/to the following
+    for standard JNDI-based lookups.
+
+---
+- remote://${jboss.host}:4447
++ http-remoting://${jboss.host}:8080
+---
+
+    * The jboss-ejb-client.properties#remote.connection.default.port changed 
+    from/to the following for EJBClient-based lookups
+
+---
+- remote.connection.default.port=4447
++ remote.connection.default.port=8080
+---
+
+    [[1]] All library references need to be updated. Libraries that use to be 
+    called jboss-as-xxx have been renamed to wildfly-xxx and all standards 
+    were updated from JavaEE 6 to JavaEE 7 versions. Specific changes were isolated
+    to ejava-build/jboss-rmi-client.
+
+* Issues
+
+    [[1]] The jboss.mgmt.port changed from 9999 to 9990. That required a change 
+    to the cargo deployer configuration.
+
+---
+          <properties>
+              <cargo.hostname>${jboss.mgmt.host}</cargo.hostname>
+-             <cargo.jboss.management.port>9999</cargo.jboss.management.port>
++             <cargo.jboss.management.port>9990</cargo.jboss.management.port>
+          </properties>
+---
+
+    [[1]] Fixed issue with example code attempting (and working in previous releases)
+    to @Inject a bean into a variable that was unnecessary declared static in a Servlet
+    Filter class.
+
+---
+- @Inject private static UserTransaction tx;
++ @Inject private UserTransaction tx;
+---
+
+    [[1]] JPA 2.1 requires different dependency
+
+---
+       <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+---

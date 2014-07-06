@@ -78,8 +78,7 @@
         <javax.el.version>2.2.4</javax.el.version>        
         <jaxb-api.version>2.1</jaxb-api.version>
         <jaxb-impl.version>2.1.9-brew</jaxb-impl.version>
-        <jboss.version>7.2.0.Final</jboss.version>
-        <jboss-as-client.version>${jboss.version}</jboss-as-client.version>
+        <wildfly.version>8.1.0.Final</wildfly.version>
         <jboss-kernel.version>2.0.6.GA</jboss-kernel.version>
         <jms.version>1.1</jms.version>
         <jnpserver.version>5.0.3.GA</jnpserver.version>
@@ -101,14 +100,15 @@
         <jboss.basedir>${jboss.home}/standalone</jboss.basedir>
         <jboss.host>localhost</jboss.host>
         <jboss.mgmt.host>${jboss.host}</jboss.mgmt.host>
-        <jboss.mgmt.port>9999</jboss.mgmt.port>
-        <jboss.naming.port>4447</jboss.naming.port>
+        <jboss.mgmt.port>9990</jboss.mgmt.port>
         <jboss.protocol>http</jboss.protocol>
-        <jboss.servlet.port>8080</jboss.servlet.port>
+        <jboss.http.port>8080</jboss.http.port>
+        <jboss.remoting.port>${jboss.http.port}</jboss.remoting.port>
+        <jboss.naming.port>${jboss.remoting.port}</jboss.naming.port>
         <db.host>${jboss.host}</db.host>
         <jboss.user>admin</jboss.user>
         <jboss.password>password1!</jboss.password>
-        <cargo.containerId>jboss71x</cargo.containerId>
+        <cargo.containerId>wildfly8x</cargo.containerId>
         <jndi.user>known</jndi.user>
         <jndi.password>password1!</jndi.password>
 
@@ -119,7 +119,7 @@
         <java.naming.provider.url/>
         -->
         <jboss.remoting.java.naming.factory.initial>org.jboss.naming.remote.client.InitialContextFactory</jboss.remoting.java.naming.factory.initial>
-        <jboss.remoting.java.naming.provider.url>remote://${jboss.host}:${jboss.naming.port}</jboss.remoting.java.naming.provider.url>
+        <jboss.remoting.java.naming.provider.url>http-remoting://${jboss.host}:${jboss.http.port}</jboss.remoting.java.naming.provider.url>
         <jboss.remoting.java.naming.factory.url.pkgs/>
         <jboss.remoting.java.naming.security.principal>${jndi.user}</jboss.remoting.java.naming.security.principal>
         <jboss.remoting.java.naming.security.credentials>${jndi.password}</jboss.remoting.java.naming.security.credentials>
@@ -371,52 +371,6 @@
                 <artifactId>jsr250-api</artifactId>
                 <version>${jsr250-api.version}</version>
             </dependency>
-            <!-- DELETE ME?
-            <dependency>
-                <groupId>org.jboss.jbossas</groupId>
-                <artifactId>jboss-as-server</artifactId>
-                <version>${jboss-as-server.version}</version>
-                <classifier>jmx-invoker-adaptor-client</classifier>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.security</groupId>
-                        <artifactId>jbosssx-client</artifactId>
-                    </exclusion>
-                    <exclusion> 
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.jbossas</groupId>
-                <artifactId>jboss-as-client</artifactId>
-                <version>${jboss-as-client.version}</version>            
-                <type>pom</type>
-                <exclusions>
-                    <exclusion> <!- - gets in the way with JBoss6 and M2 - ->
-                        <groupId>org.jboss.security</groupId>
-                        <artifactId>jbosssx-client</artifactId>
-                    </exclusion>
-                    <exclusion> <!- - gets in the way with newer versions - ->
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                    <exclusion> <!- - causes reference to defunct repo - ->
-                        <groupId>trove</groupId>
-                        <artifactId>trove</artifactId>
-                    </exclusion>
-                    <exclusion> <!- - troubles finding this artifact - ->
-                        <groupId>com.sun.istack</groupId>
-                        <artifactId>istack-commons-runtime</artifactId>
-                    </exclusion>
-                    <exclusion> <!- - troubles finding this artifact - ->
-                        <groupId>woodstox</groupId>
-                        <artifactId>wstx-asl</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
@@ -1002,9 +956,9 @@
                           </configuration>
                           <dependencies>
                               <dependency>
-                                  <groupId>org.jboss.as</groupId>
-                                  <artifactId>jboss-as-controller-client</artifactId>
-                                  <version>${jboss.version}</version>
+                                  <groupId>org.wildfly</groupId>
+                                  <artifactId>wildfly-controller-client</artifactId>
+                                  <version>${wildfly.version}</version>
                               </dependency>
                           </dependencies>
                          <executions>
@@ -1067,9 +1021,9 @@
                             </configuration>
                             <dependencies>
                                 <dependency>
-                                    <groupId>org.jboss.as</groupId>
-                                    <artifactId>jboss-as-controller-client</artifactId>
-                                    <version>${jboss.version}</version>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-controller-client</artifactId>
+                                    <version>${wildfly.version}</version>
                                 </dependency>
                             </dependencies>
                             <executions>
