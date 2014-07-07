@@ -52,6 +52,13 @@
                     <properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
                 </authorization>
             </security-realm>
+            <security-realm name="UndertowRealm">
+                <server-identities>
+                    <ssl>
+                        <keystore path="${jboss.server.config.dir}/server.keystore" keystore-password="password"/>
+                    </ssl>
+                </server-identities>
+            </security-realm>
         </security-realms>
         <audit-log>
             <formatters>
@@ -91,7 +98,6 @@
                 </formatter>
             </console-handler>
             <periodic-rotating-file-handler name="FILE" autoflush="true">
-                <level name="DEBUG"/>
                 <formatter>
                     <named-formatter name="PATTERN"/>
                 </formatter>
@@ -124,7 +130,7 @@
                 <level name="DEBUG"/>
             </logger>
             <root-logger>
-                <level name="TRACE"/>
+                <level name="INFO"/>
                 <handlers>
                     <handler name="CONSOLE"/>
                     <handler name="FILE"/>
@@ -359,9 +365,9 @@
                     </security-setting>
                     <security-setting match="jms.topic.datashare-dmv">
                         <permission type="send" roles="dmv-tactical"/>
-                        <permission type="consume" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
-                        <permission type="createDurableQueue" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
-                        <permission type="createNonDurableQueue" roles="dmv-federated mayberry-analytical dmv-tactical mayberry-tactical"/>
+                        <permission type="consume" roles="mayberry-analytical dmv-federated dmv-tactical mayberry-tactical"/>
+                        <permission type="createDurableQueue" roles="mayberry-analytical dmv-federated dmv-tactical mayberry-tactical"/>
+                        <permission type="createNonDurableQueue" roles="mayberry-analytical dmv-federated dmv-tactical mayberry-tactical"/>
                     </security-setting>
                     <security-setting match="jms.topic.datashare-mayberry-poi">
                         <permission type="send" roles="mayberry-tactical"/>
@@ -516,6 +522,7 @@
             <buffer-cache name="default"/>
             <server name="default-server">
                 <http-listener name="default" socket-binding="http"/>
+                <https-listener name="https" socket-binding="https" security-realm="UndertowRealm"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
                     <filter-ref name="server-header"/>
@@ -573,5 +580,4 @@
             <remote-destination host="localhost" port="25"/>
         </outbound-socket-binding>
     </socket-binding-group>
-
 </server>

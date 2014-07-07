@@ -34,6 +34,41 @@ to any of the JavaEE 7 APIs (except an upgrade to JPA 2.1 had already been perfo
     were updated from JavaEE 6 to JavaEE 7 versions. Specific changes were isolated
     to ejava-build/jboss-rmi-client.
 
+
+    [[1]] The web server implementation has been changed and required the following
+    setup to enable SSL.
+
+---
+<security-realms>
+    <security-realm name="ManagementRealm">
+        ...
+    </security-realm>
+    <security-realm name="ApplicationRealm">
+        ...
+    </security-realm>
+    <security-realm name="UndertowRealm">
+        <server-identities>
+            <ssl>
+                <keystore path="${jboss.server.config.dir}/server.keystore" keystore-password="password"/>
+            </ssl>
+        </server-identities>
+    </security-realm>
+</security-realms>
+---
+---
+<subsystem xmlns="urn:jboss:domain:undertow:1.1">
+    <buffer-cache name="default"/>
+    <server name="default-server">
+        <http-listener name="default" socket-binding="http"/>
+        <https-listener name="https" socket-binding="https" security-realm="UndertowRealm"/>
+        <host name="default-host" alias="localhost">
+           ...
+        </host>
+    </server>
+    ...
+</subsystem>
+---
+
 * Issues
 
     [[1]] The jboss.mgmt.port changed from 9999 to 9990. That required a change 
