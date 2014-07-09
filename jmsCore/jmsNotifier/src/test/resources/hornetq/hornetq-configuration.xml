@@ -11,6 +11,7 @@
     <connectors>
         <connector name="netty-connector">
             <factory-class>org.hornetq.core.remoting.impl.netty.NettyConnectorFactory</factory-class>         
+            <param key="http-enabled" value="true"/>
             <param key="host" value="${hornetq.remoting.netty.host}"/>
             <param key="port" value="${hornetq.remoting.netty.port}"/>
         </connector>

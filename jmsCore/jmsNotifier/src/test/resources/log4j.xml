@@ -43,6 +43,7 @@
    <logger name="ejava">
       <level value="debug"/>
       <appender-ref ref="logfile"/>  
+      <appender-ref ref="CONSOLE"/>  
    </logger>
    <logger name="org.jnp.server">
       <level value="trace"/>
@@ -54,7 +55,6 @@
    </logger>
    <root>
       <priority value="info"/>    
-      <appender-ref ref="CONSOLE"/>  
    </root>   
    
 </log4j:configuration>
